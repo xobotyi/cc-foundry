@@ -1,0 +1,15 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code local files
+*.local.md
+*.local.json
+
+**/.dev/reference/

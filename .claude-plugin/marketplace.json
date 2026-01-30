@@ -1,0 +1,25 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/@anthropic-ai/claude-code@latest/marketplace.schema.json",
+  "name": "foundry",
+  "description": "Shared Claude Code configurations, skills, agents, and commands",
+  "owner": {
+    "name": "xobotyi",
+    "url": "https://github.com/xobotyi"
+  },
+  "plugins": [
+    {
+      "name": "skill-reminder",
+      "description": "Reminds Claude to evaluate and invoke relevant skills before taking action",
+      "source": "./plugins/skill-reminder",
+      "category": "productivity",
+      "version": "0.1.0"
+    },
+    {
+      "name": "ai-helpers",
+      "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
+      "source": "./plugins/ai-helpers",
+      "category": "development",
+      "version": "0.1.0"
+    }
+  ]
+}

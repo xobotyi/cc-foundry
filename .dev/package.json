@@ -1,0 +1,30 @@
+{
+  "name": "@cc-foundry/dev-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.12.0",
+  "scripts": {
+    "cli": "node src/index.ts"
+  },
+  "bin": {
+    "foundry-tools": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=25.0.0"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "citty": "^0.2.0",
+    "consola": "^3.4.2",
+    "fs-extra": "^11.3.3",
+    "linkedom": "^0.18.12",
+    "turndown": "^7.2.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.1.0",
+    "@types/turndown": "^5.0.6",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "ai-helpers",
+  "version": "0.1.0",
+  "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
+  "author": "xobotyi",
+  "license": "MIT"
+}

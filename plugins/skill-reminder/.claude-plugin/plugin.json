@@ -1,0 +1,7 @@
+{
+  "name": "skill-reminder",
+  "version": "0.1.0",
+  "description": "Reminds Claude to evaluate and invoke relevant skills before taking action",
+  "author": "xobotyi",
+  "license": "MIT"
+}
