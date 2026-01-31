@@ -1,0 +1,17 @@
+{
+  "sources": {
+    "Claude Code Sub-agents Official Docs": "https://code.claude.com/docs/en/sub-agents.md",
+    "Anthropic Best Practices for Agentic Coding": "https://www.anthropic.com/engineering/claude-code-best-practices",
+    "Claude Code System Prompts Repository": "https://github.com/Piebald-AI/claude-code-system-prompts",
+    "Awesome Claude Code Subagents Collection": "https://github.com/VoltAgent/awesome-claude-code-subagents",
+    "PubNub Subagent Best Practices": "https://www.pubnub.com/blog/best-practices-for-claude-code-sub-agents/",
+    "Shipyard Subagents Guide": "https://shipyard.build/blog/claude-code-subagents-guide/",
+    "Tracing Claude Code LLM Traffic": "https://medium.com/@georgesung/tracing-claude-codes-llm-traffic-agentic-loop-sub-agents-tool-use-prompts-7796941806f5",
+    "Building Agents with Claude Agent SDK": "https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk",
+    "Claude Skills Deep Dive": "https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/",
+    "How to Prompt Claude Code Four Modes": "https://sderosiaux.medium.com/how-i-learned-to-prompt-ai-better-my-four-modes-177bddcfa6bd",
+    "Claude Code Feature Guide": "https://blog.sshh.io/p/how-i-use-every-claude-code-feature",
+    "Builder.io Claude Code Tips": "https://www.builder.io/blog/claude-code"
+  },
+  "lastFetched": "2026-01-31T11:03:49.771Z"
+}
