@@ -69,6 +69,16 @@ All skills build on prompt engineering fundamentals:
 
 When creating any of these, apply `prompt-engineering` techniques.
 
+## Output Styles
+
+### ai-engineer
+
+Persona for designing AI artifacts: prompts, skills, agents, output styles.
+
+**Use when:** Building or improving AI artifacts, prompt engineering tasks.
+
+**Activate:** `/output-style ai-engineer`
+
 ## License
 
 MIT

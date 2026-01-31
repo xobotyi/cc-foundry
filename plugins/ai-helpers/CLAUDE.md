@@ -1,7 +1,6 @@
 # ai-helpers Plugin
 
-Skills for creating and improving AI artifacts: prompts, skills, subagents,
-and output styles.
+Skills and output styles for creating and improving AI artifacts.
 
 ## Skills
 
@@ -11,6 +10,12 @@ and output styles.
 | `skill-engineering` | Create, evaluate, iterate Claude Code skills |
 | `subagent-engineering` | Build and debug Claude Code subagents |
 | `output-style-engineering` | Create Claude Code output styles |
+
+## Output Styles
+
+| Style | Purpose |
+|-------|---------|
+| `ai-engineer` | Persona for designing AI artifacts (prompts, skills, agents, styles) |
 
 ## Skill Dependencies
 
