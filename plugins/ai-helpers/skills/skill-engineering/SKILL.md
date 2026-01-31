@@ -1,12 +1,12 @@
 ---
-name: skill-management
+name: skill-engineering
 description: >-
   Manage Claude Code skills: create, evaluate, iterate, and troubleshoot.
   Use when working with skills - creating new ones, analyzing or improving
   existing ones, debugging why a skill isn't working, or assessing skill quality.
 ---
 
-# Skill Management
+# Skill Engineering
 
 Manage the full lifecycle of Claude Code skills: creation, evaluation,
 iteration, and troubleshooting.

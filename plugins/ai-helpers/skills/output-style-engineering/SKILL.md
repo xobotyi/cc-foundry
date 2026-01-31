@@ -1,12 +1,12 @@
 ---
-name: output-style-management
+name: output-style-engineering
 description: >-
   Create and edit Claude Code output styles. Use when building
   custom personas, modifying AI communication patterns, or adapting Claude
   for non-coding domains.
 ---
 
-# Output Style Management
+# Output Style Engineering
 
 Create, edit, and manage Claude Code output styles—custom system prompts
 that transform Claude's personality while preserving all tool capabilities.

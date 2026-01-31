@@ -1,11 +1,12 @@
-# Subagent Management
-
 ---
-name: subagent-management
-description: "Create, evaluate, and improve Claude Code subagents. Use when
+name: subagent-engineering
+description: >-
+  Create, evaluate, and improve Claude Code subagents. Use when
   building custom agents, debugging agent behavior, optimizing agent pipelines,
-  or deciding between subagents vs other approaches."
+  or deciding between subagents vs other approaches.
 ---
+
+# Subagent Engineering
 
 Manage the full lifecycle of Claude Code subagents: creation, evaluation,
 iteration, and troubleshooting.
@@ -122,5 +123,5 @@ When names collide, higher priority wins.
 
 - `prompt-engineering` — Subagent prompts are system prompts; apply
   prompting techniques for better agents
-- `skill-management` — Skills and subagents complement each other;
+- `skill-engineering` — Skills and subagents complement each other;
   understand when to use which
