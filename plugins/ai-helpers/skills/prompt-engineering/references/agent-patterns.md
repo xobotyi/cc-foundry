@@ -2,6 +2,16 @@
 
 Techniques for LLM agents that reason and act in the world.
 
+## Contents
+
+- [ReAct (Reasoning + Acting)](#react-reasoning--acting)
+- [PAL (Program-Aided Language Models)](#pal-program-aided-language-models)
+- [Reflexion](#reflexion)
+- [ART (Automatic Reasoning and Tool-use)](#art-automatic-reasoning-and-tool-use)
+- [Generated Knowledge Prompting](#generated-knowledge-prompting)
+- [Pattern Selection](#pattern-selection)
+- [References](#references)
+
 ## ReAct (Reasoning + Acting)
 
 Interleave reasoning traces with actions. The model thinks about what

@@ -3,6 +3,17 @@
 How models learn from examples within prompts — the spectrum from
 zero examples to many.
 
+## Contents
+
+- [The Paradigm Spectrum](#the-paradigm-spectrum)
+- [Zero-Shot Prompting](#zero-shot-prompting)
+- [One-Shot Prompting](#one-shot-prompting)
+- [Few-Shot Prompting](#few-shot-prompting)
+- [In-Context Learning (ICL)](#in-context-learning-icl)
+- [Generated Knowledge Prompting](#generated-knowledge-prompting)
+- [Practical Guidelines](#practical-guidelines)
+- [References](#references)
+
 ## The Paradigm Spectrum
 
 ```

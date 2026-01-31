@@ -3,6 +3,15 @@
 Strategies for working with Claude's 200K token context window
 effectively.
 
+## Contents
+
+- [Core Principles](#core-principles)
+- [Document Organization Patterns](#document-organization-patterns)
+- [Query Patterns](#query-patterns)
+- [Performance Optimization](#performance-optimization)
+- [Common Pitfalls](#common-pitfalls)
+- [Checklist for Long Context Prompts](#checklist-for-long-context-prompts)
+
 ## Core Principles
 
 ### 1. Document Placement Matters

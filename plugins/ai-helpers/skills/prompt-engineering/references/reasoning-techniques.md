@@ -2,6 +2,15 @@
 
 Deep dive into techniques that enhance LLM reasoning capabilities.
 
+## Contents
+
+- [Chain-of-Thought (CoT)](#chain-of-thought-cot)
+- [Tree-of-Thoughts (ToT)](#tree-of-thoughts-tot)
+- [Self-Consistency](#self-consistency)
+- [Extended Thinking](#extended-thinking)
+- [Model Scale Note](#model-scale-note)
+- [References](#references)
+
 ## Chain-of-Thought (CoT)
 
 CoT prompting guides models through step-by-step reasoning rather than

@@ -2,6 +2,13 @@
 
 Techniques unique to Claude or requiring Claude-specific implementation.
 
+## Contents
+
+- [Prefilling](#prefilling)
+- [System Prompts (Role Prompting)](#system-prompts-role-prompting)
+- [Extended Thinking](#extended-thinking)
+- [Combining Techniques](#combining-techniques)
+
 ## Prefilling
 
 Control Claude's response by providing the start of the assistant

@@ -2,6 +2,15 @@
 
 Understanding and defending against prompt-based attacks.
 
+## Contents
+
+- [The Core Vulnerability](#the-core-vulnerability)
+- [Prompt Injection](#prompt-injection)
+- [Jailbreaking](#jailbreaking)
+- [Defense Strategies](#defense-strategies)
+- [Security Checklist](#security-checklist)
+- [Realistic Expectations](#realistic-expectations)
+
 ## The Core Vulnerability
 
 LLMs accept natural language for both **instructions** (system prompts)

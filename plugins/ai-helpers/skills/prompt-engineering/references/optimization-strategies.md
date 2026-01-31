@@ -2,6 +2,15 @@
 
 Approaches to improving LLM performance for specific use cases.
 
+## Contents
+
+- [The Three Pillars](#the-three-pillars)
+- [Prompt Engineering](#prompt-engineering)
+- [Retrieval-Augmented Generation (RAG)](#retrieval-augmented-generation-rag)
+- [Fine-Tuning](#fine-tuning)
+- [DSPy: Programmatic Optimization](#dspy-programmatic-optimization)
+- [Choosing a Strategy](#choosing-a-strategy)
+
 ## The Three Pillars
 
 | Method | What It Does | Cost | When to Use |

@@ -2,6 +2,13 @@
 
 Techniques for structuring multi-step prompting workflows.
 
+## Contents
+
+- [Prompt Chaining](#prompt-chaining)
+- [Iterative Prompting](#iterative-prompting)
+- [Meta Prompting](#meta-prompting)
+- [Combining Patterns](#combining-patterns)
+
 ## Prompt Chaining
 
 Decompose complex tasks into a sequence of simpler prompts, where
