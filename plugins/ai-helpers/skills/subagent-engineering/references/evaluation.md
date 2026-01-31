@@ -2,6 +2,18 @@
 
 Framework for assessing subagent quality and effectiveness.
 
+---
+
+## Table of Contents
+- [Evaluation Dimensions](#evaluation-dimensions)
+- [Evaluation Checklist](#evaluation-checklist)
+- [Testing Protocol](#testing-protocol)
+- [Comparative Evaluation](#comparative-evaluation)
+- [Quality Scoring](#quality-scoring)
+- [Continuous Monitoring](#continuous-monitoring)
+
+---
+
 ## Evaluation Dimensions
 
 ### 1. Trigger Accuracy
@@ -258,6 +270,14 @@ Rate each dimension 1-5:
 | Tool Usage | ? | 10% |
 
 **Overall = weighted average**
+
+**Why these weights?**
+- Task Completion (30%) is highest — an agent that doesn't complete its
+  task fails regardless of other qualities
+- Trigger Accuracy and Output Quality (25% each) — wrong triggers waste
+  time; poor output requires rework
+- Context Efficiency and Tool Usage (10% each) — important for cost and
+  speed, but secondary to correctness
 
 | Score | Rating | Action |
 |-------|--------|--------|

@@ -2,6 +2,17 @@
 
 Diagnose and fix common subagent problems.
 
+---
+
+## Table of Contents
+- [Quick Diagnosis](#quick-diagnosis)
+- [Detailed Troubleshooting](#detailed-troubleshooting)
+- [Error Messages](#error-messages)
+- [Debug Mode](#debug-mode)
+- [Getting Help](#getting-help)
+
+---
+
 ## Quick Diagnosis
 
 | Symptom | Likely Cause | Solution |

@@ -2,6 +2,17 @@
 
 Step-by-step guide to creating effective subagents.
 
+---
+
+## Table of Contents
+- [Two Approaches](#two-approaches)
+- [Creation Process](#creation-process)
+- [Common Agent Types](#common-agent-types)
+- [Proactive Delegation](#proactive-delegation)
+- [Validation Before Deployment](#validation-before-deployment)
+
+---
+
 ## Two Approaches
 
 ### 1. Interactive (`/agents` command)
@@ -118,6 +129,10 @@ high-volume, straightforward tasks.
 
 ### Step 5: Write the System Prompt
 
+The system prompt is where prompt engineering matters most. Apply
+techniques from `prompt-engineering` skill: clear structure, numbered
+steps, XML tags for complex inputs, examples for format compliance.
+
 Structure your prompt clearly:
 
 ```markdown
@@ -169,110 +184,39 @@ Iterate on the system prompt based on failures.
 
 ## Common Agent Types
 
-### Code Reviewer
+For full examples with complete prompts, see [patterns.md](patterns.md).
+
+Common patterns:
+- **Code Reviewer** — Read-only analysis after code changes
+- **Debugger** — Root cause analysis with edit permissions
+- **Security Auditor** — Vulnerability scanning (read-only, opus model)
+- **Domain Expert** — Specialized knowledge (SQL, APIs, etc.)
+- **Test Runner** — Execute and analyze test results
+
+**Template (compact):**
 
 ```markdown
 ---
-name: code-reviewer
-description: "Expert code review specialist. Proactively reviews code for
-  quality, security, and maintainability. Use immediately after writing
-  or modifying code."
-tools: Read, Grep, Glob, Bash
-model: inherit
+name: [role]-[action]
+description: "[What it does]. Use [when/proactively]."
+tools: [minimal set]
+model: [haiku|sonnet|opus|inherit]
 ---
 
-You are a senior code reviewer ensuring high standards.
+You are a [role] specializing in [domain].
 
 When invoked:
-1. Run git diff to see recent changes
-2. Focus on modified files
-3. Begin review immediately
+1. [First action]
+2. [Analysis/work]
+3. [Compile results]
 
-Review checklist:
-- Code is clear and readable
-- Functions and variables are well-named
-- No duplicated code
-- Proper error handling
-- No exposed secrets or API keys
-- Input validation implemented
-- Good test coverage
+Checklist:
+- [ ] [Key check 1]
+- [ ] [Key check 2]
 
-Provide feedback organized by priority:
-- Critical issues (must fix)
-- Warnings (should fix)
-- Suggestions (consider improving)
-
-Include specific examples of how to fix issues.
-```
-
-### Debugger
-
-```markdown
----
-name: debugger
-description: "Debugging specialist for errors, test failures, and unexpected
-  behavior. Use proactively when encountering any issues."
-tools: Read, Edit, Bash, Grep, Glob
----
-
-You are an expert debugger specializing in root cause analysis.
-
-When invoked:
-1. Capture error message and stack trace
-2. Identify reproduction steps
-3. Isolate the failure location
-4. Implement minimal fix
-5. Verify solution works
-
-Debugging process:
-- Analyze error messages and logs
-- Check recent code changes
-- Form and test hypotheses
-- Add strategic debug logging
-- Inspect variable states
-
-For each issue, provide:
-- Root cause explanation
-- Evidence supporting the diagnosis
-- Specific code fix
-- Testing approach
-- Prevention recommendations
-
-Focus on fixing the underlying issue, not the symptoms.
-```
-
-### Domain Expert (Example: Data Science)
-
-```markdown
----
-name: data-scientist
-description: "Data analysis expert for SQL queries, BigQuery operations,
-  and data insights. Use proactively for data analysis tasks."
-tools: Bash, Read, Write
-model: sonnet
----
-
-You are a data scientist specializing in SQL and BigQuery analysis.
-
-When invoked:
-1. Understand the data analysis requirement
-2. Write efficient SQL queries
-3. Use BigQuery command line tools (bq) when appropriate
-4. Analyze and summarize results
-5. Present findings clearly
-
-Key practices:
-- Write optimized SQL with proper filters
-- Use appropriate aggregations and joins
-- Include comments explaining complex logic
-- Format results for readability
-- Provide data-driven recommendations
-
-For each analysis:
-- Explain the query approach
-- Document any assumptions
-- Highlight key findings
-- Suggest next steps based on data
+Output format:
+## [Section 1]
+- [Finding]: [Location] - [Recommendation]
 ```
 
 ## Proactive Delegation

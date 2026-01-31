@@ -2,6 +2,20 @@
 
 Guide to improving existing subagents based on observed behavior.
 
+---
+
+## Table of Contents
+- [Improvement Workflow](#improvement-workflow)
+- [Common Issues and Fixes](#common-issues-and-fixes)
+- [Prompt Refinement Techniques](#prompt-refinement-techniques)
+- [Version Control for Agents](#version-control-for-agents)
+- [A/B Testing Agents](#ab-testing-agents)
+- [Incremental Improvement](#incremental-improvement)
+- [When to Redesign vs. Iterate](#when-to-redesign-vs-iterate)
+- [Feedback Loop](#feedback-loop)
+
+---
+
 ## Improvement Workflow
 
 ```

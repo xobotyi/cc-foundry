@@ -2,6 +2,19 @@
 
 Complete reference for subagent frontmatter fields and constraints.
 
+---
+
+## Table of Contents
+- [File Format](#file-format)
+- [Required Fields](#required-fields)
+- [Optional Fields](#optional-fields)
+- [System Prompt (Body)](#system-prompt-body)
+- [Storage Locations](#storage-locations)
+- [CLI-Defined Agents](#cli-defined-agents)
+- [Validation Checklist](#validation-checklist)
+
+---
+
 ## File Format
 
 Subagents are Markdown files with YAML frontmatter:
@@ -157,8 +170,16 @@ permissionMode: plan
 permissionMode: acceptEdits
 ```
 
-**Warning:** `bypassPermissions` skips ALL checks. Use with extreme caution.
-If parent uses `bypassPermissions`, it cannot be overridden.
+**⚠️ Security Warning:**
+- `bypassPermissions` skips ALL permission checks including file writes
+  and command execution. Only use for trusted, well-tested agents in
+  controlled environments.
+- `acceptEdits` auto-accepts file modifications — ensure the agent's
+  tools and prompt are sufficiently constrained.
+- If parent uses `bypassPermissions`, child agents inherit it and
+  cannot override to a more restrictive mode.
+- Prefer `plan` mode for read-only agents to enforce safety at the
+  permission level, not just in the prompt.
 
 ### `skills`
 Skills to inject into the subagent's context at startup.

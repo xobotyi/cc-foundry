@@ -11,6 +11,9 @@ description: >-
 Manage the full lifecycle of Claude Code subagents: creation, evaluation,
 iteration, and troubleshooting.
 
+**Note:** Subagent prompts are system prompts. Apply `prompt-engineering`
+skill techniques for better agents.
+
 ## What Are You Trying To Do?
 
 | Goal | Read |
@@ -21,20 +24,15 @@ iteration, and troubleshooting.
 | Debug a subagent that isn't working | [troubleshooting.md](references/troubleshooting.md) |
 | Check frontmatter rules and constraints | [spec.md](references/spec.md) |
 | See common patterns and examples | [patterns.md](references/patterns.md) |
+| Apply prompt engineering techniques | `prompt-engineering` skill |
 
-## What Are Subagents?
+## What Good Looks Like
 
-Subagents are specialized AI assistants that run in their own context window
-with custom system prompts, specific tool access, and independent permissions.
-When Claude encounters a task matching a subagent's description, it delegates
-to that subagent, which works independently and returns results.
-
-**Key benefits:**
-- **Preserve context** — keep exploration out of main conversation
-- **Enforce constraints** — limit tools a subagent can use
-- **Specialize behavior** — focused prompts for specific domains
-- **Control costs** — route to cheaper models (Haiku) for simple tasks
-- **Reuse configurations** — share across projects
+A well-designed subagent:
+- Triggers correctly (not too often, not too rarely)
+- Completes tasks without scope creep
+- Returns concise, actionable summaries
+- Uses minimal tools for its purpose
 
 ## Built-in Subagents
 
@@ -45,6 +43,12 @@ to that subagent, which works independently and returns results.
 | **general-purpose** | Inherits | Complex multi-step tasks |
 | **Bash** | Inherits | Command execution in separate context |
 | **claude-code-guide** | Haiku | Questions about Claude Code features |
+
+## How Subagents Work
+
+Subagents run in isolated context with custom system prompts and restricted
+tools. Claude delegates based on `name` + `description` only — the body
+loads after delegation. See [spec.md](references/spec.md) for technical details.
 
 ## Core Principles
 

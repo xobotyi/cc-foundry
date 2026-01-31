@@ -2,6 +2,17 @@
 
 Common patterns and real-world examples for effective subagent design.
 
+---
+
+## Table of Contents
+- [Architecture Patterns](#architecture-patterns)
+- [Example Agents](#example-agents)
+- [Human-in-the-Loop Patterns](#human-in-the-loop-patterns)
+- [Multi-Agent Coordination](#multi-agent-coordination)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+
+---
+
 ## Architecture Patterns
 
 ### Single-Purpose Agents
@@ -144,6 +155,10 @@ When asked about database issues:
 ```
 
 ## Example Agents
+
+These examples demonstrate effective prompt structure. Apply
+`prompt-engineering` techniques: numbered steps, checklists, explicit
+output format, and XML tags for complex inputs.
 
 ### Code Reviewer
 
