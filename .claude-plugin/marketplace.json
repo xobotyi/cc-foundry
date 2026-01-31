@@ -1,10 +1,11 @@
 {
-  "$schema": "https://cdn.jsdelivr.net/npm/@anthropic-ai/claude-code@latest/marketplace.schema.json",
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "foundry",
-  "description": "Shared Claude Code configurations, skills, agents, and commands",
   "owner": {
-    "name": "xobotyi",
-    "url": "https://github.com/xobotyi"
+    "name": "xobotyi"
+  },
+  "metadata": {
+    "description": "Shared Claude Code configurations, skills, agents, and commands"
   },
   "plugins": [
     {
