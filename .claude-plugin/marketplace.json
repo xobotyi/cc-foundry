@@ -9,11 +9,11 @@
   },
   "plugins": [
     {
-      "name": "skill-reminder",
-      "description": "Reminds Claude to evaluate and invoke relevant skills before taking action",
-      "source": "./plugins/skill-reminder",
+      "name": "skill-enforcer",
+      "description": "Enforces skill evaluation at key lifecycle points via SEF checkpoints",
+      "source": "./plugins/skill-enforcer",
       "category": "productivity",
-      "version": "0.1.0"
+      "version": "1.0.0"
     },
     {
       "name": "ai-helpers",
