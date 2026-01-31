@@ -1,0 +1,9 @@
+{
+  "name": "skill-enforcer",
+  "version": "1.0.0",
+  "description": "Enforces skill evaluation at key lifecycle points via SEF checkpoints",
+  "author": {
+    "name": "xobotyi"
+  },
+  "license": "MIT"
+}
