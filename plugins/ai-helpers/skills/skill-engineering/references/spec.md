@@ -1,23 +1,22 @@
-# Skill Specification
+# Skill Technical Specification
 
-Technical requirements for valid skills.
-
-## File Structure
+## Directory Structure
 
 ```
 skill-name/
-├── SKILL.md           # Required
-├── references/        # Optional: docs loaded as needed
-│   └── *.md
-├── scripts/           # Optional: executable code
-│   └── *.py, *.sh
-└── assets/            # Optional: files used in output
-    └── templates, images, fonts
+├── SKILL.md              # Required: main instructions
+├── references/           # Optional: additional documentation
+│   ├── guide.md
+│   └── examples.md
+├── scripts/              # Optional: executable code
+│   └── helper.py
+└── assets/               # Optional: templates, data files
+    └── template.json
 ```
 
 ## SKILL.md Format
 
-```yaml
+```markdown
 ---
 name: skill-name
 description: What it does and when to use it
@@ -25,210 +24,213 @@ description: What it does and when to use it
 
 # Skill Title
 
-[Markdown content]
+[Markdown instructions]
 ```
 
 ## Frontmatter Fields
 
-### Required Fields
+| Field | Required | Constraints |
+|-------|----------|-------------|
+| `name` | Yes | 1-64 chars, lowercase, hyphens only, must match directory |
+| `description` | Yes | 1-1024 chars, describes what AND when |
+| `license` | No | License name or reference |
+| `compatibility` | No | 1-500 chars, environment requirements |
+| `metadata` | No | Arbitrary key-value pairs |
+| `allowed-tools` | No | Space-delimited tool list (experimental) |
 
-#### `name`
-- **Type:** string
-- **Max length:** 64 characters
-- **Pattern:** `^[a-z0-9-]+$` (lowercase letters, digits, hyphens)
-- **Constraints:**
-  - Cannot start or end with hyphen
-  - Cannot contain consecutive hyphens (`--`)
-  - Cannot contain `<` or `>`
-  - Cannot contain reserved words: "anthropic", "claude"
-  - Should match directory name
+### Claude Code Extensions
 
-**Valid examples:**
+| Field | Default | Description |
+|-------|---------|-------------|
+| `argument-hint` | — | Hint for autocomplete: `[issue-number]` |
+| `disable-model-invocation` | `false` | Prevent Claude from auto-triggering |
+| `user-invocable` | `true` | Show in `/` menu |
+| `model` | inherit | Model override: `sonnet`, `opus`, `haiku` |
+| `context` | — | Set to `fork` for subagent execution |
+| `agent` | general-purpose | Subagent type when `context: fork` |
+| `hooks` | — | Skill-scoped lifecycle hooks |
+
+## Name Field Rules
+
+- Lowercase letters, numbers, hyphens only: `a-z`, `0-9`, `-`
+- Cannot start or end with hyphen
+- No consecutive hyphens: `my--skill` is invalid
+- Must match parent directory name
+- Cannot contain: `anthropic`, `claude`
+
+**Valid:**
 ```
-my-skill
-data-analyzer
-pdf-processing-v2
+pdf-processing
+code-review
+data-analysis-v2
 ```
 
-**Invalid examples:**
+**Invalid:**
 ```
-My-Skill        # uppercase
-my_skill        # underscore
--my-skill       # starts with hyphen
-my--skill       # consecutive hyphens
-claude-helper   # reserved word
+PDF-Processing     # uppercase
+-pdf               # starts with hyphen
+my--skill          # consecutive hyphens
+claude-helper      # reserved word
 ```
 
-#### `description`
-- **Type:** string
-- **Max length:** 1024 characters
-- **Constraints:**
-  - Must be non-empty
-  - Cannot contain `<` or `>`
+## Description Best Practices
 
-**Content guidance:**
-- Include what the skill does
-- Include when/triggers for using it
-- Claude uses this to decide when to apply the skill
+The description is the **primary signal** for skill activation. Claude
+reads all skill descriptions at startup and matches your request against
+them.
 
-### Optional Fields
+**Structure:**
+```
+[What it does] [When to use it/trigger scenarios]
+```
 
-#### `allowed-tools`
-- **Type:** comma-separated string or YAML list
-- **Purpose:** Tools Claude can use without asking permission
-- **Note:** Only supported in Claude Code
-
+**Good:**
 ```yaml
-# String format
-allowed-tools: Read, Grep, Glob
-
-# YAML list format
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
+description: >-
+  Extract text and tables from PDF files, fill forms, merge documents.
+  Use when working with PDF files or when the user mentions PDFs,
+  forms, or document extraction.
 ```
 
-#### `model`
-- **Type:** string
-- **Purpose:** Model to use when skill is active
-- **Values:** Model ID (e.g., `claude-sonnet-4-20250514`) or alias
-- **Default:** Inherits from conversation's model
-
-#### `context`
-- **Type:** string
-- **Purpose:** Run skill in isolated context
-- **Values:** `fork` (runs in forked sub-agent context)
-
-#### `agent`
-- **Type:** string
-- **Purpose:** Agent type when `context: fork` is set
-- **Values:** `Explore`, `Plan`, `general-purpose`, or custom agent name
-- **Default:** `general-purpose`
-- **Note:** Only applicable with `context: fork`
-
-#### `hooks`
-- **Type:** object
-- **Purpose:** Hooks scoped to skill's lifecycle
-- **Events:** `PreToolUse`, `PostToolUse`, `Stop`
-
+**Bad:**
 ```yaml
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: "./scripts/validate.sh $TOOL_INPUT"
-          once: true
+description: Helps with documents  # Too vague
 ```
 
-#### `user-invocable`
-- **Type:** boolean
-- **Purpose:** Controls visibility in slash command menu
-- **Default:** `true`
-- **Note:** Does not affect Skill tool or auto-discovery
+**Include:**
+- Specific capabilities
+- Trigger keywords users might say
+- File types or domains covered
 
-#### `argument-hint`
-- **Type:** string
-- **Purpose:** Hint shown during autocomplete for expected arguments
-- **Example:** `[issue-number]` or `[filename] [format]`
+**Avoid:**
+- Vague terms: "helps with", "assists"
+- Second person: "You can use this to..."
+- XML tags in description
 
-#### `disable-model-invocation`
-- **Type:** boolean
-- **Purpose:** Blocks programmatic invocation via Skill tool
-- **Default:** `false`
-- **Note:** Does not affect slash menu or auto-discovery
+## Body Content Guidelines
 
-## Body Guidelines
+The body is injected as a user message when the skill is triggered.
+Apply prompt engineering principles throughout.
 
-### Length
-- **Recommended:** Under 500 lines
-- **Maximum:** No hard limit, but long skills hurt performance
-- **Solution:** Move detailed content to `references/` files
+**Recommended structure:**
+```markdown
+# [Purpose Statement]
 
-### Content
-- Use Markdown formatting
-- Imperative form for instructions ("Run command" not "You should run")
+## Quick Start
+[Minimal guidance to get started]
 
-## Directory Conventions
+## Instructions
+[Detailed steps, numbered if sequential]
+[Use XML tags for multi-part instructions]
 
-### references/
-Documentation Claude reads when needed.
-- Keep one level deep (no nested references)
-- Include table of contents for files >100 lines
-- Use descriptive filenames
+## Examples
+[Input/output pairs for clarity — few-shot prompting]
 
-### scripts/
-Executable code.
-- Include shebang line (`#!/usr/bin/env python3`)
-- Make executable (`chmod +x`)
-- Document dependencies
-- Scripts executed without loading into context
+## Output Format
+[Explicit format specification with example]
 
-### assets/
-Files used in output, not loaded into context.
-- Templates, images, fonts, boilerplate
-- Organized by type or purpose
+## Edge Cases
+[What to do in unusual situations]
 
-## Validation Checklist
+## References
+[Links to reference files for deep dives]
 
-```
-[ ] SKILL.md exists in skill directory
-[ ] Frontmatter starts with --- on line 1
-[ ] Frontmatter ends with --- before content
-[ ] name field present and valid
-[ ] description field present and valid
-[ ] Body is valid Markdown
+## CRITICAL
+[Most important rules — placement at end improves compliance]
 ```
 
-## Locations
+**Token budget:**
+- Keep under 500 lines
+- Aim for < 5000 tokens
+- Move detailed content to reference files
 
-Skills loaded from these locations (higher row wins on name collision):
+**Prompt engineering tips:**
+- Use XML tags (`<instructions>`, `<constraints>`, `<output_format>`)
+- Place critical rules at the end
+- Include few-shot examples
+- Be specific about output format
 
-| Location | Path | Applies To |
-|----------|------|------------|
-| Enterprise | Managed settings | All org users |
-| Personal | `~/.claude/skills/` | You, all projects |
-| Project | `.claude/skills/` | Anyone in this repo |
-| Plugin | Bundled with plugins | Plugin users |
+## Reference Files
 
-### Personal Skills
-```
-~/.claude/skills/skill-name/SKILL.md
-```
-Available across all projects for current user.
+Files in the skill directory that Claude can read when needed.
 
-### Project Skills
-```
-.claude/skills/skill-name/SKILL.md
-```
-Shared with team via git. Available in project directory.
+**When to use references:**
+- Detailed documentation (API specs, schemas)
+- Large example collections
+- Domain-specific knowledge
+- Content that applies only sometimes
 
-## Skills and Subagents
-
-### Give Subagent Access to Skills
-
-Subagents don't inherit skills from main conversation. List them explicitly:
-
-```yaml
-# .claude/agents/code-reviewer.md
----
-name: code-reviewer
-skills: pr-review, security-check
----
+**How to reference:**
+```markdown
+For form-filling details, see [FORMS.md](FORMS.md).
+For complete API reference, see [reference/api.md](reference/api.md).
 ```
 
-Full skill content is injected at subagent startup.
+**Important:** Keep references one level deep from SKILL.md. Claude may
+partially read deeply nested references.
 
-### Run Skill in Subagent Context
+## Scripts Directory
 
-Use `context: fork` and `agent` to run skill in isolated subagent:
+Executable code Claude can run via Bash tool.
 
-```yaml
----
-name: code-analysis
-description: Analyze code quality
-context: fork
-agent: Explore
----
+**When to use scripts:**
+- Deterministic operations (validation, parsing)
+- Complex transformations
+- Operations better expressed in code than prose
+
+**Script principles:**
+- Self-contained or document dependencies
+- Handle errors gracefully—don't punt to Claude
+- Include helpful error messages
+- Document constants (no "magic numbers")
+
+**Example reference in SKILL.md:**
+```markdown
+Run validation:
+\`\`\`bash
+python scripts/validate.py input.json
+\`\`\`
 ```
+
+## Assets Directory
+
+Static resources Claude references by path but doesn't load into context.
+
+**Contents:**
+- Templates (HTML, JSON, YAML)
+- Configuration examples
+- Binary files (images, fonts)
+
+**Difference from references:**
+- `references/`: Text loaded into context via Read
+- `assets/`: Files manipulated by path, not loaded
+
+## Progressive Disclosure
+
+Skills use three-level loading:
+
+| Level | When Loaded | Token Cost | Content |
+|-------|-------------|------------|---------|
+| 1. Metadata | Startup | ~30-50/skill | name, description |
+| 2. Instructions | Skill triggered | < 5000 | SKILL.md body |
+| 3. Resources | As referenced | Unlimited | scripts/, references/, assets/ |
+
+**Design for this:** Keep SKILL.md focused. Move deep dives to references.
+Claude loads references only when instructions mention them.
+
+## String Substitutions
+
+| Variable | Description |
+|----------|-------------|
+| `$ARGUMENTS` | All arguments passed when invoking |
+| `$ARGUMENTS[N]` | Specific argument by 0-based index |
+| `$N` | Shorthand for `$ARGUMENTS[N]` |
+| `${CLAUDE_SESSION_ID}` | Current session ID |
+
+**Example:**
+```markdown
+Fix GitHub issue $ARGUMENTS following our coding standards.
+```
+
+When user runs `/fix-issue 123`, Claude receives:
+"Fix GitHub issue 123 following our coding standards."

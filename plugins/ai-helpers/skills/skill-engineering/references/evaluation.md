@@ -1,116 +1,238 @@
-# Evaluating Skills
+# Skill Quality Evaluation
 
-## Quick Assessment
+Skills are prompts. Evaluate them using prompt engineering criteria.
 
-Read the skill and answer:
+## Quick Evaluation Checklist
 
-1. **Is the description specific?** Does it clearly state what the skill
-   does AND when to use it?
-2. **Would Claude trigger this correctly?** Given typical user requests,
-   would this skill activate at the right times?
-3. **Is it concise?** Could any content be removed without losing value?
-4. **Are instructions actionable?** Can Claude follow them without ambiguity?
+Before deploying a skill, verify:
 
-## Evaluation Checklist
+- [ ] Description includes WHAT it does AND WHEN to use it
+- [ ] Description contains specific trigger words/scenarios
+- [ ] Instructions are clear and imperative
+- [ ] Instructions use structure (numbered steps, XML tags, headers)
+- [ ] Examples cover normal and edge cases (few-shot prompting)
+- [ ] Critical rules placed at end of SKILL.md
+- [ ] Output format explicitly specified
+- [ ] SKILL.md is under 500 lines
+- [ ] References are one level deep (no nested chains)
+- [ ] Scope is focused (one purpose)
+- [ ] Tested with varied inputs
 
-### Metadata Quality
+## Description Quality
 
-- [ ] `name` follows spec (lowercase, hyphens, ≤64 chars)
-- [ ] `description` is specific, not vague
-- [ ] `description` includes triggers/contexts for when to use
-- [ ] `description` ≤1024 characters
-- [ ] `description` contains NO bloat (no "Keywords:", "Done when:")
+The description is the **highest-leverage field**. Poor descriptions
+cause activation failures or false triggers.
 
-### Content Quality
+### Evaluation Criteria
 
-- [ ] SKILL.md body ≤500 lines
-- [ ] No verbose explanations of things Claude already knows
-- [ ] Examples are concrete, not abstract
-- [ ] Instructions use imperative form
-- [ ] Terminology is consistent throughout
+| Aspect | Good | Bad |
+|--------|------|-----|
+| Specificity | "Extract text from PDFs, fill forms" | "Works with documents" |
+| Triggers | "Use when user mentions PDFs" | (no trigger guidance) |
+| Point of view | "Extracts and processes..." | "I can help you..." |
+| Length | 50-200 characters | < 20 or > 500 |
 
-### Structure Quality
+### Red Flags
 
-- [ ] References are one level deep (no nested references)
-- [ ] Long reference files have table of contents
-- [ ] Progressive disclosure used appropriately
-- [ ] No duplicate information between SKILL.md and references
+- No mention of when to use the skill
+- Uses vague verbs: "helps", "assists", "handles"
+- Written in second person ("you can...")
+- Contains XML tags
+- Contradicts actual skill functionality
 
-### Workflow Quality (if applicable)
+## Instruction Quality
 
-- [ ] Steps are clear and sequential
-- [ ] Decision points are explicit
-- [ ] Validation/feedback loops included for critical operations
-- [ ] Error handling guidance provided
+### Clarity Test
 
-## Quality Signals
+Could a colleague follow these instructions without asking clarifying
+questions? If not, the instructions need work. (This is the golden rule
+of prompt engineering.)
 
-### Strong Skill Indicators
+### Evaluation Criteria
 
-- Description reads like a feature announcement: "Does X when Y"
-- SKILL.md fits on ~2 screens
-- Examples show realistic user requests
-- References are domain-specific (schemas, policies) not generic
+| Aspect | Good | Bad |
+|--------|------|-----|
+| Voice | Imperative: "Extract the data" | Passive: "Data should be extracted" |
+| Steps | Numbered, sequential | Prose paragraphs |
+| Specificity | "Format as JSON with keys: name, date" | "Format appropriately" |
+| Completeness | Covers happy path + edge cases | Only happy path |
+| Structure | XML tags, clear sections | Wall of text |
+| Format spec | Explicit output example | "Return results" |
+| Critical rules | At end of document | Buried in middle |
 
-### Weak Skill Indicators
+### Red Flags
 
-- Description is vague: "Helps with documents"
-- Description is bloated: "Keywords:", "Done when:", execution details
-- Walls of explanatory text
-- Duplicates information Claude already has
+- Long paragraphs without structure
+- Ambiguous terms: "appropriately", "as needed", "correctly"
+- Missing error handling guidance
+- No examples for complex operations
+- No explicit output format specification
+- Critical constraints buried in prose
+- No XML tags for multi-part instructions
 
-## Evaluation by Purpose
+## Progressive Disclosure
 
-### For Workflow Skills
+### Evaluation Criteria
 
-Ask:
-- Are steps in logical order?
-- Are dependencies between steps clear?
-- What happens if a step fails?
-- Is there unnecessary flexibility where precision is needed?
+| Aspect | Good | Bad |
+|--------|------|-----|
+| SKILL.md size | < 500 lines | > 1000 lines |
+| Reference depth | One level from SKILL.md | Nested references |
+| Content split | Detailed docs in references | Everything in SKILL.md |
+| File references | Clear pointers with context | "See other files" |
 
-### For Reference Skills
+### Structure Check
 
-Ask:
-- Is the information something Claude doesn't already know?
-- Is it organized for quick lookup?
-- Are there search patterns for large files?
+```
+Good:
+SKILL.md → references/api.md    (one level)
+SKILL.md → references/guide.md  (one level)
 
-### For Tool Integration Skills
+Bad:
+SKILL.md → references/main.md → references/details.md → ...
+```
 
-Ask:
-- Are tool invocations precise?
-- Are error cases handled?
-- Is output format specified?
+## Scope Assessment
 
-## Comparative Evaluation
+### Too Broad
 
-When multiple skills exist for similar purposes:
+Signs:
+- Skill tries to handle multiple unrelated domains
+- Instructions are vague to cover all cases
+- Output quality varies significantly by input type
 
-1. **Check for overlap** — Do descriptions compete for the same triggers?
-2. **Check for gaps** — Are there use cases neither skill covers?
-3. **Consider merging** — Would one broader skill be clearer than two?
-4. **Consider splitting** — Is one skill trying to do too many things?
+Fix: Split into multiple focused skills.
 
-## Testing Approach
+### Too Narrow
 
-### Mental Simulation
+Signs:
+- Skill handles only one very specific case
+- Rarely triggered
+- Could be a one-line instruction instead
 
-For each example use case:
-1. Would the description trigger this skill?
-2. Walk through the instructions — are they sufficient?
-3. What could go wrong?
+Fix: Generalize slightly or absorb into a broader skill.
 
-### Real Usage Testing
+### Right Size
 
-1. Use the skill on actual tasks
-2. Note where Claude struggles or deviates
-3. Identify missing context or unclear instructions
-4. Check if the right references get loaded
+Signs:
+- Clear, consistent purpose
+- Triggered appropriately
+- Output quality is predictable
+- Valuable enough to justify the overhead
 
-### Cross-Model Testing
+## Example Quality
 
-If the skill will be used with multiple models:
-- **Haiku**: Does it provide enough guidance?
-- **Sonnet**: Is it clear and efficient?
-- **Opus**: Does it avoid over-explaining?
+### Evaluation Criteria
+
+| Aspect | Good | Bad |
+|--------|------|-----|
+| Coverage | Simple, complex, and edge cases | Only happy path |
+| Format | Clear input → output pairs | Prose descriptions |
+| Realism | Uses realistic data | Trivial "foo/bar" examples |
+| Diversity | Different scenarios represented | Same pattern repeated |
+
+### Minimum Examples
+
+For most skills, include at least:
+1. **Simple case** — Shows basic functionality
+2. **Complex case** — Shows handling of real-world complexity
+3. **Edge case** — Shows behavior at boundaries
+
+## Testing Protocol
+
+### Activation Testing
+
+Run these prompts and verify behavior:
+
+1. **Should trigger:** 3-5 prompts that should activate the skill
+2. **Should not trigger:** 3-5 prompts that shouldn't activate it
+3. **Borderline:** 2-3 ambiguous cases to understand boundaries
+
+Document expected behavior for each.
+
+### Output Quality Testing
+
+For each test case:
+1. Does output match expected format?
+2. Is content accurate and complete?
+3. Are edge cases handled correctly?
+4. Is output consistent across multiple runs?
+
+### Regression Testing
+
+After any change:
+1. Re-run activation tests
+2. Re-run quality tests
+3. Verify no new issues introduced
+
+## Scoring Rubric
+
+### Description (25 points)
+
+| Score | Criteria |
+|-------|----------|
+| 25 | Specific capabilities + clear triggers + right length |
+| 20 | Mostly complete, minor improvements possible |
+| 15 | Vague on either capabilities or triggers |
+| 10 | Very vague, missing key information |
+| 0 | Missing or actively misleading |
+
+### Instructions (25 points)
+
+| Score | Criteria |
+|-------|----------|
+| 25 | Clear, imperative, structured (XML tags/steps), explicit format |
+| 20 | Mostly clear, minor ambiguities, format specified |
+| 15 | Understandable but verbose or missing structure |
+| 10 | Confusing structure, significant gaps, no format |
+| 0 | Unclear or contradictory |
+
+### Examples (25 points)
+
+| Score | Criteria |
+|-------|----------|
+| 25 | Comprehensive coverage, realistic, well-formatted |
+| 20 | Good coverage, minor gaps |
+| 15 | Basic coverage, missing edge cases |
+| 10 | Minimal examples, not representative |
+| 0 | No examples or misleading examples |
+
+### Structure (25 points)
+
+| Score | Criteria |
+|-------|----------|
+| 25 | Proper progressive disclosure, right scope |
+| 20 | Minor structural issues |
+| 15 | Too long or too short, scope issues |
+| 10 | Poor organization, wrong scope |
+| 0 | Fundamentally broken structure |
+
+### Interpretation
+
+- **90-100:** Production-ready
+- **70-89:** Usable, improvements recommended
+- **50-69:** Needs significant work
+- **< 50:** Major revision required
+
+## Common Issues by Score Range
+
+### 70-89 (Minor Issues)
+
+- Description could be more specific
+- Missing one edge case example
+- Instructions slightly verbose
+- Could use better progressive disclosure
+
+### 50-69 (Moderate Issues)
+
+- Vague description causing activation problems
+- Instructions missing key scenarios
+- No examples for edge cases
+- Wrong scope (too broad or too narrow)
+
+### < 50 (Major Issues)
+
+- Description doesn't match actual functionality
+- Instructions contradictory or unclear
+- No examples
+- Fundamentally wrong structure

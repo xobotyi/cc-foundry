@@ -1,84 +1,95 @@
-# Iterating on Skills
+# Skill Iteration
 
-Skills rarely succeed on first attempt. Improvement comes from observing
-real usage and refining based on evidence.
+Skills improve through observation and refinement. Apply prompt engineering
+debugging techniques—when Claude doesn't follow instructions, the prompt
+needs work, not stronger language.
 
-## The Iteration Cycle
+## Iteration Cycle
 
 ```
-Use skill on real task
-        ↓
-Observe Claude's behavior
-        ↓
-Identify gaps or failures
-        ↓
-Refine skill
-        ↓
-    (repeat)
+Use skill → Observe behavior → Identify gap → Refine → Repeat
 ```
 
-## Common Iteration Triggers
+## Common Refinements
 
-### Skill Not Activating
+### Activation Issues
 
-**Symptom:** User asks relevant question, skill doesn't trigger.
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Doesn't trigger | Description misses user's words | Add trigger terms, synonyms, file extensions |
+| Triggers too often | Description too broad | Add exclusions: "Use for X, NOT for Y" |
+| Wrong skill activates | Overlapping descriptions | Make descriptions more distinct |
 
-**Likely cause:** Description doesn't match user's language.
+### Output Issues
 
-**Fix:** Add trigger terms to description. Include synonyms, file
-extensions, common phrasings.
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Wrong format | No format specification | Add explicit format with example output |
+| Missing details | Instructions vague | Be specific: "Include X, Y, Z" |
+| Ignores instructions | Buried in prose | Move to end, use XML tags, add structure |
+| Inconsistent quality | Ambiguous guidance | Add few-shot examples, resolve conflicts |
+| Partial completion | Steps unclear | Use numbered sequential steps |
+| Ignores constraints | Not emphasized | Place in `<constraints>` tags at end |
 
-### Claude Ignoring Instructions
+## Refinement Patterns
 
-**Symptom:** Skill triggers but Claude doesn't follow specific guidance.
-
-**Likely causes:**
-- Instructions too vague
-- Buried in wall of text
-- Conflicting with Claude's defaults
-
-**Fix:** Make instructions more prominent, more specific, or use stronger
-language ("MUST", "ALWAYS").
-
-### Claude Over-Following Instructions
-
-**Symptom:** Claude applies skill guidance where it doesn't fit.
-
-**Likely cause:** Description too broad.
-
-**Fix:** Narrow description, add exclusions ("Use for X, NOT for Y").
-
-### Wrong Skill Activating
-
-**Symptom:** Different skill triggers instead of intended one.
-
-**Likely cause:** Overlapping descriptions.
-
-**Fix:** Make descriptions more distinct. Use specific terminology unique
-to each skill.
-
-### Missing Context
-
-**Symptom:** Claude struggles with domain-specific details.
-
-**Fix:** Add reference file with needed context. Update SKILL.md to point
-to it.
-
-## Iteration Patterns
-
-### Strengthening Instructions
+### Restructuring with XML Tags
 
 Before:
 ```markdown
-Filter out test accounts when querying.
+Filter out test accounts when querying. Also validate
+input and check permissions before running.
 ```
 
 After:
 ```markdown
-ALWAYS filter test accounts: `WHERE account_type != 'test'`
+<constraints>
+- ALWAYS filter test accounts: `WHERE account_type != 'test'`
+- Validate input format before processing
+- Check permissions before write operations
+</constraints>
 ```
 
-### Adding Missing Triggers
+### Adding Explicit Format
+
+Before:
+```markdown
+Return the analysis results.
+```
+
+After:
+```markdown
+<output_format>
+Return as JSON:
+\`\`\`json
+{"summary": "...", "findings": [...], "confidence": "high|medium|low"}
+\`\`\`
+</output_format>
+```
+
+### Moving Critical Rules to End
+
+Before (buried in middle):
+```markdown
+## Process
+1. Read input
+2. NEVER delete without confirmation
+3. Transform data
+4. Write output
+```
+
+After (at end):
+```markdown
+## Process
+1. Read input
+2. Transform data
+3. Write output
+
+## CRITICAL
+NEVER delete without explicit user confirmation.
+```
+
+### Adding Trigger Terms
 
 Before:
 ```yaml
@@ -87,77 +98,48 @@ description: Process PDF files.
 
 After:
 ```yaml
-description: Process PDF files. Use when working with .pdf files,
-  extracting text from documents, filling forms, or merging PDFs.
+description: >-
+  Extract text from PDFs, fill forms, merge documents.
+  Use when working with .pdf files or document extraction.
+```
+
+### Narrowing Scope
+
+Before:
+```yaml
+description: Helps with data analysis
+```
+
+After:
+```yaml
+description: >-
+  Analyze CSV and Excel files for statistical patterns.
+  Use for tabular data. NOT for text analysis or database queries.
 ```
 
 ### Splitting Overloaded Skills
 
-If a skill tries to do too much:
+When a skill does too much:
 
 1. Identify distinct capabilities
-2. Create focused skills for each
-3. Make descriptions non-overlapping
-
-### Merging Related Skills
-
-If multiple skills have confusing overlap:
-
-1. Identify shared purpose
-2. Combine into one skill with clear sections
-3. Update description to cover all use cases
+2. Create focused skill for each
+3. Ensure descriptions don't overlap
 
 ### Promoting to References
 
-When SKILL.md grows too long:
+When SKILL.md grows beyond 500 lines:
 
 1. Identify detailed sections
-2. Move to `references/detailed-topic.md`
-3. Replace with link: "For details, see [detailed-topic.md](references/detailed-topic.md)"
+2. Move to `references/<topic>.md`
+3. Replace with: "For details, see [topic.md](references/topic.md)"
 
-## Feedback Sources
+## When to Stop
 
-### Direct Observation
+A skill is done when:
 
-Use the skill yourself. Note:
-- Where you had to provide extra context
-- Where Claude made wrong assumptions
-- What worked well
-
-### User Feedback
-
-Ask users:
-- Does the skill activate when expected?
-- Are instructions clear?
-- What's missing?
-
-### Error Patterns
-
-Track recurring issues:
-- Same question asked multiple times → add to skill
-- Same mistake made repeatedly → add explicit guidance
-- Same workaround needed → automate in skill
-
-## When to Stop Iterating
-
-A skill is "done enough" when:
-- It triggers correctly for target use cases
-- Instructions are followed consistently
-- No recurring user complaints
+- Triggers correctly for target cases
+- Instructions followed consistently
+- No recurring complaints
 - Maintenance burden is low
 
-Perfection isn't the goal — effectiveness is.
-
-## Versioning Considerations
-
-For team skills, consider documenting changes:
-
-```markdown
-## Changelog
-
-- 2025-01: Added form-filling workflow
-- 2024-12: Narrowed description to reduce false triggers
-- 2024-11: Initial version
-```
-
-Keep brief. This is for humans, not Claude.
+Effectiveness over perfection.

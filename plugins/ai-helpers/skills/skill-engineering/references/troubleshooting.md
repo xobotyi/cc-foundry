@@ -1,209 +1,204 @@
-# Troubleshooting Skills
+# Skill Troubleshooting
+
+Diagnostic guide for skill failures.
 
 ## Quick Diagnosis
 
-| Symptom | Likely Cause | Check |
-|---------|--------------|-------|
-| Skill never triggers | Description mismatch | Does description match user's words? |
-| Skill triggers incorrectly | Description too broad | Is description specific enough? |
-| Wrong skill triggers | Overlapping descriptions | Do multiple skills compete? |
-| Instructions ignored | Vague or buried | Are instructions prominent and specific? |
-| YAML parse error | Frontmatter syntax | Valid YAML? Proper `---` delimiters? |
-| Skill not found | Wrong location | Correct path? SKILL.md exists? |
+| Symptom | Check |
+|---------|-------|
+| Skill not found | [Structure Issues](#structure-issues) |
+| Skill not triggering | [Activation Issues](#activation-issues) |
+| Wrong output format | [Output Issues](#output-issues) |
+| Scripts failing | [Script Issues](#script-issues) |
+| References not loading | [Reference Issues](#reference-issues) |
 
-## Detailed Troubleshooting
+## Structure Issues
 
-### Skill Not Triggering
+### Skill Not Found
 
-**Check 1: Location**
-```bash
-# Personal skills
-ls ~/.claude/skills/my-skill/SKILL.md
+**Diagnostic steps:**
 
-# Project skills
-ls .claude/skills/my-skill/SKILL.md
-```
+1. **Verify location:**
+   ```
+   Personal: ~/.claude/skills/<name>/SKILL.md
+   Project: .claude/skills/<name>/SKILL.md
+   Plugin: <plugin>/skills/<name>/SKILL.md
+   ```
 
-**Check 2: Frontmatter validity**
+2. **Verify name matches directory:**
+   ```yaml
+   # Directory: .claude/skills/my-skill/
+   ---
+   name: my-skill  # Must match
+   ---
+   ```
 
-Read SKILL.md and verify:
-- Starts with `---` on line 1
-- Has closing `---` before content
-- `name` and `description` fields present
-- No YAML syntax errors (tabs, bad indentation, unquoted special chars)
+3. **Check frontmatter syntax:**
+   ```yaml
+   # Valid
+   ---
+   name: my-skill
+   description: Does something
+   ---
 
-**Check 3: Description matching**
+   # Invalid (missing closing ---)
+   ---
+   name: my-skill
+   description: Does something
+   ```
 
-Compare user's request to description:
-- Does description contain keywords user would say?
-- Are synonyms covered?
-- Are file extensions mentioned (`.pdf`, `.xlsx`)?
+4. **Check name constraints:**
+   - Lowercase only
+   - No consecutive hyphens (`my--skill` invalid)
+   - No leading/trailing hyphens
+   - No "anthropic" or "claude" in name
 
-**Example fix:**
+## Activation Issues
+
+### Skill Not Auto-Triggering
+
+**Check description quality:**
 ```yaml
-# Before: too narrow
-description: Analyze Excel spreadsheets
+# Bad
+description: Helps with code
 
-# After: covers more triggers
-description: Analyze Excel spreadsheets, create pivot tables, generate
-  charts. Use when working with .xlsx files, spreadsheet data, or
-  tabular analysis.
+# Good
+description: >-
+  Review Python code for bugs and security issues.
+  Use when asked to review, audit, or check Python code.
 ```
 
-### Skill Triggers But Doesn't Work
+**Check for blocking flag:**
+```yaml
+# This prevents auto-triggering
+disable-model-invocation: true
+```
 
-**Check 1: Instructions clarity**
+**Test with explicit invocation:**
+Try `/skill-name` directly. If that works, the description
+needs better trigger terms.
 
-Are instructions specific enough? Compare:
-```markdown
-# Vague
-Handle errors appropriately.
+### Skill Triggers Too Often
+
+**Add exclusions:**
+```yaml
+description: >-
+  Analyze CSV files for patterns.
+  NOT for text documents, images, or database queries.
+```
+
+**Use domain-specific terms:**
+```yaml
+# Too generic
+description: Analyze data
 
 # Specific
-On error, log the error message and return early. Do not raise exceptions.
+description: Statistical analysis of time-series data using pandas
 ```
 
-**Check 2: Instructions prominence**
+## Output Issues
 
-Is key guidance buried? Move critical instructions to:
-- Top of relevant section
-- Use bold or CAPS for emphasis
-- Numbered steps for sequences
+### Wrong Format
 
-**Check 3: Conflicting guidance**
+**Add explicit format section:**
+```markdown
+## Output Format
 
-Does the skill contradict itself or Claude's defaults? Look for:
-- Ambiguous "sometimes" or "usually"
-- Multiple valid interpretations
-- Implicit assumptions
+Return results as:
+\`\`\`json
+{
+  "summary": "[1-2 sentences]",
+  "findings": ["finding 1", "finding 2"],
+  "confidence": "high|medium|low"
+}
+\`\`\`
+```
 
-### Wrong Skill Activating
+### Instructions Ignored
 
-**Diagnosis:** List all skills with similar scope. Compare descriptions.
+**Use clear structure:**
+```markdown
+## Steps
 
-**Fix options:**
-1. Make descriptions more distinct
-2. Add exclusions: "Use for X, NOT for Y"
-3. Use unique terminology in each skill
-4. Consider merging if genuinely overlapping
+1. **Validate** — Check input format
+2. **Transform** — Apply changes
+3. **Verify** — Confirm output
 
-### Multiple Skills Conflicting
+Do not proceed to next step if current step fails.
+```
 
-When two skills compete:
+**Move critical instructions to end:**
+Instructions at context end are followed more reliably.
 
-1. **Check trigger overlap** — Do descriptions share keywords?
-2. **Check purpose overlap** — Do they serve the same use case?
-3. **Resolution:**
-   - If same purpose: merge into one skill
-   - If different purposes: make descriptions distinct
+## Script Issues
+
+### Script Won't Run
+
+1. **Check executable bit:**
+   ```bash
+   chmod +x scripts/my-script.py
+   ```
+
+2. **Check shebang:**
+   ```python
+   #!/usr/bin/env python3
+   ```
+
+3. **Test manually:**
+   ```bash
+   python scripts/my-script.py test-input
+   ```
+
+4. **Check dependencies:**
+   Are required packages installed?
+
+5. **Check path in SKILL.md:**
+   ```markdown
+   # Relative to skill directory
+   python scripts/validate.py
+   ```
+
+## Reference Issues
 
 ### References Not Loading
 
-**Symptom:** Claude doesn't read reference files when it should.
-
-**Check 1: Link syntax**
-```markdown
-# Correct
-See [reference.md](references/reference.md)
-
-# Wrong (absolute path)
-See [reference.md](/path/to/references/reference.md)
-```
-
-**Check 2: Link prominence**
-
-Is the link visible? Not buried in parentheses or footnotes?
-
-**Check 3: Context clues**
-
-Does SKILL.md indicate when to read the reference?
+**Use relative paths:**
 ```markdown
 # Good
-For database schemas, see [schemas.md](references/schemas.md)
+See [guide.md](references/guide.md)
 
-# Bad (no context)
-Additional docs in references/
+# Bad (absolute)
+See [/full/path/guide.md](/full/path/guide.md)
 ```
 
-### YAML Frontmatter Errors
+**Keep one level deep:**
+```
+Good: SKILL.md → references/guide.md
 
-**Common issues:**
-
-```yaml
-# Wrong: tabs instead of spaces
-name:	my-skill
-
-# Wrong: unquoted special characters
-description: Use for: data analysis
-
-# Wrong: missing quotes on multi-line
-description: This is a long
-description that spans lines
-
-# Correct
-description: "Use for: data analysis"
-description: >
-  This is a long
-  description that spans lines
+Bad: SKILL.md → references/main.md → references/detail.md
 ```
 
-**Validation:** Read file, extract frontmatter, check against [spec.md](spec.md).
-
-### Scripts Not Executing
-
-**Check 1: File exists**
-```bash
-ls .claude/skills/my-skill/scripts/
+**Add explicit read instruction:**
+```markdown
+Read [guide.md](references/guide.md) completely before proceeding.
 ```
-
-**Check 2: Executable permission**
-```bash
-chmod +x .claude/skills/my-skill/scripts/*.py
-```
-
-**Check 3: Shebang line**
-```python
-#!/usr/bin/env python3
-```
-
-**Check 4: Dependencies available**
-
-Are required packages installed in the environment?
-
-## Debug Mode
-
-Run Claude Code with debug output:
-```bash
-claude --debug
-```
-
-Look for skill loading errors in output.
 
 ## Context Budget Issues
 
-### Claude Doesn't See All Skills
+**Symptoms:**
+- Warning about excluded skills
+- Descriptions truncated
 
-Skill descriptions are loaded into context. If many skills exist, they
-may exceed character budget (default 15,000 characters).
+**Fixes:**
+- Shorten descriptions (under 200 chars)
+- Move content to references
+- Disable rarely-used skills
 
-**Check:** Run `/context` command. Look for warning about excluded skills.
+## Getting Help
 
-**Fix:** Set environment variable to increase limit:
-```bash
-export SLASH_COMMAND_TOOL_CHAR_BUDGET=30000
-```
+When asking for help, provide:
 
-### Skill Description Too Long
-
-If description approaches 1024 characters, consider:
-1. Trim redundant phrases
-2. Focus on trigger keywords only
-3. Move detailed context to SKILL.md body
-
-## Still Not Working?
-
-1. **Simplify:** Strip skill to minimum (just SKILL.md with basic content)
-2. **Test trigger:** Ask explicitly "Use the X skill to do Y"
-3. **Check context:** Run `/context` to see if skill is loaded
-4. **Check logs:** Run `claude --debug` for skill loading errors
-5. **Compare:** Test against a known-working skill with similar structure
+1. Full SKILL.md content
+2. Expected vs actual behavior
+3. Exact prompt that failed
+4. Any error messages

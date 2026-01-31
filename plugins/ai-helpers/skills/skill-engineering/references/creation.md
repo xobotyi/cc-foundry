@@ -1,215 +1,479 @@
 # Creating Skills
 
-## Creation Workflow
+Skills are prompt templates. Apply prompt engineering principles throughout.
+For complex instruction design, consider invoking the `prompt-engineering` skill.
 
-### 1. Understand with Concrete Examples
+## Step 1: Identify the Pattern
 
-Before writing anything, clarify how the skill will be used:
-- "What would a user say that should trigger this skill?"
-- "Can you give examples of tasks this skill should handle?"
-- "What does success look like?"
+Before writing code, identify what you're encoding:
 
-Skip only when usage patterns are already clear.
+**Questions to ask:**
+- What do I repeatedly explain to Claude?
+- What workflow needs consistency across sessions?
+- What domain knowledge does Claude lack?
+- What format do I always want for this task?
 
-### 2. Plan the Structure
+**Good skill candidates:**
+- Coding conventions for your stack
+- Document generation with specific structure
+- Data analysis following your methodology
+- Workflows with multiple coordinated steps
 
-For each example, consider:
-1. How would you execute this from scratch?
-2. What would be helpful to have pre-made for repeated use?
+**Poor skill candidates:**
+- One-off tasks (just prompt directly)
+- Highly variable tasks (can't standardize)
+- Tasks needing real-time data (use MCP instead)
 
-**Identify what to bundle:**
-- `references/` — documentation Claude should consult (schemas, API docs)
-- `scripts/` — executable code for deterministic operations
-- `assets/` — files used in output (templates, images, fonts)
+## Step 2: Define Scope
 
-### 3. Create the Skill
+A skill should do one thing well.
 
-```bash
-mkdir -p .claude/skills/my-skill
+**Scope too broad:**
+```
+Skill: Full-Stack Development
+- Handles frontend, backend, databases, deployment, testing...
+```
+This will produce mediocre results across all areas.
+
+**Scope too narrow:**
+```
+Skill: Button Component Generator
+- Only creates button components
+```
+Not reusable enough to justify the overhead.
+
+**Right scope:**
+```
+Skill: React Component Generator
+- Creates TypeScript React components
+- Follows team conventions for structure
+- Includes proper typing and accessibility
+- Generates corresponding test files
+```
+Focused enough to be specific, broad enough to be useful.
+
+## Step 3: Write the Description
+
+The description is the **most important field**. Claude uses it to decide
+when to invoke your skill.
+
+### Description Formula
+
+```
+[What it does] + [When to use it / trigger scenarios]
 ```
 
-Write SKILL.md with frontmatter and instructions.
-See [spec.md](spec.md) for requirements.
+### Examples
 
-### 4. Add Bundled Resources
-
-Create only what's needed. Most skills need only SKILL.md.
-
-### 5. Test with Real Tasks
-
-Use the skill on actual tasks. Observe:
-- Does it trigger when expected?
-- Are instructions clear enough?
-- What's missing?
-
-## Writing SKILL.md
-
-### Frontmatter
-
+**PDF Processing:**
 ```yaml
----
-name: my-skill-name
-description: What it does and when to use it.
----
+description: >-
+  Extract text and tables from PDF files, fill forms, merge documents.
+  Use when working with PDF files or when the user mentions PDFs, forms,
+  or document extraction.
 ```
 
-**Description is for triggering only.** Claude uses only name + description
-to decide whether to load the skill.
-
-**Include:**
-- What the skill does (1 sentence)
-- When to use it (specific contexts, file types, user phrases)
-
-**Do NOT include:**
-- Keywords lists — redundant if description is well-written
-- Completion criteria ("Done when:") — put in SKILL.md body
-- Execution details — put in SKILL.md body
-- Success metrics — put in SKILL.md body
-
+**Git Commit Helper:**
 ```yaml
-# Bad: bloated
-description: "Edit articles. Done when: no stop-words. Keywords: edit"
-
-# Good: lean trigger
-description: "Edit articles for clarity and conciseness.
-  Use when reviewing drafts or improving writing."
+description: >-
+  Generate descriptive commit messages by analyzing git diffs.
+  Use when the user asks for help writing commit messages or
+  reviewing staged changes.
 ```
 
-### Body Structure Patterns
-
-**Workflow-based** (sequential processes):
-```markdown
-# Skill Name
-
-## Overview
-[1-2 sentences]
-
-## Workflow
-1. Step one
-2. Step two
-3. Step three
-
-## Details
-[Expand on steps as needed]
+**Code Review:**
+```yaml
+description: >-
+  Review code for bugs, security issues, performance, and style.
+  Use when asked to review, audit, or analyze code quality.
 ```
 
-**Task-based** (tool collections):
+### Description Anti-Patterns
+
+| Pattern | Problem |
+|---------|---------|
+| "Helps with X" | Too vague—what kind of help? |
+| "I can help you..." | Wrong point of view (use third person) |
+| "Useful tool for..." | Marketing speak, not actionable |
+| No trigger scenarios | Claude doesn't know when to invoke |
+
+## Step 4: Structure the SKILL.md
+
+### Minimal Template
+
 ```markdown
-# Skill Name
+---
+name: my-skill
+description: [What it does and when to use it]
+---
 
-## Overview
-[1-2 sentences]
+# [Skill Name]
 
-## Quick Start
-[Most common operation]
+## Instructions
 
-## Operations
-### Operation A
-### Operation B
-```
-
-**Reference-based** (standards/specs):
-```markdown
-# Skill Name
-
-## Overview
-[1-2 sentences]
-
-## Guidelines
-[Core rules]
+[Clear, imperative guidance]
 
 ## Examples
-[Concrete examples]
+
+[Input/output pairs showing expected behavior]
 ```
 
-## Output Patterns
+### Template with References
 
-### Template Pattern
-
-For consistent output format:
+For skills with multiple reference files, use a **route to reference** table.
+This tells Claude which reference to read based on the situation:
 
 ```markdown
-## Report Structure
+---
+name: my-skill
+description: [What it does and when to use it]
+---
 
-ALWAYS use this template:
+# [Skill Name]
 
-# [Title]
+[1-2 sentence purpose statement]
 
-## Summary
-[One paragraph]
+## Route to Reference
 
-## Findings
-- Finding 1
-- Finding 2
+| Situation | Reference |
+|-----------|-----------|
+| Need to do X | [x-guide.md](references/x-guide.md) |
+| Need to do Y | [y-guide.md](references/y-guide.md) |
+| Something is broken | [troubleshooting.md](references/troubleshooting.md) |
 
-## Recommendations
-1. Action 1
-2. Action 2
+Read the relevant reference before proceeding.
+
+## Core Rules
+
+[Essential guidance that applies to all situations]
+
+## Quick Checklist
+
+- [ ] Check 1
+- [ ] Check 2
 ```
 
-### Examples Pattern
+This pattern:
+- Routes Claude to detailed content based on situation
+- Avoids repeating reference content in SKILL.md
+- Makes the skill self-documenting
 
-For quality-dependent output, provide input/output pairs:
+SKILL.md can still contain core rules, examples, and guidance—the
+router table just provides navigation to deep-dive content.
+
+### Simple Template
+
+For skills without references:
 
 ```markdown
-## Commit Messages
+---
+name: my-skill
+description: [What it does and when to use it]
+---
 
-**Example 1:**
-Input: Added JWT authentication
-Output:
-feat(auth): implement JWT-based authentication
+# [Skill Name]
 
-**Example 2:**
-Input: Fixed date display bug
-Output:
-fix(reports): correct date formatting in timezone conversion
+## Instructions
+
+[Clear, imperative guidance]
+
+## Examples
+
+[Input/output pairs showing expected behavior]
 ```
 
-## Workflow Patterns
+## Step 5: Write Instructions
 
-### Sequential Workflow
+Skills are prompts—apply prompt engineering fundamentals.
+
+### Use Imperative Language
+
+**Good:**
+```markdown
+1. Read the input file
+2. Extract key entities
+3. Format as JSON
+4. Validate the output
+```
+
+**Avoid:**
+```markdown
+You should read the input file, and then you might want to
+extract entities from it...
+```
+
+### Be Specific
+
+**Vague:**
+```markdown
+Make sure the code is good.
+```
+
+**Specific:**
+```markdown
+Verify the code:
+1. Compiles without errors
+2. Passes all existing tests
+3. Follows project naming conventions
+4. Has no obvious security vulnerabilities
+```
+
+### Use XML Tags for Structure
+
+Separate instruction components with XML tags:
 
 ```markdown
+<instructions>
+1. Parse the configuration file
+2. Validate against schema
+3. Generate output
+</instructions>
+
+<constraints>
+- Max file size: 10MB
+- Supported formats: JSON, YAML
+</constraints>
+
+<output_format>
+Return: {"status": "ok|error", "data": [...]}
+</output_format>
+```
+
+Tags improve instruction following, especially in complex skills.
+
+### Place Critical Rules at the End
+
+Instructions near the context boundary are followed more reliably:
+
+```markdown
+## Background
+[Domain explanation...]
+
 ## Process
+[Steps...]
 
-1. Analyze input (run analyze.py)
-2. Validate results (run validate.py)
-3. Generate output (run generate.py)
-4. Verify output
+## IMPORTANT
+Never skip validation. Always confirm before destructive operations.
 ```
 
-### Conditional Workflow
+### Handle Ambiguity
+
+What should Claude do when the input is unclear?
 
 ```markdown
-## Workflow
+## Handling Ambiguous Requests
 
-1. Determine task type:
-   - **Creating new?** → See "Creation" below
-   - **Editing existing?** → See "Editing" below
+If the user's intent is unclear:
+1. State what you understood
+2. Ask one clarifying question
+3. Proceed only after confirmation
 
-## Creation
-[steps]
-
-## Editing
-[steps]
+Do not guess at ambiguous requirements.
 ```
 
-### Feedback Loop
+## Step 6: Add Examples
+
+Examples are the most effective way to communicate expected behavior.
+Few-shot prompting (showing input/output pairs) reliably improves output quality.
+
+### Input/Output Pairs
 
 ```markdown
-## Validation Loop
+## Examples
 
-1. Make changes
-2. Validate: `python validate.py`
-3. If errors: fix and repeat step 2
-4. Only proceed when validation passes
+### Example: Simple Component
+**Request:** "Create a button component with primary and secondary variants"
+
+**Output:**
+\`\`\`typescript
+interface ButtonProps {
+  variant?: 'primary' | 'secondary';
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export const Button: React.FC<ButtonProps> = ({
+  variant = 'primary',
+  children,
+  onClick
+}) => {
+  return (
+    <button className={`btn btn-${variant}`} onClick={onClick}>
+      {children}
+    </button>
+  );
+};
+\`\`\`
 ```
 
-## Common Mistakes
+### Cover Edge Cases
 
-| Mistake | Fix |
-|---------|-----|
-| Vague description | Include specific triggers and use cases |
-| Too verbose | Challenge each paragraph: "Does Claude need this?" |
-| No examples | Add 2-3 concrete input/output pairs |
-| Deeply nested references | Keep references one level deep from SKILL.md |
+```markdown
+### Example: Edge Case - Empty Input
+**Request:** "Analyze this data: [empty file]"
+
+**Output:**
+"The input file is empty. Please provide data to analyze,
+or specify if you'd like me to create sample data."
+```
+
+## Step 7: Test Thoroughly
+
+### Activation Testing
+
+Test that the skill triggers when it should:
+```
+✓ "Process this PDF" → should trigger pdf-skill
+✓ "Extract text from document.pdf" → should trigger
+✓ "Help me with this PDF form" → should trigger
+```
+
+Test that it doesn't trigger when it shouldn't:
+```
+✗ "Create a PDF of this document" → might be different skill
+✗ "What's a PDF?" → informational, no skill needed
+```
+
+### Output Quality Testing
+
+1. **Simple cases** — Does basic functionality work?
+2. **Complex cases** — Does it handle real-world complexity?
+3. **Edge cases** — Empty input, malformed data, unusual requests
+4. **Consistency** — Same input produces same quality output?
+
+### Iteration
+
+Based on testing:
+- Refine description if activation is wrong
+- Clarify instructions if output quality is poor
+- Add examples for edge cases that fail
+- Split skill if scope is too broad
+
+## Common Patterns
+
+### Router Skill
+
+For skills covering multiple scenarios with detailed guidance for each:
+
+```markdown
+---
+name: code-review
+description: >-
+  Review code for quality issues. Use when asked to review,
+  audit, or check code.
+---
+
+# Code Review
+
+## Route to Reference
+
+| Reviewing | Reference |
+|-----------|-----------|
+| Security concerns | [security.md](references/security.md) |
+| Performance issues | [performance.md](references/performance.md) |
+| Test coverage | [testing.md](references/testing.md) |
+| Style and conventions | [style.md](references/style.md) |
+
+Read relevant references based on review focus.
+
+## Always Check
+
+- [ ] No obvious bugs
+- [ ] Error handling present
+- [ ] No hardcoded secrets
+```
+
+The router pattern organizes access to detailed references while
+SKILL.md still provides core guidance that applies to all scenarios.
+
+### Workflow Skill
+
+```markdown
+---
+name: deploy
+description: Deploy application to production environment.
+  Use when user wants to deploy or push to production.
+disable-model-invocation: true
+---
+
+# Deployment Workflow
+
+## Pre-Deployment Checklist
+- [ ] All tests pass
+- [ ] No uncommitted changes
+- [ ] Version bumped appropriately
+
+## Steps
+1. Run full test suite
+2. Build production bundle
+3. Deploy to staging
+4. Run smoke tests
+5. Deploy to production
+6. Verify deployment health
+
+## Rollback
+If deployment fails at any step, rollback to previous version.
+```
+
+### Knowledge Skill
+
+```markdown
+---
+name: api-conventions
+description: API design patterns and conventions for this project.
+  Use when creating or modifying API endpoints.
+---
+
+# API Conventions
+
+## Endpoint Naming
+- Use plural nouns: `/users`, not `/user`
+- Nest related resources: `/users/{id}/orders`
+- Use kebab-case for multi-word: `/user-profiles`
+
+## Response Format
+\`\`\`json
+{
+  "data": { ... },
+  "meta": { "page": 1, "total": 100 },
+  "errors": []
+}
+\`\`\`
+
+## Error Handling
+Return appropriate HTTP status codes with error details.
+```
+
+### Template Skill
+
+```markdown
+---
+name: pr-template
+description: Generate pull request descriptions following team format.
+  Use when creating PRs or asked about PR content.
+---
+
+# PR Description Generator
+
+## Template
+\`\`\`markdown
+## Summary
+[1-3 sentences describing the change]
+
+## Changes
+- [Bullet points of specific changes]
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Manual testing completed
+- [ ] Edge cases considered
+
+## Screenshots
+[If UI changes, include before/after]
+\`\`\`
+
+## Instructions
+1. Analyze the diff or described changes
+2. Fill in template sections
+3. Suggest appropriate reviewers based on changed files
+```

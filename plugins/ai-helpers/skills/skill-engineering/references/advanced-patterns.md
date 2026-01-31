@@ -1,120 +1,217 @@
 # Advanced Skill Patterns
 
-## String Substitutions
+## Multi-File Skills
 
-Skills support dynamic value substitution in content:
+### When to Split
 
-| Variable | Description |
-|----------|-------------|
-| `$ARGUMENTS` | All arguments passed when invoking |
-| `$ARGUMENTS[N]` | Specific argument by 0-based index |
-| `$N` | Shorthand for `$ARGUMENTS[N]` (`$0`, `$1`, `$2`) |
-| `${CLAUDE_SESSION_ID}` | Current session ID |
+Split into multiple files when:
+- SKILL.md exceeds 500 lines
+- Content applies only to specific scenarios
+- Detailed reference material needed occasionally
+- Multiple distinct domains within one skill
 
-**Example: Positional Arguments**
-```yaml
----
-name: migrate-component
-description: Migrate a component from one framework to another
----
+### Structure Pattern
 
-Migrate the $0 component from $1 to $2.
-Preserve all existing behavior and tests.
+```
+complex-skill/
+├── SKILL.md                 # Overview + navigation
+├── references/
+│   ├── domain-a.md          # Domain A details
+│   ├── domain-b.md          # Domain B details
+│   └── api-reference.md     # Full API docs
+├── scripts/
+│   └── validator.py         # Validation script
+└── assets/
+    └── template.json        # Output template
 ```
 
-Usage: `/migrate-component SearchBar React Vue`
+### Navigation in SKILL.md
 
-**Example: Session Logging**
-```yaml
----
-name: session-logger
-description: Log activity for this session
----
+```markdown
+# Complex Skill
 
-Log the following to logs/${CLAUDE_SESSION_ID}.log:
+## Quick Start
+[Minimal guidance to get going]
 
-$ARGUMENTS
+## Detailed Guides
+
+**For Domain A tasks:** See [domain-a.md](references/domain-a.md)
+**For Domain B tasks:** See [domain-b.md](references/domain-b.md)
+**API reference:** See [api-reference.md](references/api-reference.md)
 ```
 
-## Dynamic Context Injection
+Claude reads referenced files only when needed.
 
-The `!`command`` syntax runs shell commands **before** skill content is
-sent to Claude. Output replaces the placeholder.
+## Skills with Scripts
 
-```yaml
----
-name: pr-summary
-description: Summarize changes in a pull request
-context: fork
-agent: Explore
-allowed-tools: Bash(gh *)
----
+### When to Use Scripts
 
-## Pull request context
-- PR diff: !`gh pr diff`
-- PR comments: !`gh pr view --comments`
-- Changed files: !`gh pr diff --name-only`
+- Deterministic operations (no LLM judgment needed)
+- Complex transformations
+- Validation logic
+- Data parsing
+- File format manipulation
 
-## Your task
-Summarize this pull request...
+### Script Design Principles
+
+**Handle errors explicitly:**
+```python
+def process_file(path):
+    try:
+        with open(path) as f:
+            return f.read()
+    except FileNotFoundError:
+        # Create default instead of failing
+        print(f"File {path} not found, creating default")
+        with open(path, 'w') as f:
+            f.write('{}')
+        return '{}'
 ```
 
-**How it works:**
-1. Each `!`command`` executes immediately (preprocessing)
-2. Output replaces the placeholder in skill content
-3. Claude receives the fully-rendered prompt
+**Don't punt to Claude:**
+```python
+# Bad: Raises exception for Claude to handle
+def validate(data):
+    if not data:
+        raise ValueError("Invalid data")
 
-This is **preprocessing**, not something Claude executes.
-
-## Invocation Control Matrix
-
-Two frontmatter fields control who can invoke a skill:
-
-| Frontmatter | User | Claude | When loaded |
-|-------------|------|--------|-------------|
-| (default) | Yes | Yes | Description always, body on invoke |
-| `disable-model-invocation: true` | Yes | No | Nothing until user invokes |
-| `user-invocable: false` | No | Yes | Description always, body on invoke |
-
-**When to use each:**
-
-- **`disable-model-invocation: true`**: Side effects or timing-sensitive.
-  Deploy, commit, send notifications. Prevent Claude from auto-triggering.
-
-- **`user-invocable: false`**: Background knowledge, not actionable as
-  a command. Legacy system context, domain rules. Claude uses when
-  relevant, but `/skill-name` isn't meaningful.
-
-```yaml
-# User-only: don't let Claude auto-deploy
----
-name: deploy
-description: Deploy the application to production
-disable-model-invocation: true
----
+# Good: Returns actionable information
+def validate(data):
+    if not data:
+        return {"valid": False, "error": "Data is empty",
+                "suggestion": "Provide input data"}
 ```
 
-```yaml
-# Claude-only: background knowledge
----
-name: legacy-system-context
-description: Context about legacy authentication system
-user-invocable: false
----
+**Document constants:**
+```python
+# Bad: Magic numbers
+TIMEOUT = 47
+RETRIES = 5
+
+# Good: Explained
+TIMEOUT = 30  # HTTP requests typically complete within 30 seconds
+RETRIES = 3   # Most intermittent failures resolve by second retry
 ```
 
-## Run Skills in Subagents
+### Referencing Scripts
 
-Add `context: fork` to run skill in isolated context. The skill content
-becomes the subagent's prompt.
+```markdown
+## Validation
+
+Run validation before processing:
+\`\`\`bash
+python scripts/validate.py input.json
+\`\`\`
+
+Expected output:
+- "OK" if valid
+- Error details with line numbers if invalid
+```
+
+## Workflow Skills
+
+### Sequential Workflow Pattern
+
+```markdown
+## Workflow
+
+Copy this checklist and track progress:
+
+\`\`\`
+Progress:
+- [ ] Step 1: Analyze input
+- [ ] Step 2: Generate plan
+- [ ] Step 3: Execute plan
+- [ ] Step 4: Verify results
+\`\`\`
+
+### Step 1: Analyze Input
+[Instructions]
+
+### Step 2: Generate Plan
+Wait for user approval before proceeding.
+
+### Step 3: Execute Plan
+[Instructions]
+
+### Step 4: Verify Results
+[Verification criteria]
+```
+
+### Conditional Workflow Pattern
+
+```markdown
+## Workflow
+
+### Determine Task Type
+
+**Creating new?** → Follow [Creation Workflow](#creation-workflow)
+**Modifying existing?** → Follow [Modification Workflow](#modification-workflow)
+
+### Creation Workflow
+1. [Create steps]
+
+### Modification Workflow
+1. [Modify steps]
+```
+
+### Feedback Loop Pattern
+
+```markdown
+## Iterative Refinement
+
+1. Generate initial output
+2. Run validation: \`python scripts/validate.py output.json\`
+3. If validation fails:
+   - Review error messages
+   - Fix identified issues
+   - Re-run validation
+4. Only proceed when validation passes
+5. Present results to user
+```
+
+## Context Injection
+
+### Dynamic Context with Shell Commands
+
+Use `!`command\`\` to inject shell output:
+
+```markdown
+## Current Context
+
+- Git status: !`git status --short`
+- Current branch: !`git branch --show-current`
+- Recent commits: !`git log --oneline -5`
+```
+
+The commands execute before Claude sees the skill, replacing placeholders
+with actual output.
+
+### Session Variables
+
+```markdown
+Log activity to: logs/${CLAUDE_SESSION_ID}.log
+
+Arguments provided: $ARGUMENTS
+First argument: $0
+Second argument: $1
+```
+
+## Subagent Integration
+
+### Fork Pattern
+
+Run skill in isolated context:
 
 ```yaml
 ---
 name: deep-research
-description: Research a topic thoroughly
+description: Research a topic thoroughly using isolated context
 context: fork
 agent: Explore
 ---
+
+# Research Task
 
 Research $ARGUMENTS thoroughly:
 
@@ -123,129 +220,192 @@ Research $ARGUMENTS thoroughly:
 3. Summarize findings with specific file references
 ```
 
-**How it works:**
-1. New isolated context created
-2. Subagent receives skill content as prompt
-3. `agent` field determines execution environment
-4. Results summarized and returned to main conversation
+### Available Agents
 
-**Agent options:**
-- `Explore` — read-only, fast, for codebase exploration
-- `Plan` — read-only, for planning and research
-- `general-purpose` — full tools (default if omitted)
-- Custom agent from `.claude/agents/`
+| Agent | Best For |
+|-------|----------|
+| `Explore` | Read-only exploration, research |
+| `Plan` | Architecture design, implementation planning |
+| `general-purpose` | Complex multi-step tasks |
+| Custom | Define in `.claude/agents/` |
 
-**Skills + Subagents relationship:**
+### When to Fork
 
-| Approach | System prompt | Task | Also loads |
-|----------|---------------|------|------------|
-| Skill with `context: fork` | From agent type | SKILL.md content | CLAUDE.md |
-| Subagent with `skills` field | Subagent's body | Delegation message | Preloaded skills + CLAUDE.md |
+Fork when:
+- Task is computationally heavy
+- Need isolated context (won't pollute main conversation)
+- Want specific model for the task
+- Task is self-contained with clear output
 
-## Visual Output Pattern
+Don't fork when:
+- Need access to conversation history
+- Task builds on recent context
+- Simple task that doesn't need isolation
 
-Skills can bundle scripts that generate interactive output.
+## Composable Skills
 
-**Structure:**
-```
-codebase-visualizer/
-├── SKILL.md
-└── scripts/
-    └── visualize.py
-```
+### Skills That Reference Other Skills
 
-**SKILL.md:**
-```yaml
----
-name: codebase-visualizer
-description: Generate an interactive collapsible tree visualization of
-  your codebase. Use when exploring a new repo or understanding structure.
-allowed-tools: Bash(python *)
----
+```markdown
+# Code Review Skill
 
-# Codebase Visualizer
+## Process
 
-Run the visualization script from your project root:
-
-```bash
-python ~/.claude/skills/codebase-visualizer/scripts/visualize.py .
+1. First, invoke the `code-style` skill to check formatting
+2. Then check for these additional issues:
+   - Security vulnerabilities
+   - Performance concerns
+   - Test coverage
 ```
 
-This creates `codebase-map.html` in the current directory.
+### Skills With Shared References
+
+```
+shared-knowledge/
+├── company-conventions.md
+└── glossary.md
+
+skill-a/
+├── SKILL.md (references ../shared-knowledge/conventions.md)
+
+skill-b/
+├── SKILL.md (references ../shared-knowledge/conventions.md)
 ```
 
-**Key pattern:**
-- Skill instructs Claude to run bundled script
-- Script generates output file (HTML, PDF, etc.)
-- Claude can open result in browser or report location
+## Permission Scoping
 
-**Common uses:**
-- Dependency graphs
-- Test coverage reports
-- API documentation
-- Database schema visualizations
-
-## Restrict Tool Access
-
-Limit tools when skill is active:
+### allowed-tools Field
 
 ```yaml
 ---
 name: safe-reader
-description: Read files without making changes
-allowed-tools: Read, Grep, Glob
+description: Read-only file exploration
+allowed-tools: Read Grep Glob
 ---
 ```
 
-Claude can only use listed tools without permission prompts.
+Claude can only use listed tools without prompting.
 
-## Skill-Scoped Hooks
-
-Run hooks only while skill is active:
+### Tool Patterns
 
 ```yaml
----
-name: secure-operations
-description: Perform operations with security checks
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: "./scripts/security-check.sh"
-          once: true
----
+# Specific git commands only
+allowed-tools: Bash(git status:*) Bash(git diff:*) Bash(git log:*) Read
+
+# File operations only
+allowed-tools: Read Write Edit Glob Grep
+
+# Specific script only
+allowed-tools: Bash(python scripts/validator.py:*) Read
 ```
 
-**Supported events:** `PreToolUse`, `PostToolUse`, `Stop`
+## Template Skills
 
-**`once: true`**: Run hook only once per session, then remove.
+### Template with Placeholders
 
-## Extended Thinking
+```markdown
+## Output Template
 
-To enable extended thinking in a skill, include "ultrathink" anywhere
-in content:
+Use this template for all reports:
 
-```yaml
----
-name: complex-analysis
-description: Deep analysis of complex problems
----
+\`\`\`markdown
+# {{TITLE}}
 
-Analyze this problem thoroughly. ultrathink
+## Summary
+{{EXECUTIVE_SUMMARY}}
 
-[Instructions...]
+## Key Findings
+{{FINDINGS_LIST}}
+
+## Recommendations
+{{RECOMMENDATIONS}}
+
+## Appendix
+{{DETAILED_DATA}}
+\`\`\`
+
+Fill placeholders based on analysis.
 ```
 
-## Skill Distribution Scopes
+### Template from Assets
 
-| Scope | Path | Applies to |
-|-------|------|------------|
-| Enterprise | Managed settings | All org users |
-| Personal | `~/.claude/skills/` | You, all projects |
-| Project | `.claude/skills/` | This project only |
-| Plugin | `<plugin>/skills/` | Where plugin is enabled |
+```markdown
+## Report Generation
 
-**Priority:** enterprise > personal > project (higher wins on collision)
+1. Read template from assets/report-template.html
+2. Fill placeholders with analyzed data:
+   - {{title}} → Report title
+   - {{date}} → Current date
+   - {{content}} → Analysis results
+3. Save to output directory
+```
 
-Plugin skills use namespace: `plugin-name:skill-name` (no conflicts)
+## Visual Output Skills
+
+### HTML Generation Pattern
+
+```markdown
+## Visualization
+
+Generate interactive HTML for exploration:
+
+\`\`\`bash
+python scripts/visualize.py --input data.json --output report.html
+\`\`\`
+
+The script generates a self-contained HTML file with:
+- Interactive charts
+- Collapsible sections
+- Search/filter capability
+
+Open in browser to explore results.
+```
+
+### When to Generate Visual Output
+
+- Data exploration with many dimensions
+- Results that benefit from interactivity
+- Outputs for non-technical stakeholders
+- Complex relationships that need visualization
+
+## Security Considerations
+
+### Input Validation in Skills
+
+```markdown
+## Input Requirements
+
+Before processing, verify:
+1. File exists and is readable
+2. File size is under 10MB
+3. File extension matches expected type
+4. Content does not contain executable code
+```
+
+### Limiting Scope
+
+```markdown
+## Scope Boundaries
+
+This skill operates ONLY on:
+- Files in the current project directory
+- Files with extensions: .py, .js, .ts
+
+Do NOT:
+- Access files outside project directory
+- Modify system files
+- Execute downloaded code
+- Make network requests
+```
+
+### Audit Trail
+
+```markdown
+## Logging
+
+Log all operations to logs/${CLAUDE_SESSION_ID}.log:
+- Timestamp
+- Operation performed
+- Files affected
+- Result status
+```
