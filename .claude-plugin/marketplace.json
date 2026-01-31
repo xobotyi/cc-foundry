@@ -2,7 +2,8 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "foundry",
   "owner": {
-    "name": "xobotyi"
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru"
   },
   "metadata": {
     "description": "Shared Claude Code configurations, skills, agents, and commands"
@@ -11,16 +12,34 @@
     {
       "name": "skill-enforcer",
       "description": "Enforces skill evaluation at key lifecycle points via SEF checkpoints",
+      "version": "1.0.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
       "source": "./plugins/skill-enforcer",
       "category": "productivity",
-      "version": "1.0.0"
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/main/plugins/skill-enforcer",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["skills", "enforcement", "hooks", "lifecycle"],
+      "tags": ["automation", "workflow", "discipline"]
     },
     {
       "name": "ai-helpers",
       "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
       "source": "./plugins/ai-helpers",
       "category": "development",
-      "version": "0.1.0"
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/main/plugins/ai-helpers",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["prompts", "skills", "agents", "output-styles"],
+      "tags": ["ai", "engineering", "meta"]
     }
   ]
 }
