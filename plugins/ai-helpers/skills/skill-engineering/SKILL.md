@@ -1,8 +1,8 @@
 ---
 name: skill-engineering
 description: >-
-  Create, evaluate, and improve Claude Code skills. Use when working with
-  SKILL.md files, debugging skill activation, or building new skills.
+  Skills for Claude Code. Invoke when creating, editing, debugging,
+  or asking questions about skills.
 ---
 
 # Skill Engineering
@@ -11,8 +11,16 @@ Skills are prompt templates that extend Claude with domain expertise.
 They load on-demand: Claude sees only `name` and `description` at startup,
 then loads full SKILL.md content when triggered.
 
-**Skills are prompts.** Apply prompt engineering principles when writing them.
-Consider invoking the `prompt-engineering` skill for complex instruction design.
+<prerequisite>
+**Skills are prompts.** Before writing or improving a skill, invoke
+`prompt-engineering` to load instruction design techniques.
+
+```
+Skill(ai-helpers:prompt-engineering)
+```
+
+Skip only for trivial edits (typos, formatting).
+</prerequisite>
 
 ## Route to Reference
 
@@ -131,8 +139,7 @@ For skills with multiple references, add a "Route to Reference" table
 
 **Skills are prompts.**
 Every prompt engineering principle applies. Use clear structure, examples,
-XML tags, and explicit format specifications. Consider invoking the
-`prompt-engineering` skill when designing complex instructions.
+XML tags, and explicit format specifications.
 
 **Description is the trigger.**
 Claude decides activation based solely on matching user request to

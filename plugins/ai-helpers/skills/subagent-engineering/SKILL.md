@@ -1,9 +1,8 @@
 ---
 name: subagent-engineering
 description: >-
-  Create, evaluate, and improve Claude Code subagents. Use when
-  building custom agents, debugging agent behavior, optimizing agent pipelines,
-  or deciding between subagents vs other approaches.
+  Subagents for Claude Code. Invoke when creating, debugging, or
+  deciding whether to use agents for task delegation.
 ---
 
 # Subagent Engineering
@@ -11,8 +10,16 @@ description: >-
 Manage the full lifecycle of Claude Code subagents: creation, evaluation,
 iteration, and troubleshooting.
 
-**Note:** Subagent prompts are system prompts. Apply `prompt-engineering`
-skill techniques for better agents.
+<prerequisite>
+**Subagent prompts are system prompts.** Before creating or improving
+a subagent, invoke `prompt-engineering` to load instruction design techniques.
+
+```
+Skill(ai-helpers:prompt-engineering)
+```
+
+Skip only for trivial edits (typos, formatting).
+</prerequisite>
 
 ## What Are You Trying To Do?
 
@@ -125,7 +132,6 @@ When names collide, higher priority wins.
 
 ## Related Skills
 
-- `prompt-engineering` — Subagent prompts are system prompts; apply
-  prompting techniques for better agents
+- `prompt-engineering` — Load first for instruction design techniques
 - `skill-engineering` — Skills and subagents complement each other;
   understand when to use which

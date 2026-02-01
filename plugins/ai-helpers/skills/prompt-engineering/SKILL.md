@@ -1,7 +1,8 @@
 ---
 name: prompt-engineering
 description: >-
-  Craft, debug, and improve prompts, skills, agents, and output styles. Use when working with any AI instructions.
+  Prompt design for any AI context. Invoke for skills, agents,
+  output styles, system prompts, or any LLM instructions.
 ---
 
 # Prompt Engineering

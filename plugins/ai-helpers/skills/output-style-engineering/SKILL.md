@@ -1,8 +1,8 @@
 ---
 name: output-style-engineering
 description: >-
-  Create and improve Claude Code output styles. Use when building
-  personas, changing Claude's tone, or working with output-styles files.
+  Output styles for Claude Code. Invoke when creating or editing
+  styles, or changing Claude's personality/tone.
 ---
 
 # Output Style Engineering
@@ -10,8 +10,16 @@ description: >-
 Output styles replace Claude Code's system prompt, transforming the
 main agent's personality while retaining all tools and capabilities.
 
-**Output styles are prompts.** Apply prompt engineering principles when
-writing them. Consider invoking `prompt-engineering` for complex designs.
+<prerequisite>
+**Output styles are system prompts.** Before creating or improving
+an output style, invoke `prompt-engineering` to load instruction design techniques.
+
+```
+Skill(ai-helpers:prompt-engineering)
+```
+
+Skip only for trivial edits (typos, formatting).
+</prerequisite>
 
 ## Quick Start
 

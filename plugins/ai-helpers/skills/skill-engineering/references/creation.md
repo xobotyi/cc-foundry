@@ -88,6 +88,36 @@ description: >-
   Use when asked to review, audit, or analyze code quality.
 ```
 
+### Default to Broad Descriptions
+
+Descriptions should be **broad by default**. Narrow descriptions create
+implicit exclusion — if a user's request doesn't match the listed scenarios,
+Claude won't activate the skill.
+
+**Too narrow (avoid):**
+```yaml
+description: >-
+  Create, evaluate, and improve Claude Code skills. Use when working with
+  SKILL.md files, debugging skill activation, or building new skills.
+```
+Lists specific scenarios → misses "how do skills work?" or "should I use a skill here?"
+
+**Broad (preferred):**
+```yaml
+description: >-
+  Skills for Claude Code. Invoke when creating, editing, debugging,
+  or asking questions about skills.
+```
+Category first, inclusive language ("asking questions about") catches exploratory queries.
+
+**Principles:**
+- Lead with category, not action list
+- Use "Invoke" (imperative) over "Use when" (conditional)
+- Include "asking questions about" for exploratory coverage
+- Keep short — less room for implicit exclusions
+
+Users can request narrowing during iteration if over-activation occurs.
+
 ### Description Anti-Patterns
 
 | Pattern | Problem |
