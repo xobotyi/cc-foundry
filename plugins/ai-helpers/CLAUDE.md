@@ -10,6 +10,7 @@ Skills and output styles for creating and improving AI artifacts.
 | `skill-engineering` | Create, evaluate, iterate Claude Code skills |
 | `subagent-engineering` | Build and debug Claude Code subagents |
 | `output-style-engineering` | Create Claude Code output styles |
+| `claude-code-sdk` | Reference for Claude Code extensibility (plugins, hooks, MCP, settings) |
 
 ## Output Styles
 
@@ -19,18 +20,20 @@ Skills and output styles for creating and improving AI artifacts.
 
 ## Skill Dependencies
 
-All skills share a foundation:
-
 ```
 prompt-engineering (foundation)
     ↑
     ├── skill-engineering (skills are prompts)
     ├── subagent-engineering (agent prompts are system prompts)
     └── output-style-engineering (styles are system prompts)
+
+claude-code-sdk (reference)
+    ↑
+    └── All engineering skills consult SDK docs for implementation details
 ```
 
 When writing skills, subagents, or output styles, invoke `prompt-engineering`
-for complex instruction design.
+for instruction design and `claude-code-sdk` for API/configuration details.
 
 ## Skill Structure Pattern
 

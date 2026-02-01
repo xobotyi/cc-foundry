@@ -49,6 +49,14 @@ Create and improve Claude Code output styles.
 **Triggers:** Building personas, customizing Claude's tone,
 working with output-styles files.
 
+### claude-code-sdk
+
+Claude Code extensibility reference: plugins, skills, hooks, MCP,
+output styles, settings, CLAUDE.md, subagents.
+
+**Triggers:** Creating or debugging Claude Code extensions, understanding
+configuration hierarchy, questions about Claude Code internals.
+
 ## Quick Reference
 
 | Task | Skill |
@@ -58,6 +66,7 @@ working with output-styles files.
 | Build a custom agent | `subagent-engineering` |
 | Change Claude's personality | `output-style-engineering` |
 | Debug AI behavior | Start with `prompt-engineering` |
+| Claude Code API/config reference | `claude-code-sdk` |
 
 ## Skill Relationships
 

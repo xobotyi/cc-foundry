@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "Subagents": "https://code.claude.com/docs/en/sub-agents.md",
+    "Plugins": "https://code.claude.com/docs/en/plugins.md",
+    "Plugins Reference": "https://code.claude.com/docs/en/plugins-reference.md",
+    "Discover Plugins": "https://code.claude.com/docs/en/discover-plugins.md",
+    "Plugin Marketplaces": "https://code.claude.com/docs/en/plugin-marketplaces.md",
+    "Skills": "https://code.claude.com/docs/en/skills.md",
+    "Output Styles": "https://code.claude.com/docs/en/output-styles.md",
+    "Hooks": "https://code.claude.com/docs/en/hooks.md",
+    "Hooks Guide": "https://code.claude.com/docs/en/hooks-guide.md",
+    "MCP": "https://code.claude.com/docs/en/mcp.md",
+    "Settings": "https://code.claude.com/docs/en/settings.md",
+    "Model Config": "https://code.claude.com/docs/en/model-config.md",
+    "Memory": "https://code.claude.com/docs/en/memory.md",
+    "Best Practices": "https://code.claude.com/docs/en/best-practices.md"
+  },
+  "lastFetched": "2026-02-01T15:56:50.366Z"
+}
