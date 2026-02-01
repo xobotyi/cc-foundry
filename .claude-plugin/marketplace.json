@@ -11,8 +11,8 @@
   "plugins": [
     {
       "name": "skill-enforcer",
-      "description": "Enforces skill evaluation at key lifecycle points via SEF checkpoints",
-      "version": "1.0.0",
+      "description": "Enforces skill invocation and reference reading via SEF checkpoints",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
