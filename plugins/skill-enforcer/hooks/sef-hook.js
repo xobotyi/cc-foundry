@@ -1,69 +1,82 @@
 #!/usr/bin/env node
 
-const FRAMEWORK = `<skill-enforcement-framework id="SEF">
-SEF governs skill invocation throughout this session.
+const FRAMEWORK = `<SEF>
+Skill Enforcement. Ensure skills are invoked and references read.
 
-## Protocol
+## Purpose
 
-<constraint>
-Proceeding without completing the action is FORBIDDEN.
-Acknowledging tags without acting is a violation.
-You MUST state your evaluation result in thinking before tool use.
-</constraint>
+1. INVOKE skills when task matches their coverage or domain
+2. READ skill references when context or phase shifts
 
-<verification>
-After invoking skills, verify: Did I call Skill() for each identified
-skill, or only acknowledge them in text? If acknowledge-only, invoke NOW.
-</verification>
+## Matching
 
-## Tags
+- Match by coverage: skill description covers the task
+- Match by domain: skill operates in same domain (coding, prompting, etc.)
+- Multiple skills often apply — invoke all that match, not just one
 
-<SEF_PROMPT>
-User prompt received. Evaluate skills BEFORE any tool use.
-1. CLASSIFY: Task domain?
-2. MATCH: Skills whose coverage INCLUDES this task?
-3. CHECK: Already invoked vs missing?
-4. INVOKE: Call Skill() for each missing
-5. RE-EVALUATE: New context may reveal more skills
+## Format
 
-Output in thinking: "SEF: [domain] → invoke [skills] | none needed"
-</SEF_PROMPT>
+Tag seen → Thought → Action → proceed.
 
-<SEF_EVAL>
-Context gathered. Evaluate skills NOW.
-1. Review context to understand task domain
-2. Identify skills whose coverage matches
-3. If missing, invoke BEFORE continuing
-4. Multiple may apply—invoke ALL in batch
+Thought:
+  SEF [PHASE]
+  [evaluation]
+  → [decision]
 
-Output in thinking: "SEF: [domain] → invoke [skills] | none needed"
-</SEF_EVAL>
+## Stages
 
-<SEF_PHASE>
-Code modified. Phase may have shifted.
-1. Assess phase: coding → testing → review
-2. If changed, re-read skill references for new phase
-3. Check phase-specific guidance (testing docs, validation)
-4. Consider if quality-validation now applies
+USER-PROMPT (new user message):
+  Task: [what user asked]
+  Skills: [all skills matching by coverage or domain]
+  → invoke [list] | none match
 
-Output in thinking: "SEF: phase [current] → re-read [refs] | same phase"
-</SEF_PHASE>
+  Action: Call Skill() for each match.
 
-<SEF_REFS>
-Skill loaded. Check batch opportunities.
-1. Need more skills? Invoke together NOW
-2. Read loaded skill's references/ for current phase
+EVALUATION (after Read):
+  Context: [what was learned]
+  Skills: [skills now relevant that weren't before]
+  Refs: [references to read given new context]
+  → invoke [list] | continue
 
-Output in thinking: "SEF: batch [additional skills] | complete"
-</SEF_REFS>
-</skill-enforcement-framework>`;
+  Action: Invoke missing skills. Read relevant refs.
+
+PHASE-CHANGE (after Edit/Write):
+  Phase: [coding | testing | review]
+  Shift: [yes/no]
+  Refs: [skill references for new phase]
+  → read [refs] | same phase
+
+  Action: Read phase-appropriate references.
+
+SKILL-LOAD (after Skill):
+  Loaded: [skill name]
+  Related: [other skills to batch]
+  Refs: [this skill's references to read now]
+  → batch [list] | done
+
+  Action: Invoke related skills. Read references.
+
+## Rule
+
+No skill invocation when matched = violation.
+No reference read when context shifts = incomplete.
+
+## Example
+
+  SEF USER-PROMPT
+  Task: improve commit message validation
+  Skills: prompt-engineering, skill-engineering
+  → invoke both
+</SEF>`;
+
+const TRIGGER = 'Invoke stage procedure.';
 
 const RESPONSES = {
     'session-start': { event: 'SessionStart', context: FRAMEWORK },
-    'prompt': { event: 'UserPromptSubmit', context: '<SEF_PROMPT/>' },
-    'read': { event: 'PostToolUse', context: '<SEF_EVAL/>' },
-    'write': { event: 'PostToolUse', context: '<SEF_PHASE/>' },
-    'skill': { event: 'PostToolUse', context: '<SEF_REFS/>' }
+    'prompt': { event: 'UserPromptSubmit', context: `<SEF phase="USER-PROMPT">${TRIGGER}</SEF>` },
+    'read': { event: 'PostToolUse', context: `<SEF phase="EVALUATION">${TRIGGER}</SEF>` },
+    'write': { event: 'PostToolUse', context: `<SEF phase="PHASE-CHANGE">${TRIGGER}</SEF>` },
+    'skill': { event: 'PostToolUse', context: `<SEF phase="SKILL-LOAD">${TRIGGER}</SEF>` }
 };
 
 const action = process.argv[2];

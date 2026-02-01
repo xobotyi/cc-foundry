@@ -19,10 +19,10 @@ creates mandatory checkpoints at key lifecycle points:
 
 ```
 Session Start    →  Load full SEF framework
-User Prompt      →  SEF_PROMPT: Evaluate before tool use
-After Read       →  SEF_EVAL: Evaluate after context gathering
-After Edit/Write →  SEF_PHASE: Check for phase transitions
-After Skill      →  SEF_REFS: Consider batch invocations
+User Prompt      →  USER-PROMPT: Evaluate and invoke skills
+After Read       →  EVALUATION: Re-evaluate after context gathering
+After Edit/Write →  PHASE-CHANGE: Check for phase transitions
+After Skill      →  SKILL-LOAD: Consider batch invocations, read refs
 ```
 
 ## Installation
@@ -49,15 +49,14 @@ evaluation protocols.
 
 ### 2. Tag-Based Checkpoints
 
-During the session, hooks inject minimal XML tags at specific points:
+During the session, hooks inject XML tags at specific points:
 
-- `<SEF_PROMPT/>` - Before processing user prompts
-- `<SEF_EVAL/>` - After Read/Grep/Glob tool use
-- `<SEF_PHASE/>` - After Edit/Write tool use
-- `<SEF_REFS/>` - After Skill tool use
+- `<SEF phase="USER-PROMPT">` - Before processing user prompts
+- `<SEF phase="EVALUATION">` - After Read tool use
+- `<SEF phase="PHASE-CHANGE">` - After Edit/Write tool use
+- `<SEF phase="SKILL-LOAD">` - After Skill tool use
 
-Each tag triggers a specific evaluation workflow defined in the
-framework.
+Each tag triggers a Thought → Action workflow defined in the framework.
 
 ### 3. Enforcement
 
@@ -77,10 +76,10 @@ argument:
 
 ```bash
 node sef-hook.js session-start  # Outputs full framework
-node sef-hook.js prompt         # Outputs SEF_PROMPT tag
-node sef-hook.js read           # Outputs SEF_EVAL tag
-node sef-hook.js write          # Outputs SEF_PHASE tag
-node sef-hook.js skill          # Outputs SEF_REFS tag
+node sef-hook.js prompt         # Outputs <SEF phase="USER-PROMPT">
+node sef-hook.js read           # Outputs <SEF phase="EVALUATION">
+node sef-hook.js write          # Outputs <SEF phase="PHASE-CHANGE">
+node sef-hook.js skill          # Outputs <SEF phase="SKILL-LOAD">
 ```
 
 ## Configuration
