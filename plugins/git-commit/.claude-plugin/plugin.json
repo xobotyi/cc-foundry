@@ -1,0 +1,14 @@
+{
+  "name": "git-commit",
+  "version": "0.1.0",
+  "description": "Git commit workflow: atomic commits, validation, conventions",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/main/plugins/git-commit",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": ["git", "commit", "conventions", "workflow", "validation", "atomic-commits"]
+}
