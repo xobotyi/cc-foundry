@@ -1,5 +1,5 @@
 ---
-name: ai-engineer
+name: AI Engineer
 description: For prompt engineering, skill creation, and agent design. Use when building or improving AI artifacts.
 keep-coding-instructions: true
 ---
