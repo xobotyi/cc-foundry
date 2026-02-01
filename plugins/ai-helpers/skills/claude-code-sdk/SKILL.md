@@ -21,6 +21,7 @@ Authoritative reference for Claude Code extensibility and configuration.
 | Memory: CLAUDE.md, rules, imports, hierarchy | [memory.md](references/memory.md) |
 | Output Styles: personas, system prompt modification | [output-styles.md](references/output-styles.md) |
 | Settings: scopes, permissions, sandbox, env vars, tools | [settings.md](references/settings.md) |
+| Status line: custom display, JSON input, scripts | [statusline.md](references/statusline.md) |
 | Usage patterns: context management, verification, scaling | [best-practices.md](references/best-practices.md) |
 
 **Read the relevant reference before making changes.**

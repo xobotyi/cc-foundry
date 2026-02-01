@@ -13,7 +13,8 @@
     "Settings": "https://code.claude.com/docs/en/settings.md",
     "Model Config": "https://code.claude.com/docs/en/model-config.md",
     "Memory": "https://code.claude.com/docs/en/memory.md",
-    "Best Practices": "https://code.claude.com/docs/en/best-practices.md"
+    "Best Practices": "https://code.claude.com/docs/en/best-practices.md",
+    "Status Line": "https://code.claude.com/docs/en/statusline.md"
   },
   "lastFetched": "2026-02-01T15:56:50.366Z"
 }
