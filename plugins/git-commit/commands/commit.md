@@ -24,6 +24,18 @@ Do not proceed without loading the skill.
 
 ## Commit Pipeline
 
+<pipeline-awareness>
+**Context drift prevention.** Steps like Quality Gate may require fixing
+code, running tests, or debugging — work that can span many turns. Before
+executing any git command, verify you haven't lost the pipeline:
+
+1. **Am I in the commit pipeline?** (If not, return to step 1)
+2. **Which step am I on?**
+3. **Were prior steps completed?**
+
+If uncertain, re-read staged changes with `git diff --cached` to re-anchor.
+</pipeline-awareness>
+
 ### 1. Identify Atomic Units
 
 Review the diff and identify **separate logical changes**:
@@ -75,6 +87,9 @@ For each identified unit, classify and order:
 3. **On failure:** Fix issues before proceeding. Do not commit broken code.
 
 4. **On success:** Continue to self-review.
+
+**After returning from fixes:** Re-read `<pipeline-awareness>` above.
+Verify you're resuming at step 4, not starting over or skipping steps.
 </quality-gate>
 
 ### 4. Self-Review Before Commit
