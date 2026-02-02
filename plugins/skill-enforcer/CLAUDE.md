@@ -1,49 +1,65 @@
 # Skill Enforcer Plugin
 
-Enforces skill invocation and reference reading at key lifecycle points.
+This plugin ensures Claude consistently invokes skills and reads their
+references throughout a coding session. Without enforcement, Claude tends
+to skip skills when jumping straight to implementation, and forgets to
+re-read references when development phases change.
 
-## How It Works
+## The Core Problem
 
-SEF framework injected at session start, then tags trigger evaluation:
+Skills aren't atomic. When you invoke a skill, you get its main content,
+but skills often contain multiple references — some relevant to coding,
+others to testing, others to review. The default behavior treats skill
+invocation as "done," missing references that become relevant later.
 
-- **Session start**: Full framework loaded
-- **User prompt**: Invoke skills matching task
-- **After Read**: Re-evaluate with new context
-- **After Edit/Write**: Check phase transitions
-- **After Skill**: Batch invoke, read references
+For example: you invoke a coding skill while writing implementation.
+Later, you transition to writing tests. The same skill has testing
+references you never read, because the skill was already "invoked."
 
-## SEF Tags
+## How SEF Solves This
 
-| Tag | Trigger | Action |
-|-----|---------|--------|
-| `<SEF phase="USER-PROMPT">` | User message | Invoke matching skills |
-| `<SEF phase="EVALUATION">` | After Read | Invoke if context reveals needs |
-| `<SEF phase="PHASE-CHANGE">` | After Edit/Write | Read refs if phase shifted |
-| `<SEF phase="SKILL-LOAD">` | After Skill | Batch invoke, read skill refs |
+The Skill Enforcement Framework (SEF) injects at session start and
+establishes checkpoints via XML tags at key lifecycle events:
 
-## Matching Principles
+| Event | Tag | What Happens |
+|-------|-----|--------------|
+| Session start | Full framework | Establishes vocabulary and protocol |
+| User message | `<SEF phase="USER-PROMPT">` | Evaluate which skills match the task |
+| After Read | `<SEF phase="EVALUATION">` | Re-evaluate after learning new context |
+| After Edit/Write | `<SEF phase="PHASE-CHANGE">` | Check if phase shifted, load new refs |
+| After Skill | `<SEF phase="SKILL-LOAD">` | Consider related skills, read initial refs |
 
-- Match by **coverage**: skill description covers the task
-- Match by **domain**: skill operates in same domain
-- **Multiple skills** often apply — invoke all that match
+## Key Concepts
 
-## Compliance
+**Skills are not atomic.** A skill isn't exhausted until all phase-relevant
+references have been read. Invocation is a starting point, not an endpoint.
 
-Tag seen → Thought → Action → proceed.
+**Phase shifts require re-evaluation.** When transitioning from coding to
+testing (or any phase change), both new skills AND references from
+already-loaded skills must be considered.
 
-### Thought Format
+**Evaluation requires reasoning output.** Seeing a tag and silently
+acknowledging it is a violation. The evaluation must be output in the
+reasoning stage (thinking block) following the prescribed thought format.
+
+## Thought Format
+
+When a tag is seen, output in reasoning stage:
 
 ```
 SEF [PHASE]
-Task: [what user asked]
-Skills: [matching skills]
-→ invoke [list] | none
+[evaluation fields per stage]
+→ [decision]
 ```
 
-### Rule
+Each stage has specific fields. For example, PHASE-CHANGE requires
+enumerating loaded skills and listing unread refs per skill.
 
-No skill invocation when matched = violation.
-No reference read when context shifts = incomplete.
+## Compliance
+
+- No skill invocation when matched = violation
+- No reference read when context shifts = incomplete
+- No reasoning output = no evaluation = violation
 
 <claude-mem-context>
 # Recent Activity
@@ -54,6 +70,7 @@ No reference read when context shifts = incomplete.
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #6530 | 8:46 PM | ✅ | SEF thought format wrapped in code block for clarity | ~284 |
 | #6520 | 8:41 PM | 🔵 | Skill enforcer plugin documentation structure examined | ~387 |
 | #6517 | 8:40 PM | 🔵 | SEF plugin documentation with compliance verification workflow | ~456 |
 </claude-mem-context>
