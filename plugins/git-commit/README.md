@@ -11,7 +11,10 @@ Git commit workflow plugin for Claude Code.
 
 ## Installation
 
-Add to your Claude Code plugins or marketplace.
+```
+/plugin marketplace add xobotyi/cc-foundry
+/plugin install git-commit
+```
 
 ## Usage
 

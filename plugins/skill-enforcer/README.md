@@ -42,16 +42,9 @@ references have been read.
 
 ## Installation
 
-Copy this plugin to your Claude Code plugins directory:
-
-```bash
-cp -r plugins/skill-enforcer ~/.claude/plugins/
 ```
-
-Or symlink for development:
-
-```bash
-ln -s $(pwd)/plugins/skill-enforcer ~/.claude/plugins/skill-enforcer
+/plugin marketplace add xobotyi/cc-foundry
+/plugin install skill-enforcer
 ```
 
 ## How It Works
