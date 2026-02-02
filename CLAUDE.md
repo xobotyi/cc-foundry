@@ -57,6 +57,14 @@ Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 - Each plugin has `CLAUDE.md` explaining its components
 - Each plugin has `README.md` for user-facing documentation
 
+**Installation instructions:**
+- All plugin READMEs must use marketplace commands:
+  ```
+  /plugin marketplace add xobotyi/cc-foundry
+  /plugin install <plugin-name>
+  ```
+- Do not use manual cp/ln installation methods
+
 **Version management:**
 - Plugin versions must be synchronized between `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
 - Update both files when bumping versions
