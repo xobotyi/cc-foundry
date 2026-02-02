@@ -1,72 +1,179 @@
 #!/usr/bin/env node
 
 const FRAMEWORK = `<SEF>
-Skill Enforcement. Ensure skills are invoked and references read.
+Skill Enforcement Framework for Claude skill and reference management.
 
-## Purpose
+<purpose>
+- Ensure skills are invoked in advance of tasks they cover — proactive, not reactive.
+- References within skills are read when context or phase makes them relevant — not all at once.
+- Skills are not atomic: a skill is not exhausted until all phase-relevant references have been read.
+- Therefore, skill invocation is a starting point, not an endpoint.
+</purpose>
 
-1. INVOKE skills when task matches their coverage or domain
-2. READ skill references when context or phase shifts
+<skill-matching>
+- Multiple skills may match a single task — invoke all that match, not just one.
+- Skills are identified by name and description; both are used for matching.
+- Match by comparing task context to skill names and descriptions.
+- A skill matches when the task involves its subject matter or would benefit from its capabilities.
+</skill-matching>
 
-## Matching
+<skill-reference-matching>
+- Skills contain references; not all are relevant at once.
+- After invoking a skill, read references relevant to the current context and phase.
+- When context or phase shifts, re-evaluate loaded skills for newly relevant references.
+- Read new references before proceeding — anticipate needs, don't react to gaps.
+</skill-reference-matching>
 
-- Match by coverage: skill description covers the task
-- Match by domain: skill operates in same domain (coding, prompting, etc.)
-- Multiple skills often apply — invoke all that match, not just one
+<phase-shift>
+- Tasks involve phases — coding, testing, review, deployment, and others.
+- Phase shifts require re-evaluation — both new skills and references from already-loaded skills.
+- Already-loaded skills often have unread references relevant to the new phase; these must be read.
+- Identify the phase shift, load what's needed, then proceed.
+</phase-shift>
 
-## Format
+<evaluation-protocol>
+Throughout the session, SEF tags appear at lifecycle events to trigger
+evaluation. Each tag includes a phase attribute indicating which stage
+to execute.
 
-Tag seen → Thought → Action → proceed.
+The evaluation must be output in the reasoning stage (thinking block),
+not in the visible response. The user does not see SEF evaluation
+unless they examine extended output. Silent acknowledgment without
+reasoning output is a violation.
 
-Thought:
+Flow:
+  1. Tag seen → identify phase
+  2. Output evaluation in reasoning stage (thinking block)
+  3. Reach decision
+  4. Take action (visible to user)
+  5. Proceed
+
+Thought format (in reasoning stage):
   SEF [PHASE]
-  [evaluation]
+  [evaluation per stage requirements]
   → [decision]
 
-## Stages
+No reasoning output = no evaluation = violation.
+</evaluation-protocol>
 
-USER-PROMPT (new user message):
+<stages>
+
+<SEF phase="USER-PROMPT">
+Trigger: new user message
+
+Thought:
+  SEF USER-PROMPT
   Task: [what user asked]
-  Skills: [all skills matching by coverage or domain]
+  Skills: [matching skills]
   → invoke [list] | none match
 
-  Action: Call Skill() for each match.
+Action: Invoke each matching skill.
+</SEF>
 
-EVALUATION (after Read):
+<SEF phase="EVALUATION">
+Trigger: after Read
+
+Thought:
+  SEF EVALUATION
   Context: [what was learned]
-  Skills: [skills now relevant that weren't before]
-  Refs: [references to read given new context]
-  → invoke [list] | continue
+  Skills: [skills now relevant]
+  Refs: [references to read]
+  → invoke [list] | none match
 
-  Action: Invoke missing skills. Read relevant refs.
+Action: Invoke missing skills. Read relevant refs.
+</SEF>
 
-PHASE-CHANGE (after Edit/Write):
-  Phase: [coding | testing | review]
+<SEF phase="PHASE-CHANGE">
+Trigger: after Edit/Write
+
+Thought:
+  SEF PHASE-CHANGE
+  Phase: [current phase]
   Shift: [yes/no]
-  Refs: [skill references for new phase]
-  → read [refs] | same phase
+  Loaded skills: [list each by name]
+  Unread refs for new phase: [list per skill]
+  → read [refs] | no shift
 
-  Action: Read phase-appropriate references.
+Action: Read phase-appropriate references from loaded skills.
+</SEF>
 
-SKILL-LOAD (after Skill):
+<SEF phase="SKILL-LOAD">
+Trigger: after Skill invocation
+
+Thought:
+  SEF SKILL-LOAD
   Loaded: [skill name]
   Related: [other skills to batch]
   Refs: [this skill's references to read now]
-  → batch [list] | done
+  → batch [list] | none
 
-  Action: Invoke related skills. Read references.
+Action: Invoke related skills. Read references.
+</SEF>
 
-## Rule
+</stages>
 
-No skill invocation when matched = violation.
-No reference read when context shifts = incomplete.
+<rules>
+- No skill invocation when matched = violation.
+- No reference read when context shifts = incomplete.
+</rules>
 
-## Example
+<examples>
 
+<example name="skill-invocation">
+Trigger received:
+  <SEF phase="USER-PROMPT">Invoke stage procedure.</SEF>
+
+Thought output:
   SEF USER-PROMPT
   Task: improve commit message validation
   Skills: prompt-engineering, skill-engineering
   → invoke both
+</example>
+
+<example name="phase-transition">
+Trigger received:
+  <SEF phase="PHASE-CHANGE">Invoke stage procedure.</SEF>
+
+Context: Agent finished writing implementation code, now writing tests.
+Coding skill was loaded earlier; its testing references were not read.
+
+Thought output:
+  SEF PHASE-CHANGE
+  Phase: testing
+  Shift: yes (from coding to testing)
+  Loaded skills: coding, golang
+  Unread refs for new phase:
+    - coding: references/testing-guidelines.md
+    - golang: references/testing-conventions.md
+  → read both refs
+
+Action: Read testing-guidelines.md and testing-conventions.md before
+writing tests.
+</example>
+
+<example name="violation">
+Context: Agent transitions from coding to testing. Test-reviewer skill
+matches but was not invoked. Coding skill is loaded but testing refs
+were not read.
+
+Violation thought (WRONG):
+  SEF PHASE-CHANGE
+  Phase: testing
+  Shift: yes
+  Loaded skills: coding
+  Unread refs: none
+  → no shift
+
+Problems:
+  1. Did not invoke test-reviewer skill (matched but not invoked)
+  2. Did not enumerate golang in loaded skills
+  3. Claimed "none" for unread refs when testing refs exist
+  4. Decided "no shift" despite acknowledging shift=yes
+
+This is a double violation: missed skill invocation AND missed reference read.
+</example>
+
+</examples>
 </SEF>`;
 
 const TRIGGER = 'Invoke stage procedure.';
