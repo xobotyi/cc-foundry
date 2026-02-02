@@ -4,19 +4,10 @@ Claude Code plugin for creating and improving AI artifacts.
 
 ## Installation
 
-Add to your Claude Code plugins:
-
-```bash
-# Project-level
-mkdir -p .claude/plugins
-ln -s path/to/ai-helpers .claude/plugins/ai-helpers
-
-# User-level
-mkdir -p ~/.claude/plugins
-ln -s path/to/ai-helpers ~/.claude/plugins/ai-helpers
 ```
-
-Or add to your plugin configuration.
+/plugin marketplace add xobotyi/cc-foundry
+/plugin install ai-helpers
+```
 
 ## Skills
 
