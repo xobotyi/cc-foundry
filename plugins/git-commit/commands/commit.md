@@ -60,7 +60,24 @@ For each identified unit, classify and order:
 
 **Commit style/refactor first** — keeps behavior-changing commits clean.
 
-### 3. Self-Review Before Commit
+### 3. Quality Gate
+
+<quality-gate>
+**Before committing, ensure code quality checks pass.**
+
+1. **Review context:** Were lint/test/build commands run earlier in this
+   session for the changed files? If yes and they passed, proceed.
+
+2. **If not verified:** Run appropriate quality checks for the project.
+   Use your knowledge of the codebase to determine what checks apply.
+   Scope to changed files when possible for faster feedback.
+
+3. **On failure:** Fix issues before proceeding. Do not commit broken code.
+
+4. **On success:** Continue to self-review.
+</quality-gate>
+
+### 4. Self-Review Before Commit
 
 Before each commit, verify:
 
@@ -73,7 +90,7 @@ Before each commit, verify:
 git diff --cached      # Review exactly what will be committed
 ```
 
-### 4. Stage Files
+### 5. Stage Files
 
 For each logical unit:
 
@@ -83,13 +100,13 @@ git add <files>
 git add -p             # Interactive: stage specific hunks
 ```
 
-### 5. Validate Message
+### 6. Validate Message
 
 <mandatory>
 **Before committing, validate the message against conventions:**
 
 ```bash
-echo "<commit-message>" | node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js
+node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js --msg "<commit-message>"
 ```
 
 - Fix any ERROR issues before proceeding
@@ -97,7 +114,7 @@ echo "<commit-message>" | node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-mes
 - Do not commit until validation passes without errors
 </mandatory>
 
-### 6. Commit
+### 7. Commit
 
 **Before executing git commit, display the full message as a blockquote.**
 
@@ -107,7 +124,7 @@ Then commit:
 git commit -m "<validated-message>"
 ```
 
-### 7. Verify
+### 8. Verify
 
 After committing:
 
