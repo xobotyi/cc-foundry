@@ -2,7 +2,45 @@
 
 import process from 'node:process';
 import posixpath from 'node:path/posix';
+import path from 'node:path';
 import os from 'node:os';
+import fs from 'node:fs';
+import {fileURLToPath} from 'node:url';
+
+/*
+ * ENSURING ROBUST ERROR LOGGING
+ */
+
+/**
+ * Writes error to a log file next to the script.
+ * @param {unknown} err
+ */
+function writeScriptError(err) {
+    const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+    const errorFile = path.join(scriptDir, 'statusline.error.log');
+
+    const timestamp = new Date().toISOString();
+    const message = err instanceof Error
+        ? `${err.name}: ${err.message}\n${err.stack}`
+        : String(err);
+
+    fs.appendFileSync(errorFile, `[${timestamp}]\n${message}\n\n`);
+}
+
+// Register global exception handlers
+process.on('uncaughtException', (err) => {
+    writeScriptError(err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+    writeScriptError(reason);
+    process.exit(1);
+});
+
+/*
+ * ACTUAL STATUSLINE IMPLEMENTATION
+ */
 
 const RESET = '\x1b[0m';
 
@@ -306,7 +344,7 @@ function formatApiTime(data) {
  * @returns {string}
  */
 function formatContextRemaining(data) {
-    const remaining = data.context_window?.remaining_percentage;
+    const remaining = data.context_window?.remaining_percentage ?? undefined;
     let val = c.gray('--.--%')
     if (remaining !== undefined) {
         val = `${remaining.toFixed(2)}%`
@@ -405,4 +443,4 @@ async function main() {
     process.stdout.write(rows.join('\n'));
 }
 
-main().catch(console.error);
+main();
