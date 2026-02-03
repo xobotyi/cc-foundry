@@ -1,11 +1,15 @@
 ---
 name: commit-message
 description: >-
-  Git commit messages. Invoke when creating, reviewing,
-  or asking questions about commit messages.
+  Git commit messages. Invoke when creating, reviewing, or asking questions about commit messages.
 ---
 
 # Commit Message Format
+
+<scope>
+These rules apply **only to git commit messages**. Do not apply line length limits, formatting
+conventions, or structure requirements from this skill to other files (code, documentation, configs, etc.).
+</scope>
 
 A good commit message is a patch note read by colleagues, QA, and future you.
 
@@ -25,9 +29,8 @@ The best commit messages draw from three sources:
 2. **The implementation context** — why this approach was chosen
 3. **The deliverable** — what was actually built
 
-When all three are available, use them. The code shows WHAT exists;
-context reveals WHY. When context is incomplete, describe what you can
-verify from the code and available information.
+When all three are available, use them. The code shows WHAT exists; context reveals WHY.
+When context is incomplete, describe what you can verify from the code and available information.
 </context-principle>
 
 ### Factual, Not Promotional
@@ -35,11 +38,9 @@ verify from the code and available information.
 <factual-principle>
 Commit messages are **factual records**, not marketing copy.
 
-**Subject line**: Strictly factual. Imperative mood. No judgment.
-Describes what was done, not how good it is.
+**Subject line**: Strictly factual. Imperative mood. No judgment. Describes what was done, not how good it is.
 
-**Body**: Can explain reasoning and trade-offs, but remains objective.
-Avoid promotional language.
+**Body**: Can explain reasoning and trade-offs, but remains objective. Avoid promotional language.
 
 The subject answers: "What did this commit do?"
 Not: "Why is this commit amazing?"
@@ -102,8 +103,8 @@ When using scope, it identifies the affected subsystem:
 [myapp/backend]   # or abbreviated: [myapp/b]
 ```
 
-Determine scope from file paths (not contents) — use the common parent
-directory or the most significant component affected.
+Determine scope from file paths (not contents) — use the common parent directory or the most
+significant component affected.
 
 ## Body
 
@@ -130,18 +131,16 @@ The body is where you communicate with future readers. It answers:
 <body-patterns>
 **Bug fix — explain the cause:**
 ```
-Session cache was returning nil when the key existed but the value
-had expired. The TTL check happened after the nil check, causing
-panics on expired sessions.
+Session cache was returning nil when the key existed but the value had expired.
+The TTL check happened after the nil check, causing panics on expired sessions.
 
-Now returns ErrExpired, allowing callers to distinguish between
-"not found" and "expired".
+Now returns ErrExpired, allowing callers to distinguish between "not found" and "expired".
 ```
 
 **Feature — explain the purpose:**
 ```
-Reduces request volume to the API by buffering push attempts and
-sending them as a single batch request on a configured interval.
+Reduces request volume to the API by buffering push attempts and sending them as a single
+batch request on a configured interval.
 ```
 
 **Refactoring — explain the benefit:**
@@ -156,8 +155,8 @@ Preparation for the new package resolution algorithm.
 ## Breaking Changes
 
 <breaking-changes>
-When a commit breaks backward compatibility, the body MUST start with
-a `BREAKING:` declaration as the first paragraph:
+When a commit breaks backward compatibility, the body MUST start with a `BREAKING:` declaration
+as the first paragraph:
 
 ```
 BREAKING: <what is broken>
@@ -165,14 +164,14 @@ BREAKING: <what is broken>
 <explanation and migration path>
 ```
 
-The `BREAKING:` prefix is uppercase and followed by a brief description
-of what breaks. The following paragraphs explain why and how to migrate.
+The `BREAKING:` prefix is uppercase and followed by a brief description of what breaks.
+The following paragraphs explain why and how to migrate.
 </breaking-changes>
 
 ## Trailers (Footer Metadata)
 
-Trailers are structured key-value pairs at the end of the commit message,
-following [git-trailer format](https://git-scm.com/docs/git-interpret-trailers).
+Trailers are structured key-value pairs at the end of the commit message, following
+[git-trailer format](https://git-scm.com/docs/git-interpret-trailers).
 
 <trailers>
 ```
@@ -204,15 +203,14 @@ All trailers use Title-Case for consistency with git standards.
 
 ## Examples
 
-Each example includes: context (what led to the change), the message,
-and analysis (why it works or doesn't).
+Each example includes: context (what led to the change), the message, and analysis (why it works or doesn't).
 
 <examples>
 
 ### Good: Bug fix with cause explanation
 
-**Story:** Users reported session timeouts. Investigation revealed the
-cache was panicking on expired entries instead of returning an error.
+**Story:** Users reported session timeouts. Investigation revealed the cache was panicking on
+expired entries instead of returning an error.
 
 ```
 [core/cache] fix nil pointer in session lookup
@@ -220,51 +218,47 @@ cache was panicking on expired entries instead of returning an error.
 Session cache returned nil when key existed but value had expired.
 TTL check happened after nil check, causing panics.
 
-Now returns ErrExpired, letting callers distinguish "not found"
-from "expired".
+Now returns ErrExpired, letting callers distinguish "not found" from "expired".
 
 Fixes: #127
 ```
 
-**Why it works:** Subject is factual ("fix nil pointer"), not promotional
-("fix critical bug" or "improve session handling"). Body explains the
-cause (TTL check order), not just the symptom. Reader understands both
-what was wrong and why.
+**Why it works:** Subject is factual ("fix nil pointer"), not promotional ("fix critical bug" or
+"improve session handling"). Body explains the cause (TTL check order), not just the symptom.
+Reader understands both what was wrong and why.
 
 ---
 
 ### Good: Feature without scope (single-purpose repo)
 
-**Story:** A metrics library was causing API rate-limits due to high
-request volume. Task was to reduce requests by batching pushes.
+**Story:** A metrics library was causing API rate-limits due to high request volume.
+Task was to reduce requests by batching pushes.
 
 ```
 add buffered metrics pusher
 
-Batches push attempts and sends them as a single request on a
-configured interval. Reduces API request volume.
+Batches push attempts and sends them as a single request on a configured interval.
+Reduces API request volume.
 
 Task: https://tracker.example.com/MRN-53
 ```
 
-**Why it works:** No scope needed — this is a single-purpose metrics
-library. Subject states what was added ("add buffered metrics pusher"),
-not why it's good. Body explains the mechanism and benefit objectively.
-No "implement amazing new feature" or "greatly improve performance".
+**Why it works:** No scope needed — this is a single-purpose metrics library. Subject states what
+was added ("add buffered metrics pusher"), not why it's good. Body explains the mechanism and
+benefit objectively. No "implement amazing new feature" or "greatly improve performance".
 
 ---
 
 ### Bad: Promotional subject
 
-**Story:** Refactored the query builder to use prepared statements
-instead of string concatenation.
+**Story:** Refactored the query builder to use prepared statements instead of string concatenation.
 
 ```
 [storage] implement better SQL query construction
 ```
 
-**Problem:** "better" is a judgment, not a fact. What makes it better?
-The subject sells rather than describes.
+**Problem:** "better" is a judgment, not a fact. What makes it better? The subject sells rather
+than describes.
 
 **Fixed:**
 ```
@@ -274,15 +268,15 @@ Prevents SQL injection and improves readability.
 Uses prepared statements for all dynamic values.
 ```
 
-**Why the fix works:** Subject describes the factual change (replaced X
-with Y). Body explains the benefits objectively.
+**Why the fix works:** Subject describes the factual change (replaced X with Y). Body explains
+the benefits objectively.
 
 ---
 
 ### Bad: Missing cause in bug fix
 
-**Story:** Login was failing for some users. Found that password hash
-comparison was case-sensitive on some databases.
+**Story:** Login was failing for some users. Found that password hash comparison was
+case-sensitive on some databases.
 
 ```
 [auth] fix login bug
@@ -292,36 +286,34 @@ Fixed the login issue.
 Fixes: #234
 ```
 
-**Problem:** "fix login bug" and "fixed the login issue" say nothing.
-What was the bug? Why did it happen? Future reader learns nothing.
+**Problem:** "fix login bug" and "fixed the login issue" say nothing. What was the bug?
+Why did it happen? Future reader learns nothing.
 
 **Fixed:**
 ```
 [auth] fix case-sensitive password hash comparison
 
-Some database collations compare strings case-sensitively, causing
-hash mismatches for passwords with mixed case. Now uses binary
-comparison explicitly.
+Some database collations compare strings case-sensitively, causing hash mismatches for
+passwords with mixed case. Now uses binary comparison explicitly.
 
 Fixes: #234
 ```
 
-**Why the fix works:** Subject describes the actual fix. Body explains
-why the bug existed (database collation) and what changed.
+**Why the fix works:** Subject describes the actual fix. Body explains why the bug existed
+(database collation) and what changed.
 
 ---
 
 ### Bad: No body on non-trivial change
 
-**Story:** Migrated authentication from session cookies to JWT tokens.
-This affects all API endpoints.
+**Story:** Migrated authentication from session cookies to JWT tokens. This affects all API endpoints.
 
 ```
 [auth] migrate to JWT authentication
 ```
 
-**Problem:** Major architectural change with single-line message.
-How does this affect existing sessions? What about the migration path?
+**Problem:** Major architectural change with single-line message. How does this affect existing
+sessions? What about the migration path?
 
 **Fixed:**
 ```
@@ -341,25 +333,25 @@ See: docs/auth-migration.md
 Closes: #456
 ```
 
-**Why the fix works:** Breaking change is declared upfront. Body explains
-impact, migration steps, and links to documentation.
+**Why the fix works:** Breaking change is declared upfront. Body explains impact, migration steps,
+and links to documentation.
 
 ---
 
 ### Bad: Mixed changes, vague description
 
-**Story:** While fixing a bug in the parser, also cleaned up some
-formatting and added a new validation method.
+**Story:** While fixing a bug in the parser, also cleaned up some formatting and added a new
+validation method.
 
 ```
 [parser] various improvements and fixes
 ```
 
-**Problem:** "various improvements" is meaningless. What was improved?
-What was fixed? This should be multiple commits.
+**Problem:** "various improvements" is meaningless. What was improved? What was fixed?
+This should be multiple commits.
 
-**Analysis:** This is a workflow problem, not just a message problem.
-Mixed changes should be split into atomic commits:
+**Analysis:** This is a workflow problem, not just a message problem. Mixed changes should be
+split into atomic commits:
 
 1. `[parser] fix off-by-one error in token position`
 2. `[parser] reformat according to style guide`
