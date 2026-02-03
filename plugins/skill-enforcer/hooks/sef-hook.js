@@ -151,7 +151,7 @@ Action: Read testing-guidelines.md and testing-conventions.md before
 writing tests.
 </example>
 
-<example name="violation">
+<example name="violation-content">
 Context: Agent transitions from coding to testing. Test-reviewer skill
 matches but was not invoked. Coding skill is loaded but testing refs
 were not read.
@@ -171,6 +171,32 @@ Problems:
   4. Decided "no shift" despite acknowledging shift=yes
 
 This is a double violation: missed skill invocation AND missed reference read.
+</example>
+
+<example name="violation-location">
+Context: Agent receives USER-PROMPT trigger.
+
+WRONG — evaluation output in visible response to user:
+  [User sees this in the response]
+  SEF USER-PROMPT
+  Task: refactor authentication module
+  Skills: coding, security
+  → invoke both
+
+  I'll start by invoking the coding and security skills...
+
+CORRECT — evaluation stays in thinking block:
+  [Inside extended thinking, invisible to user]
+  SEF USER-PROMPT
+  Task: refactor authentication module
+  Skills: coding, security
+  → invoke both
+
+  [User sees only this]
+  I'll invoke the coding and security skills to guide this refactor.
+
+The evaluation format is internal reasoning. Users should see actions
+and explanations, not the SEF protocol output itself.
 </example>
 
 </examples>

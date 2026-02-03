@@ -1,6 +1,6 @@
 {
   "name": "skill-enforcer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Enforces skill invocation and reference reading via SEF checkpoints",
   "author": {
     "name": "xobotyi",
