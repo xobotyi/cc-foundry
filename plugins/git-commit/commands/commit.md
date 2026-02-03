@@ -22,6 +22,32 @@ Do not proceed without loading the skill.
 - Unstaged: !`git diff --stat`
 - Recent commits: !`git log --oneline -5`
 
+## Project Configuration
+
+<project-config>
+Projects can define commit requirements in their CLAUDE.md using `<git-commit-config>`:
+
+```xml
+<git-commit-config>
+<validator-args>
+<flag name="require-trailers" value="Task"/>
+</validator-args>
+
+<extra-instructions>
+Project-specific commit guidance goes here.
+</extra-instructions>
+</git-commit-config>
+```
+
+**Before starting the pipeline**, check project CLAUDE.md for `<git-commit-config>`:
+
+1. **`<validator-args>`** — Pass all defined flags directly to the validator.
+   Each `<flag name="X" value="Y"/>` becomes `--X "Y"` in the command.
+
+2. **`<extra-instructions>`** — Highest priority guidance for this commit process.
+   Follow these instructions throughout the pipeline. They override defaults.
+</project-config>
+
 ## Commit Pipeline
 
 <pipeline-awareness>
@@ -121,9 +147,10 @@ git add -p             # Interactive: stage specific hunks
 **Before committing, validate the message against conventions:**
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js --msg "<commit-message>"
+node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js [validator-args] --msg "<commit-message>"
 ```
 
+- If `<validator-args>` exists in project config, include those flags
 - Fix any ERROR issues before proceeding
 - WARN issues are recommendations — address if reasonable
 - Do not commit until validation passes without errors

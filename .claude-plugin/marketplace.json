@@ -44,7 +44,7 @@
     {
       "name": "git-commit",
       "description": "Git commit workflow: atomic commits, validation, conventions",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"

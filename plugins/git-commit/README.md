@@ -66,6 +66,36 @@ Before each commit, the message runs through `validate-commit-message.js`:
 Validation checks: subject length, scope format, body presence for non-trivial changes,
 trailer format, and more.
 
+### Validator Flags
+
+| Flag | Purpose | Example |
+|------|---------|---------|
+| `--require-trailers` | Require specific trailers | `--require-trailers "Task,Fixes"` |
+
+## Project Configuration
+
+Projects can customize commit behavior by adding `<git-commit-config>` to their CLAUDE.md:
+
+```xml
+<git-commit-config>
+<validator-args>
+<flag name="require-trailers" value="Task"/>
+</validator-args>
+
+<extra-instructions>
+All commits must reference a task from the issue tracker.
+</extra-instructions>
+</git-commit-config>
+```
+
+**`<validator-args>`** — Flags passed to the validator script. Each `<flag name="X" value="Y"/>`
+becomes `--X "Y"` on the command line. Use this to enforce project-specific requirements
+like mandatory trailers.
+
+**`<extra-instructions>`** — Additional guidance applied during the commit process.
+These instructions have highest priority and override plugin defaults. Use for
+project-specific conventions not covered by the validator.
+
 ## Components
 
 | Type | Path | Purpose |
