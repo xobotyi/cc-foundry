@@ -1,6 +1,6 @@
 {
   "name": "git-commit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Git commit workflow: atomic commits, validation, conventions",
   "author": {
     "name": "xobotyi",
