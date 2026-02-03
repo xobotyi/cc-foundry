@@ -7,7 +7,7 @@
     "email": "xog3@yandex.ru",
     "url": "https://github.com/xobotyi"
   },
-  "homepage": "https://github.com/xobotyi/cc-foundry/tree/main/plugins/skill-enforcer",
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/skill-enforcer",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
   "keywords": ["skills", "enforcement", "hooks", "lifecycle"]
