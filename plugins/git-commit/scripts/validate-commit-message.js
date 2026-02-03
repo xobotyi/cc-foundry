@@ -17,11 +17,14 @@ const MSG_FLAG = '--msg';
 const SUBJECT_MAX_LENGTH = 72;
 const BREAKING_CHANGE_PREFIX = 'BREAKING:';
 
+let hasErrors = false;
+
 /**
  * Prints an error message to stdout.
  * @param {string} msg
  */
 function printError(msg) {
+    hasErrors = true;
     console.log(`ERROR: ${msg}`);
 }
 
@@ -185,7 +188,11 @@ function validateMessage(message) {
 async function main() {
     maybePrintHelp();
 
-    validateMessage(await getMessage())
+    validateMessage(await getMessage());
+
+    if (!hasErrors) {
+        console.log('OK: Commit message is valid.');
+    }
 }
 
 main().catch(console.error);
