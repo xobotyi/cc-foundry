@@ -11,11 +11,16 @@ const HELP_TEXT = `Usage:
     validate-commit-message.js --file <path>
     validate-commit-message.js --msg "message"
     echo "message" | validate-commit-message.js
+
+Options:
+    --require-trailers <list>   Comma-separated trailer names that must be present
+                                Example: --require-trailers "Task,Fixes"
     `;
 const FILE_FLAG = '--file';
 const MSG_FLAG = '--msg';
+const REQUIRE_TRAILERS_FLAG = '--require-trailers';
 const SUBJECT_MAX_LENGTH = 72;
-const BREAKING_CHANGE_PREFIX = 'BREAKING:';
+const TRAILER_RX = /^([A-Za-z][A-Za-z0-9-]*):[ \t]+.+$/;
 
 let hasErrors = false;
 
@@ -88,8 +93,8 @@ function maybePrintHelp() {
 async function getMessage() {
     let fileArg = null;
     let msgArg = null;
-    let stdin = await readStdin();
 
+    // Parse flags first (before reading stdin)
     for (let i = 2; i < process.argv.length; i++) {
         switch (process.argv[i]) {
             case FILE_FLAG:
@@ -108,11 +113,14 @@ async function getMessage() {
                 msgArg = process.argv[i + 1];
                 break;
 
+            case REQUIRE_TRAILERS_FLAG:
+                // Handled separately in getRequiredTrailers()
+                break;
         }
     }
 
-    if ([fileArg, msgArg, stdin].filter(Boolean).length > 1) {
-        console.error('ERROR: Only one of --file, --msg, or stdin may be used at a time.');
+    if (fileArg && msgArg) {
+        console.error('ERROR: Only one of --file or --msg may be used at a time.');
         process.exit(1);
     }
 
@@ -124,12 +132,34 @@ async function getMessage() {
         return msgArg;
     }
 
-    if (stdin) {
-        return stdin;
+    // Only read stdin if no flags provided and stdin has data (not a TTY)
+    if (!process.stdin.isTTY) {
+        const stdin = await readStdin();
+        if (stdin) {
+            return stdin;
+        }
     }
 
     console.error('ERROR: No commit message provided. Use --file, --msg, or stdin.');
     process.exit(1);
+}
+
+/**
+ * Parses --require-trailers flag and returns list of required trailer names.
+ *
+ * @returns {string[]}
+ */
+function getRequiredTrailers() {
+    for (let i = 2; i < process.argv.length; i++) {
+        if (process.argv[i] === REQUIRE_TRAILERS_FLAG) {
+            if (process.argv.length === i + 1) {
+                console.error(`ERROR: ${REQUIRE_TRAILERS_FLAG} requires a comma-separated list`);
+                process.exit(1);
+            }
+            return process.argv[i + 1].split(',').map(t => t.trim()).filter(Boolean);
+        }
+    }
+    return [];
 }
 
 /**
@@ -155,8 +185,9 @@ function validateSubject(subject) {
  * Validates the commit message against conventions and prints errors or warnings.
  *
  * @param message {string}
+ * @param requiredTrailers {string[]}
  */
-function validateMessage(message) {
+function validateMessage(message, requiredTrailers) {
     if (!message || message.trim().length === 0) {
         printError('Commit message is empty.');
         process.exit(1);
@@ -183,12 +214,42 @@ function validateMessage(message) {
             printError('Subject must be separated from body by a blank line.');
         }
     }
+
+    // Extract and validate trailers
+    if (requiredTrailers.length > 0) {
+        const trailers = new Set();
+
+        // Walk backwards from end to find trailer block
+        for (let i = lines.length - 1; i >= 0; i--) {
+            const line = lines[i];
+
+            if (line === '') {
+                break;
+            }
+
+            const match = line.match(TRAILER_RX);
+            if (match) {
+                trailers.add(match[1]);
+            } else {
+                break;
+            }
+        }
+
+        for (const required of requiredTrailers) {
+            if (!trailers.has(required)) {
+                printError(`Required trailer missing: ${required}`);
+            }
+        }
+    }
 }
 
 async function main() {
     maybePrintHelp();
 
-    validateMessage(await getMessage());
+    const message = await getMessage();
+    const requiredTrailers = getRequiredTrailers();
+
+    validateMessage(message, requiredTrailers);
 
     if (!hasErrors) {
         console.log('OK: Commit message is valid.');
