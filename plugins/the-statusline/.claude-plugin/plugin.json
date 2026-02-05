@@ -1,0 +1,14 @@
+{
+  "name": "the-statusline",
+  "version": "0.1.0",
+  "description": "Status line with context window, cost, and model info",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-statusline",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": ["statusline", "status", "ui", "context-window"]
+}

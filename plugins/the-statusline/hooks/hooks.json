@@ -1,0 +1,17 @@
+{
+  "description": "Syncs status line script and settings to user-level Claude configuration",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sync-statusline.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
