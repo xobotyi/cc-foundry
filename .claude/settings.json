@@ -1,7 +1,1 @@
-{
-  "statusLine": {
-    "type": "command",
-    "command": "node statusline.js",
-    "padding": 0
-  }
-}
+{}

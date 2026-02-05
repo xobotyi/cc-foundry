@@ -56,6 +56,22 @@
       "license": "MIT",
       "keywords": ["git", "commit", "conventions", "workflow", "validation", "atomic-commits"],
       "tags": ["git", "workflow", "automation"]
+    },
+    {
+      "name": "the-statusline",
+      "description": "Status line with context window, cost, and model info",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/the-statusline",
+      "category": "productivity",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-statusline",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["statusline", "status", "ui", "context-window", "cost"],
+      "tags": ["ui", "monitoring", "automation"]
     }
   ]
 }
