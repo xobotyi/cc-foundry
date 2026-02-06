@@ -251,8 +251,19 @@ Outdated design docs mislead. Update or mark as superseded.
 Without explicit non-goals, scope creep is invisible. Readers assume everything related is
 in scope.
 
+## After Completion
+
+When a design document is complete and the recommendation is accepted, prompt the user to
+proceed with the technical design:
+
+> The design document is complete. The next step is creating a technical design that maps the
+> chosen solution onto the codebase — affected components, tool selection, and sequencing.
+> Would you like to proceed with the technical design?
+
+Invoke the `technical-design` skill when the user confirms.
+
 ## Related Skills
 
-- **task-decomposition** — After design doc is approved, use this to break it into tracked
-  work items
-- **task-creation** — Create individual tasks from decomposition output
+- **technical-design** — Next step after design doc: maps the chosen solution onto the codebase
+- **task-decomposition** — After technical design, breaks it into tracked work items
+- **task-creation** — Creates individual tasks from decomposition output
