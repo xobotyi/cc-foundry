@@ -15,6 +15,7 @@ Skill Enforcement Framework for Claude skill and reference management.
 - Skills are identified by name and description; both are used for matching.
 - Match by comparing task context to skill names and descriptions.
 - A skill matches when the task involves its subject matter or would benefit from its capabilities.
+- Skills exist because the model's defaults are insufficient. If the model already knew better, the skill would not exist. Matching a skill and choosing not to invoke it is never correct — you cannot outperform guidance you have not read.
 </skill-matching>
 
 <skill-reference-matching>
@@ -65,7 +66,11 @@ Thought:
   SEF USER-PROMPT
   Task: [what user asked]
   Skills: [matching skills]
-  → invoke [list] | none match
+  → invoke [list]
+
+  If no skills match:
+  Skills: none
+  → proceed
 
 Action: Invoke each matching skill.
 </SEF>
@@ -78,7 +83,12 @@ Thought:
   Context: [what was learned]
   Skills: [skills now relevant]
   Refs: [references to read]
-  → invoke [list] | none match
+  → invoke [list] / read [refs]
+
+  If no skills or refs are relevant:
+  Skills: none
+  Refs: none
+  → proceed
 
 Action: Invoke missing skills. Read relevant refs.
 </SEF>
@@ -92,7 +102,11 @@ Thought:
   Shift: [yes/no]
   Loaded skills: [list each by name]
   Unread refs for new phase: [list per skill]
-  → read [refs] | no shift
+  → read [refs]
+
+  If no phase shift:
+  Shift: no
+  → proceed
 
 Action: Read phase-appropriate references from loaded skills.
 </SEF>
@@ -105,7 +119,12 @@ Thought:
   Loaded: [skill name]
   Related: [other skills to batch]
   Refs: [this skill's references to read now]
-  → batch [list] | none
+  → batch [list] / read [refs]
+
+  If no related skills or refs:
+  Related: none
+  Refs: none
+  → proceed
 
 Action: Invoke related skills. Read references.
 </SEF>
@@ -171,6 +190,31 @@ Problems:
   4. Decided "no shift" despite acknowledging shift=yes
 
 This is a double violation: missed skill invocation AND missed reference read.
+</example>
+
+<example name="violation-overconfidence">
+Context: Agent is creating a new skill. skill-engineering matches.
+
+Violation thought (WRONG):
+  SEF USER-PROMPT
+  Task: create new plugin with skills
+  Skills: skill-engineering (creating skills)
+  → proceed (I already know the pattern)
+
+Problems:
+  1. Identified skill-engineering as matching
+  2. Decided own knowledge was sufficient
+  3. Skipped invocation based on confidence
+
+The skill exists because default behavior is insufficient.
+"I already know" is never a valid reason to skip — you cannot
+know what a skill contains until you read it.
+
+Correct:
+  SEF USER-PROMPT
+  Task: create new plugin with skills
+  Skills: skill-engineering
+  → invoke skill-engineering
 </example>
 
 <example name="violation-location">
