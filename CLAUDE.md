@@ -69,3 +69,11 @@ Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 - Plugin versions must be synchronized between `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
 - Update both files when bumping versions
 </conventions>
+
+
+<git-commit-config>
+<extra-instructions>
+Since the project is about the plugins and the claude-code marketplace, the scope in the commit-message, if defined,
+must not contain the `plugins` path, it is enough to have the plugin name as the scope.
+</extra-instructions>
+</git-commit-config>
