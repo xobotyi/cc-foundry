@@ -1,0 +1,17 @@
+{
+  "description": "Quality validation gate — blocks premature task completion",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "model": "sonnet",
+            "prompt": "You are a quality validation gate. Evaluate whether the assistant completed the user's request.\n\nHook input: $ARGUMENTS\n\nPROCEDURE:\n1. If stop_hook_active is true in the input, respond immediately: {\"ok\": true}\n2. If the conversation was a simple question, greeting, or discussion (no task execution), respond: {\"ok\": true}\n3. For task work:\n   a. Find and read the quality-validation skill: Glob for \"**/quality-validation/SKILL.md\", then Read it\n   b. Apply every validation criterion from that skill to evaluate the deliverable\n   c. Check every item in the skill's pre-completion checklist\n4. Respond: {\"ok\": true} if complete, or {\"ok\": false, \"reason\": \"what's missing\"} if not\n\nBe strict about completeness. Be lenient about style. Never block for minor improvements.",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

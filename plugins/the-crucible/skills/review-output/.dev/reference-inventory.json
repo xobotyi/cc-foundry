@@ -1,0 +1,6 @@
+{
+  "sources": {
+    "Anthropic Code Review Plugin": "https://raw.githubusercontent.com/anthropics/claude-code/refs/heads/main/plugins/code-review/commands/code-review.md"
+  },
+  "lastFetched": "2026-02-10T13:14:25.701Z"
+}
