@@ -43,6 +43,26 @@ Creating prompts, skills, agents, and output styles is guesswork. This plugin pr
 /plugin install ai-helpers
 ```
 
+---
+
+### the-blueprint
+
+Planning is ad-hoc — design decisions live in chat, task breakdowns are inconsistent, context is lost between sessions. This plugin provides a four-stage pipeline: design documents (problem analysis → recommendation), technical designs (solution → components), task decomposition (components → tracked tasks), and task creation (tasks → issue tracker). Each stage produces a persistent artifact and hands off to the next.
+
+```
+/plugin install the-blueprint
+```
+
+---
+
+### the-statusline
+
+No visibility into context window usage, cost, or active model. This plugin adds a status line showing real-time session metrics.
+
+```
+/plugin install the-statusline
+```
+
 ## License
 
 MIT
