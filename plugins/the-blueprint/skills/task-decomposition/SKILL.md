@@ -1,9 +1,9 @@
 ---
 name: task-decomposition
 description: >-
-  Break technical designs into actionable, tracked task hierarchies.
-  Use after a technical design exists, before task creation. Invoke when
-  decomposing features into subtasks or preparing work items for implementation.
+  Task decomposition — convert technical designs into actionable, tracked
+  task hierarchies. Invoke when decomposing features into subtasks, preparing
+  work items, or creating decomposition documents.
 ---
 
 # Task Decomposition
@@ -49,20 +49,18 @@ Skip decomposition when:
 
 ### Step 1: Read the Technical Design
 
-Start from the technical design's affected components, sequencing, and scope boundaries.
-Understand:
-- Which components change and what the nature of each change is
-- What dependencies exist between component changes
-- What tools or technologies were selected
-- What risks and assumptions were documented
-
-If acting as an agent, confirm understanding with the user before proceeding. Restate the
-scope in your own terms.
+1. Read the technical design's affected components, sequencing, and scope boundaries:
+   - Which components change and what the nature of each change is
+   - What dependencies exist between component changes
+   - What tools or technologies were selected
+   - What risks and assumptions were documented
+2. Confirm understanding with the user before proceeding — restate the scope in your
+   own terms.
 
 ### Step 2: Identify Work Boundaries
 
-Decide how to slice the work. There is no single correct decomposition — the right one
-depends on the project. Choose the approach that produces the most natural boundaries:
+Choose the slicing approach that produces the most natural boundaries. There is no single
+correct decomposition — the right one depends on the project:
 
 **By component** — One task per affected component. Works well when components are
 independent and changes don't span multiple modules.
@@ -81,13 +79,12 @@ Most real decompositions combine approaches. A database migration might be one t
 
 ### Step 3: Draft the Task List
 
-For each task, write:
-- A clear title (imperative verb + object: "Add compound index on tenant_id and created_at")
-- A rough estimate (hours or days — enough to validate sizing, not a commitment)
-- Dependencies on other tasks in the list
-
-Present this as a table. No detailed descriptions yet — the goal is to validate the
-structure before investing in details.
+1. For each task, write:
+   - A clear title (imperative verb + object: "Add compound index on tenant_id and created_at")
+   - A rough estimate (hours or days — enough to validate sizing, not a commitment)
+   - Dependencies on other tasks in the list
+2. Present as a table. No detailed descriptions yet — validate the structure before
+   investing in details.
 
 ```
 | # | Task | Estimate | Dependencies |
@@ -99,42 +96,39 @@ structure before investing in details.
 | 5 | Add integration tests for migration path | ~3h | #1, #2 |
 ```
 
-**Ask the user for approval** before proceeding to detailed descriptions. The draft is
-cheap to change; detailed descriptions are not.
+3. Ask the user for approval before proceeding to detailed descriptions. The draft is
+   cheap to change; detailed descriptions are not.
+4. If the user requests changes, revise and present again.
 
 ### Step 4: Validate Sizing
 
-Every leaf task — a task that someone actually implements, not a parent grouping subtasks
-beneath it — must take no more than 8 hours. Parent tasks accumulate the time of their
-children and will naturally exceed this; that's expected. The constraint applies to the
-work units that reach an implementer's hands.
+1. Verify every leaf task takes no more than 8 hours. Leaf tasks are work units that
+   reach an implementer's hands — not parent tasks grouping subtasks beneath them.
 
 Eight hours is the ceiling, not the target. Well-decomposed work produces tasks well
-under that limit. If most of your tasks cluster near 8 hours, the decomposition is
-likely too coarse — you're fitting work to the boundary rather than finding natural
-seams. Tasks in the 2-4 hour range signal that the decomposer understood the work
-deeply enough to find clean boundaries.
+under that limit. If most tasks cluster near 8 hours, the decomposition is likely too
+coarse.
 
-- **Over 8 hours:** The task must be broken down further. No exceptions. If you can't
-  split it, you don't understand the work well enough yet — go back to the technical
-  design or investigate the codebase.
+- **Over 8 hours:** Break down further. No exceptions. If you can't split it, you don't
+  understand the work well enough — go back to the technical design or investigate the
+  codebase.
 - **Near 8 hours (6-8h):** Acceptable but worth a second look. Is there a natural seam
   hiding inside? Often there is.
 - **2-4 hours:** The sweet spot. Clean boundaries, estimable with confidence, completable
   in a focused session.
-- **Under an hour:** The tracking overhead may exceed the work. Combine with related
-  tasks unless isolation matters for risk or dependency reasons.
+- **Under an hour:** Tracking overhead may exceed the work. Combine with related tasks
+  unless isolation matters for risk or dependency reasons.
 - **Can't estimate at all:** You don't understand the work well enough. Go back to the
   technical design or investigate the codebase before decomposing further.
 
-Also verify coverage using the 100% rule: the sum of all tasks must account for the
-complete scope defined in the technical design. If a component appears in the technical
-design but has no corresponding task, something is missing.
+2. Verify coverage using the 100% rule: the sum of all tasks must account for the
+   complete scope defined in the technical design. If a component appears in the technical
+   design but has no corresponding task, something is missing.
 
 ### Step 5: Write Detailed Descriptions
 
-For each approved task, write a description that an implementer can act on without
-asking questions.
+1. For each approved task, write a description that an implementer can act on without
+   asking questions.
 
 Two rules that agents violate constantly:
 
@@ -153,20 +147,20 @@ pseudocode is acceptable when describing logical changes that are easier to comm
 as structured logic than as prose; configuration samples are acceptable when the
 configuration itself is the deliverable (e.g., a YAML snippet for a CI pipeline change).
 
-**Structure each description with:**
+2. Structure each description with:
 
-**Context** — Why this task exists. One or two sentences connecting it to the larger
-effort. Don't restate the entire design document — link to it.
+   **Context** — Why this task exists. One or two sentences connecting it to the larger
+   effort. Don't restate the entire design document — link to it.
 
-**What to do** — Specific work items. Concrete enough to act on, abstract enough to
-leave implementation judgment to the implementer.
+   **What to do** — Specific work items. Concrete enough to act on, abstract enough to
+   leave implementation judgment to the implementer.
 
-**Acceptance criteria** — Observable conditions that prove the task is done. Prefer
-verifiable statements: "API returns cached response within 50ms for repeated queries"
-over "caching works correctly."
+   **Acceptance criteria** — Observable conditions that prove the task is done. Prefer
+   verifiable statements: "API returns cached response within 50ms for repeated queries"
+   over "caching works correctly."
 
-**References** — Links to the design document, technical design, relevant code, or
-similar implementations in the codebase.
+   **References** — Links to the design document, technical design, relevant code, or
+   similar implementations in the codebase.
 
 ```markdown
 ## Context
@@ -189,16 +183,16 @@ because the new schema lacks a compound index.
 - Current schema: db/migrations/latest
 ```
 
-**Ask the user for approval** before creating tasks in the issue tracker.
+3. Ask the user for approval before creating tasks in the issue tracker.
+4. If the user requests changes, revise and present again.
 
 ### Step 6: Map Dependencies and Parallelization
 
-Make ordering constraints explicit:
-- Which tasks must complete before others can start
-- Which tasks can proceed in parallel
-- Where handoff points exist between different people or agents
-
-Visualize when helpful:
+1. Make ordering constraints explicit:
+   - Which tasks must complete before others can start
+   - Which tasks can proceed in parallel
+   - Where handoff points exist between different people or agents
+2. Visualize when helpful:
 
 ```
 [#1 DB migration] (no deps)
@@ -208,19 +202,17 @@ Visualize when helpful:
     └──→ [#5 Integration tests] (depends on #1, #2)
 ```
 
-Shallower dependency chains allow more parallel execution, but depth is dictated by the
-work, not by a rule. Some changes are inherently sequential — a migration must exist
-before the code that uses it, which must exist before the tests that verify it. Deep
-chains are fine when the work demands them. What matters is that every dependency is
-real, not accidental. If a task is marked as dependent but could actually start
-independently, the chain is artificially deep.
+3. Verify every dependency is real, not accidental. If a task is marked as dependent but
+   could actually start independently, the chain is artificially deep.
 
 ### Step 7: Create the Decomposition Document
 
-The decomposition document persists the task breakdown so future sessions — human or
-agent — can reference it during implementation. Without it, the rationale behind task
-boundaries, ordering decisions, and scope choices exists only in the conversation that
-produced them.
+1. Compose the decomposition document using the Document Template below, incorporating
+   the approved task list and detailed descriptions from Steps 3-6.
+2. Save to `design-docs/` following the file conventions.
+3. Present to the user for review.
+4. If the user requests changes, revise and present again. Do not proceed to After
+   Completion until approved.
 
 ## Decomposition Approaches
 
@@ -317,6 +309,7 @@ Before considering a decomposition complete:
 - [ ] Dependencies are explicit — no hidden ordering assumptions
 - [ ] Parallel execution opportunities are identified
 - [ ] Decomposition document created and persisted
+- [ ] User approved the decomposition document (Step 7) before task creation
 - [ ] An implementer can start any unblocked task without asking questions
 
 ## Anti-Patterns
@@ -368,13 +361,24 @@ design has unnecessary scope.
 
 ## After Completion
 
-When the decomposition is complete and approved, prompt the user to proceed with task
-creation:
+When the decomposition is complete and approved:
 
-> The decomposition is complete. The next step is creating these tasks in your issue
-> tracker. Would you like to proceed with task creation?
+1. Check whether task tracking tools are available (MCP servers, APIs, or other
+   integrations that can create tasks).
+2. **If tools are available:**
+   1. Prompt the user:
+      > The decomposition is complete. I can create these tasks in your issue tracker.
+      > Would you like to proceed?
+   2. On confirmation, invoke the `task-creation` skill.
+   3. After tasks are created, update the decomposition document: add task IDs and links
+      to each entry in the task table so the document becomes the single reference
+      connecting the plan to the tracked work.
+3. **If no tools are available:** Tell the user explicitly:
+   > The decomposition is complete, but I don't have access to a task tracking tool to
+   > create tasks autonomously. You'll need to create these tasks manually using the
+   > descriptions above.
 
-Invoke the `task-creation` skill when the user confirms.
+Do not silently skip task creation or pretend the pipeline is complete without it.
 
 ## Related Skills
 

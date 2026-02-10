@@ -58,6 +58,22 @@
       "tags": ["git", "workflow", "automation"]
     },
     {
+      "name": "the-blueprint",
+      "description": "Structured planning pipeline: design documents, technical designs, task decomposition, and task creation",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/the-blueprint",
+      "category": "productivity",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-blueprint",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["design-docs", "technical-design", "task-decomposition", "task-creation", "planning"],
+      "tags": ["planning", "management", "workflow"]
+    },
+    {
       "name": "the-statusline",
       "description": "Status line with context window, cost, and model info",
       "version": "0.1.0",
