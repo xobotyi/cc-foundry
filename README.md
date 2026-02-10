@@ -55,6 +55,16 @@ Planning is ad-hoc — design decisions live in chat, task breakdowns are incons
 
 ---
 
+### the-crucible
+
+Code quality is checked manually or not at all. This plugin provides a two-level validation pipeline: task completion validation (did you deliver what was asked?) and multi-agent code evaluation (8 specialized agents reviewing naming, complexity, comments, tests, error handling, security, observability, and documentation). All agents are read-only — they report, you decide.
+
+```
+/plugin install the-crucible
+```
+
+---
+
 ### the-statusline
 
 No visibility into context window usage, cost, or active model. This plugin adds a status line showing real-time session metrics.
