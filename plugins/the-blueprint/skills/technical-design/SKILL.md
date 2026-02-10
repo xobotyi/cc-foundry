@@ -2,8 +2,8 @@
 name: technical-design
 description: >-
   High-level technical design — affected components, tool selection, approach,
-  and sequencing. Use after a design document is created, before task
-  decomposition. Invoke when planning how to realize a design decision.
+  and sequencing. Invoke after a design document to map the chosen solution
+  onto the codebase before task decomposition.
 ---
 
 # Technical Design
@@ -45,41 +45,38 @@ Skip when:
 
 ### Step 1: Read the Design Document
 
-Start from the design document's recommendation. Understand the chosen solution, its
-constraints, and any conditions noted in the recommendation.
-
-If acting as an agent, confirm understanding with the user before proceeding. Restate the
-chosen solution in your own terms.
+1. Read the design document's recommendation, constraints, and conditions.
+2. Confirm understanding with the user before proceeding — restate the chosen solution
+   in your own terms.
 
 ### Step 2: Identify Affected Components
 
-Map which parts of the codebase, infrastructure, or system the solution touches:
-- Which modules, packages, or services change
-- Which interfaces or APIs are affected
-- Which data models or storage layers are involved
-- Which external dependencies are impacted
-
-Be exhaustive but stay at the component level — name the modules, not the functions.
+1. Map which parts of the codebase, infrastructure, or system the solution touches:
+   - Which modules, packages, or services change
+   - Which interfaces or APIs are affected
+   - Which data models or storage layers are involved
+   - Which external dependencies are impacted
+2. Be exhaustive but stay at the component level — name the modules, not the functions.
 
 ### Step 3: Define Technical Approach per Component
 
 For each affected component, describe WHAT changes at a high level:
-- What the component does today
-- What it needs to do after the change
-- What the nature of the change is (new code, refactor, configuration, migration, etc.)
+1. What the component does today.
+2. What it needs to do after the change.
+3. What the nature of the change is (new code, refactor, configuration, migration, etc.).
 
-This is the boundary: describe the change in terms of its effect on the component, not
-the code that will implement it.
+Describe changes in terms of their effect on the component, not the code that implements them.
+Pseudocode is acceptable when expressing logical changes that are easier to communicate as
+structured logic than as prose.
 
 ### Step 4: Select Tools and Technologies
 
-Document any tool or technology decisions that must be made before implementation:
-- New libraries or frameworks to adopt
-- Migration tools needed
-- Testing infrastructure changes
-- Build or deployment pipeline adjustments
-
-Justify each selection briefly — why this tool over alternatives.
+1. Document tool or technology decisions that must be made before implementation:
+   - New libraries or frameworks to adopt
+   - Migration tools needed
+   - Testing infrastructure changes
+   - Build or deployment pipeline adjustments
+2. Justify each selection briefly — why this tool over alternatives.
 
 ### Step 5: Map Dependencies and Sequencing
 
@@ -88,14 +85,11 @@ Identify ordering constraints between component changes:
 - Which changes can proceed in parallel
 - Which changes have external dependencies (API availability, data migration, etc.)
 
-This becomes the foundation for task decomposition's sequencing.
-
 ### Step 6: Document Risks and Assumptions
 
-Capture what could go wrong and what you're taking for granted:
-- Technical risks (performance unknowns, compatibility concerns)
-- Assumptions about existing behavior that haven't been verified
-- Areas where the approach might need revision during implementation
+1. List technical risks (performance unknowns, compatibility concerns).
+2. List assumptions about existing behavior that haven't been verified.
+3. Flag areas where the approach might need revision during implementation.
 
 ### Step 7: Set Scope Boundaries
 
@@ -103,6 +97,15 @@ Explicitly state what this technical design does NOT cover:
 - Adjacent systems that won't be modified
 - Future work that's out of scope for this effort
 - Known tech debt that won't be addressed now
+
+### Step 8: Write and Present the Document
+
+1. Compose the technical design using the Document Template below, incorporating research
+   from Steps 1-7.
+2. Save to `design-docs/` following the file conventions.
+3. Present the document to the user for review.
+4. If the user requests changes, revise and present again. Do not proceed to After
+   Completion until approved.
 
 ## Document Template
 
@@ -168,11 +171,13 @@ Before considering a technical design complete:
 - [ ] Links to the source design document
 - [ ] All affected components identified at the module level
 - [ ] Technical approach described per component (current → target)
-- [ ] No implementation details — no code, no pseudocode, no function signatures
+- [ ] No implementation details — no production code, no function signatures (pseudocode
+  acceptable for logical changes)
 - [ ] Tool selections justified
 - [ ] Dependencies and sequencing mapped
 - [ ] Risks and assumptions documented
 - [ ] Scope boundaries explicit
+- [ ] User approved the document (Step 8) before proceeding to task decomposition
 - [ ] An agent or colleague could decompose this into tasks without further clarification
 
 ## File Conventions
@@ -185,10 +190,10 @@ Before considering a technical design complete:
 ## Anti-Patterns
 
 **Contains implementation details:**
-If the document includes code, pseudocode, or function-level descriptions, it has crossed
-into implementation. The technical design describes WHAT changes at the component level and
-HOW the approach works abstractly — the exact implementation is the job of whoever picks up
-the task.
+If the document includes production code or function-level descriptions, it has crossed into
+implementation. The technical design describes WHAT changes at the component level and HOW the
+approach works abstractly — the exact implementation is the job of whoever picks up the task.
+Pseudocode for logical changes is acceptable; production code is not.
 
 **Skips the design document:**
 A technical design without a design document is a solution without a justified decision. Go
@@ -205,6 +210,15 @@ someone starts before prerequisites are ready.
 **Scope creep from the design document:**
 The technical design realizes the CHOSEN solution. If it starts exploring alternatives or
 revisiting decisions, it belongs back in the design document.
+
+## After Completion
+
+When the technical design is complete and approved:
+
+1. Prompt the user to proceed with task decomposition:
+   > The technical design is complete. The next step is decomposing it into actionable tasks.
+   > Would you like to proceed with task decomposition?
+2. On confirmation, invoke the `task-decomposition` skill.
 
 ## Related Skills
 

@@ -1,9 +1,9 @@
 ---
 name: task-creation
 description: >-
-  Create individual tasks in issue trackers with clear descriptions,
-  acceptance criteria, and proper categorization. Use when creating
-  tasks, bug reports, or feature requests in any tracker.
+  Task creation for issue trackers — clear descriptions, acceptance criteria,
+  proper categorization. Invoke when creating tasks, bug reports, or feature
+  requests in any tracker.
 ---
 
 # Task Creation
@@ -46,88 +46,59 @@ gather context from the conversation.
 
 ### Step 1: Gather Context
 
-Determine what you need before drafting. This is an active discovery step — don't rely
-solely on inference. Use available tools to learn what the tracker expects.
+This is an active discovery step — use available tools, don't rely on inference.
 
-**Identify the tracker** — Check which task tracking tools are available (MCP servers,
-APIs, CLI integrations). If multiple trackers are present, ask the user which one to
-use for this task. Don't assume.
-
-**Discover the project** — Use the tracker's project listing or configuration tools to
-find the target project. Infer from conversation context (directory, subsystem, prior
-tasks) when possible, but validate against the tracker. If ambiguous, ask the user.
-
-**Explore project configuration** — Query the tracker for the project's field setup:
-- What fields exist (type, priority, severity, component, sprint, etc.)
-- Which fields are required vs optional
-- What values are valid for each field (the tracker defines these, not this skill)
-
-This matters because field names, types, and valid values differ across projects and
-trackers. "Type" might offer Bug/Task/Feature in one project and
-Defect/Story/Epic/Spike in another. "Priority" might be Critical/Major/Minor or
-P0/P1/P2/P3. Don't hardcode assumptions — read them from the tracker.
-
-**Determine task type** — Based on the user's intent and the project's available types,
-select the closest match. Common patterns:
-- Something is broken → bug/defect type. Needs: what's wrong, reproduction path,
-  expected behavior.
-- Implementation work → task/story type. Needs: what to do, why, acceptance criteria.
-- New capability → feature/story type. Needs: user-facing description, scope,
-  acceptance criteria.
-
-The exact type name comes from the tracker, not from a universal list.
-
-**Source material** — Is there a decomposition document, design document, or technical
-design to reference? Link to it. If this is a standalone task, the conversation itself
-is the source.
+1. **Identify the tracker** — Check which task tracking tools are available (MCP servers,
+   APIs, CLI integrations). If multiple trackers are present, ask the user which one to
+   use. Don't assume.
+2. **Discover the project** — Use the tracker's project listing or configuration tools to
+   find the target project. Infer from conversation context (directory, subsystem, prior
+   tasks) when possible, but validate against the tracker. If ambiguous, ask the user.
+3. **Explore project configuration** — Query the tracker for the project's field setup:
+   - What fields exist (type, priority, severity, component, sprint, etc.)
+   - Which fields are required vs optional
+   - What values are valid for each field (the tracker defines these, not this skill)
+   Don't hardcode assumptions — field names, types, and valid values differ across
+   projects and trackers.
+4. **Determine task type** — Based on the user's intent and the project's available types,
+   select the closest match:
+   - Something is broken → bug/defect type
+   - Implementation work → task/story type
+   - New capability → feature/story type
+   The exact type name comes from the tracker, not from a universal list.
+5. **Identify source material** — Link to decomposition document, design document, or
+   technical design if available. If standalone, the conversation is the source.
 
 ### Step 2: Draft the Task
 
-Compose the task and present it to the user for approval before creating it in the
-tracker.
+1. **Write the title.** The title is what people see in lists, boards, and notifications:
+   - **Imperative mood:** "Add pagination to search results" not "Pagination was added"
+   - **Specific:** "Fix negative offset in paginator navigation" not "Fix pagination bug"
+   - **5-10 words:** Long enough to be meaningful, short enough to scan
+   - **No tracker noise:** Don't prefix with project codes, parent references, or type
+     labels — the tracker handles metadata
 
-#### Title
+2. **Write the description.** Structure depends on task type, but every description needs:
 
-The title is what people see in lists, boards, and notifications. It must communicate
-the task at a glance.
+   **Context** — Why this task exists. Connect it to the larger effort. Link to the design
+   document or technical design if one exists. One or two sentences.
 
-- **Imperative mood:** "Add pagination to search results" not "Pagination was added"
-- **Specific:** "Fix negative offset in paginator navigation" not "Fix pagination bug"
-- **5-10 words:** Long enough to be meaningful, short enough to scan
-- **No tracker noise:** Don't prefix with project codes, parent references, or type
-  labels — the tracker handles metadata
+   **What to do** — The specific work. Concrete enough that the implementer knows the
+   scope, abstract enough that they choose the approach. Describe the change, not the code.
 
-#### Description
+   **Acceptance criteria** — How to know it's done. See the dedicated section below.
 
-The description is the contract between the person who defined the work and the person
-who will do it. Structure depends on the task type, but every description needs at
-minimum:
+   **References** — Links to design documents, technical designs, relevant code paths,
+   mockups, or similar implementations.
 
-**Context** — Why this task exists. Connect it to the larger effort. Link to the design
-document or technical design if one exists. One or two sentences — enough to orient,
-not enough to re-explain everything.
-
-**What to do** — The specific work. Concrete enough that the implementer knows the
-scope, abstract enough that they choose the approach. Describe the change, not the
-code.
-
-**Acceptance criteria** — How to know it's done. See the dedicated section below.
-
-**References** — Links to design documents, technical designs, relevant code paths,
-mockups, or similar implementations. The implementer should find everything they need
-without leaving the task.
-
-#### Fields
-
-Set fields based on what you discovered in Step 1. The project configuration tells you
-which fields exist, which are required, and what values are valid. Carry over estimates
-from the decomposition document if available. Only set fields that the tracker supports
-and the project uses — don't invent metadata.
+3. **Set fields** based on what you discovered in Step 1. Carry over estimates from the
+   decomposition document if available. Only set fields that the tracker supports and the
+   project uses — don't invent metadata.
 
 ### Step 3: Present the Draft
 
-Show the complete task to the user before creating it. Include all fields you plan to
-set, using the actual field names and values from the project configuration:
+1. Show the complete task to the user before creating it. Include all fields using actual
+   field names and values from the project configuration:
 
 ```markdown
 ## Task Draft
@@ -144,34 +115,25 @@ set, using the actual field names and values from the project configuration:
 [list each field you plan to set with its value, based on project config]
 ```
 
-**Ask the user for approval.** Tasks are visible to the entire team once created. A
-wrong task creates noise and confusion. Wait for explicit confirmation.
+2. Wait for explicit approval. Tasks are visible to the entire team once created — a
+   wrong task creates noise and confusion.
+3. If the user requests changes, revise and present again.
 
 ### Step 4: Create in Tracker
 
 After approval:
 
-1. Create the task using the tracker's API or integration
-2. Set all agreed fields
-3. Establish relationships between tasks (see below)
-4. Report the created task ID and URL back to the user
-
-#### Task Linking
-
-If the tracker's tools support linking between tasks, use them. Tasks relate to each
-other in multiple ways — parent-child, blocks/blocked-by, depends-on, relates-to,
-duplicates — and a single pair of tasks can have more than one relationship. Create
-every relationship that applies.
-
-**Always prefer the tracker's native linking** over mentioning relationships in the
-description text. Native links are visible in dedicated UI, enable dependency tracking
-and blocking detection, and stay current when tasks move or rename. Description text
-becomes stale.
-
-**Fallback:** If the tracker's tools genuinely lack linking capabilities, then
-referencing related tasks in the description is acceptable. But this is the exception,
-not the default. Check the available tools before falling back to description-based
-references.
+1. Create the task using the tracker's API or integration.
+2. Set all agreed fields.
+3. Establish relationships between tasks:
+   - Use the tracker's native linking for all relationships (parent-child, blocks/blocked-by,
+     depends-on, relates-to, duplicates). A single pair of tasks can have more than one
+     relationship — create every one that applies.
+   - Always prefer native links over description text. Native links are visible in dedicated
+     UI, enable dependency tracking, and stay current when tasks move or rename.
+   - Fallback to description-based references only if the tracker's tools genuinely lack
+     linking capabilities. Check the available tools first.
+4. Report the created task ID and URL back to the user.
 
 ## Acceptance Criteria
 
@@ -394,10 +356,11 @@ are only acceptable when the tracker's tools lack linking capabilities.
 
 ## After Completion
 
-When tasks are created, report:
-- Created task IDs and URLs
-- Any tasks that need manual linking (parent-child, dependencies)
-- Remaining untracted items from the decomposition, if any
+When all tasks are created:
+
+1. Report created task IDs and URLs to the user.
+2. Flag any tasks that need manual linking not supported by the tracker's tools.
+3. If working from a decomposition document, list any remaining items not yet created.
 
 ## Related Skills
 

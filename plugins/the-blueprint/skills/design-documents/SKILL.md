@@ -2,8 +2,8 @@
 name: design-documents
 description: >-
   Technical design documents — problem analysis, solution exploration,
-  architectural decisions. Use when working with any design or design
-  document task.
+  architectural decisions. Invoke when creating, updating, reviewing,
+  or asking questions about design documents.
 ---
 
 # Design Documents
@@ -48,64 +48,64 @@ Write a design doc when 3+ of these apply:
 
 ### Step 1: Understand the Problem
 
-Don't start writing until you can answer:
-- What's broken or missing?
-- Who is affected and how?
-- What's the root cause (not just the symptom)?
-
-**Gather context:** Read related code, talk to stakeholders, check for prior attempts. If acting
-as an agent, interview the user — ask clarifying questions before drafting. Don't assume
-requirements.
+1. Answer these before drafting:
+   - What's broken or missing?
+   - Who is affected and how?
+   - What's the root cause (not just the symptom)?
+2. Gather context: read related code, check for prior attempts, review existing issues.
+3. If any answer is unclear, ask the user clarifying questions. Do not assume requirements.
 
 ### Step 2: Research Current State
 
-Document how things work now:
+Document how the affected system works today:
 - Architecture and data flow
 - Current limitations
 - Why it was built this way (if known)
 
-This section prevents solutions that ignore existing constraints.
+Verify against source code and configuration — don't rely on secondhand descriptions.
 
 ### Step 3: Define Goals and Non-Goals
 
-**Goals:** What this change must achieve. Bullet points.
-
-**Non-Goals:** Scope deliberately excluded. Non-goals are things that *could reasonably be goals*
-but aren't for this effort. "Shouldn't crash" is not a non-goal — it's a basic expectation.
-"ACID compliance" for a cache layer is a non-goal.
-
-This section prevents scope creep and misaligned expectations.
+1. List goals: what this change must achieve. Use bullet points.
+2. List non-goals: scope deliberately excluded.
+   - Non-goals are things that *could reasonably be goals* but aren't for this effort.
+   - "Shouldn't crash" is not a non-goal — it's a basic expectation.
+   - "ACID compliance" for a cache layer is a non-goal.
 
 ### Step 4: Generate Options
 
-Always explore whether multiple approaches exist. Think through alternatives before committing
-to one — the act of looking often surfaces edge cases or trade-offs you'd miss otherwise.
+1. Explore whether multiple approaches exist before committing to one.
+2. For each option: describe the approach, list pros, list cons.
+3. If genuinely only one viable option exists after honest exploration, document it as the
+   single proposed solution and explain why alternatives don't apply.
 
-If genuinely only one viable option exists after honest exploration, that's fine — document it
-as the single proposed solution and explain why alternatives don't apply. A single option is not
-an anti-pattern when it's the result of exploration. It's an anti-pattern when exploration was
-skipped.
-
-For each option: describe the approach, list pros, list cons.
+A single option is acceptable when it results from exploration — not when exploration was skipped.
 
 ### Step 5: Compare and Recommend
 
-Create a comparison table on key dimensions (complexity, risk, timeline, cost, etc.).
-
-Pick one option. Justify why. State conditions that might change your recommendation.
+1. Create a comparison table on key dimensions (complexity, risk, timeline, cost, etc.).
+2. Pick one option and justify the choice.
+3. State conditions that might change the recommendation.
 
 ### Step 6: Identify Gaps and Cross-Cutting Concerns
 
-What's still unknown? What needs validation before implementation?
+1. List what's still unknown or needs validation before implementation.
+2. Review cross-cutting concerns relevant to the project:
+   - Security implications
+   - Privacy and data handling
+   - Observability (logging, metrics, tracing)
+   - Performance impact
+   - Backward compatibility
+3. Write this as the "Next Steps" section of the document.
 
-Review cross-cutting concerns relevant to the project:
-- Security implications
-- Privacy and data handling
-- Observability (logging, metrics, tracing)
-- Performance impact
-- Backward compatibility
+### Step 7: Write and Present the Document
 
-This becomes the "Next Steps" section.
+1. Compose the design document using the Document Template below, incorporating research
+   from Steps 1-6.
+2. Save to `design-docs/` following the file conventions.
+3. Present the document to the user for review.
+4. If the user requests changes, revise and present again. Do not proceed to After
+   Completion until approved.
 
 ## Updating an Existing Document
 
@@ -207,6 +207,7 @@ Before considering a design doc complete:
 - [ ] Recommendation is explicit with justification
 - [ ] Cross-cutting concerns addressed
 - [ ] Next steps identify remaining unknowns
+- [ ] User approved the document (Step 7) before proceeding to technical design
 - [ ] Reader can make informed decision without asking questions
 
 ## Example: Good Problem Statement
@@ -253,14 +254,13 @@ in scope.
 
 ## After Completion
 
-When a design document is complete and the recommendation is accepted, prompt the user to
-proceed with the technical design:
+When the design document is complete and the recommendation is accepted:
 
-> The design document is complete. The next step is creating a technical design that maps the
-> chosen solution onto the codebase — affected components, tool selection, and sequencing.
-> Would you like to proceed with the technical design?
-
-Invoke the `technical-design` skill when the user confirms.
+1. Prompt the user to proceed with the technical design:
+   > The design document is complete. The next step is creating a technical design that maps
+   > the chosen solution onto the codebase — affected components, tool selection, and
+   > sequencing. Would you like to proceed with the technical design?
+2. On confirmation, invoke the `technical-design` skill.
 
 ## Related Skills
 
