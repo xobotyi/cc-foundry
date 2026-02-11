@@ -1,8 +1,9 @@
 ---
 name: subagent-engineering
 description: >-
-  Subagents for Claude Code. Invoke when creating, debugging, or
-  deciding whether to use agents for task delegation.
+  Design and debug Claude Code subagents: right agent type, right prompt, right scope. Invoke
+  whenever task involves any interaction with Claude Code subagents — creating, configuring,
+  debugging, or deciding whether to delegate work to agents.
 ---
 
 # Subagent Engineering

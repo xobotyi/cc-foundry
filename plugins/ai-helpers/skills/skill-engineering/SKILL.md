@@ -1,8 +1,9 @@
 ---
 name: skill-engineering
 description: >-
-  Skills for Claude Code. Invoke when creating, editing, debugging,
-  or asking questions about skills.
+  Design and iterate Claude Code skills: description triggers activation, instructions shape
+  behavior. Invoke whenever task involves any interaction with Claude Code skills — creating,
+  evaluating, debugging, or understanding how they work.
 ---
 
 # Skill Engineering
