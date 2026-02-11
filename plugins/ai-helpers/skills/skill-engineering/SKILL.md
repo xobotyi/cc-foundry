@@ -39,26 +39,63 @@ Read the relevant reference before proceeding.
 
 ## Description Formula
 
-The description determines when Claude activates your skill.
+The description determines when Claude activates your skill. It's the
+highest-leverage field — poor descriptions cause missed activations.
 
 ```
-[What it does] + [When to use it]
+[Philosophy anchor] + [Broad domain claim] + [Trigger keywords]
 ```
 
-**Good:**
+1. **Philosophy anchor** — Core principle as a short phrase. Primes
+   reasoning before the full SKILL.md loads.
+2. **Broad domain claim** — "Invoke whenever task involves any
+   interaction with X." Claims the domain rather than listing verbs.
+3. **Trigger keywords** — Specific actions listed as examples under
+   the broad claim, not as the exhaustive condition.
+
+**Good — broad claim with philosophy anchor:**
 ```yaml
 description: >-
-  Extract text from PDFs, fill forms, merge documents.
-  Use when working with .pdf files or document extraction.
+  Universal coding discipline: discover before assuming, verify
+  before shipping. Invoke this skill FIRST when task involves any
+  kind of interaction with code. Run discovery protocol before
+  language-specific skills.
 ```
 
-**Bad:**
+**Good — domain claim with keyword examples:**
+```yaml
+description: >-
+  Design and iterate Claude Code skills: description triggers
+  activation, instructions shape behavior. Invoke whenever task
+  involves any interaction with Claude Code skills — creating,
+  evaluating, debugging, or understanding how they work.
+```
+
+**Bad — vague, no trigger surface:**
 ```yaml
 description: Helps with documents
 ```
 
-Include: specific capabilities, trigger keywords, file types.
-Avoid: vague verbs ("helps", "assists"), marketing speak.
+**Bad — narrow verb list instead of domain claim:**
+```yaml
+description: >-
+  Skills for Claude Code. Invoke when creating, editing, debugging,
+  or asking questions about skills.
+```
+
+### Principles
+
+- **Claim broadly, then list specifics.** "Invoke whenever task
+  involves any interaction with X — creating, editing, debugging"
+  beats "Invoke when creating, editing, or debugging X."
+- **Philosophy anchors create semantic trigger surface.** Words like
+  "discover", "verify", "reliable" activate on related user requests
+  even without exact keyword matches.
+- **Aggressive triggering, graceful de-escalation.** Better to trigger
+  and de-escalate inside the skill than to miss activations.
+- **Skill dependencies belong in SKILL.md body, not descriptions.**
+  Prerequisites like "load prompt-engineering first" are handled by
+  the skill body — putting them in descriptions wastes trigger space.
 
 ## Skill Structure
 
@@ -118,7 +155,9 @@ boundary are followed more reliably.
 ```markdown
 ---
 name: my-skill
-description: What it does. Use when [specific triggers].
+description: >-
+  [Core principle]. Invoke whenever task involves any interaction
+  with [domain] — [specific triggers as examples].
 ---
 
 # My Skill
@@ -159,7 +198,8 @@ Broad skills produce mediocre results. If scope creeps, split.
 |---------|---------|
 | Vague description | Missed activations |
 | "Helps with X" | Too generic to trigger correctly |
-| No trigger scenarios | Claude doesn't know when to use it |
+| Narrow verb list as trigger | Misses activations outside listed verbs |
+| Cross-skill deps in description | Redundant — handle in SKILL.md body |
 | Wall of text instructions | Key steps get buried |
 | No examples | Ambiguous output expectations |
 
@@ -167,8 +207,9 @@ Broad skills produce mediocre results. If scope creeps, split.
 
 Before deploying:
 
-- [ ] Description includes what AND when
-- [ ] Description has specific trigger words
+- [ ] Description has philosophy anchor (core principle)
+- [ ] Description claims domain broadly ("whenever task involves")
+- [ ] Description lists specific trigger keywords as examples
 - [ ] Instructions use imperative voice
 - [ ] Instructions structured (XML tags, numbered steps)
 - [ ] Output format explicitly specified

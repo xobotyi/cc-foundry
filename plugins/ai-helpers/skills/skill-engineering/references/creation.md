@@ -60,72 +60,88 @@ when to invoke your skill.
 ### Description Formula
 
 ```
-[What it does] + [When to use it / trigger scenarios]
+[Philosophy anchor] + [Broad domain claim] + [Trigger keywords]
 ```
 
+1. **Philosophy anchor** — Core principle as a short phrase. Primes
+   reasoning before the full SKILL.md loads.
+2. **Broad domain claim** — "Invoke whenever task involves any
+   interaction with X." Claims the domain rather than listing verbs.
+3. **Trigger keywords** — Specific actions listed as examples under
+   the broad claim, not as the exhaustive condition.
+
 ### Examples
+
+**Coding discipline:**
+```yaml
+description: >-
+  Universal coding discipline: discover before assuming, verify
+  before shipping. Invoke this skill FIRST when task involves any
+  kind of interaction with code. Run discovery protocol before
+  language-specific skills.
+```
+
+**Skill engineering:**
+```yaml
+description: >-
+  Design and iterate Claude Code skills: description triggers
+  activation, instructions shape behavior. Invoke whenever task
+  involves any interaction with Claude Code skills — creating,
+  evaluating, debugging, or understanding how they work.
+```
 
 **PDF Processing:**
 ```yaml
 description: >-
-  Extract text and tables from PDF files, fill forms, merge documents.
-  Use when working with PDF files or when the user mentions PDFs, forms,
-  or document extraction.
+  Extract and transform PDF documents: text extraction, form
+  filling, merging, splitting. Invoke whenever task involves any
+  interaction with PDF files — reading, creating, editing, or
+  converting documents.
 ```
 
-**Git Commit Helper:**
-```yaml
-description: >-
-  Generate descriptive commit messages by analyzing git diffs.
-  Use when the user asks for help writing commit messages or
-  reviewing staged changes.
-```
+### Aggressive Triggering, Graceful De-escalation
 
-**Code Review:**
-```yaml
-description: >-
-  Review code for bugs, security issues, performance, and style.
-  Use when asked to review, audit, or analyze code quality.
-```
-
-### Default to Broad Descriptions
-
-Descriptions should be **broad by default**. Narrow descriptions create
-implicit exclusion — if a user's request doesn't match the listed scenarios,
-Claude won't activate the skill.
+Descriptions should **claim the domain broadly**. Narrow verb lists
+create implicit exclusion — if a user's request doesn't match the
+listed verbs, Claude won't activate the skill.
 
 **Too narrow (avoid):**
-```yaml
-description: >-
-  Create, evaluate, and improve Claude Code skills. Use when working with
-  SKILL.md files, debugging skill activation, or building new skills.
-```
-Lists specific scenarios → misses "how do skills work?" or "should I use a skill here?"
-
-**Broad (preferred):**
 ```yaml
 description: >-
   Skills for Claude Code. Invoke when creating, editing, debugging,
   or asking questions about skills.
 ```
-Category first, inclusive language ("asking questions about") catches exploratory queries.
+Lists specific verbs → misses valid activations outside that set.
+
+**Broad domain claim (preferred):**
+```yaml
+description: >-
+  Design and iterate Claude Code skills: description triggers
+  activation, instructions shape behavior. Invoke whenever task
+  involves any interaction with Claude Code skills — creating,
+  evaluating, debugging, or understanding how they work.
+```
+Claims domain with "any interaction with X", then lists keywords as
+examples under the broad claim.
 
 **Principles:**
-- Lead with category, not action list
-- Use "Invoke" (imperative) over "Use when" (conditional)
-- Include "asking questions about" for exploratory coverage
-- Keep short — less room for implicit exclusions
+- Philosophy anchor first — primes reasoning, adds semantic surface
+- Claim domain with "whenever task involves any interaction with X"
+- List specific verbs as examples, not exhaustive conditions
+- Handle de-escalation inside the skill body, not the description
+- Skill dependencies belong in SKILL.md body, not descriptions
 
-Users can request narrowing during iteration if over-activation occurs.
+Better to trigger and de-escalate than to miss activations.
 
 ### Description Anti-Patterns
 
 | Pattern | Problem |
 |---------|---------|
-| "Helps with X" | Too vague—what kind of help? |
+| "Helps with X" | Too vague — what kind of help? |
 | "I can help you..." | Wrong point of view (use third person) |
 | "Useful tool for..." | Marketing speak, not actionable |
-| No trigger scenarios | Claude doesn't know when to invoke |
+| Narrow verb list as trigger | Misses activations outside listed verbs |
+| Cross-skill deps in description | Redundant — handle in SKILL.md body |
 
 ## Step 4: Structure the SKILL.md
 
@@ -134,7 +150,9 @@ Users can request narrowing during iteration if over-activation occurs.
 ```markdown
 ---
 name: my-skill
-description: [What it does and when to use it]
+description: >-
+  [Core principle]. Invoke whenever task involves any interaction
+  with [domain] — [specific triggers as examples].
 ---
 
 # [Skill Name]
@@ -156,7 +174,9 @@ This tells Claude which reference to read based on the situation:
 ```markdown
 ---
 name: my-skill
-description: [What it does and when to use it]
+description: >-
+  [Core principle]. Invoke whenever task involves any interaction
+  with [domain] — [specific triggers as examples].
 ---
 
 # [Skill Name]
@@ -198,7 +218,9 @@ For skills without references:
 ```markdown
 ---
 name: my-skill
-description: [What it does and when to use it]
+description: >-
+  [Core principle]. Invoke whenever task involves any interaction
+  with [domain] — [specific triggers as examples].
 ---
 
 # [Skill Name]
