@@ -6,8 +6,9 @@ Skills are prompts. Evaluate them using prompt engineering criteria.
 
 Before deploying a skill, verify:
 
-- [ ] Description includes WHAT it does AND WHEN to use it
-- [ ] Description contains specific trigger words/scenarios
+- [ ] Description has philosophy anchor (core principle)
+- [ ] Description claims domain broadly ("whenever task involves")
+- [ ] Description lists specific trigger keywords as examples
 - [ ] Instructions are clear and imperative
 - [ ] Instructions use structure (numbered steps, XML tags, headers)
 - [ ] Examples cover normal and edge cases (few-shot prompting)
@@ -27,17 +28,18 @@ cause activation failures or false triggers.
 
 | Aspect | Good | Bad |
 |--------|------|-----|
-| Specificity | "Extract text from PDFs, fill forms" | "Works with documents" |
-| Triggers | "Use when user mentions PDFs" | (no trigger guidance) |
-| Point of view | "Extracts and processes..." | "I can help you..." |
-| Length | 50-200 characters | < 20 or > 500 |
+| Philosophy anchor | "Universal coding discipline: discover before assuming" | "Helps with coding" |
+| Domain claim | "Invoke whenever task involves any interaction with X" | "Use when creating or editing X" |
+| Trigger keywords | "— creating, evaluating, debugging, or understanding" | (no trigger keywords) |
+| Point of view | "Design and iterate..." | "I can help you..." |
 
 ### Red Flags
 
-- No mention of when to use the skill
+- No philosophy anchor (opens with vague label)
+- Narrow verb list instead of broad domain claim
 - Uses vague verbs: "helps", "assists", "handles"
+- Cross-skill dependencies that belong in SKILL.md body
 - Written in second person ("you can...")
-- Contains XML tags
 - Contradicts actual skill functionality
 
 ## Instruction Quality

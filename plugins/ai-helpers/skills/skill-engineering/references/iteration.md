@@ -16,7 +16,7 @@ Use skill → Observe behavior → Identify gap → Refine → Repeat
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
-| Doesn't trigger | Description misses user's words | Add trigger terms, synonyms, file extensions |
+| Doesn't trigger | Description misses user's words | Broaden domain claim, add trigger keywords |
 | Triggers too often | Description too broad | Add exclusions: "Use for X, NOT for Y" |
 | Wrong skill activates | Overlapping descriptions | Make descriptions more distinct |
 
@@ -89,32 +89,41 @@ After (at end):
 NEVER delete without explicit user confirmation.
 ```
 
-### Adding Trigger Terms
+### Broadening Domain Claim
 
-Before:
-```yaml
-description: Process PDF files.
-```
-
-After:
+Before — narrow verb list:
 ```yaml
 description: >-
-  Extract text from PDFs, fill forms, merge documents.
-  Use when working with .pdf files or document extraction.
+  Process PDF files. Use when extracting text or filling forms.
+```
+
+After — broad domain claim with philosophy anchor:
+```yaml
+description: >-
+  Extract and transform PDF documents: text extraction, form
+  filling, merging, splitting. Invoke whenever task involves any
+  interaction with PDF files — reading, creating, editing, or
+  converting documents.
 ```
 
 ### Narrowing Scope
 
-Before:
-```yaml
-description: Helps with data analysis
-```
+When a skill triggers too often, add exclusions rather than
+narrowing the domain claim:
 
-After:
+Before — too broad, no boundaries:
 ```yaml
 description: >-
-  Analyze CSV and Excel files for statistical patterns.
-  Use for tabular data. NOT for text analysis or database queries.
+  Data analysis and processing. Invoke whenever task involves
+  any interaction with data.
+```
+
+After — broad claim with explicit exclusions:
+```yaml
+description: >-
+  Tabular data analysis: statistical patterns in structured
+  datasets. Invoke whenever task involves any interaction with
+  CSV or Excel files. NOT for text analysis or database queries.
 ```
 
 ### Splitting Overloaded Skills
