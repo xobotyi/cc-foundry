@@ -1,8 +1,9 @@
 ---
 name: output-style-engineering
 description: >-
-  Output styles for Claude Code. Invoke when creating or editing
-  styles, or changing Claude's personality/tone.
+  Design Claude Code output styles: persona, tone, and behavioral rules that replace the default
+  system prompt. Invoke whenever task involves any interaction with output styles — creating,
+  editing, evaluating, or changing how Claude communicates.
 ---
 
 # Output Style Engineering

@@ -1,8 +1,9 @@
 ---
 name: claude-code-sdk
 description: >-
-  Claude Code reference. Invoke for any question about Claude Code
-  capabilities, configuration, or extensibility.
+  Authoritative Claude Code reference: plugins, hooks, skills, MCP servers, settings, and
+  extensibility APIs. Invoke for any question about Claude Code capabilities, configuration,
+  or how to implement features using the platform.
 ---
 
 # Claude Code SDK
