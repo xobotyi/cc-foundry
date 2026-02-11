@@ -14,11 +14,22 @@
     ],
     "SessionStart": [
       {
-        "matcher": "startup|compact",
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js session-start",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js pre-compact",
             "timeout": 5
           }
         ]

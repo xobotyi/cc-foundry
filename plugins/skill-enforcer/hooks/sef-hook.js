@@ -246,10 +246,30 @@ and explanations, not the SEF protocol output itself.
 </examples>
 </SEF>`;
 
+const COMPACT_INSTRUCTIONS = `<sef-compaction-instructions>
+When compacting this conversation:
+
+1. REMOVE all content between <SEF> and </SEF> tags — the full framework
+   definition will be re-injected automatically after compaction.
+2. REMOVE all <SEF phase="..."> checkpoint tags — they are transient
+   triggers with no value in compacted context.
+3. PRESERVE a flat list of all skill reference file paths that were read
+   during this session. Format as:
+   <sef-references-read>
+   - /path/to/reference1.md
+   - /path/to/reference2.md
+   </sef-references-read>
+4. Include this instruction in the compacted output:
+   "After compaction, skills will be re-invoked automatically. The agent
+   MUST also re-read all references listed in <sef-references-read> to
+   restore session context."
+</sef-compaction-instructions>`;
+
 const TRIGGER = 'Invoke stage procedure.';
 
 const RESPONSES = {
     'session-start': { event: 'SessionStart', context: FRAMEWORK },
+    'pre-compact': { event: 'PreCompact', context: COMPACT_INSTRUCTIONS },
     'prompt': { event: 'UserPromptSubmit', context: `<SEF phase="USER-PROMPT">${TRIGGER}</SEF>` },
     'read': { event: 'PostToolUse', context: `<SEF phase="EVALUATION">${TRIGGER}</SEF>` },
     'write': { event: 'PostToolUse', context: `<SEF phase="PHASE-CHANGE">${TRIGGER}</SEF>` },
