@@ -55,6 +55,16 @@ Planning is ad-hoc — design decisions live in chat, task breakdowns are incons
 
 ---
 
+### the-coder
+
+Coding agents skip reading code, assume APIs exist, and ship unverified changes. This plugin provides a universal coding discipline skill (discover before assuming, verify before shipping) and a software engineer output style that enforces discovery-first workflow, LSP navigation, and honest communication.
+
+```
+/plugin install the-coder
+```
+
+---
+
 ### the-crucible
 
 Code quality is checked manually or not at all. This plugin provides a two-level validation pipeline: task completion validation (did you deliver what was asked?) and multi-agent code evaluation (8 specialized agents reviewing naming, complexity, comments, tests, error handling, security, observability, and documentation). All agents are read-only — they report, you decide.
