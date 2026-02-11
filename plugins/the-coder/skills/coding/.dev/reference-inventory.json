@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "Anthropic Context Engineering for Agents": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "Anthropic Harnesses for Long-Running Agents": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+    "Anthropic Writing Tools for Agents": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "Anthropic Advanced Tool Use": "https://www.anthropic.com/engineering/advanced-tool-use",
+    "Anthropic Building Effective Agents": "https://www.anthropic.com/research/building-effective-agents",
+    "Anthropic Claude Code Best Practices": "https://code.claude.com/docs/en/best-practices.md",
+    "Anthropic 2026 Agentic Coding Trends Report": "https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf?hsLang=en",
+    "Addy Osmani 80 Percent Problem": "https://addyo.substack.com/p/the-80-problem-in-agentic-coding",
+    "Armin Ronacher Agentic Coding Recommendations": "https://lucumr.pocoo.org/2025/6/12/agentic-coding/",
+    "Armin Ronacher Things That Didnt Work": "https://lucumr.pocoo.org/2025/7/30/things-that-didnt-work/",
+    "HumanLayer Writing Good CLAUDE.md": "https://www.humanlayer.dev/blog/writing-a-good-claude-md",
+    "Claude Code CLAUDE.md Guide": "https://claude.com/blog/using-claude-md-files",
+    "Softcery Agentic Coding Best Practices": "https://softcery.com/lab/softcerys-guide-agentic-coding-best-practices",
+    "SWE-Search MCTS for Coding Agents": "https://arxiv.org/html/2410.20285v2",
+    "SERA Soft-Verified Repository Agents": "https://arxiv.org/html/2601.20789v1",
+    "Agent READMEs Empirical Study": "https://arxiv.org/html/2511.12884v1"
+  },
+  "lastFetched": "2026-02-11T05:23:15.343Z"
+}

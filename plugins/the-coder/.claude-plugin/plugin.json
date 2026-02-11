@@ -1,0 +1,15 @@
+{
+  "name": "the-coder",
+  "version": "0.1.0",
+  "description": "Software engineering discipline: output styles, coding fundamentals, and universal development practices",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-coder",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": ["coding", "software-engineering", "output-styles", "development"],
+  "outputStyles": "./output-styles/"
+}
