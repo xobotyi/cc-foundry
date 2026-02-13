@@ -64,15 +64,3 @@ Use a routing table in SKILL.md to direct users.
 
 **Prompt engineering:** All AI artifact skills reference `prompt-engineering`
 because prompts are foundational to skills, subagents, and output styles.
-
-
-<claude-mem-context>
-# Recent Activity
-
-### Feb 2, 2026
-
-| ID | Time | T | Title | Read |
-|----|------|---|-------|------|
-| #6771 | 8:53 PM | ✅ | Simplified ai-helpers Plugin Installation Instructions to Use Marketplace Commands | ~317 |
-| #6768 | " | 🔵 | Reviewed AI Helpers Plugin Documentation and Skill Relationships | ~421 |
-</claude-mem-context>
