@@ -1,1 +1,19 @@
-{}
+{
+  "enabledPlugins": {
+    "ai-helpers@foundry": true,
+    "git-commit@foundry": true,
+    "skill-enforcer@foundry": true,
+    "the-blueprint@foundry": true,
+    "the-coder@foundry": true,
+    "the-crucible@foundry": true
+  },
+  "extraKnownMarketplaces": {
+    "foundry": {
+      "source": {
+        "source": "github",
+        "repo": "xobotyi/cc-foundry"
+      }
+    }
+  },
+  "outputStyle": "ai-helpers:AI Engineer"
+}
