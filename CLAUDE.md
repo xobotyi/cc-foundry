@@ -44,6 +44,9 @@ Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 ## Conventions
 
 <conventions>
+**Formatting:**
+- Wrap all markdown and instruction files at 100–120 characters per line
+
 **Skill structure:**
 - Router pattern: SKILL.md routes to `references/` for detailed content
 - Keep SKILL.md under 500 lines; move depth to references
