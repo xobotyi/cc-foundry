@@ -50,6 +50,13 @@ Project-specific commit guidance goes here.
 
 ## Commit Pipeline
 
+<command-format>
+**One git command per Bash call.** Every Bash invocation must start with
+`git` or `node`. Never chain commands with `&&`, `||`, or `;`. Never pipe
+input to git commands. This ensures each call matches `allowed-tools`
+patterns and runs without manual approval.
+</command-format>
+
 <pipeline-awareness>
 **Context drift prevention.** Steps like Quality Gate may require fixing
 code, running tests, or debugging — work that can span many turns. Before
@@ -136,10 +143,13 @@ git diff --cached      # Review exactly what will be committed
 For each logical unit:
 
 ```bash
-# Stage specific files/hunks
 git add <files>
-git add -p             # Interactive: stage specific hunks
 ```
+
+Do not use `git add -p` or pipe input to interactive commands — these break
+tool permission matching. Stage by explicit file path. If a file contains
+mixed changes, split it in a prior refactoring commit or accept the broader
+staging.
 
 ### 6. Validate Message
 
@@ -168,11 +178,13 @@ git commit -m "<validated-message>"
 
 ### 8. Verify
 
-After committing:
+After committing, run each as a **separate Bash call**:
 
 ```bash
-git log -1 --stat      # Verify commit content
-git status             # Confirm working tree state
+git log -1 --stat
+```
+```bash
+git status
 ```
 
 ## Breaking Changes
