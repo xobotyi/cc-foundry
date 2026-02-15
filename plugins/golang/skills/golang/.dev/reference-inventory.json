@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "Effective Go": "https://go.dev/doc/effective_go",
+    "Go Code Review Comments": "https://go.dev/wiki/CodeReviewComments",
+    "Go Common Mistakes": "https://go.dev/wiki/CommonMistakes",
+    "Uber Go Style Guide": "https://raw.githubusercontent.com/uber-go/guide/master/style.md",
+    "Google Go Style Decisions": "https://google.github.io/styleguide/go/decisions",
+    "Google Go Style Best Practices": "https://google.github.io/styleguide/go/best-practices",
+    "100 Go Mistakes": "https://100go.co/",
+    "Go Wiki Test Comments": "https://go.dev/wiki/TestComments",
+    "Go Error Handling": "https://go.dev/blog/error-handling-and-go",
+    "Go 1.13 Error Wrapping": "https://go.dev/blog/go1.13-errors",
+    "Go Concurrency Patterns Pipelines": "https://go.dev/blog/pipelines",
+    "Go Modules Layout": "https://go.dev/doc/modules/layout",
+    "Go Subtests and Table-Driven Tests": "https://go.dev/blog/subtests"
+  },
+  "lastFetched": "2026-02-14T20:42:06.532Z"
+}

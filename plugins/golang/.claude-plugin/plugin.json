@@ -1,0 +1,14 @@
+{
+  "name": "golang",
+  "version": "0.1.0",
+  "description": "Go language discipline: conventions, idioms, and toolchain practices",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/golang",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": ["go", "golang", "conventions", "idioms"]
+}
