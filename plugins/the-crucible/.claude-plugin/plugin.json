@@ -1,6 +1,6 @@
 {
   "name": "the-crucible",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
   "author": {
     "name": "xobotyi",
