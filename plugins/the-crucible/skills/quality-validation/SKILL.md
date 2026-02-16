@@ -1,8 +1,9 @@
 ---
 name: quality-validation
 description: >-
-  Task completion validation — verify deliverables match original requirements.
-  Invoke after completing any task, before reporting completion.
+  Task completion validation — verify deliverables match original requirements. Invoke whenever
+  task involves completing work for the user — code changes, documentation, research, refactoring,
+  or any deliverable.
 ---
 
 # Quality Validation

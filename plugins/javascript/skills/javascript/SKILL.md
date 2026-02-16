@@ -1,10 +1,9 @@
 ---
 name: javascript
 description: >-
-  Core JavaScript language conventions, idioms, and modern practices. Invoke when task
-  involves any interaction with JavaScript code — writing, reviewing, refactoring, or
-  debugging .js/.jsx files. For TypeScript projects, invoke the typescript skill alongside
-  this one — it extends JavaScript with type system conventions.
+  Core JavaScript language conventions, idioms, and modern practices. Invoke whenever task
+  involves any interaction with JavaScript code — writing, reviewing, refactoring, debugging,
+  or understanding .js/.jsx files and JavaScript projects.
 ---
 
 # JavaScript

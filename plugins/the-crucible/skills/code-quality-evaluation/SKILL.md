@@ -1,10 +1,10 @@
 ---
 name: code-quality-evaluation
 description: >-
-  Multi-agent code quality evaluation — orchestrates specialized review agents
-  for naming, complexity, comments, tests, error handling, security,
-  observability, and documentation. Invoke after completing coding tasks
-  or when asked to evaluate code quality.
+  Multi-agent code quality evaluation — orchestrates specialized review agents across naming,
+  complexity, tests, security, and documentation dimensions. Invoke whenever task involves any
+  interaction with code quality — reviewing implementations, evaluating pull requests, or
+  assessing code before commits.
 ---
 
 # Code Quality Evaluation

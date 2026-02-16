@@ -1,7 +1,9 @@
 ---
 name: commit-message
 description: >-
-  Git commit messages. Invoke when creating, reviewing, or asking questions about commit messages.
+  Git commit message conventions: structure, formatting, scoping, body content, breaking changes,
+  trailers. Invoke whenever task involves any interaction with commit messages — writing,
+  reviewing, validating, or understanding message format.
 ---
 
 # Commit Message Format

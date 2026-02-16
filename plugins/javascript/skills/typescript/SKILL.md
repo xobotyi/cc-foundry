@@ -1,11 +1,10 @@
 ---
 name: typescript
 description: >-
-  TypeScript type system, strict mode, and TS-specific patterns beyond
-  JavaScript fundamentals. Extends the javascript skill — always invoke
-  javascript alongside this skill. Invoke whenever task involves any
-  interaction with TypeScript code — .ts/.tsx files, type definitions,
-  generics, narrowing, tsconfig, or type-level programming.
+  TypeScript type system, strict mode, and TS-specific patterns beyond JavaScript fundamentals.
+  Invoke whenever task involves any interaction with TypeScript code — writing, reviewing,
+  refactoring, debugging .ts/.tsx files, type definitions, generics, narrowing, tsconfig, or
+  type-level programming.
 ---
 
 # TypeScript

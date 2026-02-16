@@ -1,8 +1,8 @@
 ---
 name: css
 description: >-
-  CSS conventions, methodologies, and patterns. Invoke when task involves writing, reviewing,
-  or modifying CSS or styling code.
+  CSS conventions, methodologies, and patterns. Invoke whenever task involves any interaction
+  with CSS or styling code — writing, reviewing, refactoring, debugging, or understanding styles.
 ---
 
 # CSS

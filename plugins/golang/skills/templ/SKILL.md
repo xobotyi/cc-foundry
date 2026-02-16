@@ -1,9 +1,9 @@
 ---
 name: templ
 description: >-
-  Type-safe Go HTML templating with templ. Invoke when task involves any
-  interaction with templ — writing .templ files, creating components, composing
-  templates, testing rendered output, or understanding templ syntax.
+  templ templating: syntax, components, attributes, styling, and JavaScript integration.
+  Invoke when task involves any interaction with templ — writing .templ files, creating
+  components, composing templates, testing rendered output, or understanding templ syntax.
 ---
 
 # templ

@@ -1,8 +1,9 @@
 ---
 name: logging
 description: >-
-  Logging conventions, structured logging, and log level practices. Invoke when task involves
-  adding, reviewing, or modifying logging in service code.
+  Logging conventions, structured logging, and log level practices. Invoke whenever task involves
+  any interaction with logging in service code — adding, reviewing, refactoring, debugging, or
+  understanding observability patterns.
 ---
 
 # Logging

@@ -1,9 +1,9 @@
 ---
 name: prompt-engineering
 description: >-
-  Foundational prompt design: clear instructions produce reliable behavior. Invoke whenever task
-  involves crafting, debugging, or improving any AI instructions — skills, agents, output styles,
-  system prompts, or LLM configurations.
+  Prompt design techniques for LLMs: structure, examples, reasoning patterns, and optimization.
+  Invoke whenever task involves any interaction with AI instructions — crafting, debugging,
+  improving, or evaluating prompts for skills, agents, output styles, or system configurations.
 ---
 
 # Prompt Engineering
