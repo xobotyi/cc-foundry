@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "Vue Style Guide - Overview": "https://raw.githubusercontent.com/vuejs/docs/main/src/style-guide/index.md",
+    "Vue Style Guide - Essential Rules": "https://raw.githubusercontent.com/vuejs/docs/main/src/style-guide/rules-essential.md",
+    "Vue Style Guide - Strongly Recommended Rules": "https://raw.githubusercontent.com/vuejs/docs/main/src/style-guide/rules-strongly-recommended.md",
+    "Vue Composition API FAQ": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/extras/composition-api-faq.md",
+    "Vue Reactivity Fundamentals": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/essentials/reactivity-fundamentals.md",
+    "Vue Reactivity In Depth": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/extras/reactivity-in-depth.md",
+    "Vue Composables": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/reusability/composables.md",
+    "Vue Single-File Components": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/scaling-up/sfc.md",
+    "Vue Component Props": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/components/props.md",
+    "Vue Component Events": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/components/events.md",
+    "Vue Provide-Inject": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/components/provide-inject.md",
+    "Vue Performance": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/best-practices/performance.md",
+    "Vue TypeScript with Composition API": "https://raw.githubusercontent.com/vuejs/docs/main/src/guide/typescript/composition-api.md"
+  },
+  "lastFetched": "2026-02-16T15:43:03.196Z"
+}

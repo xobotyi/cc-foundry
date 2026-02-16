@@ -1,0 +1,24 @@
+{
+  "sources": {
+    "React Docs - Thinking in React": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/thinking-in-react.md",
+    "React Docs - Keeping Components Pure": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/keeping-components-pure.md",
+    "React Docs - Reusing Logic with Custom Hooks": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/reusing-logic-with-custom-hooks.md",
+    "React Docs - You Might Not Need an Effect": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/you-might-not-need-an-effect.md",
+    "React Docs - Passing Data Deeply with Context": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/passing-data-deeply-with-context.md",
+    "React Docs - Extracting State Logic into a Reducer": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/extracting-state-logic-into-a-reducer.md",
+    "React Docs - Server Components": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/reference/rsc/server-components.md",
+    "React Docs - use Hook": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/reference/react/use.md",
+    "React Docs - useActionState": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/reference/react/useActionState.md",
+    "React Docs - useOptimistic": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/reference/react/useOptimistic.md",
+    "React Docs - useFormStatus": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/reference/react-dom/hooks/useFormStatus.md",
+    "React Docs - React Compiler Introduction": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/learn/react-compiler/introduction.md",
+    "React 19 Release Blog Post": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/blog/2024/12/05/react-19.md",
+    "Vercel React Best Practices (Agent Skills)": "https://raw.githubusercontent.com/vercel-labs/agent-skills/main/skills/react-best-practices/AGENTS.md",
+    "Vercel Composition Patterns (Agent Skills)": "https://raw.githubusercontent.com/vercel-labs/agent-skills/main/skills/composition-patterns/AGENTS.md",
+    "Kent C Dodds - Common Mistakes with React Testing Library": "https://kentcdodds.com/blog/common-mistakes-with-react-testing-library",
+    "Kent C Dodds - Application State Management with React": "https://kentcdodds.com/blog/application-state-management-with-react",
+    "Patterns.dev - React Server Components": "https://www.patterns.dev/react/react-server-components/",
+    "Patterns.dev - Compound Pattern": "https://www.patterns.dev/react/compound-pattern/"
+  },
+  "lastFetched": "2026-02-16T16:43:58.188Z"
+}
