@@ -74,8 +74,14 @@ These apply to ALL JavaScript code. No exceptions.
 
 1. **Named exports** over default exports.
 2. **Imports at the top**, grouped: built-in, external, internal.
-3. **No circular dependencies.** Extract shared code to a third module.
-4. **No wildcard re-exports.** Explicit re-exports only.
+3. **Always include file extensions** in import paths — `"./user.js"`, not `"./user"`.
+4. **No directory imports.** Import from the file directly, not from a folder that resolves
+   to `index.js`.
+5. **No barrel files in subdirectories.** `index.js` re-exports to aggregate a folder's
+   exports create indirection and hurt tree-shaking. Acceptable only as a standalone
+   package entry point.
+6. **No circular dependencies.** Extract shared code to a third module.
+7. **No wildcard re-exports.** Explicit re-exports only.
 
 ### Objects and Arrays
 
