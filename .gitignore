@@ -11,8 +11,5 @@ Thumbs.db
 # Claude Code local files
 *.local.md
 *.local.json
-# we exclude claude.md since claude-mem uses it as history injection file.
-# we know what files we want to track therefore no need to add all of them.
-CLAUDE.md
 
 **/.dev/reference/
