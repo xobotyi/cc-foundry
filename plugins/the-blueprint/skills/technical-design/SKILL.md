@@ -2,8 +2,9 @@
 name: technical-design
 description: >-
   High-level technical design — affected components, tool selection, approach,
-  and sequencing. Invoke after a design document to map the chosen solution
-  onto the codebase before task decomposition.
+  and sequencing. Invoke when task involves any interaction with technical
+  designs — creating, reviewing, understanding, or mapping design decisions
+  onto the codebase.
 ---
 
 # Technical Design

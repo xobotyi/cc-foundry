@@ -1,9 +1,9 @@
 ---
 name: coding
 description: >-
-  Universal coding discipline: discover before assuming, verify before shipping. Invoke this skill
-  FIRST when task involves any kind of interaction with code. Run discovery protocol before
-  language-specific skills.
+  Coding workflow covering discovery, planning, implementation, and verification. Invoke whenever
+  task involves any interaction with code — writing, modifying, debugging, refactoring, or
+  understanding codebases. Runs discovery protocol before language-specific skills engage.
 ---
 
 # Coding
