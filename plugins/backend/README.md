@@ -1,18 +1,19 @@
 # backend
 
-Backend platform discipline for service-oriented development.
+Backend platform discipline plugin for Claude Code.
 
 ## The Problem
 
-Building reliable services requires consistent approaches to observability, API design, and
-infrastructure patterns. Without standardized practices, teams reinvent logging strategies,
-monitoring conventions, and service architectures on every project.
+Building reliable services requires consistent approaches to observability, metrics
+instrumentation, and distributed tracing. Without standardized practices, teams reinvent
+logging strategies, monitoring conventions, and instrumentation patterns on every project.
 
 ## The Solution
 
-This plugin provides backend platform skills that encode proven practices for building services,
-operators, workers, and daemons. It focuses on platform-level concerns that apply across
-languages—structured logging, observability patterns, API design, and service architecture.
+Provides skills that encode proven practices for building observable services. The
+`observability` skill covers the three pillars at a high level; technology-specific skills
+(`prometheus`, `statsd`, `otel-tracing`) cover tooling conventions. Focuses on platform-level
+concerns that apply across languages.
 
 ## Installation
 
@@ -23,11 +24,30 @@ languages—structured logging, observability patterns, API design, and service 
 
 ## Skills
 
-### logging
+### observability
 
-Logging conventions, structured logging, and log level practices. **Use when:** adding,
-reviewing, refactoring, or debugging logging in service code, or when establishing observability
-patterns.
+The three pillars of observable systems: structured logging, metrics, and distributed tracing.
+Covers interconnection between pillars, correlation patterns, and high-level best practices.
+**Use when:** adding logging, designing metrics, instrumenting traces, or reviewing
+observability patterns.
+
+### prometheus
+
+Prometheus instrumentation: metric types, naming conventions, labels, cardinality management,
+PromQL, alerting rules, and exporter patterns. **Use when:** instrumenting code with
+Prometheus metrics or writing PromQL queries.
+
+### statsd
+
+StatsD metric instrumentation: counters, gauges, timers, histograms, sets, naming conventions,
+DogStatsD extensions, and aggregation patterns. **Use when:** emitting StatsD metrics or
+configuring StatsD backends.
+
+### otel-tracing
+
+OpenTelemetry tracing: span creation, context propagation, instrumentation patterns, sampling
+strategies, and semantic conventions. **Use when:** adding distributed tracing, configuring
+OTel SDKs, or reviewing trace instrumentation.
 
 ## Related Plugins
 

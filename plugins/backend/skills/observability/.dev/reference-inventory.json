@@ -1,0 +1,20 @@
+{
+  "sources": {
+    "OTel - Observability Primer": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/observability-primer.md",
+    "OTel - Traces Signal": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/signals/traces.md",
+    "OTel - Metrics Signal": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/signals/metrics.md",
+    "OTel - Logs Signal": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/signals/logs.md",
+    "Google SRE - Monitoring Distributed Systems": "https://sre.google/sre-book/monitoring-distributed-systems/",
+    "Microsoft Playbook - Observability Overview": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/README.md",
+    "Microsoft Playbook - Logging Pillar": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/pillars/logging.md",
+    "Microsoft Playbook - Metrics Pillar": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/pillars/metrics.md",
+    "Microsoft Playbook - Tracing Pillar": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/pillars/tracing.md",
+    "Microsoft Playbook - Logs vs Metrics vs Traces": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/log-vs-metric-vs-trace.md",
+    "Microsoft Playbook - Correlation IDs": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/correlation-id.md",
+    "Microsoft Playbook - Best Practices": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/best-practices.md",
+    "Prometheus - Metric Naming Best Practices": "https://prometheus.io/docs/practices/naming/",
+    "Prometheus - Instrumentation Best Practices": "https://prometheus.io/docs/practices/instrumentation/",
+    "Better Stack - RED and USE Metrics Guide": "https://betterstack.com/community/guides/monitoring/red-use-metrics/"
+  },
+  "lastFetched": "2026-02-16T15:45:04.255Z"
+}

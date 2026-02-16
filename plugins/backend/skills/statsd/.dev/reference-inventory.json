@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "StatsD Specification": "https://raw.githubusercontent.com/b/statsd_spec/master/README.md",
+    "StatsD README": "https://raw.githubusercontent.com/statsd/statsd/master/README.md",
+    "StatsD Metric Types": "https://raw.githubusercontent.com/statsd/statsd/master/docs/metric_types.md",
+    "StatsD Namespacing": "https://raw.githubusercontent.com/statsd/statsd/master/docs/namespacing.md",
+    "StatsD Server Types": "https://raw.githubusercontent.com/statsd/statsd/master/docs/server.md",
+    "StatsD Backends": "https://raw.githubusercontent.com/statsd/statsd/master/docs/backend.md",
+    "StatsD Graphite Configuration": "https://raw.githubusercontent.com/statsd/statsd/master/docs/graphite.md",
+    "DogStatsD Overview": "https://docs.datadoghq.com/developers/dogstatsd/",
+    "DogStatsD Datagram Format": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/",
+    "DogStatsD Metrics Submission": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/",
+    "DogStatsD High Throughput": "https://docs.datadoghq.com/developers/dogstatsd/high_throughput/",
+    "DogStatsD Data Aggregation": "https://docs.datadoghq.com/developers/dogstatsd/data_aggregation/",
+    "Prometheus StatsD Exporter": "https://raw.githubusercontent.com/prometheus/statsd_exporter/master/README.md",
+    "Telegraf StatsD Input Plugin": "https://raw.githubusercontent.com/influxdata/telegraf/master/plugins/inputs/statsd/README.md"
+  },
+  "lastFetched": "2026-02-16T15:43:00.301Z"
+}

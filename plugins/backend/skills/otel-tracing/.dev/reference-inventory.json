@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "OTel Concepts - Traces": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/signals/traces.md",
+    "OTel Concepts - Context Propagation": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/context-propagation/index.md",
+    "OTel Concepts - Sampling": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/sampling/index.md",
+    "OTel Concepts - Instrumentation Libraries": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/instrumentation/libraries.md",
+    "OTel Concepts - Code-Based Instrumentation": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/main/content/en/docs/concepts/instrumentation/code-based.md",
+    "OTel Spec - Tracing API": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/main/specification/trace/api.md",
+    "OTel Spec - Tracing SDK": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/main/specification/trace/sdk.md",
+    "OTel Spec - Propagators API": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/main/specification/context/api-propagators.md",
+    "OTel Semantic Conventions - General Trace": "https://raw.githubusercontent.com/open-telemetry/semantic-conventions/main/docs/general/trace.md",
+    "OTel Semantic Conventions - HTTP Spans": "https://raw.githubusercontent.com/open-telemetry/semantic-conventions/main/docs/http/http-spans.md",
+    "OTel Semantic Conventions - Database Spans": "https://raw.githubusercontent.com/open-telemetry/semantic-conventions/main/docs/database/database-spans.md",
+    "OTel Blog - Tail Sampling": "https://opentelemetry.io/blog/2022/tail-sampling/",
+    "Microsoft Engineering Playbook - OpenTelemetry": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/tools/OpenTelemetry.md",
+    "Microsoft Engineering Playbook - Observability Best Practices": "https://raw.githubusercontent.com/microsoft/code-with-engineering-playbook/main/docs/observability/best-practices.md"
+  },
+  "lastFetched": "2026-02-16T15:42:13.759Z"
+}
