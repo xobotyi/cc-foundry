@@ -1,9 +1,8 @@
 ---
 name: golang
 description: >-
-  Simplicity over cleverness, explicit over implicit: Go language conventions, idioms, and
-  toolchain. Invoke when task involves any interaction with Go code — writing, reviewing,
-  refactoring, debugging, or understanding Go projects.
+  Go language conventions, idioms, and toolchain. Invoke when task involves any interaction
+  with Go code — writing, reviewing, refactoring, debugging, or understanding Go projects.
 ---
 
 # Go
