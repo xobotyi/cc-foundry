@@ -1,6 +1,6 @@
 {
   "name": "golang",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Go language discipline: conventions, idioms, and toolchain practices",
   "author": {
     "name": "xobotyi",

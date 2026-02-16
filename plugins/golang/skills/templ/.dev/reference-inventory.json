@@ -1,0 +1,30 @@
+{
+  "sources": {
+    "Basic Syntax": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/01-basic-syntax.md",
+    "Elements": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/02-elements.md",
+    "Attributes": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/03-attributes.md",
+    "Expressions": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/04-expressions.md",
+    "Statements": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/05-statements.md",
+    "If Else": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/06-if-else.md",
+    "Switch": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/07-switch.md",
+    "Loops": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/08-loops.md",
+    "Raw Go": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/09-raw-go.md",
+    "Template Composition": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/10-template-composition.md",
+    "Forms": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/11-forms.md",
+    "CSS Style Management": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/12-css-style-management.md",
+    "Script Templates": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/13-script-templates.md",
+    "Comments": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/14-comments.md",
+    "Context": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/15-context.md",
+    "Using With Go Templates": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/16-using-with-go-templates.md",
+    "Rendering Raw HTML": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/17-rendering-raw-html.md",
+    "Render Once": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/18-render-once.md",
+    "Fragments": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/19-fragments.md",
+    "Using React With Templ": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/03-syntax-and-usage/20-using-react-with-templ.md",
+    "Components": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/04-core-concepts/01-components.md",
+    "Template Generation": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/04-core-concepts/02-template-generation.md",
+    "Testing": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/04-core-concepts/03-testing.md",
+    "View Models": "https://raw.githubusercontent.com/a-h/templ/main/docs/docs/04-core-concepts/04-view-models.md",
+    "LLM Reference (full docs)": "https://templ.guide/llms.md"
+  },
+  "lastFetched": "2026-02-16T08:47:44.035Z"
+}

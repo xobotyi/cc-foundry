@@ -16,6 +16,8 @@ Go-specific conventions, idioms, and toolchain practices.
 
 - **golang** — Go language conventions, idioms, error handling,
   concurrency patterns, and toolchain (GoMod, etc.).
+- **templ** — Templ (a-h/templ) type-safe HTML templating: syntax,
+  component composition, CSS/JS integration, and idiomatic patterns.
 
 ## Related Plugins
 
