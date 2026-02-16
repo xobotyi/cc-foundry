@@ -27,6 +27,10 @@ practices.
 
 ## Related Plugins
 
-Language-specific coding disciplines are provided by separate plugins:
+Language and platform disciplines are provided by separate plugins:
 
-- *(coming soon)* — Go, TypeScript, React, and other language plugins
+- **golang** — Go language conventions, idioms, and toolchain
+- **javascript** — JavaScript and TypeScript conventions and patterns
+- **frontend** — Frontend platform (CSS, accessibility)
+- **backend** — Backend platform (observability, API design)
+- **cli** — CLI platform (command-line design patterns)

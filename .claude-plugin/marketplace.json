@@ -120,6 +120,86 @@
       "license": "MIT",
       "keywords": ["coding", "software-engineering", "output-styles", "development"],
       "tags": ["coding", "engineering", "discipline"]
+    },
+    {
+      "name": "golang",
+      "description": "Go language discipline: conventions, idioms, and toolchain practices",
+      "version": "0.2.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/golang",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/golang",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["go", "golang", "conventions", "idioms"],
+      "tags": ["language", "go", "coding"]
+    },
+    {
+      "name": "javascript",
+      "description": "JavaScript and TypeScript language discipline: conventions, patterns, and ecosystem practices",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/javascript",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/javascript",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["javascript", "typescript", "conventions", "patterns"],
+      "tags": ["language", "javascript", "typescript", "coding"]
+    },
+    {
+      "name": "frontend",
+      "description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/frontend",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/frontend",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["frontend", "css", "accessibility", "browser", "web"],
+      "tags": ["platform", "frontend", "web"]
+    },
+    {
+      "name": "backend",
+      "description": "Backend platform discipline: observability, API design, and service architecture practices",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/backend",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/backend",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["backend", "observability", "logging", "api", "services"],
+      "tags": ["platform", "backend", "services"]
+    },
+    {
+      "name": "cli",
+      "description": "CLI platform discipline: command-line interface design, UX patterns, and conventions",
+      "version": "0.1.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/cli",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/cli",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["cli", "command-line", "terminal", "ux"],
+      "tags": ["platform", "cli", "terminal"]
     }
   ]
 }
