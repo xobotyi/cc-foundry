@@ -6,7 +6,7 @@ Skills are prompts. Evaluate them using prompt engineering criteria.
 
 Before deploying a skill, verify:
 
-- [ ] Description has philosophy anchor (core principle)
+- [ ] Description leads with what the skill does (not a slogan)
 - [ ] Description claims domain broadly ("whenever task involves")
 - [ ] Description lists specific trigger keywords as examples
 - [ ] Instructions are clear and imperative
@@ -28,14 +28,14 @@ cause activation failures or false triggers.
 
 | Aspect | Good | Bad |
 |--------|------|-----|
-| Philosophy anchor | "Universal coding discipline: discover before assuming" | "Helps with coding" |
+| Functional lead | "Go language conventions, idioms, and toolchain" | "Helps with coding" |
 | Domain claim | "Invoke whenever task involves any interaction with X" | "Use when creating or editing X" |
 | Trigger keywords | "— creating, evaluating, debugging, or understanding" | (no trigger keywords) |
 | Point of view | "Design and iterate..." | "I can help you..." |
 
 ### Red Flags
 
-- No philosophy anchor (opens with vague label)
+- Slogan instead of functional description (opens with tagline)
 - Narrow verb list instead of broad domain claim
 - Uses vague verbs: "helps", "assists", "handles"
 - Cross-skill dependencies that belong in SKILL.md body

@@ -97,7 +97,7 @@ description: >-
   Process PDF files. Use when extracting text or filling forms.
 ```
 
-After — broad domain claim with philosophy anchor:
+After — functional description with broad domain claim:
 ```yaml
 description: >-
   Extract and transform PDF documents: text extraction, form

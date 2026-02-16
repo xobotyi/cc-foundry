@@ -60,28 +60,26 @@ when to invoke your skill.
 ### Description Formula
 
 ```
-[Philosophy anchor] + [Broad domain claim] + [Trigger keywords]
+[What it does] + [When to invoke — broad domain claim with trigger examples]
 ```
 
-1. **Philosophy anchor** — Core principle as a short phrase. Primes
-   reasoning before the full SKILL.md loads.
-2. **Broad domain claim** — "Invoke whenever task involves any
-   interaction with X." Claims the domain rather than listing verbs.
-3. **Trigger keywords** — Specific actions listed as examples under
-   the broad claim, not as the exhaustive condition.
+1. **What it does** — Functional description of the skill's purpose.
+   State what the skill covers concretely, not a slogan or tagline.
+2. **When to invoke** — "Invoke whenever task involves any interaction
+   with X." Claims the domain broadly, then lists specific triggers
+   as examples under the broad claim.
 
 ### Examples
 
-**Coding discipline:**
+**Language skill:**
 ```yaml
 description: >-
-  Universal coding discipline: discover before assuming, verify
-  before shipping. Invoke this skill FIRST when task involves any
-  kind of interaction with code. Run discovery protocol before
-  language-specific skills.
+  Go language conventions, idioms, and toolchain. Invoke when task
+  involves any interaction with Go code — writing, reviewing,
+  refactoring, debugging, or understanding Go projects.
 ```
 
-**Skill engineering:**
+**Tool skill:**
 ```yaml
 description: >-
   Design and iterate Claude Code skills: description triggers
@@ -90,13 +88,12 @@ description: >-
   evaluating, debugging, or understanding how they work.
 ```
 
-**PDF Processing:**
+**Domain skill:**
 ```yaml
 description: >-
-  Extract and transform PDF documents: text extraction, form
-  filling, merging, splitting. Invoke whenever task involves any
-  interaction with PDF files — reading, creating, editing, or
-  converting documents.
+  PDF document processing: text extraction, form filling, merging,
+  splitting. Invoke whenever task involves any interaction with PDF
+  files — reading, creating, editing, or converting documents.
 ```
 
 ### Aggressive Triggering, Graceful De-escalation
@@ -125,11 +122,13 @@ Claims domain with "any interaction with X", then lists keywords as
 examples under the broad claim.
 
 **Principles:**
-- Philosophy anchor first — primes reasoning, adds semantic surface
+- Lead with function — state what the skill does, not a tagline
 - Claim domain with "whenever task involves any interaction with X"
 - List specific verbs as examples, not exhaustive conditions
 - Handle de-escalation inside the skill body, not the description
 - Skill dependencies belong in SKILL.md body, not descriptions
+- Philosophy/guiding principles belong in SKILL.md body, not
+  descriptions — they shape behavior after loading, not activation
 
 Better to trigger and de-escalate than to miss activations.
 
@@ -140,6 +139,7 @@ Better to trigger and de-escalate than to miss activations.
 | "Helps with X" | Too vague — what kind of help? |
 | "I can help you..." | Wrong point of view (use third person) |
 | "Useful tool for..." | Marketing speak, not actionable |
+| Slogan before description | Wastes tokens, zero activation value |
 | Narrow verb list as trigger | Misses activations outside listed verbs |
 | Cross-skill deps in description | Redundant — handle in SKILL.md body |
 
@@ -151,8 +151,8 @@ Better to trigger and de-escalate than to miss activations.
 ---
 name: my-skill
 description: >-
-  [Core principle]. Invoke whenever task involves any interaction
-  with [domain] — [specific triggers as examples].
+  [What it does — functional description]. Invoke whenever task
+  involves any interaction with [domain] — [specific triggers].
 ---
 
 # [Skill Name]
@@ -175,8 +175,8 @@ This tells Claude which reference to read based on the situation:
 ---
 name: my-skill
 description: >-
-  [Core principle]. Invoke whenever task involves any interaction
-  with [domain] — [specific triggers as examples].
+  [What it does — functional description]. Invoke whenever task
+  involves any interaction with [domain] — [specific triggers].
 ---
 
 # [Skill Name]
@@ -219,8 +219,8 @@ For skills without references:
 ---
 name: my-skill
 description: >-
-  [Core principle]. Invoke whenever task involves any interaction
-  with [domain] — [specific triggers as examples].
+  [What it does — functional description]. Invoke whenever task
+  involves any interaction with [domain] — [specific triggers].
 ---
 
 # [Skill Name]
