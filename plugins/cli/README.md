@@ -1,7 +1,17 @@
 # cli
 
-CLI platform discipline plugin for Claude Code. Provides skills for
-command-line interface design and conventions.
+CLI platform discipline for Claude Code — command-line interface design, UX patterns, and
+conventions.
+
+## The Problem
+
+Building command-line tools requires discipline-specific knowledge: argument parsing conventions,
+output formatting, error handling, interactive vs. non-interactive modes, and terminal UX patterns.
+
+## The Solution
+
+This plugin provides skills for CLI design patterns and conventions, helping Claude build
+command-line tools that follow platform best practices.
 
 ## Installation
 
@@ -10,7 +20,7 @@ command-line interface design and conventions.
 /plugin install cli
 ```
 
-## What's Inside
+## Skills
 
 *(No skills yet — to be developed.)*
 
@@ -18,5 +28,8 @@ command-line interface design and conventions.
 
 - **golang** — Go language discipline
 - **javascript** — JavaScript and TypeScript language discipline
-- **the-coder** — Language-agnostic coding discipline (discovery,
-  planning, verification)
+- **the-coder** — Language-agnostic coding discipline (discovery, planning, verification)
+
+## License
+
+MIT

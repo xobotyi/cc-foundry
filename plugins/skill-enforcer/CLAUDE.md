@@ -1,62 +1,57 @@
-# Skill Enforcer Plugin
+# skill-enforcer Plugin
 
-This plugin ensures Claude consistently invokes skills and reads their
-references throughout a coding session. Without enforcement, Claude tends
-to skip skills when jumping straight to implementation, and forgets to
-re-read references when development phases change.
+Enforces skill invocation and reference reading via lifecycle hooks.
 
-## The Core Problem
+## How It Works
 
-Skills aren't atomic. When you invoke a skill, you get its main content,
-but skills often contain multiple references — some relevant to coding,
-others to testing, others to review. The default behavior treats skill
-invocation as "done," missing references that become relevant later.
+The plugin injects a Skill Enforcement Framework (SEF) at session start, then uses XML tag
+checkpoints to force evaluation at key lifecycle events. The framework treats skills as
+non-atomic — a skill isn't exhausted until all phase-relevant references have been read.
 
-For example: you invoke a coding skill while writing implementation.
-Later, you transition to writing tests. The same skill has testing
-references you never read, because the skill was already "invoked."
+**Lifecycle flow:**
 
-## How SEF Solves This
+1. **Session start** — inject full framework definition (~1050 tokens)
+2. **User prompt** — inject `<SEF phase="USER-PROMPT">` tag
+3. **After Read** — inject `<SEF phase="EVALUATION">` tag
+4. **After Edit/Write** — inject `<SEF phase="PHASE-CHANGE">` tag
+5. **After Skill** — inject `<SEF phase="SKILL-LOAD">` tag
 
-The Skill Enforcement Framework (SEF) injects at session start and
-establishes checkpoints via XML tags at key lifecycle events:
+Each tag triggers a mandatory evaluation that must be output in the reasoning stage using
+`<sef-eval>` XML structure. Silent acknowledgment = violation.
 
-| Event | Tag | What Happens |
-|-------|-----|--------------|
-| Session start | Full framework | Establishes vocabulary and protocol |
-| User message | `<SEF phase="USER-PROMPT">` | Evaluate which skills match the task |
-| After Read | `<SEF phase="EVALUATION">` | Re-evaluate after learning new context |
-| After Edit/Write | `<SEF phase="PHASE-CHANGE">` | Check if phase shifted, load new refs |
-| After Skill | `<SEF phase="SKILL-LOAD">` | Consider related skills, read initial refs |
+**Enforcement mechanism:**
 
-## Key Concepts
+- Skills that match the task MUST be invoked (no "I already know" excuses)
+- Phase shifts (coding → testing) MUST trigger re-evaluation of loaded skills for unread refs
+- Each evaluation MUST enumerate loaded skills, unread refs, and reach explicit decision
+- The evaluation MUST appear inside `<think><sef-eval>...</sef-eval></think>`
 
-**Skills are not atomic.** A skill isn't exhausted until all phase-relevant
-references have been read. Invocation is a starting point, not an endpoint.
+## Components
 
-**Phase shifts require re-evaluation.** When transitioning from coding to
-testing (or any phase change), both new skills AND references from
-already-loaded skills must be considered.
+**`hooks/sef-hook.js`** — Unified Node.js script handling all hook events via command-line arg:
+- `session-start` — outputs full framework definition
+- `pre-compact` — outputs compaction instructions
+- `prompt` — outputs USER-PROMPT tag
+- `read` — outputs EVALUATION tag
+- `write` — outputs PHASE-CHANGE tag
+- `skill` — outputs SKILL-LOAD tag
 
-**Evaluation requires reasoning output.** Seeing a tag and silently
-acknowledging it is a violation. The evaluation must be output in the
-reasoning stage (thinking block) following the prescribed thought format.
+**`hooks/hooks.json`** — Hook registration mapping lifecycle events to script invocations:
+- `SessionStart` (startup|resume|clear|compact) → `session-start`
+- `PreCompact` → `pre-compact`
+- `UserPromptSubmit` → `prompt`
+- `PostToolUse` (Read) → `read`
+- `PostToolUse` (Edit|Write) → `write`
+- `PostToolUse` (Skill) → `skill`
 
-## Thought Format
+## Conventions
 
-When a tag is seen, output in reasoning stage:
+**Token efficiency:**
+- Framework loaded once per session: ~1050 tokens
+- Per-checkpoint cost: ~15 tokens per tag
+- Trade-off: higher upfront cost, minimal per-action overhead
 
-```
-SEF [PHASE]
-[evaluation fields per stage]
-→ [decision]
-```
-
-Each stage has specific fields. For example, PHASE-CHANGE requires
-enumerating loaded skills and listing unread refs per skill.
-
-## Compliance
-
-- No skill invocation when matched = violation
-- No reference read when context shifts = incomplete
-- No reasoning output = no evaluation = violation
+**Compaction handling:**
+- PreCompact hook injects instructions to strip SEF tags and evaluation blocks
+- Preserves list of read references for restoration after compaction
+- Framework re-injected automatically on SessionStart after compaction
