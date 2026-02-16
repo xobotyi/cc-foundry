@@ -1,0 +1,20 @@
+{
+  "sources": {
+    "MDN - Understanding WCAG": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/accessibility/guides/understanding_wcag/index.md",
+    "MDN - WCAG Perceivable": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/accessibility/guides/understanding_wcag/perceivable/index.md",
+    "MDN - ARIA Overview": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/accessibility/aria/index.md",
+    "MDN - ARIA Roles Reference": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/accessibility/aria/reference/roles/index.md",
+    "MDN - ARIA Attributes Reference": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/accessibility/aria/reference/attributes/index.md",
+    "MDN - HTML Accessibility Fundamentals": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/learn_web_development/core/accessibility/html/index.md",
+    "MDN - WAI-ARIA Basics": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/learn_web_development/core/accessibility/wai-aria_basics/index.md",
+    "MDN - Keyboard Accessibility": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/accessibility/guides/understanding_wcag/keyboard/index.md",
+    "W3C APG - Keyboard Interface Practices": "https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/",
+    "W3C APG - Landmark Regions": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/",
+    "W3C APG - Patterns Overview": "https://www.w3.org/WAI/ARIA/apg/patterns/",
+    "W3C APG - Dialog Modal Pattern": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+    "W3C - ARIA in HTML": "https://www.w3.org/TR/html-aria/",
+    "WebAIM - WCAG 2 Checklist": "https://webaim.org/standards/wcag/checklist",
+    "web.dev - Learn Accessibility Focus": "https://web.dev/learn/accessibility/focus"
+  },
+  "lastFetched": "2026-02-16T15:46:16.397Z"
+}
