@@ -1,0 +1,16 @@
+{
+  "sources": {
+    "TS Handbook - Narrowing & Type Guards": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Narrowing.md",
+    "TS Handbook - Generics": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Generics.md",
+    "TS Handbook - Conditional Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Conditional%20Types.md",
+    "TS Handbook - Mapped Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Mapped%20Types.md",
+    "TS Handbook - Template Literal Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Template%20Literal%20Types.md",
+    "TS Handbook - Utility Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/reference/Utility%20Types.md",
+    "TS Handbook - Do's and Don'ts": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/declaration-files/Do's%20and%20Don'ts.md",
+    "Google TypeScript Style Guide": "https://google.github.io/styleguide/tsguide.html",
+    "Total TypeScript - TSConfig Cheat Sheet": "https://www.totaltypescript.com/tsconfig-cheat-sheet",
+    "typescript-eslint Rules Overview": "https://typescript-eslint.io/rules/",
+    "typescript-eslint Shared Configs": "https://typescript-eslint.io/users/configs/"
+  },
+  "lastFetched": "2026-02-16T13:19:39.900Z"
+}

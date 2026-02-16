@@ -1,0 +1,14 @@
+{
+  "sources": {
+    "Google JavaScript Style Guide": "https://google.github.io/styleguide/jsguide.html",
+    "Airbnb JavaScript Style Guide": "https://raw.githubusercontent.com/airbnb/javascript/master/README.md",
+    "Clean Code JavaScript": "https://raw.githubusercontent.com/ryanmcdermott/clean-code-javascript/master/README.md",
+    "MDN - JavaScript Modules": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/modules/index.md",
+    "MDN - Using Promises": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/using_promises/index.md",
+    "MDN - Iterators and Generators": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/iterators_and_generators/index.md",
+    "MDN - Closures": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/closures/index.md",
+    "MDN - Control Flow and Error Handling": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/control_flow_and_error_handling/index.md",
+    "TypeScript JSDoc Reference": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/javascript/JSDoc%20Reference.md"
+  },
+  "lastFetched": "2026-02-16T13:19:39.193Z"
+}

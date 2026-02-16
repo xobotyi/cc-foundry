@@ -1,0 +1,25 @@
+{
+  "sources": {
+    "Bun LLMs Full Documentation": "https://bun.sh/docs/llms-full.txt",
+    "Bun APIs Overview": "https://bun.com/docs/runtime/bun-apis.md",
+    "Bun HTTP Server (Bun.serve)": "https://bun.com/docs/runtime/http/server.md",
+    "Bun Shell API (Bun.$)": "https://bun.com/docs/runtime/shell.md",
+    "Bun File I/O (Bun.file, Bun.write)": "https://bun.com/docs/runtime/file-io.md",
+    "Bun Child Process (Bun.spawn)": "https://bun.com/docs/runtime/child-process.md",
+    "Bun Bundler": "https://bun.com/docs/bundler/index.md",
+    "Bun Macros": "https://bun.com/docs/bundler/macros.md",
+    "Bun Test Runner": "https://bun.com/docs/test/index.md",
+    "Bun Test Writing": "https://bun.com/docs/test/writing-tests.md",
+    "Bun Test Mocks": "https://bun.com/docs/test/mocks.md",
+    "Bun Configuration (bunfig.toml)": "https://bun.com/docs/runtime/bunfig.md",
+    "Bun Node.js Compatibility": "https://bun.com/docs/runtime/nodejs-compat.md",
+    "Bun Package Manager (bun install)": "https://bun.com/docs/pm/cli/install.md",
+    "Bun SQLite": "https://bun.com/docs/runtime/sqlite.md",
+    "Bun Workers": "https://bun.com/docs/runtime/workers.md",
+    "Bun WebSockets": "https://bun.com/docs/runtime/http/websockets.md",
+    "Bun Environment Variables": "https://bun.com/docs/runtime/environment-variables.md",
+    "Bun Plugins": "https://bun.com/docs/runtime/plugins.md",
+    "Bun Fullstack Dev Server": "https://bun.com/docs/bundler/fullstack.md"
+  },
+  "lastFetched": "2026-02-16T13:19:42.784Z"
+}

@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "Vitest LLMs Full Documentation": "https://vitest.dev/llms-full.txt",
+    "Configuration Guide": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/config/index.md",
+    "Test API Reference": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/api/expect.md",
+    "Vi Utility API (vi.fn, vi.mock, vi.spyOn, timers)": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/api/vi.md",
+    "Mock API Reference": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/api/mock.md",
+    "Mocking Guide (overview + cheat sheet)": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/mocking.md",
+    "Mocking Functions": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/mocking/functions.md",
+    "Mocking Modules": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/mocking/modules.md",
+    "Snapshot Testing Guide": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/snapshot.md",
+    "Coverage Configuration": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/coverage.md",
+    "Test Projects (workspace/monorepo)": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/projects.md",
+    "Browser Mode": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/browser/index.md",
+    "Lifecycle Hooks": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/lifecycle.md",
+    "Extending Matchers": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/extending-matchers.md",
+    "In-Source Testing": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/in-source.md",
+    "Migration Guide (from Jest)": "https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/guide/migration.md"
+  },
+  "lastFetched": "2026-02-16T13:19:42.312Z"
+}

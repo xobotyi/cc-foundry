@@ -1,7 +1,7 @@
 # javascript
 
 JavaScript and TypeScript language discipline plugin for Claude Code.
-Provides skills for JS/TS conventions, patterns, and ecosystem practices.
+Provides skills for JS/TS conventions, runtime practices, and testing.
 
 ## Installation
 
@@ -14,8 +14,13 @@ Provides skills for JS/TS conventions, patterns, and ecosystem practices.
 
 ### Skills
 
-- **typescript** — JavaScript and TypeScript conventions, patterns,
-  type system practices, and ecosystem tooling.
+- **javascript** — Core JavaScript language conventions, idioms, and
+  modern practices (ESM, async/await, closures, JSDoc).
+- **typescript** — TypeScript type system, strict mode, and TS-specific
+  patterns. Extends the javascript skill.
+- **nodejs** — Node.js runtime conventions, APIs, and ecosystem practices.
+- **bun** — Bun runtime conventions, APIs, and ecosystem practices.
+- **vitest** — Vitest testing framework conventions and practices.
 
 ## Related Plugins
 
