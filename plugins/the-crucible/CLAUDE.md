@@ -1,77 +1,74 @@
 # the-crucible Plugin
 
-## Philosophy
-
-The crucible tests what the blueprint designs.
-
-These skills validate completed work at two levels: task validation checks that deliverables match
-original requirements, code quality evaluation subjects code to 8 specialized review agents covering
-naming, complexity, comments, tests, error handling, security, observability, and documentation.
-
-All review agents are read-only — they report findings without modifying code. The developer decides
-which findings to address. This preserves human judgment while automating the tedious parts of
-quality review.
+Code quality validation pipeline enforcing task completion criteria and orchestrating multi-agent
+code evaluation.
 
 ## Skills
 
 | Skill | Purpose |
 |-------|---------|
-| `quality-validation` | Verify task deliverables match original requirements |
-| `code-quality-evaluation` | Orchestrate 8 specialized agents for code review |
-| `review-output` | Standardized report format shared by all agents (not user-invocable) |
+| `quality-validation` | Verify task deliverables match original requirements before completion |
+| `code-quality-evaluation` | Orchestrate 8 specialized review agents for comprehensive code analysis |
+| `review-output` | Standardized report format for review agents (not user-invocable) |
 
-## Skill Flow
+## How It Works
 
-```
-quality-validation (did you deliver what was asked?)
-    ↓
-code-quality-evaluation (is what you delivered well-crafted?)
-    ↓
-  ├── namer
-    ├── code-simplifier
-    ├── comment-cleaner
-    ├── test-reviewer
-    ├── error-handling-reviewer
-    ├── security-reviewer
-    ├── observability-reviewer
-    └── documenter (runs last, after fixes)
-```
+### Two-Level Validation
 
-`quality-validation` runs after any task completion.
-`code-quality-evaluation` runs after coding tasks, before commit.
+1. **quality-validation** — Task completion gate. Compares deliverables against original request.
+   Applies to code changes, documentation, research, and refactoring tasks. Validates before
+   reporting completion.
 
-## Agents
+2. **code-quality-evaluation** — Multi-agent code review pipeline. Runs after quality validation
+   for coding tasks, before commit. Eight specialized agents evaluate code in parallel, report
+   findings using standardized format, then developer addresses issues.
 
-All agents use sonnet model, read-only tools, and `review-output` skill for consistent report
-formatting.
+### Multi-Agent Code Review Pipeline
 
-| Agent | Review Type | Focus |
-|-------|-------------|-------|
-| namer | Naming Review | Vague, misleading, type-focused identifiers |
-| code-simplifier | Complexity Review | Duplication, nesting, verbose patterns |
-| comment-cleaner | Comment Review | Noise comments, missing doc comments |
-| test-reviewer | Test Suite | Strategy, leanness, locality, clarity |
-| error-handling-reviewer | Error Handling | Creation, propagation, silent swallowing |
-| security-reviewer | Security Review | Secrets, injection, validation, crypto |
-| observability-reviewer | Observability | Logging, metrics, tracing, context |
-| documenter | Documentation Review | Missing, outdated, insufficient API docs |
+**Phase 1: Parallel Evaluation**
+- 7 agents run in background simultaneously:
+  - `namer` — vague, misleading, type-focused identifiers
+  - `code-simplifier` — duplication, deep nesting, verbose patterns
+  - `comment-cleaner` — comment noise, redundancy, missing doc comments
+  - `test-reviewer` — test quality, strategy, leanness, locality
+  - `error-handling-reviewer` — error creation, propagation, silent swallowing
+  - `security-reviewer` — secrets, injection, validation, crypto, auth
+  - `observability-reviewer` — logging, metrics, tracing, context propagation
+
+**Phase 2: Findings Presentation**
+- Aggregate reports by severity (Critical / Issues / Recommendations)
+- Present to developer for triage
+
+**Phase 3: Apply Fixes**
+- Developer addresses findings in priority order
+- Iterative fix-verify loop
+
+**Phase 4: Documentation Review**
+- `documenter` runs last after code fixes complete
+- Evaluates API documentation against final state
+
+**Phase 5: Cleanup**
+- Remove temporary `.reviews/` directory
+
+All agents are read-only and write reports to `{target}/.reviews/{timestamp}/`. Developer decides
+which findings to address.
 
 ## Hooks
 
 | Event | Type | Purpose |
 |-------|------|---------|
-| `Stop` | `agent` | Automatic quality gate — blocks premature task completion |
+| `Stop` | `agent` | Automatic quality gate blocking premature task completion |
 
-The Stop hook fires every time Claude finishes responding. An agent hook reads the
-`quality-validation` skill (SKILL.md) and applies its criteria to evaluate whether the deliverable
-matches the original request. Returns `{"ok": false, "reason": "..."}` if incomplete, forcing Claude
-to continue. Returns `{"ok": true}` for complete work or non-task interactions.
+The Stop hook fires when Claude finishes responding. An agent reads the `quality-validation` skill
+criteria and evaluates whether deliverables match the original request. Returns `{"ok": false}`
+for incomplete work, forcing continuation. Returns `{"ok": true}` for complete work or non-task
+interactions.
 
-The skill remains the single source of truth — the hook reads it at evaluation time rather than
-duplicating criteria in the prompt.
+The skill is the single source of truth — the hook reads SKILL.md at evaluation time rather than
+duplicating validation logic.
 
-**Infinite loop prevention:** The hook checks `stop_hook_active` in the input. When true (meaning
-this is already a follow-up from a previous hook rejection), it always approves to prevent loops.
+**Infinite loop prevention:** Hook checks `stop_hook_active` input flag. When true (already a
+follow-up from previous rejection), always approves to prevent loops.
 
 ## Relationship to the-blueprint
 
@@ -81,3 +78,21 @@ the-blueprint produces the plan. the-crucible validates the execution.
 the-blueprint: design → technical design → task decomposition → task creation
 the-crucible:  quality-validation → code-quality-evaluation
 ```
+
+## Conventions
+
+**Report Storage:**
+- All review reports written to `{target}/.reviews/{timestamp}/`
+- Reports directory must be inside target directory (agent write scope)
+- Cleanup reports after completion
+
+**Agent Coordination:**
+- Launch background agents with `run_in_background=true`
+- Never use TaskOutput tool — read report files directly
+- Wait for completion notifications before reading reports
+- Pass report file paths in agent prompts
+
+**Review Format:**
+- All agents use `review-output` skill for consistent structure
+- `file:line` format for all findings
+- Severity levels: Critical (must fix) / Issues (should fix) / Recommendations (consider)

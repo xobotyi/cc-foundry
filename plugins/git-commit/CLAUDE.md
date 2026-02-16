@@ -1,21 +1,32 @@
 # git-commit Plugin
 
-Git commit workflow with conventions and validation.
+Structured git commit workflow with atomic commits, message validation, and conventions.
 
-## Components
+## Command
 
-| Type | Name | Purpose |
-|------|------|---------|
-| Command | `/commit` | 8-step commit pipeline |
-| Skill | `commit-message` | Message formatting conventions |
-| Script | `validate-commit-message.js` | Message validation |
+| Command | Purpose |
+|---------|---------|
+| `/commit` | 8-step pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify |
+
+## Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `commit-message` | Message formatting conventions and structure rules |
+
+## Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `validate-commit-message.js` | Pre-commit message validation (errors block, warnings advise) |
 
 ## Workflow
 
-1. `/commit` loads `commit-message` skill for formatting rules
-2. Pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify
-3. Validation script runs before each commit (errors block, warnings advise)
-4. Commit message displayed as blockquote before execution
+1. `/commit` loads `commit-message` skill first for formatting rules
+2. Pipeline identifies logical units in diff and plans commit order
+3. Quality gate checks pass before staging
+4. Each message validated before commit execution
+5. Final verification with `git log` and `git status`
 
 ## Validator Flags
 
@@ -25,7 +36,7 @@ Git commit workflow with conventions and validation.
 
 ## Project Configuration
 
-Projects can override commit behavior via `<git-commit-config>` in their CLAUDE.md:
+Projects customize commit behavior via `<git-commit-config>` in their CLAUDE.md:
 
 ```xml
 <git-commit-config>
@@ -39,8 +50,31 @@ Project-specific commit guidance here.
 </git-commit-config>
 ```
 
-- **`<validator-args>`** — Flags passed to validator. Each `<flag name="X" value="Y"/>` becomes `--X "Y"`.
-- **`<extra-instructions>`** — Highest priority guidance during commit process.
+- **`<validator-args>`** — Flags passed to validator. Each `<flag name="X" value="Y"/>` becomes
+  `--X "Y"`.
+- **`<extra-instructions>`** — Highest priority guidance during commit process. Overrides plugin
+  defaults.
+
+## Conventions
+
+**Commit message structure:**
+- Subject line: `[scope] verb description` (max 72 chars, factual, imperative mood)
+- Body: explains why change was needed, how to verify
+- Trailers: structured metadata (Task, Fixes, Refs, etc.)
+
+**Scope usage:**
+- Use for monorepos or multi-component repositories
+- Omit for single-purpose repositories
+- Determined from file paths, not contents
+
+**Breaking changes:**
+- Body starts with `BREAKING:` prefix
+- Explains what breaks and migration path
+
+**No AI attribution:**
+- No "Generated with Claude Code" or similar
+- No "Co-Authored-By: Claude" trailers
+- Commits appear as regular developer work
 
 ## Extension Points
 

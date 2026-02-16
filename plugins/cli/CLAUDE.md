@@ -1,7 +1,6 @@
 # cli Plugin
 
-CLI platform discipline plugin. Teaches command-line interface design
-patterns and conventions.
+CLI platform discipline — command-line interface design, UX patterns, and conventions.
 
 ## Skills
 
@@ -9,6 +8,6 @@ patterns and conventions.
 
 ## Plugin Scope
 
-This plugin covers CLI platform concerns — what's specific to building
-command-line tools and terminal applications. Language-specific skills
-(Go, TypeScript) are provided by their respective language plugins.
+This plugin covers CLI platform concerns specific to building command-line tools and terminal
+applications. Language-specific implementations (argument parsing, terminal I/O) are provided by
+their respective language plugins.

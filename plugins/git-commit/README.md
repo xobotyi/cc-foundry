@@ -1,35 +1,33 @@
 # git-commit
 
-A Claude Code plugin for structured git commits.
+Structured git commit workflow with atomic commits, message validation, and conventions.
 
 ## The Problem
 
-Claude's default commit behavior creates messy history:
+**Mixed changes in single commits.** Claude's default commit behavior bundles bug fixes,
+refactoring, and new features together. The resulting history is impossible to bisect,
+cherry-pick, or review meaningfully. When something breaks, you can't isolate the change that
+caused it.
 
-**Mixed changes in single commits.** A bug fix, a refactor, and a new feature all land in one commit.
-The history becomes impossible to bisect, cherry-pick, or review meaningfully.
+**Vague commit messages.** "Fix stuff" or "Update code" tells future readers nothing. When
+debugging at 3am, you need to understand what changed and why by reading the log. Generic
+messages waste that opportunity.
 
-**Vague commit messages.** "Fix stuff" or "Update code" tell you nothing. When something breaks,
-you can't understand what changed or why by reading the log.
+**No validation before commit.** Typos in messages, missing context, forgotten scope prefixes,
+inconsistent formatting — all slip through. Manual review catches some, but not systematically.
 
-**No validation before commit.** Typos in messages, missing context, forgotten scope prefixes —
-errors that could be caught automatically slip through.
-
-**Wrong commit order.** Behavior changes committed before the refactoring that enables them.
-Style fixes mixed with logic changes. The commit sequence doesn't tell a coherent story.
+**Wrong commit order.** New behavior committed before the refactoring that enables it. Style
+changes mixed with logic changes. The commit sequence doesn't tell a coherent story, making
+git bisect and code review harder than necessary.
 
 ## The Solution
 
-This plugin provides a `/commit` command that enforces a structured pipeline. Instead of committing
-whatever is staged, it:
+The `/commit` command enforces an 8-step pipeline that identifies logical units in your diff,
+plans their commit order, validates quality, and creates atomic commits with meaningful messages.
 
-1. Analyzes the diff to identify separate logical changes
-2. Plans the commit order (style → refactor → fix → feature)
-3. Validates each message against conventions before committing
-4. Creates focused, atomic commits with meaningful messages
-
-The `commit-message` skill provides formatting conventions that the pipeline enforces via
-automated validation.
+Each commit message runs through automated validation before execution. Errors block the commit;
+warnings advise. The `commit-message` skill provides formatting conventions that match
+professional standards for open-source and team repositories.
 
 ## Installation
 
@@ -44,37 +42,41 @@ automated validation.
 /commit
 ```
 
-### The Pipeline
+The command walks through the complete pipeline automatically. No configuration required for
+basic usage.
+
+## The Pipeline
 
 | Step | Purpose |
 |------|---------|
-| 1. Identify | Find separate logical changes in the diff |
-| 2. Plan | Order by type: style → refactor → fix → feature |
-| 3. Review | Verify diff matches intent, no debug code |
-| 4. Stage | Selective staging per logical unit |
-| 5. Validate | Check message against conventions |
-| 6. Commit | Display message, then execute |
-| 7. Verify | Confirm result matches expectation |
+| 1. Identify units | Find separate logical changes in the diff |
+| 2. Plan order | Sort by type: style → refactor → fix → feature |
+| 3. Quality gate | Verify tests/lint pass before committing |
+| 4. Self-review | Check diff matches intent, no debug code |
+| 5. Stage files | Selective staging per logical unit |
+| 6. Validate message | Check conventions via validation script |
+| 7. Commit | Display message as blockquote, then execute |
+| 8. Verify | Confirm with `git log -1 --stat` and `git status` |
 
-### Message Validation
+## Message Validation
 
 Before each commit, the message runs through `validate-commit-message.js`:
 
-- **Errors** block the commit — must be fixed
-- **Warnings** are recommendations — address if reasonable
+- **Errors** block the commit and must be fixed
+- **Warnings** are recommendations to address if reasonable
 
-Validation checks: subject length, scope format, body presence for non-trivial changes,
-trailer format, and more.
+Validation checks subject length, scope format, body presence for non-trivial changes, trailer
+format, blank line separation, and more.
 
 ### Validator Flags
 
 | Flag | Purpose | Example |
 |------|---------|---------|
-| `--require-trailers` | Require specific trailers | `--require-trailers "Task,Fixes"` |
+| `--require-trailers` | Require specific trailers in message | `--require-trailers "Task,Fixes"` |
 
 ## Project Configuration
 
-Projects can customize commit behavior by adding `<git-commit-config>` to their CLAUDE.md:
+Customize commit behavior by adding `<git-commit-config>` to your project's CLAUDE.md:
 
 ```xml
 <git-commit-config>
@@ -84,25 +86,58 @@ Projects can customize commit behavior by adding `<git-commit-config>` to their 
 
 <extra-instructions>
 All commits must reference a task from the issue tracker.
+Use imperative mood for subjects.
 </extra-instructions>
 </git-commit-config>
 ```
 
 **`<validator-args>`** — Flags passed to the validator script. Each `<flag name="X" value="Y"/>`
-becomes `--X "Y"` on the command line. Use this to enforce project-specific requirements
-like mandatory trailers.
+becomes `--X "Y"` on the command line. Use this to enforce project-specific requirements like
+mandatory trailers.
 
-**`<extra-instructions>`** — Additional guidance applied during the commit process.
-These instructions have highest priority and override plugin defaults. Use for
-project-specific conventions not covered by the validator.
+**`<extra-instructions>`** — Additional guidance applied during the commit process. These
+instructions have highest priority and override plugin defaults. Use for project conventions not
+covered by the validator.
 
-## Components
+## Message Format
 
-| Type | Path | Purpose |
-|------|------|---------|
-| Command | `commands/commit/` | 7-step commit pipeline |
-| Skill | `skills/commit-message/` | Message formatting conventions |
-| Script | `scripts/validate-commit-message.js` | Automated validation |
+The `commit-message` skill defines the expected format:
+
+```
+[scope] subject
+
+body
+
+trailers
+```
+
+**Subject line:**
+- Max 72 characters total
+- Imperative mood: "add" not "added"
+- Lowercase after scope (except proper nouns)
+- No period at end
+- Factual description of what changed
+
+**Body:**
+- Explains why change was needed
+- Describes how to verify the change
+- For bug fixes: explain the cause, not just the symptom
+- For features: explain the use case
+- For refactoring: explain the motivation
+
+**Trailers:**
+- Structured key-value pairs following git-trailer format
+- Common trailers: `Task:`, `Fixes:`, `Refs:`, `Closes:`, `See:`
+- Title-Case keys, single line values
+
+**Breaking changes:**
+- Body starts with `BREAKING:` prefix
+- Explains what breaks and provides migration path
+
+**Scope:**
+- Optional for single-purpose repositories
+- Required for monorepos or multi-component projects
+- Examples: `[parser]`, `[core/auth]`, `[web/api]`
 
 ## Customization
 
