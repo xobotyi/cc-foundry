@@ -5,7 +5,8 @@
     "skill-enforcer@foundry": true,
     "the-blueprint@foundry": true,
     "the-coder@foundry": true,
-    "the-crucible@foundry": true
+    "the-crucible@foundry": true,
+    "javascript@foundry": true
   },
   "extraKnownMarketplaces": {
     "foundry": {
