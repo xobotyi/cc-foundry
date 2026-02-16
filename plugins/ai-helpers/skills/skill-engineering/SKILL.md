@@ -43,26 +43,24 @@ The description determines when Claude activates your skill. It's the
 highest-leverage field — poor descriptions cause missed activations.
 
 ```
-[Philosophy anchor] + [Broad domain claim] + [Trigger keywords]
+[What it does] + [When to invoke — broad domain claim with trigger examples]
 ```
 
-1. **Philosophy anchor** — Core principle as a short phrase. Primes
-   reasoning before the full SKILL.md loads.
-2. **Broad domain claim** — "Invoke whenever task involves any
-   interaction with X." Claims the domain rather than listing verbs.
-3. **Trigger keywords** — Specific actions listed as examples under
-   the broad claim, not as the exhaustive condition.
+1. **What it does** — Functional description of the skill's purpose.
+   State what the skill covers concretely, not a slogan or tagline.
+2. **When to invoke** — "Invoke whenever task involves any interaction
+   with X." Claims the domain broadly, then lists specific triggers
+   as examples under the broad claim.
 
-**Good — broad claim with philosophy anchor:**
+**Good — functional description + broad claim:**
 ```yaml
 description: >-
-  Universal coding discipline: discover before assuming, verify
-  before shipping. Invoke this skill FIRST when task involves any
-  kind of interaction with code. Run discovery protocol before
-  language-specific skills.
+  Go language conventions, idioms, and toolchain. Invoke when task
+  involves any interaction with Go code — writing, reviewing,
+  refactoring, debugging, or understanding Go projects.
 ```
 
-**Good — domain claim with keyword examples:**
+**Good — what it does + when with trigger keywords:**
 ```yaml
 description: >-
   Design and iterate Claude Code skills: description triggers
@@ -76,6 +74,13 @@ description: >-
 description: Helps with documents
 ```
 
+**Bad — slogan instead of functional description:**
+```yaml
+description: >-
+  Speed and simplicity over compatibility layers: Bun runtime
+  conventions, APIs, and toolchain.
+```
+
 **Bad — narrow verb list instead of domain claim:**
 ```yaml
 description: >-
@@ -85,17 +90,22 @@ description: >-
 
 ### Principles
 
+- **Lead with function, not slogans.** The first sentence must
+  describe what the skill covers. "Node.js runtime conventions,
+  APIs, and ecosystem patterns" — not "Async-first, event-driven".
+  Slogans waste description tokens on zero activation value.
 - **Claim broadly, then list specifics.** "Invoke whenever task
   involves any interaction with X — creating, editing, debugging"
   beats "Invoke when creating, editing, or debugging X."
-- **Philosophy anchors create semantic trigger surface.** Words like
-  "discover", "verify", "reliable" activate on related user requests
-  even without exact keyword matches.
 - **Aggressive triggering, graceful de-escalation.** Better to trigger
   and de-escalate inside the skill than to miss activations.
 - **Skill dependencies belong in SKILL.md body, not descriptions.**
   Prerequisites like "load prompt-engineering first" are handled by
   the skill body — putting them in descriptions wastes trigger space.
+- **Philosophy belongs in SKILL.md body.** If a skill has a guiding
+  principle ("simplicity over cleverness"), put it as the opening
+  statement in SKILL.md where it shapes behavior — not in the
+  description where it wastes trigger space.
 
 ## Skill Structure
 
@@ -156,8 +166,8 @@ boundary are followed more reliably.
 ---
 name: my-skill
 description: >-
-  [Core principle]. Invoke whenever task involves any interaction
-  with [domain] — [specific triggers as examples].
+  [What it does — functional description]. Invoke whenever task
+  involves any interaction with [domain] — [specific triggers].
 ---
 
 # My Skill
@@ -198,6 +208,7 @@ Broad skills produce mediocre results. If scope creeps, split.
 |---------|---------|
 | Vague description | Missed activations |
 | "Helps with X" | Too generic to trigger correctly |
+| Slogan before description | Wastes tokens, zero activation value |
 | Narrow verb list as trigger | Misses activations outside listed verbs |
 | Cross-skill deps in description | Redundant — handle in SKILL.md body |
 | Wall of text instructions | Key steps get buried |
@@ -207,7 +218,7 @@ Broad skills produce mediocre results. If scope creeps, split.
 
 Before deploying:
 
-- [ ] Description has philosophy anchor (core principle)
+- [ ] Description leads with what the skill does (not a slogan)
 - [ ] Description claims domain broadly ("whenever task involves")
 - [ ] Description lists specific trigger keywords as examples
 - [ ] Instructions use imperative voice
