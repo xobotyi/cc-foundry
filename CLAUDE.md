@@ -1,16 +1,26 @@
 # cc-foundry
 
-Claude Code plugin development repository.
+Claude Code plugin development repository. Contains plugins that extend Claude Code with
+domain-specific skills, output styles, hooks, and workflow automation.
 
 ## Structure
 
 ```
 cc-foundry/
 ├── .dev/                 # Development CLI tools
-├── plugins/              # Plugin packages
-│   ├── ai-helpers/       # AI artifact engineering skills
-│   ├── git-commit/       # Git commit workflow
-│   └── skill-enforcer/   # Skill activation enforcement
+├── plugins/
+│   ├── ai-helpers/       # AI artifact engineering (prompts, skills, agents, styles)
+│   ├── git-commit/       # Structured commit workflow with validation
+│   ├── skill-enforcer/   # Skill activation enforcement via lifecycle hooks
+│   ├── the-blueprint/    # Planning pipeline (design → technical design → tasks)
+│   ├── the-coder/        # Language-agnostic coding discipline
+│   ├── the-crucible/     # Quality validation and multi-agent code review
+│   ├── the-statusline/   # Session metrics status line
+│   ├── frontend/         # Frontend platform discipline (CSS, accessibility)
+│   ├── backend/          # Backend platform discipline (logging, observability)
+│   ├── cli/              # CLI platform discipline (scaffold)
+│   ├── golang/           # Go language discipline (conventions, templ)
+│   └── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest)
 └── CLAUDE.md
 ```
 
@@ -59,6 +69,23 @@ Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 **Plugin context:**
 - Each plugin has `CLAUDE.md` explaining its components
 - Each plugin has `README.md` for user-facing documentation
+
+**Documentation maintenance:**
+After any significant change to a plugin, update its documentation before committing:
+
+- **Plugin CLAUDE.md** — update when: adding/removing/renaming skills, output styles, hooks,
+  or commands; changing skill purpose, scope, or dependencies; adding/removing conventions.
+  This file is Claude's internal reference — keep it accurate to what exists.
+- **Plugin README.md** — update when: any change that affects what users see or install.
+  Same triggers as CLAUDE.md, plus installation instructions or usage examples.
+- **Root CLAUDE.md** — update the structure diagram when: adding/removing a plugin, or
+  changing a plugin's one-line purpose.
+- **Root README.md** — update the plugin listing when: adding/removing a plugin, or
+  changing a plugin's purpose or skill roster significantly enough that the summary
+  paragraph no longer describes it accurately.
+
+Do not defer documentation to a separate task. Update docs in the same work session as
+the code change, ideally in the same commit or immediately following commit.
 
 **Installation instructions:**
 - All plugin READMEs must use marketplace commands:

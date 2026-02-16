@@ -2,7 +2,9 @@
 
 Plugins that make Claude Code better at its job.
 
-Claude Code is powerful out of the box, but it has gaps. It forgets skills mid-session. Commits are messy. Building AI artifacts is trial-and-error. These plugins fix that.
+Claude Code is powerful out of the box, but it has gaps. It forgets skills mid-session.
+Commits are messy. Building AI artifacts is trial-and-error. Code ships without validation.
+These plugins fix that.
 
 ## Installation
 
@@ -13,11 +15,15 @@ Add the marketplace, then install any plugin:
 /plugin install <plugin-name>
 ```
 
-## Plugins
+## Workflow Plugins
 
 ### skill-enforcer
 
-Claude skips skills and forgets about them mid-session. This plugin injects checkpoints at key lifecycle points (user prompt, after read, after edit, after skill load) that force Claude to evaluate which skills apply and what references to read.
+Claude skips skills and forgets about them mid-session. This plugin injects a Skill
+Enforcement Framework via lifecycle hooks that forces Claude to evaluate which skills apply
+at every checkpoint: user prompt, after reading files, after editing, and after loading
+skills. Skills are treated as non-atomic — phase shifts (coding to testing) trigger
+re-evaluation of unread references from already-loaded skills.
 
 ```
 /plugin install skill-enforcer
@@ -27,7 +33,11 @@ Claude skips skills and forgets about them mid-session. This plugin injects chec
 
 ### git-commit
 
-Messy commits — mixed changes, vague messages, wrong order. This plugin adds a `/commit` command that analyzes your diff, identifies atomic changes, orders them correctly (style → refactor → fix → feature), validates messages, and creates focused commits.
+Messy commits — mixed changes, vague messages, wrong order. The `/commit` command enforces
+an 8-step pipeline: identify logical units in the diff, plan commit order (style to refactor
+to fix to feature), run quality gates, self-review, stage selectively, validate messages
+against conventions, commit, and verify. Each message runs through automated validation
+before execution.
 
 ```
 /plugin install git-commit
@@ -35,19 +45,13 @@ Messy commits — mixed changes, vague messages, wrong order. This plugin adds a
 
 ---
 
-### ai-helpers
-
-Creating prompts, skills, agents, and output styles is guesswork. This plugin provides skills that encode best practices for each artifact type: creation patterns, evaluation criteria, iteration techniques, and reference examples.
-
-```
-/plugin install ai-helpers
-```
-
----
-
 ### the-blueprint
 
-Planning is ad-hoc — design decisions live in chat, task breakdowns are inconsistent, context is lost between sessions. This plugin provides a four-stage pipeline: design documents (problem analysis → recommendation), technical designs (solution → components), task decomposition (components → tracked tasks), and task creation (tasks → issue tracker). Each stage produces a persistent artifact and hands off to the next.
+Planning is either too shallow or too detailed. This plugin provides a four-stage pipeline
+that produces artifacts consumable by both humans and agents: design documents (problem
+analysis and recommendation), technical designs (component mapping and sequencing), task
+decomposition (actionable hierarchies with acceptance criteria), and task creation (issue
+tracker items). Each stage builds on the previous with explicit approval gates.
 
 ```
 /plugin install the-blueprint
@@ -57,7 +61,11 @@ Planning is ad-hoc — design decisions live in chat, task breakdowns are incons
 
 ### the-coder
 
-Coding agents skip reading code, assume APIs exist, and ship unverified changes. This plugin provides a universal coding discipline skill (discover before assuming, verify before shipping) and a software engineer output style that enforces discovery-first workflow, LSP navigation, and honest communication.
+Claude writes code before understanding what exists — guessing APIs, skipping tests,
+multiplying abstractions. This plugin provides a `coding` skill that enforces a
+discovery-first workflow (Discover, Plan, Implement, Verify) and a `software-engineer`
+output style with LSP-first navigation and engineering judgment. Runs before
+language-specific skills as a prerequisite.
 
 ```
 /plugin install the-coder
@@ -67,7 +75,12 @@ Coding agents skip reading code, assume APIs exist, and ship unverified changes.
 
 ### the-crucible
 
-Code quality is checked manually or not at all. This plugin provides a two-level validation pipeline: task completion validation (did you deliver what was asked?) and multi-agent code evaluation (8 specialized agents reviewing naming, complexity, comments, tests, error handling, security, observability, and documentation). All agents are read-only — they report, you decide.
+Code quality is checked manually or not at all. This plugin provides a two-level validation
+pipeline: `quality-validation` checks that deliverables match the original request before
+completion, and `code-quality-evaluation` orchestrates 8 specialized review agents (naming,
+complexity, comments, tests, error handling, security, observability, documentation) that
+evaluate code in parallel. All agents are read-only — they report, you decide. A Stop hook
+automatically validates task completion before Claude reports work as done.
 
 ```
 /plugin install the-crucible
@@ -77,10 +90,93 @@ Code quality is checked manually or not at all. This plugin provides a two-level
 
 ### the-statusline
 
-No visibility into context window usage, cost, or active model. This plugin adds a status line showing real-time session metrics.
+No visibility into context window usage, cost, or model. This plugin installs a 3-row
+status line to your user-level Claude configuration showing output style, model, session
+cost, context window remaining, cache hit rate, and current working directory. Color urgency
+increases as context approaches limits. Auto-syncs on every session start and survives agent
+directory changes.
 
 ```
 /plugin install the-statusline
+```
+
+## AI Artifact Plugins
+
+### ai-helpers
+
+Creating prompts, skills, agents, and output styles is guesswork without structured guidance.
+This plugin provides skills encoding best practices for each artifact type:
+`prompt-engineering` (foundation), `skill-engineering`, `subagent-engineering`,
+`output-style-engineering`, and `claude-code-sdk` (reference). All skills build on
+prompt-engineering fundamentals. Includes an `ai-engineer` output style for collaborative
+artifact work.
+
+```
+/plugin install ai-helpers
+```
+
+## Language Discipline Plugins
+
+### golang
+
+Go has strong idioms that differ from other languages — premature abstraction, incorrect
+error handling, interface misuse, and concurrency bugs are common pitfalls. This plugin
+provides a `golang` skill covering conventions, error handling, interfaces, concurrency,
+testing, and project structure, plus a `templ` skill for type-safe HTML templating with
+component composition, attribute handling, and JS integration.
+
+```
+/plugin install golang
+```
+
+---
+
+### javascript
+
+Claude knows JS/TS syntax but defaults to outdated patterns, mixes module systems, and
+ignores runtime-specific APIs. This plugin provides five skills: `javascript` (core language
+conventions), `typescript` (type system and strict mode), `nodejs` (Node.js runtime APIs),
+`bun` (Bun runtime APIs), and `vitest` (testing framework practices). Skills activate
+automatically based on file context.
+
+```
+/plugin install javascript
+```
+
+## Platform Discipline Plugins
+
+### frontend
+
+Browser development requires knowledge beyond general programming — CSS layout systems,
+accessibility standards, cross-browser compatibility. This plugin provides a `css` skill
+covering methodologies, patterns, and conventions. Keeps platform discipline separate from
+language discipline.
+
+```
+/plugin install frontend
+```
+
+---
+
+### backend
+
+Building reliable services requires consistent approaches to observability and API design.
+This plugin provides a `logging` skill covering structured logging, log levels, and
+observability patterns. Keeps platform discipline separate from language discipline.
+
+```
+/plugin install backend
+```
+
+---
+
+### cli
+
+CLI platform discipline for command-line interface design, UX patterns, and conventions.
+Currently a scaffold — skills to be developed.
+
+```
+/plugin install cli
 ```
 
 ## License
