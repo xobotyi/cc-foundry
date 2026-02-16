@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "Prometheus Overview": "https://raw.githubusercontent.com/prometheus/docs/main/docs/introduction/overview.md",
+    "Prometheus Data Model": "https://raw.githubusercontent.com/prometheus/docs/main/docs/concepts/data_model.md",
+    "Prometheus Metric Types": "https://raw.githubusercontent.com/prometheus/docs/main/docs/concepts/metric_types.md",
+    "Practices - Naming Conventions": "https://raw.githubusercontent.com/prometheus/docs/main/docs/practices/naming.md",
+    "Practices - Instrumentation": "https://raw.githubusercontent.com/prometheus/docs/main/docs/practices/instrumentation.md",
+    "Practices - Histograms and Summaries": "https://raw.githubusercontent.com/prometheus/docs/main/docs/practices/histograms.md",
+    "Practices - Alerting": "https://raw.githubusercontent.com/prometheus/docs/main/docs/practices/alerting.md",
+    "Practices - Recording Rules": "https://raw.githubusercontent.com/prometheus/docs/main/docs/practices/rules.md",
+    "PromQL - Querying Basics": "https://raw.githubusercontent.com/prometheus/prometheus/main/docs/querying/basics.md",
+    "PromQL - Operators": "https://raw.githubusercontent.com/prometheus/prometheus/main/docs/querying/operators.md",
+    "PromQL - Functions": "https://raw.githubusercontent.com/prometheus/prometheus/main/docs/querying/functions.md",
+    "PromQL - Query Examples": "https://raw.githubusercontent.com/prometheus/prometheus/main/docs/querying/examples.md",
+    "Client Library Conventions": "https://raw.githubusercontent.com/prometheus/docs/main/docs/instrumenting/writing_clientlibs.md",
+    "Writing Exporters": "https://raw.githubusercontent.com/prometheus/docs/main/docs/instrumenting/writing_exporters.md"
+  },
+  "lastFetched": "2026-02-16T15:42:39.191Z"
+}
