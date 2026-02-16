@@ -1,6 +1,6 @@
 {
   "name": "ai-helpers",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
   "author": {
     "name": "xobotyi",
