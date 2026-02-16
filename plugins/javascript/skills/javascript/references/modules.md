@@ -68,6 +68,38 @@ export function increment() { count++; }
 
 ## Imports
 
+### Always Include File Extensions
+
+Always include file extensions in import paths. Extensionless imports rely on
+resolution algorithms that vary across runtimes and bundlers — explicit extensions
+are unambiguous and work everywhere:
+
+```js
+// Bad — extensionless
+import { db } from "./database";
+import { validate } from "../utils/validation";
+
+// Good — explicit extension
+import { db } from "./database.js";
+import { validate } from "../utils/validation.js";
+```
+
+This applies to all relative imports. External package imports (`"express"`,
+`"zod"`) use the package name as-is.
+
+### No Directory Imports
+
+Don't import from a directory path. Directory imports resolve to `index.js`,
+which creates implicit coupling to barrel files and hides the actual source:
+
+```js
+// Bad — directory import, resolves to ./services/index.js
+import { UserService } from "./services";
+
+// Good — import from the actual file
+import { UserService } from "./services/user.js";
+```
+
 ### Import at the Top
 
 All imports must be at the top of the file, before any other code:
@@ -171,25 +203,52 @@ them for:
 Each module should have a clear, single purpose. If a module exports unrelated
 functionality, split it.
 
-### Index Files (Barrel Files)
+### No Barrel Files in Subdirectories
 
-Use barrel files (`index.js`) to provide a public API for a directory, but be
-deliberate about what you re-export:
-
-```
-services/
-  user.js
-  post.js
-  index.js  ← public API
-```
+Don't create `index.js` files that re-export from sibling modules just to
+aggregate a directory's exports. Barrel files add indirection, hurt tree-shaking,
+create circular dependency risks, and hide the real source of imports:
 
 ```js
-// services/index.js
+// Bad — services/index.js barrel re-exporting siblings
 export { UserService } from "./user.js";
 export { PostService } from "./post.js";
+
+// Bad — consuming code imports from the barrel
+import { UserService } from "./services";          // directory import
+import { UserService } from "./services/index.js"; // explicit but still a barrel
+
+// Good — import directly from the source file
+import { UserService } from "./services/user.js";
+import { PostService } from "./services/post.js";
 ```
 
-Keep barrel files thin — no logic, no side effects.
+**Exception: standalone package entry points.** A top-level `index.js` that
+defines a package's public API is acceptable — it's the package boundary, not
+an internal convenience barrel:
+
+```js
+// my-lib/index.js — package entry point, this is fine
+export { createClient } from "./client.js";
+export { parseConfig } from "./config.js";
+```
+
+The distinction: a package entry point defines what external consumers see.
+A subdirectory barrel is internal convenience that adds indirection without value.
+
+**Why this matters — social contract vs. language contract:**
+
+Barrel exports are unenforceable within a project. Any developer can always import
+directly from the source file — there is no mechanism to require they use the barrel
+instead. This creates two sources of truth for every export: the barrel and the
+source file. IDEs will autocomplete both paths, and over time a codebase accumulates
+a mix of `import from "./services"` and `import from "./services/user.js"` with no
+way to converge.
+
+Package entry points are different. Node.js `exports` field in `package.json`
+restricts which paths external consumers can resolve — the runtime will throw on
+unauthorized deep imports. That's a language contract, not a social one, which is
+why barrel files at the package boundary work: they can actually be enforced.
 
 ### Avoid Circular Dependencies
 
