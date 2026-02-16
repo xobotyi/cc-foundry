@@ -148,9 +148,12 @@ automatically based on file context.
 ### frontend
 
 Browser development requires knowledge beyond general programming — CSS layout systems,
-accessibility standards, cross-browser compatibility. This plugin provides a `css` skill
-covering methodologies, patterns, and conventions. Keeps platform discipline separate from
-language discipline.
+accessibility standards, framework-specific patterns. This plugin provides five skills:
+`css` (conventions, layout, SCSS/SASS, responsive design, methodologies), `react` (component
+patterns, hooks, state, performance, testing), `vue` (Composition API, reactivity,
+composables), `svelte` (Svelte 5 runes, SvelteKit conventions), and `accessibility` (WCAG 2.2,
+ARIA, semantic HTML, keyboard navigation). Keeps platform discipline separate from language
+discipline.
 
 ```
 /plugin install frontend
@@ -160,9 +163,12 @@ language discipline.
 
 ### backend
 
-Building reliable services requires consistent approaches to observability and API design.
-This plugin provides a `logging` skill covering structured logging, log levels, and
-observability patterns. Keeps platform discipline separate from language discipline.
+Building reliable services requires consistent approaches to observability and instrumentation.
+This plugin provides four skills: `observability` (three pillars — logging, metrics, tracing —
+their interconnection and high-level practices), `prometheus` (metric types, naming, labels,
+PromQL, alerting), `statsd` (metric types, UDP push model, DogStatsD extensions), and
+`otel-tracing` (spans, context propagation, instrumentation, sampling, semantic conventions).
+Technology-agnostic guidance in `observability`; tool-specific depth in the others.
 
 ```
 /plugin install backend

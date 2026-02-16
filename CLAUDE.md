@@ -16,8 +16,8 @@ cc-foundry/
 │   ├── the-coder/        # Language-agnostic coding discipline
 │   ├── the-crucible/     # Quality validation and multi-agent code review
 │   ├── the-statusline/   # Session metrics status line
-│   ├── frontend/         # Frontend platform discipline (CSS, accessibility)
-│   ├── backend/          # Backend platform discipline (logging, observability)
+│   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
+│   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
 │   ├── cli/              # CLI platform discipline (scaffold)
 │   ├── golang/           # Go language discipline (conventions, templ)
 │   └── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest)
@@ -69,6 +69,23 @@ Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 **Plugin context:**
 - Each plugin has `CLAUDE.md` explaining its components
 - Each plugin has `README.md` for user-facing documentation
+
+**Plugin documentation style:**
+Both `CLAUDE.md` and `README.md` must be written in explanatory style — prose that tells the
+reader what exists, how it works, and why it's structured that way. Tables and bullet lists
+support the explanation; they don't replace it.
+
+- **CLAUDE.md** — Claude's internal reference. Explain the plugin's components (skills, hooks,
+  output styles), how they relate to each other, what conventions apply, and where scope
+  boundaries are. The goal is that Claude can read this file and understand the plugin well
+  enough to work with it correctly without needless research.
+- **README.md** — user-facing documentation. Frame the plugin around the problem it solves
+  ("The Problem" / "The Solution"), explain what each skill does and when to use it, show
+  relationships between skills. The goal is that a human can read this file and decide
+  whether to install the plugin.
+
+Don't write documentation as flat inventories. Explain the *why* and the connections, not
+just the *what*.
 
 **Documentation maintenance:**
 After any significant change to a plugin, update its documentation before committing:
