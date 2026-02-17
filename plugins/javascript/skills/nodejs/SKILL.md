@@ -34,9 +34,12 @@ These apply to ALL Node.js code. No exceptions.
 1. **Use ESM.** Set `"type": "module"` in `package.json`. Use `.mjs`/`.cjs` only when
    mixing module systems within one package.
 2. **Use `node:` prefix** for all built-in imports: `import fs from 'node:fs'`.
-3. **Define `"exports"` in `package.json`** for libraries. Encapsulate internals.
-4. **Imports at module top.** No dynamic `import()` for statically-known dependencies.
-5. **Use `import.meta.dirname`/`import.meta.filename`** instead of `__dirname`/`__filename`.
+3. **Import `process` explicitly.** `import process from 'node:process'`. Never rely on
+   the `process` global — explicit imports make dependencies visible and enable proper
+   tree-shaking in bundled environments.
+4. **Define `"exports"` in `package.json`** for libraries. Encapsulate internals.
+5. **Imports at module top.** No dynamic `import()` for statically-known dependencies.
+6. **Use `import.meta.dirname`/`import.meta.filename`** instead of `__dirname`/`__filename`.
 
 ### Event Loop
 
@@ -95,6 +98,7 @@ These apply to ALL Node.js code. No exceptions.
 | `"main": "./index.js"` alone | `"exports": { ".": "./index.js" }` |
 | Catching errors and ignoring them | Handle, log, or re-throw with cause |
 | `process.on('uncaughtException')` then continue | Log, cleanup, exit |
+| `process.env.FOO` (global) | `import process from 'node:process'` first |
 
 ## Application
 

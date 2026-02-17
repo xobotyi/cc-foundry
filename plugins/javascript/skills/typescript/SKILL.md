@@ -9,8 +9,13 @@ description: >-
 
 # TypeScript
 
-**This skill extends the javascript skill. All JavaScript conventions apply to TypeScript
-code. This skill covers only what TypeScript adds on top.**
+<prerequisite>
+**Requires: `javascript` skill.**
+This skill extends the JavaScript skill and cannot operate without it. If the `javascript`
+skill is not yet loaded, invoke it now before reading further. Do not proceed with any
+TypeScript work until the JavaScript skill is active — its conventions are the foundation
+that this skill builds on.
+</prerequisite>
 
 **Types encode intent. Let the compiler prove the rest.**
 
@@ -129,9 +134,10 @@ When **reviewing** TypeScript code:
 
 ## Integration
 
-This skill extends the **javascript** skill — both must be active simultaneously:
+The **javascript** skill is a hard prerequisite (see top of this file). The full
+activation stack for TypeScript work:
 
-1. **JavaScript** — Language fundamentals, idioms, async patterns
+1. **JavaScript** — Language fundamentals, idioms, async patterns (must be loaded first)
 2. **TypeScript** — Type system conventions (this skill)
 3. **Runtime** (Node.js/Bun) — Runtime-specific APIs
 4. **Vitest** — Testing conventions (if testing)
