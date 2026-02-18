@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backend platform discipline: observability, API design, and service architecture practices",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,11 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/backend",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["backend", "observability", "logging", "api", "services"]
+  "keywords": [
+    "backend",
+    "observability",
+    "logging",
+    "api",
+    "services"
+  ]
 }

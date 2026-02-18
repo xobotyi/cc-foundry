@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,11 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/frontend",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["frontend", "css", "accessibility", "browser", "web"]
+  "keywords": [
+    "frontend",
+    "css",
+    "accessibility",
+    "browser",
+    "web"
+  ]
 }

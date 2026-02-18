@@ -1,6 +1,6 @@
 {
   "name": "skill-enforcer",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Enforces skill invocation and reference reading via SEF checkpoints",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,10 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/skill-enforcer",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["skills", "enforcement", "hooks", "lifecycle"]
+  "keywords": [
+    "skills",
+    "enforcement",
+    "hooks",
+    "lifecycle"
+  ]
 }

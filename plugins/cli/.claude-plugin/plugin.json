@@ -1,6 +1,6 @@
 {
   "name": "cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI platform discipline: command-line interface design, UX patterns, and conventions",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,10 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/cli",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["cli", "command-line", "terminal", "ux"]
+  "keywords": [
+    "cli",
+    "command-line",
+    "terminal",
+    "ux"
+  ]
 }
