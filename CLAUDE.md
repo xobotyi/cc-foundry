@@ -44,7 +44,7 @@ When a skill needs to embed external documentation as reference material:
    ```bash
    cd .dev && yarn cli docs-fetch <path-to-inventory.json>
    ```
-   URLs ending in `.md` fetch as raw markdown. Others convert from HTML.
+   URLs ending in `.md` or `.mdx` fetch as raw markdown. Others convert from HTML.
 
 3. **Distill into references** — process fetched content into skill `references/*.md` files
 

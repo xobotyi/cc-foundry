@@ -197,7 +197,7 @@ export default defineCommand({
       }
 
       const fetchDate = new Date().toISOString();
-      const isMarkdown = url.endsWith(".md");
+      const isMarkdown = url.endsWith(".md") || url.endsWith(".mdx");
 
       let content: string;
       let ext: string;
@@ -205,7 +205,7 @@ export default defineCommand({
       if (isMarkdown) {
         consola.log(`  Raw markdown`);
         content = raw;
-        ext = ".md";
+        ext = path.extname(url);
       } else {
         consola.log(`  Processing HTML`);
         const processed = processHtml(raw);

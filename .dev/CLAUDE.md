@@ -52,7 +52,7 @@ yarn cli docs-fetch \
 ```
 
 The command:
-1. If URL ends with `.md` — treats as raw markdown
+1. If URL ends with `.md` or `.mdx` — treats as raw markdown
 2. Otherwise — fetches HTML, extracts with Readability, converts to markdown
 3. Adds YAML frontmatter with source URL and fetch timestamp
 4. Updates `lastFetched` in inventory file
