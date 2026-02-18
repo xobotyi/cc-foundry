@@ -1,7 +1,8 @@
 {
   "name": "golang",
-  "version": "1.0.1",
-  "description": "Go language discipline: conventions, idioms, and toolchain practices",
+  "version": "1.1.0",
+  "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
+  "lspServers": "./.lsp.json",
   "author": {
     "name": "xobotyi",
     "email": "xog3@yandex.ru",

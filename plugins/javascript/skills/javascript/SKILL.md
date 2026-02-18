@@ -158,6 +158,51 @@ Good review comment:
   "`let` → `const` — `config` is never reassigned."
 ```
 
+## Code Navigation — LSP Required
+
+This plugin provides a `typescript-language-server` LSP server that covers both JavaScript and
+TypeScript files. When working with JS/TS code, **always use LSP tools for code navigation
+instead of Grep or Glob**. LSP understands module resolution, type inference, scope rules, and
+project boundaries — text search does not.
+
+### Tool Routing
+
+Use the right tool for the job. LSP tools are mandatory for semantic navigation; text tools
+remain appropriate for non-semantic searches.
+
+| Task | Tool | Operation | Why |
+|------|------|-----------|-----|
+| Find where a function/class/variable is defined | LSP | `goToDefinition` | Resolves imports, re-exports, aliases, declaration merging |
+| Find all usages of a symbol | LSP | `findReferences` | Scope-aware, no false positives from strings or comments |
+| Get type signature, docs, or return types | LSP | `hover` | Instant type info without reading source — works for inferred types too |
+| List all exports/symbols in a file | LSP | `documentSymbol` | Structured output: functions, classes, variables, types |
+| Find a symbol by name across the project | LSP | `workspaceSymbol` | Searches all modules, respects tsconfig paths and aliases |
+| Find implementations of an interface/abstract class | LSP | `goToImplementation` | Knows the type system — Grep can't resolve structural typing |
+| Find what calls a function | LSP | `incomingCalls` | Precise call graph, no false matches from similar names |
+| Find what a function calls | LSP | `outgoingCalls` | Structured dependency map of a function |
+
+**Still use Grep/Glob for:**
+- Text patterns in comments, string literals, log messages, TODO markers
+- Config values, environment variable names, CSS class names
+- Finding files by name or path pattern (Glob)
+- Content that isn't JS/TS identifiers (URLs, error message text, template strings)
+
+### Anti-Patterns
+
+| Don't | Do |
+|-------|------|
+| `Grep "function handleRequest"` to find definition | `LSP goToDefinition` on a call site |
+| `Grep "handleRequest"` to find all usages | `LSP findReferences` on the symbol |
+| `Grep "implements.*Interface"` to find implementations | `LSP goToImplementation` on the interface |
+| `Read` a file just to check a function's signature | `LSP hover` on any reference to it |
+| `Glob "**/*.ts"` + `Grep` to find a type | `LSP workspaceSymbol` with the type name |
+
+### Exploration Agents
+
+When spawning subagents for JS/TS codebase exploration, instruct them to use LSP tools for
+navigation. Subagents have access to the same LSP server. An exploration agent that uses
+`Grep "export.*function"` instead of `LSP goToDefinition` is doing it wrong.
+
 ## Integration
 
 This skill provides JavaScript-specific conventions alongside the **coding** skill:

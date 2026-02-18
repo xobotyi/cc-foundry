@@ -123,8 +123,8 @@
     },
     {
       "name": "golang",
-      "description": "Go language discipline: conventions, idioms, and toolchain practices",
-      "version": "1.0.0",
+      "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -139,8 +139,8 @@
     },
     {
       "name": "javascript",
-      "description": "JavaScript and TypeScript language discipline: conventions, patterns, and ecosystem practices",
-      "version": "1.0.0",
+      "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"

@@ -1,6 +1,6 @@
 # golang
 
-Go language discipline plugin for Claude Code.
+Go language discipline plugin for Claude Code with built-in `gopls` LSP support.
 
 ## The Problem
 
@@ -10,14 +10,30 @@ mismanagement, and concurrency bugs. The templ templating library adds another l
 conventions for type-safe HTML rendering that requires understanding both Go and templ-specific
 patterns.
 
+Beyond conventions, Claude Code's default approach to code navigation — Grep and Glob — misses
+Go's semantic structure. Text search can't resolve imports, distinguish shadowed names, find
+interface implementations, or trace call hierarchies. Without LSP-powered navigation, exploration
+is imprecise and error-prone.
+
 ## The Solution
 
-This plugin provides two skills that encode Go and templ best practices as executable
-instructions. The `golang` skill covers core Go conventions: naming, error handling, interfaces,
-concurrency, testing, and project structure. The `templ` skill extends those conventions to
-type-safe HTML templating with component composition, attribute handling, styling, and JavaScript
-integration. Both skills include anti-pattern references and route to detailed topic-specific
+This plugin provides two skills and a `gopls` LSP server that together give Claude deep Go
+fluency. The `golang` skill covers core Go conventions (naming, error handling, interfaces,
+concurrency, testing, project structure) and enforces LSP-first code navigation — agents must
+use `goToDefinition`, `findReferences`, `hover`, and other LSP tools instead of text search for
+semantic navigation tasks. The `templ` skill extends those conventions to type-safe HTML
+templating. Both skills include anti-pattern references and route to detailed topic-specific
 guides.
+
+## Prerequisites
+
+Install `gopls` (the Go language server) and ensure it's available in PATH:
+
+```bash
+go install golang.org/x/tools/gopls@latest
+```
+
+Make sure `$GOPATH/bin` (or `$HOME/go/bin`) is in your PATH.
 
 ## Installation
 
@@ -36,7 +52,15 @@ interfaces (consumer-side, accept interfaces/return structs), concurrency (gorou
 context cancellation, errgroup), testing (table tests, subtests, test doubles), and project
 structure (package organization, imports, breaking changes). Includes anti-pattern reference for
 quick lookups and detailed topic guides for errors, concurrency, testing, idioms, gotchas, and
-structure. **Use when:** writing, reviewing, refactoring, or debugging any Go code.
+structure.
+
+The skill also enforces LSP-first navigation: use `goToDefinition` instead of grepping for
+function names, `findReferences` instead of text-searching for usages, `goToImplementation`
+instead of pattern-matching interface types, and `workspaceSymbol` instead of globbing for
+symbols. Grep/Glob remain appropriate for non-semantic searches (comments, string literals,
+config values).
+
+**Use when:** writing, reviewing, refactoring, debugging, or exploring any Go code.
 
 ### templ
 
@@ -47,6 +71,22 @@ components), JavaScript integration (script tags, data passing), and testing (ex
 snapshot). Includes anti-pattern reference and detailed topic guides for syntax, attributes,
 components, styling, JavaScript, and patterns. **Use when:** writing or reviewing `.templ` files,
 creating components, composing templates, or testing rendered output.
+
+## LSP Integration
+
+This plugin bundles a `gopls` LSP server configuration. Once installed, Claude Code automatically
+starts `gopls` for `.go` files, enabling precise code intelligence:
+
+| LSP Operation | What It Does |
+|---------------|-------------|
+| `goToDefinition` | Jump to where a symbol is defined |
+| `findReferences` | Find all usages of a symbol |
+| `hover` | Get type signature and documentation |
+| `documentSymbol` | List all symbols in a file |
+| `workspaceSymbol` | Search for symbols across the project |
+| `goToImplementation` | Find types implementing an interface |
+| `incomingCalls` | Find what calls a function |
+| `outgoingCalls` | Find what a function calls |
 
 ## Related Plugins
 
