@@ -47,6 +47,17 @@ Svelte 5 runes-first reactivity and SvelteKit fullstack conventions. **Use when:
 with Svelte components, runes ($state, $derived, $effect), or SvelteKit routing and load
 functions.
 
+### tailwindcss
+
+Tailwind CSS v4 utility-first discipline: CSS-first configuration via `@theme`, design
+tokens, principled class composition, and framework integration patterns. Requires the
+`css` skill as a prerequisite — loads it automatically. Includes 9 reference files covering
+theme configuration, custom utilities/variants, class authoring conventions, framework
+setup (Vite/PostCSS/Prettier), layout, sizing and spacing, typography, backgrounds and
+effects, and transforms/animations. **Use when:** writing, reviewing, refactoring, or
+debugging Tailwind CSS utility classes, theme configuration, custom utilities, dark mode,
+or Tailwind integration with React/Vue/Svelte.
+
 ### accessibility
 
 Web accessibility discipline: WCAG 2.2 compliance, ARIA patterns, semantic HTML, keyboard
