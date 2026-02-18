@@ -19,8 +19,8 @@ cc-foundry/
 │   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
 │   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
 │   ├── cli/              # CLI platform discipline (scaffold)
-│   ├── golang/           # Go language discipline (conventions, templ)
-│   └── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest)
+│   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)
+│   └── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
 └── CLAUDE.md
 ```
 

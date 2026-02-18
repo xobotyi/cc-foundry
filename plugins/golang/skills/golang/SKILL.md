@@ -127,6 +127,50 @@ Good review comment:
    `errors.New("not found")`"
 ```
 
+## Code Navigation — LSP Required
+
+This plugin provides a `gopls` LSP server. When working with Go code, **always use LSP tools
+for code navigation instead of Grep or Glob**. LSP understands Go's type system, scope rules,
+and module boundaries — text search does not.
+
+### Tool Routing
+
+Use the right tool for the job. LSP tools are mandatory for semantic navigation; text tools
+remain appropriate for non-semantic searches.
+
+| Task | Tool | Operation | Why |
+|------|------|-----------|-----|
+| Find where a function/type/method is defined | LSP | `goToDefinition` | Resolves imports, aliases, embedded types — Grep can't |
+| Find all usages of a symbol | LSP | `findReferences` | Scope-aware, no false positives from comments or strings |
+| Get type signature, docs, or return types | LSP | `hover` | Instant type info without reading source files |
+| List all symbols in a file | LSP | `documentSymbol` | Structured output: functions, types, methods, constants |
+| Find a symbol by name across the project | LSP | `workspaceSymbol` | Searches all packages, respects module boundaries |
+| Find concrete types implementing an interface | LSP | `goToImplementation` | Knows the type system — Grep patterns miss embeddings |
+| Find what calls a function | LSP | `incomingCalls` | Precise call graph, no false matches from similar names |
+| Find what a function calls | LSP | `outgoingCalls` | Structured dependency map of a function |
+
+**Still use Grep/Glob for:**
+- Text patterns in comments, string literals, log messages, TODO markers
+- Config values, build tags, file-level patterns
+- Finding files by name or path pattern (Glob)
+- Content that isn't Go identifiers (error message text, URLs, constants used as strings)
+
+### Anti-Patterns
+
+| Don't | Do |
+|-------|------|
+| `Grep "func HandleRequest"` to find definition | `LSP goToDefinition` on a call site |
+| `Grep "HandleRequest"` to find all usages | `LSP findReferences` on the symbol |
+| `Grep "type.*interface"` to find implementations | `LSP goToImplementation` on the interface |
+| `Read` a file just to check a function's signature | `LSP hover` on any reference to it |
+| `Glob "**/*.go"` + `Grep` to find a type | `LSP workspaceSymbol` with the type name |
+
+### Exploration Agents
+
+When spawning subagents for Go codebase exploration, instruct them to use LSP tools for
+navigation. Subagents have access to the same LSP server. An exploration agent that uses
+`Grep "func.*Name"` instead of `LSP goToDefinition` is doing it wrong.
+
 ## Toolchain
 
 - **`golangci-lint`**: single entry point for formatting and linting. Configure per project.
