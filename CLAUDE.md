@@ -115,6 +115,10 @@ the code change, ideally in the same commit or immediately following commit.
 **Version management:**
 - Plugin versions must be synchronized between `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
 - Update both files when bumping versions
+
+**Licensing:**
+- Every plugin must contain a copy of the root `LICENSE` file in its directory
+- When adding a new plugin, copy `LICENSE` from the repository root into the plugin directory
 </conventions>
 
 
