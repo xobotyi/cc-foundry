@@ -1,6 +1,6 @@
 {
   "name": "ai-helpers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
   "author": {
     "name": "xobotyi",
@@ -10,6 +10,11 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/ai-helpers",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["prompts", "skills", "agents", "output-styles"],
+  "keywords": [
+    "prompts",
+    "skills",
+    "agents",
+    "output-styles"
+  ],
   "outputStyles": "./output-styles/"
 }

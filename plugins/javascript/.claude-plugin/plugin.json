@@ -1,6 +1,6 @@
 {
   "name": "javascript",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "JavaScript and TypeScript language discipline: conventions, patterns, and ecosystem practices",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,10 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/javascript",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["javascript", "typescript", "conventions", "patterns"]
+  "keywords": [
+    "javascript",
+    "typescript",
+    "conventions",
+    "patterns"
+  ]
 }

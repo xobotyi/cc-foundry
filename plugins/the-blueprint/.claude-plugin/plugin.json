@@ -1,6 +1,6 @@
 {
   "name": "the-blueprint",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Structured planning pipeline: design documents, technical designs, task decomposition, and task creation",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,11 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-blueprint",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["design-docs", "technical-design", "task-decomposition", "task-creation", "planning"]
+  "keywords": [
+    "design-docs",
+    "technical-design",
+    "task-decomposition",
+    "task-creation",
+    "planning"
+  ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "the-crucible",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
   "author": {
     "name": "xobotyi",
@@ -10,5 +10,11 @@
   "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-crucible",
   "repository": "https://github.com/xobotyi/cc-foundry",
   "license": "MIT",
-  "keywords": ["code-quality", "validation", "code-review", "multi-agent", "evaluation"]
+  "keywords": [
+    "code-quality",
+    "validation",
+    "code-review",
+    "multi-agent",
+    "evaluation"
+  ]
 }
