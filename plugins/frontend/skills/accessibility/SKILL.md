@@ -14,102 +14,273 @@ description: >-
 non-negotiable. If an element looks interactive, it must be interactive
 for everyone.**
 
-Web accessibility is not a feature -- it is a baseline quality attribute.
-Every UI component must be perceivable, operable, understandable, and robust
-for all users, including those using screen readers, keyboard navigation,
-switch devices, and voice control.
+Target **WCAG 2.2 AA conformance** unless the project explicitly specifies
+otherwise. AA includes all A criteria.
 
-## Route to Reference
+## References
 
-| Situation | Reference |
-|-----------|-----------|
-| Page structure, landmarks, headings, images, text alternatives | [semantic-html.md](references/semantic-html.md) |
-| ARIA roles, states, properties, the five rules of ARIA | [aria.md](references/aria.md) |
-| Keyboard navigation, focus order, focus trapping, focus restoration | [keyboard.md](references/keyboard.md) |
-| Form labels, validation, error messages, required fields | [forms.md](references/forms.md) |
-| WCAG 2.2 success criteria tables, compliance checklist | [wcag.md](references/wcag.md) |
-| Dialog, tabs, accordion, menu, combobox, tooltip, alert patterns | [component-patterns.md](references/component-patterns.md) |
+| Reference | Content |
+|-----------|---------|
+| `references/semantic-html.md` | Landmarks, headings, images, tables, lists, language markup |
+| `references/aria.md` | Roles, states, properties, naming, live regions, common mistakes |
+| `references/keyboard.md` | Focus order, visibility, roving tabindex, focus traps, restoration |
+| `references/forms.md` | Labels, grouping, required fields, validation, autocomplete |
+| `references/component-patterns.md` | Dialog, tabs, accordion, disclosure, menu, combobox, tooltip |
+| `references/wcag.md` | Full WCAG 2.2 AA criteria tables and compliance checklist |
 
-Read the relevant reference before writing or reviewing code in that area.
+---
 
-## Core Rules
+## 1. Semantic HTML
 
-These apply to ALL accessibility work. No exceptions.
+Use the right element for the right job. Native elements provide built-in
+keyboard support, screen reader announcements, and focus management that
+ARIA can only approximate.
 
-### 1. Semantic HTML First
+### Landmarks
 
-1. **Use native HTML elements** for their intended purpose. `<button>` not
-   `<div onclick>`. `<a href>` not `<span class="link">`. `<nav>` not
-   `<div class="nav">`.
-2. **Do not add ARIA roles that duplicate implicit semantics.** Never
-   `<nav role="navigation">` or `<main role="main">`.
-3. **No ARIA is better than bad ARIA.** Incorrect ARIA causes more harm
-   than missing ARIA. When unsure, use native HTML.
-4. **Every `<img>` has an `alt` attribute.** Informative images get
-   descriptive text. Decorative images get `alt=""`.
+1. Every page must have exactly one `<main>`.
+2. `<header>`/`<footer>` map to `banner`/`contentinfo` only as direct children
+   of `<body>` -- nested inside `<article>`, `<section>`, etc. they lose their
+   landmark role.
+3. Label multiple `<nav>` elements with `aria-label` or `aria-labelledby`.
+4. Never duplicate implicit roles (`<main role="main">`, `<nav role="navigation">`).
+5. Include all perceivable content within a landmark region.
 
-### 2. Keyboard Access
+For the full landmark-to-role mapping table, see `references/semantic-html.md`.
 
-1. **All interactive elements must be keyboard operable.** If it responds
-   to click, it must respond to Enter/Space/Arrow keys as appropriate.
-2. **Never use `tabindex` > 0.** Reorder the DOM instead.
-3. **Focus indicators must be visible.** Never `outline: none` without a
-   custom replacement. Use `:focus-visible` for keyboard-only styles.
-4. **Focus must never be lost.** When content is removed or hidden, move
-   focus to a logical target.
+### Headings
 
-### 3. Labels and Names
+1. One `<h1>` per page identifying the primary content.
+2. Never skip heading levels -- `<h1>` then `<h3>` breaks the outline.
+3. Use headings for structure, not visual styling.
+4. Every `<section>` and major content area should begin with a heading.
 
-1. **Every form control has a programmatic label.** `<label for>`,
-   `aria-label`, or `aria-labelledby` -- in that priority order.
-2. **Every interactive component has an accessible name.** Buttons use
-   text content. Icon buttons use `aria-label`.
-3. **Visible label text must be contained in the accessible name**
-   (WCAG 2.5.3 Label in Name).
+### Interactive Elements
 
-### 4. Color and Contrast
+Use `<button>` for actions (submit, toggle, open dialog) -- activates via
+Enter and Space. Use `<a href>` for navigation -- activates via Enter.
+Never `<a href="#" onclick="...">` for actions. Never `<button>` for navigation.
+
+### Tables
+
+1. Use `<th>` with `scope="col"` or `scope="row"` for headers.
+2. Add `<caption>` to describe the table's purpose.
+3. Never use tables for layout.
+
+### Lists
+
+Use `<ul>` for unordered, `<ol>` for ordered, `<dl>`/`<dt>`/`<dd>` for
+term/description pairs. Screen readers announce list type and item count.
+
+### Images
+
+1. Every `<img>` must have an `alt` attribute -- even if empty.
+2. Do not start alt text with "Image of" or "Picture of".
+3. Keep alt text under ~125 characters.
+4. For decorative images, prefer CSS `background-image` over `<img alt="">`.
+5. Use real text, not images of text (WCAG 1.4.5).
+
+For alt treatment by image type, see `references/semantic-html.md`.
+
+### Language and Page Metadata
+
+1. Set `<html lang="...">` on every page (WCAG 3.1.1).
+2. Mark inline language changes: `<span lang="fr">bonjour</span>` (WCAG 3.1.2).
+3. Expand abbreviations on first use with `<abbr>`.
+4. Provide a descriptive `<title>` on every page (WCAG 2.4.2).
+5. Provide a skip link as the first focusable element (WCAG 2.4.1).
+
+---
+
+## 2. ARIA
+
+**No ARIA is better than bad ARIA.** ARIA modifies only the accessibility
+tree -- it does not change behavior, keyboard interaction, or appearance.
+
+### The Five Rules of ARIA
+
+1. **Use native HTML first.** If a semantic HTML element exists, use it.
+2. **Do not change native semantics** unless absolutely necessary. Never
+   `<h2 role="tab">` -- use `<div role="tab"><h2>...</h2></div>`.
+3. **All interactive ARIA controls must be keyboard operable.** A `role="button"`
+   must respond to Enter and Space.
+4. **Never `role="presentation"` or `aria-hidden="true"` on focusable elements.**
+5. **All interactive elements must have an accessible name.**
+
+### Naming and Describing
+
+**Priority:** `aria-labelledby` > `aria-label` > `<label>` > element content
+> `title`.
+
+1. Prefer visible labels over `aria-label`.
+2. Use `aria-labelledby` to compose names from multiple elements.
+3. `aria-label` and `aria-labelledby` replace native label text, not supplement.
+4. Never `aria-label` on elements with `role="presentation"` or `role="none"`.
+5. Never `aria-label` on `<div>` without a role -- ignored by most AT.
+6. Use `aria-describedby` or `aria-description` for supplementary info after
+   the name is established.
+
+### Live Regions
+
+1. Use `aria-live="polite"` for non-urgent updates.
+2. Use `aria-live="assertive"` sparingly -- only errors, alerts, urgent info.
+3. Set live regions in the DOM before content changes. Adding `aria-live` and
+   content simultaneously may not be announced.
+4. Inject alert content into an existing `role="alert"` container for reliable
+   announcement.
+
+Place `aria-expanded` on the trigger element, not the panel.
+
+For widget roles, state/relationship attribute tables, and common ARIA mistakes,
+see `references/aria.md`.
+
+---
+
+## 3. Keyboard Navigation
+
+All interactive functionality must be operable with a keyboard alone.
+
+### Fundamental Keys
+
+Tab/Shift+Tab between components. Arrow keys within composite widgets.
+Enter activates links, buttons, menu items. Space activates buttons,
+checkboxes, toggles. Escape closes overlays.
+
+### Focus Order
+
+1. Never `tabindex` > 0. Rearrange DOM order instead.
+2. `tabindex="0"` makes non-interactive elements focusable (use sparingly).
+3. `tabindex="-1"` for programmatic focus only (dialog containers, skip targets).
+4. Source order = visual order = focus order. CSS reordering
+   (`flex-direction: row-reverse`, `order`, grid) must not break this.
+
+### Focus Visibility
+
+1. Never `outline: none` without a custom focus style replacement.
+2. Use `:focus-visible` for keyboard-only focus styles.
+3. Focus indicator: at least 3:1 contrast against adjacent background.
+4. Focus indicator area: at least 2px border equivalent (WCAG 2.4.13).
+5. Focused element must not be entirely obscured (WCAG 2.4.11).
+
+### Focus Management
+
+Use roving tabindex for composite widgets (tabs, toolbars, menus): active
+child gets `tabindex="0"`, others get `tabindex="-1"`. Use
+`aria-activedescendant` when the container must maintain focus (combobox).
+
+### Focus Trap (Dialogs)
+
+1. On open: focus first focusable element inside dialog.
+2. Trap Tab/Shift+Tab -- wrap last-to-first and first-to-last.
+3. Escape closes dialog.
+4. On close: return focus to the trigger element.
+5. Set `aria-modal="true"`.
+
+### Focus Restoration
+
+1. **Deleted item** -- focus next item, or previous if last was deleted.
+2. **Closed overlay** -- focus the trigger that opened it.
+3. **Removed section** -- focus nearest logical container or heading.
+4. Never let focus fall to `document.body`.
+
+### Disabled Elements
+
+1. Remove disabled standalone controls from tab sequence (`disabled` attribute
+   or `tabindex="-1"`).
+2. Keep disabled items focusable inside composite widgets (menus, tabs, trees,
+   listboxes) so screen reader users can discover them.
+3. Use `aria-disabled="true"` to keep element focusable but not operable.
+
+---
+
+## 4. Accessible Forms
+
+### Labels
+
+Every `<input>`, `<select>`, `<textarea>` must have a programmatic label.
+
+**Priority:** `<label for/id>` > wrapping `<label>` > `aria-labelledby` >
+`aria-label`.
+
+1. `placeholder` is not a label substitute -- disappears on input, unreliable
+   in screen readers.
+2. Visible label text must be contained in the accessible name (WCAG 2.5.3).
+
+### Grouping
+
+1. Group related controls with `<fieldset>` + `<legend>`. Required for: radio
+   groups, checkbox groups, related input sets (address, date parts).
+2. Use `role="group"` with `aria-labelledby` when `<fieldset>` is impractical.
+
+### Required Fields
+
+1. Use `required` attribute or `aria-required="true"`.
+2. Indicate visually with asterisk + "* Required" legend.
+3. Never color alone for required status.
+
+### Validation and Errors
+
+1. Display errors adjacent to the invalid field.
+2. Associate errors via `aria-describedby` or `aria-errormessage`.
+3. Set `aria-invalid="true"` on invalid fields.
+4. Use `role="alert"` on error container for immediate announcement.
+5. For multiple errors: error summary at top with links to fields; move focus
+   to summary on validation failure.
+6. On success: announce via `role="status"`.
+7. On failure: do not clear the form -- preserve user input.
+
+### Input Types and Autocomplete
+
+Use semantic `type` attributes (`email`, `tel`, `url`, `number`, `password`).
+Use `autocomplete` for user data inputs (WCAG 1.3.5): `given-name`,
+`family-name`, `email`, `tel`, `street-address`, etc.
+
+### Disabling Controls
+
+1. Native `disabled` attribute removes from tab sequence and announces state.
+2. `aria-disabled="true"` keeps element focusable -- prevent activation in JS.
+3. Announce dynamic disabled state changes via a live region.
+
+---
+
+## 5. Visual Requirements
 
 1. **Text contrast:** 4.5:1 minimum (3:1 for large text 18pt+ or 14pt bold+).
-2. **UI component contrast:** 3:1 minimum for borders, icons, focus
-   indicators against adjacent colors.
-3. **Color is not the sole indicator.** Never rely on color alone to convey
-   information -- add icons, text, or patterns.
+2. **UI component contrast:** 3:1 minimum for borders, icons, focus indicators.
+3. **Never color alone** to convey information -- add icons, text, or patterns.
+4. Content must reflow at 320px width without horizontal scroll (WCAG 1.4.10).
+5. No content loss when user adjusts line-height/spacing (WCAG 1.4.12).
+6. Content on hover/focus must be dismissible, hoverable, persistent (1.4.13).
+7. No content flashes more than 3 times/second (2.3.1).
+8. Time limits adjustable; moving content pausable (2.2.1, 2.2.2).
 
-### 5. Dynamic Content
+---
 
-1. **Status messages use `role="status"`** (polite) -- search results count,
-   save confirmations.
-2. **Error messages use `role="alert"`** (assertive) -- validation errors,
-   critical warnings.
-3. **Set live regions in the DOM before updating content.** Adding
-   `aria-live` and content simultaneously may not be announced.
+## 6. Component Patterns
 
-### 6. Page Structure
+For full ARIA structure, keyboard contracts, and code examples for each
+pattern, see `references/component-patterns.md`. Key rules:
 
-1. **Set `<html lang="...">`** on every page.
-2. **One `<h1>` per page.** Heading hierarchy must not skip levels.
-3. **All content lives within landmark regions** (`<header>`, `<nav>`,
-   `<main>`, `<aside>`, `<footer>`).
-4. **Provide a skip link** as the first focusable element.
+1. **Dialog** -- use native `<dialog>` with `.showModal()` when possible.
+   Focus trap, Escape to close, return focus to trigger on close.
+2. **Tabs** -- `role="tablist/tab/tabpanel"`, roving tabindex, arrow keys
+   switch tabs, Tab enters active panel.
+3. **Accordion** -- trigger is `<button>` inside a heading, `aria-expanded`
+   on button, `aria-controls` to panel.
+4. **Disclosure** -- `<button>` with `aria-expanded` and `aria-controls`.
+5. **Menu button** -- `aria-haspopup="true"`, arrows navigate, Enter activates.
+   Never `role="menu"` for navigation -- use `<nav>` with links.
+6. **Combobox** -- `aria-activedescendant` tracks highlighted option, arrows
+   navigate, Enter selects, Escape closes.
+7. **Tooltip** -- show on focus + hover, `aria-describedby`, must be hoverable
+   and persistent. No interactive content inside.
+8. **Alert/Status** -- `role="alert"` for urgent (assertive), `role="status"`
+   for non-urgent (polite). Inject into pre-existing container.
 
-## Quick Anti-Pattern Reference
+For WCAG 2.2 AA compliance checklist with criterion numbers,
+see `references/wcag.md`.
 
-| Don't | Do |
-|-------|------|
-| `<div onclick="...">Click me</div>` | `<button>Click me</button>` |
-| `<a href="#">` for actions | `<button>` for actions, `<a href>` for navigation |
-| `<nav role="navigation">` | `<nav>` -- implicit role is sufficient |
-| `<img src="photo.jpg">` (no alt) | `<img src="photo.jpg" alt="Description">` |
-| `outline: none` on `:focus` | `:focus-visible { outline: 2px solid #005fcc; }` |
-| `tabindex="5"` | `tabindex="0"` or reorder the DOM |
-| `placeholder="Email"` as sole label | `<label for="email">Email</label>` |
-| `<span class="error" style="color:red">` | `<span role="alert" id="err">` + `aria-describedby` |
-| `aria-label="Click here"` on a link | `<a href="/products">View all products</a>` |
-| `role="button"` on `<div>` without keyboard | `<button>` or add keydown handler for Enter/Space |
-| `aria-hidden="true"` on focusable element | Remove from tab order first, or do not hide |
-| `<div role="alert">` always in DOM | Inject content into existing `role="alert"` container |
-| Color-only error indication | Color + icon + text description |
-| `<h1>` then `<h3>` (skipped level) | `<h1>` then `<h2>` then `<h3>` |
+---
 
 ## Application
 
@@ -126,25 +297,8 @@ When **reviewing** code for accessibility:
 - Reference the WCAG criterion number when relevant (e.g., "1.4.3 Contrast").
 - Do not lecture -- state what is wrong and how to fix it.
 
-```
-Bad review comment:
-  "According to WCAG guidelines, you should ensure that all form
-   inputs have properly associated labels for accessibility."
-
-Good review comment:
-  "Missing label -- add `<label for="email">Email</label>` before the
-   input. (WCAG 1.3.1)"
-```
-
 ## Integration
 
-This skill provides accessibility-specific conventions alongside the
-**coding** skill:
-
-1. **Coding** -- Discovery, planning, verification discipline
-2. **Accessibility** -- WCAG compliance, ARIA, keyboard, semantic HTML
-3. **Coding** -- Final verification
-
-The coding skill governs workflow; this skill governs accessibility
-implementation choices. For CSS-related accessibility concerns (contrast,
-focus styles, motion preferences), the **css** skill complements this one.
+The coding skill governs workflow; this skill governs accessibility choices.
+For CSS-related accessibility (contrast, focus styles, motion), the css skill
+complements this one.

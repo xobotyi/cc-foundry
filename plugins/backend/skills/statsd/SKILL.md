@@ -10,91 +10,199 @@ description: >-
 
 # StatsD
 
-**Measure everything. StatsD is fire-and-forget: UDP means zero latency impact
-on your application, but wrong metric types or bad naming corrupt your data
-silently.**
+Choose the right metric type, name it with dot-delimited hierarchy, tag dimensions instead
+of encoding them in names. StatsD is fire-and-forget: UDP means zero latency impact on
+your application, but wrong metric types or bad naming corrupt your data silently.
 
-StatsD is a push-based metric collection protocol. Clients send UDP datagrams
-to a local aggregation daemon, which flushes aggregated values to a backend
-(Graphite, Datadog, Prometheus exporter, Telegraf) on a fixed interval
-(default: 10 seconds).
+## References
 
-## Route to Reference
+| Reference | Contains |
+|-----------|----------|
+| `references/metric-types.md` | Wire format details, type comparison, sampling correction |
+| `references/naming.md` | Graphite namespace mapping, character rules, naming examples |
+| `references/dogstatsd.md` | Events format, service checks, protocol versions, distributions vs histograms |
+| `references/aggregation.md` | Flush mechanics, Graphite downsampling, DogStatsD aggregation, pre-aggregated timestamps |
+| `references/client-patterns.md` | High-throughput tuning, error handling, K8s deployment, UDS configuration |
+| `references/backends.md` | statsd_exporter config, Telegraf setup, migration guides |
 
-| Situation | Reference |
-|-----------|-----------|
-| Choosing between counter, gauge, timer, histogram, set, distribution | [metric-types.md](references/metric-types.md) |
-| Naming metrics, hierarchy, tagging conventions | [naming.md](references/naming.md) |
-| DogStatsD extensions: tags, events, service checks, distributions | [dogstatsd.md](references/dogstatsd.md) |
-| Flush intervals, aggregation rules, downsampling | [aggregation.md](references/aggregation.md) |
-| Client library setup, buffering, sampling, high-throughput tuning | [client-patterns.md](references/client-patterns.md) |
-| Prometheus statsd_exporter, Telegraf StatsD input, backend mapping | [backends.md](references/backends.md) |
+## Metric Types
 
-Read the relevant reference before writing or reviewing instrumentation code.
+Wire format: `<metric_name>:<value>|<type>[|@<sample_rate>][|#<tags>]`
 
-## Core Rules
+### Decision Matrix
 
-These apply to ALL StatsD instrumentation. No exceptions.
+| Question | Type |
+|----------|------|
+| How many times did X happen? | Counter (`c`) |
+| What is X right now? | Gauge (`g`) |
+| How long did X take? | Timer (`ms`) |
+| What is the distribution of X? | Histogram (`h`) |
+| How many unique X occurred? | Set (`s`) |
+| What is the global distribution of X? | Distribution (`d`, DogStatsD only) |
 
-### Choose the Right Metric Type
+Wrong metric type = wrong math at the server. A gauge used as a counter loses data
+between flushes. A counter used as a gauge produces meaningless rates.
 
-1. **Counting occurrences?** Use a **counter** (`|c`). Counters reset each
-   flush. The server computes rate and count.
-2. **Tracking a current value?** Use a **gauge** (`|g`). Gauges retain their
-   last value between flushes.
-3. **Measuring duration or size?** Use a **timer** (`|ms`) or **histogram**
-   (`|h`). The server computes min, max, mean, percentiles, count.
-4. **Counting unique values?** Use a **set** (`|s`). The server counts
-   distinct values per flush interval.
-5. **Need server-side percentiles across hosts?** Use a **distribution**
-   (`|d`) (DogStatsD only). Raw values aggregate globally, not per-host.
+### Counter (`|c`)
 
-Wrong metric type = wrong math at the server. A gauge used as a counter
-loses data between flushes. A counter used as a gauge produces meaningless
-rates.
+Measures rate of events over time. Server sums all values during flush interval,
+resets to 0 after flush, reports both raw count and per-second rate.
 
-### Name Metrics Consistently
+- Use for: request counts, error counts, event occurrences (cache hits, logins)
+- Sample rate correction: value multiplied by `1/rate`
+- Supports sampling (`|@<rate>`)
 
-1. **Dot-delimited hierarchy:** `<namespace>.<subsystem>.<metric>.<unit>`
-2. **Lowercase, alphanumeric + dots + underscores only.** No spaces, no
-   dashes in metric names (dashes break Graphite tree navigation).
-3. **Include the unit:** `request.duration.ms`, `queue.size.bytes`,
-   `cache.hit.total`.
-4. **Namespace by service:** `myapp.api.request.duration.ms` not just
-   `request.duration.ms`.
+### Gauge (`|g`)
 
-### Use Sampling Correctly
+Instantaneous value at a point in time. Server stores last value received,
+retains between flushes (sticky).
 
-1. **Sample only high-volume counters and timers.** Gauges and sets must
-   not be sampled — the server cannot correct for sampling on these types.
-2. **Always pass the sample rate to the client.** The server multiplies
-   counter values by `1/rate` to estimate the true count. Omitting the
-   rate means the server underreports.
-3. **Start at `1.0` (no sampling).** Only reduce when you have evidence
-   of UDP packet drops or excessive agent CPU.
+- Use for: queue depth, active connections, memory/CPU usage, thread pool size
+- Signed values (`+N`, `-N`) modify current value incrementally
+- Cannot set to a negative number directly — set to 0 first, then decrement
+- **Do not sample gauges** — server cannot correct for sampling on point-in-time values
 
-### Tags (DogStatsD)
+### Timer (`|ms`)
 
-1. **Use tags for dimensions, not metric names.** `http.request.count` with
-   tag `method:GET` — not `http.request.get.count`.
-2. **Keep tag cardinality bounded.** Tags like `user_id` or `request_id`
-   create unbounded series. Use `endpoint`, `status_code`, `region` instead.
-3. **Use Datadog's unified service tagging:** `env`, `service`, `version`
-   as global tags on the client.
+Duration of an operation in milliseconds. Server computes per flush interval:
+count, mean, upper (max), lower (min), sum, stddev, median, configurable
+percentiles (p90, p95, p99).
 
-## Quick Anti-Pattern Reference
+- Use for: HTTP request latency, DB query duration, function execution time
+- Supports sampling (`|@<rate>`)
 
-| Don't | Do | Why |
-|-------|----|-----|
-| `gauge("requests", count)` | `counter("requests", 1)` | Gauge overwrites; counter accumulates |
-| `counter("cpu.percent", 75)` | `gauge("cpu.percent", 75)` | CPU usage is a point-in-time value |
-| `timer("cache.hit", 1)` | `counter("cache.hit", 1)` | Hit/miss is an event count, not a duration |
-| `http.request.get.200.count:1\|c` | `http.request.count:1\|c\|#method:GET,status:200` | Tags keep metric names stable |
-| `counter("req", 1)` with `@0.1` but no client rate | `counter("req", 1, rate=0.1)` | Server needs rate to correct the count |
-| `set("page.views", page_url)` sampled at 0.5 | `set("page.views", page_url)` at rate 1.0 | Sampling breaks set uniqueness |
-| `myMetric-Name:1\|c` | `my_metric_name:1\|c` | Dashes break Graphite; uppercase varies by backend |
-| One metric per UDP packet in hot loop | Enable client-side buffering | Reduces syscalls and packet overhead |
-| `gauge("queue.depth", len(q))` every 10ms | `gauge("queue.depth", len(q))` every 1-10s | Gauge keeps last value; high frequency wastes bandwidth |
+### Histogram (`|h`)
+
+Distribution of values over time. Identical to timer in most implementations.
+DogStatsD treats histograms as the native distribution type.
+
+- Use for: request payload sizes, response body sizes, batch sizes
+- Conceptually: timers measure duration, histograms measure arbitrary distributions
+
+### Set (`|s`)
+
+Count of unique values per flush interval. Server tracks distinct values, reports
+cardinality at flush, resets.
+
+- Use for: unique users, unique IPs, unique error codes per interval
+- **Do not sample sets** — sampling breaks uniqueness tracking
+
+### Distribution (`|d`) — DogStatsD Only
+
+Global distribution across all hosts. Raw values sent to Datadog servers (not
+aggregated locally). Use when you need accurate fleet-wide percentiles.
+
+See `references/dogstatsd.md` for distributions vs histograms comparison and
+protocol version details.
+
+## Naming
+
+Format: `<namespace>.<subsystem>.<target>.<metric>.<unit>`
+
+Example: `myapp.api.request.duration.ms`, `myapp.cache.hit.count.total`
+
+### Naming Rules
+
+1. Always namespace by service name — `myapp.api.requests` not just `requests`
+2. Use dot-delimited hierarchy
+3. Include the unit: `.ms`, `.bytes`, `.total`, `.items`
+4. Dimensions go in tags, not metric names (when tags are available)
+5. Use lowercase everywhere — some backends are case-sensitive
+6. Use underscores within path segments: `http_request` not `httpRequest`
+7. No dashes — they break Graphite navigation
+
+See `references/naming.md` for Graphite namespace mapping, character rules table,
+and naming anti-patterns.
+
+## Tags (DogStatsD)
+
+Format: `metric.name:1|c|#key1:value1,key2:value2` — comma-separated, no spaces.
+
+### Tag Rules
+
+1. Use tags for dimensions you will filter or group by — not metric names
+2. Keep cardinality bounded — each unique tag combination creates a separate time series
+3. No spaces in tag values — use underscores: `region:us_east`
+
+### Unified Service Tagging
+
+Set these as global/constant tags on the client — attach to every metric automatically:
+
+| Tag | Purpose | Example |
+|-----|---------|---------|
+| `env` | Deployment environment | `env:production` |
+| `service` | Service name | `service:payment-api` |
+| `version` | Deployed version | `version:2.1.0` |
+
+### Tag Cardinality
+
+Rule of thumb: if a tag can have >1000 distinct values, do not use it. Use logs or
+traces for high-cardinality data.
+
+| Tag | Cardinality | Acceptable? |
+|-----|-------------|-------------|
+| `env:production` | ~3-5 | Yes |
+| `method:GET` | ~7 | Yes |
+| `status_code:200` | ~20-50 | Yes |
+| `endpoint:/api/users` | ~50-200 | Caution |
+| `user_id:12345` | Unbounded | No |
+
+## Aggregation and Flush
+
+The flush cycle determines metric resolution. Default: 10 seconds.
+
+- Counters reset to 0 after flush; gauges are sticky (retain last value)
+- If no counter values received during flush: behavior depends on `deleteCounters`
+  config (default: send 0)
+- Enable client-side aggregation for high-throughput applications (Go v5.0+,
+  Java v3.0+, .NET v7.0+) — pre-aggregates before sending to Agent
+
+See `references/aggregation.md` for flush mechanics, Graphite downsampling rules,
+DogStatsD aggregation details, and pre-aggregated timestamps.
+
+## Client Patterns
+
+### Initialization
+
+1. **One client instance per application** — do not create per-request
+2. **Set namespace prefix** — auto-prepends to all metric names
+3. **Set global/constant tags** — env, service, version set once
+4. **Close/flush on shutdown** — buffered metrics lost otherwise
+
+### Buffering
+
+Enable client-side buffering — packs multiple metrics into single UDP packets.
+Reduces syscall overhead in hot paths. Most modern DogStatsD clients buffer by
+default. Call `flush()` before shutdown.
+
+### Sampling
+
+Client randomly decides whether to send each metric based on sample rate. Datagram
+includes `|@<rate>` so server corrects the count.
+
+| Volume | Recommendation |
+|--------|---------------|
+| < 1000 metrics/sec | `rate=1.0` (no sampling) |
+| 1000-10000/sec | `rate=0.5` to `0.1` for counters/timers |
+| > 10000/sec | `rate=0.1` or lower; enable client-side aggregation |
+
+**Never sample gauges or sets** — server cannot correct for these types.
+
+See `references/client-patterns.md` for high-throughput tuning steps, error handling,
+and Kubernetes deployment patterns.
+
+## Backends
+
+| Need | Backend |
+|------|---------|
+| Simple, self-hosted graphing | Graphite |
+| Cloud monitoring + APM | Datadog (DogStatsD) |
+| Prometheus ecosystem integration | statsd_exporter |
+| Flexible multi-output pipeline | Telegraf |
+| Migrating StatsD to Prometheus | statsd_exporter with relay |
+
+See `references/backends.md` for statsd_exporter configuration, Telegraf setup,
+and migration guides.
 
 ## Application
 
@@ -106,29 +214,10 @@ When **writing** StatsD instrumentation:
 - Always configure client-side buffering for production use.
 
 When **reviewing** StatsD instrumentation:
-- Check metric type correctness first — this is the most common and
-  most damaging mistake.
+- Check metric type correctness first — most common and most damaging mistake.
 - Verify tag cardinality is bounded.
 - Cite the specific issue and show the fix inline.
 
-```
-Bad review comment:
-  "According to StatsD best practices, you should use a counter
-   instead of a gauge for this metric because..."
-
-Good review comment:
-  "`gauge` -> `counter` -- `request_count` is an event count,
-   not a point-in-time value. Gauge loses data between flushes."
-```
-
 ## Integration
 
-This skill provides StatsD-specific conventions alongside the **coding**
-skill and platform skills:
-
-1. **Coding** — Discovery, planning, verification discipline
-2. **StatsD** — Metric type selection, naming, client patterns
-3. **Observability** — Broader observability strategy (if active)
-
-The coding skill governs workflow; this skill governs StatsD
-instrumentation choices.
+The coding skill governs workflow; this skill governs StatsD instrumentation choices.
