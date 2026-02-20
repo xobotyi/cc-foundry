@@ -14,99 +14,358 @@ If you reach for Options API, you need a reason.**
 
 Vue 3 rewards explicit, composable code. Prefer `ref()` over `reactive()`,
 composables over mixins, and typed props over runtime-only validation.
+References contain extended examples, rationale, and edge cases for each topic.
 
-## Route to Reference
+## References
 
-| Situation | Reference |
-|-----------|-----------|
-| `ref`, `reactive`, `computed`, `watch`, `watchEffect`, shallow refs | [reactivity.md](references/reactivity.md) |
-| `<script setup>`, SFC structure, `defineOptions`, block ordering | [sfc.md](references/sfc.md) |
-| Props, emits, slots, provide/inject, component naming, v-model | [components.md](references/components.md) |
-| Composable design, naming, return values, lifecycle coupling | [composables.md](references/composables.md) |
-| `defineProps<T>()`, `defineEmits<T>()`, typed refs, `InjectionKey` | [typescript.md](references/typescript.md) |
-| `v-once`, `v-memo`, `shallowRef`, lazy routes, virtualized lists | [performance.md](references/performance.md) |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Reactivity | `references/reactivity.md` | Ref unwrapping, watchers, computed edge cases |
+| SFC | `references/sfc.md` | Full compiler macros catalog, scoped styles, template refs |
+| Components | `references/components.md` | Props, emits, slots, provide/inject |
+| Composables | `references/composables.md` | Design patterns, composition, restrictions |
+| TypeScript | `references/typescript.md` | Full utility types table, generic components, event typing |
+| Performance | `references/performance.md` | Update optimization, large lists, profiling |
 
-Read the relevant reference before writing code in that area.
+## Reactivity
 
-## Core Rules
+### Choosing a Reactive Primitive
 
-These apply to ALL Vue code. No exceptions.
+| Primitive | Use when |
+|-----------|----------|
+| `ref()` | **Default choice.** Works with any value type. |
+| `reactive()` | Grouping related state when destructure is not needed. |
+| `shallowRef()` | Large immutable structures, external state integration. |
+| `shallowReactive()` | Root-level-only reactivity on objects. |
+| `computed()` | Derived state. Caches until dependencies change. |
 
-### API Style
+### `ref()` Is the Primary API
 
-1. **Composition API only.** Never use Options API in new code.
-2. **`<script setup>` always.** Never use bare `setup()` in SFCs.
-3. **`ref()` over `reactive()`.** `reactive()` loses reactivity on destructure
-   and reassignment. Use `ref()` as the primary reactive primitive.
-4. **`computed()` for derived state.** Never derive state inside templates
-   with inline expressions longer than a single property access or method call.
+1. Works with primitives (`string`, `number`, `boolean`).
+2. Can be destructured from composable returns without losing reactivity.
+3. Can be reassigned (`count.value = newValue`).
+4. Consistent `.value` access pattern everywhere in script.
+5. Access `.value` in script, omit in template — templates auto-unwrap top-level refs.
 
-### Component Conventions
+### `reactive()` Limitations
 
-1. **Multi-word names.** Every component name must be multi-word (`TodoItem`,
-   not `Item`) to avoid conflicts with HTML elements.
-2. **PascalCase in templates.** Use `<TodoItem />` in SFC templates,
-   kebab-case only in in-DOM templates.
-3. **Self-closing tags.** Components with no children: `<MyComponent />`.
-4. **One component per file.** No inline component registration.
-5. **PascalCase filenames.** `TodoItem.vue`, not `todoItem.vue` or
-   `todo-item.vue`.
-6. **Base component prefix.** Presentational components use `Base`, `App`,
-   or `V` prefix: `BaseButton`, `BaseIcon`.
+1. Cannot hold primitives.
+2. Reassignment loses reactivity — `state = reactive({...})` breaks tracking.
+3. Destructuring primitives loses reactivity — use `toRefs()` if you must destructure.
+4. Do not use `reactive()` as the primary primitive. Use `ref()`.
 
-### Props and Events
+### Ref Unwrapping Rules
 
-1. **Type-based props.** Use `defineProps<T>()` in TypeScript projects.
-   Use object syntax with types in JavaScript projects. Never array syntax
-   in committed code.
-2. **camelCase declaration, kebab-case in templates.**
-   Declare `greetingText`, use `:greeting-text="value"`.
-3. **Never mutate props.** Use `computed()` for transformations,
-   `ref()` + initial value for local copies.
-4. **Declare all emits.** Use `defineEmits()` — preferably type-based.
-5. **One-way data flow.** Child emits events, parent handles mutations.
+- Top-level refs in templates are auto-unwrapped: `{{ count }}` works.
+- Non-top-level refs in plain objects are NOT unwrapped: `{{ obj.id + 1 }}` breaks
+  if `obj.id` is a ref. Destructure to top level to fix.
+- Refs nested inside `reactive()` objects are unwrapped automatically.
+- Refs inside reactive arrays/collections are NOT unwrapped — need `.value`.
 
-### Template Rules
+### Computed Properties
 
-1. **`v-for` always has `:key`.** Use stable, unique identifiers.
-2. **Never `v-if` on same element as `v-for`.** Use `computed` to filter,
-   or wrap with `<template v-for>`.
-3. **Simple expressions only.** Move logic to `computed` or functions.
-4. **Directive shorthands consistently.** Always use `:` for `v-bind`,
-   `@` for `v-on`, `#` for `v-slot` — or never. Don't mix.
-5. **Multi-attribute elements span multiple lines.** One attribute per line.
+1. Keep computed getters pure — no side effects.
+2. Split complex computed into smaller ones.
+3. Computed caches its value; only recalculates when dependencies change.
+4. Computed stability (3.4+): only triggers effects when the returned value actually
+   changes. Avoid returning new objects from computed — each new object is "different".
+5. Writable computed is rare — use sparingly. Requires `get`/`set` form.
 
-### Styling
+### Watchers
 
-1. **Scoped styles by default.** Use `<style scoped>` or CSS modules.
-2. **Global styles only in `App.vue` or layout components.**
+**`watch()` vs `watchEffect()`:**
 
-### Reactivity Safety
+| Use `watch()` when | Use `watchEffect()` when |
+|--------------------|--------------------------|
+| Need old and new values | Don't need old value |
+| Want lazy execution | Want immediate execution |
+| Watching specific sources | Dependencies are implicit |
+| Need conditional watching | Effect tracks all accessed refs |
 
-1. **Access `.value` in script, omit in template.** Templates auto-unwrap
-   top-level refs.
-2. **Don't destructure `reactive()` objects.** Loses reactivity. Use
-   `toRefs()` or stick with `ref()`.
-3. **Use `toValue()` in composables** to normalize ref/getter/raw inputs.
-4. **`nextTick()` for post-DOM-update logic.** DOM updates are async.
+**`watch()` options:**
+- `{ immediate: true }` — run callback on creation (like watchEffect).
+- `{ deep: true }` — watch all nested properties (expensive, use sparingly).
+- Watch a getter for specific property: `watch(() => obj.specificProp, callback)`.
+- Watch multiple sources: `watch([a, b], ([newA, newB]) => {...})`.
 
-## Quick Anti-Pattern Reference
+**Cleanup:** Both `watch` and `watchEffect` support cleanup via the `onCleanup` parameter.
+Use it for aborting fetch requests, clearing timers, removing listeners.
 
-| Don't | Do |
-|-------|------|
-| `defineProps(['title'])` | `defineProps<{ title: string }>()` |
-| `reactive({ count: 0 })` for primitives | `ref(0)` |
-| `let { count } = reactive(state)` | `const { count } = toRefs(state)` or use `ref()` |
-| `<item />` (single-word) | `<TodoItem />` (multi-word) |
-| `v-for="u in users" v-if="u.active"` | `v-for="u in activeUsers"` with `computed` |
-| `{{ name.split(' ').map(...).join(' ') }}` | `{{ normalizedName }}` with `computed` |
-| `props.size = 'large'` | `const localSize = ref(props.size)` |
-| `<style>` (unscoped) | `<style scoped>` |
-| `export default { data() {}, methods: {} }` | `<script setup>` with Composition API |
-| `this.$emit('update')` | `const emit = defineEmits<{ update: [] }>()` |
-| `mixins: [myMixin]` | `const { x } = useMyComposable()` |
-| `watch: { deep: true }` on large objects | `watch(() => obj.specificProp, ...)` |
-| `<MyComponent></MyComponent>` (no content) | `<MyComponent />` |
+### DOM Update Timing
+
+Reactive state changes batch DOM updates to the next tick. Use `nextTick()` for
+post-DOM-update logic.
+
+## Single-File Components
+
+### Block Order
+
+Always: `<script setup>` first, `<template>` second, `<style>` last.
+
+### Organization Within `<script setup>`
+
+Order declarations logically:
+
+1. Imports — Vue APIs, components, composables, types
+2. Props and emits — `defineProps`, `defineEmits`
+3. Composable calls — `useRouter()`, custom composables
+4. Reactive state — `ref()`, `reactive()`, `computed()`
+5. Functions — event handlers, helpers
+6. Watchers — `watch()`, `watchEffect()`
+7. Lifecycle hooks — `onMounted()`, `onUnmounted()`
+8. Expose — `defineExpose()` (rare)
+
+### Compiler Macros
+
+Key macros available without import in `<script setup>`: `defineProps()`,
+`defineEmits()`, `defineModel()`. Use `defineOptions()` for options that
+`<script setup>` doesn't natively support (`name`, `inheritAttrs: false`).
+Full macro catalog in `references/sfc.md`.
+
+### Template Syntax
+
+**Directive shorthands** — use consistently, don't mix:
+
+| Shorthand | Full | Purpose |
+|-----------|------|---------|
+| `:prop` | `v-bind:prop` | Bind attribute/prop |
+| `@event` | `v-on:event` | Listen to event |
+| `#slot` | `v-slot:slot` | Named slot |
+
+**Conditional rendering:**
+- `v-if` / `v-else-if` / `v-else` for conditional blocks.
+- `v-show` for frequent toggles (CSS `display: none`, avoids mount/unmount cost).
+- Use `v-if` for conditions that rarely change, `v-show` for frequent toggles.
+
+**Template refs:**
+- 3.5+: `useTemplateRef<HTMLInputElement>('input')` with matching `ref` attribute.
+- Pre-3.5: `ref<HTMLInputElement | null>(null)` with matching ref name.
+
+### Scoped Styles
+
+1. Use `<style scoped>` by default. Global styles only in `App.vue` or layouts.
+2. Child component root elements are affected by both parent and child scoped styles.
+3. Deep selectors: `.parent :deep(.child-class)` to style child internals (use sparingly).
+4. CSS modules: `<style module>` generates unique class names, accessed via `$style`.
+5. `v-bind(color)` in `<style>` uses reactive values in CSS.
+
+## Components
+
+### Naming
+
+1. Multi-word names always — `TodoItem` not `Item`. Avoids HTML element conflicts.
+2. PascalCase in SFC templates: `<TodoItem />`. Kebab-case only in in-DOM templates.
+3. PascalCase filenames: `TodoItem.vue`.
+4. Base component prefix for presentational components: `BaseButton`, `BaseIcon`.
+5. Parent prefix for tightly coupled children: `TodoListItem`, `TodoListItemButton`.
+6. Highest-level word first to group related: `SearchButtonClear`, `SearchInputQuery`.
+7. Full words always — no abbreviations.
+8. One component per file. No inline registration.
+9. Self-closing tags for components without children: `<MyComponent />`.
+10. PascalCase when importing in JS/TS.
+
+### Props
+
+1. Use `defineProps<T>()` (type-based) in TypeScript projects. Object syntax in JS
+   projects. Never array syntax in committed code.
+2. Declare in `camelCase`, use in templates as `kebab-case` — Vue converts automatically.
+3. Never mutate props. Use `computed()` for transformations, `ref()` + initial value
+   for local copies.
+4. One-way data flow — props down, events up.
+5. Reactive props destructure (3.5+): destructured props are reactive, usable in
+   watch/computed directly.
+6. Pass destructured props to composables via getter: `useComposable(() => id)`.
+
+### Emits
+
+1. Declare all emits with `defineEmits()` — preferably type-based.
+2. Emit in `camelCase`: `emit('someEvent')`. Listen in `kebab-case`:
+   `@some-event="handler"`. Vue converts automatically.
+3. Use named tuple syntax (3.3+) for type-based emits:
+   `defineEmits<{ change: [id: number] }>()`.
+
+### v-model
+
+1. Use `defineModel<T>()` for two-way binding shorthand.
+2. Named v-model: `defineModel<string>('firstName')` with
+   `v-model:first-name="first"` on parent.
+
+### Slots
+
+1. Default slot: `<slot />` in child, content between tags in parent.
+2. Named slots: `<slot name="header" />` in child, `<template #header>` in parent.
+3. Scoped slots: pass data via slot props — `<slot :item="item" />`, consume with
+   `<template #default="{ item }">`.
+
+### Provide / Inject
+
+1. Use `Symbol` keys (`InjectionKey<T>`) for type safety — avoid string collisions.
+2. Export keys from a shared `keys.ts` file.
+3. Provide `readonly()` refs to prevent consumers from mutating state.
+4. Provide updater functions when consumers need to change provided state.
+5. Always provide a default or handle `undefined` in the consumer.
+
+## Template Rules
+
+1. `v-for` always has `:key` — stable, unique identifiers.
+2. Never `v-if` on same element as `v-for`. Use `computed` to filter, or wrap with
+   `<template v-for>`.
+3. Simple expressions only in templates. Move logic to `computed` or functions.
+4. Multi-attribute elements span multiple lines — one attribute per line.
+
+## Composables
+
+### Design
+
+1. Always prefix with `use`: `useMouse`, `useFetch`, `useAuth`.
+2. `camelCase` naming: `useEventListener` not `use-event-listener`.
+3. The `use` prefix signals the function uses Vue reactivity and must be called
+   within `setup()` or `<script setup>`.
+
+### Structure
+
+Follow this order: (1) reactive state, (2) logic that modifies state, (3) lifecycle
+hooks for side effects, (4) return refs.
+
+### Return Values
+
+Always return a plain object containing refs. Never return a `reactive()` object —
+it loses reactivity on destructure. If the consumer wants an object, they can wrap:
+`const mouse = reactive(useMouse())`.
+
+### Input Arguments
+
+Accept refs, getters, and raw values. Use `toValue()` (with `MaybeRefOrGetter<T>` type)
+to normalize inputs inside `watchEffect` so reactive sources are tracked.
+
+### Side Effects and Cleanup
+
+1. Always clean up side effects in `onUnmounted()` — event listeners, timers,
+   subscriptions.
+2. SSR safety: DOM-specific effects go in `onMounted()` / `onUnmounted()`, not at
+   top level.
+
+### Composition
+
+Composables can call other composables — build complex logic by composing simple hooks.
+
+### Usage Restrictions
+
+1. Must be called inside `<script setup>` or `setup()` function.
+2. Must be called synchronously — not inside async callbacks or promises.
+3. Exception: `<script setup>` restores the active instance after `await`, so composables
+   work after `await` in `<script setup>`.
+4. Inside lifecycle hooks like `onMounted()` is acceptable.
+
+### Composables vs Alternatives
+
+| Technique | Drawback |
+|-----------|----------|
+| Mixins | Unclear property sources, namespace collisions, implicit coupling |
+| Renderless components | Extra component instance overhead |
+| Utility functions | No reactive state or lifecycle hooks |
+
+Composables are explicit, namespaced through destructuring, and integrate with Vue's
+reactivity and lifecycle.
+
+## TypeScript
+
+### Props
+
+1. Use `defineProps<T>()` with an interface.
+2. Defaults with 3.5+ destructure: `const { title, count = 0 } = defineProps<Props>()`.
+3. Defaults with 3.4 and below: `withDefaults(defineProps<Props>(), { count: 0 })`.
+   Mutable reference defaults (arrays, objects) must use factory functions with
+   `withDefaults`.
+4. Imported types work since Vue 3.3.
+
+### Emits
+
+Use named tuple syntax (3.3+): `defineEmits<{ change: [id: number] }>()`.
+
+### Refs
+
+1. Refs infer types from initial values — `ref(0)` is `Ref<number>`.
+2. Use explicit type for union types: `ref<string | number>('2024')`.
+3. Nullable: `ref<User | null>(null)`.
+4. Without initial value: `ref<ResponseData>()` yields `Ref<ResponseData | undefined>`.
+
+### Computed
+
+Types are inferred. Use explicit generic only when inference falls short:
+`computed<string>(() => ...)`.
+
+### Reactive
+
+Annotate with interface, do not use `reactive<T>()` generic — the returned type handles
+ref unwrapping differently from the generic parameter.
+
+### Template Refs
+
+- 3.5+: `useTemplateRef<HTMLInputElement>('input')`.
+- Component refs: `useTemplateRef<InstanceType<typeof MyComponent>>('comp')`.
+- Pre-3.5: `ref<HTMLInputElement | null>(null)`.
+
+### Provide / Inject
+
+Use `InjectionKey<T>` for type-safe keys. String keys require generic annotation:
+`inject<string>('key')`.
+
+### Generic Components
+
+Use `generic` attribute on `<script setup>`:
+`<script setup lang="ts" generic="T extends string | number">`.
+
+### Event Handlers
+
+Type DOM events explicitly: `(event: Event)` then cast target:
+`event.target as HTMLInputElement`.
+
+### Utility Types
+
+Use Vue's typed helpers: `Ref<T>`, `ComputedRef<T>`, `MaybeRefOrGetter<T>`,
+`InjectionKey<T>`, `PropType<T>`, `ComponentPublicInstance`. Full utility types
+table in `references/typescript.md`.
+
+## Performance
+
+### Page Load
+
+1. Use dynamic imports for route-level code splitting.
+2. Use `defineAsyncComponent()` for component-level splitting.
+3. Prefer tree-shakable dependencies (`lodash-es` over `lodash`).
+4. `<script setup>` compiles to more minification-friendly code than Options API.
+
+### Update Performance
+
+1. **Props stability** — pass derived booleans (`active="item.id === activeId"`) instead
+   of raw IDs to prevent unnecessary child re-renders.
+2. **`v-once`** — render once, skip all future updates. For truly static content.
+3. **`v-memo`** — conditionally skip sub-tree updates. Accepts a dependency array; only
+   re-renders when a dependency changes. Use on `v-for` lists where most items don't
+   change.
+4. **Computed stability (3.4+)** — computed only triggers effects when value actually
+   changes. Avoid returning new objects from computed (each new object is "different").
+
+### Large Lists
+
+1. Virtual scrolling for 1000+ items — render only visible items
+   (`vue-virtual-scroller`, `vueuc/VVirtualList`).
+2. `shallowRef()` for large immutable datasets — mutations must replace the whole value.
+3. Avoid unnecessary wrapper components in large lists — every component instance has
+   overhead.
+
+### Watch Performance
+
+1. Avoid `{ deep: true }` on large objects — watch specific properties instead.
+2. Throttle/debounce watchers for expensive callbacks (e.g., `useDebounceFn` from
+   VueUse).
+
+### Profiling
+
+1. Enable `app.config.performance = true` for Vue-specific performance markers.
+2. Use Chrome DevTools Performance panel and Vue DevTools profiler.
+3. Measure before and after — don't optimize without data.
 
 ## Application
 
@@ -120,25 +379,8 @@ When **reviewing** Vue code:
 - Cite the specific violation and show the fix inline.
 - Don't lecture or quote the rule — state what's wrong and how to fix it.
 
-```
-Bad review comment:
-  "According to Vue best practices, you should use defineProps
-   with type-based declaration instead of array syntax."
-
-Good review comment:
-  "`defineProps(['title'])` -> `defineProps<{ title: string }>()`
-   -- type-based declaration enables compile-time validation."
-```
-
 ## Integration
 
-This skill provides Vue-specific conventions alongside other skills:
-
-1. **Coding** — Discovery, planning, verification discipline
-2. **JavaScript/TypeScript** — Language-level idioms
-3. **Vue** — Framework-specific patterns (this skill)
-4. **CSS** — Styling conventions within `<style>` blocks
-
-The coding skill governs workflow; language skills govern JS/TS choices;
-this skill governs Vue component architecture, reactivity patterns, and
-framework API usage.
+This skill provides Vue-specific conventions. The coding skill governs workflow;
+language skills govern JS/TS choices; this skill governs component architecture,
+reactivity patterns, and framework API usage.
