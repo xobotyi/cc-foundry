@@ -12,9 +12,9 @@ description: >-
 
 Every coding failure traces to one of three root causes:
 
-1. Acting on assumptions instead of evidence
-2. Skipping verification before declaring done
-3. Burning context on noise instead of signal
+- Acting on assumptions instead of evidence
+- Skipping verification before declaring done
+- Burning context on noise instead of signal
 
 This skill prevents all three.
 
@@ -104,18 +104,18 @@ Before writing code, establish:
 
 <planning-checklist>
 
-1. **Success criteria** — What does "done" look like? Define measurable outcomes, not vague goals.
+- **Success criteria** — What does "done" look like? Define measurable outcomes, not vague goals.
 
-   Bad: "improve the API"
-   Good: "add pagination to /api/users, 100 items/page, response under 200ms"
+  Bad: "improve the API"
+  Good: "add pagination to /api/users, 100 items/page, response under 200ms"
 
-2. **Scope** — What files change? What stays untouched? Explicitly bound the change. Don't
-   "helpfully improve" adjacent code.
+- **Scope** — What files change? What stays untouched? Explicitly bound the change. Don't
+  "helpfully improve" adjacent code.
 
-3. **Risks** — What could break? If modifying shared code, trace all callers first.
+- **Risks** — What could break? If modifying shared code, trace all callers first.
 
-4. **Verification strategy** — How will you prove it works? Tests > manual check > "it looks
-   right". Define this BEFORE writing any implementation code.
+- **Verification strategy** — How will you prove it works? Tests > manual check > "it looks
+  right". Define this BEFORE writing any implementation code.
 
 </planning-checklist>
 

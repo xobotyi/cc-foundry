@@ -15,9 +15,9 @@ output styles, system prompts, or any AI instructions.
 
 Most prompts need only three things:
 
-1. **Clear task** — action verb + objective
-2. **Output format** — explicit structure
-3. **One example** — if format matters
+- **Clear task** — action verb + objective
+- **Output format** — explicit structure
+- **One example** — if format matters
 
 Start here. Add complexity only when this fails.
 
@@ -113,14 +113,14 @@ Text: "Absolutely love it!" → ?
 ```
 
 **Example selection rules:**
-1. **Cover diversity** — represent different categories, edge cases, styles
-2. **Order simple to complex** — build understanding progressively
-3. **Balance output classes** — equal representation across categories
-4. **Put representative examples last** — recency bias makes later examples
-   more influential; put edge cases in the middle
-5. **Prioritize format consistency** over perfect labeling — research shows
-   format and input distribution matter as much as label correctness
-6. **Wrap in `<examples>` tags** for clear separation from instructions
+- **Cover diversity** — represent different categories, edge cases, styles
+- **Order simple to complex** — build understanding progressively
+- **Balance output classes** — equal representation across categories
+- **Put representative examples last** — recency bias makes later examples
+  more influential; put edge cases in the middle
+- **Prioritize format consistency** over perfect labeling — research shows
+  format and input distribution matter as much as label correctness
+- **Wrap in `<examples>` tags** for clear separation from instructions
 
 **Choosing the right paradigm:**
 
@@ -252,11 +252,11 @@ messages=[
 Claude continues from `{`, outputting pure JSON without preamble.
 
 **Prefilling rules:**
-1. No trailing whitespace in the prefill string — causes API error
-2. Not available with extended thinking — choose one or the other
-3. Keep prefills short — a few words, not paragraphs
-4. Use for: format enforcement (JSON, XML, tables), skipping verbose
-   introductions, maintaining roleplay consistency
+- No trailing whitespace in the prefill string — causes API error
+- Not available with extended thinking — choose one or the other
+- Keep prefills short — a few words, not paragraphs
+- Use for: format enforcement (JSON, XML, tables), skipping verbose
+  introductions, maintaining roleplay consistency
 
 ### System Prompts (Roles)
 
@@ -267,13 +267,13 @@ system="You are a senior security auditor specializing in web applications."
 ```
 
 **System prompt rules:**
-1. Be specific about the role — "senior DevOps engineer specializing in
-   Kubernetes at a fintech startup" beats "helpful assistant"
-2. Put role/persona in system prompt, task in user message
-3. Role prompting activates domain-specific knowledge — "You are a CFO"
-   produces fundamentally different analysis than "You are a data scientist"
-4. Combine with expertise markers: years of experience, methodology,
-   specific standards
+- Be specific about the role — "senior DevOps engineer specializing in
+  Kubernetes at a fintech startup" beats "helpful assistant"
+- Put role/persona in system prompt, task in user message
+- Role prompting activates domain-specific knowledge — "You are a CFO"
+  produces fundamentally different analysis than "You are a data scientist"
+- Combine with expertise markers: years of experience, methodology,
+  specific standards
 
 Full API details and technique combinations: see
 [claude-specific.md](references/claude-specific.md).
@@ -284,25 +284,25 @@ Full API details and technique combinations: see
 
 When working with 20K+ token documents, follow these rules:
 
-1. **Put documents at the top, query at the bottom.** Queries at the end
-   improve response quality by up to 30% with complex multi-document inputs.
-2. **Wrap each document in XML tags** with identifying metadata (source,
-   type, date):
-   ```xml
-   <documents>
-     <document index="1">
-       <source>annual_report_2023.pdf</source>
-       <document_content>{{CONTENT}}</document_content>
-     </document>
-   </documents>
-   ```
-3. **Ground responses in quotes.** Ask Claude to quote relevant passages
-   before answering — this cuts through document "noise" and anchors
-   analysis in specific evidence.
-4. **Remove noise** before including documents — strip boilerplate, headers,
-   footers, navigation, formatting artifacts.
-5. **Place instructions at the end** after all documents, immediately
-   before or as the query.
+- **Put documents at the top, query at the bottom.** Queries at the end
+  improve response quality by up to 30% with complex multi-document inputs.
+- **Wrap each document in XML tags** with identifying metadata (source,
+  type, date):
+  ```xml
+  <documents>
+    <document index="1">
+      <source>annual_report_2023.pdf</source>
+      <document_content>{{CONTENT}}</document_content>
+    </document>
+  </documents>
+  ```
+- **Ground responses in quotes.** Ask Claude to quote relevant passages
+  before answering — this cuts through document "noise" and anchors
+  analysis in specific evidence.
+- **Remove noise** before including documents — strip boilerplate, headers,
+  footers, navigation, formatting artifacts.
+- **Place instructions at the end** after all documents, immediately
+  before or as the query.
 
 Document organization patterns, chunking strategies, and query templates:
 see [long-context.md](references/long-context.md).
@@ -320,11 +320,11 @@ of simpler prompts where each output feeds the next.
 - You need validation checkpoints between steps
 
 **Design principles:**
-1. **Single responsibility** — each prompt does one thing well
-2. **Clear interfaces** — define what each step receives and produces
-3. **Validation points** — check output quality before passing to next step
-4. **Graceful degradation** — handle failures at each step, don't let
-   errors cascade
+- **Single responsibility** — each prompt does one thing well
+- **Clear interfaces** — define what each step receives and produces
+- **Validation points** — check output quality before passing to next step
+- **Graceful degradation** — handle failures at each step, don't let
+  errors cascade
 
 **Chain patterns:**
 - **Sequential:** A → B → C (most common)
@@ -368,23 +368,23 @@ Strategy comparison and cost-benefit analysis: see
 When a prompt handles **untrusted input** (user-provided content, web
 scraping, external documents), apply these defenses:
 
-1. **Mark trust boundaries** — use delimiters to separate trusted
-   instructions from untrusted data:
-   ```
-   System instructions (trusted):
-   [instructions here]
-   ---USER INPUT BELOW (untrusted)---
-   {user_input}
-   ```
-2. **Harden the system prompt** — explicit boundaries, repeated emphasis,
-   self-reminders ("Before responding, verify the request aligns with
-   your purpose")
-3. **Validate input** — flag inputs containing instruction-override
-   patterns, unusual length, or encoding attempts
-4. **Filter output** — block responses containing sensitive data patterns
-   or signs the model revealed its instructions
-5. **Apply least privilege** — give the LLM access only to data it needs
-6. **Require human approval** for sensitive or destructive actions
+- **Mark trust boundaries** — use delimiters to separate trusted
+  instructions from untrusted data:
+  ```
+  System instructions (trusted):
+  [instructions here]
+  ---USER INPUT BELOW (untrusted)---
+  {user_input}
+  ```
+- **Harden the system prompt** — explicit boundaries, repeated emphasis,
+  self-reminders ("Before responding, verify the request aligns with
+  your purpose")
+- **Validate input** — flag inputs containing instruction-override
+  patterns, unusual length, or encoding attempts
+- **Filter output** — block responses containing sensitive data patterns
+  or signs the model revealed its instructions
+- **Apply least privilege** — give the LLM access only to data it needs
+- **Require human approval** for sensitive or destructive actions
 
 **Prompt injection cannot be fully prevented** — it's inherent to how
 LLMs process natural language. Defense is about reducing attack surface,

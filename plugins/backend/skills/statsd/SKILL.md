@@ -103,13 +103,13 @@ Example: `myapp.api.request.duration.ms`, `myapp.cache.hit.count.total`
 
 ### Naming Rules
 
-1. Always namespace by service name — `myapp.api.requests` not just `requests`
-2. Use dot-delimited hierarchy
-3. Include the unit: `.ms`, `.bytes`, `.total`, `.items`
-4. Dimensions go in tags, not metric names (when tags are available)
-5. Use lowercase everywhere — some backends are case-sensitive
-6. Use underscores within path segments: `http_request` not `httpRequest`
-7. No dashes — they break Graphite navigation
+- Always namespace by service name — `myapp.api.requests` not just `requests`
+- Use dot-delimited hierarchy
+- Include the unit: `.ms`, `.bytes`, `.total`, `.items`
+- Dimensions go in tags, not metric names (when tags are available)
+- Use lowercase everywhere — some backends are case-sensitive
+- Use underscores within path segments: `http_request` not `httpRequest`
+- No dashes — they break Graphite navigation
 
 See `references/naming.md` for Graphite namespace mapping, character rules table,
 and naming anti-patterns.
@@ -120,9 +120,9 @@ Format: `metric.name:1|c|#key1:value1,key2:value2` — comma-separated, no space
 
 ### Tag Rules
 
-1. Use tags for dimensions you will filter or group by — not metric names
-2. Keep cardinality bounded — each unique tag combination creates a separate time series
-3. No spaces in tag values — use underscores: `region:us_east`
+- Use tags for dimensions you will filter or group by — not metric names
+- Keep cardinality bounded — each unique tag combination creates a separate time series
+- No spaces in tag values — use underscores: `region:us_east`
 
 ### Unified Service Tagging
 
@@ -164,10 +164,10 @@ DogStatsD aggregation details, and pre-aggregated timestamps.
 
 ### Initialization
 
-1. **One client instance per application** — do not create per-request
-2. **Set namespace prefix** — auto-prepends to all metric names
-3. **Set global/constant tags** — env, service, version set once
-4. **Close/flush on shutdown** — buffered metrics lost otherwise
+- **One client instance per application** — do not create per-request
+- **Set namespace prefix** — auto-prepends to all metric names
+- **Set global/constant tags** — env, service, version set once
+- **Close/flush on shutdown** — buffered metrics lost otherwise
 
 ### Buffering
 

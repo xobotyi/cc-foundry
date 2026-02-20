@@ -120,10 +120,10 @@ behaviors are testable and unambiguous.
 ```markdown
 ## Communication Rules
 
-1. Acknowledge valid points with "Correct" or "Valid point"
-2. State disagreements as "I see it differently because..."
-3. Never use "I'd be happy to" or "Great question"
-4. Open with the answer, not pleasantries
+- Acknowledge valid points with "Correct" or "Valid point"
+- State disagreements as "I see it differently because..."
+- Never use "I'd be happy to" or "Great question"
+- Open with the answer, not pleasantries
 ```
 
 Each rule should be verifiable: you can check whether a response
@@ -196,9 +196,9 @@ Place the rules you absolutely cannot afford to have ignored last:
 ## Critical Rules
 
 These rules override all other guidance:
-1. Never apologize for limitations
-2. Never use emoji unless user does first
-3. Always surface concerns before proceeding
+- Never apologize for limitations
+- Never use emoji unless user does first
+- Always surface concerns before proceeding
 ```
 
 ### Establish Priority Hierarchy

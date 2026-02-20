@@ -84,13 +84,13 @@ Prefix with `_`: `_defaultPort`, `_maxRetries`. Exception: error values use `err
 
 ## Interfaces
 
-1. **Consumer-side.** Define where used, not where implemented. Producers return concrete types.
-2. **No premature interfaces.** Wait for a concrete need. Don't define "for mocking."
-3. **Accept interfaces, return structs.**
-4. **Never pointer-to-interface.** Interfaces are already reference types.
-5. **Small interfaces.** Prefer 1-3 methods. `io.Reader` (1 method) is more powerful than any
-   10-method interface.
-6. **Compile-time verification.** `var _ http.Handler = (*Handler)(nil)`.
+- **Consumer-side.** Define where used, not where implemented. Producers return concrete types.
+- **No premature interfaces.** Wait for a concrete need. Don't define "for mocking."
+- **Accept interfaces, return structs.**
+- **Never pointer-to-interface.** Interfaces are already reference types.
+- **Small interfaces.** Prefer 1-3 methods. `io.Reader` (1 method) is more powerful than any
+  10-method interface.
+- **Compile-time verification.** `var _ http.Handler = (*Handler)(nil)`.
 
 ## Receivers
 
@@ -112,10 +112,10 @@ Already reference types. Never use pointers to them: `func process(m map[string]
 
 ## Context
 
-1. **First parameter.** `func Foo(ctx context.Context, ...)`.
-2. **Never store in structs.** Pass through call chains explicitly.
-3. **`context.Background()` only at the top level** — in `main()` or test setup.
-4. **Never include `context.Context` in option structs** — pass as separate parameter.
+- **First parameter.** `func Foo(ctx context.Context, ...)`.
+- **Never store in structs.** Pass through call chains explicitly.
+- **`context.Background()` only at the top level** — in `main()` or test setup.
+- **Never include `context.Context` in option structs** — pass as separate parameter.
 
 ## Declarations
 
@@ -158,28 +158,28 @@ returns, or when the name repeats the type.
 
 ## Functions
 
-1. **Synchronous default.** Let callers add concurrency.
-2. **Return errors, never exit.** Only `main()` calls `os.Exit`/`log.Fatal`.
-3. **`defer` for cleanup.** Always.
-4. **Early return on error.** Happy path at minimum indentation.
-5. **Accept `io.Reader`, not filenames.** Improves reusability and testability.
-6. **Close transient resources.** `defer r.Body.Close()`, `defer rows.Close()`,
-   `defer f.Close()`.
+- **Synchronous default.** Let callers add concurrency.
+- **Return errors, never exit.** Only `main()` calls `os.Exit`/`log.Fatal`.
+- **`defer` for cleanup.** Always.
+- **Early return on error.** Happy path at minimum indentation.
+- **Accept `io.Reader`, not filenames.** Improves reusability and testability.
+- **Close transient resources.** `defer r.Body.Close()`, `defer rows.Close()`,
+  `defer f.Close()`.
 
 ## Error Handling
 
 ### Core Rules
 
-1. **Always check errors.** Never discard with `_`.
-2. **Handle once.** Log OR return — never both. If logging, degrade gracefully (don't return
-   the error). If returning, wrap with context and let the caller decide.
-3. **Wrap with context.** Prefer structured errors when the project uses them:
-   `ErrNotFound.Wrap(err)` or `e.NewFrom("context", err)`. Standard fallback:
-   `fmt.Errorf("context: %w", err)`. Avoid "failed to" prefix in both.
-4. **Error strings**: lowercase, no trailing punctuation. They compose:
-   `"read config: open file: permission denied"`.
-5. **Don't panic.** Return errors. Reserve panic for truly irrecoverable states.
-6. **Use `errors.Is`/`errors.As`** — never `==` or direct type assertion on wrapped errors.
+- **Always check errors.** Never discard with `_`.
+- **Handle once.** Log OR return — never both. If logging, degrade gracefully (don't return
+  the error). If returning, wrap with context and let the caller decide.
+- **Wrap with context.** Prefer structured errors when the project uses them:
+  `ErrNotFound.Wrap(err)` or `e.NewFrom("context", err)`. Standard fallback:
+  `fmt.Errorf("context: %w", err)`. Avoid "failed to" prefix in both.
+- **Error strings**: lowercase, no trailing punctuation. They compose:
+  `"read config: open file: permission denied"`.
+- **Don't panic.** Return errors. Reserve panic for truly irrecoverable states.
+- **Use `errors.Is`/`errors.As`** — never `==` or direct type assertion on wrapped errors.
 
 ### Error Creation
 
@@ -410,8 +410,8 @@ work.
 
 ### Concurrency Rules
 
-1. No goroutines in `init()` — spawn in constructors with lifecycle management.
-2. Use `select` with done/context for cancellable operations.
+- No goroutines in `init()` — spawn in constructors with lifecycle management.
+- Use `select` with done/context for cancellable operations.
 
 ## Testing
 

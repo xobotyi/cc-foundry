@@ -78,39 +78,39 @@ different purpose; choosing wrong causes friction or failure.
 
 ### Skills vs Subagents vs Hooks vs MCP vs CLAUDE.md
 
-1. **Use CLAUDE.md** for persistent project context that applies to every session:
-   coding conventions, repo structure, build commands, team practices. It loads
-   automatically — no invocation needed. Keep it concise; bloated CLAUDE.md causes
-   instruction drift.
+- **Use CLAUDE.md** for persistent project context that applies to every session:
+  coding conventions, repo structure, build commands, team practices. It loads
+  automatically — no invocation needed. Keep it concise; bloated CLAUDE.md causes
+  instruction drift.
 
-2. **Use skills** for reusable domain expertise or workflows that load on-demand.
-   Skills load only when relevant, keeping context clean when not needed. Two
-   content patterns:
-   - **Reference content** — knowledge Claude applies alongside conversation
-     (conventions, patterns, style guides). Runs inline, auto-triggered.
-   - **Task content** — step-by-step actions (deploy, commit, generate). Runs
-     in subagent (`context: fork`), manual invocation
-     (`disable-model-invocation: true`).
+- **Use skills** for reusable domain expertise or workflows that load on-demand.
+  Skills load only when relevant, keeping context clean when not needed. Two
+  content patterns:
+  - **Reference content** — knowledge Claude applies alongside conversation
+    (conventions, patterns, style guides). Runs inline, auto-triggered.
+  - **Task content** — step-by-step actions (deploy, commit, generate). Runs
+    in subagent (`context: fork`), manual invocation
+    (`disable-model-invocation: true`).
 
-3. **Use subagents** for isolated delegated work with tool restrictions or when
-   output is verbose and should not consume main context. Custom agents in
-   `.claude/agents/` get their own system prompt, tool set, and permissions.
-   Subagents cannot spawn other subagents.
+- **Use subagents** for isolated delegated work with tool restrictions or when
+  output is verbose and should not consume main context. Custom agents in
+  `.claude/agents/` get their own system prompt, tool set, and permissions.
+  Subagents cannot spawn other subagents.
 
-4. **Use hooks** for deterministic automation that must always happen — formatting
-   after edits, blocking writes to protected paths, injecting context at session
-   start. Unlike CLAUDE.md instructions (advisory), hooks are guaranteed to run.
+- **Use hooks** for deterministic automation that must always happen — formatting
+  after edits, blocking writes to protected paths, injecting context at session
+  start. Unlike CLAUDE.md instructions (advisory), hooks are guaranteed to run.
 
-5. **Use MCP servers** for connecting to external services: databases, APIs, issue
-   trackers. MCP is the integration layer — use it when Claude needs tools or
-   resources from outside the local environment.
+- **Use MCP servers** for connecting to external services: databases, APIs, issue
+  trackers. MCP is the integration layer — use it when Claude needs tools or
+  resources from outside the local environment.
 
-6. **Use output styles** when you need to change how Claude communicates (tone,
-   format, persona) without changing its capabilities. Styles modify the system
-   prompt and are always active once selected.
+- **Use output styles** when you need to change how Claude communicates (tone,
+  format, persona) without changing its capabilities. Styles modify the system
+  prompt and are always active once selected.
 
-7. **Use plugins** to package and distribute any combination of the above as a
-   single installable unit.
+- **Use plugins** to package and distribute any combination of the above as a
+  single installable unit.
 
 ### Skill Content Design
 

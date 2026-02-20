@@ -34,11 +34,11 @@ bridge — it turns strategic intent into executable work.
 
 Decompose when any of these apply:
 
-1. The technical design touches more than one component
-2. Implementation will take more than a day
-3. Multiple people or agents will work on different parts
-4. The work has non-obvious ordering constraints
-5. You need to track progress at a granular level
+- The technical design touches more than one component
+- Implementation will take more than a day
+- Multiple people or agents will work on different parts
+- The work has non-obvious ordering constraints
+- You need to track progress at a granular level
 
 Skip decomposition when:
 - The technical design scopes a single, self-contained change

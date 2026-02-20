@@ -41,18 +41,18 @@ References contain extended examples, rationale, and edge cases for each topic.
 
 ### `ref()` Is the Primary API
 
-1. Works with primitives (`string`, `number`, `boolean`).
-2. Can be destructured from composable returns without losing reactivity.
-3. Can be reassigned (`count.value = newValue`).
-4. Consistent `.value` access pattern everywhere in script.
-5. Access `.value` in script, omit in template — templates auto-unwrap top-level refs.
+- Works with primitives (`string`, `number`, `boolean`).
+- Can be destructured from composable returns without losing reactivity.
+- Can be reassigned (`count.value = newValue`).
+- Consistent `.value` access pattern everywhere in script.
+- Access `.value` in script, omit in template — templates auto-unwrap top-level refs.
 
 ### `reactive()` Limitations
 
-1. Cannot hold primitives.
-2. Reassignment loses reactivity — `state = reactive({...})` breaks tracking.
-3. Destructuring primitives loses reactivity — use `toRefs()` if you must destructure.
-4. Do not use `reactive()` as the primary primitive. Use `ref()`.
+- Cannot hold primitives.
+- Reassignment loses reactivity — `state = reactive({...})` breaks tracking.
+- Destructuring primitives loses reactivity — use `toRefs()` if you must destructure.
+- Do not use `reactive()` as the primary primitive. Use `ref()`.
 
 ### Ref Unwrapping Rules
 
@@ -64,12 +64,12 @@ References contain extended examples, rationale, and edge cases for each topic.
 
 ### Computed Properties
 
-1. Keep computed getters pure — no side effects.
-2. Split complex computed into smaller ones.
-3. Computed caches its value; only recalculates when dependencies change.
-4. Computed stability (3.4+): only triggers effects when the returned value actually
-   changes. Avoid returning new objects from computed — each new object is "different".
-5. Writable computed is rare — use sparingly. Requires `get`/`set` form.
+- Keep computed getters pure — no side effects.
+- Split complex computed into smaller ones.
+- Computed caches its value; only recalculates when dependencies change.
+- Computed stability (3.4+): only triggers effects when the returned value actually
+  changes. Avoid returning new objects from computed — each new object is "different".
+- Writable computed is rare — use sparingly. Requires `get`/`set` form.
 
 ### Watchers
 
@@ -143,84 +143,84 @@ Full macro catalog in `references/sfc.md`.
 
 ### Scoped Styles
 
-1. Use `<style scoped>` by default. Global styles only in `App.vue` or layouts.
-2. Child component root elements are affected by both parent and child scoped styles.
-3. Deep selectors: `.parent :deep(.child-class)` to style child internals (use sparingly).
-4. CSS modules: `<style module>` generates unique class names, accessed via `$style`.
-5. `v-bind(color)` in `<style>` uses reactive values in CSS.
+- Use `<style scoped>` by default. Global styles only in `App.vue` or layouts.
+- Child component root elements are affected by both parent and child scoped styles.
+- Deep selectors: `.parent :deep(.child-class)` to style child internals (use sparingly).
+- CSS modules: `<style module>` generates unique class names, accessed via `$style`.
+- `v-bind(color)` in `<style>` uses reactive values in CSS.
 
 ## Components
 
 ### Naming
 
-1. Multi-word names always — `TodoItem` not `Item`. Avoids HTML element conflicts.
-2. PascalCase in SFC templates: `<TodoItem />`. Kebab-case only in in-DOM templates.
-3. PascalCase filenames: `TodoItem.vue`.
-4. Base component prefix for presentational components: `BaseButton`, `BaseIcon`.
-5. Parent prefix for tightly coupled children: `TodoListItem`, `TodoListItemButton`.
-6. Highest-level word first to group related: `SearchButtonClear`, `SearchInputQuery`.
-7. Full words always — no abbreviations.
-8. One component per file. No inline registration.
-9. Self-closing tags for components without children: `<MyComponent />`.
-10. PascalCase when importing in JS/TS.
+- Multi-word names always — `TodoItem` not `Item`. Avoids HTML element conflicts.
+- PascalCase in SFC templates: `<TodoItem />`. Kebab-case only in in-DOM templates.
+- PascalCase filenames: `TodoItem.vue`.
+- Base component prefix for presentational components: `BaseButton`, `BaseIcon`.
+- Parent prefix for tightly coupled children: `TodoListItem`, `TodoListItemButton`.
+- Highest-level word first to group related: `SearchButtonClear`, `SearchInputQuery`.
+- Full words always — no abbreviations.
+- One component per file. No inline registration.
+- Self-closing tags for components without children: `<MyComponent />`.
+- PascalCase when importing in JS/TS.
 
 ### Props
 
-1. Use `defineProps<T>()` (type-based) in TypeScript projects. Object syntax in JS
-   projects. Never array syntax in committed code.
-2. Declare in `camelCase`, use in templates as `kebab-case` — Vue converts automatically.
-3. Never mutate props. Use `computed()` for transformations, `ref()` + initial value
-   for local copies.
-4. One-way data flow — props down, events up.
-5. Reactive props destructure (3.5+): destructured props are reactive, usable in
-   watch/computed directly.
-6. Pass destructured props to composables via getter: `useComposable(() => id)`.
+- Use `defineProps<T>()` (type-based) in TypeScript projects. Object syntax in JS
+  projects. Never array syntax in committed code.
+- Declare in `camelCase`, use in templates as `kebab-case` — Vue converts automatically.
+- Never mutate props. Use `computed()` for transformations, `ref()` + initial value
+  for local copies.
+- One-way data flow — props down, events up.
+- Reactive props destructure (3.5+): destructured props are reactive, usable in
+  watch/computed directly.
+- Pass destructured props to composables via getter: `useComposable(() => id)`.
 
 ### Emits
 
-1. Declare all emits with `defineEmits()` — preferably type-based.
-2. Emit in `camelCase`: `emit('someEvent')`. Listen in `kebab-case`:
-   `@some-event="handler"`. Vue converts automatically.
-3. Use named tuple syntax (3.3+) for type-based emits:
-   `defineEmits<{ change: [id: number] }>()`.
+- Declare all emits with `defineEmits()` — preferably type-based.
+- Emit in `camelCase`: `emit('someEvent')`. Listen in `kebab-case`:
+  `@some-event="handler"`. Vue converts automatically.
+- Use named tuple syntax (3.3+) for type-based emits:
+  `defineEmits<{ change: [id: number] }>()`.
 
 ### v-model
 
-1. Use `defineModel<T>()` for two-way binding shorthand.
-2. Named v-model: `defineModel<string>('firstName')` with
-   `v-model:first-name="first"` on parent.
+- Use `defineModel<T>()` for two-way binding shorthand.
+- Named v-model: `defineModel<string>('firstName')` with
+  `v-model:first-name="first"` on parent.
 
 ### Slots
 
-1. Default slot: `<slot />` in child, content between tags in parent.
-2. Named slots: `<slot name="header" />` in child, `<template #header>` in parent.
-3. Scoped slots: pass data via slot props — `<slot :item="item" />`, consume with
-   `<template #default="{ item }">`.
+- Default slot: `<slot />` in child, content between tags in parent.
+- Named slots: `<slot name="header" />` in child, `<template #header>` in parent.
+- Scoped slots: pass data via slot props — `<slot :item="item" />`, consume with
+  `<template #default="{ item }">`.
 
 ### Provide / Inject
 
-1. Use `Symbol` keys (`InjectionKey<T>`) for type safety — avoid string collisions.
-2. Export keys from a shared `keys.ts` file.
-3. Provide `readonly()` refs to prevent consumers from mutating state.
-4. Provide updater functions when consumers need to change provided state.
-5. Always provide a default or handle `undefined` in the consumer.
+- Use `Symbol` keys (`InjectionKey<T>`) for type safety — avoid string collisions.
+- Export keys from a shared `keys.ts` file.
+- Provide `readonly()` refs to prevent consumers from mutating state.
+- Provide updater functions when consumers need to change provided state.
+- Always provide a default or handle `undefined` in the consumer.
 
 ## Template Rules
 
-1. `v-for` always has `:key` — stable, unique identifiers.
-2. Never `v-if` on same element as `v-for`. Use `computed` to filter, or wrap with
-   `<template v-for>`.
-3. Simple expressions only in templates. Move logic to `computed` or functions.
-4. Multi-attribute elements span multiple lines — one attribute per line.
+- `v-for` always has `:key` — stable, unique identifiers.
+- Never `v-if` on same element as `v-for`. Use `computed` to filter, or wrap with
+  `<template v-for>`.
+- Simple expressions only in templates. Move logic to `computed` or functions.
+- Multi-attribute elements span multiple lines — one attribute per line.
 
 ## Composables
 
 ### Design
 
-1. Always prefix with `use`: `useMouse`, `useFetch`, `useAuth`.
-2. `camelCase` naming: `useEventListener` not `use-event-listener`.
-3. The `use` prefix signals the function uses Vue reactivity and must be called
-   within `setup()` or `<script setup>`.
+- Always prefix with `use`: `useMouse`, `useFetch`, `useAuth`.
+- `camelCase` naming: `useEventListener` not `use-event-listener`.
+- The `use` prefix signals the function uses Vue reactivity and must be called
+  within `setup()` or `<script setup>`.
 
 ### Structure
 
@@ -240,10 +240,10 @@ to normalize inputs inside `watchEffect` so reactive sources are tracked.
 
 ### Side Effects and Cleanup
 
-1. Always clean up side effects in `onUnmounted()` — event listeners, timers,
-   subscriptions.
-2. SSR safety: DOM-specific effects go in `onMounted()` / `onUnmounted()`, not at
-   top level.
+- Always clean up side effects in `onUnmounted()` — event listeners, timers,
+  subscriptions.
+- SSR safety: DOM-specific effects go in `onMounted()` / `onUnmounted()`, not at
+  top level.
 
 ### Composition
 
@@ -251,11 +251,11 @@ Composables can call other composables — build complex logic by composing simp
 
 ### Usage Restrictions
 
-1. Must be called inside `<script setup>` or `setup()` function.
-2. Must be called synchronously — not inside async callbacks or promises.
-3. Exception: `<script setup>` restores the active instance after `await`, so composables
-   work after `await` in `<script setup>`.
-4. Inside lifecycle hooks like `onMounted()` is acceptable.
+- Must be called inside `<script setup>` or `setup()` function.
+- Must be called synchronously — not inside async callbacks or promises.
+- Exception: `<script setup>` restores the active instance after `await`, so composables
+  work after `await` in `<script setup>`.
+- Inside lifecycle hooks like `onMounted()` is acceptable.
 
 ### Composables vs Alternatives
 
@@ -272,12 +272,12 @@ reactivity and lifecycle.
 
 ### Props
 
-1. Use `defineProps<T>()` with an interface.
-2. Defaults with 3.5+ destructure: `const { title, count = 0 } = defineProps<Props>()`.
-3. Defaults with 3.4 and below: `withDefaults(defineProps<Props>(), { count: 0 })`.
-   Mutable reference defaults (arrays, objects) must use factory functions with
-   `withDefaults`.
-4. Imported types work since Vue 3.3.
+- Use `defineProps<T>()` with an interface.
+- Defaults with 3.5+ destructure: `const { title, count = 0 } = defineProps<Props>()`.
+- Defaults with 3.4 and below: `withDefaults(defineProps<Props>(), { count: 0 })`.
+  Mutable reference defaults (arrays, objects) must use factory functions with
+  `withDefaults`.
+- Imported types work since Vue 3.3.
 
 ### Emits
 
@@ -285,10 +285,10 @@ Use named tuple syntax (3.3+): `defineEmits<{ change: [id: number] }>()`.
 
 ### Refs
 
-1. Refs infer types from initial values — `ref(0)` is `Ref<number>`.
-2. Use explicit type for union types: `ref<string | number>('2024')`.
-3. Nullable: `ref<User | null>(null)`.
-4. Without initial value: `ref<ResponseData>()` yields `Ref<ResponseData | undefined>`.
+- Refs infer types from initial values — `ref(0)` is `Ref<number>`.
+- Use explicit type for union types: `ref<string | number>('2024')`.
+- Nullable: `ref<User | null>(null)`.
+- Without initial value: `ref<ResponseData>()` yields `Ref<ResponseData | undefined>`.
 
 ### Computed
 
@@ -331,41 +331,41 @@ table in `references/typescript.md`.
 
 ### Page Load
 
-1. Use dynamic imports for route-level code splitting.
-2. Use `defineAsyncComponent()` for component-level splitting.
-3. Prefer tree-shakable dependencies (`lodash-es` over `lodash`).
-4. `<script setup>` compiles to more minification-friendly code than Options API.
+- Use dynamic imports for route-level code splitting.
+- Use `defineAsyncComponent()` for component-level splitting.
+- Prefer tree-shakable dependencies (`lodash-es` over `lodash`).
+- `<script setup>` compiles to more minification-friendly code than Options API.
 
 ### Update Performance
 
-1. **Props stability** — pass derived booleans (`active="item.id === activeId"`) instead
-   of raw IDs to prevent unnecessary child re-renders.
-2. **`v-once`** — render once, skip all future updates. For truly static content.
-3. **`v-memo`** — conditionally skip sub-tree updates. Accepts a dependency array; only
-   re-renders when a dependency changes. Use on `v-for` lists where most items don't
-   change.
-4. **Computed stability (3.4+)** — computed only triggers effects when value actually
-   changes. Avoid returning new objects from computed (each new object is "different").
+- **Props stability** — pass derived booleans (`active="item.id === activeId"`) instead
+  of raw IDs to prevent unnecessary child re-renders.
+- **`v-once`** — render once, skip all future updates. For truly static content.
+- **`v-memo`** — conditionally skip sub-tree updates. Accepts a dependency array; only
+  re-renders when a dependency changes. Use on `v-for` lists where most items don't
+  change.
+- **Computed stability (3.4+)** — computed only triggers effects when value actually
+  changes. Avoid returning new objects from computed (each new object is "different").
 
 ### Large Lists
 
-1. Virtual scrolling for 1000+ items — render only visible items
-   (`vue-virtual-scroller`, `vueuc/VVirtualList`).
-2. `shallowRef()` for large immutable datasets — mutations must replace the whole value.
-3. Avoid unnecessary wrapper components in large lists — every component instance has
-   overhead.
+- Virtual scrolling for 1000+ items — render only visible items
+  (`vue-virtual-scroller`, `vueuc/VVirtualList`).
+- `shallowRef()` for large immutable datasets — mutations must replace the whole value.
+- Avoid unnecessary wrapper components in large lists — every component instance has
+  overhead.
 
 ### Watch Performance
 
-1. Avoid `{ deep: true }` on large objects — watch specific properties instead.
-2. Throttle/debounce watchers for expensive callbacks (e.g., `useDebounceFn` from
-   VueUse).
+- Avoid `{ deep: true }` on large objects — watch specific properties instead.
+- Throttle/debounce watchers for expensive callbacks (e.g., `useDebounceFn` from
+  VueUse).
 
 ### Profiling
 
-1. Enable `app.config.performance = true` for Vue-specific performance markers.
-2. Use Chrome DevTools Performance panel and Vue DevTools profiler.
-3. Measure before and after — don't optimize without data.
+- Enable `app.config.performance = true` for Vue-specific performance markers.
+- Use Chrome DevTools Performance panel and Vue DevTools profiler.
+- Measure before and after — don't optimize without data.
 
 ## Application
 

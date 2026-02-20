@@ -63,10 +63,10 @@ completion.
 
 <research-validation>
 
-1. **Question coverage** — did you answer what was asked?
-2. **Evidence basis** — are claims supported by what you found?
-3. **Gaps acknowledged** — did you note what you couldn't find or verify?
-4. **Actionable output** — can the user do something with this information?
+- **Question coverage** — did you answer what was asked?
+- **Evidence basis** — are claims supported by what you found?
+- **Gaps acknowledged** — did you note what you couldn't find or verify?
+- **Actionable output** — can the user do something with this information?
 
 </research-validation>
 
@@ -74,10 +74,10 @@ completion.
 
 <refactor-validation>
 
-1. **Behavior preservation** — does it still do what it did before?
-2. **Scope adherence** — did you change only what was requested?
-3. **No regressions** — run tests if available
-4. **Improvement achieved** — is the stated goal (readability, performance, etc.) actually better?
+- **Behavior preservation** — does it still do what it did before?
+- **Scope adherence** — did you change only what was requested?
+- **No regressions** — run tests if available
+- **Improvement achieved** — is the stated goal (readability, performance, etc.) actually better?
 
 </refactor-validation>
 

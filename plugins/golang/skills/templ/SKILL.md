@@ -73,8 +73,8 @@ Use `{{ }}` to avoid calling expensive functions twice — cache results in a va
 ### Implicit Variables
 
 Every component has two implicit variables:
-1. **`ctx`** — `context.Context` from the `Render` call. Available in all components.
-2. **`children`** — content passed via `@component() { ... }`. Access with `{ children... }`.
+- **`ctx`** — `context.Context` from the `Render` call. Available in all components.
+- **`children`** — content passed via `@component() { ... }`. Access with `{ children... }`.
 
 ## Components
 
