@@ -16,14 +16,14 @@ understand over clever tricks that save characters.
 
 ### References
 
-| Topic | File |
-|-------|------|
-| Functions, closures, composition | `references/functions.md` |
-| Async patterns, error handling, concurrency | `references/async.md` |
-| Objects, arrays, iteration, Map/Set | `references/objects-and-arrays.md` |
-| ES modules, imports, barrel files | `references/modules.md` |
-| JSDoc typing, full tag catalog | `references/jsdoc.md` |
-| General JS idioms and edge cases | `references/idioms.md` |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Functions, closures, composition | `references/functions.md` | Arrow function examples, closure patterns, early return, parameter destructuring |
+| Async patterns, error handling, concurrency | `references/async.md` | Promise.all/race/any examples, cancellation, custom error classes, for-await |
+| Objects, arrays, iteration, Map/Set | `references/objects-and-arrays.md` | Iteration decision table, destructuring patterns, immutable updates, generators |
+| ES modules, imports, barrel files | `references/modules.md` | Import ordering, barrel file rationale, directory import pitfalls, dynamic imports |
+| JSDoc typing, full tag catalog | `references/jsdoc.md` | Full tag reference (@callback, @template, @enum), type assertions, class modifiers |
+| General JS idioms and edge cases | `references/idioms.md` | Variable/naming examples, equality coercion table, modern syntax patterns |
 
 ## Variables and Declarations
 

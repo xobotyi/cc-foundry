@@ -25,12 +25,12 @@ or `any`, the types are wrong.
 
 ### References
 
-| Topic | File |
-|-------|------|
-| Generics, utility types, conditional/mapped types | `references/generics.md` |
-| Narrowing, type guards, discriminated unions | `references/narrowing.md` |
-| tsconfig options, module resolution, project setup | `references/configuration.md` |
-| Branded types, overloads, class patterns, enums | `references/patterns.md` |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Generics, utility types, type-level programming | `references/generics.md` | Utility type tables, conditional/mapped type examples, infer, template literals |
+| Narrowing, type guards, discriminated unions | `references/narrowing.md` | typeof/instanceof/in examples, exhaustive switch, type predicates, assertion fns |
+| tsconfig options, module resolution, project setup | `references/configuration.md` | Base/strict/module configs, library setup, compiler directives, project structure |
+| Branded types, overloads, class patterns, enums | `references/patterns.md` | Interface vs type examples, assertion patterns, enum anti-patterns, callback types |
 
 ## Type Safety
 

@@ -13,16 +13,16 @@ is proven.
 ## References
 
 Extended examples, code patterns, and detailed rationale for the rules below live in
-`references/`. Key topics:
+`references/`.
 
-| Topic | Reference |
-|-------|-----------|
-| Naming, declarations, interfaces, receivers, configuration, embedding | [idioms.md](references/idioms.md) |
-| Variable shadowing, defer traps, slice mutation, strings, copy safety | [gotchas.md](references/gotchas.md) |
-| Error creation, wrapping, Is/As, structured errors (golib/e) | [errors.md](references/errors.md) |
-| Goroutines, channels, context, sync, errgroup, data races | [concurrency.md](references/concurrency.md) |
-| Table tests, subtests, assertions, test doubles, benchmarks | [testing.md](references/testing.md) |
-| Project layout, packages, imports, file organization | [structure.md](references/structure.md) |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Naming, declarations, interfaces, receivers, configuration, embedding | [idioms.md](references/idioms.md) | Extended code examples for each idiom, Go/bad vs good comparisons, decision criteria tables |
+| Variable shadowing, defer traps, slice mutation, strings, copy safety | [gotchas.md](references/gotchas.md) | Annotated code showing each pitfall with fix patterns, global state examples |
+| Error creation, wrapping, Is/As, structured errors (golib/e) | [errors.md](references/errors.md) | Error type decision tree, golib/e API (sentinels, fields, logging), wrapping context examples |
+| Goroutines, channels, context, sync, errgroup, data races | [concurrency.md](references/concurrency.md) | Worker lifecycle patterns, pipeline/fan-out/fan-in code, data race scenarios with fixes |
+| Table tests, subtests, assertions, test doubles, benchmarks | [testing.md](references/testing.md) | Full table-test template, testify usage, parallel subtests, httptest/iotest utilities |
+| Project layout, packages, imports, file organization | [structure.md](references/structure.md) | Package naming examples, import grouping, backward-incompatible change staged workflow |
 
 ## Naming
 

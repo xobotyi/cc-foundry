@@ -28,6 +28,20 @@ Tailwind CSS uses CSS-first configuration: design tokens live in `@theme`,
 custom utilities use `@utility`, and there is no JavaScript configuration
 file. Constrain yourself to the design system; break out only with intention.
 
+## References
+
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Theme | `references/theme-configuration.md` | Theme tokens, `@theme` options, namespace mapping, color system |
+| Class authoring | `references/class-authoring.md` | Class composition, variants, dark mode, breakpoints |
+| Custom utilities | `references/custom-utilities-and-variants.md` | `@utility`, `@custom-variant`, directives, `@source` |
+| Layout | `references/layout.md` | Display, position, flexbox, grid, alignment, order utilities |
+| Sizing | `references/sizing-and-spacing.md` | Spacing scale, width/height, padding/margin, borders, box model |
+| Typography | `references/typography.md` | Font properties, text spacing, styling, decoration, layout |
+| Backgrounds | `references/backgrounds-and-effects.md` | Gradients, shadows, rings, opacity, SVG, filters |
+| Transforms | `references/transforms-and-animations.md` | Transitions, animations, 2D/3D transforms, masks |
+| Framework | `references/framework-integration.md` | Preflight, CSS Modules, class binding (React, Vue, Svelte) |
+
 ## Entry Point and Installation
 
 1. Single import: `@import "tailwindcss";` — provides preflight reset, theme
@@ -400,20 +414,6 @@ When **writing** Tailwind CSS:
 When **reviewing** Tailwind CSS:
 - Cite the specific violation and show the fix inline.
 - Don't lecture — state what's wrong and how to fix it.
-
-## References
-
-| File | Contents |
-|------|----------|
-| `references/theme-configuration.md` | Theme tokens, `@theme` options, namespace mapping, color system |
-| `references/class-authoring.md` | Class composition, variants, dark mode, breakpoints |
-| `references/custom-utilities-and-variants.md` | `@utility`, `@custom-variant`, directives, `@source` |
-| `references/layout.md` | Display, position, flexbox, grid, alignment, order utilities |
-| `references/sizing-and-spacing.md` | Spacing scale, width/height, padding/margin, borders, box model |
-| `references/typography.md` | Font properties, text spacing, styling, decoration, layout |
-| `references/backgrounds-and-effects.md` | Gradients, shadows, rings, opacity, SVG, filters |
-| `references/transforms-and-animations.md` | Transitions, animations, 2D/3D transforms, masks |
-| `references/framework-integration.md` | Preflight, CSS Modules, class binding (React, Vue, Svelte) |
 
 ## Integration
 

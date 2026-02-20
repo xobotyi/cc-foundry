@@ -15,14 +15,14 @@ Vite config (aliases, plugins, transforms) so tests run against the same code yo
 
 ## References
 
-| Reference | Contains |
-|-----------|----------|
-| `references/mocking.md` | Full mocking rules, module mocking patterns, cleanup strategy |
-| `references/assertions.md` | Matcher tables, asymmetric matchers, soft assertions |
-| `references/lifecycle.md` | Hook execution order, test context, setup files, global setup |
-| `references/configuration.md` | Config file options, projects, pools, sharding, env vars |
-| `references/coverage.md` | Coverage providers, thresholds, ignore comments, performance |
-| `references/jest-migration.md` | Jest API translation, key behavioral differences, Mocha/Sinon |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Mocking | `references/mocking.md` | Full mocking rules, module mocking patterns, cleanup strategy |
+| Assertions | `references/assertions.md` | Matcher tables, asymmetric matchers, soft assertions |
+| Lifecycle | `references/lifecycle.md` | Hook execution order, test context, setup files, global setup |
+| Configuration | `references/configuration.md` | Config file options, projects, pools, sharding, env vars |
+| Coverage | `references/coverage.md` | Coverage providers, thresholds, ignore comments, performance |
+| Jest migration | `references/jest-migration.md` | Jest API translation, key behavioral differences, Mocha/Sinon |
 
 ## Test Structure
 

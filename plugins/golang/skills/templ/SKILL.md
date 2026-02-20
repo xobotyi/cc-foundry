@@ -16,14 +16,14 @@ Inside = templ syntax.
 
 Extended examples and detailed patterns for the rules below:
 
-| Topic | Reference |
-|-------|-----------|
-| Template syntax, expressions, control flow, raw Go blocks | [syntax.md](references/syntax.md) |
-| Component definition, composition, children, fragments | [components.md](references/components.md) |
-| Boolean, conditional, spread attributes, key expressions | [attributes.md](references/attributes.md) |
-| View models, layouts, context, html/template interop | [patterns.md](references/patterns.md) |
-| Script/style tags, inline events, data passing to JS | [javascript.md](references/javascript.md) |
-| Class patterns, CSS components, style attributes | [styling.md](references/styling.md) |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Template syntax, expressions, control flow, raw Go blocks | [syntax.md](references/syntax.md) | File structure, expression types, error propagation, auto-escaping, control flow examples |
+| Component definition, composition, children, fragments | [components.md](references/components.md) | Component interface, `@` composition, children context API, render-once, fragment rendering |
+| Boolean, conditional, spread attributes, key expressions | [attributes.md](references/attributes.md) | Attribute types with code examples, spread value table, URL/JS/JSON attribute patterns |
+| View models, layouts, context, html/template interop | [patterns.md](references/patterns.md) | Props struct pattern, nested layouts, context helpers with middleware, Go template interop |
+| Script/style tags, inline events, data passing to JS | [javascript.md](references/javascript.md) | JSFuncCall/JSExpression/JSONString/JSONScript API, IIFE pattern, method summary table |
+| Class patterns, CSS components, style attributes | [styling.md](references/styling.md) | Class toggling approaches (KV, maps, raw Go), CSS component scoping, style sanitization |
 
 ## Syntax
 

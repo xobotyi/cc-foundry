@@ -15,6 +15,16 @@ to work, restructure the cascade.**
 CSS rewards explicit, low-specificity selectors and intentional cascade
 ordering. Prefer boring, readable patterns over clever one-liners.
 
+## References
+
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Layout | `references/layout.md` | Flex shorthand values, grid details (subgrid, implicit rows, alignment), layout patterns |
+| Modern CSS | `references/modern-css.md` | Extended modern CSS patterns and examples |
+| SCSS | `references/scss.md` | `@forward` patterns, module configuration, built-in modules, file organization |
+| Responsive | `references/responsive.md` | Extended responsive design patterns and examples |
+| Methodologies | `references/methodologies.md` | Methodology patterns and architecture details |
+
 ## Selectors and Specificity
 
 1. Single class selectors by default — keep specificity flat at 0-1-0
@@ -332,16 +342,6 @@ Bad review comment:
 Good review comment:
   "`#header` -> `.header` -- IDs create specificity 1-0-0, difficult to override."
 ```
-
-## References
-
-| File | Contents |
-|------|----------|
-| `references/layout.md` | Flex shorthand values, grid details (subgrid, implicit rows, alignment), layout patterns |
-| `references/modern-css.md` | Extended modern CSS patterns and examples |
-| `references/scss.md` | `@forward` patterns, module configuration, built-in modules, file organization |
-| `references/responsive.md` | Extended responsive design patterns and examples |
-| `references/methodologies.md` | Methodology patterns and architecture details |
 
 ## Integration
 
