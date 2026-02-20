@@ -2,58 +2,86 @@
 
 > **Latest docs:** https://code.claude.com/docs/en/statusline.md
 
-Custom status line displays contextual information at the bottom of
-Claude Code, similar to terminal prompts (PS1) in shells like Oh-my-zsh.
+A customizable bar at the bottom of Claude Code. Runs any shell script you configure — the script
+receives JSON session data on stdin and displays whatever it prints to stdout.
 
 ## Configuration
 
-Add `statusLine` to `.claude/settings.json`:
+Add `statusLine` to `~/.claude/settings.json` (user) or `.claude/settings.json` (project):
 
 ```json
 {
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
-    "padding": 0
+    "padding": 2
   }
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `type` | Must be `"command"` |
-| `command` | Path to script (absolute or `~/` relative) |
-| `padding` | Optional: set to `0` to let status line reach edge |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | Yes | Must be `"command"` |
+| `command` | Yes | Script path or inline shell command |
+| `padding` | No | Extra horizontal spacing in characters (default `0`) |
 
-**Settings scopes apply:** Can be configured at user, project, or local level.
+**Critical — command runs from CWD:** The status line command executes from Claude Code's
+current working directory. If the `command` uses a relative path (e.g., `./statusline.sh`
+or `.claude/statusline.sh`), it will break whenever Claude performs a `cd` operation to a
+different directory. **Always use absolute paths** — either a full path
+(`/home/user/.claude/statusline.sh`), home directory expansion (`~/.claude/statusline.sh`),
+or an environment variable (`"$CLAUDE_PROJECT_DIR/.claude/statusline.sh"`).
 
-## How It Works
-
-- Updated when conversation messages change
-- Updates run at most every 300ms
-- First line of stdout becomes status line text
-- ANSI color codes supported
-- JSON context passed to script via stdin
-
-## JSON Input Structure
-
-Script receives session data via stdin:
+**Inline command** (no script file needed):
 
 ```json
 {
-  "hook_event_name": "Status",
+  "statusLine": {
+    "type": "command",
+    "command": "jq -r '[\\(.model.display_name)] \\(.context_window.used_percentage // 0)% context'"
+  }
+}
+```
+
+**Interactive setup:** `/statusline show model name and context percentage` — Claude generates the
+script and updates settings automatically.
+
+**Disable:** `/statusline remove` or delete the `statusLine` key from settings.
+
+**Note:** If `disableAllHooks` is `true`, the status line is also disabled.
+
+## How It Works
+
+- Runs after each new assistant message, permission mode change, or vim mode toggle
+- Updates debounced at 300ms — rapid changes batch; script runs once things settle
+- If a new update triggers while script is still running, in-flight execution is cancelled
+- Script changes don't appear until the next interaction triggers an update
+- Does **not** consume API tokens
+- Temporarily hidden during autocomplete, help menu, and permission prompts
+
+**Output capabilities:**
+- Multiple lines: each `echo` creates a separate row
+- Colors: ANSI escape codes (`\033[32m` green, `\033[33m` yellow, `\033[0m` reset)
+- Clickable links: OSC 8 escape sequences (requires iTerm2, Kitty, or WezTerm)
+
+## JSON Input Schema
+
+Script receives this structure via stdin on each update:
+
+```json
+{
   "session_id": "abc123...",
-  "transcript_path": "/path/to/transcript.json",
+  "transcript_path": "/path/to/transcript.jsonl",
   "cwd": "/current/working/directory",
+  "version": "1.0.80",
   "model": {
-    "id": "claude-opus-4-1",
+    "id": "claude-opus-4-6",
     "display_name": "Opus"
   },
   "workspace": {
     "current_dir": "/current/working/directory",
     "project_dir": "/original/project/directory"
   },
-  "version": "1.0.80",
   "output_style": {
     "name": "default"
   },
@@ -68,92 +96,132 @@ Script receives session data via stdin:
     "total_input_tokens": 15234,
     "total_output_tokens": 4521,
     "context_window_size": 200000,
-    "used_percentage": 42.5,
-    "remaining_percentage": 57.5,
+    "used_percentage": 8,
+    "remaining_percentage": 92,
     "current_usage": {
       "input_tokens": 8500,
       "output_tokens": 1200,
       "cache_creation_input_tokens": 5000,
       "cache_read_input_tokens": 2000
     }
+  },
+  "exceeds_200k_tokens": false,
+  "vim": { "mode": "NORMAL" },
+  "agent": { "name": "security-reviewer" }
+}
+```
+
+**Fields that may be absent:**
+- `vim` — only present when vim mode is enabled
+- `agent` — only present when running with `--agent` flag or agent settings configured
+
+**Fields that may be `null`:**
+- `context_window.current_usage` — `null` before the first API call
+- `context_window.used_percentage`, `context_window.remaining_percentage` — may be `null` early
+  in the session
+
+Always use fallbacks: `// 0` in jq, `or 0` in Python, `|| 0` in JS.
+
+## Available Fields
+
+| Field | Description |
+|-------|-------------|
+| `model.id` | Model identifier (e.g., `claude-opus-4-6`) |
+| `model.display_name` | Human-readable name (e.g., `Opus`) |
+| `cwd` | Current working directory (alias for `workspace.current_dir`) |
+| `workspace.current_dir` | Current working directory (preferred) |
+| `workspace.project_dir` | Directory where Claude Code was launched |
+| `session_id` | Unique session identifier |
+| `transcript_path` | Path to conversation transcript file |
+| `version` | Claude Code version string |
+| `output_style.name` | Name of the active output style |
+| `vim.mode` | `NORMAL` or `INSERT` when vim mode is enabled |
+| `agent.name` | Agent name when running with `--agent` flag |
+| `cost.total_cost_usd` | Session cost in USD |
+| `cost.total_duration_ms` | Total elapsed time since session start (ms) |
+| `cost.total_api_duration_ms` | Time spent waiting for API responses (ms) |
+| `cost.total_lines_added` | Lines of code added in session |
+| `cost.total_lines_removed` | Lines of code removed in session |
+| `context_window.context_window_size` | Max context tokens (200000 default, 1000000 extended) |
+| `context_window.used_percentage` | Pre-calculated usage percentage |
+| `context_window.remaining_percentage` | Pre-calculated remaining percentage |
+| `context_window.total_input_tokens` | Cumulative input tokens (whole session) |
+| `context_window.total_output_tokens` | Cumulative output tokens (whole session) |
+| `context_window.current_usage` | Token counts from most recent API call (see below) |
+| `exceeds_200k_tokens` | Whether recent response exceeded 200k tokens (fixed threshold) |
+
+### Context Window Detail
+
+`current_usage` sub-fields (null before first API call):
+
+| Field | Description |
+|-------|-------------|
+| `input_tokens` | Input tokens in current context |
+| `output_tokens` | Output tokens generated |
+| `cache_creation_input_tokens` | Tokens written to cache |
+| `cache_read_input_tokens` | Tokens read from cache |
+
+**`used_percentage` formula:** `(input_tokens + cache_creation_input_tokens + cache_read_input_tokens)
+/ context_window_size × 100` — does **not** include `output_tokens`.
+
+Use `current_usage` (not cumulative totals) for accurate context percentage. Cumulative totals
+accumulate across the whole session and can exceed context window size.
+
+## Implementation Notes
+
+**Script contract:** Read JSON from stdin, print display text to stdout. Any language works —
+the script is a standalone process. Non-zero exit or no output produces a blank status line.
+
+**Multiple lines:** Each line of stdout becomes a separate status line row.
+
+**Colors:** Use ANSI escape codes (`\033[32m` for green, `\033[0m` for reset). Prefer
+`printf '%b'` over `echo -e` for reliable escape handling across shells.
+
+**Clickable links:** Use OSC 8 escape sequences (`\e]8;;<url>\a<text>\e]8;;\a`). Only works
+in iTerm2, Kitty, and WezTerm. Terminal.app and SSH/tmux sessions may strip these sequences.
+
+**Caching slow operations:** Each invocation spawns a new process — `$$` and PID differ every
+time. Cache to a fixed filename (e.g., `/tmp/statusline-cache`) with a staleness check.
+Operations like `git status` on large repos cause visible lag without caching.
+
+**Null handling:** Several fields are `null` before the first API call. Always use fallbacks
+in your parsing (`// 0` in jq, `or 0` in Python, `|| 0` in JS).
+
+## Plugin Delivery
+
+Status line scripts can ship in a plugin directory, but users must configure them manually:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/plugins/my-plugin/statusline.sh"
   }
 }
 ```
 
-## Available Fields
+Plugins cannot auto-enable the status line — the user must add `statusLine` to their settings.
 
-### Model
+## Tips and Pitfalls
 
-| Field | Description |
-|-------|-------------|
-| `model.id` | Model identifier (e.g., `claude-opus-4-1`) |
-| `model.display_name` | Human-readable name (e.g., `Opus`) |
-
-### Workspace
-
-| Field | Description |
-|-------|-------------|
-| `cwd` | Current working directory |
-| `workspace.current_dir` | Same as `cwd` |
-| `workspace.project_dir` | Original project directory |
-
-### Session
-
-| Field | Description |
-|-------|-------------|
-| `session_id` | Unique session identifier |
-| `transcript_path` | Path to session transcript |
-| `version` | Claude Code version |
-| `output_style.name` | Active output style |
-
-### Cost
-
-| Field | Description |
-|-------|-------------|
-| `cost.total_cost_usd` | Session cost in USD |
-| `cost.total_duration_ms` | Total session duration |
-| `cost.total_api_duration_ms` | Time spent in API calls |
-| `cost.total_lines_added` | Lines added in session |
-| `cost.total_lines_removed` | Lines removed in session |
-
-### Context Window
-
-| Field | Description |
-|-------|-------------|
-| `context_window.total_input_tokens` | Cumulative input tokens |
-| `context_window.total_output_tokens` | Cumulative output tokens |
-| `context_window.context_window_size` | Max context size (e.g., 200000) |
-| `context_window.used_percentage` | Pre-calculated usage (0-100) |
-| `context_window.remaining_percentage` | Pre-calculated remaining (0-100) |
-| `context_window.current_usage` | Current context usage (may be `null`) |
-
-### Current Usage (nested)
-
-| Field | Description |
-|-------|-------------|
-| `current_usage.input_tokens` | Input tokens in current context |
-| `current_usage.output_tokens` | Output tokens generated |
-| `current_usage.cache_creation_input_tokens` | Tokens written to cache |
-| `current_usage.cache_read_input_tokens` | Tokens read from cache |
-
-## Interactive Setup
-
-Run `/statusline` to have Claude Code help create a custom status line.
-Provide instructions like `/statusline show model name in orange`.
+| Tip | Detail |
+|-----|--------|
+| Test with mock input | `echo '{"model":{"display_name":"Opus"},"context_window":{"used_percentage":25}}' | ./statusline.sh` |
+| Keep output short | Long output truncates or wraps on narrow terminals |
+| Cache slow commands | `git status`/`git diff` on large repos cause lag; cache to `/tmp/fixed-name` |
+| Fixed cache filename | Never use `$$` or PID — each run is a new process, cache is never reused |
+| Use `printf '%b'` not `echo -e` | More reliable escape sequence handling across shells |
+| Notifications share the row | MCP errors, token warnings display on the right; narrow terminals truncate status |
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Status line doesn't appear | Check script is executable (`chmod +x`) |
-| No output | Ensure script writes to stdout, not stderr |
-| Script errors | Test manually: `echo '{"model":{"display_name":"Test"}}' | ./script.sh` |
-
-## Plugin Delivery
-
-Status line scripts can be included in plugins but must be configured
-via settings. Plugins cannot auto-enable statusLine — users must add
-the `statusLine` configuration to their settings.
-
-For project-wide status lines, add configuration to `.claude/settings.json`
-(committed) or `.claude/settings.local.json` (gitignored).
+| Symptom | Fix |
+|---------|-----|
+| Status line not appearing | `chmod +x` the script; check stdout (not stderr); verify `disableAllHooks` is not `true` |
+| Empty or `--` values | Fields are `null` before first API call; add `// 0` fallbacks |
+| Wrong context percentage | Use `used_percentage` not cumulative totals; cumulative can exceed window size |
+| OSC 8 links not clickable | Requires iTerm2/Kitty/WezTerm; Terminal.app unsupported; SSH/tmux may strip OSC sequences |
+| Escape sequences as literal text | Use `printf '%b'` instead of `echo -e` |
+| Display glitches | Simplify to plain text; multi-line + escape codes are most prone to rendering issues |
+| Script hangs or errors | Non-zero exit or no output → blank status line; test independently with mock input |
+| Status line truncated | Terminal too narrow; notifications on right side consume space |
