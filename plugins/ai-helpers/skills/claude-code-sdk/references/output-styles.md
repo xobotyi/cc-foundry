@@ -3,50 +3,47 @@
 > **Action Required:** When creating, editing, or improving output styles,
 > invoke the `ai-helpers:output-style-engineering` skill first.
 
-Output styles adapt Claude Code for uses beyond software engineering by
-modifying the system prompt.
+Output styles adapt Claude Code for uses beyond software engineering by modifying the system
+prompt. They replace parts of the default prompt rather than appending to it.
 
 ## Built-in Styles
 
-| Style         | Description                                                  |
-|---------------|--------------------------------------------------------------|
-| **Default**   | Efficient software engineering                               |
-| **Explanatory** | Educational "Insights" between tasks, explains patterns    |
-| **Learning**  | Collaborative mode with `TODO(human)` markers for you to implement |
+| Style           | Description                                                                    |
+|-----------------|--------------------------------------------------------------------------------|
+| **Default**     | Efficient software engineering                                                 |
+| **Explanatory** | Educational "Insights" between tasks, explains implementation choices/patterns |
+| **Learning**    | Collaborative mode; shares Insights + adds `TODO(human)` markers for you to implement |
 
 ## How Output Styles Work
 
-- All styles exclude instructions for efficient output (responding concisely)
-- Custom styles exclude coding instructions unless `keep-coding-instructions: true`
-- Style instructions added to end of system prompt
-- Reminders triggered during conversation to maintain style adherence
+- All styles **exclude** efficient-output instructions (e.g., "respond concisely")
+- Custom styles **exclude** coding instructions unless `keep-coding-instructions: true`
+- Style instructions are appended to the end of the system prompt
+- Reminders are triggered during conversation to maintain style adherence
 
 ## Change Your Output Style
 
-**Via menu:**
-
 ```
-/output-style
-```
-
-Or access from `/config` menu.
-
-**Direct switch:**
-
-```
-/output-style explanatory
+/output-style                  # interactive menu (also accessible from /config)
+/output-style explanatory      # direct switch
 ```
 
-Changes saved to `.claude/settings.local.json` (local project level).
+Changes apply at local project level and are saved to `.claude/settings.local.json`.
+You can also directly edit the `outputStyle` field in any settings file at any scope.
 
 ## Create Custom Output Styles
 
-Custom styles are Markdown files with frontmatter:
+Custom styles are Markdown files with frontmatter, stored at:
+
+| Scope   | Path                      |
+|---------|---------------------------|
+| User    | `~/.claude/output-styles/` |
+| Project | `.claude/output-styles/`  |
 
 ```markdown
 ---
 name: My Custom Style
-description: Brief description for the UI
+description: Brief description shown in /output-style UI
 keep-coding-instructions: true
 ---
 
@@ -60,40 +57,31 @@ tasks. [Your custom instructions here...]
 [Define how the assistant should behave...]
 ```
 
-**Locations:**
-
-- User level: `~/.claude/output-styles/`
-- Project level: `.claude/output-styles/`
-
 ## Frontmatter
 
-| Field                    | Purpose                                      | Default           |
-|--------------------------|----------------------------------------------|-------------------|
-| `name`                   | Display name                                 | From filename     |
-| `description`            | Shown in `/output-style` UI                  | None              |
-| `keep-coding-instructions` | Keep coding-related system prompt parts    | `false`           |
+| Field                      | Purpose                                              | Default       |
+|----------------------------|------------------------------------------------------|---------------|
+| `name`                     | Display name                                         | From filename |
+| `description`              | Shown in `/output-style` UI                          | None          |
+| `keep-coding-instructions` | Keep coding-related parts of the default system prompt | `false`     |
 
 ## Comparisons
 
-### Output Styles vs CLAUDE.md
+| Feature                  | Modifies system prompt | Subtractive | Additive | Scope         |
+|--------------------------|------------------------|-------------|----------|---------------|
+| Output styles            | Yes                    | Yes         | Yes      | Always active |
+| CLAUDE.md                | No (added as user msg) | No          | Yes      | Always loaded |
+| `--append-system-prompt` | Yes (append only)      | No          | Yes      | Session flag  |
+| Agents                   | No (own system prompt) | —           | —        | Task-invoked  |
+| Skills                   | No (injected prompt)   | —           | Yes      | On-demand     |
 
-- **Output styles**: Modify/replace parts of default system prompt
-- **CLAUDE.md**: Added as user message after system prompt (additive)
+**Key distinctions:**
 
-### Output Styles vs --append-system-prompt
-
-- **Output styles**: Can exclude default instructions (subtractive + additive)
-- **--append-system-prompt**: Only appends to system prompt (additive)
-
-### Output Styles vs Agents
-
-- **Output styles**: Always active, only affect system prompt
-- **Agents**: Invoked for specific tasks, include model/tools/context settings
-
-### Output Styles vs Skills
-
-- **Output styles**: Modify response formatting/tone, always active when selected
-- **Skills**: Task-specific prompts invoked with `/skill-name` or auto-loaded
-
-Use output styles for consistent formatting preferences.
-Use skills for reusable workflows and tasks.
+- **vs CLAUDE.md**: Output styles replace parts of the default prompt; CLAUDE.md adds content
+  as a user message *after* the system prompt — it cannot remove default instructions.
+- **vs `--append-system-prompt`**: That flag only appends; output styles can also suppress
+  default sections.
+- **vs Agents**: Agents are invoked for specific tasks and control model, tools, and context.
+  Output styles only affect the main agent's system prompt.
+- **vs Skills**: Output styles are always active once selected and shape formatting/tone.
+  Skills are task-specific and invoked on demand.
