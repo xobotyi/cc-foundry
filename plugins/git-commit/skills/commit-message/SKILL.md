@@ -27,9 +27,9 @@ Before writing, imagine:
 <context-principle>
 The best commit messages draw from three sources:
 
-1. **The task** — what problem was being solved
-2. **The implementation context** — why this approach was chosen
-3. **The deliverable** — what was actually built
+- **The task** — what problem was being solved
+- **The implementation context** — why this approach was chosen
+- **The deliverable** — what was actually built
 
 When all three are available, use them. The code shows WHAT exists; context reveals WHY.
 When context is incomplete, describe what you can verify from the code and available information.
@@ -115,9 +115,9 @@ A good commit message is very rarely single-line.
 
 The body is where you communicate with future readers. It answers:
 
-1. **What** changed beyond the subject
-2. **Why** this change was needed
-3. **How to verify** if not obvious
+- **What** changed beyond the subject
+- **Why** this change was needed
+- **How to verify** if not obvious
 </body-philosophy>
 
 ### When Body is Essential
@@ -379,11 +379,11 @@ Commits must appear as regular developer commits.
 <critical>
 ## Core Principles
 
-1. **Use available context** — draw from task, implementation, and deliverable when available
-2. **Factual subjects** — describe what, not how good
-3. **Explain the cause** — for bug fixes, say WHY it was broken
-4. **Body is essential** — single-line commits are rarely acceptable
-5. **BREAKING first** — breaking changes start body with `BREAKING:` prefix
-6. **Trailers for metadata** — use Title-Case, structured format
-7. **No AI attribution** — commits appear as regular developer work
+- **Use available context** — draw from task, implementation, and deliverable when available
+- **Factual subjects** — describe what, not how good
+- **Explain the cause** — for bug fixes, say WHY it was broken
+- **Body is essential** — single-line commits are rarely acceptable
+- **BREAKING first** — breaking changes start body with `BREAKING:` prefix
+- **Trailers for metadata** — use Title-Case, structured format
+- **No AI attribution** — commits appear as regular developer work
 </critical>

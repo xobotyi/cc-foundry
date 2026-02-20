@@ -26,53 +26,53 @@ Vite config (aliases, plugins, transforms) so tests run against the same code yo
 
 ## Test Structure
 
-1. **Import explicitly.** `import { describe, it, expect, vi } from 'vitest'` — do not
-   rely on globals unless the project has `globals: true` configured.
-2. **One concept per test.** Name tests by behavior: `'returns empty array when input
-   is null'`, not `'test case 1'`.
-3. **Use `describe` for grouping.** Group by unit (function, class, component), not by
-   test type.
-4. **Prefer `it` over `test`.** Both work, but `it` reads better inside `describe`:
-   `describe('parseUrl', () => { it('extracts hostname', ...) })`.
-5. **Use `it.each` / `describe.each`** for parametrized tests. Supports array form and
-   template literal form with `$key` interpolation.
-6. **Test modifiers:** `it.skip`, `it.only`, `it.todo`, `it.fails`, `it.skipIf(cond)`,
-   `it.runIf(cond)`.
-7. **Retry:** `it('name', { retry: 3 }, fn)`. **Repeat:** `it('name', { repeats: 100 }, fn)`.
-8. **Concurrent tests:** `describe.concurrent(...)` — use `expect` from test context
-   (destructured parameter) for correct snapshot/assertion tracking.
+- **Import explicitly.** `import { describe, it, expect, vi } from 'vitest'` — do not
+  rely on globals unless the project has `globals: true` configured.
+- **One concept per test.** Name tests by behavior: `'returns empty array when input
+  is null'`, not `'test case 1'`.
+- **Use `describe` for grouping.** Group by unit (function, class, component), not by
+  test type.
+- **Prefer `it` over `test`.** Both work, but `it` reads better inside `describe`:
+  `describe('parseUrl', () => { it('extracts hostname', ...) })`.
+- **Use `it.each` / `describe.each`** for parametrized tests. Supports array form and
+  template literal form with `$key` interpolation.
+- **Test modifiers:** `it.skip`, `it.only`, `it.todo`, `it.fails`, `it.skipIf(cond)`,
+  `it.runIf(cond)`.
+- **Retry:** `it('name', { retry: 3 }, fn)`. **Repeat:** `it('name', { repeats: 100 }, fn)`.
+- **Concurrent tests:** `describe.concurrent(...)` — use `expect` from test context
+  (destructured parameter) for correct snapshot/assertion tracking.
 
 ## Mocking
 
 ### Function Mocks
 
-1. **`vi.fn()`** creates a standalone trackable mock. Optionally accepts implementation.
-2. **`vi.spyOn(obj, 'method')`** wraps existing method while preserving original. Also
-   supports `vi.spyOn(obj, 'prop', 'get')` for getters/setters.
-3. **Prefer `vi.spyOn` over `vi.mock`** when you only need to observe or override a
-   single export.
+- **`vi.fn()`** creates a standalone trackable mock. Optionally accepts implementation.
+- **`vi.spyOn(obj, 'method')`** wraps existing method while preserving original. Also
+  supports `vi.spyOn(obj, 'prop', 'get')` for getters/setters.
+- **Prefer `vi.spyOn` over `vi.mock`** when you only need to observe or override a
+  single export.
 
 ### Module Mocking
 
-4. **`vi.mock()` is hoisted.** It moves to top of file regardless of where you write it.
-   Always runs before imports.
-5. **Factory must return an object** with explicit exports. ESM requires explicit `default`
-   key: `vi.mock('./mod', () => ({ default: val, namedExport: vi.fn() }))`.
-6. **Partial mocking with `importOriginal`:**
-   `vi.mock(import('./api'), async (importOriginal) => ({ ...await importOriginal(), fetchUser: vi.fn() }))`.
-7. **`vi.doMock()`** is not hoisted — runs at position. Only affects subsequent dynamic
-   `import()` calls. Use when you need per-test mock behavior.
-8. **`vi.mock` cannot intercept internal calls.** If `foo()` calls `bar()` in the same
-   file, mocking `bar` externally does not affect `foo`. Refactor to separate modules or
-   use dependency injection.
+- **`vi.mock()` is hoisted.** It moves to top of file regardless of where you write it.
+  Always runs before imports.
+- **Factory must return an object** with explicit exports. ESM requires explicit `default`
+  key: `vi.mock('./mod', () => ({ default: val, namedExport: vi.fn() }))`.
+- **Partial mocking with `importOriginal`:**
+  `vi.mock(import('./api'), async (importOriginal) => ({ ...await importOriginal(), fetchUser: vi.fn() }))`.
+- **`vi.doMock()`** is not hoisted — runs at position. Only affects subsequent dynamic
+  `import()` calls. Use when you need per-test mock behavior.
+- **`vi.mock` cannot intercept internal calls.** If `foo()` calls `bar()` in the same
+  file, mocking `bar` externally does not affect `foo`. Refactor to separate modules or
+  use dependency injection.
 
 ### Cleanup & Timers
 
-9. **Always restore mocks.** Use `restoreMocks: true` in config (recommended) or
-   `afterEach(() => vi.restoreAllMocks())`.
-10. **Pair `vi.useFakeTimers()` with `vi.useRealTimers()`** — in `beforeEach`/`afterEach`
-    or use `fakeTimers` config option.
-11. **`vi.mocked(fn)`** narrows TypeScript types to mock types without runtime changes.
+- **Always restore mocks.** Use `restoreMocks: true` in config (recommended) or
+  `afterEach(() => vi.restoreAllMocks())`.
+- **Pair `vi.useFakeTimers()` with `vi.useRealTimers()`** — in `beforeEach`/`afterEach`
+  or use `fakeTimers` config option.
+- **`vi.mocked(fn)`** narrows TypeScript types to mock types without runtime changes.
 
 Full mocking rules (auto-mocking, spy mode, `vi.hoisted`, `__mocks__` directory, env/globals
 stubbing, async helpers): see `references/mocking.md`.
@@ -90,66 +90,66 @@ stubbing, async helpers): see `references/mocking.md`.
 
 ### Core Rules
 
-1. **Sync errors:** wrap in function: `expect(() => throwingFn()).toThrow('message')`.
-2. **Async errors:** `await expect(asyncFn()).rejects.toThrow('message')`.
-3. **Always `await` async assertions.** `await expect(promise).resolves.toEqual(...)` — an
-   un-awaited assertion silently passes.
-4. **`expect.poll(() => value, { timeout, interval })`** — retries assertion until pass or
-   timeout. Prefer over manual `waitFor` loops.
-5. **`expect.soft(val)`** continues after failure, reports all errors at end.
-6. **Asymmetric matchers** inside `toEqual`, `toHaveBeenCalledWith`: `expect.any(Number)`,
-   `expect.arrayContaining([...])`, `expect.objectContaining({})`,
-   `expect.stringMatching(/regex/)`. Negate with `expect.not.*`.
-7. **`expect.assertions(n)`** — exactly n assertions must run.
-   **`expect.hasAssertions()`** — at least one. Guard against missing assertions in
-   async code.
+- **Sync errors:** wrap in function: `expect(() => throwingFn()).toThrow('message')`.
+- **Async errors:** `await expect(asyncFn()).rejects.toThrow('message')`.
+- **Always `await` async assertions.** `await expect(promise).resolves.toEqual(...)` — an
+  un-awaited assertion silently passes.
+- **`expect.poll(() => value, { timeout, interval })`** — retries assertion until pass or
+  timeout. Prefer over manual `waitFor` loops.
+- **`expect.soft(val)`** continues after failure, reports all errors at end.
+- **Asymmetric matchers** inside `toEqual`, `toHaveBeenCalledWith`: `expect.any(Number)`,
+  `expect.arrayContaining([...])`, `expect.objectContaining({})`,
+  `expect.stringMatching(/regex/)`. Negate with `expect.not.*`.
+- **`expect.assertions(n)`** — exactly n assertions must run.
+  **`expect.hasAssertions()`** — at least one. Guard against missing assertions in
+  async code.
 
 Truthiness, number, string/array/object matchers, type checks, spy assertions, custom
 error messages, `expect.unreachable`: see `references/assertions.md`.
 
 ## Snapshots
 
-1. **File snapshots:** `expect(val).toMatchSnapshot()` — writes to `.snap` file.
-2. **Inline snapshots:** `expect(val).toMatchInlineSnapshot(\`"expected"\`)` — Vitest
-   auto-updates the string argument.
-3. **Property matchers for volatile data:** `toMatchSnapshot({ id: expect.any(String) })`.
-   Never snapshot timestamps, random IDs, or other volatile data without matchers.
-4. **Prefer inline snapshots** for small values — easier to review.
-5. **Avoid large snapshots** — they become rubber-stamp reviews.
-6. **Commit snapshot files.** Review them in PRs like any other code.
-7. **Update with `vitest -u`** or press `u` in watch mode.
+- **File snapshots:** `expect(val).toMatchSnapshot()` — writes to `.snap` file.
+- **Inline snapshots:** `expect(val).toMatchInlineSnapshot(\`"expected"\`)` — Vitest
+  auto-updates the string argument.
+- **Property matchers for volatile data:** `toMatchSnapshot({ id: expect.any(String) })`.
+  Never snapshot timestamps, random IDs, or other volatile data without matchers.
+- **Prefer inline snapshots** for small values — easier to review.
+- **Avoid large snapshots** — they become rubber-stamp reviews.
+- **Commit snapshot files.** Review them in PRs like any other code.
+- **Update with `vitest -u`** or press `u` in watch mode.
 
 ## Lifecycle
 
 ### Core Rules
 
-1. **`beforeAll`/`afterAll`** run once per `describe` block (or per file at top level).
-2. **`beforeEach`/`afterEach`** run before/after every test in current scope.
-3. **Teardown via return value:** if `beforeAll` or `beforeEach` returns a function, it
-   runs as teardown. **Vitest-specific, not in Jest.** Be careful not to accidentally
-   return values — wrap in braces: `beforeEach(() => { setupFn() })`.
-4. **`onTestFinished(fn)`** — register cleanup inside a test. Always runs regardless of
-   pass/fail.
-5. **`onTestFailed(fn)`** — runs only on failure. Useful for diagnostics.
+- **`beforeAll`/`afterAll`** run once per `describe` block (or per file at top level).
+- **`beforeEach`/`afterEach`** run before/after every test in current scope.
+- **Teardown via return value:** if `beforeAll` or `beforeEach` returns a function, it
+  runs as teardown. **Vitest-specific, not in Jest.** Be careful not to accidentally
+  return values — wrap in braces: `beforeEach(() => { setupFn() })`.
+- **`onTestFinished(fn)`** — register cleanup inside a test. Always runs regardless of
+  pass/fail.
+- **`onTestFailed(fn)`** — runs only on failure. Useful for diagnostics.
 
 ### Setup Files
 
-6. **`setupFiles: ['./test/setup.ts']`** — runs before each test file in the same process.
-   Use for global hooks, custom matchers, shared setup.
-7. **`globalSetup: ['./test/global-setup.ts']`** — runs once before any test workers.
-   Use for expensive one-time setup (database seeding, server startup). Return a function
-   for teardown.
+- **`setupFiles: ['./test/setup.ts']`** — runs before each test file in the same process.
+  Use for global hooks, custom matchers, shared setup.
+- **`globalSetup: ['./test/global-setup.ts']`** — runs once before any test workers.
+  Use for expensive one-time setup (database seeding, server startup). Return a function
+  for teardown.
 
 Hook execution order, test context, hook order config, `provide`/`inject`, and
 global vs setup file comparison: see `references/lifecycle.md`.
 
 ## Configuration
 
-1. **Prefer `vitest.config.ts`** with `defineConfig` from `'vitest/config'`. Inherits Vite
-   plugins and aliases automatically.
-2. **If using `vite.config.ts`**, add `/// <reference types="vitest/config" />` directive.
-3. **Use `projects`** (v3.2+, replaces deprecated `workspace`) for multi-environment setups.
-   Every project must have a unique `name`.
+- **Prefer `vitest.config.ts`** with `defineConfig` from `'vitest/config'`. Inherits Vite
+  plugins and aliases automatically.
+- **If using `vite.config.ts`**, add `/// <reference types="vitest/config" />` directive.
+- **Use `projects`** (v3.2+, replaces deprecated `workspace`) for multi-environment setups.
+  Every project must have a unique `name`.
 
 Config file merging, key options table, pools and parallelism, environment variables,
 in-source testing, and sharding: see `references/configuration.md`.

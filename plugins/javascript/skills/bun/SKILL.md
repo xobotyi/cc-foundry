@@ -42,95 +42,95 @@ Full API preference table: see `references/io-and-processes.md`.
 
 ### Routing
 
-1. **Use `routes` object** (v1.2.3+) for declarative path matching. Preferred over
-   `fetch`-based routing.
-2. **Route types:** exact (`"/users/all"`, highest priority), parameterized
-   (`"/users/:id"`, `req.params.id`), wildcard (`"/api/*"`), per-method
-   (`{ GET: handler, POST: handler }`).
-3. **Precedence:** exact > parameterized > wildcard > global catch-all.
-4. **`fetch` handler** as fallback for unmatched routes, not primary routing.
-5. **Always implement `error` handler** in `Bun.serve()`.
-6. **`development: true`** in dev for built-in error pages.
+- **Use `routes` object** (v1.2.3+) for declarative path matching. Preferred over
+  `fetch`-based routing.
+- **Route types:** exact (`"/users/all"`, highest priority), parameterized
+  (`"/users/:id"`, `req.params.id`), wildcard (`"/api/*"`), per-method
+  (`{ GET: handler, POST: handler }`).
+- **Precedence:** exact > parameterized > wildcard > global catch-all.
+- **`fetch` handler** as fallback for unmatched routes, not primary routing.
+- **Always implement `error` handler** in `Bun.serve()`.
+- **`development: true`** in dev for built-in error pages.
 
 ### Static Responses
 
-7. **Use static `Response` objects** for health checks, redirects, fixed JSON — they are
-   zero-allocation after init, cached for server lifetime.
-8. **Call `server.reload()`** to update static responses at runtime.
+- **Use static `Response` objects** for health checks, redirects, fixed JSON — they are
+  zero-allocation after init, cached for server lifetime.
+- **Call `server.reload()`** to update static responses at runtime.
 
 ### Request Object
 
-9. **Route handlers receive `BunRequest`** (extends `Request`) with `params` (auto
-   URL-decoded) and `cookies` (auto-tracked `CookieMap`).
-10. **TypeScript infers param shape** when route is a string literal.
-11. **Cookie changes are auto-tracked** — `Set-Cookie` headers added automatically when
-    using `req.cookies.set()` / `.delete()`.
+- **Route handlers receive `BunRequest`** (extends `Request`) with `params` (auto
+  URL-decoded) and `cookies` (auto-tracked `CookieMap`).
+- **TypeScript infers param shape** when route is a string literal.
+- **Cookie changes are auto-tracked** — `Set-Cookie` headers added automatically when
+  using `req.cookies.set()` / `.delete()`.
 
 ### WebSocket
 
-12. **Upgrade via `server.upgrade(req, { data })`** in the `fetch` handler.
-13. **Use native pub/sub** for topic-based broadcasting: `ws.subscribe("topic")`,
-    `ws.publish("topic", data)`.
-14. **Type `ws.data`** via the `data` property on the `websocket` handler object.
+- **Upgrade via `server.upgrade(req, { data })`** in the `fetch` handler.
+- **Use native pub/sub** for topic-based broadcasting: `ws.subscribe("topic")`,
+  `ws.publish("topic", data)`.
+- **Type `ws.data`** via the `data` property on the `websocket` handler object.
 
 WebSocket limits, server configuration, file response patterns, HTML imports, and server
 lifecycle details: see `references/server.md`.
 
 ## File I/O
 
-1. **`Bun.file()` is lazy.** Creating a `BunFile` does not read from disk. It conforms
-   to `Blob`.
-2. **Read with `.text()`, `.json()`, `.bytes()`, `.stream()`, `.arrayBuffer()`** on
-   `BunFile`.
-3. **Check existence:** `await file.exists()`. Access `file.size` and `file.type`.
-4. **`Bun.write()` handles all types** — string, Blob, Response, ArrayBuffer, BunFile.
-   Uses fastest syscall per platform (`copy_file_range`, `sendfile`, `clonefile`).
-5. **Incremental writing:** use `file.writer()` (`FileSink`). Call `.flush()` to flush
-   buffer, `.end()` to flush + close (required to let process exit).
-6. **Built-in stdio references:** `Bun.stdin` (readonly), `Bun.stdout`, `Bun.stderr`.
-7. **Use `node:fs` for directory ops** — `mkdir`, `readdir`. No Bun-specific API yet.
-8. **`import.meta.dir`** gives the directory of the current file.
+- **`Bun.file()` is lazy.** Creating a `BunFile` does not read from disk. It conforms
+  to `Blob`.
+- **Read with `.text()`, `.json()`, `.bytes()`, `.stream()`, `.arrayBuffer()`** on
+  `BunFile`.
+- **Check existence:** `await file.exists()`. Access `file.size` and `file.type`.
+- **`Bun.write()` handles all types** — string, Blob, Response, ArrayBuffer, BunFile.
+  Uses fastest syscall per platform (`copy_file_range`, `sendfile`, `clonefile`).
+- **Incremental writing:** use `file.writer()` (`FileSink`). Call `.flush()` to flush
+  buffer, `.end()` to flush + close (required to let process exit).
+- **Built-in stdio references:** `Bun.stdin` (readonly), `Bun.stdout`, `Bun.stderr`.
+- **Use `node:fs` for directory ops** — `mkdir`, `readdir`. No Bun-specific API yet.
+- **`import.meta.dir`** gives the directory of the current file.
 
 ## Shell API — `Bun.$`
 
 Cross-platform bash-like shell with JavaScript interop. Runs in-process (not `/bin/sh`).
 
-1. **`$` tagged template** for shell commands. Interpolated values are auto-escaped —
-   injection-safe by default.
-2. **Read output:** `.text()` (string, auto-quiets), `.json()` (parsed), `.lines()`
-   (async iterator), `.blob()`, or `await $\`...\`` for `{ stdout, stderr }` Buffers.
-3. **`.quiet()`** to suppress stdout/stderr output.
-4. **Non-zero exit codes throw `ShellError`** by default. Use `.nothrow()` to handle exit
-   codes manually. Configure globally: `$.nothrow()` or `$.throws(false)`.
-5. **Piping and redirection** work: `|`, `>`, `2>&1`, `< ${Bun.file("input.txt")}`,
-   `< ${response}`.
-6. **Set environment/cwd:** `.env({ FOO: "bar" })`, `.cwd("/tmp")`. Global defaults:
-   `$.env(...)`, `$.cwd(...)`.
-7. **Security:** interpolated variables are escaped (no command injection), but argument
-   injection is still possible (external commands interpret their own flags). Spawning
-   `bash -c` bypasses Bun's protections.
+- **`$` tagged template** for shell commands. Interpolated values are auto-escaped —
+  injection-safe by default.
+- **Read output:** `.text()` (string, auto-quiets), `.json()` (parsed), `.lines()`
+  (async iterator), `.blob()`, or `await $\`...\`` for `{ stdout, stderr }` Buffers.
+- **`.quiet()`** to suppress stdout/stderr output.
+- **Non-zero exit codes throw `ShellError`** by default. Use `.nothrow()` to handle exit
+  codes manually. Configure globally: `$.nothrow()` or `$.throws(false)`.
+- **Piping and redirection** work: `|`, `>`, `2>&1`, `< ${Bun.file("input.txt")}`,
+  `< ${response}`.
+- **Set environment/cwd:** `.env({ FOO: "bar" })`, `.cwd("/tmp")`. Global defaults:
+  `$.env(...)`, `$.cwd(...)`.
+- **Security:** interpolated variables are escaped (no command injection), but argument
+  injection is still possible (external commands interpret their own flags). Spawning
+  `bash -c` bypasses Bun's protections.
 
 ## Child Processes
 
-1. **`Bun.spawn()`** for fine-grained async process control. Access `proc.pid`,
-   `proc.stdout`, `proc.exited`, `proc.exitCode`. Kill with `proc.kill()`.
-2. **`Bun.spawnSync()`** for blocking execution. Rule: `spawnSync` for CLI tools,
-   `spawn` for servers.
-3. **Timeout and abort:** `{ timeout: 5000, killSignal: "SIGKILL" }` or pass
-   `AbortController.signal`.
-4. **IPC between Bun processes:** `Bun.spawn(["bun", "child.ts"], { ipc(message) {} })`.
+- **`Bun.spawn()`** for fine-grained async process control. Access `proc.pid`,
+  `proc.stdout`, `proc.exited`, `proc.exitCode`. Kill with `proc.kill()`.
+- **`Bun.spawnSync()`** for blocking execution. Rule: `spawnSync` for CLI tools,
+  `spawn` for servers.
+- **Timeout and abort:** `{ timeout: 5000, killSignal: "SIGKILL" }` or pass
+  `AbortController.signal`.
+- **IPC between Bun processes:** `Bun.spawn(["bun", "child.ts"], { ipc(message) {} })`.
 
 Stdin/stdout options, workers, and process details: see `references/io-and-processes.md`.
 
 ## Testing — `bun:test`
 
-1. **Import from `bun:test`**, not `jest` or `vitest`.
-2. **Jest-compatible API:** `test`, `describe`, `expect`, `mock`, `spyOn`, `beforeAll`,
-   `beforeEach`, `afterEach`, `afterAll`.
-3. **Run with `bun test`** — auto-discovers `*.test.*` and `*.spec.*` files.
-4. **Cleanup:** `mock.restore()` restores all spied functions, `mock.clearAllMocks()`
-   clears history. Add to `afterEach`.
-5. **`mock.module("./path", () => ({ ... }))`** for module mocking. Works for ESM and CJS.
+- **Import from `bun:test`**, not `jest` or `vitest`.
+- **Jest-compatible API:** `test`, `describe`, `expect`, `mock`, `spyOn`, `beforeAll`,
+  `beforeEach`, `afterEach`, `afterAll`.
+- **Run with `bun test`** — auto-discovers `*.test.*` and `*.spec.*` files.
+- **Cleanup:** `mock.restore()` restores all spied functions, `mock.clearAllMocks()`
+  clears history. Add to `afterEach`.
+- **`mock.module("./path", () => ({ ... }))`** for module mocking. Works for ESM and CJS.
 
 Test modifiers, parametrized tests, mocking details, snapshots, CLI flags, and
 bunfig.toml test config: see `references/testing.md`.
@@ -195,13 +195,13 @@ see `references/ecosystem.md`.
 
 Drop-in replacement for npm/yarn/pnpm. ~25x faster.
 
-1. **Lockfile:** `bun.lock` (text, default since v1.2) or `bun.lockb` (binary).
-2. **Does NOT run `postinstall`** of dependencies by default (security). Add to
-   `trustedDependencies` in `package.json` to allow.
-3. **Workspaces** supported via `package.json` `workspaces` field.
-4. **Auto-install:** when no `node_modules` found, Bun resolves packages on the fly.
-5. **`bunx`:** execute package binaries without installing (like `npx`).
-6. **`bun install --production`** skips devDependencies.
+- **Lockfile:** `bun.lock` (text, default since v1.2) or `bun.lockb` (binary).
+- **Does NOT run `postinstall`** of dependencies by default (security). Add to
+  `trustedDependencies` in `package.json` to allow.
+- **Workspaces** supported via `package.json` `workspaces` field.
+- **Auto-install:** when no `node_modules` found, Bun resolves packages on the fly.
+- **`bunx`:** execute package binaries without installing (like `npx`).
+- **`bun install --production`** skips devDependencies.
 
 ## Configuration & Compatibility
 

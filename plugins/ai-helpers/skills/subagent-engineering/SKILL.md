@@ -105,14 +105,14 @@ highest-leverage field.
 ```
 
 **Rules:**
-1. Lead with what the agent does, not a slogan or tagline.
-2. State when to use it — specific contexts and trigger conditions.
-3. Include "use proactively" to encourage automatic delegation.
-4. Keep execution instructions out of the description — those belong
-   in the body.
-5. No keyword lists, no second person ("you can..."), no vague verbs
-   ("helps", "assists").
-6. Max 1024 characters, no `<` or `>` characters.
+- Lead with what the agent does, not a slogan or tagline.
+- State when to use it — specific contexts and trigger conditions.
+- Include "use proactively" to encourage automatic delegation.
+- Keep execution instructions out of the description — those belong
+  in the body.
+- No keyword lists, no second person ("you can..."), no vague verbs
+  ("helps", "assists").
+- Max 1024 characters, no `<` or `>` characters.
 
 **Good:**
 ```yaml
@@ -227,43 +227,43 @@ You are a [role] specializing in [domain].
 
 ### System Prompt Rules
 
-1. **Start with role definition.** "You are a [role] specializing in
-   [domain]."
-2. **Use numbered steps for workflow.** Explicit ordering prevents
-   skipped steps.
-3. **Specify output format explicitly.** Include a concrete example of
-   the expected output structure.
-4. **Add constraints to prevent scope creep.** "DO NOT modify files",
-   "ONLY report findings", "ASK for clarification if unclear."
-5. **Include checklists for consistency.** Agents follow checklists
-   more reliably than prose guidelines.
-6. **Add completion criteria.** "Your task is COMPLETE when: [criteria]."
-   Prevents both early termination and over-work.
-7. **Keep single responsibility.** If listing multiple unrelated
-   capabilities, split into separate agents.
-8. **Add efficiency instructions.** "Use Grep to locate relevant code
-   BEFORE reading entire files. Return concise summaries, not raw data."
+- **Start with role definition.** "You are a [role] specializing in
+  [domain]."
+- **Use numbered steps for workflow.** Explicit ordering prevents
+  skipped steps.
+- **Specify output format explicitly.** Include a concrete example of
+  the expected output structure.
+- **Add constraints to prevent scope creep.** "DO NOT modify files",
+  "ONLY report findings", "ASK for clarification if unclear."
+- **Include checklists for consistency.** Agents follow checklists
+  more reliably than prose guidelines.
+- **Add completion criteria.** "Your task is COMPLETE when: [criteria]."
+  Prevents both early termination and over-work.
+- **Keep single responsibility.** If listing multiple unrelated
+  capabilities, split into separate agents.
+- **Add efficiency instructions.** "Use Grep to locate relevant code
+  BEFORE reading entire files. Return concise summaries, not raw data."
 
 ## Core Design Principles
 
-1. **Description is the trigger.** Claude sees ONLY `name` +
-   `description` when deciding to delegate. Vague descriptions cause
-   wrong triggers. Specific descriptions enable correct delegation.
+- **Description is the trigger.** Claude sees ONLY `name` +
+  `description` when deciding to delegate. Vague descriptions cause
+  wrong triggers. Specific descriptions enable correct delegation.
 
-2. **Single responsibility.** Each subagent excels at ONE task. Don't
-   create Swiss Army knife agents — they're hard to trigger correctly
-   and mediocre at everything.
+- **Single responsibility.** Each subagent excels at ONE task. Don't
+  create Swiss Army knife agents — they're hard to trigger correctly
+  and mediocre at everything.
 
-3. **Minimal tool access.** Grant only necessary permissions. Read-only
-   agents don't need Edit/Write. Excess tools invite scope creep.
+- **Minimal tool access.** Grant only necessary permissions. Read-only
+  agents don't need Edit/Write. Excess tools invite scope creep.
 
-4. **Clear handoffs.** Design subagents to return actionable summaries,
-   not raw data dumps. The parent agent (or user) should be able to
-   act on the output immediately.
+- **Clear handoffs.** Design subagents to return actionable summaries,
+  not raw data dumps. The parent agent (or user) should be able to
+  act on the output immediately.
 
-5. **Context efficiency.** Subagents should use Grep before Read,
-   stop when they have enough information, and return synthesized
-   findings. Verbose returns consume parent context.
+- **Context efficiency.** Subagents should use Grep before Read,
+  stop when they have enough information, and return synthesized
+  findings. Verbose returns consume parent context.
 
 ## Built-in Subagents
 
@@ -279,18 +279,18 @@ You are a [role] specializing in [domain].
 
 When evaluating a subagent, assess these five dimensions:
 
-1. **Trigger Accuracy (25%)** — Does Claude delegate at the right times?
-   Test with: direct invocation, implicit matching, and non-matching tasks.
-2. **Task Completion (30%)** — Does the agent follow its workflow and
-   produce the expected output? Test happy path, edge cases, and
-   out-of-scope requests.
-3. **Output Quality (25%)** — Is output clear, complete, actionable, and
-   format-compliant? Red flags: raw data dumps, missing information,
-   inconsistent formatting.
-4. **Context Efficiency (10%)** — Does it return concise summaries? Does
-   it avoid unnecessary tool calls and excessive file reads?
-5. **Tool Usage (10%)** — Does it use only granted tools efficiently?
-   Does it handle tool errors gracefully?
+- **Trigger Accuracy (25%)** — Does Claude delegate at the right times?
+  Test with: direct invocation, implicit matching, and non-matching tasks.
+- **Task Completion (30%)** — Does the agent follow its workflow and
+  produce the expected output? Test happy path, edge cases, and
+  out-of-scope requests.
+- **Output Quality (25%)** — Is output clear, complete, actionable, and
+  format-compliant? Red flags: raw data dumps, missing information,
+  inconsistent formatting.
+- **Context Efficiency (10%)** — Does it return concise summaries? Does
+  it avoid unnecessary tool calls and excessive file reads?
+- **Tool Usage (10%)** — Does it use only granted tools efficiently?
+  Does it handle tool errors gracefully?
 
 Scoring: 4.5+ excellent, 3.5-4.4 good, 2.5-3.4 needs revision, <2.5
 redesign. Full rubric with testing protocol: see

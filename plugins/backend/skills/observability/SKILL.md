@@ -119,13 +119,13 @@ Use levels consistently. Every team member must agree on what each level means.
 | **TRACE** | Extremely verbose step-by-step flow | Never in production |
 
 Rules:
-1. Production defaults to INFO or above. DEBUG/TRACE are off unless explicitly enabled
-   for a bounded investigation window.
-2. WARN is not a dumping ground. If it never leads to action, it is noise — downgrade
-   to DEBUG or remove it.
-3. ERROR means something is broken. Expected conditions (404 for missing resources,
-   validation failures from bad input) are not errors — they are INFO with a status field.
-4. Make log level configurable at runtime without restarts.
+- Production defaults to INFO or above. DEBUG/TRACE are off unless explicitly enabled
+  for a bounded investigation window.
+- WARN is not a dumping ground. If it never leads to action, it is noise — downgrade
+  to DEBUG or remove it.
+- ERROR means something is broken. Expected conditions (404 for missing resources,
+  validation failures from bad input) are not errors — they are INFO with a status field.
+- Make log level configurable at runtime without restarts.
 
 ### Structured Fields
 
@@ -206,13 +206,13 @@ rethrow, do it only when adding context that would otherwise be lost.
 | **Summary** | Client-side quantile calculation | Pre-computed percentiles (less flexible than histogram) |
 
 Rules:
-1. Use counters for events that accumulate. Derive rates from counters (`rate()`,
-   `increase()`), never store pre-computed rates.
-2. Use gauges for current-state snapshots. Never `rate()` a gauge.
-3. Use histograms for latency and size distributions. Histograms enable percentile
-   calculation across instances; summaries do not aggregate.
-4. Export timestamps as Unix epoch seconds, not "time since" values.
-5. Initialize all metrics with a zero value at startup to avoid missing-metric problems.
+- Use counters for events that accumulate. Derive rates from counters (`rate()`,
+  `increase()`), never store pre-computed rates.
+- Use gauges for current-state snapshots. Never `rate()` a gauge.
+- Use histograms for latency and size distributions. Histograms enable percentile
+  calculation across instances; summaries do not aggregate.
+- Export timestamps as Unix epoch seconds, not "time since" values.
+- Initialize all metrics with a zero value at startup to avoid missing-metric problems.
 
 ### What to Measure
 
@@ -263,13 +263,13 @@ infrastructure level. Use both together.
 
 Metric names should be self-documenting. Follow these conventions:
 
-1. **Prefix with namespace.** `myapp_http_requests_total`, not `requests_total`.
-2. **Use base units.** Seconds (not milliseconds), bytes (not megabytes),
-   ratio 0-1 (not percentage 0-100).
-3. **Suffix with unit.** `_seconds`, `_bytes`, `_total` (for unit-less counters).
-4. **One metric, one unit, one quantity.** Never mix request size with request duration
-   in the same metric.
-5. **snake_case.** `http_request_duration_seconds`, not `httpRequestDurationSeconds`.
+- **Prefix with namespace.** `myapp_http_requests_total`, not `requests_total`.
+- **Use base units.** Seconds (not milliseconds), bytes (not megabytes),
+  ratio 0-1 (not percentage 0-100).
+- **Suffix with unit.** `_seconds`, `_bytes`, `_total` (for unit-less counters).
+- **One metric, one unit, one quantity.** Never mix request size with request duration
+  in the same metric.
+- **snake_case.** `http_request_duration_seconds`, not `httpRequestDurationSeconds`.
 
 | Good | Bad |
 |------|-----|
@@ -294,12 +294,12 @@ separate time series.
 - `error_message` (arbitrary strings)
 
 Rules:
-1. Keep label cardinality below 10 values per label for most metrics.
-2. If a label can grow unbounded, it does not belong on a metric. Log it instead.
-3. Use labels instead of encoding dimensions in the metric name.
-   `http_requests_total{method="GET"}`, not `http_get_requests_total`.
-4. Ensure `sum()` or `avg()` across all label values is meaningful. If not,
-   split into separate metrics.
+- Keep label cardinality below 10 values per label for most metrics.
+- If a label can grow unbounded, it does not belong on a metric. Log it instead.
+- Use labels instead of encoding dimensions in the metric name.
+  `http_requests_total{method="GET"}`, not `http_get_requests_total`.
+- Ensure `sum()` or `avg()` across all label values is meaningful. If not,
+  split into separate metrics.
 
 ### Percentiles and Tail Latency
 
@@ -307,10 +307,10 @@ Averages hide outliers. A service with 100ms average latency may have 1% of requ
 taking 5 seconds. That 1% tail can dominate user experience when users hit multiple
 services per page load.
 
-1. Always track **p50, p90, p99** latency at minimum.
-2. Use histograms with exponentially distributed bucket boundaries
-   (e.g., 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s).
-3. Alert on p99, not mean. Mean latency alerts miss tail degradation.
+- Always track **p50, p90, p99** latency at minimum.
+- Use histograms with exponentially distributed bucket boundaries
+  (e.g., 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s).
+- Alert on p99, not mean. Mean latency alerts miss tail degradation.
 
 </metrics>
 
@@ -349,15 +349,15 @@ Context propagation is the mechanism that connects spans across process boundari
 single trace. Without it, you get disconnected spans, not traces.
 
 Rules:
-1. **Propagate context on every outgoing call.** HTTP headers (W3C Trace Context or
-   B3), message metadata, gRPC metadata — every cross-process boundary must carry
-   trace context.
-2. **Extract context on every incoming call.** The receiving service must extract
-   trace context and create a child span under the propagated parent.
-3. **Use W3C Trace Context (`traceparent`/`tracestate`)** as the default propagation
-   format unless the ecosystem requires otherwise (e.g., legacy B3).
-4. **Never generate a new trace ID** when you should be continuing an existing trace.
-   A new trace ID means a broken trace.
+- **Propagate context on every outgoing call.** HTTP headers (W3C Trace Context or
+  B3), message metadata, gRPC metadata — every cross-process boundary must carry
+  trace context.
+- **Extract context on every incoming call.** The receiving service must extract
+  trace context and create a child span under the propagated parent.
+- **Use W3C Trace Context (`traceparent`/`tracestate`)** as the default propagation
+  format unless the ecosystem requires otherwise (e.g., legacy B3).
+- **Never generate a new trace ID** when you should be continuing an existing trace.
+  A new trace ID means a broken trace.
 
 ### What to Trace
 
@@ -412,11 +412,11 @@ while preserving signal.
 | **Always-on for errors** | Sample 100% of error traces, probabilistic for success | Good default balance |
 
 Rules:
-1. Never drop error traces. If cost is a concern, sample successful traces at a lower
-   rate but keep 100% of error and high-latency traces.
-2. Sample at the entry point (head) and propagate the decision. Do not let each
-   service decide independently — this creates partial traces.
-3. Start with a low sampling rate (1-10%) and increase based on need, not the reverse.
+- Never drop error traces. If cost is a concern, sample successful traces at a lower
+  rate but keep 100% of error and high-latency traces.
+- Sample at the entry point (head) and propagate the decision. Do not let each
+  service decide independently — this creates partial traces.
+- Start with a low sampling rate (1-10%) and increase based on need, not the reverse.
 
 </tracing>
 
@@ -439,12 +439,12 @@ the offending trace → the trace points to a span → the span's logs reveal th
 | `service.name` + `service.version` | Groups telemetry by source | All signals |
 
 Rules:
-1. **Embed trace_id and span_id in every log record** emitted within a request context.
-   This is the primary bridge between logs and traces.
-2. **Use a correlation/request ID** that is assigned at the edge (API gateway, load
-   balancer) and propagated to all downstream services.
-3. **Attach exemplars to metrics.** An exemplar is a trace_id attached to a specific
-   metric observation, enabling drill-down from a metric spike to a representative trace.
+- **Embed trace_id and span_id in every log record** emitted within a request context.
+  This is the primary bridge between logs and traces.
+- **Use a correlation/request ID** that is assigned at the edge (API gateway, load
+  balancer) and propagated to all downstream services.
+- **Attach exemplars to metrics.** An exemplar is a trace_id attached to a specific
+  metric observation, enabling drill-down from a metric spike to a representative trace.
 
 ### The Correlation Workflow
 
@@ -503,33 +503,33 @@ backbone of incident investigation.
 
 ### When Writing Code
 
-1. **Instrument from the start.** Add golden signal metrics, structured logging, and
-   trace context propagation before the first production deploy — not after the first
-   incident.
-2. **Follow the conventions silently.** Apply structured logging, metric naming, and
-   tracing patterns without narrating each rule.
-3. **If the codebase has existing patterns, follow them.** Consistency within a codebase
-   beats theoretical correctness. Flag divergences from this skill's guidance once, then
-   move on.
-4. **Choose the right pillar.** Before adding instrumentation, ask: "Is this a metric,
-   a log, or a span?" Use the decision table above.
-5. **Connect the signals.** Every log in a request context must carry `trace_id` and
-   `span_id`. Every error metric should have an exemplar.
+- **Instrument from the start.** Add golden signal metrics, structured logging, and
+  trace context propagation before the first production deploy — not after the first
+  incident.
+- **Follow the conventions silently.** Apply structured logging, metric naming, and
+  tracing patterns without narrating each rule.
+- **If the codebase has existing patterns, follow them.** Consistency within a codebase
+  beats theoretical correctness. Flag divergences from this skill's guidance once, then
+  move on.
+- **Choose the right pillar.** Before adding instrumentation, ask: "Is this a metric,
+  a log, or a span?" Use the decision table above.
+- **Connect the signals.** Every log in a request context must carry `trace_id` and
+  `span_id`. Every error metric should have an exemplar.
 
 ### When Reviewing Code
 
-1. **Check that new endpoints/operations have golden signal coverage.** Missing metrics
-   on a new endpoint is a review blocker.
-2. **Verify structured logging.** Unstructured `log.Print("something happened")` in
-   production code should be flagged with the fix inline.
-3. **Check log levels.** Expected client errors logged as ERROR, or debug noise left
-   on at INFO, are common mistakes.
-4. **Verify trace context propagation.** Any new outgoing HTTP/gRPC/queue call must
-   propagate trace context. Missing propagation breaks traces.
-5. **Check label cardinality.** New metric labels must be bounded. Flag unbounded labels
-   (user IDs, free-text) immediately.
-6. **No sensitive data in logs or span attributes.** Passwords, tokens, PII in telemetry
-   is a security and compliance defect.
+- **Check that new endpoints/operations have golden signal coverage.** Missing metrics
+  on a new endpoint is a review blocker.
+- **Verify structured logging.** Unstructured `log.Print("something happened")` in
+  production code should be flagged with the fix inline.
+- **Check log levels.** Expected client errors logged as ERROR, or debug noise left
+  on at INFO, are common mistakes.
+- **Verify trace context propagation.** Any new outgoing HTTP/gRPC/queue call must
+  propagate trace context. Missing propagation breaks traces.
+- **Check label cardinality.** New metric labels must be bounded. Flag unbounded labels
+  (user IDs, free-text) immediately.
+- **No sensitive data in logs or span attributes.** Passwords, tokens, PII in telemetry
+  is a security and compliance defect.
 
 ```
 Bad review comment:
@@ -549,10 +549,10 @@ Good review comment:
 
 This skill provides observability discipline alongside other skills:
 
-1. **Coding skill** — Discovery, planning, verification workflow
-2. **Observability** (this skill) — What to log, measure, and trace
-3. **Tool-specific skills** (Prometheus, StatsD, OTel) — How to implement with a
-   specific technology
+- **Coding skill** — Discovery, planning, verification workflow
+- **Observability** (this skill) — What to log, measure, and trace
+- **Tool-specific skills** (Prometheus, StatsD, OTel) — How to implement with a
+  specific technology
 
 The coding skill governs workflow. This skill governs observability design decisions.
 Tool-specific skills govern implementation details for their respective technologies.

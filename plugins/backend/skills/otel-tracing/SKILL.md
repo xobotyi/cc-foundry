@@ -35,10 +35,10 @@ query, a message publish. Not every function call.
 Name spans for the **class** of operation, not the instance. Low-cardinality names enable
 aggregation; high-cardinality names destroy it.
 
-1. Use the most general string that identifies a statistically interesting class
-2. Never embed high-cardinality values (IDs, emails, paths with IDs)
-3. HTTP span names: `{METHOD} {route}` — server: `GET /users/:id`; client: `GET`
-4. Database span names: `{operation} {table}` — `SELECT users`, `INSERT orders`
+- Use the most general string that identifies a statistically interesting class
+- Never embed high-cardinality values (IDs, emails, paths with IDs)
+- HTTP span names: `{METHOD} {route}` — server: `GET /users/:id`; client: `GET`
+- Database span names: `{operation} {table}` — `SELECT users`, `INSERT orders`
 
 | Name | Verdict |
 |------|---------|
@@ -92,17 +92,17 @@ SpanKind tells backends how to assemble the trace tree. Set it correctly.
 Key-value pairs annotating a span. Value types: string, boolean, integer, float, or
 arrays of these.
 
-1. **Use semantic conventions** for attribute names — `http.request.method`, `db.system`,
-   not custom names. Consistent naming enables cross-service analysis.
-2. **Add sampling-relevant attributes at span creation** — samplers can only see attributes
-   present at creation time.
-3. **Keep cardinality low** — attribute values should be from a bounded set.
-4. **Check `IsRecording` before expensive attribute computation** — sampled-out spans
-   discard all data.
-5. **Never store PII in attributes** — trace data flows to shared backends. Use opaque
-   identifiers.
-6. **Respect attribute limits** — SDK enforces `AttributeCountLimit` (default 128). Excess
-   attributes are silently dropped.
+- **Use semantic conventions** for attribute names — `http.request.method`, `db.system`,
+  not custom names. Consistent naming enables cross-service analysis.
+- **Add sampling-relevant attributes at span creation** — samplers can only see attributes
+  present at creation time.
+- **Keep cardinality low** — attribute values should be from a bounded set.
+- **Check `IsRecording` before expensive attribute computation** — sampled-out spans
+  discard all data.
+- **Never store PII in attributes** — trace data flows to shared backends. Use opaque
+  identifiers.
+- **Respect attribute limits** — SDK enforces `AttributeCountLimit` (default 128). Excess
+  attributes are silently dropped.
 
 ### Events
 
@@ -148,12 +148,12 @@ produces isolated spans — no distributed trace.
 
 ### In-Process Propagation
 
-1. **Make spans active/current** — enables automatic log correlation, nested
-   auto-instrumentation picking up correct parent, context propagation to child ops
-2. **Pass context explicitly in async code** — automatic propagation may break across
-   thread boundaries, goroutines, or async callbacks
-3. **Never propagate request context to background work** — background tasks should start
-   new traces and link back to the triggering span
+- **Make spans active/current** — enables automatic log correlation, nested
+  auto-instrumentation picking up correct parent, context propagation to child ops
+- **Pass context explicitly in async code** — automatic propagation may break across
+  thread boundaries, goroutines, or async callbacks
+- **Never propagate request context to background work** — background tasks should start
+  new traces and link back to the triggering span
 
 ### Baggage
 
@@ -197,12 +197,12 @@ suffice? -> Add event. Otherwise -> don't instrument.
 
 ### Library Instrumentation Rules
 
-1. **Depend on OpenTelemetry API only** — never SDK. The API is a no-op without SDK, so
-   zero overhead for users who don't use OTel.
-2. Follow semantic conventions for your domain
-3. Set the `schema_url` to record which semantic convention version you use
-4. Prefer events over spans for verbose internal details
-5. Support optional `TracerProvider` injection for testability
+- **Depend on OpenTelemetry API only** — never SDK. The API is a no-op without SDK, so
+  zero overhead for users who don't use OTel.
+- Follow semantic conventions for your domain
+- Set the `schema_url` to record which semantic convention version you use
+- Prefer events over spans for verbose internal details
+- Support optional `TracerProvider` injection for testability
 
 See `references/instrumentation.md` for server-side, client-side, and async
 producer/consumer patterns, plus testing guidance.
@@ -237,11 +237,11 @@ Decision after all spans in a trace complete. Requires collector infrastructure.
 
 ### Sampling Principles
 
-1. Start with no sampling — add only when cost or volume requires it
-2. Always sample errors — configure tail sampling to keep error traces
-3. Use `ParentBased` — children follow parent decisions for complete traces
-4. Provide attributes at span creation — samplers cannot see late-added attributes
-5. Filter health checks — high volume, low value; sample aggressively or filter entirely
+- Start with no sampling — add only when cost or volume requires it
+- Always sample errors — configure tail sampling to keep error traces
+- Use `ParentBased` — children follow parent decisions for complete traces
+- Provide attributes at span creation — samplers cannot see late-added attributes
+- Filter health checks — high volume, low value; sample aggressively or filter entirely
 
 See `references/sampling.md` for combined head+tail strategies, decision guide, and
 per-scenario recommendations.
@@ -264,10 +264,10 @@ status mapping rules, and general conventions.
 
 ### TracerProvider
 
-1. Initialize once, early in application startup
-2. Always call `shutdown()` on exit — flushes remaining spans
-3. Configure `Resource` with `service.name` — identifies your service in backends
-4. Use `BatchSpanProcessor` in production — `SimpleSpanProcessor` is for dev/testing only
+- Initialize once, early in application startup
+- Always call `shutdown()` on exit — flushes remaining spans
+- Configure `Resource` with `service.name` — identifies your service in backends
+- Use `BatchSpanProcessor` in production — `SimpleSpanProcessor` is for dev/testing only
 
 See `references/sdk-components.md` for Resource attributes, BatchSpanProcessor tuning,
 exporter types, environment variable configuration, and Collector deployment patterns.

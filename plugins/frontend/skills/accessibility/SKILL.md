@@ -38,22 +38,22 @@ ARIA can only approximate.
 
 ### Landmarks
 
-1. Every page must have exactly one `<main>`.
-2. `<header>`/`<footer>` map to `banner`/`contentinfo` only as direct children
-   of `<body>` -- nested inside `<article>`, `<section>`, etc. they lose their
-   landmark role.
-3. Label multiple `<nav>` elements with `aria-label` or `aria-labelledby`.
-4. Never duplicate implicit roles (`<main role="main">`, `<nav role="navigation">`).
-5. Include all perceivable content within a landmark region.
+- Every page must have exactly one `<main>`.
+- `<header>`/`<footer>` map to `banner`/`contentinfo` only as direct children
+  of `<body>` -- nested inside `<article>`, `<section>`, etc. they lose their
+  landmark role.
+- Label multiple `<nav>` elements with `aria-label` or `aria-labelledby`.
+- Never duplicate implicit roles (`<main role="main">`, `<nav role="navigation">`).
+- Include all perceivable content within a landmark region.
 
 For the full landmark-to-role mapping table, see `references/semantic-html.md`.
 
 ### Headings
 
-1. One `<h1>` per page identifying the primary content.
-2. Never skip heading levels -- `<h1>` then `<h3>` breaks the outline.
-3. Use headings for structure, not visual styling.
-4. Every `<section>` and major content area should begin with a heading.
+- One `<h1>` per page identifying the primary content.
+- Never skip heading levels -- `<h1>` then `<h3>` breaks the outline.
+- Use headings for structure, not visual styling.
+- Every `<section>` and major content area should begin with a heading.
 
 ### Interactive Elements
 
@@ -63,9 +63,9 @@ Never `<a href="#" onclick="...">` for actions. Never `<button>` for navigation.
 
 ### Tables
 
-1. Use `<th>` with `scope="col"` or `scope="row"` for headers.
-2. Add `<caption>` to describe the table's purpose.
-3. Never use tables for layout.
+- Use `<th>` with `scope="col"` or `scope="row"` for headers.
+- Add `<caption>` to describe the table's purpose.
+- Never use tables for layout.
 
 ### Lists
 
@@ -74,21 +74,21 @@ term/description pairs. Screen readers announce list type and item count.
 
 ### Images
 
-1. Every `<img>` must have an `alt` attribute -- even if empty.
-2. Do not start alt text with "Image of" or "Picture of".
-3. Keep alt text under ~125 characters.
-4. For decorative images, prefer CSS `background-image` over `<img alt="">`.
-5. Use real text, not images of text (WCAG 1.4.5).
+- Every `<img>` must have an `alt` attribute -- even if empty.
+- Do not start alt text with "Image of" or "Picture of".
+- Keep alt text under ~125 characters.
+- For decorative images, prefer CSS `background-image` over `<img alt="">`.
+- Use real text, not images of text (WCAG 1.4.5).
 
 For alt treatment by image type, see `references/semantic-html.md`.
 
 ### Language and Page Metadata
 
-1. Set `<html lang="...">` on every page (WCAG 3.1.1).
-2. Mark inline language changes: `<span lang="fr">bonjour</span>` (WCAG 3.1.2).
-3. Expand abbreviations on first use with `<abbr>`.
-4. Provide a descriptive `<title>` on every page (WCAG 2.4.2).
-5. Provide a skip link as the first focusable element (WCAG 2.4.1).
+- Set `<html lang="...">` on every page (WCAG 3.1.1).
+- Mark inline language changes: `<span lang="fr">bonjour</span>` (WCAG 3.1.2).
+- Expand abbreviations on first use with `<abbr>`.
+- Provide a descriptive `<title>` on every page (WCAG 2.4.2).
+- Provide a skip link as the first focusable element (WCAG 2.4.1).
 
 ---
 
@@ -112,22 +112,22 @@ tree -- it does not change behavior, keyboard interaction, or appearance.
 **Priority:** `aria-labelledby` > `aria-label` > `<label>` > element content
 > `title`.
 
-1. Prefer visible labels over `aria-label`.
-2. Use `aria-labelledby` to compose names from multiple elements.
-3. `aria-label` and `aria-labelledby` replace native label text, not supplement.
-4. Never `aria-label` on elements with `role="presentation"` or `role="none"`.
-5. Never `aria-label` on `<div>` without a role -- ignored by most AT.
-6. Use `aria-describedby` or `aria-description` for supplementary info after
-   the name is established.
+- Prefer visible labels over `aria-label`.
+- Use `aria-labelledby` to compose names from multiple elements.
+- `aria-label` and `aria-labelledby` replace native label text, not supplement.
+- Never `aria-label` on elements with `role="presentation"` or `role="none"`.
+- Never `aria-label` on `<div>` without a role -- ignored by most AT.
+- Use `aria-describedby` or `aria-description` for supplementary info after
+  the name is established.
 
 ### Live Regions
 
-1. Use `aria-live="polite"` for non-urgent updates.
-2. Use `aria-live="assertive"` sparingly -- only errors, alerts, urgent info.
-3. Set live regions in the DOM before content changes. Adding `aria-live` and
-   content simultaneously may not be announced.
-4. Inject alert content into an existing `role="alert"` container for reliable
-   announcement.
+- Use `aria-live="polite"` for non-urgent updates.
+- Use `aria-live="assertive"` sparingly -- only errors, alerts, urgent info.
+- Set live regions in the DOM before content changes. Adding `aria-live` and
+  content simultaneously may not be announced.
+- Inject alert content into an existing `role="alert"` container for reliable
+  announcement.
 
 Place `aria-expanded` on the trigger element, not the panel.
 
@@ -148,19 +148,19 @@ checkboxes, toggles. Escape closes overlays.
 
 ### Focus Order
 
-1. Never `tabindex` > 0. Rearrange DOM order instead.
-2. `tabindex="0"` makes non-interactive elements focusable (use sparingly).
-3. `tabindex="-1"` for programmatic focus only (dialog containers, skip targets).
-4. Source order = visual order = focus order. CSS reordering
-   (`flex-direction: row-reverse`, `order`, grid) must not break this.
+- Never `tabindex` > 0. Rearrange DOM order instead.
+- `tabindex="0"` makes non-interactive elements focusable (use sparingly).
+- `tabindex="-1"` for programmatic focus only (dialog containers, skip targets).
+- Source order = visual order = focus order. CSS reordering
+  (`flex-direction: row-reverse`, `order`, grid) must not break this.
 
 ### Focus Visibility
 
-1. Never `outline: none` without a custom focus style replacement.
-2. Use `:focus-visible` for keyboard-only focus styles.
-3. Focus indicator: at least 3:1 contrast against adjacent background.
-4. Focus indicator area: at least 2px border equivalent (WCAG 2.4.13).
-5. Focused element must not be entirely obscured (WCAG 2.4.11).
+- Never `outline: none` without a custom focus style replacement.
+- Use `:focus-visible` for keyboard-only focus styles.
+- Focus indicator: at least 3:1 contrast against adjacent background.
+- Focus indicator area: at least 2px border equivalent (WCAG 2.4.13).
+- Focused element must not be entirely obscured (WCAG 2.4.11).
 
 ### Focus Management
 
@@ -178,18 +178,18 @@ child gets `tabindex="0"`, others get `tabindex="-1"`. Use
 
 ### Focus Restoration
 
-1. **Deleted item** -- focus next item, or previous if last was deleted.
-2. **Closed overlay** -- focus the trigger that opened it.
-3. **Removed section** -- focus nearest logical container or heading.
-4. Never let focus fall to `document.body`.
+- **Deleted item** -- focus next item, or previous if last was deleted.
+- **Closed overlay** -- focus the trigger that opened it.
+- **Removed section** -- focus nearest logical container or heading.
+- Never let focus fall to `document.body`.
 
 ### Disabled Elements
 
-1. Remove disabled standalone controls from tab sequence (`disabled` attribute
-   or `tabindex="-1"`).
-2. Keep disabled items focusable inside composite widgets (menus, tabs, trees,
-   listboxes) so screen reader users can discover them.
-3. Use `aria-disabled="true"` to keep element focusable but not operable.
+- Remove disabled standalone controls from tab sequence (`disabled` attribute
+  or `tabindex="-1"`).
+- Keep disabled items focusable inside composite widgets (menus, tabs, trees,
+  listboxes) so screen reader users can discover them.
+- Use `aria-disabled="true"` to keep element focusable but not operable.
 
 ---
 
@@ -202,32 +202,32 @@ Every `<input>`, `<select>`, `<textarea>` must have a programmatic label.
 **Priority:** `<label for/id>` > wrapping `<label>` > `aria-labelledby` >
 `aria-label`.
 
-1. `placeholder` is not a label substitute -- disappears on input, unreliable
-   in screen readers.
-2. Visible label text must be contained in the accessible name (WCAG 2.5.3).
+- `placeholder` is not a label substitute -- disappears on input, unreliable
+  in screen readers.
+- Visible label text must be contained in the accessible name (WCAG 2.5.3).
 
 ### Grouping
 
-1. Group related controls with `<fieldset>` + `<legend>`. Required for: radio
-   groups, checkbox groups, related input sets (address, date parts).
-2. Use `role="group"` with `aria-labelledby` when `<fieldset>` is impractical.
+- Group related controls with `<fieldset>` + `<legend>`. Required for: radio
+  groups, checkbox groups, related input sets (address, date parts).
+- Use `role="group"` with `aria-labelledby` when `<fieldset>` is impractical.
 
 ### Required Fields
 
-1. Use `required` attribute or `aria-required="true"`.
-2. Indicate visually with asterisk + "* Required" legend.
-3. Never color alone for required status.
+- Use `required` attribute or `aria-required="true"`.
+- Indicate visually with asterisk + "* Required" legend.
+- Never color alone for required status.
 
 ### Validation and Errors
 
-1. Display errors adjacent to the invalid field.
-2. Associate errors via `aria-describedby` or `aria-errormessage`.
-3. Set `aria-invalid="true"` on invalid fields.
-4. Use `role="alert"` on error container for immediate announcement.
-5. For multiple errors: error summary at top with links to fields; move focus
-   to summary on validation failure.
-6. On success: announce via `role="status"`.
-7. On failure: do not clear the form -- preserve user input.
+- Display errors adjacent to the invalid field.
+- Associate errors via `aria-describedby` or `aria-errormessage`.
+- Set `aria-invalid="true"` on invalid fields.
+- Use `role="alert"` on error container for immediate announcement.
+- For multiple errors: error summary at top with links to fields; move focus
+  to summary on validation failure.
+- On success: announce via `role="status"`.
+- On failure: do not clear the form -- preserve user input.
 
 ### Input Types and Autocomplete
 
@@ -237,22 +237,22 @@ Use `autocomplete` for user data inputs (WCAG 1.3.5): `given-name`,
 
 ### Disabling Controls
 
-1. Native `disabled` attribute removes from tab sequence and announces state.
-2. `aria-disabled="true"` keeps element focusable -- prevent activation in JS.
-3. Announce dynamic disabled state changes via a live region.
+- Native `disabled` attribute removes from tab sequence and announces state.
+- `aria-disabled="true"` keeps element focusable -- prevent activation in JS.
+- Announce dynamic disabled state changes via a live region.
 
 ---
 
 ## 5. Visual Requirements
 
-1. **Text contrast:** 4.5:1 minimum (3:1 for large text 18pt+ or 14pt bold+).
-2. **UI component contrast:** 3:1 minimum for borders, icons, focus indicators.
-3. **Never color alone** to convey information -- add icons, text, or patterns.
-4. Content must reflow at 320px width without horizontal scroll (WCAG 1.4.10).
-5. No content loss when user adjusts line-height/spacing (WCAG 1.4.12).
-6. Content on hover/focus must be dismissible, hoverable, persistent (1.4.13).
-7. No content flashes more than 3 times/second (2.3.1).
-8. Time limits adjustable; moving content pausable (2.2.1, 2.2.2).
+- **Text contrast:** 4.5:1 minimum (3:1 for large text 18pt+ or 14pt bold+).
+- **UI component contrast:** 3:1 minimum for borders, icons, focus indicators.
+- **Never color alone** to convey information -- add icons, text, or patterns.
+- Content must reflow at 320px width without horizontal scroll (WCAG 1.4.10).
+- No content loss when user adjusts line-height/spacing (WCAG 1.4.12).
+- Content on hover/focus must be dismissible, hoverable, persistent (1.4.13).
+- No content flashes more than 3 times/second (2.3.1).
+- Time limits adjustable; moving content pausable (2.2.1, 2.2.2).
 
 ---
 
@@ -261,21 +261,21 @@ Use `autocomplete` for user data inputs (WCAG 1.3.5): `given-name`,
 For full ARIA structure, keyboard contracts, and code examples for each
 pattern, see `references/component-patterns.md`. Key rules:
 
-1. **Dialog** -- use native `<dialog>` with `.showModal()` when possible.
-   Focus trap, Escape to close, return focus to trigger on close.
-2. **Tabs** -- `role="tablist/tab/tabpanel"`, roving tabindex, arrow keys
-   switch tabs, Tab enters active panel.
-3. **Accordion** -- trigger is `<button>` inside a heading, `aria-expanded`
-   on button, `aria-controls` to panel.
-4. **Disclosure** -- `<button>` with `aria-expanded` and `aria-controls`.
-5. **Menu button** -- `aria-haspopup="true"`, arrows navigate, Enter activates.
-   Never `role="menu"` for navigation -- use `<nav>` with links.
-6. **Combobox** -- `aria-activedescendant` tracks highlighted option, arrows
-   navigate, Enter selects, Escape closes.
-7. **Tooltip** -- show on focus + hover, `aria-describedby`, must be hoverable
-   and persistent. No interactive content inside.
-8. **Alert/Status** -- `role="alert"` for urgent (assertive), `role="status"`
-   for non-urgent (polite). Inject into pre-existing container.
+- **Dialog** -- use native `<dialog>` with `.showModal()` when possible.
+  Focus trap, Escape to close, return focus to trigger on close.
+- **Tabs** -- `role="tablist/tab/tabpanel"`, roving tabindex, arrow keys
+  switch tabs, Tab enters active panel.
+- **Accordion** -- trigger is `<button>` inside a heading, `aria-expanded`
+  on button, `aria-controls` to panel.
+- **Disclosure** -- `<button>` with `aria-expanded` and `aria-controls`.
+- **Menu button** -- `aria-haspopup="true"`, arrows navigate, Enter activates.
+  Never `role="menu"` for navigation -- use `<nav>` with links.
+- **Combobox** -- `aria-activedescendant` tracks highlighted option, arrows
+  navigate, Enter selects, Escape closes.
+- **Tooltip** -- show on focus + hover, `aria-describedby`, must be hoverable
+  and persistent. No interactive content inside.
+- **Alert/Status** -- `role="alert"` for urgent (assertive), `role="status"`
+  for non-urgent (polite). Inject into pre-existing container.
 
 For WCAG 2.2 AA compliance checklist with criterion numbers,
 see `references/wcag.md`.

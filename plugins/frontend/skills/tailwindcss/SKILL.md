@@ -44,29 +44,29 @@ file. Constrain yourself to the design system; break out only with intention.
 
 ## Entry Point and Installation
 
-1. Single import: `@import "tailwindcss";` — provides preflight reset, theme
-   variables, and all utilities. No `@tailwind base/components/utilities` (v3 syntax)
-2. Vite: install `@tailwindcss/vite` plugin. PostCSS: install `@tailwindcss/postcss`.
-   CLI: `npx @tailwindcss/cli -i input.css -o output.css`
-3. No `tailwind.config.js` in v4 — all configuration lives in CSS via `@theme`
-4. Remove `postcss-import` and `autoprefixer` — v4 handles both internally
-5. Do not use Sass, Less, or Stylus with Tailwind v4 — Tailwind is the
-   preprocessor (handles `@import`, nesting, variables, vendor prefixes)
+- Single import: `@import "tailwindcss";` — provides preflight reset, theme
+  variables, and all utilities. No `@tailwind base/components/utilities` (v3 syntax)
+- Vite: install `@tailwindcss/vite` plugin. PostCSS: install `@tailwindcss/postcss`.
+  CLI: `npx @tailwindcss/cli -i input.css -o output.css`
+- No `tailwind.config.js` in v4 — all configuration lives in CSS via `@theme`
+- Remove `postcss-import` and `autoprefixer` — v4 handles both internally
+- Do not use Sass, Less, or Stylus with Tailwind v4 — Tailwind is the
+  preprocessor (handles `@import`, nesting, variables, vendor prefixes)
 
 ## Theme Configuration (`@theme`)
 
 ### Core Rules
 
-1. `@theme` defines design tokens that generate utility classes — not equivalent
-   to `:root`. Use `@theme` for values needing utilities; use `:root` for CSS
-   variables that only need `var()` access
-2. `@theme` must be top-level (not nested under selectors or media queries)
-3. All `@theme` values compile to `:root { }` CSS vars in output
-4. Only used CSS vars are emitted by default
-5. Semantic token names: `--color-primary`, `--color-surface` — not
-   `--color-blue-500` or `--color-gray-100`
-6. OKLCH for custom colors: `oklch(0.72 0.11 178)` — perceptually uniform,
-   works with CSS `color-mix()`
+- `@theme` defines design tokens that generate utility classes — not equivalent
+  to `:root`. Use `@theme` for values needing utilities; use `:root` for CSS
+  variables that only need `var()` access
+- `@theme` must be top-level (not nested under selectors or media queries)
+- All `@theme` values compile to `:root { }` CSS vars in output
+- Only used CSS vars are emitted by default
+- Semantic token names: `--color-primary`, `--color-surface` — not
+  `--color-blue-500` or `--color-gray-100`
+- OKLCH for custom colors: `oklch(0.72 0.11 178)` — perceptually uniform,
+  works with CSS `color-mix()`
 
 ### `@theme` Options
 
@@ -126,24 +126,24 @@ Put `@theme` in a standalone CSS file and `@import` it after `@import "tailwindc
 
 ### Fundamental Rules
 
-1. **Complete class names only.** Never concatenate or interpolate —
-   `text-red-600` yes, `` `text-${color}-600` `` never. Tailwind scans
-   source files as plain text
-2. Map dynamic values to static class string lookups
-3. **Prettier plugin for ordering.** Install `prettier-plugin-tailwindcss` —
-   do not manually sort classes
-4. **CSS variable shorthand:** `bg-(--brand-color)` — parenthesis syntax
-   auto-wraps in `var()`. Do not use `bg-[var(--brand)]` (v3 verbose form)
-5. **Modifiers stack left-to-right** (v4): `dark:lg:hover:bg-indigo-600`.
-   v3 was right-to-left — reverse stacking order when migrating
-6. **Arbitrary values for one-offs only.** Repeated values belong in `@theme`
-7. **Important suffix:** `bg-red-500!` — the `!` goes at end, after all modifiers
-8. **Conflict resolution:** Last class in the generated stylesheet wins, not last
-   in the HTML attribute. Don't rely on attribute order — use conditional rendering
-9. **Underscores = spaces** in arbitrary values: `grid-cols-[1fr_500px_2fr]`.
-   Escape for literal underscore: `content-['hello\_world']`
-10. **Type hints** for ambiguous CSS vars: `text-(length:--my-var)` for font-size,
-    `text-(color:--my-var)` for text color
+- **Complete class names only.** Never concatenate or interpolate —
+  `text-red-600` yes, `` `text-${color}-600` `` never. Tailwind scans
+  source files as plain text
+- Map dynamic values to static class string lookups
+- **Prettier plugin for ordering.** Install `prettier-plugin-tailwindcss` —
+  do not manually sort classes
+- **CSS variable shorthand:** `bg-(--brand-color)` — parenthesis syntax
+  auto-wraps in `var()`. Do not use `bg-[var(--brand)]` (v3 verbose form)
+- **Modifiers stack left-to-right** (v4): `dark:lg:hover:bg-indigo-600`.
+  v3 was right-to-left — reverse stacking order when migrating
+- **Arbitrary values for one-offs only.** Repeated values belong in `@theme`
+- **Important suffix:** `bg-red-500!` — the `!` goes at end, after all modifiers
+- **Conflict resolution:** Last class in the generated stylesheet wins, not last
+  in the HTML attribute. Don't rely on attribute order — use conditional rendering
+- **Underscores = spaces** in arbitrary values: `grid-cols-[1fr_500px_2fr]`.
+  Escape for literal underscore: `content-['hello\_world']`
+- **Type hints** for ambiguous CSS vars: `text-(length:--my-var)` for font-size,
+  `text-(color:--my-var)` for text color
 
 ### Responsive Breakpoints (Mobile-First)
 
@@ -187,39 +187,39 @@ Unprefixed = all sizes. Prefix = that breakpoint **and up**.
 
 ### Dark Mode
 
-1. Default is `prefers-color-scheme` media query — `dark:` works without config
-2. Manual toggle via `@custom-variant dark (&:where(.dark, .dark *));`
-3. Data attribute: `@custom-variant dark (&:where([data-theme=dark],
-   [data-theme=dark] *));`
-4. **Prevent FOUC:** Theme-detection script must be inline in `<head>`,
-   never in a deferred bundle
-5. `color-scheme` for native UI: `scheme-light dark:scheme-dark` on `<html>`
-   matches scrollbars and form controls to active theme
+- Default is `prefers-color-scheme` media query — `dark:` works without config
+- Manual toggle via `@custom-variant dark (&:where(.dark, .dark *));`
+- Data attribute: `@custom-variant dark (&:where([data-theme=dark],
+  [data-theme=dark] *));`
+- **Prevent FOUC:** Theme-detection script must be inline in `<head>`,
+  never in a deferred bundle
+- `color-scheme` for native UI: `scheme-light dark:scheme-dark` on `<html>`
+  matches scrollbars and form controls to active theme
 
 ## Custom Utilities and Variants
 
 ### `@utility`
 
-1. Custom utilities are inserted into the `utilities` layer automatically and
-   support all variants (`hover:`, `focus:`, `lg:`, etc.)
-2. Simple: `@utility content-auto { content-visibility: auto; }`
-3. Complex with nesting:
-   `@utility scrollbar-hidden { &::-webkit-scrollbar { display: none; } }`
-4. Functional (accepts argument): use wildcard `@utility tab-*` with `--value()`
-5. `--value()` resolution modes: `--value(--ns-*)` (theme key), `--value(integer)`
-   (bare value), `--value([integer])` (arbitrary value), `--value("inherit")`
-   (literal)
-6. Multiple modes: `--value(--tab-size-*, integer, [integer])`
-7. `--modifier()` reads the modifier portion (`text-lg/tight`)
-8. Negative values: register separate `-utility-*` form
-9. Prefer `@utility` and `@custom-variant` over JS plugins for new code
+- Custom utilities are inserted into the `utilities` layer automatically and
+  support all variants (`hover:`, `focus:`, `lg:`, etc.)
+- Simple: `@utility content-auto { content-visibility: auto; }`
+- Complex with nesting:
+  `@utility scrollbar-hidden { &::-webkit-scrollbar { display: none; } }`
+- Functional (accepts argument): use wildcard `@utility tab-*` with `--value()`
+- `--value()` resolution modes: `--value(--ns-*)` (theme key), `--value(integer)`
+  (bare value), `--value([integer])` (arbitrary value), `--value("inherit")`
+  (literal)
+- Multiple modes: `--value(--tab-size-*, integer, [integer])`
+- `--modifier()` reads the modifier portion (`text-lg/tight`)
+- Negative values: register separate `-utility-*` form
+- Prefer `@utility` and `@custom-variant` over JS plugins for new code
 
 ### `@custom-variant`
 
-1. Shorthand:
-   `@custom-variant theme-midnight (&:where([data-theme="midnight"] *));`
-2. Block form with `@slot` for multiple rules or media queries
-3. Override built-in `dark` variant for class-based toggling
+- Shorthand:
+  `@custom-variant theme-midnight (&:where([data-theme="midnight"] *));`
+- Block form with `@slot` for multiple rules or media queries
+- Override built-in `dark` variant for class-based toggling
 
 ### Other Directives
 
@@ -244,24 +244,24 @@ Unprefixed = all sizes. Prefix = that breakpoint **and up**.
 
 ## Content Detection (`@source`)
 
-1. Auto-scans all project files except `.gitignore`d, `node_modules`, binaries,
-   CSS files, lock files
-2. `@source "../node_modules/@my-company/ui-lib"` for external packages
-3. `@source not "../src/legacy"` to exclude directories
-4. `@source inline("underline")` for safelisting (brace expansion supported)
-5. `@source not inline(...)` to explicitly exclude from generation
-6. `@import "tailwindcss" source(none)` disables auto-detection entirely
-7. `@import "tailwindcss" source("../src")` sets base scan path
+- Auto-scans all project files except `.gitignore`d, `node_modules`, binaries,
+  CSS files, lock files
+- `@source "../node_modules/@my-company/ui-lib"` for external packages
+- `@source not "../src/legacy"` to exclude directories
+- `@source inline("underline")` for safelisting (brace expansion supported)
+- `@source not inline(...)` to explicitly exclude from generation
+- `@import "tailwindcss" source(none)` disables auto-detection entirely
+- `@import "tailwindcss" source("../src")` sets base scan path
 
 ## Component Extraction
 
-1. **Template components over `@apply`.** In React/Vue/Svelte, extract a
-   component. In server templates, extract a partial. `@apply` is the last resort
-2. `@apply` only for single-element patterns — multi-element structures belong
-   in template components
-3. Place `@apply`-based classes in `@layer components` so utilities can override
-4. Acceptable `@apply` uses: third-party library overrides, legacy HTML you
-   don't control
+- **Template components over `@apply`.** In React/Vue/Svelte, extract a
+  component. In server templates, extract a partial. `@apply` is the last resort
+- `@apply` only for single-element patterns — multi-element structures belong
+  in template components
+- Place `@apply`-based classes in `@layer components` so utilities can override
+- Acceptable `@apply` uses: third-party library overrides, legacy HTML you
+  don't control
 
 ## Layout
 
@@ -369,14 +369,14 @@ See `references/transforms-and-animations.md` for full transition, animation,
 
 ## Motion and Accessibility
 
-1. **Respect reduced motion.** Gate animations with `motion-safe:` or disable
-   with `motion-reduce:transition-none`
-2. `sr-only` / `not-sr-only` for screen reader accessibility
-3. `forced-color-adjust-none` only for elements where forced colors destroys
-   essential visual information — always include `sr-only` text label
-4. `forced-colors:` variant for styles only in forced colors mode
-5. Add `role="list"` on unstyled lists — VoiceOver doesn't announce
-   `list-style: none` elements as lists
+- **Respect reduced motion.** Gate animations with `motion-safe:` or disable
+  with `motion-reduce:transition-none`
+- `sr-only` / `not-sr-only` for screen reader accessibility
+- `forced-color-adjust-none` only for elements where forced colors destroys
+  essential visual information — always include `sr-only` text label
+- `forced-colors:` variant for styles only in forced colors mode
+- Add `role="list"` on unstyled lists — VoiceOver doesn't announce
+  `list-style: none` elements as lists
 
 ## Framework Integration
 
