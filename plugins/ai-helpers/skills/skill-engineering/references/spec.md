@@ -140,9 +140,12 @@ Apply prompt engineering principles throughout.
 ```
 
 **Token budget:**
-- Keep under 500 lines
+- Target under 500 lines for instruction core
 - Aim for < 5000 tokens
-- Move detailed content to reference files
+- Behavioral rules count as core — they stay in SKILL.md even if that
+  pushes past 500 lines (a 700-line skill with all behavioral rules is
+  better than a 400-line skill with critical rules in unread references)
+- Move catalog, lookup, and situational content to reference files
 
 **Prompt engineering tips:**
 - Use XML tags (`<instructions>`, `<constraints>`, `<output_format>`)
@@ -215,8 +218,28 @@ Skills use three-level loading:
 | 2. Instructions | Skill triggered | < 5000 | SKILL.md body |
 | 3. Resources | As referenced | Unlimited | scripts/, references/, assets/ |
 
-**Design for this:** Keep SKILL.md focused. Move deep dives to references.
-Claude loads references only when instructions mention them.
+**Design for this:** SKILL.md (Level 2) must be behaviorally self-sufficient.
+An agent that reads only SKILL.md must produce correct output. References
+(Level 3) provide depth — detailed rubrics, extended examples, full catalogs,
+niche how-tos — but never core behavioral rules.
+
+Agents do not reliably load references. Design for that reality: put every
+rule and directive the agent needs in SKILL.md. Use references for content
+that enriches but isn't required for correctness.
+
+**Content classification for the split:**
+
+| Content Type | Location | Example |
+|---|---|---|
+| Behavioral rules | SKILL.md | "Use `pipeline()` not `.pipe()`" |
+| Catalog/lookup | references/ | API tables, comparison charts |
+| Situational | references/ | Migration guides, deployment patterns |
+| Voluminous structural | references/ | Schemas, 50+ entry tables |
+
+**Working-resolution / high-resolution:** When a reference covers a topic
+that also has rules in SKILL.md, the SKILL.md version is the
+working-resolution summary (enough for correct behavior) and the reference
+is the high-resolution version (extended depth, examples, edge cases).
 
 ## String Substitutions
 

@@ -9,12 +9,15 @@ Before deploying a skill, verify:
 - [ ] Description leads with what the skill does (not a slogan)
 - [ ] Description claims domain broadly ("whenever task involves")
 - [ ] Description lists specific trigger keywords as examples
+- [ ] SKILL.md is behaviorally self-sufficient — no critical rules only in references
+- [ ] References contain only deepening material (examples, catalogs, how-tos)
+- [ ] Route-to-Reference table has Contents column (if references exist)
 - [ ] Instructions are clear and imperative
-- [ ] Instructions use structure (numbered steps, XML tags, headers)
+- [ ] Instructions use structure (numbered steps/rules, XML tags, headers)
 - [ ] Examples cover normal and edge cases (few-shot prompting)
 - [ ] Critical rules placed at end of SKILL.md
-- [ ] Output format explicitly specified
-- [ ] SKILL.md is under 500 lines
+- [ ] Output format explicitly specified (if applicable)
+- [ ] Under 500 lines (behavioral rules count as core; exceeding is acceptable)
 - [ ] References are one level deep (no nested chains)
 - [ ] Scope is focused (one purpose)
 - [ ] Tested with varied inputs
@@ -169,45 +172,63 @@ After any change:
 
 ## Scoring Rubric
 
-### Description (25 points)
+### Description (20 points)
 
 | Score | Criteria |
 |-------|----------|
-| 25 | Specific capabilities + clear triggers + right length |
-| 20 | Mostly complete, minor improvements possible |
-| 15 | Vague on either capabilities or triggers |
-| 10 | Very vague, missing key information |
+| 20 | Specific capabilities + clear triggers + right length |
+| 15 | Mostly complete, minor improvements possible |
+| 10 | Vague on either capabilities or triggers |
+| 5 | Very vague, missing key information |
 | 0 | Missing or actively misleading |
 
-### Instructions (25 points)
+### Instructions (20 points)
 
 | Score | Criteria |
 |-------|----------|
-| 25 | Clear, imperative, structured (XML tags/steps), explicit format |
-| 20 | Mostly clear, minor ambiguities, format specified |
-| 15 | Understandable but verbose or missing structure |
-| 10 | Confusing structure, significant gaps, no format |
+| 20 | Clear, imperative, structured (XML tags/steps), explicit format |
+| 15 | Mostly clear, minor ambiguities, format specified |
+| 10 | Understandable but verbose or missing structure |
+| 5 | Confusing structure, significant gaps, no format |
 | 0 | Unclear or contradictory |
 
-### Examples (25 points)
+### Examples (20 points)
 
 | Score | Criteria |
 |-------|----------|
-| 25 | Comprehensive coverage, realistic, well-formatted |
-| 20 | Good coverage, minor gaps |
-| 15 | Basic coverage, missing edge cases |
-| 10 | Minimal examples, not representative |
+| 20 | Comprehensive coverage, realistic, well-formatted |
+| 15 | Good coverage, minor gaps |
+| 10 | Basic coverage, missing edge cases |
+| 5 | Minimal examples, not representative |
 | 0 | No examples or misleading examples |
 
-### Structure (25 points)
+### Structure (20 points)
 
 | Score | Criteria |
 |-------|----------|
-| 25 | Proper progressive disclosure, right scope |
-| 20 | Minor structural issues |
-| 15 | Too long or too short, scope issues |
-| 10 | Poor organization, wrong scope |
+| 20 | Right scope, proper organization, appropriate length |
+| 15 | Minor structural issues |
+| 10 | Too long or too short, scope issues |
+| 5 | Poor organization, wrong scope |
 | 0 | Fundamentally broken structure |
+
+### Content Placement (20 points)
+
+| Score | Criteria |
+|-------|----------|
+| 20 | SKILL.md behaviorally self-sufficient; references contain only deepening material; route table has Contents column |
+| 15 | Most behavioral rules inline; one or two rules only in references |
+| 10 | Significant behavioral content only in references; agent would produce partial/incorrect output without reading them |
+| 5 | SKILL.md is mostly a router; critical rules live in references |
+| 0 | No references exist but SKILL.md is incomplete, or references duplicate SKILL.md body content |
+
+**What to check:**
+- Can an agent produce correct output reading only SKILL.md?
+- Do references contain depth (examples, catalogs, rubrics) or breadth
+  (rules, directives)?
+- Are anti-patterns stated as positive directives in the body, or
+  duplicated in a separate table?
+- Does the route table include a Contents column?
 
 ### Interpretation
 
@@ -223,7 +244,8 @@ After any change:
 - Description could be more specific
 - Missing one edge case example
 - Instructions slightly verbose
-- Could use better progressive disclosure
+- One or two behavioral rules only in references
+- Route table missing Contents column
 
 ### 50-69 (Moderate Issues)
 
@@ -231,6 +253,7 @@ After any change:
 - Instructions missing key scenarios
 - No examples for edge cases
 - Wrong scope (too broad or too narrow)
+- Significant behavioral content only in references
 
 ### < 50 (Major Issues)
 
@@ -238,3 +261,4 @@ After any change:
 - Instructions contradictory or unclear
 - No examples
 - Fundamentally wrong structure
+- SKILL.md is a router with no behavioral content
