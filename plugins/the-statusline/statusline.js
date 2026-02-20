@@ -105,7 +105,7 @@ function colorByUrgency(percent, text) {
 
 /**
  * @typedef {object} ModelData
- * @property {string} id - Model identifier (e.g., "claude-opus-4-1")
+ * @property {string} id - Model identifier (e.g., "claude-opus-4-6")
  * @property {string} display_name - Human-readable name (e.g., "Opus")
  */
 
@@ -123,7 +123,7 @@ function colorByUrgency(percent, text) {
 /**
  * @typedef {object} CostData
  * @property {number} total_cost_usd - Session cost in USD
- * @property {number} total_duration_ms - Total session duration
+ * @property {number} total_duration_ms - Total wall-clock time since session start (ms)
  * @property {number} total_api_duration_ms - Time spent in API calls
  * @property {number} total_lines_added - Lines added in session
  * @property {number} total_lines_removed - Lines removed in session
@@ -141,24 +141,36 @@ function colorByUrgency(percent, text) {
  * @typedef {object} ContextWindowData
  * @property {number} total_input_tokens - Cumulative input tokens
  * @property {number} total_output_tokens - Cumulative output tokens
- * @property {number} context_window_size - Max context size (e.g., 200000)
- * @property {number} used_percentage - Pre-calculated usage (0-100)
- * @property {number} remaining_percentage - Pre-calculated remaining (0-100)
+ * @property {number} context_window_size - Max context size (200000 default, 1000000 extended)
+ * @property {number|null} used_percentage - Pre-calculated usage (0-100), null early in session
+ * @property {number|null} remaining_percentage - Pre-calculated remaining (0-100), null early in session
  * @property {CurrentUsageData|null} current_usage - Current context usage
  */
 
 /**
+ * @typedef {object} VimData
+ * @property {"NORMAL"|"INSERT"} mode - Current vim mode
+ */
+
+/**
+ * @typedef {object} AgentData
+ * @property {string} name - Agent name when running with --agent flag
+ */
+
+/**
  * @typedef {object} SessionData
- * @property {string} hook_event_name - Always "Status" for statusline
  * @property {string} session_id - Unique session identifier
  * @property {string} transcript_path - Path to session transcript
- * @property {string} cwd - Current working directory
+ * @property {string} cwd - Current working directory (alias for workspace.current_dir)
  * @property {ModelData} model - Model information
  * @property {WorkspaceData} workspace - Workspace paths
  * @property {string} version - Claude Code version
  * @property {OutputStyleData} output_style - Active output style
  * @property {CostData} cost - Session cost and stats
  * @property {ContextWindowData} context_window - Context usage info
+ * @property {boolean} exceeds_200k_tokens - Whether last response exceeded 200k tokens (fixed threshold)
+ * @property {VimData} [vim] - Present only when vim mode is enabled
+ * @property {AgentData} [agent] - Present only when running with --agent flag or agent settings
  */
 
 
