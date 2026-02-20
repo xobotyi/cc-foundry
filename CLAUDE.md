@@ -113,7 +113,8 @@ the code change, ideally in the same commit or immediately following commit.
 - Do not use manual cp/ln installation methods
 
 **Version management:**
-- Plugin versions must be synchronized between `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+- Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and
+  the repo-root `.claude-plugin/marketplace.json` (which lists all plugins in a single file)
 - Update both files when bumping versions
 
 **Licensing:**
