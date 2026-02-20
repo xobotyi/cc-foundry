@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "CLI Guidelines (clig.dev)": "https://raw.githubusercontent.com/cli-guidelines/cli-guidelines/main/content/_index.md",
+    "POSIX Utility Conventions": "https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html",
+    "GNU Coding Standards - CLI": "https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html",
+    "GNU Argument Syntax": "https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html",
+    "GNU Exit Status": "https://www.gnu.org/software/libc/manual/html_node/Exit-Status.html",
+    "GNU Termination Signals": "https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html",
+    "NO_COLOR Specification": "https://raw.githubusercontent.com/jcs/no_color/master/index.md",
+    "ANSI Escape Codes Reference": "https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797/raw"
+  },
+  "lastFetched": "2026-02-20T21:29:03.563Z"
+}

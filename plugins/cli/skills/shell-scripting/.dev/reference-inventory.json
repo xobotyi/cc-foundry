@@ -1,0 +1,14 @@
+{
+  "sources": {
+    "Google Shell Style Guide": "https://raw.githubusercontent.com/google/styleguide/gh-pages/shellguide.md",
+    "Pure Bash Bible": "https://raw.githubusercontent.com/dylanaraps/pure-bash-bible/master/README.md",
+    "Pure POSIX sh Bible": "https://raw.githubusercontent.com/dylanaraps/pure-sh-bible/master/README.md",
+    "ShellCheck README": "https://raw.githubusercontent.com/koalaman/shellcheck/master/README.md",
+    "Bash Style Guide (bahamas10)": "https://raw.githubusercontent.com/bahamas10/bash-style-guide/master/README.md",
+    "Bash Best Practices Cheat Sheet": "https://raw.githubusercontent.com/bertvv/cheat-sheets/master/docs/Bash.md",
+    "BashPitfalls (Greg Wooledge Wiki)": "https://mywiki.wooledge.org/BashPitfalls",
+    "BashGuide Practices (Greg Wooledge Wiki)": "https://mywiki.wooledge.org/BashGuide/Practices",
+    "POSIX Shell Command Language Spec": "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+  },
+  "lastFetched": "2026-02-20T21:29:06.235Z"
+}
