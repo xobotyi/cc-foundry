@@ -143,7 +143,7 @@ The agent works correctly at working resolution. References let it zoom in.
 and weights in SKILL.md. The reference provides detailed 0-20 scoring rubrics
 for each criterion with examples at each level.
 
-**Example:** A Node.js skill puts 17 numbered module system rules in SKILL.md.
+**Example:** A Node.js skill puts 17 module system rules in SKILL.md.
 The reference provides ESM/CJS comparison tables, file extension edge cases,
 and interop patterns.
 
@@ -227,12 +227,13 @@ expected behavior. Include input/output pairs.
 **Place critical rules at the end.** Instructions near the context boundary
 are followed more reliably.
 
-**Two styles of numbered content:**
-- **Sequential steps** for workflows: "1. Read input → 2. Validate → 3. Output"
-- **Declarative rules** for conventions: "1. Use ESM. 2. Use `node:` prefix..."
+**Numbered lists vs bullet lists:**
+- **Numbered lists** — ONLY for sequential steps where order matters:
+  "1. Read input → 2. Validate → 3. Output"
+- **Bullet lists** — for rules, directives, and conventions where there is
+  no ordering: "- Use ESM. - Use `node:` prefix..."
 
-Both use numbered lists but serve different purposes. Declarative rules don't
-imply ordering — they're a numbered inventory of things to follow.
+If the items can be reordered without changing meaning, use bullets.
 
 ## Skill Archetypes
 
@@ -260,7 +261,7 @@ Conventions and rules for a language, framework, or platform. Structure:
 [Philosophy statement — one line]
 
 ## References (route table with Contents column)
-## [Topic sections with numbered declarative rules]
+## [Topic sections with declarative rules as bullet lists]
 ## Application (writing mode vs reviewing mode)
 ## Integration (relationship to other skills)
 [Closing maxim]
@@ -269,7 +270,7 @@ Conventions and rules for a language, framework, or platform. Structure:
 Key patterns:
 - **Philosophy bookends** — opening statement frames the skill's values;
   closing maxim reinforces
-- **Numbered declarative rules** per topic (8-17 rules is typical)
+- **Declarative rules as bullet lists** per topic (8-17 rules is typical)
 - **Application section** — "when writing: apply silently; when reviewing:
   cite violation, show fix inline"
 - **Integration section** — names related skills and their boundaries
@@ -327,20 +328,20 @@ description: >-
 
 ## Core Principles
 
-1. **Skills are prompts.** Every prompt engineering principle applies. Use
-   clear structure, examples, XML tags, and explicit format specifications.
+- **Skills are prompts.** Every prompt engineering principle applies. Use
+  clear structure, examples, XML tags, and explicit format specifications.
 
-2. **Description is the trigger.** Claude activates based solely on matching
-   request to description. Vague descriptions → missed activations.
+- **Description is the trigger.** Claude activates based solely on matching
+  request to description. Vague descriptions → missed activations.
 
-3. **SKILL.md is the discipline.** An agent reading only SKILL.md must be
-   able to do the job correctly. References deepen — they don't complete.
+- **SKILL.md is the discipline.** An agent reading only SKILL.md must be
+  able to do the job correctly. References deepen — they don't complete.
 
-4. **References are optional depth.** Detailed rubrics, extended examples,
-   full catalogs, niche how-tos. Never core behavioral rules.
+- **References are optional depth.** Detailed rubrics, extended examples,
+  full catalogs, niche how-tos. Never core behavioral rules.
 
-5. **One skill, one purpose.** Broad skills produce mediocre results. If
-   scope creeps, split.
+- **One skill, one purpose.** Broad skills produce mediocre results. If
+  scope creeps, split.
 
 ## Quick Checks
 
