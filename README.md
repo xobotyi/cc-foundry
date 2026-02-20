@@ -178,8 +178,11 @@ Technology-agnostic guidance in `observability`; tool-specific depth in the othe
 
 ### cli
 
-CLI platform discipline for command-line interface design, UX patterns, and conventions.
-Currently a scaffold — skills to be developed.
+CLI platform discipline — command-line interface design, shell scripting conventions, and
+terminal UX patterns. Two skills cover the full CLI surface: `cli` handles the design layer
+(argument conventions, output streams, exit codes, configuration hierarchy, signal handling)
+for CLIs written in any language, while `shell-scripting` handles the implementation layer
+(strict mode, quoting, portability, error handling) for scripts written in shell.
 
 ```
 /plugin install cli
