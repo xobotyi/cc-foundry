@@ -124,7 +124,7 @@
     {
       "name": "golang",
       "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -140,7 +140,7 @@
     {
       "name": "javascript",
       "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -156,7 +156,7 @@
     {
       "name": "frontend",
       "description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
-      "version": "1.0.0",
+      "version": "1.2.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -172,7 +172,7 @@
     {
       "name": "backend",
       "description": "Backend platform discipline: observability, API design, and service architecture practices",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"

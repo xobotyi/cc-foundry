@@ -1,6 +1,6 @@
 {
   "name": "javascript",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
   "lspServers": "./.lsp.json",
   "author": {
