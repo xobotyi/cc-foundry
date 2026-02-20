@@ -168,8 +168,12 @@ description: >-
 
 ### Template with References
 
-For skills with multiple reference files, use a **route to reference** table.
-This tells Claude which reference to read based on the situation:
+For skills with reference files, SKILL.md must contain working-resolution
+versions of all behavioral content. References provide depth (extended
+examples, catalogs, detailed rubrics), not core rules.
+
+Include a route table with a **Contents** column so the agent can make
+informed decisions about which references to read:
 
 ```markdown
 ---
@@ -181,35 +185,29 @@ description: >-
 
 # [Skill Name]
 
-[1-2 sentence purpose statement]
+[Purpose statement]
 
-## Route to Reference
+## References
 
-| Situation | Reference |
-|-----------|-----------|
-| Need to do X | [x-guide.md](references/x-guide.md) |
-| Need to do Y | [y-guide.md](references/y-guide.md) |
-| Something is broken | [troubleshooting.md](references/troubleshooting.md) |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Topic A | `references/a.md` | Comparison tables, extended examples |
+| Topic B | `references/b.md` | Full API catalog, edge case patterns |
 
-Read the relevant reference before proceeding.
+## [Topic Sections]
 
-## Core Rules
+[Working-resolution rules — the complete behavioral specification.
+An agent reading only SKILL.md produces correct output.]
 
-[Essential guidance that applies to all situations]
-
-## Quick Checklist
-
-- [ ] Check 1
-- [ ] Check 2
+[Pointers to references for extended depth: "Comparison tables and
+file extension rules: see `references/a.md`."]
 ```
 
 This pattern:
-- Routes Claude to detailed content based on situation
-- Avoids repeating reference content in SKILL.md
-- Makes the skill self-documenting
-
-SKILL.md can still contain core rules, examples, and guidance—the
-router table just provides navigation to deep-dive content.
+- SKILL.md IS the discipline — not a router to the real content
+- References deepen topics whose rules are already stated in the body
+- Contents column enables informed read decisions
+- Agent works correctly without ever loading a reference
 
 ### Simple Template
 
@@ -529,3 +527,78 @@ description: Generate pull request descriptions following team format.
 2. Fill in template sections
 3. Suggest appropriate reviewers based on changed files
 ```
+
+### Coding Discipline Skill
+
+For language, framework, or platform conventions. The most reference-heavy
+archetype — typically 5-10 references covering different topic areas.
+
+Key structural patterns:
+- **Philosophy bookends** — opening statement frames values, closing maxim
+  reinforces
+- **Numbered declarative rules** per topic section (8-17 rules typical)
+- **Application section** — differentiates writing mode (apply silently)
+  from reviewing mode (cite violation, show fix inline)
+- **Integration section** — names related skills and their scope boundaries
+
+```markdown
+---
+name: nodejs
+description: >-
+  Node.js runtime conventions, APIs, and ecosystem patterns. Invoke
+  whenever task involves any interaction with Node.js runtime — server
+  code, CLI tools, scripts, module system, streams, or process lifecycle.
+---
+
+# Node.js
+
+**Respect the event loop. Every blocking operation is a scalability bug.**
+
+## References
+
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Modules | `references/modules.md` | ESM/CJS comparison tables, file extension rules |
+| Event loop | `references/event-loop.md` | Phase order, execution priority, worker pool |
+| Streams | `references/streams.md` | Stream types table, pipeline patterns |
+
+## Module System
+
+1. **Use ESM.** Set `"type": "module"` in `package.json`.
+2. **Use `node:` prefix** for all built-in imports.
+3. **Define `"exports"` in `package.json`** for libraries.
+[... more numbered rules ...]
+
+File extension rules and ESM vs CJS comparison tables:
+see `references/modules.md`.
+
+## Event Loop
+
+### Core Rules
+
+1. **Never block the event loop.** No sync I/O in servers.
+2. **Offload CPU-intensive work** to `worker_threads`.
+[... more numbered rules ...]
+
+## Application
+
+When **writing** Node.js code:
+- Apply all conventions silently — don't narrate each rule.
+- If an existing codebase contradicts a convention, follow the
+  codebase and flag the divergence once.
+
+When **reviewing** Node.js code:
+- Cite the specific violation and show the fix inline.
+- Don't lecture — state what's wrong and how to fix it.
+
+## Integration
+
+The **javascript** skill governs language choices; this skill governs
+Node.js runtime decisions.
+
+**Respect the event loop. When in doubt, make it async.**
+```
+
+Note how every reference topic has working-resolution rules in the body.
+The references provide depth (comparison tables, phase diagrams, patterns)
+but the agent can write correct Node.js code from SKILL.md alone.
