@@ -28,7 +28,7 @@
     {
       "name": "ai-helpers",
       "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -44,7 +44,7 @@
     {
       "name": "git-commit",
       "description": "Git commit workflow: atomic commits, validation, conventions",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -60,7 +60,7 @@
     {
       "name": "the-blueprint",
       "description": "Structured planning pipeline: design documents, technical designs, task decomposition, and task creation",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -92,7 +92,7 @@
     {
       "name": "the-crucible",
       "description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -108,7 +108,7 @@
     {
       "name": "the-coder",
       "description": "Software engineering discipline: output styles, coding fundamentals, and universal development practices",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -124,7 +124,7 @@
     {
       "name": "golang",
       "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -140,7 +140,7 @@
     {
       "name": "javascript",
       "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -156,7 +156,7 @@
     {
       "name": "frontend",
       "description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -172,7 +172,7 @@
     {
       "name": "backend",
       "description": "Backend platform discipline: observability, API design, and service architecture practices",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -187,8 +187,8 @@
     },
     {
       "name": "cli",
-      "description": "CLI platform discipline: command-line interface design, UX patterns, and conventions",
-      "version": "1.0.0",
+      "description": "CLI platform discipline: CLI application design, shell scripting conventions, and terminal UX",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -198,7 +198,7 @@
       "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/cli",
       "repository": "https://github.com/xobotyi/cc-foundry",
       "license": "MIT",
-      "keywords": ["cli", "command-line", "terminal", "ux"],
+      "keywords": ["cli", "command-line", "terminal", "shell-scripting", "bash", "ux"],
       "tags": ["platform", "cli", "terminal"]
     }
   ]

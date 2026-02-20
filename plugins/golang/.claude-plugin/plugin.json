@@ -1,6 +1,6 @@
 {
   "name": "golang",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
   "lspServers": "./.lsp.json",
   "author": {
