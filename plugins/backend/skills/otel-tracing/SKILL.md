@@ -15,15 +15,15 @@ selection, sampling strategy — trades off cost against visibility.
 
 ## References
 
-| Reference | Contains |
-|-----------|----------|
-| `references/spans.md` | Span anatomy, root spans, lifetime details |
-| `references/span-data.md` | Events format, links format, SDK limits |
-| `references/context-propagation.md` | W3C header format, propagator selection, baggage details, security |
-| `references/instrumentation.md` | Server/client/async patterns, library rules, testing |
-| `references/sampling.md` | Head/tail/combined sampling, decision guide, sampler types |
-| `references/semantic-conventions.md` | HTTP/DB/messaging attribute lists, general conventions |
-| `references/sdk-components.md` | Resource config, env vars, Collector deployment, exporter types |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Spans | `references/spans.md` | Span anatomy, root spans, lifetime code patterns |
+| Span data | `references/span-data.md` | Events format, links format, SDK limits table |
+| Context propagation | `references/context-propagation.md` | W3C header format, propagator selection, baggage details, security |
+| Instrumentation | `references/instrumentation.md` | Server/client/async code patterns, library rules, testing guidance |
+| Sampling | `references/sampling.md` | Head/tail/combined strategies, decision guide, sampler types |
+| Semantic conventions | `references/semantic-conventions.md` | HTTP/DB/messaging attribute lists, status mapping, general conventions |
+| SDK components | `references/sdk-components.md` | Resource config, env vars, Collector deployment, exporter types |
 
 ## Spans
 

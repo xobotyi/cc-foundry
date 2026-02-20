@@ -17,13 +17,13 @@ requirement.
 
 ## References
 
-| Reference | Contains |
-|-----------|----------|
-| `references/server.md` | Route types, file response patterns, WebSocket pub/sub, server config |
-| `references/io-and-processes.md` | File I/O details, shell API, child processes, workers |
-| `references/testing.md` | Test modifiers, parametrized tests, mocking, snapshots, CLI flags |
-| `references/ecosystem.md` | SQLite API, bundler options, plugins, macros |
-| `references/config-and-compat.md` | bunfig.toml sections, Node.js compatibility, env vars |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| HTTP server | `references/server.md` | Route types, file response patterns, WebSocket pub/sub, server config |
+| File I/O and processes | `references/io-and-processes.md` | File I/O details, shell API, child processes, workers |
+| Testing | `references/testing.md` | Test modifiers, parametrized tests, mocking, snapshots, CLI flags |
+| SQLite, bundler, plugins | `references/ecosystem.md` | SQLite API, bundler options, plugins, macros |
+| Configuration | `references/config-and-compat.md` | bunfig.toml sections, Node.js compatibility, env vars |
 
 ## Prefer Bun-Native APIs
 

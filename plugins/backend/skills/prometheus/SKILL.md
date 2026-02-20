@@ -17,14 +17,14 @@ expensive rework later.
 
 ## References
 
-| Reference | Contains |
-|-----------|----------|
-| `references/metric-types.md` | Extended type comparison, histogram bucket tuning, summary configuration |
-| `references/naming.md` | Full naming examples, base units table, recording rule naming |
-| `references/instrumentation.md` | Code patterns per system type, library instrumentation, performance tuning |
-| `references/promql.md` | Full operator catalog, vector matching, over-time aggregation, operator precedence |
-| `references/alerting-and-rules.md` | Alert design, recording rule naming, anti-patterns, when to record |
-| `references/exporters.md` | Exporter architecture, collectors, help strings, push-based sources |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Metric types | `references/metric-types.md` | Extended type comparison, histogram bucket tuning, summary configuration |
+| Naming | `references/naming.md` | Full naming examples, base units table, character rules, label best practices |
+| Instrumentation | `references/instrumentation.md` | Code patterns per system type, library instrumentation, performance tuning |
+| PromQL | `references/promql.md` | Full operator catalog, vector matching, over-time aggregation, operator precedence |
+| Alerting and rules | `references/alerting-and-rules.md` | Alert design, recording rule naming, aggregation patterns, anti-patterns |
+| Exporters | `references/exporters.md` | Exporter architecture, collectors, help strings, push-based sources |
 
 ## Metric Type Selection
 

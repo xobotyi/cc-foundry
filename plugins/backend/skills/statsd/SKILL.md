@@ -16,14 +16,14 @@ your application, but wrong metric types or bad naming corrupt your data silentl
 
 ## References
 
-| Reference | Contains |
-|-----------|----------|
-| `references/metric-types.md` | Wire format details, type comparison, sampling correction |
-| `references/naming.md` | Graphite namespace mapping, character rules, naming examples |
-| `references/dogstatsd.md` | Events format, service checks, protocol versions, distributions vs histograms |
-| `references/aggregation.md` | Flush mechanics, Graphite downsampling, DogStatsD aggregation, pre-aggregated timestamps |
-| `references/client-patterns.md` | High-throughput tuning, error handling, K8s deployment, UDS configuration |
-| `references/backends.md` | statsd_exporter config, Telegraf setup, migration guides |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Metric types | `references/metric-types.md` | Wire format details, type comparison, sampling correction |
+| Naming | `references/naming.md` | Graphite namespace mapping, character rules, naming examples |
+| DogStatsD | `references/dogstatsd.md` | Events format, service checks, protocol versions, distributions vs histograms |
+| Aggregation | `references/aggregation.md` | Flush mechanics, Graphite downsampling, DogStatsD aggregation, timestamps |
+| Client patterns | `references/client-patterns.md` | High-throughput tuning, error handling, K8s deployment, UDS configuration |
+| Backends | `references/backends.md` | statsd_exporter config, Telegraf setup, migration guides |
 
 ## Metric Types
 

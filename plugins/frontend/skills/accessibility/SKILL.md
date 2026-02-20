@@ -19,14 +19,14 @@ otherwise. AA includes all A criteria.
 
 ## References
 
-| Reference | Content |
-|-----------|---------|
-| `references/semantic-html.md` | Landmarks, headings, images, tables, lists, language markup |
-| `references/aria.md` | Roles, states, properties, naming, live regions, common mistakes |
-| `references/keyboard.md` | Focus order, visibility, roving tabindex, focus traps, restoration |
-| `references/forms.md` | Labels, grouping, required fields, validation, autocomplete |
-| `references/component-patterns.md` | Dialog, tabs, accordion, disclosure, menu, combobox, tooltip |
-| `references/wcag.md` | Full WCAG 2.2 AA criteria tables and compliance checklist |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Semantic HTML | `references/semantic-html.md` | Landmarks, headings, images, tables, lists, language markup |
+| ARIA | `references/aria.md` | Roles, states, properties, naming, live regions, common mistakes |
+| Keyboard | `references/keyboard.md` | Focus order, visibility, roving tabindex, focus traps, restoration |
+| Forms | `references/forms.md` | Labels, grouping, required fields, validation, autocomplete |
+| Component patterns | `references/component-patterns.md` | Dialog, tabs, accordion, disclosure, menu, combobox, tooltip |
+| WCAG | `references/wcag.md` | Full WCAG 2.2 AA criteria tables and compliance checklist |
 
 ---
 

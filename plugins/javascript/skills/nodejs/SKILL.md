@@ -15,13 +15,13 @@ event loop, it's wrong.
 
 ## References
 
-| Reference | Contains |
-|-----------|----------|
-| `references/modules.md` | ESM/CJS comparison tables, file extension rules, conditional exports patterns |
-| `references/event-loop.md` | Phase order, execution priority, blocking operations table, worker pool |
-| `references/streams.md` | Stream types table, pipeline patterns, backpressure details |
-| `references/errors.md` | Error categories table, global handlers, centralized error handling |
-| `references/security.md` | Supply chain threats table, HTTP security headers, process hardening |
+| Topic | Reference | Contents |
+|-------|-----------|----------|
+| Module system | `references/modules.md` | ESM/CJS comparison tables, file extension rules, conditional exports patterns |
+| Event loop | `references/event-loop.md` | Phase order, execution priority, blocking operations table, worker pool |
+| Streams | `references/streams.md` | Stream types table, pipeline patterns, backpressure details |
+| Error handling | `references/errors.md` | Error categories table, global handlers, centralized error handling |
+| Security | `references/security.md` | Supply chain threats table, HTTP security headers, process hardening |
 
 ## Module System
 
