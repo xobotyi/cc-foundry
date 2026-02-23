@@ -99,13 +99,13 @@ tree -- it does not change behavior, keyboard interaction, or appearance.
 
 ### The Five Rules of ARIA
 
-1. **Use native HTML first.** If a semantic HTML element exists, use it.
-2. **Do not change native semantics** unless absolutely necessary. Never
-   `<h2 role="tab">` -- use `<div role="tab"><h2>...</h2></div>`.
-3. **All interactive ARIA controls must be keyboard operable.** A `role="button"`
-   must respond to Enter and Space.
-4. **Never `role="presentation"` or `aria-hidden="true"` on focusable elements.**
-5. **All interactive elements must have an accessible name.**
+- **Use native HTML first.** If a semantic HTML element exists, use it.
+- **Do not change native semantics** unless absolutely necessary. Never
+  `<h2 role="tab">` -- use `<div role="tab"><h2>...</h2></div>`.
+- **All interactive ARIA controls must be keyboard operable.** A `role="button"`
+  must respond to Enter and Space.
+- **Never `role="presentation"` or `aria-hidden="true"` on focusable elements.**
+- **All interactive elements must have an accessible name.**
 
 ### Naming and Describing
 

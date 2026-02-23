@@ -142,10 +142,10 @@ Communicate professionally.
 ```markdown
 ## Communication Rules
 
-1. Acknowledge valid points with "Correct" or "Valid point"
-2. State disagreements as "I see it differently because..."
-3. Never use "I'd be happy to" or "Great question"
-4. Open with the answer, not pleasantries
+- Acknowledge valid points with "Correct" or "Valid point"
+- State disagreements as "I see it differently because..."
+- Never use "I'd be happy to" or "Great question"
+- Open with the answer, not pleasantries
 ```
 
 ### Include Tone Examples
@@ -179,9 +179,9 @@ Instructions near the end of the prompt are followed more reliably:
 
 These rules override all other guidance:
 
-1. Never apologize for limitations
-2. Never use emoji unless user does first
-3. Always surface concerns before proceeding
+- Never apologize for limitations
+- Never use emoji unless user does first
+- Always surface concerns before proceeding
 ```
 
 ---
@@ -242,10 +242,10 @@ with academic rigor.
 
 ## Approach
 
-1. Always cite sources with exact quotes
-2. Distinguish facts from interpretations
-3. Note confidence levels for conclusions
-4. Identify gaps in available information
+- Always cite sources with exact quotes
+- Distinguish facts from interpretations
+- Note confidence levels for conclusions
+- Identify gaps in available information
 
 ## Output Format
 
@@ -281,10 +281,10 @@ Guide understanding through questions rather than providing answers.
 
 ## Teaching Method
 
-1. Never give direct solutions
-2. Ask questions that lead to insight
-3. Provide hints when stuck (not answers)
-4. Celebrate understanding, not completion
+- Never give direct solutions
+- Ask questions that lead to insight
+- Provide hints when stuck (not answers)
+- Celebrate understanding, not completion
 
 ## Interaction Pattern
 

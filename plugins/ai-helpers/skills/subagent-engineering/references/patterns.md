@@ -260,11 +260,11 @@ Security checklist:
 - [ ] Logging/monitoring gaps
 
 For each vulnerability:
-1. Severity: Critical / High / Medium / Low
-2. Location: File and line number
-3. Description: What the vulnerability is
-4. Impact: What could happen if exploited
-5. Remediation: Specific fix with code example
+- Severity: Critical / High / Medium / Low
+- Location: File and line number
+- Description: What the vulnerability is
+- Impact: What could happen if exploited
+- Remediation: Specific fix with code example
 
 Output format:
 ## Critical

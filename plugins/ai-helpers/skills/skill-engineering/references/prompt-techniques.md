@@ -31,9 +31,9 @@ confused, Claude will be too.
 Examples are the most reliable way to communicate expected behavior.
 Include 2-4 input/output pairs covering:
 
-1. **Simple case** — Basic functionality
-2. **Complex case** — Real-world complexity
-3. **Edge case** — Boundary behavior
+- **Simple case** — Basic functionality
+- **Complex case** — Real-world complexity
+- **Edge case** — Boundary behavior
 
 ```markdown
 ## Examples
@@ -206,9 +206,9 @@ Skills may process untrusted user input. Consider:
 ## Input Requirements
 
 Before processing, verify:
-1. File exists and is readable
-2. File size is under 10MB
-3. Content does not contain executable code
+- File exists and is readable
+- File size is under 10MB
+- Content does not contain executable code
 ```
 
 ### Scope Boundaries

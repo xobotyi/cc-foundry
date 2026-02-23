@@ -851,10 +851,10 @@ Toggle verbose mode with `Ctrl+O` to see hook output in the transcript.
 
 ### Hook Not Firing
 
-1. Run `/hooks` and confirm the hook appears under the correct event
-2. Check matcher pattern matches exactly (matchers are case-sensitive)
-3. Confirm the correct event type (`PreToolUse` fires before, `PostToolUse` fires after)
-4. `PermissionRequest` hooks do not fire in non-interactive mode (`-p`) — use `PreToolUse`
+- Run `/hooks` and confirm the hook appears under the correct event
+- Check matcher pattern matches exactly (matchers are case-sensitive)
+- Confirm the correct event type (`PreToolUse` fires before, `PostToolUse` fires after)
+- `PermissionRequest` hooks do not fire in non-interactive mode (`-p`) — use `PreToolUse`
 
 ### Testing a Hook Manually
 

@@ -41,11 +41,11 @@ Project-specific commit guidance goes here.
 
 **Before starting the pipeline**, check project CLAUDE.md for `<git-commit-config>`:
 
-1. **`<validator-args>`** — Pass all defined flags directly to the validator.
-   Each `<flag name="X" value="Y"/>` becomes `--X "Y"` in the command.
+- **`<validator-args>`** — Pass all defined flags directly to the validator.
+  Each `<flag name="X" value="Y"/>` becomes `--X "Y"` in the command.
 
-2. **`<extra-instructions>`** — Highest priority guidance for this commit process.
-   Follow these instructions throughout the pipeline. They override defaults.
+- **`<extra-instructions>`** — Highest priority guidance for this commit process.
+  Follow these instructions throughout the pipeline. They override defaults.
 </project-config>
 
 ## Commit Pipeline
@@ -206,6 +206,6 @@ When a commit breaks backward compatibility:
 ## Output
 
 After completing all commits, show:
-1. List of created commits with subjects
-2. Current branch status
-3. Any remaining uncommitted changes
+- List of created commits with subjects
+- Current branch status
+- Any remaining uncommitted changes

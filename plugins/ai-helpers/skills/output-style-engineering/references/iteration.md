@@ -161,10 +161,10 @@ for multi-step work.
 
 When tasks require multiple steps:
 
-1. Maintain style for EACH step
-2. Structure output clearly (headers, bullets)
-3. If length needed, prefer structure over prose
-4. Preserve tone even when providing details
+- Maintain style for EACH step
+- Structure output clearly (headers, bullets)
+- If length needed, prefer structure over prose
+- Preserve tone even when providing details
 
 For longer responses, check: "Does each paragraph
 match this style?"

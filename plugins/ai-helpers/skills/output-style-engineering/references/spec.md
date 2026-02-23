@@ -81,11 +81,11 @@ The body is Markdown that becomes part of Claude's system prompt.
 
 ### Recommended Sections
 
-1. **Persona Definition** — Who is Claude in this style?
-2. **Core Behaviors** — Primary rules and interaction patterns
-3. **Communication Style** — Tone, language, formatting preferences
-4. **Output Format** — How to structure responses
-5. **Examples** — Demonstrate expected tone/behavior
+- **Persona Definition** — Who is Claude in this style?
+- **Core Behaviors** — Primary rules and interaction patterns
+- **Communication Style** — Tone, language, formatting preferences
+- **Output Format** — How to structure responses
+- **Examples** — Demonstrate expected tone/behavior
 
 ### Length Guidelines
 

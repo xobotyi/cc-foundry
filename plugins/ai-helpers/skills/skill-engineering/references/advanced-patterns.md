@@ -376,10 +376,10 @@ Open in browser to explore results.
 ## Input Requirements
 
 Before processing, verify:
-1. File exists and is readable
-2. File size is under 10MB
-3. File extension matches expected type
-4. Content does not contain executable code
+- File exists and is readable
+- File size is under 10MB
+- File extension matches expected type
+- Content does not contain executable code
 ```
 
 ### Limiting Scope

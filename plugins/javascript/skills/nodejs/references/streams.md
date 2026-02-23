@@ -242,25 +242,25 @@ for await (const line of rl) {
 
 ## Error Handling in Streams
 
-1. **Always handle `'error'` events** on streams not managed by `pipeline()`.
-   An unhandled `'error'` event on a stream crashes the process.
+- **Always handle `'error'` events** on streams not managed by `pipeline()`.
+  An unhandled `'error'` event on a stream crashes the process.
 
-2. **`pipeline()` handles errors automatically** — cleans up all streams and rejects
-   the promise.
+- **`pipeline()` handles errors automatically** — cleans up all streams and rejects
+  the promise.
 
-3. **Destroy streams explicitly** when you need to abort:
-   ```js
-   stream.destroy(new Error('aborted'));
-   ```
+- **Destroy streams explicitly** when you need to abort:
+  ```js
+  stream.destroy(new Error('aborted'));
+  ```
 
-4. **Never ignore the `'error'` event** on EventEmitters:
-   ```js
-   // BAD — crashes process on error
-   const stream = createReadStream('maybe-missing.txt');
+- **Never ignore the `'error'` event** on EventEmitters:
+  ```js
+  // BAD — crashes process on error
+  const stream = createReadStream('maybe-missing.txt');
 
-   // GOOD
-   const stream = createReadStream('maybe-missing.txt');
-   stream.on('error', (err) => {
-     console.error('Stream error:', err.message);
-   });
-   ```
+  // GOOD
+  const stream = createReadStream('maybe-missing.txt');
+  stream.on('error', (err) => {
+    console.error('Stream error:', err.message);
+  });
+  ```

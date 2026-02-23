@@ -24,9 +24,9 @@ Models trained on massive datasets have learned reasoning patterns, but
 standard prompting doesn't activate them. CoT explicitly requests the
 intermediate steps, providing:
 
-1. **Grounding** — each step anchors the next
-2. **Error detection** — flawed logic becomes visible
-3. **Transparency** — you can audit the reasoning path
+- **Grounding** — each step anchors the next
+- **Error detection** — flawed logic becomes visible
+- **Transparency** — you can audit the reasoning path
 
 ### Variants
 
@@ -307,9 +307,9 @@ appear only in sufficiently large models. Wei et al. (2022) showed CoT
 provides no benefit for small models and can even hurt performance.
 
 Rule of thumb: If a model struggles with CoT, try:
-1. Simpler prompts (zero-shot)
-2. More examples (few-shot without CoT)
-3. Larger model
+- Simpler prompts (zero-shot)
+- More examples (few-shot without CoT)
+- Larger model
 
 ---
 

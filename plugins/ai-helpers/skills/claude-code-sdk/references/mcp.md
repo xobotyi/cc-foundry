@@ -482,10 +482,10 @@ servers within policy constraints.
 
 ### Tools Not Appearing
 
-1. Verify server is configured: `claude mcp get <name>`
-2. Check server implements MCP protocol correctly
-3. Look for connection timeouts in `claude --debug` output
-4. Check `/mcp` for server status
+- Verify server is configured: `claude mcp get <name>`
+- Check server implements MCP protocol correctly
+- Look for connection timeouts in `claude --debug` output
+- Check `/mcp` for server status
 
 ### Large Output Issues
 

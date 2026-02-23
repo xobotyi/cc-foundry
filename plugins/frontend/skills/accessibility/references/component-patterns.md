@@ -237,11 +237,11 @@ mouse hover.
 
 ### Requirements
 
-1. Show on focus and hover; hide on blur, mouse leave, and Escape.
-2. Use `aria-describedby` to associate the tooltip with its trigger.
-3. Tooltip content must be hoverable (user can move pointer to tooltip).
-4. Tooltip must persist until dismissed by user action.
-5. Do not put interactive content inside tooltips.
+- Show on focus and hover; hide on blur, mouse leave, and Escape.
+- Use `aria-describedby` to associate the tooltip with its trigger.
+- Tooltip content must be hoverable (user can move pointer to tooltip).
+- Tooltip must persist until dismissed by user action.
+- Do not put interactive content inside tooltips.
 
 ## Alert
 

@@ -71,17 +71,17 @@ screen.getByRole('link', { name: /about/i });
 
 ### Rules
 
-1. **Use `getBy` by default.** It throws a helpful error with the full DOM
-   if the element isn't found.
-2. **Use `queryBy` ONLY to assert non-existence:**
-   ```tsx
-   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-   ```
-3. **Use `findBy` for async elements** (after data fetches, transitions):
-   ```tsx
-   const alert = await screen.findByRole('alert');
-   ```
-4. **Never use `queryBy` to assert existence** — `getBy` gives better errors.
+- **Use `getBy` by default.** It throws a helpful error with the full DOM
+  if the element isn't found.
+- **Use `queryBy` ONLY to assert non-existence:**
+  ```tsx
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  ```
+- **Use `findBy` for async elements** (after data fetches, transitions):
+  ```tsx
+  const alert = await screen.findByRole('alert');
+  ```
+- **Never use `queryBy` to assert existence** — `getBy` gives better errors.
 
 ## User Interactions
 
@@ -151,22 +151,22 @@ await waitFor(() => {
 
 ### waitFor Rules
 
-1. **Put one assertion per `waitFor` callback.** Multiple assertions
-   cause slower failure detection.
-2. **Never put side-effects in `waitFor`.** The callback may run multiple
-   times. Fire events outside, assert inside.
-3. **Prefer `findBy` over `waitFor` + `getBy`:**
-   ```tsx
-   // BAD
-   const button = await waitFor(() =>
-     screen.getByRole('button', { name: /submit/i })
-   );
+- **Put one assertion per `waitFor` callback.** Multiple assertions
+  cause slower failure detection.
+- **Never put side-effects in `waitFor`.** The callback may run multiple
+  times. Fire events outside, assert inside.
+- **Prefer `findBy` over `waitFor` + `getBy`:**
+  ```tsx
+  // BAD
+  const button = await waitFor(() =>
+    screen.getByRole('button', { name: /submit/i })
+  );
 
-   // GOOD
-   const button = await screen.findByRole('button', { name: /submit/i });
-   ```
-4. **Never pass an empty callback** to `waitFor`. Always wait for a
-   specific assertion.
+  // GOOD
+  const button = await screen.findByRole('button', { name: /submit/i });
+  ```
+- **Never pass an empty callback** to `waitFor`. Always wait for a
+  specific assertion.
 
 ## Assertions
 
@@ -191,12 +191,12 @@ expect(element).toHaveValue('hello');
 
 ## Accessibility in Tests
 
-1. **Don't add `role` attributes to native elements.** `<button>` already
-   has `role="button"`.
-2. **Make inputs accessible with `type` and `<label>`.** This makes them
-   queryable by role.
-3. **Query by role to enforce accessibility.** If you can't query an element
-   by role, it's probably not accessible to screen reader users either.
+- **Don't add `role` attributes to native elements.** `<button>` already
+  has `role="button"`.
+- **Make inputs accessible with `type` and `<label>`.** This makes them
+  queryable by role.
+- **Query by role to enforce accessibility.** If you can't query an element
+  by role, it's probably not accessible to screen reader users either.
 
 ## Anti-Patterns
 

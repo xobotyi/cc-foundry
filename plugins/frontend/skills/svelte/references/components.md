@@ -362,9 +362,9 @@ export const [getUserContext, setUserContext] = createContext<User>();
 
 ### Rules
 
-1. Do NOT reassign the context object -- mutate its properties instead
-2. For SSR safety, prefer context over global module state
-3. Pass functions into `setContext` to maintain reactivity across boundaries
+- Do NOT reassign the context object -- mutate its properties instead
+- For SSR safety, prefer context over global module state
+- Pass functions into `setContext` to maintain reactivity across boundaries
 
 ## Special Elements
 

@@ -28,14 +28,14 @@ these as navigation shortcuts.
 | `<search>` | `search` | Search functionality container |
 
 **Rules:**
-1. Every page must have exactly one `<main>`.
-2. `<header>` and `<footer>` only map to `banner`/`contentinfo` when they are
-   direct children of `<body>` -- nested inside `<article>`, `<section>`, etc.
-   they have no landmark role.
-3. If multiple `<nav>` elements exist, label each with `aria-label` or
-   `aria-labelledby` to distinguish them.
-4. Do not duplicate implicit roles -- never write `<main role="main">`.
-5. Include all perceivable content within a landmark region.
+- Every page must have exactly one `<main>`.
+- `<header>` and `<footer>` only map to `banner`/`contentinfo` when they are
+  direct children of `<body>` -- nested inside `<article>`, `<section>`, etc.
+  they have no landmark role.
+- If multiple `<nav>` elements exist, label each with `aria-label` or
+  `aria-labelledby` to distinguish them.
+- Do not duplicate implicit roles -- never write `<main role="main">`.
+- Include all perceivable content within a landmark region.
 
 ### Headings
 
@@ -43,10 +43,10 @@ Headings (`<h1>`--`<h6>`) create a document outline. Screen reader users navigat
 by headings more than any other method.
 
 **Rules:**
-1. One `<h1>` per page identifying the primary content.
-2. Do not skip heading levels -- `<h1>` then `<h3>` breaks the outline.
-3. Use headings to structure content, not for visual styling.
-4. Every `<section>` and major content area should begin with a heading.
+- One `<h1>` per page identifying the primary content.
+- Do not skip heading levels -- `<h1>` then `<h3>` breaks the outline.
+- Use headings to structure content, not for visual styling.
+- Every `<section>` and major content area should begin with a heading.
 
 ```html
 <!-- Good: logical heading hierarchy -->
@@ -125,9 +125,9 @@ headers.
 ```
 
 **Rules:**
-1. Use `<th>` with `scope="col"` or `scope="row"` for headers.
-2. Add `<caption>` to describe the table's purpose.
-3. Never use tables for layout.
+- Use `<th>` with `scope="col"` or `scope="row"` for headers.
+- Add `<caption>` to describe the table's purpose.
+- Never use tables for layout.
 
 ## Text Alternatives
 
@@ -158,11 +158,11 @@ headers.
 ```
 
 **Rules:**
-1. Every `<img>` must have an `alt` attribute -- even if empty.
-2. Do not start alt text with "Image of" or "Picture of" -- screen readers
-   already announce it as an image.
-3. Keep alt text concise -- typically under 125 characters.
-4. For decorative images, prefer CSS `background-image` over `<img alt="">`.
+- Every `<img>` must have an `alt` attribute -- even if empty.
+- Do not start alt text with "Image of" or "Picture of" -- screen readers
+  already announce it as an image.
+- Keep alt text concise -- typically under 125 characters.
+- For decorative images, prefer CSS `background-image` over `<img alt="">`.
 
 ## Lists
 
@@ -176,6 +176,6 @@ whether to traverse or skip.
 
 ## Language
 
-1. Set the page language: `<html lang="en">`.
-2. Mark language changes inline: `<span lang="fr">bonjour</span>`.
-3. Use clear, simple language. Expand abbreviations on first use with `<abbr>`.
+- Set the page language: `<html lang="en">`.
+- Mark language changes inline: `<span lang="fr">bonjour</span>`.
+- Use clear, simple language. Expand abbreviations on first use with `<abbr>`.

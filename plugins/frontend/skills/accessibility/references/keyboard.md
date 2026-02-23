@@ -6,12 +6,12 @@ voice control users, and anyone without a pointing device.
 
 ## Fundamental Conventions
 
-1. **Tab** moves focus between interactive components (links, buttons, inputs).
-2. **Shift+Tab** moves focus backward.
-3. **Arrow keys** move focus within composite widgets (tabs, menus, grids).
-4. **Enter** activates links, buttons, and menu items.
-5. **Space** activates buttons, checkboxes, and toggles.
-6. **Escape** closes overlays, menus, and dialogs.
+- **Tab** moves focus between interactive components (links, buttons, inputs).
+- **Shift+Tab** moves focus backward.
+- **Arrow keys** move focus within composite widgets (tabs, menus, grids).
+- **Enter** activates links, buttons, and menu items.
+- **Space** activates buttons, checkboxes, and toggles.
+- **Escape** closes overlays, menus, and dialogs.
 
 ## Focus Order
 
@@ -19,27 +19,27 @@ Focus order must match visual reading order. The DOM order determines the
 default tab sequence.
 
 **Rules:**
-1. Never use `tabindex` values greater than 0. Rearrange DOM order instead.
-2. Use `tabindex="0"` to make non-interactive elements focusable (sparingly).
-3. Use `tabindex="-1"` for elements that should be programmatically focusable
-   but not in the tab sequence (e.g., dialog containers, skip link targets).
-4. Source order = visual order = focus order. CSS layout changes
-   (`flex-direction: row-reverse`, `order`, `grid` reordering) must not
-   break this alignment.
+- Never use `tabindex` values greater than 0. Rearrange DOM order instead.
+- Use `tabindex="0"` to make non-interactive elements focusable (sparingly).
+- Use `tabindex="-1"` for elements that should be programmatically focusable
+  but not in the tab sequence (e.g., dialog containers, skip link targets).
+- Source order = visual order = focus order. CSS layout changes
+  (`flex-direction: row-reverse`, `order`, `grid` reordering) must not
+  break this alignment.
 
 ## Focus Visibility
 
 Every focusable element must have a visible focus indicator.
 
 **Rules:**
-1. Never use `outline: none` or `outline: 0` without providing a custom
-   focus style.
-2. Use `:focus-visible` for keyboard-only focus styles (avoids showing
-   outlines on mouse click).
-3. Focus indicator must have at least 3:1 contrast against the adjacent
-   background.
-4. The focus indicator area must be at least as large as a 2px border
-   around the element (WCAG 2.2 AAA 2.4.13).
+- Never use `outline: none` or `outline: 0` without providing a custom
+  focus style.
+- Use `:focus-visible` for keyboard-only focus styles (avoids showing
+  outlines on mouse click).
+- Focus indicator must have at least 3:1 contrast against the adjacent
+  background.
+- The focus indicator area must be at least as large as a 2px border
+  around the element (WCAG 2.2 AAA 2.4.13).
 
 ```css
 /* Good: custom focus indicator with :focus-visible */
@@ -173,9 +173,9 @@ function trapFocus(dialogElement) {
 When dynamic content is removed (deleted list item, closed dialog, dismissed
 notification), focus must move to a logical target:
 
-1. **Deleted item** -- focus the next item, or previous if last was deleted.
-2. **Closed overlay** -- focus the trigger element that opened it.
-3. **Removed section** -- focus the nearest logical container or heading.
+- **Deleted item** -- focus the next item, or previous if last was deleted.
+- **Closed overlay** -- focus the trigger element that opened it.
+- **Removed section** -- focus the nearest logical container or heading.
 
 Never let focus fall to `document.body` -- this causes a complete loss of
 keyboard context.
@@ -198,9 +198,9 @@ keyboard context.
 
 ## Disabled Elements
 
-1. Remove disabled standalone controls from the tab sequence (`disabled`
-   attribute on native elements, or `tabindex="-1"` for custom).
-2. Keep disabled items focusable inside composite widgets (menu items, tabs,
-   tree items, listbox options) so screen reader users can discover them.
-3. Use `aria-disabled="true"` when you want the element to remain focusable
-   and announced as disabled, but not operable.
+- Remove disabled standalone controls from the tab sequence (`disabled`
+  attribute on native elements, or `tabindex="-1"` for custom).
+- Keep disabled items focusable inside composite widgets (menu items, tabs,
+  tree items, listbox options) so screen reader users can discover them.
+- Use `aria-disabled="true"` when you want the element to remain focusable
+  and announced as disabled, but not operable.

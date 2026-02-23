@@ -32,12 +32,12 @@ constraints — reducing drift from the intended solution.
 
 Write a design doc when 3+ of these apply:
 
-1. You're uncertain about the right design
-2. The design is ambiguous or contentious
-3. Multiple valid approaches exist with meaningful trade-offs
-4. Cross-cutting concerns (security, privacy, observability) are involved
-5. The decision rationale should be preserved as an architecture decision record
-6. The knowledge should be shared across the team, not kept in one person's head
+- You're uncertain about the right design
+- The design is ambiguous or contentious
+- Multiple valid approaches exist with meaningful trade-offs
+- Cross-cutting concerns (security, privacy, observability) are involved
+- The decision rationale should be preserved as an architecture decision record
+- The knowledge should be shared across the team, not kept in one person's head
 
 **Don't write one when:**
 - The solution is unambiguous with no trade-offs
@@ -66,8 +66,8 @@ Verify against source code and configuration — don't rely on secondhand descri
 
 ### Step 3: Define Goals and Non-Goals
 
-1. List goals: what this change must achieve. Use bullet points.
-2. List non-goals: scope deliberately excluded.
+- List goals: what this change must achieve. Use bullet points.
+- List non-goals: scope deliberately excluded.
    - Non-goals are things that *could reasonably be goals* but aren't for this effort.
    - "Shouldn't crash" is not a non-goal — it's a basic expectation.
    - "ACID compliance" for a cache layer is a non-goal.

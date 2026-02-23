@@ -358,9 +358,9 @@ are only acceptable when the tracker's tools lack linking capabilities.
 
 When all tasks are created:
 
-1. Report created task IDs and URLs to the user.
-2. Flag any tasks that need manual linking not supported by the tracker's tools.
-3. If working from a decomposition document, list any remaining items not yet created.
+- Report created task IDs and URLs to the user.
+- Flag any tasks that need manual linking not supported by the tracker's tools.
+- If working from a decomposition document, list any remaining items not yet created.
 
 ## Related Skills
 
