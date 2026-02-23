@@ -31,10 +31,10 @@ how many files `@use` it.
 ```
 
 **Rules:**
-1. `@use` must appear before any rules except `@forward`.
-2. Namespace defaults to the last component of the URL (without extension).
-3. Members are scoped to the loading file -- not globally available.
-4. Each module loaded exactly once -- no duplicate CSS output.
+- `@use` must appear before any rules except `@forward`.
+- Namespace defaults to the last component of the URL (without extension).
+- Members are scoped to the loading file -- not globally available.
+- Each module loaded exactly once -- no duplicate CSS output.
 
 ### `@forward`
 

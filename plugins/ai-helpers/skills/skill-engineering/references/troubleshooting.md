@@ -198,7 +198,7 @@ Read [guide.md](references/guide.md) completely before proceeding.
 
 When asking for help, provide:
 
-1. Full SKILL.md content
-2. Expected vs actual behavior
-3. Exact prompt that failed
-4. Any error messages
+- Full SKILL.md content
+- Expected vs actual behavior
+- Exact prompt that failed
+- Any error messages

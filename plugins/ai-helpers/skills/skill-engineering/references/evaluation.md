@@ -139,9 +139,9 @@ Signs:
 ### Minimum Examples
 
 For most skills, include at least:
-1. **Simple case** — Shows basic functionality
-2. **Complex case** — Shows handling of real-world complexity
-3. **Edge case** — Shows behavior at boundaries
+- **Simple case** — Shows basic functionality
+- **Complex case** — Shows handling of real-world complexity
+- **Edge case** — Shows behavior at boundaries
 
 ## Testing Protocol
 
@@ -149,19 +149,19 @@ For most skills, include at least:
 
 Run these prompts and verify behavior:
 
-1. **Should trigger:** 3-5 prompts that should activate the skill
-2. **Should not trigger:** 3-5 prompts that shouldn't activate it
-3. **Borderline:** 2-3 ambiguous cases to understand boundaries
+- **Should trigger:** 3-5 prompts that should activate the skill
+- **Should not trigger:** 3-5 prompts that shouldn't activate it
+- **Borderline:** 2-3 ambiguous cases to understand boundaries
 
 Document expected behavior for each.
 
 ### Output Quality Testing
 
 For each test case:
-1. Does output match expected format?
-2. Is content accurate and complete?
-3. Are edge cases handled correctly?
-4. Is output consistent across multiple runs?
+- Does output match expected format?
+- Is content accurate and complete?
+- Are edge cases handled correctly?
+- Is output consistent across multiple runs?
 
 ### Regression Testing
 

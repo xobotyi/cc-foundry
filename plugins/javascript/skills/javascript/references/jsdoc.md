@@ -223,14 +223,14 @@ function oldFunction() { ... }
 
 ## Best Practices
 
-1. **Annotate public API boundaries** — exported functions, classes, and
-   module-level variables. Internal/private code often needs fewer annotations
-   because types flow from context.
-2. **Prefer inline TypeScript syntax** in JSDoc types: `{string | number}`
-   over `{(string|number)}`.
-3. **Use `@typedef` for shared shapes** — define once near the top of the file
-   or in a dedicated `types.js` file, then reference with `@type`.
-4. **Enable `// @ts-check`** at the top of files (or `checkJs` in
-   `jsconfig.json`) to get type errors in your editor.
-5. **Don't annotate the obvious** — if `const x = 5` is clearly a number,
-   skip the `@type`. Annotate when types are ambiguous or at API boundaries.
+- **Annotate public API boundaries** — exported functions, classes, and
+  module-level variables. Internal/private code often needs fewer annotations
+  because types flow from context.
+- **Prefer inline TypeScript syntax** in JSDoc types: `{string | number}`
+  over `{(string|number)}`.
+- **Use `@typedef` for shared shapes** — define once near the top of the file
+  or in a dedicated `types.js` file, then reference with `@type`.
+- **Enable `// @ts-check`** at the top of files (or `checkJs` in
+  `jsconfig.json`) to get type errors in your editor.
+- **Don't annotate the obvious** — if `const x = 5` is clearly a number,
+  skip the `@type`. Annotate when types are ambiguous or at API boundaries.

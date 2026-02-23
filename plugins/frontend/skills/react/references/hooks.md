@@ -210,14 +210,14 @@ function subscribe(callback: () => void) {
 
 ## Hook Rules
 
-1. **Top level only.** Never call hooks inside conditions, loops, or
-   nested functions. React relies on call order. Exception: `use()` can
-   be called conditionally.
-2. **React functions only.** Call hooks from function components or
-   custom hooks — never from regular JavaScript functions.
-3. **Exhaustive deps.** Include all reactive values used inside the
-   Effect in the dependency array. The linter enforces this — don't
-   suppress it. If a dependency causes unwanted re-runs, restructure
-   the code.
-4. **One Effect per concern.** Don't merge unrelated sync logic into
-   a single Effect. Separate Effects for separate external systems.
+- **Top level only.** Never call hooks inside conditions, loops, or
+  nested functions. React relies on call order. Exception: `use()` can
+  be called conditionally.
+- **React functions only.** Call hooks from function components or
+  custom hooks — never from regular JavaScript functions.
+- **Exhaustive deps.** Include all reactive values used inside the
+  Effect in the dependency array. The linter enforces this — don't
+  suppress it. If a dependency causes unwanted re-runs, restructure
+  the code.
+- **One Effect per concern.** Don't merge unrelated sync logic into
+  a single Effect. Separate Effects for separate external systems.

@@ -224,15 +224,110 @@ FlyOut.List = function List({ children }: { children: React.ReactNode }) {
 Prefer controlled components when parent needs to coordinate state across
 siblings. Prefer uncontrolled for isolated, self-contained UI.
 
+## Component Body Organization
+
+Separate logic from rendering. The component body handles computation, state, and handler
+definitions. JSX is declarative — it references results, not processes.
+
+### Named Prop Types
+
+Every component with props must have a dedicated named type. Never define prop types
+inline in the function signature:
+
+```tsx
+// BAD — inline prop type
+function SavePopover({ names, onCreate }: {
+  names: ReadonlySet<string>;
+  onCreate: (name: string) => void;
+}) { ... }
+
+// GOOD — dedicated named type
+interface SavePopoverProps {
+  readonly names: ReadonlySet<string>;
+  readonly onCreate: (name: string) => void;
+}
+
+function SavePopover({ names, onCreate }: SavePopoverProps) { ... }
+```
+
+### Handler Object
+
+Group all event handlers in a single `handle` object. This creates a clear boundary
+between logic and rendering:
+
+```tsx
+const handle = {
+  submit() {
+    if (!canSubmit) return;
+    onSubmit(value);
+    reset();
+  },
+  inputChange(e: ChangeEvent<HTMLInputElement>) {
+    setValue(e.target.value);
+  },
+  keyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter') handle.submit();
+  },
+};
+
+return <input onChange={handle.inputChange} onKeyDown={handle.keyDown} />;
+```
+
+Never inline handler logic in JSX. Reference handlers from the `handle` object.
+
+### Pre-render Computation
+
+Move list rendering and derived JSX out of the return statement into component body
+variables:
+
+```tsx
+// BAD — iteration logic inside JSX
+return (
+  <TabList>
+    {allTabs.map((tab) => (
+      <Tab key={tab.id}>{tab.name}</Tab>
+    ))}
+  </TabList>
+);
+
+// GOOD — computed before the return
+const tabElements: ReactNode[] = [];
+for (const tab of allTabs) {
+  tabElements.push(<Tab key={tab.id}>{tab.name}</Tab>);
+}
+
+return <TabList>{tabElements}</TabList>;
+```
+
+### Conditional Rendering
+
+Simple conditions are acceptable inline in JSX:
+
+```tsx
+{isModified && <SaveButton />}
+```
+
+When the condition is complex or involves multiple branches, compute in the body:
+
+```tsx
+// BAD — complex logic in JSX
+{items.length > 0 && hasPermission && !isLoading && <ItemList items={items} />}
+
+// GOOD — computed in body
+const showItems = items.length > 0 && hasPermission && !isLoading;
+// ...
+{showItems && <ItemList items={items} />}
+```
+
 ## JSX Conventions
 
-1. **Self-closing tags** for components without children: `<Input />`.
-2. **Boolean attributes** without value: `<Input disabled />` not
-   `disabled={true}`.
-3. **Fragments** to avoid wrapper divs: `<>...</>` or `<Fragment key={id}>`.
-4. **Avoid `&&` with numbers.** `count && <List />` renders `0`.
-   Use `count > 0 && <List />` or ternary.
-5. **Inline event handlers are fine** for simple one-liners.
-   Extract to named functions when logic is complex.
-6. **Spread props sparingly.** `{...props}` makes it unclear what a
-   component accepts. Prefer explicit props.
+- **Self-closing tags** for components without children: `<Input />`.
+- **Boolean attributes** without value: `<Input disabled />` not
+  `disabled={true}`.
+- **Fragments** to avoid wrapper divs: `<>...</>` or `<Fragment key={id}>`.
+- **Avoid `&&` with numbers.** `count && <List />` renders `0`.
+  Use `count > 0 && <List />` or ternary.
+- **Never inline handler logic in JSX.** Group all handlers in a `handle`
+  object in the component body (see Handler Object above).
+- **Spread props sparingly.** `{...props}` makes it unclear what a
+  component accepts. Prefer explicit props.

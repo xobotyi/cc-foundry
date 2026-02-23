@@ -294,17 +294,17 @@ echo $?  # Check exit code
 
 **Causes and fixes:**
 
-1. **Auto-compaction:** Context may have been summarized.
-   - Set `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` lower
-   - Use more concise prompts
+- **Auto-compaction:** Context may have been summarized.
+  - Set `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` lower
+  - Use more concise prompts
 
-2. **Subagent isolation:** Subagents have own context, don't inherit conversation.
-   - Pass necessary context in the prompt/task description
-   - Use `skills` field to preload required knowledge
+- **Subagent isolation:** Subagents have own context, don't inherit conversation.
+  - Pass necessary context in the prompt/task description
+  - Use `skills` field to preload required knowledge
 
-3. **Fresh start:** Each subagent invocation starts fresh (unless resumed).
-   - Use resume feature: `resume: agent-id`
-   - Or pass context explicitly
+- **Fresh start:** Each subagent invocation starts fresh (unless resumed).
+  - Use resume feature: `resume: agent-id`
+  - Or pass context explicitly
 
 ### Performance Issues
 
@@ -393,6 +393,6 @@ Or trace LLM traffic (advanced):
 
 If still stuck:
 
-1. Check `/agents` output for agent status
-2. Review Claude Code docs: https://docs.anthropic.com/en/docs/claude-code/sub-agents
-3. Report issues: https://github.com/anthropics/claude-code/issues
+- Check `/agents` output for agent status
+- Review Claude Code docs: https://docs.anthropic.com/en/docs/claude-code/sub-agents
+- Report issues: https://github.com/anthropics/claude-code/issues

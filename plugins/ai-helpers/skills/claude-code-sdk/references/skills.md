@@ -267,15 +267,15 @@ visual output, run analysis, or extend what's possible in a single prompt.
 
 ### Skill not triggering
 
-1. Check description includes keywords users would naturally say
-2. Verify skill appears in `What skills are available?`
-3. Try rephrasing request to match description more closely
-4. Invoke directly with `/skill-name`
+- Check description includes keywords users would naturally say
+- Verify skill appears in `What skills are available?`
+- Try rephrasing request to match description more closely
+- Invoke directly with `/skill-name`
 
 ### Skill triggers too often
 
-1. Make description more specific
-2. Add `disable-model-invocation: true` for manual-only invocation
+- Make description more specific
+- Add `disable-model-invocation: true` for manual-only invocation
 
 ### Claude doesn't see all skills
 

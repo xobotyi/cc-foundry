@@ -188,9 +188,9 @@ the entire file.
 
 ## Project Structure Tips
 
-1. **Use `paths` sparingly.** Prefer relative imports. Deep `../../../` chains
-   suggest the module structure needs refactoring, not aliases.
-2. **Keep `tsconfig.json` minimal.** Use `extends` for shared base configs.
-3. **`include` explicitly.** Don't rely on defaults — specify which directories
-   to compile.
-4. **Separate `tsconfig.build.json`** for builds (excludes tests, scripts).
+- **Use `paths` sparingly.** Prefer relative imports. Deep `../../../` chains
+  suggest the module structure needs refactoring, not aliases.
+- **Keep `tsconfig.json` minimal.** Use `extends` for shared base configs.
+- **`include` explicitly.** Don't rely on defaults — specify which directories
+  to compile.
+- **Separate `tsconfig.build.json`** for builds (excludes tests, scripts).

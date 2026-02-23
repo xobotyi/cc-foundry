@@ -46,11 +46,11 @@ highest-leverage field — poor descriptions cause missed activations.
 [What it does] + [When to invoke — broad domain claim with trigger examples]
 ```
 
-1. **What it does** — Functional description of the skill's purpose.
-   State what the skill covers concretely, not a slogan or tagline.
-2. **When to invoke** — "Invoke whenever task involves any interaction
-   with X." Claims the domain broadly, then lists specific triggers
-   as examples under the broad claim.
+- **What it does** — Functional description of the skill's purpose.
+  State what the skill covers concretely, not a slogan or tagline.
+- **When to invoke** — "Invoke whenever task involves any interaction
+  with X." Claims the domain broadly, then lists specific triggers
+  as examples under the broad claim.
 
 **Good — functional description + broad claim:**
 ```yaml

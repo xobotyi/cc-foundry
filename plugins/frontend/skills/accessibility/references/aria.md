@@ -10,17 +10,17 @@ keyboard interaction, or visual appearance. You must implement those yourself.
 
 ## The Five Rules of ARIA
 
-1. **Use native HTML first.** If an HTML element with the semantics you need
-   exists, use it instead of ARIA.
-2. **Do not change native semantics** unless absolutely necessary. Never
-   `<h2 role="tab">` -- use `<div role="tab"><h2>...</h2></div>`.
-3. **All interactive ARIA controls must be keyboard operable.** A
-   `role="button"` must respond to Enter and Space.
-4. **Do not use `role="presentation"` or `aria-hidden="true"` on focusable
-   elements.** This hides them from assistive technology while they remain
-   keyboard reachable.
-5. **All interactive elements must have an accessible name.** Use visible
-   labels, `aria-label`, or `aria-labelledby`.
+- **Use native HTML first.** If an HTML element with the semantics you need
+  exists, use it instead of ARIA.
+- **Do not change native semantics** unless absolutely necessary. Never
+  `<h2 role="tab">` -- use `<div role="tab"><h2>...</h2></div>`.
+- **All interactive ARIA controls must be keyboard operable.** A
+  `role="button"` must respond to Enter and Space.
+- **Do not use `role="presentation"` or `aria-hidden="true"` on focusable
+  elements.** This hides them from assistive technology while they remain
+  keyboard reachable.
+- **All interactive elements must have an accessible name.** Use visible
+  labels, `aria-label`, or `aria-labelledby`.
 
 ## Roles
 
@@ -84,12 +84,12 @@ Use these only when no native HTML equivalent exists:
 element content > `title` attribute.
 
 **Rules:**
-1. Prefer visible labels (`<label>`, element content) over `aria-label`.
-2. Use `aria-labelledby` to compose names from multiple elements.
-3. `aria-label` and `aria-labelledby` override native label text -- do not
-   use them to supplement; they replace.
-4. Do not use `aria-label` on elements with `role="presentation"` or
-   `role="none"`.
+- Prefer visible labels (`<label>`, element content) over `aria-label`.
+- Use `aria-labelledby` to compose names from multiple elements.
+- `aria-label` and `aria-labelledby` override native label text -- do not
+  use them to supplement; they replace.
+- Do not use `aria-label` on elements with `role="presentation"` or
+  `role="none"`.
 
 ### State Attributes
 
@@ -125,12 +125,12 @@ element content > `title` attribute.
 | `aria-relevant` | `additions`/`removals`/`text`/`all` | Which changes to announce |
 
 **Rules:**
-1. Use `aria-live="polite"` for non-urgent updates (search results, status).
-2. Use `aria-live="assertive"` sparingly -- only for errors, alerts, urgent info.
-3. Set live regions in the DOM before content changes. Adding `aria-live` and
-   content simultaneously may not be announced.
-4. Use `role="status"` (implicit `aria-live="polite"`) for status messages.
-5. Use `role="alert"` (implicit `aria-live="assertive"`) for error messages.
+- Use `aria-live="polite"` for non-urgent updates (search results, status).
+- Use `aria-live="assertive"` sparingly -- only for errors, alerts, urgent info.
+- Set live regions in the DOM before content changes. Adding `aria-live` and
+  content simultaneously may not be announced.
+- Use `role="status"` (implicit `aria-live="polite"`) for status messages.
+- Use `role="alert"` (implicit `aria-live="assertive"`) for error messages.
 
 ## Common ARIA Mistakes
 

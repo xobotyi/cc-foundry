@@ -66,6 +66,23 @@ understand over clever tricks that save characters.
 - **Know the falsy values:** `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined`, `NaN`.
   Everything else is truthy, including `[]`, `{}`, and `"0"`.
 
+## Ternary Operator
+
+- **One-liners or split-per-branch only.** Ternaries are acceptable in two forms:
+  ```js
+  // OK — fits on one line
+  const label = isActive ? 'Active' : 'Inactive';
+
+  // OK — each branch on its own line
+  const label = isActive
+    ? buildActiveLabel(user)
+    : buildInactiveLabel(user);
+  ```
+  Any ternary that doesn't fit one of these two patterns must be rewritten as
+  `if`/`else` or early return.
+- **Nested ternaries are banned.** No exceptions. Use `if`/`else`, early returns,
+  or a lookup object.
+
 ## Modern Syntax
 
 - **Template literals** for string interpolation: `` `Hello, ${name}` ``. Don't use

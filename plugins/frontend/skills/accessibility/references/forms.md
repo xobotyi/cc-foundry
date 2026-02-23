@@ -35,12 +35,12 @@ Every form control must have a programmatically associated label.
 ```
 
 **Rules:**
-1. Every `<input>`, `<select>`, and `<textarea>` must have a label.
-2. `placeholder` is not a substitute for a label -- it disappears when
-   the user types and is not reliably read by all screen readers.
-3. The visible label text must be contained in the accessible name
-   (WCAG 2.5.3 Label in Name) -- if the visible text says "Email", the
-   `aria-label` must include "Email", not "Enter your electronic mail".
+- Every `<input>`, `<select>`, and `<textarea>` must have a label.
+- `placeholder` is not a substitute for a label -- it disappears when
+  the user types and is not reliably read by all screen readers.
+- The visible label text must be contained in the accessible name
+  (WCAG 2.5.3 Label in Name) -- if the visible text says "Email", the
+  `aria-label` must include "Email", not "Enter your electronic mail".
 
 ## Grouping
 
@@ -71,11 +71,11 @@ Use `role="group"` with `aria-labelledby` when `<fieldset>` is impractical
 
 ## Required Fields
 
-1. Mark required fields with `required` attribute (native validation) or
-   `aria-required="true"` (custom validation).
-2. Indicate required fields visually -- asterisk with a legend explaining
-   "* Required" is the standard pattern.
-3. Do not rely on color alone to indicate required status.
+- Mark required fields with `required` attribute (native validation) or
+  `aria-required="true"` (custom validation).
+- Indicate required fields visually -- asterisk with a legend explaining
+  "* Required" is the standard pattern.
+- Do not rely on color alone to indicate required status.
 
 ```html
 <p><span aria-hidden="true">*</span> indicates a required field</p>
@@ -88,12 +88,12 @@ Use `role="group"` with `aria-labelledby` when `<fieldset>` is impractical
 
 ### Client-Side Validation
 
-1. Display errors adjacent to the invalid field.
-2. Associate each error with its field using `aria-describedby` or
-   `aria-errormessage`.
-3. Set `aria-invalid="true"` on invalid fields.
-4. Use `role="alert"` or `aria-live="assertive"` on the error container
-   for dynamic error messages so they are announced immediately.
+- Display errors adjacent to the invalid field.
+- Associate each error with its field using `aria-describedby` or
+  `aria-errormessage`.
+- Set `aria-invalid="true"` on invalid fields.
+- Use `role="alert"` or `aria-live="assertive"` on the error container
+  for dynamic error messages so they are announced immediately.
 
 ```html
 <label for="email">Email</label>
@@ -127,10 +127,10 @@ allow users to jump directly to each invalid field.
 
 ### Submission Feedback
 
-1. On success, announce the result with `role="status"` or
-   `aria-live="polite"`.
-2. On failure, move focus to the error summary or first invalid field.
-3. Do not clear the form on failure -- preserve user input.
+- On success, announce the result with `role="status"` or
+  `aria-live="polite"`.
+- On failure, move focus to the error summary or first invalid field.
+- Do not clear the form on failure -- preserve user input.
 
 ## Input Types and Autocomplete
 
@@ -154,9 +154,9 @@ identify input purpose (WCAG 1.3.5):
 
 ## Disabling Controls
 
-1. Use the native `disabled` attribute on form elements -- it removes
-   them from the tab sequence and announces the disabled state.
-2. When using `aria-disabled="true"` instead, the element remains
-   focusable and announced but you must prevent activation in JavaScript.
-3. When a control's disabled state changes dynamically, announce the
-   change via a live region so screen reader users are informed.
+- Use the native `disabled` attribute on form elements -- it removes
+  them from the tab sequence and announces the disabled state.
+- When using `aria-disabled="true"` instead, the element remains
+  focusable and announced but you must prevent activation in JavaScript.
+- When a control's disabled state changes dynamically, announce the
+  change via a live region so screen reader users are informed.

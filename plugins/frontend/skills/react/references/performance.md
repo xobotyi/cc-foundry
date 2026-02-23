@@ -10,12 +10,12 @@ using the compiler, manual memoization is largely unnecessary.
 
 ### What It Does
 
-1. **Skips cascading re-renders.** When a parent re-renders, only genuinely
-   affected children re-render — without manual `memo()` wrapping.
-2. **Memoizes expensive calculations.** Function calls inside components
-   and hooks are automatically cached.
-3. **Handles subtle bugs.** The compiler correctly optimizes patterns that
-   break manual memoization (e.g., inline arrow functions as props).
+- **Skips cascading re-renders.** When a parent re-renders, only genuinely
+  affected children re-render — without manual `memo()` wrapping.
+- **Memoizes expensive calculations.** Function calls inside components
+  and hooks are automatically cached.
+- **Handles subtle bugs.** The compiler correctly optimizes patterns that
+  break manual memoization (e.g., inline arrow functions as props).
 
 ### What to Do About useMemo, useCallback, and memo
 

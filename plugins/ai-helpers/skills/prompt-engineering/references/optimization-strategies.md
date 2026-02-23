@@ -186,9 +186,9 @@ optimization.
 ### Core Idea
 
 Instead of writing prompts, define:
-1. **Signatures:** Input/output specifications
-2. **Modules:** Processing steps
-3. **Metrics:** How to evaluate quality
+- **Signatures:** Input/output specifications
+- **Modules:** Processing steps
+- **Metrics:** How to evaluate quality
 
 DSPy automatically generates and tests prompts to optimize the metric.
 

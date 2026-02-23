@@ -245,9 +245,9 @@ For any LLM application:
 **You cannot fully prevent prompt injection.** The vulnerability is
 inherent to how LLMs work. Defense is about:
 
-1. Reducing attack surface
-2. Limiting blast radius when attacks succeed
-3. Detecting and responding to incidents
-4. Making attacks harder, not impossible
+- Reducing attack surface
+- Limiting blast radius when attacks succeed
+- Detecting and responding to incidents
+- Making attacks harder, not impossible
 
 Treat LLM outputs as untrusted. Validate before acting on them.

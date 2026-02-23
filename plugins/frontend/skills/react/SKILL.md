@@ -59,32 +59,62 @@ Never mutate props, state, or variables declared before rendering.
 
 ### Component Structure
 
-1. One component per file. Small helpers co-located in the same file are acceptable but
-   extract when reused.
-2. Always prefer function declarations for components.
-3. Do not use `React.FC` — it adds implicit `children` typing and complicates generics.
-   Use `function Component(props: Props)`.
+- One component per file. Small helpers co-located in the same file are acceptable but
+  extract when reused.
+- Always prefer function declarations for components.
+- Do not use `React.FC` — it adds implicit `children` typing and complicates generics.
+  Use `function Component(props: Props)`.
+
+### Component Body Organization
+
+Separate logic from rendering. The component body handles computation, state, and handler
+definitions. JSX is declarative — it references results, not processes.
+
+- **Handler object** — group all event handlers in a single `handle` object. This creates
+  a clear boundary between logic and rendering:
+  ```tsx
+  const handle = {
+    submit() { /* ... */ },
+    inputChange(e: ChangeEvent<HTMLInputElement>) { setName(e.target.value); },
+    keyDown(e: KeyboardEvent) { if (e.key === 'Enter') handle.submit(); },
+  };
+  ```
+  Reference in JSX as `onChange={handle.inputChange}`. Never inline handler logic in JSX.
+- **Pre-render computation** — move list rendering and derived JSX out of the return
+  statement into component body variables:
+  ```tsx
+  const tabElements: ReactNode[] = [];
+  for (const tab of allTabs) {
+    tabElements.push(<Tab key={tab.id}>{tab.name}</Tab>);
+  }
+  return <TabList>{tabElements}</TabList>;
+  ```
+  JSX `.map()` inside the return statement is discouraged — compute element arrays in the
+  body, reference them in JSX.
+- **Conditional rendering** — simple conditions (`{isVisible && <Component />}`) are
+  acceptable inline in JSX. When the condition is complex or involves multiple branches,
+  compute the result in the component body and reference the variable in JSX.
 
 ### Composition
 
-1. Props flow down, events flow up. One-way data flow. Children never mutate parent
-   state directly — they call callbacks.
-2. Composition over configuration. Pass JSX as `children` or render props instead of
-   building components with dozens of boolean flags.
-3. When a wrapper component updates its own state, React knows its `children` props
-   haven't changed, so children skip re-rendering.
-4. Use compound components (shared context between related sub-components) for complex
-   UI patterns like flyout menus, tabs, accordions.
-5. Prefer controlled components when parent needs to coordinate state across siblings.
-   Prefer uncontrolled for isolated, self-contained UI.
+- Props flow down, events flow up. One-way data flow. Children never mutate parent
+  state directly — they call callbacks.
+- Composition over configuration. Pass JSX as `children` or render props instead of
+  building components with dozens of boolean flags.
+- When a wrapper component updates its own state, React knows its `children` props
+  haven't changed, so children skip re-rendering.
+- Use compound components (shared context between related sub-components) for complex
+  UI patterns like flyout menus, tabs, accordions.
+- Prefer controlled components when parent needs to coordinate state across siblings.
+  Prefer uncontrolled for isolated, self-contained UI.
 
 ### Refs
 
-1. `ref` is a prop. Pass `ref` directly as a prop to function components.
-   Never use `forwardRef` — it is deprecated.
-2. Ref callbacks can return a cleanup function, called when the element unmounts.
-3. Avoid implicit returns in ref callbacks — use block body `{}` not parentheses to
-   prevent TypeScript confusion.
+- `ref` is a prop. Pass `ref` directly as a prop to function components.
+  Never use `forwardRef` — it is deprecated.
+- Ref callbacks can return a cleanup function, called when the element unmounts.
+- Avoid implicit returns in ref callbacks — use block body `{}` not parentheses to
+  prevent TypeScript confusion.
 
 ### Document Metadata
 
@@ -99,45 +129,45 @@ instance properties are assigned as properties, others as attributes.
 
 ## JSX Conventions
 
-1. Self-closing tags for components without children: `<Input />`.
-2. Boolean attributes without value: `<Input disabled />` not `disabled={true}`.
-3. Fragments to avoid wrapper divs: `<>...</>` or `<Fragment key={id}>`.
-4. Avoid `&&` with numbers — `count && <List />` renders `0`. Use `count > 0 && <List />`
-   or a ternary.
-5. Inline event handlers are fine for simple one-liners. Extract to named functions when
-   logic is complex.
-6. Spread props sparingly — `{...props}` makes it unclear what a component accepts.
-   Prefer explicit props.
-7. `key` on every list item. Stable, unique identifiers. Never use array index as key
-   when items can reorder.
-8. No side effects during render. Event handlers for user actions, Effects for
-   synchronization, render for pure computation.
+- Self-closing tags for components without children: `<Input />`.
+- Boolean attributes without value: `<Input disabled />` not `disabled={true}`.
+- Fragments to avoid wrapper divs: `<>...</>` or `<Fragment key={id}>`.
+- Avoid `&&` with numbers — `count && <List />` renders `0`. Use `count > 0 && <List />`
+  or a ternary.
+- Never inline handler logic in JSX. Group all handlers in a `handle` object in the
+  component body (see Component Body Organization).
+- Spread props sparingly — `{...props}` makes it unclear what a component accepts.
+  Prefer explicit props.
+- `key` on every list item. Stable, unique identifiers. Never use array index as key
+  when items can reorder.
+- No side effects during render. Event handlers for user actions, Effects for
+  synchronization, render for pure computation.
 
 ## Hooks
 
 ### `use()` — Context and Promises
 
-1. Prefer `use(MyContext)` over `useContext(MyContext)`. `use()` can be called inside
-   conditionals and loops — `useContext()` cannot.
-2. `use()` always looks for the closest provider **above** the calling component.
-3. `use(promise)` integrates with Suspense and Error Boundaries to read promise values.
-4. Do not create promises inside Client Components during render — they recreate every
-   render. Pass promises from Server Components or use a Suspense-compatible library.
-5. In Server Components, prefer `async`/`await` over `use()`.
-6. `use()` cannot be called in a try-catch block. Use Error Boundaries or
-   `promise.catch()` instead.
+- Prefer `use(MyContext)` over `useContext(MyContext)`. `use()` can be called inside
+  conditionals and loops — `useContext()` cannot.
+- `use()` always looks for the closest provider **above** the calling component.
+- `use(promise)` integrates with Suspense and Error Boundaries to read promise values.
+- Do not create promises inside Client Components during render — they recreate every
+  render. Pass promises from Server Components or use a Suspense-compatible library.
+- In Server Components, prefer `async`/`await` over `use()`.
+- `use()` cannot be called in a try-catch block. Use Error Boundaries or
+  `promise.catch()` instead.
 
 ### Hook Rules
 
-1. Top level only. Never call hooks inside conditions, loops, or nested functions.
-   React relies on call order. Exception: `use()` can be called conditionally.
-2. React functions only. Call hooks from function components or custom hooks — never
-   from regular JavaScript functions.
-3. Exhaustive deps. Include all reactive values used inside the Effect in the dependency
-   array. The linter enforces this — don't suppress it. If a dependency causes unwanted
-   re-runs, restructure the code.
-4. One Effect per concern. Don't merge unrelated sync logic into a single Effect.
-   Separate Effects for separate external systems.
+- Top level only. Never call hooks inside conditions, loops, or nested functions.
+  React relies on call order. Exception: `use()` can be called conditionally.
+- React functions only. Call hooks from function components or custom hooks — never
+  from regular JavaScript functions.
+- Exhaustive deps. Include all reactive values used inside the Effect in the dependency
+  array. The linter enforces this — don't suppress it. If a dependency causes unwanted
+  re-runs, restructure the code.
+- One Effect per concern. Don't merge unrelated sync logic into a single Effect.
+  Separate Effects for separate external systems.
 
 ### Effects Are Escape Hatches
 
@@ -168,13 +198,13 @@ data-fetching library or `use()` with Suspense over raw Effects for fetching.
 
 ### Custom Hooks
 
-1. Custom hooks share stateful logic, not state itself. Each call creates independent state.
-2. Must start with `use` followed by a capital letter. Functions that don't call hooks
-   should NOT start with `use`.
-3. Name after the **use case**, not the lifecycle — `useOnlineStatus` not `useMount`.
-4. Extract when: repetitive Effect logic across components, complex state + Effect combos,
-   or synchronization with external systems.
-5. Don't extract a single `useState` into a hook — that's unnecessary abstraction.
+- Custom hooks share stateful logic, not state itself. Each call creates independent state.
+- Must start with `use` followed by a capital letter. Functions that don't call hooks
+  should NOT start with `use`.
+- Name after the **use case**, not the lifecycle — `useOnlineStatus` not `useMount`.
+- Extract when: repetitive Effect logic across components, complex state + Effect combos,
+  or synchronization with external systems.
+- Don't extract a single `useState` into a hook — that's unnecessary abstraction.
 
 **Return value conventions:**
 - Single value: return directly (`return isOnline`)
@@ -213,14 +243,14 @@ Never reinvent caching, deduplication, and race condition handling with raw `use
 
 ### `useState`
 
-1. Minimal state. If it can be computed from existing props or state, compute it during
-   render — don't store it.
-2. Colocate state. Keep state as close to where it's used as possible. Lift up only when
-   multiple components need it.
-3. Use updater functions when next state depends on previous state:
-   `setCount(prev => prev + 1)` not `setCount(count + 1)`.
-4. Lazy initialization for expensive initial values — pass a function:
-   `useState(() => createInitialState())` not `useState(createInitialState())`.
+- Minimal state. If it can be computed from existing props or state, compute it during
+  render — don't store it.
+- Colocate state. Keep state as close to where it's used as possible. Lift up only when
+  multiple components need it.
+- Use updater functions when next state depends on previous state:
+  `setCount(prev => prev + 1)` not `setCount(count + 1)`.
+- Lazy initialization for expensive initial values — pass a function:
+  `useState(() => createInitialState())` not `useState(createInitialState())`.
 
 ### `useReducer`
 
@@ -235,12 +265,12 @@ when next state depends on previous state in non-trivial ways.
 | Need to test state logic in isolation | `useReducer` |
 
 **Reducer rules:**
-1. Reducers must be pure — same inputs = same output, no side effects.
-2. Each action describes a single user interaction — dispatch `reset_form` not five
-   separate `set_field` actions.
-3. Actions describe what happened, not what to do — `'added_task'` not `'set_tasks'`.
-4. Always have a `default` case that throws to catch typos early.
-5. Use `as const` for action types in TypeScript.
+- Reducers must be pure — same inputs = same output, no side effects.
+- Each action describes a single user interaction — dispatch `reset_form` not five
+  separate `set_field` actions.
+- Actions describe what happened, not what to do — `'added_task'` not `'set_tasks'`.
+- Always have a `default` case that throws to catch typos early.
+- Use `as const` for action types in TypeScript.
 
 ### `key` for Identity Reset
 
@@ -250,38 +280,40 @@ prop change.
 
 ### Context
 
-1. Use `<Context value={...}>` directly — not `<Context.Provider value={...}>`.
-2. Always wrap context consumption in a custom hook with a null check that throws if
-   used outside the provider.
-3. Try props and composition first. Context is not the first solution to prop drilling.
-4. Keep context close to where it's used — not every context belongs at the app root.
-5. Split logically — user settings separate from notifications. Don't put all state
-   in one giant context.
-6. Different `createContext()` calls are independent — they don't override each other.
-7. For complex shared state, combine `useReducer` with context. Split into two contexts
-   (data + dispatch) so components that only dispatch don't re-render on data changes.
+- Use `<Context value={...}>` directly — not `<Context.Provider value={...}>`.
+- Always wrap context consumption in a custom hook with a null check that throws if
+  used outside the provider.
+- Try props and composition first. Context is not the first solution to prop drilling.
+- Keep context close to where it's used — not every context belongs at the app root.
+- Split logically — user settings separate from notifications. Don't put all state
+  in one giant context.
+- Different `createContext()` calls are independent — they don't override each other.
+- For complex shared state, combine `useReducer` with context. Split into two contexts
+  (data + dispatch) so components that only dispatch don't re-render on data changes.
 
 ### Actions
 
-1. Use `useActionState` for form submissions and data mutations. It manages pending state,
-   errors, and sequential action queuing automatically.
-2. When passed to `<form action>`, React wraps submission in a transition automatically.
-   When calling dispatch manually, wrap in `startTransition`.
-3. Return error states instead of throwing to prevent skipping queued actions.
-4. Use `useOptimistic` for instant UI feedback while async Actions complete. The optimistic
-   state reverts to real value when the Action completes or fails.
-5. Use a reducer form of `useOptimistic` for complex updates (e.g., adding to a list).
-6. `useFormStatus` reads submission status of the nearest parent `<form>` — must be
-   called from a component rendered **inside** a `<form>`, not in the same component.
+- Use `useActionState` for form submissions and data mutations. It manages pending state,
+  errors, and sequential action queuing automatically.
+- When passed to `<form action>`, React wraps submission in a transition automatically.
+  When calling dispatch manually, wrap in `startTransition`.
+- Return error states instead of throwing to prevent skipping queued actions.
+- Use `useOptimistic` for instant UI feedback while async Actions complete. The optimistic
+  state reverts to real value when the Action completes or fails.
+- Use a reducer form of `useOptimistic` for complex updates (e.g., adding to a list).
+- `useFormStatus` reads submission status of the nearest parent `<form>` — must be
+  called from a component rendered **inside** a `<form>`, not in the same component.
 
 ## TypeScript
 
-1. Type props with interfaces. `function Button(props: ButtonProps)` or destructure:
-   `function Button({ label }: ButtonProps)`.
-2. Don't use `React.FC`. Use plain function declarations.
-3. Type events explicitly when needed:
-   `(e: React.ChangeEvent<HTMLInputElement>) => void`.
-4. Use `as const` for action types in reducers.
+- Every component with props must have a dedicated named type (e.g., `ButtonProps`).
+  Never define prop types inline in the function signature. Use
+  `function Button(props: ButtonProps)` or destructure:
+  `function Button({ label }: ButtonProps)`.
+- Don't use `React.FC`. Use plain function declarations.
+- Type events explicitly when needed:
+  `(e: React.ChangeEvent<HTMLInputElement>) => void`.
+- Use `as const` for action types in reducers.
 
 ## Performance
 
@@ -290,10 +322,10 @@ prop change.
 React Compiler is a build-time tool that automatically applies `memo`, `useMemo`, and
 `useCallback` equivalents. When using the compiler:
 
-1. Do not manually wrap components in `memo`, use `useMemo`, or `useCallback` in new code.
-2. Leave existing memoization in place — removing it can change compilation output.
-3. Use manual memoization only as an escape hatch (e.g., stabilizing an Effect dependency).
-4. The compiler works with plain JavaScript and the Rules of React — no code changes needed.
+- Do not manually wrap components in `memo`, use `useMemo`, or `useCallback` in new code.
+- Leave existing memoization in place — removing it can change compilation output.
+- Use manual memoization only as an escape hatch (e.g., stabilizing an Effect dependency).
+- The compiler works with plain JavaScript and the Rules of React — no code changes needed.
 
 ### Optimization Decision Tree
 
@@ -318,16 +350,16 @@ React Compiler is a build-time tool that automatically applies `memo`, `useMemo`
 
 ### Server Components
 
-1. Server Components render on the server, send only output to client. No client JS.
-2. Can read databases, filesystems, APIs directly. Can be `async` functions.
-3. Cannot use `useState`, `useEffect`, or any client-side React APIs.
-4. Default (no directive needed). Client Components require `"use client"` at file top.
-5. Server Components can render Client Components as children. Client Components cannot
-   import Server Components directly.
-6. `"use server"` marks Server Functions (Actions callable from client), not Server
-   Components.
-7. Automatic code-splitting: Client Component imports from Server Components are
-   code-split automatically.
+- Server Components render on the server, send only output to client. No client JS.
+- Can read databases, filesystems, APIs directly. Can be `async` functions.
+- Cannot use `useState`, `useEffect`, or any client-side React APIs.
+- Default (no directive needed). Client Components require `"use client"` at file top.
+- Server Components can render Client Components as children. Client Components cannot
+  import Server Components directly.
+- `"use server"` marks Server Functions (Actions callable from client), not Server
+  Components.
+- Automatic code-splitting: Client Component imports from Server Components are
+  code-split automatically.
 
 ### Streaming with Suspense
 
@@ -336,10 +368,10 @@ Server Components, pass to Client Components, read with `use()` inside `<Suspens
 
 ### Bundle Optimization
 
-1. Avoid barrel file imports — `import { Button } from '@/components/Button'` not
-   `from '@/components'`.
-2. Use `lazy(() => import('./Chart'))` with `<Suspense>` for heavy components.
-3. Parallelize independent data fetches with `Promise.all`, never sequential awaits.
+- Avoid barrel file imports — `import { Button } from '@/components/Button'` not
+  `from '@/components'`.
+- Use `lazy(() => import('./Chart'))` with `<Suspense>` for heavy components.
+- Parallelize independent data fetches with `Promise.all`, never sequential awaits.
 
 ### Error Handling
 
@@ -372,11 +404,11 @@ blur, keyDown/keyPress/keyUp sequence). Full method catalog in `references/testi
 
 ### Async Patterns
 
-1. Use `waitFor` for assertions that need to wait for async operations.
-2. One assertion per `waitFor` callback — multiple assertions cause slower failure detection.
-3. Never put side-effects in `waitFor` — the callback may run multiple times.
-4. Never pass an empty callback to `waitFor`.
-5. Prefer `findBy` over `waitFor` + `getBy`.
+- Use `waitFor` for assertions that need to wait for async operations.
+- One assertion per `waitFor` callback — multiple assertions cause slower failure detection.
+- Never put side-effects in `waitFor` — the callback may run multiple times.
+- Never pass an empty callback to `waitFor`.
+- Prefer `findBy` over `waitFor` + `getBy`.
 
 ### Testing Actions and Forms
 
@@ -385,14 +417,14 @@ ensure the component is rendered inside a `<form>` with an action prop.
 
 ### Rules
 
-1. Don't wrap in `act` unnecessarily — `render()` and `fireEvent` already handle it.
-   If you see `act` warnings, fix the root cause (state update after test finishes).
-2. Don't add `role` attributes to native elements — `<button>` already has `role="button"`.
-3. Make inputs accessible with `type` and `<label>` — this makes them queryable by role.
-4. If you can't query by role, the element is probably not accessible to screen readers.
-5. Don't call `cleanup` manually — it's automatic.
-6. Use `@testing-library/jest-dom` matchers: `toBeInTheDocument()`, `toBeVisible()`,
-   `toBeDisabled()`, `toHaveTextContent()`, `toHaveAttribute()`, `toHaveValue()`.
+- Don't wrap in `act` unnecessarily — `render()` and `fireEvent` already handle it.
+  If you see `act` warnings, fix the root cause (state update after test finishes).
+- Don't add `role` attributes to native elements — `<button>` already has `role="button"`.
+- Make inputs accessible with `type` and `<label>` — this makes them queryable by role.
+- If you can't query by role, the element is probably not accessible to screen readers.
+- Don't call `cleanup` manually — it's automatic.
+- Use `@testing-library/jest-dom` matchers: `toBeInTheDocument()`, `toBeVisible()`,
+  `toBeDisabled()`, `toHaveTextContent()`, `toHaveAttribute()`, `toHaveValue()`.
 
 ## Application
 

@@ -26,21 +26,21 @@ contain extended examples, rationale, and edge cases for each topic.
 
 ### `$state`
 
-1. Every mutable reactive value must use `$state` or `$state.raw`. Plain `let`
-   declarations are not reactive.
-2. Arrays and plain objects become deeply reactive proxies. Mutations trigger
-   granular updates.
-3. Destructuring `$state` objects breaks reactivity -- destructured values are
-   snapshots, not live references.
-4. Use `$state` on class fields or as first assignment in constructor. The compiler
-   transforms these into getter/setter pairs. Use arrow functions to preserve `this`
-   in event handlers on classes.
-5. `$state.raw` opts out of deep reactivity -- state can only be reassigned, not
-   mutated. Use for large arrays/objects you replace wholesale to avoid proxy overhead.
-6. `$state.snapshot(value)` takes a static copy of a reactive proxy for external APIs
-   that don't expect proxies (e.g., `structuredClone`, logging).
-7. Import reactive `Set`, `Map`, `Date`, `URL` from `svelte/reactivity` when you need
-   reactive built-in types.
+- Every mutable reactive value must use `$state` or `$state.raw`. Plain `let`
+  declarations are not reactive.
+- Arrays and plain objects become deeply reactive proxies. Mutations trigger
+  granular updates.
+- Destructuring `$state` objects breaks reactivity -- destructured values are
+  snapshots, not live references.
+- Use `$state` on class fields or as first assignment in constructor. The compiler
+  transforms these into getter/setter pairs. Use arrow functions to preserve `this`
+  in event handlers on classes.
+- `$state.raw` opts out of deep reactivity -- state can only be reassigned, not
+  mutated. Use for large arrays/objects you replace wholesale to avoid proxy overhead.
+- `$state.snapshot(value)` takes a static copy of a reactive proxy for external APIs
+  that don't expect proxies (e.g., `structuredClone`, logging).
+- Import reactive `Set`, `Map`, `Date`, `URL` from `svelte/reactivity` when you need
+  reactive built-in types.
 
 ### Sharing State Across Modules
 
@@ -54,60 +54,60 @@ Runes only work in `.svelte` and `.svelte.js`/`.svelte.ts` files.
 
 ### `$derived`
 
-1. Use `$derived` for all computed values -- never synchronize state with `$effect`.
-2. `$derived.by(() => { ... })` for complex derivations needing a function body.
-3. Only synchronously read values are tracked. Use `untrack` to exempt specific reads.
-4. Derived values can be temporarily overridden (useful for optimistic UI) -- reverts
-   to derived computation on next dependency update.
-5. Destructured `$derived` values are individually reactive.
-6. Push-pull reactivity: dependents are notified immediately (push) but only
-   recalculated on read (pull). If new value is referentially identical, downstream
-   updates are skipped.
+- Use `$derived` for all computed values -- never synchronize state with `$effect`.
+- `$derived.by(() => { ... })` for complex derivations needing a function body.
+- Only synchronously read values are tracked. Use `untrack` to exempt specific reads.
+- Derived values can be temporarily overridden (useful for optimistic UI) -- reverts
+  to derived computation on next dependency update.
+- Destructured `$derived` values are individually reactive.
+- Push-pull reactivity: dependents are notified immediately (push) but only
+  recalculated on read (pull). If new value is referentially identical, downstream
+  updates are skipped.
 
 ### `$effect`
 
-1. `$effect` is an escape hatch. Use only for side effects: DOM manipulation,
-   analytics, third-party library calls, timers.
-2. Return a cleanup function when acquiring resources (intervals, listeners).
-3. Only synchronously read values are tracked -- values read after `await` or inside
-   `setTimeout` are NOT tracked.
-4. Conditional reads: only values read in the last execution are dependencies.
-5. Runs only in the browser, after DOM updates.
-6. `$effect.pre` runs before DOM updates -- use for pre-DOM manipulation like
-   autoscrolling.
-7. `$effect.tracking()` returns `true` if code is running inside a tracking context.
-8. `$effect.root(() => { ... })` creates a non-tracked scope for manual effect
-   lifecycle control. Returns a destroy function.
+- `$effect` is an escape hatch. Use only for side effects: DOM manipulation,
+  analytics, third-party library calls, timers.
+- Return a cleanup function when acquiring resources (intervals, listeners).
+- Only synchronously read values are tracked -- values read after `await` or inside
+  `setTimeout` are NOT tracked.
+- Conditional reads: only values read in the last execution are dependencies.
+- Runs only in the browser, after DOM updates.
+- `$effect.pre` runs before DOM updates -- use for pre-DOM manipulation like
+  autoscrolling.
+- `$effect.tracking()` returns `true` if code is running inside a tracking context.
+- `$effect.root(() => { ... })` creates a non-tracked scope for manual effect
+  lifecycle control. Returns a destroy function.
 
 **Never use `$effect` to synchronize state** -- use `$derived` with callback event
 handlers or function bindings instead.
 
 ### `$props`
 
-1. Always destructure props: `let { name, count = 0 } = $props()`.
-2. Type with an interface in TypeScript: `let { name }: Props = $props()`.
-3. Renaming: `let { class: klass } = $props()`.
-4. Rest props: `let { a, b, ...rest } = $props()`.
-5. All props: `let props = $props()`.
-6. Unique ID: `$props.id()` -- consistent across SSR/hydration.
-7. Props can be temporarily overridden by child. Do NOT mutate prop objects unless
-   `$bindable`. Use callback props to communicate changes upward.
+- Always destructure props: `let { name, count = 0 } = $props()`.
+- Type with an interface in TypeScript: `let { name }: Props = $props()`.
+- Renaming: `let { class: klass } = $props()`.
+- Rest props: `let { a, b, ...rest } = $props()`.
+- All props: `let props = $props()`.
+- Unique ID: `$props.id()` -- consistent across SSR/hydration.
+- Props can be temporarily overridden by child. Do NOT mutate prop objects unless
+  `$bindable`. Use callback props to communicate changes upward.
 
 ### `$bindable`
 
-1. Marks a prop as two-way bindable: `let { value = $bindable() } = $props()`.
-2. Parent optionally uses `bind:value={variable}`.
-3. Use sparingly -- overuse makes data flow unpredictable. Prefer callback props for
-   most parent-child communication.
+- Marks a prop as two-way bindable: `let { value = $bindable() } = $props()`.
+- Parent optionally uses `bind:value={variable}`.
+- Use sparingly -- overuse makes data flow unpredictable. Prefer callback props for
+  most parent-child communication.
 
 ### `$inspect`
 
-1. Development-only debugging rune. Re-runs when arguments change. Noop in production.
-2. `$inspect(count, message)` logs when tracked values change.
-3. `$inspect(value).with((type, ...args) => { ... })` replaces default `console.log`
-   with custom callback. Type is `"init"` or `"update"`.
-4. `$inspect.trace()` traces which reactive state caused a re-execution. Must be first
-   statement in a function body.
+- Development-only debugging rune. Re-runs when arguments change. Noop in production.
+- `$inspect(count, message)` logs when tracked values change.
+- `$inspect(value).with((type, ...args) => { ... })` replaces default `console.log`
+  with custom callback. Type is `"init"` or `"update"`.
+- `$inspect.trace()` traces which reactive state caused a re-execution. Must be first
+  statement in a function body.
 
 ### `$host`
 
@@ -129,37 +129,37 @@ dispatching custom events.
 
 ### Naming
 
-1. Capitalize component names: `<MyComponent />`. Required for dynamic rendering.
-2. Component names must be capitalized or use dot notation (`item.component`).
-3. Components are dynamic by default -- `<svelte:component>` is unnecessary. Just
-   use `<Thing />` where `Thing` is a reactive variable.
+- Capitalize component names: `<MyComponent />`. Required for dynamic rendering.
+- Component names must be capitalized or use dot notation (`item.component`).
+- Components are dynamic by default -- `<svelte:component>` is unnecessary. Just
+  use `<Thing />` where `Thing` is a reactive variable.
 
 ### Events
 
-1. Use standard event attributes: `onclick={handler}`, never `on:click={handler}`.
-2. Event attributes are case sensitive -- `onclick` listens to `click`, `onClick`
-   listens to `Click`.
-3. No event modifiers -- call `event.preventDefault()` / `event.stopPropagation()`
-   in the handler. For capture, append to event name: `onclickcapture={...}`.
-4. Callback props for component events -- pass functions as props:
-   `let { onEvent } = $props()`. Never use `createEventDispatcher`.
-5. Event forwarding: accept callback props and spread them onto elements.
-6. Multiple handlers: combine in a single function (no duplicate attributes).
-7. Svelte uses event delegation for common events (`click`, `input`, `keydown`) --
-   single listener at app root. When manually dispatching events, set
-   `{ bubbles: true }`. Prefer `on` from `svelte/events` over raw `addEventListener`.
+- Use standard event attributes: `onclick={handler}`, never `on:click={handler}`.
+- Event attributes are case sensitive -- `onclick` listens to `click`, `onClick`
+  listens to `Click`.
+- No event modifiers -- call `event.preventDefault()` / `event.stopPropagation()`
+  in the handler. For capture, append to event name: `onclickcapture={...}`.
+- Callback props for component events -- pass functions as props:
+  `let { onEvent } = $props()`. Never use `createEventDispatcher`.
+- Event forwarding: accept callback props and spread them onto elements.
+- Multiple handlers: combine in a single function (no duplicate attributes).
+- Svelte uses event delegation for common events (`click`, `input`, `keydown`) --
+  single listener at app root. When manually dispatching events, set
+  `{ bubbles: true }`. Prefer `on` from `svelte/events` over raw `addEventListener`.
 
 ### Snippets
 
-1. Use `{@render children?.()}` for default content. Never use `<slot />`.
-2. Named snippets: declare with `{#snippet header()}...{/snippet}` in parent, accept
-   as props, render with `{@render header()}`.
-3. Snippets with parameters pass data from child to parent:
-   `{@render item(entry)}` in child, `{#snippet item(text)}` in parent.
-4. Optional snippets: use `{@render children?.()}` or `{#if children}` with fallback.
-5. Snippets follow lexical scoping -- visible within their declaring block and children.
-6. Top-level snippets can be exported from `<script module>` for cross-component use.
-7. Type snippets with `Snippet` and `Snippet<[ParamType]>` from `svelte`.
+- Use `{@render children?.()}` for default content. Never use `<slot />`.
+- Named snippets: declare with `{#snippet header()}...{/snippet}` in parent, accept
+  as props, render with `{@render header()}`.
+- Snippets with parameters pass data from child to parent:
+  `{@render item(entry)}` in child, `{#snippet item(text)}` in parent.
+- Optional snippets: use `{@render children?.()}` or `{#if children}` with fallback.
+- Snippets follow lexical scoping -- visible within their declaring block and children.
+- Top-level snippets can be exported from `<script module>` for cross-component use.
+- Type snippets with `Snippet` and `Snippet<[ParamType]>` from `svelte`.
 
 ### Template Syntax
 
@@ -186,13 +186,13 @@ dispatching custom events.
 
 ### Context
 
-1. `setContext(key, value)` / `getContext(key)` passes data through the component tree
-   without prop drilling.
-2. Type-safe context: use `createContext<T>()` from `svelte` which returns
-   `[getContext, setContext]` pair.
-3. Do NOT reassign the context object -- mutate its properties instead.
-4. For SSR safety, prefer context over global module state.
-5. Pass functions into `setContext` to maintain reactivity across boundaries.
+- `setContext(key, value)` / `getContext(key)` passes data through the component tree
+  without prop drilling.
+- Type-safe context: use `createContext<T>()` from `svelte` which returns
+  `[getContext, setContext]` pair.
+- Do NOT reassign the context object -- mutate its properties instead.
+- For SSR safety, prefer context over global module state.
+- Pass functions into `setContext` to maintain reactivity across boundaries.
 
 ### Special Elements
 
@@ -212,22 +212,22 @@ Components are functions, not classes:
 
 ## State Management
 
-1. No shared module state on the server -- module-level `$state` is shared across
-   requests during SSR. Use context or `event.locals` instead.
-2. Return data from `load`, don't write to globals. No side effects in load functions.
-3. Context for SSR-safe shared state -- `setContext`/`getContext` for data that must
-   not leak between requests.
-4. Use `$derived` for reactive computed values in components -- plain assignments in
-   `<script>` run once, not reactively.
-5. Store filter/sort state in URL for survival across reload.
-6. Use snapshots for ephemeral UI state that should survive back/forward navigation.
+- No shared module state on the server -- module-level `$state` is shared across
+  requests during SSR. Use context or `event.locals` instead.
+- Return data from `load`, don't write to globals. No side effects in load functions.
+- Context for SSR-safe shared state -- `setContext`/`getContext` for data that must
+  not leak between requests.
+- Use `$derived` for reactive computed values in components -- plain assignments in
+  `<script>` run once, not reactively.
+- Store filter/sort state in URL for survival across reload.
+- Use snapshots for ephemeral UI state that should survive back/forward navigation.
 
 ## File Conventions
 
-1. `.svelte.js` / `.svelte.ts` for reactive modules -- runes only work in `.svelte`
-   and `.svelte.js`/`.svelte.ts` files.
-2. `$lib` for shared code -- import from `$lib/` instead of relative paths climbing
-   multiple levels.
+- `.svelte.js` / `.svelte.ts` for reactive modules -- runes only work in `.svelte`
+  and `.svelte.js`/`.svelte.ts` files.
+- `$lib` for shared code -- import from `$lib/` instead of relative paths climbing
+  multiple levels.
 
 ## SvelteKit
 
@@ -266,26 +266,26 @@ files. `+layout` and `+error` apply to subdirectories too.
 | Access | `params`, `url`, `fetch` | + `cookies`, `locals`, `request` |
 | Returns | Any value (classes, components) | Serializable data only |
 
-1. Use the provided `fetch`, not global `fetch` -- inherits cookies, makes relative
-   requests work on server, bypasses HTTP overhead for internal requests.
-2. Export page options from `+page.js`: `prerender`, `ssr`, `csr`.
-3. Layout load data is available to all child pages.
-4. Stream non-essential data by returning un-awaited promises.
-5. SvelteKit tracks load dependencies and only reruns when: `params` change, `url`
-   properties change, `parent()` was called and parent reran, or
-   `invalidate()`/`invalidateAll()` called.
-6. Use `error()` and `redirect()` from `@sveltejs/kit` for error and redirect responses.
+- Use the provided `fetch`, not global `fetch` -- inherits cookies, makes relative
+  requests work on server, bypasses HTTP overhead for internal requests.
+- Export page options from `+page.js`: `prerender`, `ssr`, `csr`.
+- Layout load data is available to all child pages.
+- Stream non-essential data by returning un-awaited promises.
+- SvelteKit tracks load dependencies and only reruns when: `params` change, `url`
+  properties change, `parent()` was called and parent reran, or
+  `invalidate()`/`invalidateAll()` called.
+- Use `error()` and `redirect()` from `@sveltejs/kit` for error and redirect responses.
 
 ### Form Actions
 
 Server-only POST handlers in `+page.server.js`. Work without JavaScript.
 
-1. Default action: `export const actions = { default: async ({ request }) => { ... } }`.
-2. Named actions: `action="?/login"` on form, multiple actions in the `actions` object.
-3. Validation: return `fail(400, { field, missing: true })` from action. Access via
-   `form` prop in the page component.
-4. Progressive enhancement: add `use:enhance` from `$app/forms` for JS-enhanced
-   submission without full page reload.
+- Default action: `export const actions = { default: async ({ request }) => { ... } }`.
+- Named actions: `action="?/login"` on form, multiple actions in the `actions` object.
+- Validation: return `fail(400, { field, missing: true })` from action. Access via
+  `form` prop in the page component.
+- Progressive enhancement: add `use:enhance` from `$app/forms` for JS-enhanced
+  submission without full page reload.
 
 ### API Routes
 
@@ -317,14 +317,14 @@ table in `references/sveltekit.md`.
 
 ### Performance
 
-1. Use server `load` functions to avoid browser-to-API waterfalls.
-2. Stream non-essential data with un-awaited promises.
-3. Use `$derived` instead of `$effect` for computed values.
-4. Use link preloading (default on `<body>`).
-5. Minimize third-party scripts.
-6. Use `@sveltejs/enhanced-img` for image optimization.
-7. Use dynamic `import()` for conditional code.
-8. Deploy frontend near backend to minimize latency.
+- Use server `load` functions to avoid browser-to-API waterfalls.
+- Stream non-essential data with un-awaited promises.
+- Use `$derived` instead of `$effect` for computed values.
+- Use link preloading (default on `<body>`).
+- Minimize third-party scripts.
+- Use `@sveltejs/enhanced-img` for image optimization.
+- Use dynamic `import()` for conditional code.
+- Deploy frontend near backend to minimize latency.
 
 ## Application
 

@@ -262,11 +262,11 @@ const theme = inject(ThemeKey, ref('light')) // with default
 
 ### Rules
 
-1. **Use `Symbol` keys** for non-trivial apps to avoid collisions.
-2. **Export keys from a shared `keys.ts`** file.
-3. **Provide `readonly()` refs** to prevent consumers from mutating state.
-4. **Provide updater functions** when consumers need to change state.
-5. **Always provide a default** or handle `undefined` in the consumer.
+- **Use `Symbol` keys** for non-trivial apps to avoid collisions.
+- **Export keys from a shared `keys.ts`** file.
+- **Provide `readonly()` refs** to prevent consumers from mutating state.
+- **Provide updater functions** when consumers need to change state.
+- **Always provide a default** or handle `undefined` in the consumer.
 
 ## Component Naming
 

@@ -190,9 +190,9 @@ function padLeft(padding: number | string, input: string) {
 
 ## Rules Summary
 
-1. **Prefer discriminated unions** over optional properties for variant types
-2. **Use exhaustive switches** with `never` default to catch missing cases
-3. **Use `!= null`** (loose equality) to check both null and undefined
-4. **Write type predicates** for reusable, complex guards
-5. **Avoid non-null assertions (`!`)** — narrow instead
-6. **Use assertion functions** (`asserts x is T`) for validation at boundaries
+- **Prefer discriminated unions** over optional properties for variant types
+- **Use exhaustive switches** with `never` default to catch missing cases
+- **Use `!= null`** (loose equality) to check both null and undefined
+- **Write type predicates** for reusable, complex guards
+- **Avoid non-null assertions (`!`)** — narrow instead
+- **Use assertion functions** (`asserts x is T`) for validation at boundaries

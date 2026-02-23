@@ -283,15 +283,15 @@ debugging impossible.
 
 ### Strengthening Techniques
 
-1. **Repetition** — Reinforce critical rules across persona, behaviors,
-   examples, and critical rules sections.
-2. **Contrast examples** — Show default Claude (avoid) vs this style (use).
-3. **Consolidation** — Merge overlapping rules into single authoritative
-   statements. Five scattered "be direct" rules become one "Directness Rule"
-   section.
-4. **Escalation patterns** — For teaching/mentoring styles, define how
-   behavior changes when the user is frustrated or explicitly requests
-   a different mode.
+- **Repetition** — Reinforce critical rules across persona, behaviors,
+  examples, and critical rules sections.
+- **Contrast examples** — Show default Claude (avoid) vs this style (use).
+- **Consolidation** — Merge overlapping rules into single authoritative
+  statements. Five scattered "be direct" rules become one "Directness Rule"
+  section.
+- **Escalation patterns** — For teaching/mentoring styles, define how
+  behavior changes when the user is frustrated or explicitly requests
+  a different mode.
 
 ### Rewrite vs Iterate
 

@@ -27,17 +27,17 @@ Native CSS nesting eliminates the need for preprocessors in many cases.
 
 ### Rules
 
-1. **Use `&` for pseudo-classes/elements and compound selectors.**
-   `&:hover`, `&::before`, `&.active`.
-2. **Omit `&` for descendant selectors.** `.card { .title {} }` works.
-3. **`&` is required when the nested selector starts with a type selector.**
-   `& p {}` not `p {}` (without `&`, starts a new rule).
-4. **Nesting at-rules works.** `@media`, `@supports`, `@container` nest directly.
-5. **Specificity:** `:is()` wrapping applies. `.card { .title {} }` has same
-   specificity as `.card .title`, but nested `:is(.card) .title` specificity
-   may differ. Be aware of specificity changes.
-6. **Max depth: 3 levels.** Deeper nesting creates specificity issues and
-   couples CSS to DOM structure.
+- **Use `&` for pseudo-classes/elements and compound selectors.**
+  `&:hover`, `&::before`, `&.active`.
+- **Omit `&` for descendant selectors.** `.card { .title {} }` works.
+- **`&` is required when the nested selector starts with a type selector.**
+  `& p {}` not `p {}` (without `&`, starts a new rule).
+- **Nesting at-rules works.** `@media`, `@supports`, `@container` nest directly.
+- **Specificity:** `:is()` wrapping applies. `.card { .title {} }` has same
+  specificity as `.card .title`, but nested `:is(.card) .title` specificity
+  may differ. Be aware of specificity changes.
+- **Max depth: 3 levels.** Deeper nesting creates specificity issues and
+  couples CSS to DOM structure.
 
 ## Cascade Layers (`@layer`)
 
@@ -93,15 +93,15 @@ Priority (lowest to highest):
 
 ### Best Practices
 
-1. **Declare all layers at the top of the stylesheet** in a single statement.
-2. **Typical ordering:** `reset, defaults, themes, components, utilities`.
-3. **Import third-party CSS into sub-layers:**
-   `@import url('bootstrap.css') layer(vendor.bootstrap);`
-4. **Use `revert-layer`** to roll back to the previous layer's value.
-5. **`!important` in low layers is intentional** -- it means "this style is
-   essential, don't override."
-6. **Don't create layers per-component.** Layers manage cascade priority
-   between categories (reset vs component vs utility), not scope.
+- **Declare all layers at the top of the stylesheet** in a single statement.
+- **Typical ordering:** `reset, defaults, themes, components, utilities`.
+- **Import third-party CSS into sub-layers:**
+  `@import url('bootstrap.css') layer(vendor.bootstrap);`
+- **Use `revert-layer`** to roll back to the previous layer's value.
+- **`!important` in low layers is intentional** -- it means "this style is
+  essential, don't override."
+- **Don't create layers per-component.** Layers manage cascade priority
+  between categories (reset vs component vs utility), not scope.
 
 ## Container Queries
 
@@ -187,12 +187,12 @@ h1:has(+ h2) {
 
 ### Performance Rules
 
-1. **Anchor to specific elements, not `body`, `:root`, or `*`.**
-   Broad anchors force expensive re-evaluation on every DOM change.
-2. **Use direct child (`>`) or sibling (`+`, `~`) combinators** inside
-   `:has()` to limit traversal scope.
-3. **Cannot nest `:has()` inside `:has()`.**
-4. **Pseudo-elements are not valid** inside `:has()`.
+- **Anchor to specific elements, not `body`, `:root`, or `*`.**
+  Broad anchors force expensive re-evaluation on every DOM change.
+- **Use direct child (`>`) or sibling (`+`, `~`) combinators** inside
+  `:has()` to limit traversal scope.
+- **Cannot nest `:has()` inside `:has()`.**
+- **Pseudo-elements are not valid** inside `:has()`.
 
 ```css
 /* Bad -- broad anchor, full subtree traversal */
@@ -218,12 +218,12 @@ body:has(.sidebar-open) { /* ... */ }
 
 ### Rules
 
-1. **Define on `:root` for globals.** Scope to components for local overrides.
-2. **Always provide fallbacks** for component-level variables:
-   `var(--button-bg, var(--color-primary))`.
-3. **Case-sensitive.** `--my-color` differs from `--My-Color`.
-4. **Custom properties inherit** by default (unlike most CSS properties).
-5. **Use `@property` for typed variables:**
+- **Define on `:root` for globals.** Scope to components for local overrides.
+- **Always provide fallbacks** for component-level variables:
+  `var(--button-bg, var(--color-primary))`.
+- **Case-sensitive.** `--my-color` differs from `--My-Color`.
+- **Custom properties inherit** by default (unlike most CSS properties).
+- **Use `@property` for typed variables:**
 
 ```css
 @property --gradient-angle {
@@ -302,9 +302,9 @@ document.startViewTransition(() => {
 
 ### Rules
 
-1. **`view-transition-name` must be unique** per page at transition time.
-2. **Keep transitions short** -- 200-400ms for UI, longer for page-level.
-3. **Respect `prefers-reduced-motion`:**
+- **`view-transition-name` must be unique** per page at transition time.
+- **Keep transitions short** -- 200-400ms for UI, longer for page-level.
+- **Respect `prefers-reduced-motion`:**
 
 ```css
 @media (prefers-reduced-motion: reduce) {

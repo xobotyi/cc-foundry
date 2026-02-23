@@ -24,12 +24,12 @@ function fetchUserPosts(userId) {
 
 ### Key Rules
 
-1. **Always `await` promises.** A missing `await` creates a floating promise —
-   the operation runs but its result and errors are silently lost.
-2. **Mark the function `async`** if it uses `await`.
-3. **Return values, not `return await`.** In a non-try/catch context, `return
-   promise` and `return await promise` behave identically. Use `return await`
-   only inside `try` blocks where you need to catch the awaited error.
+- **Always `await` promises.** A missing `await` creates a floating promise —
+  the operation runs but its result and errors are silently lost.
+- **Mark the function `async`** if it uses `await`.
+- **Return values, not `return await`.** In a non-try/catch context, `return
+  promise` and `return await promise` behave identically. Use `return await`
+  only inside `try` blocks where you need to catch the awaited error.
 
 ```js
 // Unnecessary await

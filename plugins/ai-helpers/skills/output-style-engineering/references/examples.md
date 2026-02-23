@@ -118,11 +118,11 @@ information with academic rigor and intellectual honesty.
 
 ## Core Principles
 
-1. **Citation Required:** Always cite sources with exact quotes
-2. **Fact/Opinion Separation:** Clearly distinguish facts from
-   interpretations
-3. **Confidence Levels:** State certainty for conclusions
-4. **Gap Acknowledgment:** Identify what's missing or unknown
+- **Citation Required:** Always cite sources with exact quotes
+- **Fact/Opinion Separation:** Clearly distinguish facts from
+  interpretations
+- **Confidence Levels:** State certainty for conclusions
+- **Gap Acknowledgment:** Identify what's missing or unknown
 
 ## Analysis Framework
 
@@ -358,10 +358,10 @@ All questions must be answerable by speaking.
 
 ## Pacing Rules
 
-1. ONE question at a time
-2. Wait for complete response
-3. Check understanding: "Does that make sense?"
-4. "Ready for the next question?" before proceeding
+- ONE question at a time
+- Wait for complete response
+- Check understanding: "Does that make sense?"
+- "Ready for the next question?" before proceeding
 
 ## Session Structure
 

@@ -225,12 +225,12 @@ class Dog extends Animal {
 
 ### Class Guidelines
 
-1. **Prefer composition over inheritance.** Use inheritance only for true
-   "is-a" relationships.
-2. **Use `#private` fields** for encapsulation — not `_` convention.
-3. **Methods can return `this`** for fluent/chainable APIs.
-4. **No empty constructors.** If the constructor only calls `super()`, omit it.
-5. **Static methods** for operations that don't need instance state.
+- **Prefer composition over inheritance.** Use inheritance only for true
+  "is-a" relationships.
+- **Use `#private` fields** for encapsulation — not `_` convention.
+- **Methods can return `this`** for fluent/chainable APIs.
+- **No empty constructors.** If the constructor only calls `super()`, omit it.
+- **Static methods** for operations that don't need instance state.
 
 ### When Not to Use Classes
 

@@ -62,9 +62,9 @@ Skip when:
 ### Step 3: Define Technical Approach per Component
 
 For each affected component, describe WHAT changes at a high level:
-1. What the component does today.
-2. What it needs to do after the change.
-3. What the nature of the change is (new code, refactor, configuration, migration, etc.).
+- What the component does today.
+- What it needs to do after the change.
+- What the nature of the change is (new code, refactor, configuration, migration, etc.).
 
 Describe changes in terms of their effect on the component, not the code that implements them.
 Pseudocode is acceptable when expressing logical changes that are easier to communicate as
@@ -88,9 +88,9 @@ Identify ordering constraints between component changes:
 
 ### Step 6: Document Risks and Assumptions
 
-1. List technical risks (performance unknowns, compatibility concerns).
-2. List assumptions about existing behavior that haven't been verified.
-3. Flag areas where the approach might need revision during implementation.
+- List technical risks (performance unknowns, compatibility concerns).
+- List assumptions about existing behavior that haven't been verified.
+- Flag areas where the approach might need revision during implementation.
 
 ### Step 7: Set Scope Boundaries
 

@@ -21,13 +21,13 @@ Naming convention that creates clear relationships between HTML and CSS.
 
 ### Rules
 
-1. **Blocks** are standalone components: `.card`, `.nav`, `.form`.
-2. **Elements** are parts of a block: `.card__header`, `.card__body`.
-3. **Modifiers** are variations: `.card--dark`, `.card__title--bold`.
-4. **Never nest elements:** `.card__header__title` is wrong.
-   Flatten to `.card__title` or create a new block.
-5. **Modifiers don't exist alone.** Always pair with the base class:
-   `class="card card--featured"`.
+- **Blocks** are standalone components: `.card`, `.nav`, `.form`.
+- **Elements** are parts of a block: `.card__header`, `.card__body`.
+- **Modifiers** are variations: `.card--dark`, `.card__title--bold`.
+- **Never nest elements:** `.card__header__title` is wrong.
+  Flatten to `.card__title` or create a new block.
+- **Modifiers don't exist alone.** Always pair with the base class:
+  `class="card card--featured"`.
 
 ### When to Use BEM
 
@@ -63,17 +63,17 @@ import styles from './Button.module.css';
 
 ### Rules
 
-1. **Use simple, descriptive class names.** Scoping eliminates conflict risk.
-   `.button` not `.btn-component-primary-v2`.
-2. **One module per component.**
-3. **Compose shared styles:**
-   ```css
-   .button {
-     composes: resetButton from './shared.module.css';
-   }
-   ```
-4. **Global escape hatch:** `:global(.utility-class)` when needed.
-5. **Pair with custom properties** for theming (variables aren't scoped).
+- **Use simple, descriptive class names.** Scoping eliminates conflict risk.
+  `.button` not `.btn-component-primary-v2`.
+- **One module per component.**
+- **Compose shared styles:**
+  ```css
+  .button {
+    composes: resetButton from './shared.module.css';
+  }
+  ```
+- **Global escape hatch:** `:global(.utility-class)` when needed.
+- **Pair with custom properties** for theming (variables aren't scoped).
 
 ## Utility-First CSS
 
@@ -167,14 +167,14 @@ utilities/
 
 ### Specificity Management
 
-1. **Keep specificity flat and low.** Prefer single class selectors.
-2. **Never use ID selectors for styling.** `#header` = specificity 1-0-0.
-3. **Avoid qualifying classes with elements.** `.error` not `div.error`.
-4. **Use `:where()` to zero-out specificity** when needed:
-   ```css
-   :where(.card) .title { /* 0-0-1 specificity */ }
-   ```
-5. **Use `:is()` with awareness** -- takes highest specificity of its arguments.
+- **Keep specificity flat and low.** Prefer single class selectors.
+- **Never use ID selectors for styling.** `#header` = specificity 1-0-0.
+- **Avoid qualifying classes with elements.** `.error` not `div.error`.
+- **Use `:where()` to zero-out specificity** when needed:
+  ```css
+  :where(.card) .title { /* 0-0-1 specificity */ }
+  ```
+- **Use `:is()` with awareness** -- takes highest specificity of its arguments.
 
 ### Selector Nesting Depth
 
@@ -213,17 +213,17 @@ a consistent convention.
 
 ### General Rules
 
-1. **2-space indentation.** No tabs.
-2. **One declaration per line.**
-3. **Semicolon after every declaration** (including the last one).
-4. **Space after colon:** `color: red` not `color:red`.
-5. **Opening brace on same line** as selector.
-6. **Blank line between rules.**
-7. **Lowercase everything** (selectors, properties, values, hex colors).
-8. **Single quotes** for attribute selectors and font names:
-   `font-family: 'Open Sans', sans-serif`.
-9. **No units on zero values:** `margin: 0` not `margin: 0px`
-   (except where required, e.g., `flex: 0 0 0px`).
-10. **Leading zero on decimals:** `opacity: 0.5` not `opacity: .5`.
-11. **Shorthand hex where possible:** `#ebc` not `#eebbcc`.
-12. **Avoid `!important`.** Use cascade layers or specificity to resolve conflicts.
+- **2-space indentation.** No tabs.
+- **One declaration per line.**
+- **Semicolon after every declaration** (including the last one).
+- **Space after colon:** `color: red` not `color:red`.
+- **Opening brace on same line** as selector.
+- **Blank line between rules.**
+- **Lowercase everything** (selectors, properties, values, hex colors).
+- **Single quotes** for attribute selectors and font names:
+  `font-family: 'Open Sans', sans-serif`.
+- **No units on zero values:** `margin: 0` not `margin: 0px`
+  (except where required, e.g., `flex: 0 0 0px`).
+- **Leading zero on decimals:** `opacity: 0.5` not `opacity: .5`.
+- **Shorthand hex where possible:** `#ebc` not `#eebbcc`.
+- **Avoid `!important`.** Use cascade layers or specificity to resolve conflicts.

@@ -257,15 +257,15 @@ Stay at the lowest tier that solves your problem.
 
 ## Best Practices
 
-1. **Use the simplest construct that works.** Interface extension over `Pick`.
-   Explicit properties over mapped types. Repetition is cheaper than complexity.
-2. **Mapped and conditional types are powerful but costly** — they hurt readability,
-   IDE performance, and refactoring. Use only when the alternative is worse.
-3. **Avoid return-type-only generics.** If a generic parameter appears only in the
-   return type, it cannot be inferred and forces callers to guess.
-4. **Prefer built-in utility types** over hand-rolling equivalents.
-5. **Keep generic constraints tight** — `<T extends Record<string, unknown>>` is
-   better than `<T extends object>` when you need string keys.
+- **Use the simplest construct that works.** Interface extension over `Pick`.
+  Explicit properties over mapped types. Repetition is cheaper than complexity.
+- **Mapped and conditional types are powerful but costly** — they hurt readability,
+  IDE performance, and refactoring. Use only when the alternative is worse.
+- **Avoid return-type-only generics.** If a generic parameter appears only in the
+  return type, it cannot be inferred and forces callers to guess.
+- **Prefer built-in utility types** over hand-rolling equivalents.
+- **Keep generic constraints tight** — `<T extends Record<string, unknown>>` is
+  better than `<T extends object>` when you need string keys.
 
 ### When to Use Utility Types vs Explicit Interfaces
 

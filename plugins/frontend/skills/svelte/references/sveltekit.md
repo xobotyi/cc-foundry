@@ -293,15 +293,15 @@ export async function handle({ event, resolve }) {
 
 ### Rules
 
-1. **No shared state on server.** Module-level variables are shared across
-   requests. Use `event.locals` or context instead.
-2. **No side effects in load.** Return data, don't write to global state.
-3. **Use context for SSR-safe shared state.** Context is per-component-tree,
-   not global.
-4. **Components are reused on navigation.** Use `$derived` for values that
-   depend on `data` props -- plain assignments run only once.
-5. **Store state in URL** for filter/sort that should survive reload.
-6. **Use snapshots** for ephemeral UI state that should survive back/forward.
+- **No shared state on server.** Module-level variables are shared across
+  requests. Use `event.locals` or context instead.
+- **No side effects in load.** Return data, don't write to global state.
+- **Use context for SSR-safe shared state.** Context is per-component-tree,
+  not global.
+- **Components are reused on navigation.** Use `$derived` for values that
+  depend on `data` props -- plain assignments run only once.
+- **Store state in URL** for filter/sort that should survive reload.
+- **Use snapshots** for ephemeral UI state that should survive back/forward.
 
 ### Context Pattern for Shared State
 
@@ -338,11 +338,11 @@ export async function handle({ event, resolve }) {
 
 ## Performance
 
-1. Use server `load` functions to avoid browser-to-API waterfalls
-2. Stream non-essential data with promises
-3. Use `$derived` instead of `$effect` for computed values
-4. Use link preloading (default on `<body>`)
-5. Minimize third-party scripts
-6. Use `@sveltejs/enhanced-img` for image optimization
-7. Use dynamic `import()` for conditional code
-8. Deploy frontend near backend to minimize latency
+- Use server `load` functions to avoid browser-to-API waterfalls
+- Stream non-essential data with promises
+- Use `$derived` instead of `$effect` for computed values
+- Use link preloading (default on `<body>`)
+- Minimize third-party scripts
+- Use `@sveltejs/enhanced-img` for image optimization
+- Use dynamic `import()` for conditional code
+- Deploy frontend near backend to minimize latency

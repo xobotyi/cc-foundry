@@ -63,10 +63,10 @@ event loop.
 
 ### Mitigations
 
-1. **Use `indexOf`/`includes`** for simple string matching — always O(n)
-2. **Validate regex** with tools like `safe-regex2` or `recheck`
-3. **Use RE2** via `re2` npm package for untrusted patterns (linear time guarantee)
-4. **Bound input length** before regex matching
+- **Use `indexOf`/`includes`** for simple string matching — always O(n)
+- **Validate regex** with tools like `safe-regex2` or `recheck`
+- **Use RE2** via `re2` npm package for untrusted patterns (linear time guarantee)
+- **Bound input length** before regex matching
 
 ```js
 // BAD — exponential on crafted input
@@ -92,18 +92,18 @@ if (filePath.length < 1000) filePath.match(SAFE);
 
 ### Mitigations
 
-1. **Use `npm ci`** in CI and production — enforces lockfile exactly, fails on mismatch
-2. **Lock dependencies** — commit `package-lock.json` or `yarn.lock`
-3. **Pin exact versions** for critical dependencies (no `^` or `~`)
-4. **Audit regularly** — `npm audit` in CI pipeline
-5. **Disable postinstall scripts** for untrusted packages:
-   ```bash
-   npm install --ignore-scripts
-   ```
-6. **Review before install** — check package size, maintainers, dependencies
-7. **Use `npm publish --dry-run`** to verify what gets published
-8. **Configure `.npmignore`** or `"files"` in `package.json` to prevent secret leaks
-9. **Enable 2FA** on npm accounts
+- **Use `npm ci`** in CI and production — enforces lockfile exactly, fails on mismatch
+- **Lock dependencies** — commit `package-lock.json` or `yarn.lock`
+- **Pin exact versions** for critical dependencies (no `^` or `~`)
+- **Audit regularly** — `npm audit` in CI pipeline
+- **Disable postinstall scripts** for untrusted packages:
+  ```bash
+  npm install --ignore-scripts
+  ```
+- **Review before install** — check package size, maintainers, dependencies
+- **Use `npm publish --dry-run`** to verify what gets published
+- **Configure `.npmignore`** or `"files"` in `package.json` to prevent secret leaks
+- **Enable 2FA** on npm accounts
 
 ## HTTP Security
 
@@ -143,24 +143,24 @@ HAProxy, or a cloud load balancer handle:
 
 ## Secrets Management
 
-1. **Never hardcode secrets** in source code
-2. **Use environment variables** loaded from secure vaults (not `.env` in production)
-3. **Never commit `.env` files** — add to `.gitignore`
-4. **Use `crypto.timingSafeEqual()`** for secret comparison (prevents timing attacks):
+- **Never hardcode secrets** in source code
+- **Use environment variables** loaded from secure vaults (not `.env` in production)
+- **Never commit `.env` files** — add to `.gitignore`
+- **Use `crypto.timingSafeEqual()`** for secret comparison (prevents timing attacks):
 
-   ```js
-   import { timingSafeEqual } from 'node:crypto';
+  ```js
+  import { timingSafeEqual } from 'node:crypto';
 
-   function verifyToken(provided, expected) {
-     if (provided.length !== expected.length) return false;
-     return timingSafeEqual(
-       Buffer.from(provided),
-       Buffer.from(expected)
-     );
-   }
-   ```
+  function verifyToken(provided, expected) {
+    if (provided.length !== expected.length) return false;
+    return timingSafeEqual(
+      Buffer.from(provided),
+      Buffer.from(expected)
+    );
+  }
+  ```
 
-5. **Use `crypto.scrypt()` or `crypto.pbkdf2()`** for password hashing (async versions)
+- **Use `crypto.scrypt()` or `crypto.pbkdf2()`** for password hashing (async versions)
 
 ## Child Processes
 
@@ -193,23 +193,23 @@ require(userInput);   // Module loading as code execution
 
 ## Process Hardening
 
-1. **Run as non-root** — use a dedicated user in Docker:
-   ```dockerfile
-   RUN addgroup --system app && adduser --system --ingroup app app
-   USER app
-   ```
+- **Run as non-root** — use a dedicated user in Docker:
+  ```dockerfile
+  RUN addgroup --system app && adduser --system --ingroup app app
+  USER app
+  ```
 
-2. **Set `NODE_ENV=production`** — disables debug output, enables optimizations
+- **Set `NODE_ENV=production`** — disables debug output, enables optimizations
 
-3. **Use `--secure-heap`** for sensitive crypto operations (Linux only):
-   ```bash
-   node --secure-heap=4096 server.js
-   ```
+- **Use `--secure-heap`** for sensitive crypto operations (Linux only):
+  ```bash
+  node --secure-heap=4096 server.js
+  ```
 
-4. **Limit V8 heap** to prevent memory exhaustion:
-   ```bash
-   node --max-old-space-size=512 server.js
-   ```
+- **Limit V8 heap** to prevent memory exhaustion:
+  ```bash
+  node --max-old-space-size=512 server.js
+  ```
 
 ## Security Checklist
 

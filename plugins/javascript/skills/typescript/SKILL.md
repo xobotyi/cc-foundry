@@ -10,11 +10,9 @@ description: >-
 # TypeScript
 
 <prerequisite>
-**Requires: `javascript` skill.**
-This skill extends the JavaScript skill and cannot operate without it. If the `javascript`
-skill is not yet loaded, invoke it now before reading further. Do not proceed with any
-TypeScript work until the JavaScript skill is active — its conventions are the foundation
-that this skill builds on.
+This skill extends the JavaScript skill. You must load `javascript` first — naming,
+ternary operator rules, async patterns, and module conventions are defined there and
+not duplicated here.
 </prerequisite>
 
 **Types encode intent. Let the compiler prove the rest.**

@@ -63,11 +63,11 @@ when to invoke your skill.
 [What it does] + [When to invoke — broad domain claim with trigger examples]
 ```
 
-1. **What it does** — Functional description of the skill's purpose.
-   State what the skill covers concretely, not a slogan or tagline.
-2. **When to invoke** — "Invoke whenever task involves any interaction
-   with X." Claims the domain broadly, then lists specific triggers
-   as examples under the broad claim.
+- **What it does** — Functional description of the skill's purpose.
+  State what the skill covers concretely, not a slogan or tagline.
+- **When to invoke** — "Invoke whenever task involves any interaction
+  with X." Claims the domain broadly, then lists specific triggers
+  as examples under the broad claim.
 
 ### Examples
 
@@ -262,10 +262,10 @@ Make sure the code is good.
 **Specific:**
 ```markdown
 Verify the code:
-1. Compiles without errors
-2. Passes all existing tests
-3. Follows project naming conventions
-4. Has no obvious security vulnerabilities
+- Compiles without errors
+- Passes all existing tests
+- Follows project naming conventions
+- Has no obvious security vulnerabilities
 ```
 
 ### Use XML Tags for Structure
@@ -386,10 +386,10 @@ Test that it doesn't trigger when it shouldn't:
 
 ### Output Quality Testing
 
-1. **Simple cases** — Does basic functionality work?
-2. **Complex cases** — Does it handle real-world complexity?
-3. **Edge cases** — Empty input, malformed data, unusual requests
-4. **Consistency** — Same input produces same quality output?
+- **Simple cases** — Does basic functionality work?
+- **Complex cases** — Does it handle real-world complexity?
+- **Edge cases** — Empty input, malformed data, unusual requests
+- **Consistency** — Same input produces same quality output?
 
 ### Iteration
 

@@ -27,16 +27,16 @@ ordering. Prefer boring, readable patterns over clever one-liners.
 
 ## Selectors and Specificity
 
-1. Single class selectors by default — keep specificity flat at 0-1-0
-2. Never use ID selectors for styling — IDs are for anchors and JS hooks
-3. Never qualify classes with elements — `.error` not `div.error`
-4. Max nesting depth: 3 levels — deeper nesting couples CSS to DOM structure
-5. Avoid `!important` — use cascade layers or restructure selectors instead;
-   only valid use is in a low-priority reset layer for truly essential styles
-6. Use `:where()` to zero-out specificity when needed —
-   `:where(.card) .title` has 0-0-1 specificity
-7. Use `:is()` with awareness — it takes the highest specificity of its arguments
-8. Flatten nested selectors in SCSS — ability to nest does not mean you should
+- Single class selectors by default — keep specificity flat at 0-1-0
+- Never use ID selectors for styling — IDs are for anchors and JS hooks
+- Never qualify classes with elements — `.error` not `div.error`
+- Max nesting depth: 3 levels — deeper nesting couples CSS to DOM structure
+- Avoid `!important` — use cascade layers or restructure selectors instead;
+  only valid use is in a low-priority reset layer for truly essential styles
+- Use `:where()` to zero-out specificity when needed —
+  `:where(.card) .title` has 0-0-1 specificity
+- Use `:is()` with awareness — it takes the highest specificity of its arguments
+- Flatten nested selectors in SCSS — ability to nest does not mean you should
 
 ## Layout Systems
 
@@ -84,47 +84,47 @@ Both work together — a grid item can be a flex container and vice versa.
 
 ### General Layout Rules
 
-1. Never use `float` for layout — floats are for wrapping text around images
-2. Intrinsic sizing first — use `flex-wrap`, `min()`, `max()`, `clamp()` before
-   reaching for media queries
-3. `gap` over margin hacks in both flexbox and grid
+- Never use `float` for layout — floats are for wrapping text around images
+- Intrinsic sizing first — use `flex-wrap`, `min()`, `max()`, `clamp()` before
+  reaching for media queries
+- `gap` over margin hacks in both flexbox and grid
 
 ## CSS Nesting
 
-1. Use `&` for pseudo-classes/elements and compound selectors —
-   `&:hover`, `&::before`, `&.active`
-2. Omit `&` for descendant selectors — `.card { .title {} }` works
-3. `&` is required when the nested selector starts with a type selector —
-   `& p {}` not `p {}`
-4. Nesting at-rules (`@media`, `@supports`, `@container`) nest directly inside rules
-5. Specificity: `:is()` wrapping applies in nesting — be aware that specificity
-   may differ from the equivalent unnested selector
-6. Max depth: 3 levels — same rule as flat CSS
+- Use `&` for pseudo-classes/elements and compound selectors —
+  `&:hover`, `&::before`, `&.active`
+- Omit `&` for descendant selectors — `.card { .title {} }` works
+- `&` is required when the nested selector starts with a type selector —
+  `& p {}` not `p {}`
+- Nesting at-rules (`@media`, `@supports`, `@container`) nest directly inside rules
+- Specificity: `:is()` wrapping applies in nesting — be aware that specificity
+  may differ from the equivalent unnested selector
+- Max depth: 3 levels — same rule as flat CSS
 
 ## Cascade Layers (`@layer`)
 
-1. Declare all layers at the top of the stylesheet in a single statement:
-   `@layer reset, defaults, themes, components, utilities;`
-2. First declared = lowest priority; un-layered styles always beat layered styles
-3. `!important` reverses layer order — `!important` in the lowest layer wins over
-   `!important` in higher layers
-4. Import third-party CSS into sub-layers:
-   `@import url('vendor.css') layer(vendor.bootstrap);`
-5. Use `revert-layer` to roll back to the previous layer's value
-6. `!important` in low layers is intentional — it means "this style is essential,
-   don't override"
-7. Don't create layers per-component — layers manage cascade priority between
-   categories (reset vs component vs utility), not scope
-8. Nested layers: `@layer components { @layer buttons, cards; }` —
-   access via `@layer components.buttons`
-9. Anonymous layers (`@layer { }`) can't be appended to later
+- Declare all layers at the top of the stylesheet in a single statement:
+  `@layer reset, defaults, themes, components, utilities;`
+- First declared = lowest priority; un-layered styles always beat layered styles
+- `!important` reverses layer order — `!important` in the lowest layer wins over
+  `!important` in higher layers
+- Import third-party CSS into sub-layers:
+  `@import url('vendor.css') layer(vendor.bootstrap);`
+- Use `revert-layer` to roll back to the previous layer's value
+- `!important` in low layers is intentional — it means "this style is essential,
+  don't override"
+- Don't create layers per-component — layers manage cascade priority between
+  categories (reset vs component vs utility), not scope
+- Nested layers: `@layer components { @layer buttons, cards; }` —
+  access via `@layer components.buttons`
+- Anonymous layers (`@layer { }`) can't be appended to later
 
 ## Container Queries
 
-1. Define containment: `container-type: inline-size` on the wrapper
-2. Name containers for targeting: `container: card / inline-size`
-3. Query by name: `@container card (width > 400px) { }`
-4. Unnamed queries hit the nearest ancestor container
+- Define containment: `container-type: inline-size` on the wrapper
+- Name containers for targeting: `container: card / inline-size`
+- Query by name: `@container card (width > 400px) { }`
+- Unnamed queries hit the nearest ancestor container
 
 ### Container Query Units
 
@@ -152,17 +152,17 @@ Design from the inside out — use the right tool for each level:
 
 ### Core Rules
 
-1. Mobile-first — default styles for small screens, enhance upward
-2. Content-driven breakpoints — let content decide, not device sizes
-3. `rem` for breakpoints: `@media (width >= 45rem)` not `(min-width: 768px)`
-4. Use modern range syntax: `@media (768px <= width < 1024px)`
-5. Logical properties for layout: `margin-inline-start` not `margin-left`
-6. Container queries for component-level adaptation; media queries only for
-   viewport-dependent elements (nav, header)
-7. Respect user preferences: `prefers-reduced-motion`, `prefers-color-scheme`,
-   `prefers-contrast`
-8. Single container max-width pattern: `width: min(100% - 2rem, 75rem);
-   margin-inline: auto` — avoid multiple `max-width` values at different breakpoints
+- Mobile-first — default styles for small screens, enhance upward
+- Content-driven breakpoints — let content decide, not device sizes
+- `rem` for breakpoints: `@media (width >= 45rem)` not `(min-width: 768px)`
+- Use modern range syntax: `@media (768px <= width < 1024px)`
+- Logical properties for layout: `margin-inline-start` not `margin-left`
+- Container queries for component-level adaptation; media queries only for
+  viewport-dependent elements (nav, header)
+- Respect user preferences: `prefers-reduced-motion`, `prefers-color-scheme`,
+  `prefers-contrast`
+- Single container max-width pattern: `width: min(100% - 2rem, 75rem);
+  margin-inline: auto` — avoid multiple `max-width` values at different breakpoints
 
 ### Fluid Sizing
 
@@ -193,14 +193,14 @@ Shorthands: `margin-block: 1rem 2rem` (block-start, block-end);
 
 ### User Preference Queries
 
-1. Color scheme: declare `color-scheme: light dark` on `:root` and use
-   `@media (prefers-color-scheme: dark)` for overrides
-2. Reduced motion: either remove motion in `prefers-reduced-motion: reduce` or
-   add motion only in `prefers-reduced-motion: no-preference` (progressive
-   enhancement approach)
-3. High contrast: `@media (prefers-contrast: more)`
-4. Interaction: `@media (hover: hover)` for hover effects on capable devices;
-   `@media (pointer: coarse)` for touch targets (min 44px)
+- Color scheme: declare `color-scheme: light dark` on `:root` and use
+  `@media (prefers-color-scheme: dark)` for overrides
+- Reduced motion: either remove motion in `prefers-reduced-motion: reduce` or
+  add motion only in `prefers-reduced-motion: no-preference` (progressive
+  enhancement approach)
+- High contrast: `@media (prefers-contrast: more)`
+- Interaction: `@media (hover: hover)` for hover effects on capable devices;
+  `@media (pointer: coarse)` for touch targets (min 44px)
 
 ### Responsive Images
 
@@ -211,65 +211,65 @@ Shorthands: `margin-block: 1rem 2rem` (block-start, block-end);
 
 Select elements based on descendants or siblings — the "parent selector."
 
-1. Anchor to specific elements, not `body`, `:root`, or `*` — broad anchors
-   force expensive re-evaluation on every DOM change
-2. Use direct child (`>`) or sibling (`+`, `~`) combinators inside `:has()`
-   to limit traversal scope
-3. Cannot nest `:has()` inside `:has()`
-4. Pseudo-elements are not valid inside `:has()`
-5. `.layout:has(> .sidebar-open)` (good) not `body:has(.sidebar-open)` (bad)
+- Anchor to specific elements, not `body`, `:root`, or `*` — broad anchors
+  force expensive re-evaluation on every DOM change
+- Use direct child (`>`) or sibling (`+`, `~`) combinators inside `:has()`
+  to limit traversal scope
+- Cannot nest `:has()` inside `:has()`
+- Pseudo-elements are not valid inside `:has()`
+- `.layout:has(> .sidebar-open)` (good) not `body:has(.sidebar-open)` (bad)
 
 ## Custom Properties
 
-1. Define design tokens on `:root` — scope overrides to components
-2. Semantic naming: `--color-text-primary` not `--dark-gray`
-3. Use kebab-case; prefix with category: `--color-`, `--spacing-`, `--font-`
-4. Provide fallbacks for component-level variables:
-   `var(--button-bg, var(--color-primary))`
-5. Custom properties are case-sensitive — `--my-color` differs from `--My-Color`
-6. Custom properties inherit by default (unlike most CSS properties)
-7. Use `@property` for typed, animatable custom properties — enables type checking
-   (invalid values fall back to `initial-value`), controlled inheritance
-   (`inherits: false`), and transitions on custom properties
+- Define design tokens on `:root` — scope overrides to components
+- Semantic naming: `--color-text-primary` not `--dark-gray`
+- Use kebab-case; prefix with category: `--color-`, `--spacing-`, `--font-`
+- Provide fallbacks for component-level variables:
+  `var(--button-bg, var(--color-primary))`
+- Custom properties are case-sensitive — `--my-color` differs from `--My-Color`
+- Custom properties inherit by default (unlike most CSS properties)
+- Use `@property` for typed, animatable custom properties — enables type checking
+  (invalid values fall back to `initial-value`), controlled inheritance
+  (`inherits: false`), and transitions on custom properties
 
 ## View Transitions
 
-1. `view-transition-name` must be unique per page at transition time
-2. Keep transitions short — 200-400ms for UI, longer for page-level
-3. Always respect `prefers-reduced-motion: reduce` for view transitions
-4. Same-document (SPA): `document.startViewTransition(() => { /* update DOM */ })`
-5. Cross-document (MPA): `@view-transition { navigation: auto; }`
-6. Named transitions target specific elements via `::view-transition-group(name)`
+- `view-transition-name` must be unique per page at transition time
+- Keep transitions short — 200-400ms for UI, longer for page-level
+- Always respect `prefers-reduced-motion: reduce` for view transitions
+- Same-document (SPA): `document.startViewTransition(() => { /* update DOM */ })`
+- Cross-document (MPA): `@view-transition { navigation: auto; }`
+- Named transitions target specific elements via `::view-transition-group(name)`
 
 ## Box Model and Sizing
 
-1. Always set `box-sizing: border-box` globally via reset
-2. `rem` for font sizes and breakpoints — respects user preferences
-3. `em` for component-relative spacing (padding that scales with font size)
-4. Fluid sizing with `clamp()` — replace manual breakpoint ladders
-5. `aspect-ratio` over padding hacks for maintaining proportions
-6. No units on zero values — `margin: 0` not `margin: 0px`
-   (except where required: `flex: 0 0 0px`)
-7. Leading zero on decimals: `opacity: 0.5` not `opacity: .5`
-8. Shorthand hex where possible: `#ebc` not `#eebbcc`
+- Always set `box-sizing: border-box` globally via reset
+- `rem` for font sizes and breakpoints — respects user preferences
+- `em` for component-relative spacing (padding that scales with font size)
+- Fluid sizing with `clamp()` — replace manual breakpoint ladders
+- `aspect-ratio` over padding hacks for maintaining proportions
+- No units on zero values — `margin: 0` not `margin: 0px`
+  (except where required: `flex: 0 0 0px`)
+- Leading zero on decimals: `opacity: 0.5` not `opacity: .5`
+- Shorthand hex where possible: `#ebc` not `#eebbcc`
 
 ## SCSS / Dart Sass
 
 ### Module System
 
-1. `@use` and `@forward` only — `@import` is deprecated (Dart Sass 1.80.0),
-   removed in 3.0.0
-2. `@use` must appear before any rules except `@forward`
-3. Namespace defaults to the last component of the URL (without extension)
-4. Members are scoped to the loading file — not globally available
-5. Each module loaded exactly once — no duplicate CSS output
-6. Namespace access: `variables.$primary` not global `$primary`
-7. No-namespace `@use 'variables' as *` — use sparingly, only for own files
-8. `math.div()` for division — the `/` operator is deprecated
-9. Prefix private members with `-` or `_`
-10. Prefer mixins over `@extend` — more predictable output; `@extend` produces
-    unexpected selectors and doesn't work across media queries
-11. Max nesting: 3 levels
+- `@use` and `@forward` only — `@import` is deprecated (Dart Sass 1.80.0),
+  removed in 3.0.0
+- `@use` must appear before any rules except `@forward`
+- Namespace defaults to the last component of the URL (without extension)
+- Members are scoped to the loading file — not globally available
+- Each module loaded exactly once — no duplicate CSS output
+- Namespace access: `variables.$primary` not global `$primary`
+- No-namespace `@use 'variables' as *` — use sparingly, only for own files
+- `math.div()` for division — the `/` operator is deprecated
+- Prefix private members with `-` or `_`
+- Prefer mixins over `@extend` — more predictable output; `@extend` produces
+  unexpected selectors and doesn't work across media queries
+- Max nesting: 3 levels
 
 `@forward` re-exports modules, supports prefixing and visibility control.
 Module configuration uses `!default` variables and `@use ... with ()`.
@@ -285,23 +285,23 @@ For built-in functions only: `sass-migrator module --built-in-only entrypoint.sc
 
 ### BEM (Block Element Modifier)
 
-1. Blocks are standalone components: `.card`, `.nav`, `.form`
-2. Elements are parts of a block (double underscore): `.card__title`, `.card__image`
-3. Modifiers are variations (double hyphen): `.card--featured`, `.card__title--bold`
-4. Never nest elements: `.card__header__title` is wrong — flatten to `.card__title`
-   or create a new block
-5. Modifiers don't exist alone — always pair with base class:
-   `class="card card--featured"`
-6. Use BEM in team projects, large codebases, projects without scoped styles
-7. Skip BEM when using CSS Modules, utility-first CSS, or small projects
+- Blocks are standalone components: `.card`, `.nav`, `.form`
+- Elements are parts of a block (double underscore): `.card__title`, `.card__image`
+- Modifiers are variations (double hyphen): `.card--featured`, `.card__title--bold`
+- Never nest elements: `.card__header__title` is wrong — flatten to `.card__title`
+  or create a new block
+- Modifiers don't exist alone — always pair with base class:
+  `class="card card--featured"`
+- Use BEM in team projects, large codebases, projects without scoped styles
+- Skip BEM when using CSS Modules, utility-first CSS, or small projects
 
 ### CSS Modules
 
-1. Use simple, descriptive class names — scoping eliminates conflict risk
-2. One module per component
-3. Compose shared styles: `composes: resetButton from './shared.module.css'`
-4. Global escape hatch: `:global(.utility-class)` when needed
-5. Pair with custom properties for theming (variables aren't scoped)
+- Use simple, descriptive class names — scoping eliminates conflict risk
+- One module per component
+- Compose shared styles: `composes: resetButton from './shared.module.css'`
+- Global escape hatch: `:global(.utility-class)` when needed
+- Pair with custom properties for theming (variables aren't scoped)
 
 ### Architecture (ITCSS)
 
@@ -311,16 +311,16 @@ Elements → Objects → Components → Utilities. Maps naturally to cascade lay
 
 ## Formatting
 
-1. 2-space indentation, no tabs
-2. One declaration per line
-3. Semicolon after every declaration including the last
-4. Space after colon: `color: red` not `color:red`
-5. Opening brace on same line as selector
-6. Blank line between rules
-7. Lowercase everything (selectors, properties, values, hex colors)
-8. Single quotes for attribute selectors and font names
-9. Group declarations by category: layout → box model → typography →
-   visual → interaction
+- 2-space indentation, no tabs
+- One declaration per line
+- Semicolon after every declaration including the last
+- Space after colon: `color: red` not `color:red`
+- Opening brace on same line as selector
+- Blank line between rules
+- Lowercase everything (selectors, properties, values, hex colors)
+- Single quotes for attribute selectors and font names
+- Group declarations by category: layout → box model → typography →
+  visual → interaction
 
 ## Application
 

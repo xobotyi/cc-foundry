@@ -374,9 +374,9 @@ In `managed-settings.json` only:
 
 **Options to persist environment variables:**
 
-1. **Activate before starting Claude Code** — `conda activate myenv && claude`
-2. **Set `CLAUDE_ENV_FILE`** — export path to a setup script; Claude sources it before each command
-3. **SessionStart hook** — write to `$CLAUDE_ENV_FILE` in hook; ideal for team configs
+- **Activate before starting Claude Code** — `conda activate myenv && claude`
+- **Set `CLAUDE_ENV_FILE`** — export path to a setup script; Claude sources it before each command
+- **SessionStart hook** — write to `$CLAUDE_ENV_FILE` in hook; ideal for team configs
 
 ```json
 {
@@ -413,15 +413,15 @@ Script receives JSON on stdin (`{"query": "src/comp"}`), outputs newline-separat
 
 ### Settings Not Applied
 
-1. Check scope precedence (managed overrides all)
-2. Restart Claude Code after editing settings files
-3. Run `/config` to verify effective settings
+- Check scope precedence (managed overrides all)
+- Restart Claude Code after editing settings files
+- Run `/config` to verify effective settings
 
 ### Permissions Not Working
 
-1. Deny rules take precedence over allow
-2. Check wildcard syntax (`Bash(npm run *)` not `Bash(npm run:*)`)
-3. Argument-constraining patterns are fragile — don't rely on for security
+- Deny rules take precedence over allow
+- Check wildcard syntax (`Bash(npm run *)` not `Bash(npm run:*)`)
+- Argument-constraining patterns are fragile — don't rely on for security
 
 ### Sensitive Files Still Accessible
 

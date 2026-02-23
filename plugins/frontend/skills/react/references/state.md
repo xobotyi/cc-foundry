@@ -110,12 +110,12 @@ const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
 
 ### Reducer Rules
 
-1. **Reducers must be pure.** Same inputs = same output. No side effects.
-2. **Each action describes a single user interaction.** Dispatch `reset_form`,
-   not five separate `set_field` actions.
-3. **Actions describe what happened, not what to do.** `'added_task'` not
-   `'set_tasks'`.
-4. **Always have a `default` that throws** — catch typos early.
+- **Reducers must be pure.** Same inputs = same output. No side effects.
+- **Each action describes a single user interaction.** Dispatch `reset_form`,
+  not five separate `set_field` actions.
+- **Actions describe what happened, not what to do.** `'added_task'` not
+  `'set_tasks'`.
+- **Always have a `default` that throws** — catch typos early.
 
 ## Context with `use()`
 
@@ -152,14 +152,14 @@ function useCount() {
 
 ### Context Rules
 
-1. **Try props and composition first.** Context is not the first solution
-   to prop drilling.
-2. **Keep state close to where it's used.** Not every context belongs at
-   the app root. Page-level or feature-level providers are fine.
-3. **Split logically.** User settings context separate from notifications
-   context. Don't put all state in one giant context.
-4. **Different contexts don't override each other.** Each `createContext()`
-   is independent.
+- **Try props and composition first.** Context is not the first solution
+  to prop drilling.
+- **Keep state close to where it's used.** Not every context belongs at
+  the app root. Page-level or feature-level providers are fine.
+- **Split logically.** User settings context separate from notifications
+  context. Don't put all state in one giant context.
+- **Different contexts don't override each other.** Each `createContext()`
+  is independent.
 
 ## Actions
 
