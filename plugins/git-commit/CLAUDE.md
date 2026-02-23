@@ -2,16 +2,11 @@
 
 Structured git commit workflow with atomic commits, message validation, and conventions.
 
-## Command
-
-| Command | Purpose |
-|---------|---------|
-| `/commit` | 8-step pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify |
-
 ## Skills
 
 | Skill | Purpose |
 |-------|---------|
+| `commit` | 8-step commit pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify |
 | `commit-message` | Message formatting conventions and structure rules |
 
 ## Scripts
@@ -22,7 +17,7 @@ Structured git commit workflow with atomic commits, message validation, and conv
 
 ## Workflow
 
-1. `/commit` loads `commit-message` skill first for formatting rules
+1. `commit` skill loads `commit-message` skill first for formatting rules
 2. Pipeline identifies logical units in diff and plans commit order
 3. Quality gate checks pass before staging
 4. Each message validated before commit execution
@@ -78,5 +73,6 @@ Project-specific commit guidance here.
 
 ## Extension Points
 
+- `skills/commit/SKILL.md` — commit pipeline workflow
 - `skills/commit-message/SKILL.md` — message format conventions
 - `scripts/validate-commit-message.js` — validation rules

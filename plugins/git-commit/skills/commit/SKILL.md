@@ -1,6 +1,10 @@
 ---
 name: commit
-description: Create git commit following conventions
+description: >-
+  Git commit workflow pipeline: atomic unit identification, commit ordering, quality gates,
+  message validation, and post-commit verification. Invoke whenever task involves any interaction
+  with git commits — committing changes, staging work, splitting diffs into atomic units, or
+  preparing work for version control.
 allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git branch:*), Bash(git reset:*), Bash(git restore:*), Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js)
 ---
 

@@ -22,7 +22,7 @@ git bisect and code review harder than necessary.
 
 ## The Solution
 
-The `/commit` command enforces an 8-step pipeline that identifies logical units in your diff,
+The `commit` skill enforces an 8-step pipeline that identifies logical units in your diff,
 plans their commit order, validates quality, and creates atomic commits with meaningful messages.
 
 Each commit message runs through automated validation before execution. Errors block the commit;
@@ -38,11 +38,13 @@ professional standards for open-source and team repositories.
 
 ## Usage
 
+Invoke the commit skill directly or use the `/commit` shorthand:
+
 ```
 /commit
 ```
 
-The command walks through the complete pipeline automatically. No configuration required for
+The skill walks through the complete pipeline automatically. No configuration required for
 basic usage.
 
 ## The Pipeline
@@ -138,14 +140,6 @@ trailers
 - Optional for single-purpose repositories
 - Required for monorepos or multi-component projects
 - Examples: `[parser]`, `[core/auth]`, `[web/api]`
-
-## Customization
-
-**Message conventions:** Edit `skills/commit-message/SKILL.md` to change formatting rules,
-required sections, or scope patterns.
-
-**Validation rules:** Edit `scripts/validate-commit-message.js` to add checks, change severity
-levels, or adjust thresholds.
 
 ## License
 
