@@ -20,7 +20,8 @@ cc-foundry/
 │   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
 │   ├── cli/              # CLI platform discipline (CLI design, shell scripting)
 │   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)
-│   └── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
+│   ├── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
+│   └── python/           # Python language discipline (conventions, typing, pytest, uv)
 └── CLAUDE.md
 ```
 
@@ -65,6 +66,32 @@ the repo structure — this procedure contains everything needed.
    c. Distill fetched content into `references/*.md` files.
 
    Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
+
+   <reference-inventory-guidance>
+   **Building a quality inventory:**
+
+   The inventory is the foundation of reference quality. Never write references from
+   training data alone — always ground them in fetched official documentation.
+
+   - **Start with official docs.** For languages: standard library reference pages
+     (e.g., `docs.python.org/3.14/library/typing.html`). For tools: the tool's own
+     docs site (e.g., `docs.astral.sh/ruff/configuration/`). For frameworks: the
+     framework's how-to and API reference pages.
+   - **Add the canonical style guide** if one exists (e.g., PEP 8, Google Style Guide,
+     Effective Go). These are high-signal sources for convention-oriented skills.
+   - **Add "What's New" pages** when targeting a specific language version — they
+     document the exact features and syntax changes the skill should cover.
+   - **Add specification pages** alongside tutorial pages for the same topic (e.g.,
+     the pyproject.toml specification alongside the "Writing pyproject.toml" guide).
+     Tutorials explain the happy path; specs cover edge cases and full field lists.
+   - **Skip community blog posts and tutorials** — they paraphrase official docs,
+     go stale, and add noise. Official docs and canonical style guides are sufficient.
+   - **Use Perplexity or web search** to discover sources you might not know about,
+     but be selective — most results for well-known ecosystems are obvious. The real
+     value is for niche tools or discovering lesser-known official doc pages.
+   - **10–15 sources per skill is typical.** More is fine if each source covers a
+     distinct topic. Fewer is fine for narrow skills.
+   </reference-inventory-guidance>
 
 5. **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content.
    SKILL.md must be behaviorally self-sufficient. References provide depth, not breadth.
