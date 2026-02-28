@@ -10,6 +10,7 @@ Structured planning pipeline that converts problem analysis into tracked work it
 | `technical-design` | Map chosen solution to codebase components, tools, sequencing |
 | `task-decomposition` | Break technical design into actionable task hierarchies |
 | `task-creation` | Create individual tasks in issue trackers with proper categorization |
+| `youtrack` | YouTrack domain knowledge — data model, fields, queries, commands, linking |
 
 ## Skill Flow
 
@@ -35,6 +36,11 @@ tracked tasks.
 
 **Standalone task creation:** Invoke `task-creation` directly when creating individual tasks
 outside the pipeline context.
+
+**YouTrack-specific work:** The `youtrack` skill provides domain knowledge for YouTrack's
+data model, custom fields, query language, commands, and linking. It complements
+`task-creation` (which is tracker-agnostic) with YouTrack-specific field handling and
+conventions. Invoke both when creating issues in YouTrack.
 
 ## Conventions
 

@@ -1,0 +1,14 @@
+{
+  "sources": {
+    "YouTrack: Custom Fields Overview": "https://www.jetbrains.com/help/youtrack/server/custom-fields.html",
+    "YouTrack: Manage Custom Fields Per Project": "https://www.jetbrains.com/help/youtrack/server/manage-custom-fields-per-project.html",
+    "YouTrack: Required Custom Fields": "https://www.jetbrains.com/help/youtrack/server/required-custom-fields.html",
+    "YouTrack: State Machine Rules Per Issue Type": "https://www.jetbrains.com/help/youtrack/server/state-machine-per-issue-type.html",
+    "YouTrack: Search Query Reference": "https://www.jetbrains.com/help/youtrack/server/search-and-command-attributes.html",
+    "YouTrack: Command Reference": "https://www.jetbrains.com/help/youtrack/server/command-reference.html",
+    "YouTrack: Issue Linking": "https://www.jetbrains.com/help/youtrack/server/link-issues.html",
+    "YouTrack: Workflow Tutorial": "https://www.jetbrains.com/help/youtrack/server/workflow-tutorial.html",
+    "YouTrack: Tag Issues": "https://www.jetbrains.com/help/youtrack/server/using-tags.html"
+  },
+  "lastFetched": "2026-02-28T17:46:36.429Z"
+}
