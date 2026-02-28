@@ -188,6 +188,18 @@ for CLIs written in any language, while `shell-scripting` handles the implementa
 /plugin install cli
 ```
 
+### python
+
+Python language discipline targeting 3.14+. Two skills cover the full Python surface:
+`python` handles conventions, modern idioms, type annotations (built-in generics, `|` unions,
+protocols), data classes, pattern matching, exception handling, packaging (pyproject.toml, uv,
+ruff), and project structure, while `pytest` handles testing conventions (fixtures, parametrize,
+markers, mocking, async testing, conftest patterns).
+
+```
+/plugin install python
+```
+
 ## License
 
 MIT

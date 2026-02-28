@@ -1,0 +1,15 @@
+{
+  "sources": {
+    "pytest: How to use fixtures": "https://docs.pytest.org/en/stable/how-to/fixtures.html",
+    "pytest: How to parametrize": "https://docs.pytest.org/en/stable/how-to/parametrize.html",
+    "pytest: How to use monkeypatch": "https://docs.pytest.org/en/stable/how-to/monkeypatch.html",
+    "pytest: How to capture output": "https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+    "pytest: Configuration": "https://docs.pytest.org/en/stable/reference/reference.html",
+    "pytest: Fixtures reference": "https://docs.pytest.org/en/stable/reference/fixtures.html",
+    "pytest: Parametrize examples": "https://docs.pytest.org/en/stable/example/parametrize.html",
+    "pytest: Good practices": "https://docs.pytest.org/en/stable/explanation/goodpractices.html",
+    "pytest-asyncio: Documentation": "https://pytest-asyncio.readthedocs.io/en/latest/",
+    "pytest-mock: Documentation": "https://pytest-mock.readthedocs.io/en/latest/"
+  },
+  "lastFetched": "2026-02-28T20:10:27.758Z"
+}
