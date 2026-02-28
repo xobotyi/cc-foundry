@@ -1,0 +1,20 @@
+{
+  "sources": {
+    "Python: typing module": "https://docs.python.org/3.14/library/typing.html",
+    "Python: dataclasses module": "https://docs.python.org/3.14/library/dataclasses.html",
+    "Python: import system": "https://docs.python.org/3.14/reference/import.html",
+    "Python: pathlib module": "https://docs.python.org/3.14/library/pathlib.html",
+    "Python: enum module": "https://docs.python.org/3.14/library/enum.html",
+    "Python: contextlib module": "https://docs.python.org/3.14/library/contextlib.html",
+    "Python: asyncio tasks": "https://docs.python.org/3.14/library/asyncio-task.html",
+    "Packaging: Writing pyproject.toml": "https://packaging.python.org/en/latest/guides/writing-pyproject-toml/",
+    "Packaging: pyproject.toml specification": "https://packaging.python.org/en/latest/specifications/pyproject-toml/",
+    "uv: Project Guide": "https://docs.astral.sh/uv/guides/projects/",
+    "ruff: Configuration": "https://docs.astral.sh/ruff/configuration/",
+    "ruff: Formatter": "https://docs.astral.sh/ruff/formatter/",
+    "Google Python Style Guide": "https://google.github.io/styleguide/pyguide.html",
+    "PEP 8: Style Guide": "https://peps.python.org/pep-0008/",
+    "Python 3.14: What's New": "https://docs.python.org/3.14/whatsnew/3.14.html"
+  },
+  "lastFetched": "2026-02-28T20:10:28.354Z"
+}

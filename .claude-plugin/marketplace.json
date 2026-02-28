@@ -200,6 +200,22 @@
       "license": "MIT",
       "keywords": ["cli", "command-line", "terminal", "shell-scripting", "bash", "ux"],
       "tags": ["platform", "cli", "terminal"]
+    },
+    {
+      "name": "python",
+      "description": "Python language discipline: conventions, modern idioms, type system, packaging, and testing",
+      "version": "1.0.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/python",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/python",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["python", "conventions", "typing", "packaging"],
+      "tags": ["language", "python", "coding"]
     }
   ]
 }
