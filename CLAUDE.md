@@ -26,29 +26,55 @@ cc-foundry/
 
 Each plugin has its own `CLAUDE.md` with plugin-specific context.
 
-## Building Skills with External Documentation
+## Creating a New Skill
 
 <workflow>
-When a skill needs to embed external documentation as reference material:
+Follow this procedure to add a skill to an existing plugin. Do not explore or research
+the repo structure — this procedure contains everything needed.
 
-1. **Create inventory** — add `.dev/reference-inventory.json` in the skill directory:
-   ```json
-   {
-     "sources": {
-       "Topic Name": "https://example.com/docs/page.md"
-     }
-   }
+1. **Read the target plugin's CLAUDE.md** — understand existing skills, scope boundaries,
+   and conventions. Read one existing SKILL.md in the same plugin to match the tone and
+   structure.
+
+2. **Invoke `skill-engineering`** — load the skill before writing anything. It contains
+   the description formula, content architecture rules, and archetype templates.
+
+3. **Scaffold the directory:**
+   ```
+   plugins/<plugin>/skills/<skill-name>/
+   ├── SKILL.md              # Written last — needs reference material first
+   ├── references/            # Optional: deepening material
+   └── .dev/
+       └── reference-inventory.json  # Optional: external doc sources
    ```
 
-2. **Fetch docs** — from repo root:
-   ```bash
-   cd .dev && yarn cli docs-fetch <path-to-inventory.json>
-   ```
-   URLs ending in `.md` or `.mdx` fetch as raw markdown. Others convert from HTML.
+4. **Populate references** (if the skill needs external documentation):
+   a. Create `.dev/reference-inventory.json`:
+      ```json
+      {
+        "sources": {
+          "Topic Name": "https://example.com/docs/page.md"
+        }
+      }
+      ```
+   b. Fetch docs from repo root:
+      ```bash
+      cd .dev && yarn cli docs-fetch <path-to-inventory.json>
+      ```
+      URLs ending in `.md`/`.mdx` fetch as raw markdown. Others convert from HTML.
+   c. Distill fetched content into `references/*.md` files.
 
-3. **Distill into references** — process fetched content into skill `references/*.md` files
+   Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 
-Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
+5. **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content.
+   SKILL.md must be behaviorally self-sufficient. References provide depth, not breadth.
+   Writing the skill last ensures it's informed by the distilled reference material.
+
+6. **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable),
+   plugin README.md (skill listing), root CLAUDE.md structure diagram (only if new plugin).
+
+7. **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and
+   root `.claude-plugin/marketplace.json`.
 </workflow>
 
 ## Conventions
