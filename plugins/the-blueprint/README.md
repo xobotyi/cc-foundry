@@ -72,6 +72,17 @@ categorization, and native linking between related tasks.
 **Use when:** Creating tasks from a decomposition document (pipeline mode) or creating
 standalone tasks outside the pipeline context.
 
+### youtrack
+
+YouTrack issue tracker domain knowledge — data model, custom fields, query language,
+commands, linking, state machines, and tags. Provides the tracker-specific knowledge that
+task-creation lacks: field type taxonomy, required field mechanics, state machine constraints,
+and YouTrack's query/command syntax.
+
+**Use when:** Creating, searching, or updating issues in YouTrack. Use alongside task-creation
+for issue creation — task-creation handles description quality, youtrack handles field
+correctness.
+
 ## Skill Relationships
 
 The skills form a linear pipeline with user approval gates at each transition:
@@ -84,7 +95,8 @@ Each skill prompts the user to proceed to the next stage on completion. Approval
 before advancing.
 
 task-creation can also be invoked standalone for creating individual tasks without going
-through the full pipeline.
+through the full pipeline. When working with YouTrack specifically, the youtrack skill
+complements task-creation with tracker-specific domain knowledge.
 
 ## Document Conventions
 

@@ -60,7 +60,7 @@
     {
       "name": "the-blueprint",
       "description": "Structured planning pipeline: design documents, technical designs, task decomposition, and task creation",
-      "version": "1.0.2",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
