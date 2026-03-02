@@ -1,0 +1,22 @@
+{
+  "sources": {
+    "PHP Type Declarations": "https://www.php.net/manual/en/language.types.declarations.php",
+    "PHP Union Types": "https://www.php.net/manual/en/language.types.type-system.php",
+    "PHP Enumerations": "https://www.php.net/manual/en/language.enumerations.php",
+    "PHP Fibers": "https://www.php.net/manual/en/language.fibers.php",
+    "PHP OOP Basics": "https://www.php.net/manual/en/language.oop5.php",
+    "PHP Interfaces": "https://www.php.net/manual/en/language.oop5.interfaces.php",
+    "PHP Traits": "https://www.php.net/manual/en/language.oop5.traits.php",
+    "PHP Readonly Properties": "https://www.php.net/manual/en/language.oop5.properties.php",
+    "PHP Error Handling": "https://www.php.net/manual/en/language.exceptions.php",
+    "PHP 8.5 Migration": "https://www.php.net/manual/en/migration85.new-features.php",
+    "PHP 8.4 Migration": "https://www.php.net/manual/en/migration84.new-features.php",
+    "PHP 8.3 Migration": "https://www.php.net/manual/en/migration83.new-features.php",
+    "PSR-1 Basic Coding": "https://www.php-fig.org/psr/psr-1/",
+    "PSR-4 Autoloading": "https://www.php-fig.org/psr/psr-4/",
+    "PSR-12 Extended Coding Style": "https://www.php-fig.org/psr/psr-12/",
+    "PER Coding Style 2.0": "https://www.php-fig.org/per/coding-style/",
+    "Composer Documentation": "https://getcomposer.org/doc/04-schema.md"
+  },
+  "lastFetched": "2026-03-02T11:53:57.420Z"
+}

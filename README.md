@@ -188,6 +188,20 @@ for CLIs written in any language, while `shell-scripting` handles the implementa
 /plugin install cli
 ```
 
+### php
+
+PHP language discipline targeting 8.5+. Two skills cover the full PHP surface: `php` handles
+conventions, type declarations (union, intersection, DNF), enums, readonly classes, property
+hooks, closures, Fibers, error handling, Composer, PSR-4/PER-CS, and project structure, while
+`phpunit` handles testing conventions (test structure, data providers, assertions, stubs vs
+mocks, attributes, configuration). Bundled Intelephense LSP for semantic code navigation.
+
+```
+/plugin install php
+```
+
+---
+
 ### python
 
 Python language discipline targeting 3.14+. Two skills cover the full Python surface:
