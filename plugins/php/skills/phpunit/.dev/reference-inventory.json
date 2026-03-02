@@ -1,0 +1,17 @@
+{
+  "sources": {
+    "Writing Tests": "https://docs.phpunit.de/en/11.5/writing-tests-for-phpunit.html",
+    "Assertions": "https://docs.phpunit.de/en/11.5/assertions.html",
+    "Test Doubles": "https://docs.phpunit.de/en/11.5/test-doubles.html",
+    "Fixtures": "https://docs.phpunit.de/en/11.5/fixtures.html",
+    "Organizing Tests": "https://docs.phpunit.de/en/11.5/organizing-tests.html",
+    "Configuration": "https://docs.phpunit.de/en/11.5/configuration.html",
+    "Code Coverage": "https://docs.phpunit.de/en/11.5/code-coverage.html",
+    "Attributes": "https://docs.phpunit.de/en/11.5/attributes.html",
+    "Error Handling": "https://docs.phpunit.de/en/11.5/error-handling.html",
+    "Risky Tests": "https://docs.phpunit.de/en/11.5/risky-tests.html",
+    "PHPUnit 11 Announcement": "https://phpunit.de/announcements/phpunit-11.html",
+    "PHPUnit 12 Announcement": "https://phpunit.de/announcements/phpunit-12.html"
+  },
+  "lastFetched": "2026-03-02T11:54:26.327Z"
+}

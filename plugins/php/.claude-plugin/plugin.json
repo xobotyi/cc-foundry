@@ -1,0 +1,20 @@
+{
+  "name": "php",
+  "version": "1.0.0",
+  "description": "PHP language discipline: conventions, modern idioms, type system, OOP, and testing",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/php",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": [
+    "php",
+    "conventions",
+    "typing",
+    "oop",
+    "phpunit"
+  ]
+}

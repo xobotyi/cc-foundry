@@ -21,6 +21,7 @@ cc-foundry/
 │   ├── cli/              # CLI platform discipline (CLI design, shell scripting)
 │   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)
 │   ├── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
+│   ├── php/              # PHP language discipline (conventions, types, OOP, PHPUnit, Intelephense LSP)
 │   └── python/           # Python language discipline (conventions, typing, pytest, uv)
 └── CLAUDE.md
 ```
@@ -174,7 +175,6 @@ the code change, ideally in the same commit or immediately following commit.
 - Every plugin must contain a copy of the root `LICENSE` file in its directory
 - When adding a new plugin, copy `LICENSE` from the repository root into the plugin directory
 </conventions>
-
 
 <git-commit-config>
 <extra-instructions>

@@ -124,7 +124,7 @@
     {
       "name": "golang",
       "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -140,7 +140,7 @@
     {
       "name": "javascript",
       "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-      "version": "1.2.3",
+      "version": "1.2.4",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -203,8 +203,8 @@
     },
     {
       "name": "python",
-      "description": "Python language discipline: conventions, modern idioms, type system, packaging, and testing",
-      "version": "1.0.0",
+      "description": "Python language discipline: conventions, modern idioms, type system, packaging, testing, and LSP-powered code intelligence",
+      "version": "1.2.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -216,6 +216,22 @@
       "license": "MIT",
       "keywords": ["python", "conventions", "typing", "packaging"],
       "tags": ["language", "python", "coding"]
+    },
+    {
+      "name": "php",
+      "description": "PHP language discipline: conventions, modern idioms, type system, OOP, testing, and LSP-powered code intelligence",
+      "version": "1.0.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/php",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/php",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["php", "conventions", "typing", "oop", "phpunit"],
+      "tags": ["language", "php", "coding"]
     }
   ]
 }
