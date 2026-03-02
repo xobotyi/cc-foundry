@@ -1,14 +1,29 @@
 # python Plugin
 
 Python language discipline: conventions, modern idioms, type annotations, packaging, testing
-practices, and project structure targeting Python 3.14+.
+practices, project structure targeting Python 3.14+, and LSP-powered code intelligence via
+`pyright-langserver`.
 
 ## Skills
 
 | Skill | Purpose |
 |-------|---------|
-| `python` | Python language conventions, idioms, type annotations, data classes, pattern matching, packaging (pyproject.toml, uv, ruff), and project structure |
+| `python` | Python language conventions, idioms, type annotations, data classes, pattern matching, packaging (pyproject.toml, uv, ruff), project structure, and LSP navigation rules |
 | `pytest` | pytest testing framework conventions and practices (fixtures, parametrize, markers, assertions, conftest patterns) |
+
+## LSP Integration
+
+This plugin ships a `pyright-langserver` LSP configuration (`.lsp.json`). When installed, Claude
+Code automatically connects to Pyright for `.py` and `.pyi` files, enabling LSP tools
+(`goToDefinition`, `findReferences`, `hover`, `workspaceSymbol`, etc.).
+
+The `python` skill enforces LSP-first navigation: agents must use LSP tools for semantic code
+navigation (finding definitions, references, implementations, call hierarchies) instead of
+falling back to Grep/Glob pattern matching. Text search tools remain appropriate for non-semantic
+searches (comments, string literals, config values).
+
+**Prerequisite:** Users must have `pyright-langserver` installed and available in PATH. Install
+via `npm install -g pyright` or `uv tool install pyright`.
 
 ## Skill Dependencies
 
@@ -23,9 +38,9 @@ planning, verification).
 ## Plugin Scope
 
 This plugin covers Python language specifics, the modern Python toolchain (uv, ruff, mypy/pyright),
-and testing with pytest. Language-agnostic coding practices (discovery, planning, verification) are
-provided by the `the-coder` plugin. Platform-specific concerns (backend, CLI) are provided by their
-respective platform plugins.
+testing with pytest, and LSP-powered code intelligence. Language-agnostic coding practices
+(discovery, planning, verification) are provided by the `the-coder` plugin. Platform-specific
+concerns (backend, CLI) are provided by their respective platform plugins.
 
 ## Conventions
 
@@ -38,3 +53,4 @@ respective platform plugins.
 - `pathlib.Path` over `os.path` for all filesystem operations
 - `@dataclass(frozen=True, slots=True)` as default for data containers
 - `asyncio.TaskGroup` over `asyncio.gather()` for structured concurrency
+- LSP tools are required for code navigation — Grep/Glob only for non-semantic text search

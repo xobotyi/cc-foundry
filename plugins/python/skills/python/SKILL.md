@@ -479,6 +479,32 @@ Bad:  "According to Python best practices, you should use type unions
 Good: "Optional[str] -> str | None"
 ```
 
+## Code Navigation — LSP Required
+
+A `pyright-langserver` LSP server is configured for `.py` and `.pyi` files. **Always use LSP
+tools for code navigation instead of Grep or Glob.** LSP understands Python's module system,
+type inference, scope rules, and package boundaries — text search does not.
+
+### Tool Routing
+
+| Task | LSP Operation | Why LSP over text search |
+|------|---------------|--------------------------|
+| Find where a function/class/variable is defined | `goToDefinition` | Resolves imports, re-exports, aliases |
+| Find all usages of a symbol | `findReferences` | Scope-aware, no false positives from string matches |
+| Get type signature, docs, or return types | `hover` | Instant type info without reading source files |
+| List all symbols in a file | `documentSymbol` | Structured output vs grepping for `def`/`class` |
+| Find a symbol by name across the project | `workspaceSymbol` | Searches all packages, respects `__all__` |
+| Find implementations of a Protocol or ABC | `goToImplementation` | Knows the type system and structural subtyping |
+| Find what calls a function | `incomingCalls` | Precise call graph across module boundaries |
+| Find what a function calls | `outgoingCalls` | Structured dependency map |
+
+**Grep/Glob remain appropriate for:** text in comments, string literals, log messages, TODO
+markers, config values, env vars, file name patterns, URLs, error message text — anything
+that isn't a Python identifier.
+
+When spawning subagents for Python codebase exploration, instruct them to use LSP tools.
+Subagents have access to the same LSP server.
+
 ## Toolchain
 
 - **`ruff`**: single entry point for linting and formatting. Must pass before committing.
