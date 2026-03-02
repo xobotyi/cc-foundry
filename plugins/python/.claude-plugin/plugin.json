@@ -1,6 +1,6 @@
 {
   "name": "python",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Python language discipline: conventions, modern idioms, type system, packaging, testing, and LSP-powered code intelligence",
   "lspServers": "./.lsp.json",
   "author": {

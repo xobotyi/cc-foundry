@@ -33,6 +33,20 @@ The bundled Pyright LSP configuration enables semantic code intelligence — go 
 references, hover for type info, workspace symbol search — directly in Claude Code for `.py` and
 `.pyi` files.
 
+## Prerequisites
+
+Install Pyright (the Python language server) and ensure it's available in PATH:
+
+```bash
+npm install -g pyright
+```
+
+Or via uv:
+
+```bash
+uv tool install pyright
+```
+
 ## Installation
 
 ```
@@ -58,9 +72,6 @@ packaging workflows (pyproject.toml templates, uv commands, ruff configuration),
 system details (import resolution, circular imports, namespace packages).
 
 **Use when:** writing, reviewing, refactoring, debugging, or exploring any Python code.
-
-**Prerequisite:** `pyright-langserver` must be available in PATH. Install via
-`npm install -g pyright` or `uv tool install pyright`.
 
 ### pytest
 
