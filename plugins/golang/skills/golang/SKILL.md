@@ -667,40 +667,28 @@ Good: "errors.New("Not found.") -> errors.New("not found")"
 
 ## Code Navigation — LSP Required
 
-This plugin provides a `gopls` LSP server. When working with Go code, **always use LSP tools
-for code navigation instead of Grep or Glob**. LSP understands Go's type system, scope rules,
-and module boundaries — text search does not.
+A `gopls` LSP server is configured for `.go` files. **Always use LSP tools for code navigation
+instead of Grep or Glob.** LSP understands Go's type system, scope rules, and module
+boundaries — text search does not.
 
 ### Tool Routing
 
-| Task | Tool | Operation | Why |
-|------|------|-----------|-----|
-| Find where a function/type/method is defined | LSP | `goToDefinition` | Resolves imports, aliases, embedded types |
-| Find all usages of a symbol | LSP | `findReferences` | Scope-aware, no false positives |
-| Get type signature, docs, or return types | LSP | `hover` | Instant type info |
-| List all symbols in a file | LSP | `documentSymbol` | Structured output |
-| Find a symbol by name across the project | LSP | `workspaceSymbol` | Searches all packages |
-| Find concrete types implementing an interface | LSP | `goToImplementation` | Knows the type system |
-| Find what calls a function | LSP | `incomingCalls` | Precise call graph |
-| Find what a function calls | LSP | `outgoingCalls` | Structured dependency map |
+| Task | LSP Operation | Why LSP over text search |
+|------|---------------|--------------------------|
+| Find where a function/type/method is defined | `goToDefinition` | Resolves imports, aliases, embedded types |
+| Find all usages of a symbol | `findReferences` | Scope-aware, no false positives from string matches |
+| Get type signature, docs, or return types | `hover` | Instant type info without reading source files |
+| List all symbols in a file | `documentSymbol` | Structured output vs grepping for `func`/`type` |
+| Find a symbol by name across the project | `workspaceSymbol` | Searches all packages |
+| Find concrete types implementing an interface | `goToImplementation` | Knows the type system and implicit interfaces |
+| Find what calls a function | `incomingCalls` | Precise call graph across module boundaries |
+| Find what a function calls | `outgoingCalls` | Structured dependency map |
 
-**Still use Grep/Glob for:** text patterns in comments/strings/logs/TODOs, config values,
-build tags, file-level patterns, finding files by name, content that isn't Go identifiers.
+**Grep/Glob remain appropriate for:** text in comments, string literals, log messages, TODO
+markers, config values, build tags, file name patterns — anything that isn't a Go identifier.
 
-### LSP Anti-Patterns
-
-| Don't | Do |
-|-------|------|
-| `Grep "func HandleRequest"` to find definition | `LSP goToDefinition` on a call site |
-| `Grep "HandleRequest"` to find all usages | `LSP findReferences` on the symbol |
-| `Grep "type.*interface"` to find implementations | `LSP goToImplementation` on the interface |
-| `Read` a file just to check a function's signature | `LSP hover` on any reference to it |
-| `Glob "**/*.go"` + `Grep` to find a type | `LSP workspaceSymbol` with the type name |
-
-### Exploration Agents
-
-When spawning subagents for Go codebase exploration, instruct them to use LSP tools for
-navigation. Subagents have access to the same LSP server.
+When spawning subagents for Go codebase exploration, instruct them to use LSP tools.
+Subagents have access to the same LSP server.
 
 ## Toolchain
 
