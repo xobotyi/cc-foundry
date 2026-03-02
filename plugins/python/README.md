@@ -1,6 +1,7 @@
 # python
 
-Python language discipline plugin for Claude Code targeting Python 3.14+.
+Python language discipline plugin for Claude Code targeting Python 3.14+, with LSP-powered code
+intelligence via Pyright.
 
 ## The Problem
 
@@ -14,14 +15,23 @@ The Python ecosystem has modernized rapidly — `uv` for package management, `ru
 linting/formatting, built-in generics, the `type` statement, lazy annotation evaluation — but
 Claude's defaults often lag behind the current state of the art.
 
+Beyond conventions, Claude defaults to text-based code search (Grep/Glob) even when a language
+server can provide precise, scope-aware navigation. This leads to false positives in large
+codebases and missed references across module boundaries.
+
 ## The Solution
 
-This plugin provides two skills that give Claude deep Python fluency targeting 3.14+. The
-`python` skill covers core language conventions (naming, typing, data classes, pattern matching,
-exceptions, generators, decorators), modern toolchain practices (uv, ruff, pyproject.toml), and
-project structure (src layout, import organization, packaging). The `pytest` skill covers testing
-conventions (fixtures, parametrize, markers, assertions, conftest patterns). Both skills include
-reference guides for extended examples and detailed patterns.
+This plugin provides two skills and an LSP server configuration that give Claude deep Python
+fluency targeting 3.14+. The `python` skill covers core language conventions (naming, typing,
+data classes, pattern matching, exceptions, generators, decorators), modern toolchain practices
+(uv, ruff, pyproject.toml), project structure (src layout, import organization, packaging), and
+LSP-first code navigation rules. The `pytest` skill covers testing conventions (fixtures,
+parametrize, markers, assertions, conftest patterns). Both skills include reference guides for
+extended examples and detailed patterns.
+
+The bundled Pyright LSP configuration enables semantic code intelligence — go to definition, find
+references, hover for type info, workspace symbol search — directly in Claude Code for `.py` and
+`.pyi` files.
 
 ## Installation
 
@@ -40,14 +50,17 @@ functions, PascalCase classes, UPPER_SNAKE constants), type annotations (built-i
 pattern matching (structural dispatch, guards, class patterns), exception handling (specific
 catches, chaining with `from`, exception groups), generators (lazy sequences, `yield from`,
 itertools), decorators (signature preservation, ParamSpec), context managers, comprehensions,
-f-strings, pathlib, enums, concurrency (asyncio TaskGroup, threading), and packaging
-(pyproject.toml, uv, ruff, src layout).
+f-strings, pathlib, enums, concurrency (asyncio TaskGroup, threading), packaging
+(pyproject.toml, uv, ruff, src layout), and LSP-first code navigation.
 
 Includes reference guides for type annotation patterns (generics, overloads, variance, ParamSpec),
 packaging workflows (pyproject.toml templates, uv commands, ruff configuration), and module
 system details (import resolution, circular imports, namespace packages).
 
 **Use when:** writing, reviewing, refactoring, debugging, or exploring any Python code.
+
+**Prerequisite:** `pyright-langserver` must be available in PATH. Install via
+`npm install -g pyright` or `uv tool install pyright`.
 
 ### pytest
 
