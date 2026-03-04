@@ -3,7 +3,8 @@ name: youtrack
 description: >-
   YouTrack issue tracker domain knowledge — data model, custom fields, query language,
   commands, linking, state machines, and tags. Invoke whenever task involves any interaction
-  with YouTrack — creating issues, searching, updating fields, linking, or querying.
+  with YouTrack — creating issues, searching, updating fields, linking, querying, or
+  understanding workflows.
 ---
 
 # YouTrack
@@ -205,27 +206,66 @@ Before creating or updating issues in a YouTrack project, always:
 
 1. **Query the project** — discover available fields, their types, and valid values.
    Do not hardcode field names or assume default configurations.
+   If the project query fails (permissions, wrong ID), stop and report — do not guess fields.
 2. **Check required fields** — identify which fields must be set during creation.
    Missing required fields will block issue creation.
 3. **Check state machines** — determine whether the project enforces state transitions.
-   Attempting an invalid transition will fail.
+   Attempting an invalid transition will fail. If state machine info is unavailable,
+   set only the initial state and let the user transition manually.
 4. **Check link types** — the project may have custom link types beyond the defaults.
    Use the correct link type names.
 5. **Check existing issues** — before creating, search for duplicates or related issues
-   using YouTrack's query language.
+   using YouTrack's query language. Use `summary: <keywords> #Unresolved` to find
+   potential duplicates.
 
-## Integration with task-creation
+<example>
+**Task:** Create a bug report in project MYAPP for a login timeout issue.
+
+**Discovery sequence:**
+1. Query project: `get_project("MYAPP")` → fields: Type (Bug/Feature/Task),
+   State (Open/In Progress/Fixed/Verified), Priority (Critical..Minor), Assignee, Subsystem
+2. Required fields: Type, Priority (both marked "Cannot be empty")
+3. State machine: Open → In Progress → Fixed → Verified (no direct Open → Fixed)
+4. Link types: default set + custom "caused by" / "causes"
+5. Duplicate search: `project: MYAPP summary: login timeout #Unresolved` → no matches
+
+**Issue creation:** Set Type: Bug, Priority: Major, State: Open (initial),
+Summary and Description per task-creation skill. After creation, link to related
+issues with `relates to MYAPP-42` if applicable.
+</example>
+
+## Application
+
+**When creating or updating issues:** Apply all rules silently. Run the Discovery Protocol
+before every create or update operation, use correct field types and valid values from the
+project configuration, create native links for all inter-task relationships, and respect
+state machine transitions. Do not narrate which rules you are following.
+
+**When reviewing existing issues:** Evaluate against YouTrack data model conventions. For
+each violation, cite the specific rule and show the fix. Common review findings:
+- Fields set with values not in the project's valid set
+- State transitions that violate the project's state machine
+- Inter-task relationships written in description text instead of native YouTrack links
+- Missing required fields
+- Duplicate issues that should be linked with "duplicates" link type
+
+## Integration
 
 This skill provides YouTrack domain knowledge. The `task-creation` skill provides
-tracker-agnostic writing discipline. Use them together:
+tracker-agnostic writing discipline. The `task-decomposition` skill breaks technical
+designs into task hierarchies. Use them together:
 
 - **task-creation** → title format, description structure, acceptance criteria quality
+- **task-decomposition** → task hierarchy design that maps to YouTrack's parent/subtask
+  linking model
 - **youtrack** → field discovery, correct field types, valid state transitions, proper
   linking, query syntax for duplicate search
 
-## Related Skills
+YouTrack has full native linking (subtask-of, depends-on, relates-to, duplicates). Never
+put inter-task relationships in issue descriptions — use YouTrack links instead. The
+References section of a description is for external resources (design docs, code paths,
+mockups), not for "Depends on PROJ-123" or "Subtask of PROJ-456". YouTrack links are
+visible in dedicated UI panels, enable dependency graphs, and update automatically when
+issues move or rename.
 
-- **task-creation** — Writing discipline for task descriptions, acceptance criteria, and
-  description patterns (bug reports, implementation tasks, investigations)
-- **task-decomposition** — Breaking technical designs into task hierarchies that map to
-  YouTrack's parent/subtask linking model
+Discover first, then create. Never assume — always query.
