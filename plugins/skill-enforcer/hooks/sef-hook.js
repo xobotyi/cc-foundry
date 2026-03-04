@@ -33,17 +33,17 @@ Skill Enforcement Framework for Claude skill and reference management.
 </phase-shift>
 
 <evaluation-protocol>
-All SEF evaluation is output inside <think></think> using <sef-eval> tags. Never in visible response.
+All SEF evaluation is output with the internal reasoning stage surrounded by \`think\` tags, using <sef-eval> tags. Never in visible response. In all examples below, <reasoning> tags represent the model's native \`think\` tags.
 
 Format:
-<think>
+<reasoning>
 <sef-eval phase="[PHASE]">
 [stage-specific fields as child elements]
 <decision>[action]</decision>
 </sef-eval>
-</think>
+</reasoning>
 
-No <sef-eval> inside <think> = no evaluation = violation.
+No <sef-eval> inside <reasoning> = no evaluation = violation.
 </evaluation-protocol>
 
 <lifecycle>
@@ -68,13 +68,13 @@ in work type, not target file. Recognize shifts by what you are doing, not where
 Trigger: new user message.
 Decide: Does this task match any skill by name or description?
 
-<think>
+<reasoning>
 <sef-eval phase="USER-PROMPT">
 <task>[what user asked]</task>
 <skills>[matching skills, or "none"]</skills>
 <decision>[invoke list / proceed]</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 When uncertain, invoke — skills de-escalate gracefully.
 </stage>
@@ -83,7 +83,7 @@ When uncertain, invoke — skills de-escalate gracefully.
 Trigger: after Skill invocation.
 Decide: Does this skill have references relevant to the current phase? Should other skills be batched?
 
-<think>
+<reasoning>
 <sef-eval phase="SKILL-LOAD">
 <loaded>[skill name]</loaded>
 <phase>[current work type]</phase>
@@ -91,7 +91,7 @@ Decide: Does this skill have references relevant to the current phase? Should ot
 <batch>[other skills to invoke, or "none"]</batch>
 <decision>[read refs / invoke skills / proceed]</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 A skill is "related" when it covers a different facet of the same task — e.g., a language skill
 alongside a general coding skill.
@@ -101,7 +101,7 @@ alongside a general coding skill.
 Trigger: after Read.
 Decide: Did this read shift understanding enough to reconsider skills or references?
 
-<think>
+<reasoning>
 <sef-eval phase="EVALUATION">
 <source>[file path or name — never reproduce content]</source>
 <impact>[one-line: what shifted, or "nothing — no new domain or scope change"]</impact>
@@ -109,7 +109,7 @@ Decide: Did this read shift understanding enough to reconsider skills or referen
 <refs>[to read, or "none"]</refs>
 <decision>[invoke list / read refs / proceed]</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 The question is: does what was read change which skills or references are needed? If the read
 reveals a new domain, unfamiliar pattern, or shifts task requirements — act on it.
@@ -119,7 +119,7 @@ reveals a new domain, unfamiliar pattern, or shifts task requirements — act on
 Trigger: after Edit/Write.
 Decide: Did the type of work change?
 
-<think>
+<reasoning>
 <sef-eval phase="PHASE-CHANGE">
 <previous>[phase before this edit]</previous>
 <current>[phase after this edit]</current>
@@ -129,7 +129,7 @@ Decide: Did the type of work change?
 <new-skills>[not yet loaded, or "none"]</new-skills>
 <decision>[read refs / invoke skills / proceed]</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 Writing tests after implementation = shift. Editing the same implementation file = not a shift.
 </stage>
@@ -146,13 +146,13 @@ Writing tests after implementation = shift. Editing the same implementation file
 <example name="skill-invocation">
 Context: User asks to improve commit message validation.
 
-<think>
+<reasoning>
 <sef-eval phase="USER-PROMPT">
 <task>improve commit message validation</task>
 <skills>prompt-engineering, skill-engineering</skills>
 <decision>invoke both</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 Visible: "I'll invoke prompt-engineering and skill-engineering to guide this work."
 </example>
@@ -161,7 +161,7 @@ Visible: "I'll invoke prompt-engineering and skill-engineering to guide this wor
 Context: Agent finished writing implementation code, now writing tests. Coding skill was loaded
 earlier; its testing references were not read.
 
-<think>
+<reasoning>
 <sef-eval phase="PHASE-CHANGE">
 <previous>coding</previous>
 <current>testing</current>
@@ -171,7 +171,7 @@ earlier; its testing references were not read.
 <new-skills>none</new-skills>
 <decision>read both refs before writing tests</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 Visible: Read testing-guidelines.md and testing-conventions.md, then write tests.
 </example>
@@ -181,7 +181,7 @@ Context: Agent transitions from coding to testing. Test-reviewer skill matches b
 Coding skill is loaded but testing refs were not read.
 
 WRONG:
-<think>
+<reasoning>
 <sef-eval phase="PHASE-CHANGE">
 <previous>coding</previous>
 <current>testing</current>
@@ -191,7 +191,7 @@ WRONG:
 <new-skills>none</new-skills>
 <decision>no shift</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 Problems:
 1. Did not invoke test-reviewer skill (matched but not invoked)
@@ -206,13 +206,13 @@ Double violation: missed skill invocation AND missed reference read.
 Context: Agent is creating a new skill. skill-engineering matches.
 
 WRONG:
-<think>
+<reasoning>
 <sef-eval phase="USER-PROMPT">
 <task>create new plugin with skills</task>
 <skills>skill-engineering</skills>
 <decision>proceed (I already know the pattern)</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 Problems:
 1. Identified skill-engineering as matching
@@ -223,13 +223,13 @@ The skill exists because default behavior is insufficient. "I already know" is n
 reason to skip — you cannot know what a skill contains until you read it.
 
 CORRECT:
-<think>
+<reasoning>
 <sef-eval phase="USER-PROMPT">
 <task>create new plugin with skills</task>
 <skills>skill-engineering</skills>
 <decision>invoke skill-engineering</decision>
 </sef-eval>
-</think>
+</reasoning>
 </example>
 
 <example name="violation-location">
@@ -243,14 +243,14 @@ WRONG — sef-eval leaked into visible response:
 </sef-eval>
 I'll start by invoking the coding and security skills...
 
-CORRECT — sef-eval stays inside <think>:
-<think>
+CORRECT — sef-eval stays inside <reasoning>:
+<reasoning>
 <sef-eval phase="USER-PROMPT">
 <task>refactor authentication module</task>
 <skills>coding, security</skills>
 <decision>invoke both</decision>
 </sef-eval>
-</think>
+</reasoning>
 
 Visible: "I'll invoke coding and security skills to guide this refactor."
 

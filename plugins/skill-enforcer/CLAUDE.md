@@ -24,7 +24,7 @@ Each tag triggers a mandatory evaluation that must be output in the reasoning st
 - Skills that match the task MUST be invoked (no "I already know" excuses)
 - Phase shifts (coding → testing) MUST trigger re-evaluation of loaded skills for unread refs
 - Each evaluation MUST enumerate loaded skills, unread refs, and reach explicit decision
-- The evaluation MUST appear inside `<think><sef-eval>...</sef-eval></think>`
+- The evaluation MUST appear inside `<reasoning><sef-eval>...</sef-eval></reasoning>`
 
 ## Components
 
