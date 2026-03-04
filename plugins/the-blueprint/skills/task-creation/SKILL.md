@@ -1,9 +1,10 @@
 ---
 name: task-creation
 description: >-
-  Task creation for issue trackers — clear descriptions, acceptance criteria,
-  proper categorization. Invoke when creating tasks, bug reports, or feature
-  requests in any tracker.
+  Task creation for issue trackers — structured descriptions, acceptance
+  criteria, field categorization, and tracker linking. Invoke whenever task
+  involves creating work items in any issue tracker — bugs, features, stories,
+  tasks, or any tracked work from standalone requests or decomposition documents.
 ---
 
 # Task Creation
@@ -15,22 +16,10 @@ questions.
 
 ## Why Task Creation Matters
 
-A task is the atomic unit of tracked work. It's the handoff point — where planning
-ends and implementation begins. Everything upstream in the pipeline (design documents,
-technical designs, decomposition) converges here into a concrete assignment that someone
-picks up and completes.
-
-Bad tasks waste more time than they save. A vague title with no description forces the
-implementer to reverse-engineer the intent from chat history, commit logs, or the
-person who created it — if that person is still available. A task that's too detailed
-prescribes implementation and removes the judgment that makes skilled developers
-effective. The sweet spot is a description that communicates intent, scope, and
-completion criteria without dictating how to get there.
-
-Tasks also serve as institutional memory. Months later, when someone asks "why did we
-change the authentication flow?", the task description, its linked design document, and
-its acceptance criteria reconstruct the reasoning. If the task was just a title, that
-context is lost.
+A task is the handoff point — where planning ends and implementation begins. The sweet
+spot is a description that communicates intent, scope, and completion criteria without
+dictating how to get there. Tasks also serve as institutional memory: months later, the
+description and linked design documents reconstruct the reasoning behind a change.
 
 ## When to Use
 
@@ -89,7 +78,10 @@ This is an active discovery step — use available tools, don't rely on inferenc
    **Acceptance criteria** — How to know it's done. See the dedicated section below.
 
    **References** — Links to design documents, technical designs, relevant code paths,
-   mockups, or similar implementations.
+   mockups, or similar implementations. Only external resources belong here — never
+   references to other tasks in the same tracker. Inter-task relationships (blocks,
+   depends-on, parent-child, relates-to) are handled exclusively through native tracker
+   links in Step 4.
 
 3. **Set fields** based on what you discovered in Step 1. Carry over estimates from the
    decomposition document if available. Only set fields that the tracker supports and the
@@ -252,7 +244,7 @@ decomposition document follow this structure.
 - [ ] [Verifiable conditions]
 
 ## References
-- [Links to design docs, code, similar implementations]
+- [Links to design docs, code paths, mockups — never other tasks]
 ```
 
 ### Pattern 3: Investigation Task
@@ -296,6 +288,58 @@ being restructured and why, despite no user-visible change.
 - [ ] [Specific structural improvements verifiable in code review]
 ```
 
+## Example: Standalone Task Creation
+
+**User request:** "Create a bug for the search — it returns 500 when the query has special
+characters like & or %"
+
+**Step 1 (Gather Context):** Query the tracker for the project's field configuration.
+Discover available types (Bug, Task, Story), required fields (Priority, State), and
+valid values.
+
+**Step 2 (Draft):**
+
+```markdown
+## Task Draft
+
+**Project:** SEARCH
+**Type:** Bug
+**Priority:** High
+
+**Title:** Fix 500 error on search queries containing special characters
+
+**Description:**
+
+## Context
+The search API returns HTTP 500 when queries contain URL-significant characters
+(& , %, =). This affects all clients using the search endpoint.
+
+## Problem
+Special characters in the search query are passed to the backend unescaped,
+causing the query parser to fail with an unhandled exception.
+
+## Steps to Reproduce
+1. Open the search page
+2. Enter a query containing `&` or `%` (e.g., "R&D budget")
+3. Submit the search
+
+## Expected Behavior
+Search returns results matching the literal query text.
+
+## Actual Behavior
+HTTP 500 response. No results displayed.
+
+## Acceptance Criteria
+- [ ] Search queries containing &, %, =, and + return correct results
+- [ ] Invalid UTF-8 sequences return HTTP 400 with a descriptive error message
+- [ ] Existing search functionality is unaffected (run search test suite)
+```
+
+**Step 3 (Present):** Show draft to user, wait for approval.
+
+**Step 4 (Create):** Create in tracker, set fields, link to parent epic via native
+tracker link if applicable, report task ID and URL.
+
 ## Writing Rules
 
 Two rules from the decomposition skill apply equally here:
@@ -310,19 +354,22 @@ looks like. No production code, no function signatures, no class names to create
 Pseudocode is acceptable for complex logic. Configuration samples are acceptable when
 configuration is the deliverable.
 
-## Quality Checklist
+## Application
 
-Before creating a task in the tracker:
+**When creating:** Apply all rules silently. Follow the workflow steps, discover project
+configuration before drafting, write titles in imperative mood, structure descriptions
+with Context/What to do/Acceptance criteria/References, and use native tracker links for
+all inter-task relationships. Do not narrate which rules you are following.
 
-- [ ] Title is imperative, specific, and 5-10 words
-- [ ] Description includes context linking to the larger effort
-- [ ] Work items are concrete but don't prescribe implementation
-- [ ] Acceptance criteria are testable with clear pass/fail outcomes
-- [ ] Negative cases and error conditions are covered where relevant
-- [ ] References link to design docs, technical designs, or relevant code
-- [ ] All tracker fields match the project's configuration
-- [ ] User approved the draft before creation
-- [ ] Task reads as a plan for future work, not a report of past work
+**When reviewing:** Evaluate existing tasks against the Quality Checklist. For each
+violation, cite the specific rule, quote the problematic section, and show the fix inline.
+Common review findings:
+- Title is vague or past-tense ("Fixed X" instead of "Fix X")
+- Missing or untestable acceptance criteria
+- Description contains implementation prescriptions (code, class names, function signatures)
+- Inter-task relationships written in description text instead of native tracker links
+- References section lists other tasks instead of external resources (design docs, code)
+- Fields set with values not matching the project's configuration
 
 ## Anti-Patterns
 
@@ -349,10 +396,9 @@ Tasks written weeks ago with outdated assumptions. If the context changed betwee
 creation and implementation, update the description. Don't let implementers discover
 stale requirements mid-work.
 
-**Relationships in descriptions instead of native links:**
-"Subtask of PROJ-456. See also PROJ-123." When the tracker supports linking, use it —
-native links are visible in dedicated UI and stay current. Description-based references
-are only acceptable when the tracker's tools lack linking capabilities.
+**Inter-task relationships in descriptions instead of native links:**
+Mentioning "Subtask of PROJ-456" or "Blocked by PROJ-789" in description text instead
+of using the tracker's native linking. See Step 2 (References) and Step 4 for the rules.
 
 ## After Completion
 
@@ -367,3 +413,18 @@ When all tasks are created:
 - **task-decomposition** — Produces the input for pipeline-mode task creation
 - **technical-design** — Source material referenced in task descriptions
 - **design-documents** — The origin of the pipeline: problem analysis and solution decision
+
+## Quality Checklist
+
+Before creating a task in the tracker:
+
+- [ ] Title is imperative, specific, and 5-10 words
+- [ ] Description includes context linking to the larger effort
+- [ ] Work items are concrete but don't prescribe implementation
+- [ ] Acceptance criteria are testable with clear pass/fail outcomes
+- [ ] Negative cases and error conditions are covered where relevant
+- [ ] References link to external resources (design docs, code) — no task-to-task refs
+- [ ] Inter-task relationships use native tracker links, not description text
+- [ ] All tracker fields match the project's configuration
+- [ ] User approved the draft before creation
+- [ ] Task reads as a plan for future work, not a report of past work

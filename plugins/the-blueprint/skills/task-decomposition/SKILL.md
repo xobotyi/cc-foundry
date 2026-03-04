@@ -1,9 +1,11 @@
 ---
 name: task-decomposition
 description: >-
-  Task decomposition — convert technical designs into actionable, tracked
-  task hierarchies. Invoke when decomposing features into subtasks, preparing
-  work items, or creating decomposition documents.
+  Convert technical designs into actionable, tracked task hierarchies with
+  sizing, dependencies, and acceptance criteria. Invoke whenever task involves
+  any interaction with work decomposition — breaking down features into
+  subtasks, slicing work items, creating task lists, or writing decomposition
+  documents.
 ---
 
 # Task Decomposition
@@ -13,37 +15,18 @@ document. The input is a technical design with affected components, sequencing, 
 boundaries. The output is a task hierarchy that any developer or agent can pick up and
 execute without further clarification.
 
-## Why Task Decomposition Matters
+## Purpose
 
-A technical design describes WHAT changes at the component level. But components aren't
-work items. Someone must decide how to slice the work into pieces that can be assigned,
-estimated, tracked, and verified independently. That's decomposition.
-
-Without it, implementation begins with implicit assumptions about order, scope, and
-boundaries. Two people working on "the backend changes" step on each other. An agent
-tasked with "implement the cache layer" produces a monolith because nobody defined where
-one task ends and the next begins.
-
-The decomposition document also solves a persistence problem. Design documents capture
-decisions. Technical designs map those decisions to components. But neither tells a new
-team member or a future agent session what the actual work units are, in what order they
-should execute, and what "done" looks like for each. The decomposition document is that
-bridge — it turns strategic intent into executable work.
+A technical design describes what changes at the component level — but components aren't work
+items. Decomposition slices the design into assignable, estimable, trackable units with explicit
+boundaries, ordering, and completion criteria. The decomposition document persists these decisions
+so any implementer — human or agent — can pick up unblocked work without further clarification.
 
 ## When to Decompose
 
-Decompose when any of these apply:
-
-- The technical design touches more than one component
-- Implementation will take more than a day
-- Multiple people or agents will work on different parts
-- The work has non-obvious ordering constraints
-- You need to track progress at a granular level
-
-Skip decomposition when:
-- The technical design scopes a single, self-contained change
-- The work is small enough that a single task with acceptance criteria covers it
-- Decomposition overhead exceeds the work itself
+Decompose when the technical design touches multiple components, involves multiple
+implementers, takes more than a day, or has non-obvious ordering constraints. Skip when a
+single task with acceptance criteria covers the entire scope.
 
 ## Creating a Task Decomposition
 
@@ -160,7 +143,9 @@ configuration itself is the deliverable (e.g., a YAML snippet for a CI pipeline 
    over "caching works correctly."
 
    **References** — Links to the design document, technical design, relevant code, or
-   similar implementations in the codebase.
+   similar implementations in the codebase. Only external resources — never references to
+   other tasks. Inter-task dependencies are expressed through the Dependencies column in
+   the task table and created as native tracker links during task creation.
 
 ```markdown
 ## Context
@@ -181,6 +166,8 @@ because the new schema lacks a compound index.
 ## References
 - Technical design: design-docs/02-cache-layer-redesign.technical-design.md
 - Current schema: db/migrations/latest
+- (Dependencies on other tasks are NOT listed here — they go in the task table's
+  Dependencies column and become native tracker links during creation)
 ```
 
 3. Ask the user for approval before creating tasks in the issue tracker.
@@ -216,28 +203,15 @@ because the new schema lacks a compound index.
 
 ## Decomposition Approaches
 
-Different situations call for different slicing strategies. These can be combined.
+Choose the slicing strategy based on team structure, delivery constraints, and risk — not
+technology. Most real decompositions combine approaches.
 
-**Horizontal decomposition** splits work by technical layer or specialty: one person
-handles the database, another the API, another the frontend. Each task requires
-coordination to deliver complete functionality. Works for teams with clear specialization.
-
-**Vertical decomposition** splits work by user-facing capability: each task delivers a
-thin slice of functionality across all layers. Every completed task produces something
-demonstrable. Works when incremental delivery matters or when a single person or agent
-handles the full stack.
-
-**Stage-based decomposition** follows the implementation lifecycle: data model first,
-then business logic, then API surface, then tests. Natural for greenfield work where
-each stage builds on the previous one.
-
-**Risk-first decomposition** isolates the most uncertain work into early tasks. If the
-risky piece fails or needs a different approach, less work is wasted. Works for efforts
-with significant unknowns.
-
-The choice depends on team structure, delivery constraints, and risk profile — not on
-the technology. A solo developer might decompose vertically while a team of specialists
-decomposes horizontally for the same technical design.
+| Approach | Slices by | Best when | Watch out for |
+|----------|-----------|-----------|---------------|
+| Horizontal | Technical layer (DB, API, UI) | Team has clear specializations | Cross-layer coordination overhead |
+| Vertical | User-facing capability | Incremental delivery matters; solo implementer | Thin slices may feel artificial |
+| Stage-based | Implementation lifecycle | Greenfield; each stage builds on previous | Late integration risk |
+| Risk-first | Uncertainty level | Significant unknowns exist | Over-isolating trivial risks |
 
 ## Document Template
 
@@ -272,7 +246,7 @@ Total estimate: ~Xh (~Y days)
 - [ ] [Verifiable condition]
 
 **References:**
-- [Links to design docs, code, similar implementations]
+- [Links to design docs, code paths, mockups — never other tasks]
 
 ### Task 2: [Title]
 ...
@@ -296,68 +270,41 @@ implementations, anything that would otherwise be lost]
 - **Completed:** Moves with the design document and technical design to
   `design-docs/completed/` when implemented
 
-## Quality Checklist
+## Application
 
-Before considering a decomposition complete:
+**When creating:** Apply all rules silently. Follow the workflow steps, validate sizing
+against the 8-hour ceiling, enforce the 100% coverage rule, write descriptions as plans
+in imperative mood, and keep implementation details out of task descriptions. Do not
+narrate which rules you are following.
 
-- [ ] Technical design was read and understood
-- [ ] User approved the draft task list (Step 3) before detailed descriptions
-- [ ] User approved detailed descriptions (Step 5) before issue tracker creation
-- [ ] Every component from the technical design has at least one corresponding task
-- [ ] No leaf task exceeds 8 hours
-- [ ] Each task has context, work items, and acceptance criteria
-- [ ] Dependencies are explicit — no hidden ordering assumptions
-- [ ] Parallel execution opportunities are identified
-- [ ] Decomposition document created and persisted
-- [ ] User approved the decomposition document (Step 7) before task creation
-- [ ] An implementer can start any unblocked task without asking questions
+**When reviewing:** Evaluate the existing decomposition against the Quality Checklist.
+For each violation, cite the specific rule, quote the problematic section, and show the
+fix inline. Common review findings:
+- Leaf tasks exceeding 8 hours (decomposition too coarse)
+- Past-tense descriptions ("Added X" instead of "Add X")
+- Implementation prescribed in descriptions (code, function signatures, class names)
+- Missing coverage — components from the technical design with no corresponding task
+- Hidden dependencies — tasks that implicitly require another task but don't declare it
+- References section containing other task IDs instead of external resources
 
 ## Anti-Patterns
 
-**Title-only tasks:**
-"Fix the bug" or "Implement feature" without description. After a day or two, nobody —
-including the author — remembers the full context. Every task needs context, work items,
-and acceptance criteria.
+These failure modes are non-obvious from the positive directives above. The most common
+agent mistakes during decomposition:
 
-**Monolithic tasks:**
-If a leaf task exceeds 8 hours, it hides internal complexity. Seeing the same task "in
-progress" for days is a signal that decomposition was skipped. Break it down until each
-piece is estimable with reasonable confidence.
+**Past-tense descriptions:** Descriptions written as if the work is already done ("Added
+the index", "The migration was created"). This happens when the agent performed exploratory
+work during decomposition and described what it did instead of what the implementer should
+do. Every description must read as a plan for future work.
 
-**Micro-tasks:**
-Tasks so small that tracking overhead exceeds the work. "Rename variable X" is not a
-task — it's a line in someone else's task. Combine related small work into meaningful
-units.
+**Implementation details in tasks:** Task descriptions that prescribe code ("create a
+function called X that takes Y") cross into implementation. Describe what should change
+and what "done" looks like. The implementer decides how. Pseudocode for logical changes
+and configuration samples for config-as-deliverable are acceptable — production code is not.
 
-**Skipping the draft:**
-Jumping straight to detailed descriptions wastes effort when the structure is wrong.
-Validate the shape of the decomposition before investing in the details.
-
-**Hidden dependencies:**
-Tasks that silently depend on each other. A developer starts a task, discovers it's
-blocked, and loses time context-switching. Make all ordering constraints visible and
-explicit.
-
-**Decomposing before understanding:**
-Rushing to create tasks before fully understanding the technical design leads to rework.
-If the technical design has unresolved risks or ambiguous scope, address those first.
-
-**Implementation details in tasks:**
-Task descriptions that prescribe code ("create a function called X that takes Y") cross
-into implementation. Describe what should change and what "done" looks like. The
-implementer decides how. Pseudocode for logical changes and configuration samples for
-config-as-deliverable are acceptable — production code is not.
-
-**Past-tense descriptions:**
-Descriptions written as if the work is already done ("Added the index", "The migration
-was created"). This happens when the agent performed exploratory work during decomposition
-and described what it did instead of what the implementer should do. Every description
-must read as a plan for future work.
-
-**Missing the 100% rule:**
-Tasks that don't cover the full scope of the technical design. If a component is in the
-technical design but has no task, either the decomposition is incomplete or the technical
-design has unnecessary scope.
+**Hidden dependencies:** Tasks that silently depend on each other. A developer starts a
+task, discovers it's blocked, and loses time context-switching. Make all ordering constraints
+visible and explicit in the task table.
 
 ## After Completion
 
@@ -387,3 +334,19 @@ Do not silently skip task creation or pretend the pipeline is complete without i
 - **design-documents** — The origin of the pipeline: problem analysis and solution decision
 - **task-creation** — Consumes this skill's output: creates individual tasks in the issue
   tracker
+
+## Quality Checklist
+
+Before considering a decomposition complete:
+
+- [ ] Technical design was read and understood
+- [ ] User approved the draft task list (Step 3) before detailed descriptions
+- [ ] User approved detailed descriptions (Step 5) before issue tracker creation
+- [ ] Every component from the technical design has at least one corresponding task
+- [ ] No leaf task exceeds 8 hours
+- [ ] Each task has context, work items, and acceptance criteria
+- [ ] Dependencies are explicit — no hidden ordering assumptions
+- [ ] Parallel execution opportunities are identified
+- [ ] Decomposition document created and persisted
+- [ ] User approved the decomposition document (Step 7) before task creation
+- [ ] An implementer can start any unblocked task without asking questions

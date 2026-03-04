@@ -2,8 +2,9 @@
 name: design-documents
 description: >-
   Technical design documents — problem analysis, solution exploration,
-  architectural decisions. Invoke when creating, updating, reviewing,
-  or asking questions about design documents.
+  architectural decisions. Invoke whenever task involves any interaction
+  with design documents — creating, updating, reviewing, comparing options,
+  or capturing architectural decisions.
 ---
 
 # Design Documents
@@ -11,22 +12,6 @@ description: >-
 Technical artifacts that explore problems and solutions before implementation.
 The deliverable must be equally useful to a person reading it and to an agent
 consuming it to plan implementation.
-
-## Why Design Documents Matter
-
-Design docs catch mistakes when they're cheapest to fix — before code exists. Writing forces
-clarity: vague ideas that sound reasonable in conversation fall apart when you have to commit
-them to structured prose. The act of exploring alternatives surfaces trade-offs that would
-otherwise emerge as surprises during implementation or review.
-
-They also become architecture decision records. Every design doc captures not just what was
-decided, but what alternatives were considered and why they were rejected. When someone asks
-"why did we build it this way?" six months later, the reasoning is preserved — not lost in
-chat history or someone's memory.
-
-For agent-driven workflows, design docs serve as the contract between human intent and agent
-execution. An agent that implements from a design doc has explicit goals, non-goals, and
-constraints — reducing drift from the intended solution.
 
 ## When to Write
 
@@ -194,22 +179,6 @@ What changed and why.
   architectural decisions.
 - If a doc exceeds 15 pages, split the problem into sub-problems with their own docs.
 
-## Quality Checklist
-
-Before considering a design doc complete:
-
-- [ ] Problem has root cause, not just symptoms
-- [ ] Current state explains why things are this way
-- [ ] Goals and non-goals are explicit
-- [ ] Alternatives were explored (single option acceptable if alternatives were considered)
-- [ ] Each option has pros AND cons (no perfect solutions)
-- [ ] Comparison covers key dimensions
-- [ ] Recommendation is explicit with justification
-- [ ] Cross-cutting concerns addressed
-- [ ] Next steps identify remaining unknowns
-- [ ] User approved the document (Step 7) before proceeding to technical design
-- [ ] Reader can make informed decision without asking questions
-
 ## Example: Good Problem Statement
 
 **Weak:**
@@ -223,6 +192,67 @@ Before considering a design doc complete:
 
 The strong version includes: metric, timeline, root cause, and business impact.
 
+## Example: Mini Design Doc (Condensed)
+
+```markdown
+# Search Performance Regression
+
+## Problem Statement
+Search latency p95 is 3.2s, up from 800ms after the October data migration.
+Root cause: the new schema lacks a compound index on (tenant_id, created_at),
+forcing full table scans. Impact: enterprise customers (40% of revenue) report
+degraded experience; 3 support tickets this week.
+
+## Current State
+Search queries hit PostgreSQL directly. The October migration changed the
+tenant isolation model from schema-per-tenant to shared table with tenant_id
+column. No index was added for the new access pattern.
+
+## Goals
+- Restore search p95 to under 1s
+- No downtime during fix
+
+## Non-Goals
+- Full-text search improvements (separate effort)
+- Migrating search to a dedicated search engine
+
+## Proposed Solutions
+
+### Option 1: Add Compound Index
+Add (tenant_id, created_at DESC) index. Estimated build time: ~20 min on
+production with CONCURRENTLY.
+
+**Pros:** Minimal change, directly addresses root cause, no downtime.
+**Cons:** Index adds ~2GB storage, slows writes marginally.
+
+### Option 2: Materialized View
+Pre-compute recent results per tenant in a materialized view, refresh on schedule.
+
+**Pros:** Faster reads, could support future search features.
+**Cons:** Stale data between refreshes, operational complexity, overkill for this problem.
+
+## Comparison
+
+| Aspect        | Compound Index    | Materialized View    |
+|---------------|-------------------|----------------------|
+| Complexity    | Low               | Medium               |
+| Risk          | Low               | Medium (staleness)   |
+| Timeline      | Hours             | Days                 |
+| Maintenance   | None              | Refresh scheduling   |
+
+## Recommendation
+Option 1 (Compound Index). Directly addresses root cause with minimal risk.
+Would reconsider if we planned search engine migration within 3 months.
+
+## Cross-Cutting Concerns
+- **Performance:** Index build with CONCURRENTLY avoids table locks.
+- **Observability:** Add p95 latency alert threshold at 1.5s.
+
+## Next Steps
+- Validate index plan on staging with production-size data
+- Coordinate deployment window with on-call
+```
+
 ## File Conventions
 
 - **Location:** `design-docs/` within project directory
@@ -231,26 +261,30 @@ The strong version includes: metric, timeline, root cause, and business impact.
 - **Superseded:** If a new doc replaces an old one, mark the old doc with a header linking to
   the replacement
 
-## Anti-Patterns
+## Application
 
-**Unexplored single-option documents:**
-Presenting one solution is fine when alternatives were genuinely considered and found unviable.
-It's a problem when the author skipped exploration and jumped to "the obvious answer."
+**When creating:** Apply all rules silently. Follow the workflow steps, use the document
+template, enforce goals/non-goals separation, generate multiple options, and produce a
+recommendation. Do not narrate which rules you are following.
+
+**When reviewing:** Evaluate the existing design document against the Quality Checklist.
+For each violation, cite the specific rule, quote the problematic section, and show the
+fix inline. Common review findings:
+- Problem statement describes symptoms without root cause
+- Options lack genuine trade-offs (pro-only or con-only)
+- Missing non-goals (scope is unbounded)
+- No recommendation or recommendation without justification
+- Cross-cutting concerns not addressed
+
+## Anti-Patterns
 
 **Implementation manuals:**
 Design docs explore WHAT and WHY, not HOW. A doc that reads "this is how we implement it"
 without exploring trade-offs is not a design doc — it's a task description. Save implementation
-for task decomposition.
+detail for the technical design stage.
 
 **No recommendation:**
-Analysis without conclusion forces readers to re-do the thinking. Take a position.
-
-**Stale documents:**
-Outdated design docs mislead. Update or mark as superseded.
-
-**Missing non-goals:**
-Without explicit non-goals, scope creep is invisible. Readers assume everything related is
-in scope.
+Analysis without conclusion forces readers to re-do the thinking. Always take a position.
 
 ## After Completion
 
@@ -267,3 +301,19 @@ When the design document is complete and the recommendation is accepted:
 - **technical-design** — Next step after design doc: maps the chosen solution onto the codebase
 - **task-decomposition** — After technical design, breaks it into tracked work items
 - **task-creation** — Creates individual tasks from decomposition output
+
+## Quality Checklist
+
+Before considering a design doc complete:
+
+- [ ] Problem has root cause, not just symptoms
+- [ ] Current state explains why things are this way
+- [ ] Goals and non-goals are explicit
+- [ ] Alternatives were explored (single option acceptable if alternatives were considered)
+- [ ] Each option has pros AND cons (no perfect solutions)
+- [ ] Comparison covers key dimensions
+- [ ] Recommendation is explicit with justification
+- [ ] Cross-cutting concerns addressed
+- [ ] Next steps identify remaining unknowns
+- [ ] User approved the document (Step 7) before proceeding to technical design
+- [ ] Reader can make informed decision without asking questions
