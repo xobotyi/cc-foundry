@@ -18,10 +18,10 @@ for setup/teardown, and a rich plugin ecosystem. All patterns target Python 3.14
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Fixture patterns, scope, factories, teardown | [fixtures.md](references/fixtures.md) | Fixture lifecycle, yield fixtures, factory pattern, request object, parametrized fixtures |
-| Parametrize patterns, indirect, IDs | [parametrize.md](references/parametrize.md) | Multi-parameter examples, indirect fixtures, custom IDs, stacking decorators |
-| Monkeypatch patterns, scoped patches | [monkeypatch.md](references/monkeypatch.md) | API overview, attribute/env/dict patching, scoped monkeypatch, common recipes |
-| Plugin ecosystem and configuration | [plugins.md](references/plugins.md) | pytest-asyncio, pytest-mock, pytest-xdist, pytest-cov configuration patterns |
+| Fixture patterns, scope, factories, teardown | [`${CLAUDE_SKILL_DIR}/references/fixtures.md`] | Fixture lifecycle, yield fixtures, factory pattern, request object, parametrized fixtures |
+| Parametrize patterns, indirect, IDs | [`${CLAUDE_SKILL_DIR}/references/parametrize.md`] | Multi-parameter examples, indirect fixtures, custom IDs, stacking decorators |
+| Monkeypatch patterns, scoped patches | [`${CLAUDE_SKILL_DIR}/references/monkeypatch.md`] | API overview, attribute/env/dict patching, scoped monkeypatch, common recipes |
+| Plugin ecosystem and configuration | [`${CLAUDE_SKILL_DIR}/references/plugins.md`] | pytest-asyncio, pytest-mock, pytest-xdist, pytest-cov configuration patterns |
 
 ## Test Structure
 
@@ -143,8 +143,8 @@ def test_inactive_users_excluded(make_user):
 | `request` | Fixture metadata: `.param`, `.node`, `.config`, `.fspath` |
 | `pytestconfig` | Access to the pytest config object |
 
-See [fixtures.md](references/fixtures.md) for fixture lifecycle details, parametrized
-fixtures, and advanced patterns.
+See `${CLAUDE_SKILL_DIR}/references/fixtures.md` for fixture lifecycle details,
+parametrized fixtures, and advanced patterns.
 
 ## Parametrize
 
@@ -187,8 +187,8 @@ def test_user_greeting(user: User):
     assert user.name in user.greet()
 ```
 
-See [parametrize.md](references/parametrize.md) for multi-parameter patterns, conditional
-skipping within parametrize, and dynamic parametrize generation.
+See `${CLAUDE_SKILL_DIR}/references/parametrize.md` for multi-parameter patterns,
+conditional skipping within parametrize, and dynamic parametrize generation.
 
 ## Markers
 
@@ -437,7 +437,8 @@ asyncio_mode = "auto"              # pytest-asyncio: auto-detect async tests
 | `pytest-httpx` | Mock `httpx` requests in tests |
 | `pytest-randomly` | Randomize test order to catch hidden dependencies |
 
-See [plugins.md](references/plugins.md) for configuration patterns and usage details.
+See `${CLAUDE_SKILL_DIR}/references/plugins.md` for configuration patterns and usage
+details.
 
 ## Application
 

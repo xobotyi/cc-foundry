@@ -16,15 +16,12 @@ with older Python versions unless the project explicitly requires it.
 
 ## References
 
-Extended examples, packaging workflows, and detailed rationale for the rules below live in
-`references/`.
-
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Type annotation patterns, generics, overloads, TypeVar, variance | [typing.md](references/typing.md) | Full annotation examples, generic class patterns, Protocol implementation, TypeVar usage |
-| Project layout, pyproject.toml, uv, dependency management | [packaging.md](references/packaging.md) | pyproject.toml templates, uv workflows, src layout, dependency groups, build backends |
-| Module system, imports, namespace packages, `__init__.py` | [modules.md](references/modules.md) | Import resolution order, circular import fixes, lazy imports, namespace packages |
-| asyncio, TaskGroup, cancellation, timeouts, threading interop | [concurrency.md](references/concurrency.md) | TaskGroup error handling, timeout scopes, cancellation semantics, to_thread, eager task factory |
+| Type annotation patterns, generics, overloads, TypeVar, variance | [`${CLAUDE_SKILL_DIR}/references/typing.md`] | Full annotation examples, generic class patterns, Protocol implementation, TypeVar usage |
+| Project layout, pyproject.toml, uv, dependency management | [`${CLAUDE_SKILL_DIR}/references/packaging.md`] | pyproject.toml templates, uv workflows, src layout, dependency groups, build backends |
+| Module system, imports, namespace packages, `__init__.py` | [`${CLAUDE_SKILL_DIR}/references/modules.md`] | Import resolution order, circular import fixes, lazy imports, namespace packages |
+| asyncio, TaskGroup, cancellation, timeouts, threading interop | [`${CLAUDE_SKILL_DIR}/references/concurrency.md`] | TaskGroup error handling, timeout scopes, cancellation semantics, to_thread, eager task factory |
 
 ## Naming
 
@@ -108,8 +105,8 @@ class Renderable(Protocol):
 - **`TypeGuard`** for narrowing where the output type is unrelated to input:
   `def is_valid_config(data: object) -> TypeGuard[Config]:`.
 
-See [typing.md](references/typing.md) for full annotation patterns, generics, overloads,
-and variance.
+See `${CLAUDE_SKILL_DIR}/references/typing.md` for full annotation patterns, generics,
+overloads, and variance.
 
 ## Data Classes and Structured Data
 
@@ -423,8 +420,8 @@ my-project/
 - **`ruff check`** to lint. **`ruff format`** to format.
 - **Configure in `pyproject.toml`** under `[tool.ruff]`.
 
-See [packaging.md](references/packaging.md) for pyproject.toml templates, uv workflows,
-and dependency management patterns.
+See `${CLAUDE_SKILL_DIR}/references/packaging.md` for pyproject.toml templates, uv
+workflows, and dependency management patterns.
 
 ## Concurrency
 

@@ -1,10 +1,12 @@
 ---
 name: review-output
 description: >-
-  Standardized output format for code review agents. Provides consistent
-  Critical/Issues/Recommendations structure for automated parsing and
-  aggregation.
+  Standardized report format for code review findings — severity mapping,
+  location format, and report structure. Invoke whenever a review agent
+  needs to produce a structured output report with Critical/Issues/Recommendations
+  sections.
 user-invocable: false
+disable-model-invocation: true
 ---
 
 # Review Output

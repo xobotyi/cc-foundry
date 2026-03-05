@@ -1,10 +1,10 @@
 ---
 name: vue
 description: >-
-  Vue 3 Composition API discipline: reactivity-aware, type-safe, composable.
-  Invoke whenever task involves any interaction with Vue code — writing,
-  reviewing, refactoring, debugging, or understanding .vue files, composables,
-  and Vue component architecture.
+  Vue 3 conventions, Composition API patterns, SFC structure, reactivity,
+  composables, and TypeScript integration. Invoke whenever task involves any
+  interaction with Vue code — writing, reviewing, refactoring, debugging,
+  or understanding .vue files, composables, and Vue component architecture.
 ---
 
 # Vue
@@ -20,12 +20,12 @@ References contain extended examples, rationale, and edge cases for each topic.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Reactivity | `references/reactivity.md` | Ref unwrapping, watchers, computed edge cases |
-| SFC | `references/sfc.md` | Full compiler macros catalog, scoped styles, template refs |
-| Components | `references/components.md` | Props, emits, slots, provide/inject |
-| Composables | `references/composables.md` | Design patterns, composition, restrictions |
-| TypeScript | `references/typescript.md` | Full utility types table, generic components, event typing |
-| Performance | `references/performance.md` | Update optimization, large lists, profiling |
+| Reactivity | [`${CLAUDE_SKILL_DIR}/references/reactivity.md`] | Ref unwrapping, watchers, computed edge cases |
+| SFC | [`${CLAUDE_SKILL_DIR}/references/sfc.md`] | Full compiler macros catalog, scoped styles, template refs |
+| Components | [`${CLAUDE_SKILL_DIR}/references/components.md`] | Props, emits, slots, provide/inject |
+| Composables | [`${CLAUDE_SKILL_DIR}/references/composables.md`] | Design patterns, composition, restrictions |
+| TypeScript | [`${CLAUDE_SKILL_DIR}/references/typescript.md`] | Full utility types table, generic components, event typing |
+| Performance | [`${CLAUDE_SKILL_DIR}/references/performance.md`] | Update optimization, large lists, profiling |
 
 ## Reactivity
 
@@ -120,7 +120,7 @@ Order declarations logically:
 Key macros available without import in `<script setup>`: `defineProps()`,
 `defineEmits()`, `defineModel()`. Use `defineOptions()` for options that
 `<script setup>` doesn't natively support (`name`, `inheritAttrs: false`).
-Full macro catalog in `references/sfc.md`.
+Full macro catalog in `${CLAUDE_SKILL_DIR}/references/sfc.md`.
 
 ### Template Syntax
 
@@ -325,7 +325,7 @@ Type DOM events explicitly: `(event: Event)` then cast target:
 
 Use Vue's typed helpers: `Ref<T>`, `ComputedRef<T>`, `MaybeRefOrGetter<T>`,
 `InjectionKey<T>`, `PropType<T>`, `ComponentPublicInstance`. Full utility types
-table in `references/typescript.md`.
+table in `${CLAUDE_SKILL_DIR}/references/typescript.md`.
 
 ## Performance
 

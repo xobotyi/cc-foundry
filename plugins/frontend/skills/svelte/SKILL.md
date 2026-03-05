@@ -18,9 +18,9 @@ contain extended examples, rationale, and edge cases for each topic.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Runes | `references/runes.md` | `$state`, `$derived`, `$effect`, `$props`, `$bindable` details |
-| Components | `references/components.md` | Snippets, events, context, special elements |
-| SvelteKit | `references/sveltekit.md` | Route files, load functions, form actions, hooks, full key imports table |
+| Runes | [`${CLAUDE_SKILL_DIR}/references/runes.md`] | `$state`, `$derived`, `$effect`, `$props`, `$bindable` details |
+| Components | [`${CLAUDE_SKILL_DIR}/references/components.md`] | Snippets, events, context, special elements |
+| SvelteKit | [`${CLAUDE_SKILL_DIR}/references/sveltekit.md`] | Routing, load functions, form actions, hooks, imports |
 
 ## Runes
 
@@ -313,7 +313,7 @@ Return `json()` or `new Response()`.
 Most-used modules: `$app/navigation` (`goto`, `invalidate`), `$app/state` (`page`,
 `navigating`), `$app/forms` (`enhance`), `$env/static/private` and
 `$env/static/public` for environment variables, `$lib` for shared code. Full imports
-table in `references/sveltekit.md`.
+table in `${CLAUDE_SKILL_DIR}/references/sveltekit.md`.
 
 ### Performance
 

@@ -17,13 +17,13 @@ selection, sampling strategy — trades off cost against visibility.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Spans | `references/spans.md` | Span anatomy, root spans, lifetime code patterns |
-| Span data | `references/span-data.md` | Events format, links format, SDK limits table |
-| Context propagation | `references/context-propagation.md` | W3C header format, propagator selection, baggage details, security |
-| Instrumentation | `references/instrumentation.md` | Server/client/async code patterns, library rules, testing guidance |
-| Sampling | `references/sampling.md` | Head/tail/combined strategies, decision guide, sampler types |
-| Semantic conventions | `references/semantic-conventions.md` | HTTP/DB/messaging attribute lists, status mapping, general conventions |
-| SDK components | `references/sdk-components.md` | Resource config, env vars, Collector deployment, exporter types |
+| Spans | [`${CLAUDE_SKILL_DIR}/references/spans.md`] | Span anatomy, root spans, lifetime code patterns |
+| Span data | [`${CLAUDE_SKILL_DIR}/references/span-data.md`] | Events format, links format, SDK limits table |
+| Context propagation | [`${CLAUDE_SKILL_DIR}/references/context-propagation.md`] | W3C header format, propagator selection, baggage details, security |
+| Instrumentation | [`${CLAUDE_SKILL_DIR}/references/instrumentation.md`] | Server/client/async code patterns, library rules, testing guidance |
+| Sampling | [`${CLAUDE_SKILL_DIR}/references/sampling.md`] | Head/tail/combined strategies, decision guide, sampler types |
+| Semantic conventions | [`${CLAUDE_SKILL_DIR}/references/semantic-conventions.md`] | HTTP/DB/messaging attribute lists, status mapping, general conventions |
+| SDK components | [`${CLAUDE_SKILL_DIR}/references/sdk-components.md`] | Resource config, env vars, Collector deployment, exporter types |
 
 ## Spans
 
@@ -128,7 +128,8 @@ Associate a span with spans from other traces without parent-child hierarchy.
 - **Async follow-up:** job span links back to triggering span
 - Add links at span creation when possible — samplers can consider them
 
-See `references/span-data.md` for events format, links format, and SDK limits table.
+See `${CLAUDE_SKILL_DIR}/references/span-data.md` for events format, links format, and SDK
+limits table.
 
 ## Context Propagation
 
@@ -163,8 +164,8 @@ Propagates arbitrary key-value pairs across service boundaries alongside trace c
 - **NEVER put PII, credentials, or API keys in baggage** — visible to all downstream
   services
 
-See `references/context-propagation.md` for W3C header format, propagator selection
-table, baggage details, and security considerations.
+See `${CLAUDE_SKILL_DIR}/references/context-propagation.md` for W3C header format,
+propagator selection table, baggage details, and security considerations.
 
 ## Instrumentation
 
@@ -204,8 +205,8 @@ suffice? -> Add event. Otherwise -> don't instrument.
 - Prefer events over spans for verbose internal details
 - Support optional `TracerProvider` injection for testability
 
-See `references/instrumentation.md` for server-side, client-side, and async
-producer/consumer patterns, plus testing guidance.
+See `${CLAUDE_SKILL_DIR}/references/instrumentation.md` for server-side, client-side,
+and async producer/consumer patterns, plus testing guidance.
 
 ## Sampling
 
@@ -243,8 +244,8 @@ Decision after all spans in a trace complete. Requires collector infrastructure.
 - Provide attributes at span creation — samplers cannot see late-added attributes
 - Filter health checks — high volume, low value; sample aggressively or filter entirely
 
-See `references/sampling.md` for combined head+tail strategies, decision guide, and
-per-scenario recommendations.
+See `${CLAUDE_SKILL_DIR}/references/sampling.md` for combined head+tail strategies,
+decision guide, and per-scenario recommendations.
 
 ## Semantic Conventions
 
@@ -257,8 +258,8 @@ cross-service analysis without learning custom attribute names.
 - Messaging producer: kind `PRODUCER`, name `{destination} publish`
 - Messaging consumer: kind `CONSUMER`, name `{destination} process`
 
-See `references/semantic-conventions.md` for required/recommended attributes per domain,
-status mapping rules, and general conventions.
+See `${CLAUDE_SKILL_DIR}/references/semantic-conventions.md` for required/recommended
+attributes per domain, status mapping rules, and general conventions.
 
 ## SDK Components
 
@@ -269,8 +270,9 @@ status mapping rules, and general conventions.
 - Configure `Resource` with `service.name` — identifies your service in backends
 - Use `BatchSpanProcessor` in production — `SimpleSpanProcessor` is for dev/testing only
 
-See `references/sdk-components.md` for Resource attributes, BatchSpanProcessor tuning,
-exporter types, environment variable configuration, and Collector deployment patterns.
+See `${CLAUDE_SKILL_DIR}/references/sdk-components.md` for Resource attributes,
+BatchSpanProcessor tuning, exporter types, environment variable configuration, and
+Collector deployment patterns.
 
 ## Application
 

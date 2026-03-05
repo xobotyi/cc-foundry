@@ -244,12 +244,13 @@ my-skill/
     └── helper.py         # Utility script — executed, not loaded into context
 ```
 
-Reference from SKILL.md so Claude knows what each file contains and when to load it:
+Reference from SKILL.md using `${CLAUDE_SKILL_DIR}` so Claude sees absolute paths it can
+pass directly to the Read tool:
 
 ```markdown
 ## Additional resources
-- For complete API details, see [reference.md](reference.md)
-- For usage examples, see [examples.md](examples.md)
+- For complete API details, see `${CLAUDE_SKILL_DIR}/reference.md`
+- For usage examples, see `${CLAUDE_SKILL_DIR}/examples.md`
 ```
 
 Skills can also bundle and run scripts in any language (Python, Bash, etc.) to generate

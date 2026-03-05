@@ -237,7 +237,7 @@ not highest.
 **Limitation:** Generated knowledge may be incorrect (model
 hallucination). Works best when model has reliable domain knowledge.
 
-See [agent-patterns.md](agent-patterns.md) for more on knowledge
+See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] for more on knowledge
 generation techniques.
 
 ---

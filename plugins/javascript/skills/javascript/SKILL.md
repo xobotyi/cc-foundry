@@ -14,16 +14,16 @@ its control flow, rewrite it.**
 JavaScript rewards explicit, readable code. Prefer boring patterns that are easy to
 understand over clever tricks that save characters.
 
-### References
+## References
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Functions, closures, composition | `references/functions.md` | Arrow function examples, closure patterns, early return, parameter destructuring |
-| Async patterns, error handling, concurrency | `references/async.md` | Promise.all/race/any examples, cancellation, custom error classes, for-await |
-| Objects, arrays, iteration, Map/Set | `references/objects-and-arrays.md` | Iteration decision table, destructuring patterns, immutable updates, generators |
-| ES modules, imports, barrel files | `references/modules.md` | Import ordering, barrel file rationale, directory import pitfalls, dynamic imports |
-| JSDoc typing, full tag catalog | `references/jsdoc.md` | Full tag reference (@callback, @template, @enum), type assertions, class modifiers |
-| General JS idioms and edge cases | `references/idioms.md` | Variable/naming examples, equality coercion table, modern syntax patterns |
+| Functions, closures, composition | [`${CLAUDE_SKILL_DIR}/references/functions.md`] | Arrow function examples, closure patterns, early return, parameter destructuring |
+| Async patterns, error handling, concurrency | [`${CLAUDE_SKILL_DIR}/references/async.md`] | Promise.all/race/any examples, cancellation, custom error classes, for-await |
+| Objects, arrays, iteration, Map/Set | [`${CLAUDE_SKILL_DIR}/references/objects-and-arrays.md`] | Iteration decision table, destructuring patterns, immutable updates, generators |
+| ES modules, imports, barrel files | [`${CLAUDE_SKILL_DIR}/references/modules.md`] | Import ordering, barrel file rationale, directory import pitfalls, dynamic imports |
+| JSDoc typing, full tag catalog | [`${CLAUDE_SKILL_DIR}/references/jsdoc.md`] | Full tag reference (@callback, @template, @enum), type assertions, class modifiers |
+| General JS idioms and edge cases | [`${CLAUDE_SKILL_DIR}/references/idioms.md`] | Variable/naming examples, equality coercion table, modern syntax patterns |
 
 ## Variables and Declarations
 
@@ -200,7 +200,7 @@ understand over clever tricks that save characters.
 
 Prefer `for...of` for side-effect loops, `Array.prototype` methods (`.map`, `.filter`,
 `.reduce`, `.find`, `.some`, `.every`) for data transforms, `for` for index-needed loops.
-See `references/objects-and-arrays.md` for the full iteration decision table.
+See `${CLAUDE_SKILL_DIR}/references/objects-and-arrays.md` for the full iteration decision table.
 
 Use `Map` when keys aren't strings or are user-provided (avoids prototype pollution).
 Use `Set` for dedup (`[...new Set(items)]`). Use generators (`function*`) for lazy
@@ -224,8 +224,8 @@ type safety through editor tooling. Enable `// @ts-check` at file top or `checkJ
 `jsconfig.json`.
 
 Core tags: `@type`, `@param`, `@returns`, `@typedef` (with `@property`), `@template`.
-See `references/jsdoc.md` for the full tag catalog including `@callback`, `@enum`,
-class modifiers, and type import syntax.
+See `${CLAUDE_SKILL_DIR}/references/jsdoc.md` for the full tag catalog including `@callback`,
+`@enum`, class modifiers, and type import syntax.
 
 ### JSDoc Best Practices
 

@@ -19,11 +19,11 @@ ordering. Prefer boring, readable patterns over clever one-liners.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Layout | `references/layout.md` | Flex shorthand values, grid details (subgrid, implicit rows, alignment), layout patterns |
-| Modern CSS | `references/modern-css.md` | Extended modern CSS patterns and examples |
-| SCSS | `references/scss.md` | `@forward` patterns, module configuration, built-in modules, file organization |
-| Responsive | `references/responsive.md` | Extended responsive design patterns and examples |
-| Methodologies | `references/methodologies.md` | Methodology patterns and architecture details |
+| Layout | [`${CLAUDE_SKILL_DIR}/references/layout.md`] | Flex shorthand values, grid details (subgrid, implicit rows, alignment), layout patterns |
+| Modern CSS | [`${CLAUDE_SKILL_DIR}/references/modern-css.md`] | Extended modern CSS patterns and examples |
+| SCSS | [`${CLAUDE_SKILL_DIR}/references/scss.md`] | `@forward` patterns, module configuration, built-in modules, file organization |
+| Responsive | [`${CLAUDE_SKILL_DIR}/references/responsive.md`] | Extended responsive design patterns and examples |
+| Methodologies | [`${CLAUDE_SKILL_DIR}/references/methodologies.md`] | Methodology patterns and architecture details |
 
 ## Selectors and Specificity
 
@@ -58,7 +58,7 @@ Both work together — a grid item can be a flex container and vice versa.
 ### Flexbox
 
 - Always use the `flex` shorthand — it sets intelligent defaults.
-  See `references/layout.md` for the full shorthand value table
+  See `${CLAUDE_SKILL_DIR}/references/layout.md` for the full shorthand value table
 - `flex-flow: row wrap` combines `flex-direction` and `flex-wrap`
 - Use `flex-wrap` with a `flex` basis for responsive layouts without media queries:
   `flex: 1 1 300px` wraps items when they can't maintain 300px minimum
@@ -79,8 +79,8 @@ Both work together — a grid item can be a flex container and vice versa.
 - `grid-auto-flow: dense` fills visual holes — use carefully, it breaks
   visual/source order alignment (a11y concern)
 - Never use `order` in ways that break logical reading order
-- See `references/layout.md` for subgrid, implicit rows, alignment shorthands,
-  and negative line numbers
+- See `${CLAUDE_SKILL_DIR}/references/layout.md` for subgrid, implicit rows,
+  alignment shorthands, and negative line numbers
 
 ### General Layout Rules
 
@@ -273,8 +273,9 @@ Select elements based on descendants or siblings — the "parent selector."
 
 `@forward` re-exports modules, supports prefixing and visibility control.
 Module configuration uses `!default` variables and `@use ... with ()`.
-See `references/scss.md` for `@forward` patterns, configuration passthrough,
-built-in module usage, and file organization conventions.
+See `${CLAUDE_SKILL_DIR}/references/scss.md` for `@forward` patterns,
+configuration passthrough, built-in module usage, and file organization
+conventions.
 
 ### Migration
 

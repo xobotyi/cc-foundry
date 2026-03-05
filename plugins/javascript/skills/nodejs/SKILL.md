@@ -17,11 +17,11 @@ event loop, it's wrong.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Module system | `references/modules.md` | ESM/CJS comparison tables, file extension rules, conditional exports patterns |
-| Event loop | `references/event-loop.md` | Phase order, execution priority, blocking operations table, worker pool |
-| Streams | `references/streams.md` | Stream types table, pipeline patterns, backpressure details |
-| Error handling | `references/errors.md` | Error categories table, global handlers, centralized error handling |
-| Security | `references/security.md` | Supply chain threats table, HTTP security headers, process hardening |
+| Module system | [`${CLAUDE_SKILL_DIR}/references/modules.md`] | ESM/CJS comparison tables, file extension rules, conditional exports patterns |
+| Event loop | [`${CLAUDE_SKILL_DIR}/references/event-loop.md`] | Phase order, execution priority, blocking operations table, worker pool |
+| Streams | [`${CLAUDE_SKILL_DIR}/references/streams.md`] | Stream types table, pipeline patterns, backpressure details |
+| Error handling | [`${CLAUDE_SKILL_DIR}/references/errors.md`] | Error categories table, global handlers, centralized error handling |
+| Security | [`${CLAUDE_SKILL_DIR}/references/security.md`] | Supply chain threats table, HTTP security headers, process hardening |
 
 ## Module System
 
@@ -55,7 +55,7 @@ event loop, it's wrong.
 - **Self-referencing:** a package can import its own exports by name when `"exports"` is
   defined.
 
-File extension rules and ESM vs CJS comparison tables: see `references/modules.md`.
+File extension rules and ESM vs CJS comparison tables: see `${CLAUDE_SKILL_DIR}/references/modules.md`.
 
 ## Event Loop
 
@@ -83,7 +83,7 @@ expensive I/O and CPU tasks.
 - **Use `AbortController`** for cancellable timers and operations.
 
 Phase order, execution priority, blocking operations table, and worker pool details:
-see `references/event-loop.md`.
+see `${CLAUDE_SKILL_DIR}/references/event-loop.md`.
 
 ## Streams
 
@@ -113,7 +113,7 @@ memory.
 - **Custom Writable:** implement `_write(chunk, encoding, callback)` and optionally
   `_final(callback)` for cleanup before `'finish'` event.
 
-Stream types table and `.pipe()` pitfalls: see `references/streams.md`.
+Stream types table and `.pipe()` pitfalls: see `${CLAUDE_SKILL_DIR}/references/streams.md`.
 
 ## Error Handling
 
@@ -144,7 +144,7 @@ Stream types table and `.pipe()` pitfalls: see `references/streams.md`.
 - **Never swallow errors** in event handlers — always re-emit or log.
 
 Error categories table and operational vs programmer error strategies:
-see `references/errors.md`.
+see `${CLAUDE_SKILL_DIR}/references/errors.md`.
 
 ## Process Lifecycle
 
@@ -193,7 +193,7 @@ see `references/errors.md`.
 - **Limit V8 heap** with `--max-old-space-size` to prevent memory exhaustion.
 
 Supply chain threats table, dependency auditing, and security checklist:
-see `references/security.md`.
+see `${CLAUDE_SKILL_DIR}/references/security.md`.
 
 ## Application
 

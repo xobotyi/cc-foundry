@@ -20,11 +20,11 @@ extended examples, rationale, and edge cases for each topic area.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Components | `references/components.md` | Composition, refs, metadata, custom elements |
-| Hooks | `references/hooks.md` | Hook rules, custom hooks, `useSyncExternalStore` |
-| State | `references/state.md` | Placement, reducers, context, actions |
-| Performance | `references/performance.md` | Compiler, memoization, server components, streaming |
-| Testing | `references/testing.md` | Query priority/variants, userEvent catalog, async patterns |
+| Components | `${CLAUDE_SKILL_DIR}/references/components.md` | Composition, refs, metadata, custom elements |
+| Hooks | `${CLAUDE_SKILL_DIR}/references/hooks.md` | Hook rules, custom hooks, `useSyncExternalStore` |
+| State | `${CLAUDE_SKILL_DIR}/references/state.md` | Placement, reducers, context, actions |
+| Performance | `${CLAUDE_SKILL_DIR}/references/performance.md` | Compiler, memoization, server components, streaming |
+| Testing | `${CLAUDE_SKILL_DIR}/references/testing.md` | Query priority/variants, userEvent catalog, async patterns |
 
 ## Component Design
 
@@ -395,12 +395,13 @@ Always use `screen` for queries — never destructure from `render()`. Set up
 Use the highest-priority query that works: `getByRole` > `getByLabelText` >
 `getByText` > `getByTestId` (last resort). Use `getBy` for present elements, `queryBy`
 for asserting absence, `findBy` for async appearance. Full query priority and variant
-tables in `references/testing.md`.
+tables in `${CLAUDE_SKILL_DIR}/references/testing.md`.
 
 ### User Interactions
 
 Always prefer `userEvent` over `fireEvent` — it simulates real user behavior (focus,
-blur, keyDown/keyPress/keyUp sequence). Full method catalog in `references/testing.md`.
+blur, keyDown/keyPress/keyUp sequence). Full method catalog in
+`${CLAUDE_SKILL_DIR}/references/testing.md`.
 
 ### Async Patterns
 

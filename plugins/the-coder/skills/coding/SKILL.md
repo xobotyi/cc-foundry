@@ -227,21 +227,6 @@ quality on the next problem.
 
 </context-rules>
 
-## Anti-Patterns
-
-| Pattern                      | Why It Fails                    | Fix                                |
-|------------------------------|---------------------------------|------------------------------------|
-| Coding before reading        | Builds on wrong assumptions     | Discovery protocol first           |
-| Assuming signatures          | Compile/runtime errors          | Read the definition                |
-| "Looks right" verification   | Misses regressions              | Run tests, validate criteria       |
-| One-shotting complex work    | Broken intermediate state       | Work incrementally                 |
-| Overcomplicating             | Abstraction bloat, dead code    | Simplest thing that works          |
-| Touching unrelated code      | Scope creep, surprise breaks    | Stay within defined scope          |
-| Ignoring existing patterns   | Inconsistent codebase           | Search for examples first          |
-| Filling context exploring    | Degrades reasoning quality      | Use subagents for research         |
-| No tests before "done"       | Shipping unverified code        | Always test before complete        |
-| Not pushing back             | Building wrong thing            | Surface concerns, question premises|
-
 ## Integration
 
 This skill runs BEFORE language-specific skills.

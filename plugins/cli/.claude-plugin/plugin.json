@@ -1,6 +1,6 @@
 {
   "name": "cli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "CLI platform discipline: CLI application design, shell scripting conventions, and terminal UX",
   "author": {
     "name": "xobotyi",

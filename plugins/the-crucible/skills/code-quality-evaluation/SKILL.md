@@ -51,24 +51,30 @@ TaskOutput destroys context efficiency for the entire workflow.
 
 ### Phase 0: Setup Reports Directory
 
-Create reports directory inside the target:
+Determine the target path from the user's request (the `[path]` argument). Generate a timestamp
+in `YYYYMMDD-HHmmss` format. Create the reports directory inside the target:
 
 ```
 mkdir -p {target}/.reviews/{timestamp}
 ```
 
+- `{target}` — the path the user specified for review
+- `{timestamp}` — current time as `YYYYMMDD-HHmmss` (e.g., `20260305-143022`)
+
 Reports directory must be inside target — agents can only write within their review scope.
 
 ### Phase 1: Evaluate Code (Parallel, Background)
 
-Launch all 7 evaluation agents in parallel:
+Launch all 7 evaluation agents in parallel using the Agent tool with `run_in_background=true`:
 
 ```
 For each agent in [namer, code-simplifier, comment-cleaner,
                    test-reviewer, error-handling-reviewer,
                    security-reviewer, observability-reviewer]:
-    Task(agent, prompt="""
-    Evaluate {target} and report findings.
+    Agent(prompt="""
+    You are a {agent} reviewer. Evaluate {target} and report findings.
+
+    Load the review-output skill first: Skill("the-crucible:review-output")
 
     Write findings to: {reports_dir}/{agent}.md
     Do NOT modify any code — only report what should change.
@@ -78,7 +84,7 @@ For each agent in [namer, code-simplifier, comment-cleaner,
 
 <agent-assumptions>
 Communicate these to every agent:
-- All tools are functional. Do not make exploratory calls.
+- All tools are functional. Do not test tools before using them.
 - Only call a tool if required to complete the task.
 - Focus on high-signal findings. False positives erode trust.
 </agent-assumptions>
@@ -105,11 +111,13 @@ This phase is iterative — fix, verify, repeat.
 
 ### Phase 4: Documentation Review (After Fixes)
 
-Only after code fixes are complete, run documenter:
+Only after code fixes are complete, run documenter using the Agent tool:
 
 ```
-Task(documenter, prompt="""
-Evaluate API documentation in {target}.
+Agent(prompt="""
+You are a documentation reviewer. Evaluate API documentation in {target}.
+
+Load the review-output skill first: Skill("the-crucible:review-output")
 
 Write findings to: {reports_dir}/documenter.md
 Do NOT modify any code — only report what documentation is missing.
@@ -122,19 +130,26 @@ outdated code.
 
 ### Phase 5: Cleanup
 
-After all work complete:
-
-```
-rm -rf {reports_dir}
-```
-
-Remove the `.reviews/` directory — reports are temporary artifacts.
+After all work is complete, remove the `.reviews/` directory — reports are temporary artifacts.
+Confirm with the user before deleting.
 
 ## Usage
 
 ```
-Run code quality evaluation on [path]
+Run code quality evaluation on src/auth/
 ```
+
+**Example interaction flow:**
+
+1. User: "Run code quality evaluation on src/auth/"
+2. Skill creates `src/auth/.reviews/20260305-143022/`
+3. 7 agents launch in parallel, each writes a report file
+4. After all complete, read reports and present summary:
+   - "Found 2 critical, 5 issues, 3 recommendations. Which should I address?"
+5. User picks categories or specific findings to fix
+6. After fixes, documenter agent runs on the updated code
+7. Present documentation findings, apply if user agrees
+8. Clean up `.reviews/` directory
 
 ## Constraints
 

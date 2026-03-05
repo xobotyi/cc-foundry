@@ -295,7 +295,7 @@ Fix any issues you find.
 
 This significantly improves correctness on coding and math tasks.
 
-See [claude-specific.md](claude-specific.md) for full extended
+See [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] for full extended
 thinking guidance.
 
 ---
