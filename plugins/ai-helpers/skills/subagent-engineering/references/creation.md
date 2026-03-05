@@ -184,7 +184,7 @@ Iterate on the system prompt based on failures.
 
 ## Common Agent Types
 
-For full examples with complete prompts, see [patterns.md](patterns.md).
+For full examples with complete prompts, see `${CLAUDE_SKILL_DIR}/references/patterns.md`.
 
 Common patterns:
 - **Code Reviewer** — Read-only analysis after code changes

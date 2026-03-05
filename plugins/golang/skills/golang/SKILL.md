@@ -13,16 +13,16 @@ is proven.
 ## References
 
 Extended examples, code patterns, and detailed rationale for the rules below live in
-`references/`.
+`${CLAUDE_SKILL_DIR}/references/`.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Naming, declarations, interfaces, receivers, configuration, embedding | [idioms.md](references/idioms.md) | Extended code examples for each idiom, Go/bad vs good comparisons, decision criteria tables |
-| Variable shadowing, defer traps, slice mutation, strings, copy safety | [gotchas.md](references/gotchas.md) | Annotated code showing each pitfall with fix patterns, global state examples |
-| Error creation, wrapping, Is/As, structured errors (golib/e) | [errors.md](references/errors.md) | Error type decision tree, golib/e API (sentinels, fields, logging), wrapping context examples |
-| Goroutines, channels, context, sync, errgroup, data races | [concurrency.md](references/concurrency.md) | Worker lifecycle patterns, pipeline/fan-out/fan-in code, data race scenarios with fixes |
-| Table tests, subtests, assertions, test doubles, benchmarks | [testing.md](references/testing.md) | Full table-test template, testify usage, parallel subtests, httptest/iotest utilities |
-| Project layout, packages, imports, file organization | [structure.md](references/structure.md) | Package naming examples, import grouping, backward-incompatible change staged workflow |
+| Naming, declarations, interfaces, receivers, configuration, embedding | [`${CLAUDE_SKILL_DIR}/references/idioms.md`] | Extended code examples for each idiom, Go/bad vs good comparisons, decision criteria tables |
+| Variable shadowing, defer traps, slice mutation, strings, copy safety | [`${CLAUDE_SKILL_DIR}/references/gotchas.md`] | Annotated code showing each pitfall with fix patterns, global state examples |
+| Error creation, wrapping, Is/As, structured errors (golib/e) | [`${CLAUDE_SKILL_DIR}/references/errors.md`] | Error type decision tree, golib/e API (sentinels, fields, logging), wrapping context examples |
+| Goroutines, channels, context, sync, errgroup, data races | [`${CLAUDE_SKILL_DIR}/references/concurrency.md`] | Worker lifecycle patterns, pipeline/fan-out/fan-in code, data race scenarios with fixes |
+| Table tests, subtests, assertions, test doubles, benchmarks | [`${CLAUDE_SKILL_DIR}/references/testing.md`] | Full table-test template, testify usage, parallel subtests, httptest/iotest utilities |
+| Project layout, packages, imports, file organization | [`${CLAUDE_SKILL_DIR}/references/structure.md`] | Package naming examples, import grouping, backward-incompatible change staged workflow |
 
 ## Naming
 
@@ -203,7 +203,7 @@ with `errors.As`.
 ### Structured Errors (golib/e)
 
 When a project uses a structured error package like golib/e, prefer it consistently over
-`fmt.Errorf`. See [errors.md](references/errors.md) for API details.
+`fmt.Errorf`. See `${CLAUDE_SKILL_DIR}/references/errors.md` for API details.
 
 ### Wrapping: %w vs %v
 
@@ -247,7 +247,7 @@ ignoring, use `_ =` to make it explicit.
 
 Acceptable only when panics never escape package boundaries and a top-level deferred
 `recover` translates them to errors. Rare — see
-[errors.md](references/errors.md) for the full pattern.
+`${CLAUDE_SKILL_DIR}/references/errors.md` for the full pattern.
 
 ### Error Flow
 

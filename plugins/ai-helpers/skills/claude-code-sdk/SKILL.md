@@ -16,17 +16,17 @@ when building, configuring, or debugging any Claude Code extension mechanism.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Skills | [skills.md](references/skills.md) | Frontmatter fields, invocation control matrix, string substitutions, dynamic context injection, subagent execution, nested discovery, sharing |
-| Subagents | [subagents.md](references/subagents.md) | Built-in agents table, frontmatter fields, permission modes, tool control, preloading skills, persistent memory, worktree isolation, CLI-defined agents, teams |
-| Plugins | [plugins.md](references/plugins.md) | Plugin manifest schema, component paths, marketplace schema, source types, strict mode, version resolution, LSP server table, caching, validation |
-| Hooks | [hooks.md](references/hooks.md) | All 15 event details (input fields, output schemas, exit code behavior), matcher patterns, hook types (command/prompt/agent), async hooks, security |
-| MCP | [mcp.md](references/mcp.md) | Server installation (HTTP/SSE/stdio), scopes, OAuth authentication, environment variable expansion, managed MCP config, tool search, plugin-provided servers |
-| Memory | [memory.md](references/memory.md) | CLAUDE.md hierarchy and loading, auto memory structure, import syntax, modular rules with path scoping, organization-level management |
-| Model config | [model-config.md](references/model-config.md) | Model aliases, setting methods, effort levels, extended context (1M), opusplan mode, third-party provider pinning, prompt caching env vars |
-| Output styles | [output-styles.md](references/output-styles.md) | Built-in styles, frontmatter fields, keep-coding-instructions flag, comparison with CLAUDE.md/agents/skills |
-| Settings | [settings.md](references/settings.md) | Scope hierarchy, permission rule syntax, sandbox config, common settings table, environment variables (API, behavior, feature toggles, paths), tools list |
-| Status line | [statusline.md](references/statusline.md) | Configuration, JSON input schema with all fields, ANSI colors, clickable links, caching, plugin delivery |
-| Best practices | [best-practices.md](references/best-practices.md) | Context management, verification patterns, explore-plan-code workflow, CLAUDE.md authoring, session management, automation/scaling |
+| Skills | [`${CLAUDE_SKILL_DIR}/references/skills.md`] | Frontmatter fields, invocation control matrix, string substitutions, dynamic context injection, subagent execution, nested discovery, sharing |
+| Subagents | [`${CLAUDE_SKILL_DIR}/references/subagents.md`] | Built-in agents table, frontmatter fields, permission modes, tool control, preloading skills, persistent memory, worktree isolation, CLI-defined agents, teams |
+| Plugins | [`${CLAUDE_SKILL_DIR}/references/plugins.md`] | Plugin manifest schema, component paths, marketplace schema, source types, strict mode, version resolution, LSP server table, caching, validation |
+| Hooks | [`${CLAUDE_SKILL_DIR}/references/hooks.md`] | All 15 event details (input fields, output schemas, exit code behavior), matcher patterns, hook types (command/prompt/agent), async hooks, security |
+| MCP | [`${CLAUDE_SKILL_DIR}/references/mcp.md`] | Server installation (HTTP/SSE/stdio), scopes, OAuth authentication, environment variable expansion, managed MCP config, tool search, plugin-provided servers |
+| Memory | [`${CLAUDE_SKILL_DIR}/references/memory.md`] | CLAUDE.md hierarchy and loading, auto memory structure, import syntax, modular rules with path scoping, organization-level management |
+| Model config | [`${CLAUDE_SKILL_DIR}/references/model-config.md`] | Model aliases, setting methods, effort levels, extended context (1M), opusplan mode, third-party provider pinning, prompt caching env vars |
+| Output styles | [`${CLAUDE_SKILL_DIR}/references/output-styles.md`] | Built-in styles, frontmatter fields, keep-coding-instructions flag, comparison with CLAUDE.md/agents/skills |
+| Settings | [`${CLAUDE_SKILL_DIR}/references/settings.md`] | Scope hierarchy, permission rule syntax, sandbox config, common settings table, environment variables (API, behavior, feature toggles, paths), tools list |
+| Status line | [`${CLAUDE_SKILL_DIR}/references/statusline.md`] | Configuration, JSON input schema with all fields, ANSI colors, clickable links, caching, plugin delivery |
+| Best practices | [`${CLAUDE_SKILL_DIR}/references/best-practices.md`] | Context management, verification patterns, explore-plan-code workflow, CLAUDE.md authoring, session management, automation/scaling |
 
 Read the relevant reference before making detailed changes. The rules below cover
 the decision framework; references provide field-level schemas and implementation details.

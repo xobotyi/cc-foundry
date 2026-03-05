@@ -18,12 +18,12 @@ Extended examples and detailed patterns for the rules below:
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Template syntax, expressions, control flow, raw Go blocks | [syntax.md](references/syntax.md) | File structure, expression types, error propagation, auto-escaping, control flow examples |
-| Component definition, composition, children, fragments | [components.md](references/components.md) | Component interface, `@` composition, children context API, render-once, fragment rendering |
-| Boolean, conditional, spread attributes, key expressions | [attributes.md](references/attributes.md) | Attribute types with code examples, spread value table, URL/JS/JSON attribute patterns |
-| View models, layouts, context, html/template interop | [patterns.md](references/patterns.md) | Props struct pattern, nested layouts, context helpers with middleware, Go template interop |
-| Script/style tags, inline events, data passing to JS | [javascript.md](references/javascript.md) | JSFuncCall/JSExpression/JSONString/JSONScript API, IIFE pattern, method summary table |
-| Class patterns, CSS components, style attributes | [styling.md](references/styling.md) | Class toggling approaches (KV, maps, raw Go), CSS component scoping, style sanitization |
+| Template syntax, expressions, control flow, raw Go blocks | `${CLAUDE_SKILL_DIR}/references/syntax.md` | File structure, expression types, error propagation, auto-escaping, control flow examples |
+| Component definition, composition, children, fragments | `${CLAUDE_SKILL_DIR}/references/components.md` | Component interface, `@` composition, children context API, render-once, fragment rendering |
+| Boolean, conditional, spread attributes, key expressions | `${CLAUDE_SKILL_DIR}/references/attributes.md` | Attribute types with code examples, spread value table, URL/JS/JSON attribute patterns |
+| View models, layouts, context, html/template interop | `${CLAUDE_SKILL_DIR}/references/patterns.md` | Props struct pattern, nested layouts, context helpers with middleware, Go template interop |
+| Script/style tags, inline events, data passing to JS | `${CLAUDE_SKILL_DIR}/references/javascript.md` | JSFuncCall/JSExpression/JSONString/JSONScript API, IIFE pattern, method summary table |
+| Class patterns, CSS components, style attributes | `${CLAUDE_SKILL_DIR}/references/styling.md` | Class toggling approaches (KV, maps, raw Go), CSS component scoping, style sanitization |
 
 ## Syntax
 
@@ -298,7 +298,7 @@ once-per-request deduplication.
 ### CSS Middleware
 
 `templ.NewCSSMiddleware` serves a global stylesheet instead of inline `<style>` tags.
-See [styling.md](references/styling.md).
+See `${CLAUDE_SKILL_DIR}/references/styling.md`.
 
 ## JavaScript Integration
 
@@ -361,7 +361,7 @@ Use `document.currentScript` for DOM traversal relative to the script element.
 ### Best Practice: Avoiding Inline Event Handlers
 
 Separate behavior from markup: load shared functions via `templ.OnceHandle`, pass data via
-`data-*` attributes, isolate in IIFEs. See [javascript.md](references/javascript.md).
+`data-*` attributes, isolate in IIFEs. See `${CLAUDE_SKILL_DIR}/references/javascript.md`.
 
 ### External Scripts
 

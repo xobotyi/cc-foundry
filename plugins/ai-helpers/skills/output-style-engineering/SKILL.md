@@ -26,11 +26,11 @@ Skip only for trivial edits (typos, formatting).
 
 | Situation | Reference | Contents |
 |-----------|-----------|----------|
-| File format, frontmatter, storage, activation | [spec.md](references/spec.md) | Frontmatter field details, storage paths, activation methods, file naming rules |
-| Creating a style from scratch | [creation.md](references/creation.md) | Full style templates by pattern, testing prompts, creation workflow steps |
-| Evaluating style quality | [evaluation.md](references/evaluation.md) | Per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol |
-| Style not working, needs refinement | [iteration.md](references/iteration.md) | Detailed fix patterns with before/after, refinement techniques, version control |
-| Real-world examples with analysis | [examples.md](references/examples.md) | 5 complete styles with dimensional scoring and improvement notes |
+| File format, frontmatter, storage, activation | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | Frontmatter field details, storage paths, activation methods, file naming rules |
+| Creating a style from scratch | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Full style templates by pattern, testing prompts, creation workflow steps |
+| Evaluating style quality | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol |
+| Style not working, needs refinement | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Detailed fix patterns with before/after, refinement techniques, version control |
+| Real-world examples with analysis | [`${CLAUDE_SKILL_DIR}/references/examples.md`] | 5 complete styles with dimensional scoring and improvement notes |
 | Prompt engineering techniques | `prompt-engineering` skill | Instruction design fundamentals |
 
 ## What Output Styles Change
@@ -90,7 +90,7 @@ Filename becomes the style identifier (without `.md`). Activate with
 the same name override user-level.
 
 Full format details, frontmatter fields, activation methods:
-see [spec.md](references/spec.md).
+see `${CLAUDE_SKILL_DIR}/references/spec.md`.
 
 ## Writing Style Instructions
 
@@ -232,8 +232,8 @@ Change how Claude engages (voice-first, educational quiz,
 pair programming mentor). Set `keep-coding-instructions`
 based on whether the mode involves coding.
 
-Full templates for each pattern: see [creation.md](references/creation.md).
-Scored examples: see [examples.md](references/examples.md).
+Full templates for each pattern: see `${CLAUDE_SKILL_DIR}/references/creation.md`.
+Scored examples: see `${CLAUDE_SKILL_DIR}/references/examples.md`.
 
 ## Evaluating Style Quality
 
@@ -255,7 +255,7 @@ tone example, output format specified.
 templates, `keep-coding-instructions` considered.
 
 Detailed per-dimension scoring rubrics and testing protocol:
-see [evaluation.md](references/evaluation.md).
+see `${CLAUDE_SKILL_DIR}/references/evaluation.md`.
 
 ## Iterating on Styles
 
@@ -302,7 +302,7 @@ style works in most cases.
 tests fail, or conflicting rules have made the style unmaintainable.
 
 Detailed fix patterns with before/after examples:
-see [iteration.md](references/iteration.md).
+see `${CLAUDE_SKILL_DIR}/references/iteration.md`.
 
 ## Built-in Styles
 

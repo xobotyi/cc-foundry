@@ -21,14 +21,14 @@ TypeScript's value is in catching bugs at compile time. Write types that express
 domain; let inference handle the obvious. Never fight the type system — if you need `as`
 or `any`, the types are wrong.
 
-### References
+## References
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Generics, utility types, type-level programming | `references/generics.md` | Utility type tables, conditional/mapped type examples, infer, template literals |
-| Narrowing, type guards, discriminated unions | `references/narrowing.md` | typeof/instanceof/in examples, exhaustive switch, type predicates, assertion fns |
-| tsconfig options, module resolution, project setup | `references/configuration.md` | Base/strict/module configs, library setup, compiler directives, project structure |
-| Branded types, overloads, class patterns, enums | `references/patterns.md` | Interface vs type examples, assertion patterns, enum anti-patterns, callback types |
+| Generics, utility types, type-level programming | [`${CLAUDE_SKILL_DIR}/references/generics.md`] | Utility type tables, conditional/mapped type examples, infer, template literals |
+| Narrowing, type guards, discriminated unions | [`${CLAUDE_SKILL_DIR}/references/narrowing.md`] | typeof/instanceof/in examples, exhaustive switch, type predicates, assertion fns |
+| tsconfig options, module resolution, project setup | [`${CLAUDE_SKILL_DIR}/references/configuration.md`] | Base/strict/module configs, library setup, compiler directives, project structure |
+| Branded types, overloads, class patterns, enums | [`${CLAUDE_SKILL_DIR}/references/patterns.md`] | Interface vs type examples, assertion patterns, enum anti-patterns, callback types |
 
 ## Type Safety
 
@@ -123,11 +123,11 @@ Prefer `unknown` for opaque values, `Record<string, unknown>` for dict-like obje
 Prefer built-in utility types over hand-rolling equivalents. Key types: `Partial`,
 `Pick`, `Omit`, `Record`, `Exclude`, `Extract`, `ReturnType`, `Parameters`, `Awaited`,
 `NoInfer`. Use explicit interfaces when the type represents a distinct domain concept.
-See `references/generics.md` for the full catalog and usage guidance.
+See `${CLAUDE_SKILL_DIR}/references/generics.md` for the full catalog and usage guidance.
 
 Conditional types (`T extends U ? X : Y`), mapped types (`{ [P in keyof T]: ... }`),
 and template literal types (`` `${T}Changed` ``) are advanced tools — use for library
-code and framework types. See `references/generics.md` for distributive behavior,
+code and framework types. See `${CLAUDE_SKILL_DIR}/references/generics.md` for distributive behavior,
 `infer`, modifier removal, and key remapping.
 
 ### Complexity Budget
@@ -237,7 +237,7 @@ element types (`Array<string | number>`). Same rule applies to readonly variants
 - **Keep `tsconfig.json` minimal.** Use `extends` for shared configs. Separate
   `tsconfig.build.json` for builds (excludes tests, scripts).
 
-See `references/configuration.md` for the full options catalog, library project setup,
+See `${CLAUDE_SKILL_DIR}/references/configuration.md` for the full options catalog, library project setup,
 and project structure guidance.
 
 ## Application

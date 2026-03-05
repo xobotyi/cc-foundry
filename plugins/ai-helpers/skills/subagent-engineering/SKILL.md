@@ -26,12 +26,12 @@ Skip only for trivial edits (typos, formatting).
 
 | Situation | Reference | Contents |
 |-----------|-----------|----------|
-| Full frontmatter field reference | [spec.md](references/spec.md) | All fields with constraints, hooks schema, CLI-defined agents, storage locations |
-| Step-by-step creation walkthrough | [creation.md](references/creation.md) | Detailed process, common agent type templates, proactive delegation |
-| Quality scoring and testing | [evaluation.md](references/evaluation.md) | 5-dimension scoring rubric with weights, testing protocol (5 levels), benchmarking |
-| Improving an existing subagent | [iteration.md](references/iteration.md) | Prompt refinement techniques, A/B testing, version control, redesign criteria |
-| Diagnosing failures | [troubleshooting.md](references/troubleshooting.md) | Diagnostic steps, error message catalog, debug mode |
-| Architecture and examples | [patterns.md](references/patterns.md) | Full agent examples, pipeline/parallel/master-clone patterns, multi-agent coordination |
+| Full frontmatter field reference | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | All fields with constraints, hooks schema, CLI-defined agents, storage locations |
+| Step-by-step creation walkthrough | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Detailed process, common agent type templates, proactive delegation |
+| Quality scoring and testing | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | 5-dimension scoring rubric with weights, testing protocol (5 levels), benchmarking |
+| Improving an existing subagent | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Prompt refinement techniques, A/B testing, version control, redesign criteria |
+| Diagnosing failures | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] | Diagnostic steps, error message catalog, debug mode |
+| Architecture and examples | [`${CLAUDE_SKILL_DIR}/references/patterns.md`] | Full agent examples, pipeline/parallel/master-clone patterns, multi-agent coordination |
 
 Read the relevant reference for extended depth. The rules below are sufficient
 for correct work without loading references.
@@ -196,7 +196,7 @@ skills:
 Lifecycle hooks scoped to this subagent. Supported events:
 `PreToolUse`, `PostToolUse`, `Stop` (converted to `SubagentStop`).
 
-Full hook schema and examples: see [spec.md](references/spec.md).
+Full hook schema and examples: see `${CLAUDE_SKILL_DIR}/references/spec.md`.
 
 ## Writing the System Prompt
 
@@ -294,7 +294,7 @@ When evaluating a subagent, assess these five dimensions:
 
 Scoring: 4.5+ excellent, 3.5-4.4 good, 2.5-3.4 needs revision, <2.5
 redesign. Full rubric with testing protocol: see
-[evaluation.md](references/evaluation.md).
+`${CLAUDE_SKILL_DIR}/references/evaluation.md`.
 
 ## Common Issues and Fixes
 
@@ -334,7 +334,7 @@ reading entire files. Stop searching once you have sufficient information.
 Return a concise summary (max 500 words)."
 
 Detailed diagnostic steps, error messages, and debug mode: see
-[troubleshooting.md](references/troubleshooting.md).
+`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`.
 
 ## Validation Checklist
 

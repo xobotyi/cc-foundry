@@ -20,10 +20,10 @@ in 12.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Assertion catalog, constraints, exception expectations | [assertions.md](references/assertions.md) | Full assertion API grouped by category, constraint system, custom assertions |
-| Test doubles — stubs, mocks, MockBuilder | [mocking.md](references/mocking.md) | createStub vs createMock, return config, invocation matchers, argument constraints, MockBuilder |
-| Data providers — static, named, generators | [data-providers.md](references/data-providers.md) | #[DataProvider], #[TestWith], named datasets, generator providers, external providers |
-| phpunit.xml structure, test suites, source config | [configuration.md](references/configuration.md) | XML elements, strict settings, source element, coverage reports, execution order |
+| Assertion catalog, constraints, exception expectations | [`${CLAUDE_SKILL_DIR}/references/assertions.md`] | Full assertion API grouped by category, constraint system, custom assertions |
+| Test doubles — stubs, mocks, MockBuilder | [`${CLAUDE_SKILL_DIR}/references/mocking.md`] | createStub vs createMock, return config, invocation matchers, argument constraints, MockBuilder |
+| Data providers — static, named, generators | [`${CLAUDE_SKILL_DIR}/references/data-providers.md`] | #[DataProvider], #[TestWith], named datasets, generator providers, external providers |
+| phpunit.xml structure, test suites, source config | [`${CLAUDE_SKILL_DIR}/references/configuration.md`] | XML elements, strict settings, source element, coverage reports, execution order |
 
 ## Test Structure
 
@@ -172,7 +172,7 @@ public static function boundaryCases(): Generator
 - **Empty providers are forbidden** in PHPUnit 11 — throws `InvalidDataProviderException`.
 - **Multiple providers** can be stacked on one test method — datasets are combined.
 
-See [data-providers.md](references/data-providers.md) for external providers, TestDox
+See `${CLAUDE_SKILL_DIR}/references/data-providers.md` for external providers, TestDox
 integration, and edge cases.
 
 ## Assertions
@@ -238,7 +238,7 @@ public function testTriggersDeprecation(): void
 }
 ```
 
-See [assertions.md](references/assertions.md) for the full assertion catalog, constraint
+See `${CLAUDE_SKILL_DIR}/references/assertions.md` for the full assertion catalog, constraint
 system, and format string assertions.
 
 ## Mocking
@@ -310,7 +310,7 @@ $stub->method('fetch')->willReturnMap([
 - **Favour interfaces over classes** for test doubles — fewer limitations, better design.
 - **Do not call `expects()` on stubs** — deprecated in 11, error in 12.
 
-See [mocking.md](references/mocking.md) for MockBuilder, intersection types, invocation
+See `${CLAUDE_SKILL_DIR}/references/mocking.md` for MockBuilder, intersection types, invocation
 matchers, and PHP 8.4 property hooks.
 
 ## Attributes
@@ -469,7 +469,7 @@ phpunit --coverage-html build/coverage --coverage-clover build/clover.xml
 Use `#[CoversClass]` and `#[UsesClass]` attributes to target coverage precisely.
 With `beStrictAboutCoverageMetadata="true"`, tests without coverage attributes are risky.
 
-See [configuration.md](references/configuration.md) for the full XML reference, coverage
+See `${CLAUDE_SKILL_DIR}/references/configuration.md` for the full XML reference, coverage
 report types, and execution order options.
 
 ## Application

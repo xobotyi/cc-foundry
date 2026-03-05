@@ -45,17 +45,12 @@ single task with acceptance criteria covers the entire scope.
 Choose the slicing approach that produces the most natural boundaries. There is no single
 correct decomposition — the right one depends on the project:
 
-**By component** — One task per affected component. Works well when components are
-independent and changes don't span multiple modules.
-
-**By functionality** — Group related changes across components into feature-oriented tasks.
-Works when a single user-facing capability requires coordinated changes in several places.
-
-**By layer** — Separate tasks for data model, API, business logic, and presentation.
-Works when changes at each layer are independent and can be verified separately.
-
-**By risk** — Isolate uncertain or experimental work into its own task. Works when part
-of the implementation has unknowns that might require a different approach.
+| Approach | Slices by | Best when | Watch out for |
+|----------|-----------|-----------|---------------|
+| By component | Affected module or service | Components are independent, changes don't span modules | Cross-component coordination overhead |
+| By functionality | User-facing capability | Incremental delivery matters; a capability requires coordinated changes across components | Thin slices may feel artificial |
+| By layer | Technical layer (DB, API, UI) | Team has clear specializations; layer changes are independent | Late integration risk |
+| By risk | Uncertainty level | Part of the implementation has unknowns that might require a different approach | Over-isolating trivial risks |
 
 Most real decompositions combine approaches. A database migration might be one task
 (by component), while the API changes that depend on it are grouped by functionality.
@@ -201,25 +196,13 @@ because the new schema lacks a compound index.
 4. If the user requests changes, revise and present again. Do not proceed to After
    Completion until approved.
 
-## Decomposition Approaches
-
-Choose the slicing strategy based on team structure, delivery constraints, and risk — not
-technology. Most real decompositions combine approaches.
-
-| Approach | Slices by | Best when | Watch out for |
-|----------|-----------|-----------|---------------|
-| Horizontal | Technical layer (DB, API, UI) | Team has clear specializations | Cross-layer coordination overhead |
-| Vertical | User-facing capability | Incremental delivery matters; solo implementer | Thin slices may feel artificial |
-| Stage-based | Implementation lifecycle | Greenfield; each stage builds on previous | Late integration risk |
-| Risk-first | Uncertainty level | Significant unknowns exist | Over-isolating trivial risks |
-
 ## Document Template
 
 ```markdown
 # [Feature/Change Name]: Task Decomposition
 
 **Source:** [link to or name of the technical design]
-**Approach:** [horizontal / vertical / stage-based / hybrid — brief justification]
+**Approach:** [by component / by functionality / by layer / by risk / hybrid — brief justification]
 
 ## Summary
 

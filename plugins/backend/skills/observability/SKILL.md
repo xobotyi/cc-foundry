@@ -1,10 +1,11 @@
 ---
 name: observability
 description: >-
-  The three pillars of observable systems: logs reveal events, metrics quantify health,
-  traces map request flow. Invoke whenever task involves any interaction with observability
-  concerns — adding logging, designing metrics, instrumenting traces, correlating signals,
-  reviewing instrumentation, or understanding when to use which pillar.
+  Observability discipline: structured logging, metrics instrumentation, distributed
+  tracing, and signal correlation. Invoke whenever task involves any interaction with
+  observability concerns — adding logging, designing metrics, instrumenting traces,
+  correlating signals, reviewing instrumentation, or understanding when to use which
+  pillar.
 ---
 
 # Observability

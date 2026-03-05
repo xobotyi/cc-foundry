@@ -19,11 +19,11 @@ requirement.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| HTTP server | `references/server.md` | Route types, file response patterns, WebSocket pub/sub, server config |
-| File I/O and processes | `references/io-and-processes.md` | File I/O details, shell API, child processes, workers |
-| Testing | `references/testing.md` | Test modifiers, parametrized tests, mocking, snapshots, CLI flags |
-| SQLite, bundler, plugins | `references/ecosystem.md` | SQLite API, bundler options, plugins, macros |
-| Configuration | `references/config-and-compat.md` | bunfig.toml sections, Node.js compatibility, env vars |
+| HTTP server | [`${CLAUDE_SKILL_DIR}/references/server.md`] | Route types, file response patterns, WebSocket pub/sub, server config |
+| File I/O and processes | [`${CLAUDE_SKILL_DIR}/references/io-and-processes.md`] | File I/O details, shell API, child processes, workers |
+| Testing | [`${CLAUDE_SKILL_DIR}/references/testing.md`] | Test modifiers, parametrized tests, mocking, snapshots, CLI flags |
+| SQLite, bundler, plugins | [`${CLAUDE_SKILL_DIR}/references/ecosystem.md`] | SQLite API, bundler options, plugins, macros |
+| Configuration | [`${CLAUDE_SKILL_DIR}/references/config-and-compat.md`] | bunfig.toml sections, Node.js compatibility, env vars |
 
 ## Prefer Bun-Native APIs
 
@@ -36,7 +36,7 @@ Core mappings: `Bun.serve()` over `http.createServer()`, `Bun.file()`/`Bun.write
 wrappers, `Bun.spawn()` over `child_process.spawn`. Use `node:fs` for directory ops —
 no Bun API yet. Use Web Streams API over `node:stream`.
 
-Full API preference table: see `references/io-and-processes.md`.
+Full API preference table: see `${CLAUDE_SKILL_DIR}/references/io-and-processes.md`.
 
 ## HTTP Server
 
@@ -74,7 +74,7 @@ Full API preference table: see `references/io-and-processes.md`.
 - **Type `ws.data`** via the `data` property on the `websocket` handler object.
 
 WebSocket limits, server configuration, file response patterns, HTML imports, and server
-lifecycle details: see `references/server.md`.
+lifecycle details: see `${CLAUDE_SKILL_DIR}/references/server.md`.
 
 ## File I/O
 
@@ -120,7 +120,7 @@ Cross-platform bash-like shell with JavaScript interop. Runs in-process (not `/b
   `AbortController.signal`.
 - **IPC between Bun processes:** `Bun.spawn(["bun", "child.ts"], { ipc(message) {} })`.
 
-Stdin/stdout options, workers, and process details: see `references/io-and-processes.md`.
+Stdin/stdout options, workers, and process details: see `${CLAUDE_SKILL_DIR}/references/io-and-processes.md`.
 
 ## Testing — `bun:test`
 
@@ -133,7 +133,7 @@ Stdin/stdout options, workers, and process details: see `references/io-and-proce
 - **`mock.module("./path", () => ({ ... }))`** for module mocking. Works for ESM and CJS.
 
 Test modifiers, parametrized tests, mocking details, snapshots, CLI flags, and
-bunfig.toml test config: see `references/testing.md`.
+bunfig.toml test config: see `${CLAUDE_SKILL_DIR}/references/testing.md`.
 
 ## SQLite, Bundler, Plugins, Macros
 
@@ -147,7 +147,7 @@ bunfig.toml test config: see `references/testing.md`.
   inlined; must be JSON-serializable.
 
 Full SQLite API, bundler options, plugin patterns, and macro constraints:
-see `references/ecosystem.md`.
+see `${CLAUDE_SKILL_DIR}/references/ecosystem.md`.
 
 ## Utilities
 
@@ -206,7 +206,7 @@ Drop-in replacement for npm/yarn/pnpm. ~25x faster.
 ## Configuration & Compatibility
 
 bunfig.toml sections, environment variable loading, and Node.js API compatibility details:
-see `references/config-and-compat.md`.
+see `${CLAUDE_SKILL_DIR}/references/config-and-compat.md`.
 
 ## Application
 

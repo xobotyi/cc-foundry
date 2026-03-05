@@ -18,12 +18,12 @@ your application, but wrong metric types or bad naming corrupt your data silentl
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Metric types | `references/metric-types.md` | Wire format details, type comparison, sampling correction |
-| Naming | `references/naming.md` | Graphite namespace mapping, character rules, naming examples |
-| DogStatsD | `references/dogstatsd.md` | Events format, service checks, protocol versions, distributions vs histograms |
-| Aggregation | `references/aggregation.md` | Flush mechanics, Graphite downsampling, DogStatsD aggregation, timestamps |
-| Client patterns | `references/client-patterns.md` | High-throughput tuning, error handling, K8s deployment, UDS configuration |
-| Backends | `references/backends.md` | statsd_exporter config, Telegraf setup, migration guides |
+| Metric types | [`${CLAUDE_SKILL_DIR}/references/metric-types.md`] | Wire format details, type comparison, sampling correction |
+| Naming | [`${CLAUDE_SKILL_DIR}/references/naming.md`] | Graphite namespace mapping, character rules, naming examples |
+| DogStatsD | [`${CLAUDE_SKILL_DIR}/references/dogstatsd.md`] | Events format, service checks, protocol versions, distributions vs histograms |
+| Aggregation | [`${CLAUDE_SKILL_DIR}/references/aggregation.md`] | Flush mechanics, Graphite downsampling, DogStatsD aggregation, timestamps |
+| Client patterns | [`${CLAUDE_SKILL_DIR}/references/client-patterns.md`] | High-throughput tuning, error handling, K8s deployment, UDS configuration |
+| Backends | [`${CLAUDE_SKILL_DIR}/references/backends.md`] | statsd_exporter config, Telegraf setup, migration guides |
 
 ## Metric Types
 
@@ -92,8 +92,8 @@ cardinality at flush, resets.
 Global distribution across all hosts. Raw values sent to Datadog servers (not
 aggregated locally). Use when you need accurate fleet-wide percentiles.
 
-See `references/dogstatsd.md` for distributions vs histograms comparison and
-protocol version details.
+See `${CLAUDE_SKILL_DIR}/references/dogstatsd.md` for distributions vs histograms comparison
+and protocol version details.
 
 ## Naming
 
@@ -111,8 +111,8 @@ Example: `myapp.api.request.duration.ms`, `myapp.cache.hit.count.total`
 - Use underscores within path segments: `http_request` not `httpRequest`
 - No dashes — they break Graphite navigation
 
-See `references/naming.md` for Graphite namespace mapping, character rules table,
-and naming anti-patterns.
+See `${CLAUDE_SKILL_DIR}/references/naming.md` for Graphite namespace mapping, character
+rules table, and naming anti-patterns.
 
 ## Tags (DogStatsD)
 
@@ -157,8 +157,8 @@ The flush cycle determines metric resolution. Default: 10 seconds.
 - Enable client-side aggregation for high-throughput applications (Go v5.0+,
   Java v3.0+, .NET v7.0+) — pre-aggregates before sending to Agent
 
-See `references/aggregation.md` for flush mechanics, Graphite downsampling rules,
-DogStatsD aggregation details, and pre-aggregated timestamps.
+See `${CLAUDE_SKILL_DIR}/references/aggregation.md` for flush mechanics, Graphite
+downsampling rules, DogStatsD aggregation details, and pre-aggregated timestamps.
 
 ## Client Patterns
 
@@ -188,8 +188,8 @@ includes `|@<rate>` so server corrects the count.
 
 **Never sample gauges or sets** — server cannot correct for these types.
 
-See `references/client-patterns.md` for high-throughput tuning steps, error handling,
-and Kubernetes deployment patterns.
+See `${CLAUDE_SKILL_DIR}/references/client-patterns.md` for high-throughput tuning steps,
+error handling, and Kubernetes deployment patterns.
 
 ## Backends
 
@@ -201,8 +201,8 @@ and Kubernetes deployment patterns.
 | Flexible multi-output pipeline | Telegraf |
 | Migrating StatsD to Prometheus | statsd_exporter with relay |
 
-See `references/backends.md` for statsd_exporter configuration, Telegraf setup,
-and migration guides.
+See `${CLAUDE_SKILL_DIR}/references/backends.md` for statsd_exporter configuration,
+Telegraf setup, and migration guides.
 
 ## Application
 

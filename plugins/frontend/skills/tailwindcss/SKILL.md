@@ -32,15 +32,15 @@ file. Constrain yourself to the design system; break out only with intention.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Theme | `references/theme-configuration.md` | Theme tokens, `@theme` options, namespace mapping, color system |
-| Class authoring | `references/class-authoring.md` | Class composition, variants, dark mode, breakpoints |
-| Custom utilities | `references/custom-utilities-and-variants.md` | `@utility`, `@custom-variant`, directives, `@source` |
-| Layout | `references/layout.md` | Display, position, flexbox, grid, alignment, order utilities |
-| Sizing | `references/sizing-and-spacing.md` | Spacing scale, width/height, padding/margin, borders, box model |
-| Typography | `references/typography.md` | Font properties, text spacing, styling, decoration, layout |
-| Backgrounds | `references/backgrounds-and-effects.md` | Gradients, shadows, rings, opacity, SVG, filters |
-| Transforms | `references/transforms-and-animations.md` | Transitions, animations, 2D/3D transforms, masks |
-| Framework | `references/framework-integration.md` | Preflight, CSS Modules, class binding (React, Vue, Svelte) |
+| Theme | [`${CLAUDE_SKILL_DIR}/references/theme-configuration.md`] | Theme tokens, `@theme` options, namespace mapping, color system |
+| Class authoring | [`${CLAUDE_SKILL_DIR}/references/class-authoring.md`] | Class composition, variants, dark mode, breakpoints |
+| Custom utilities | [`${CLAUDE_SKILL_DIR}/references/custom-utilities-and-variants.md`] | `@utility`, `@custom-variant`, directives, `@source` |
+| Layout | [`${CLAUDE_SKILL_DIR}/references/layout.md`] | Display, position, flexbox, grid, alignment, order utilities |
+| Sizing | [`${CLAUDE_SKILL_DIR}/references/sizing-and-spacing.md`] | Spacing scale, width/height, padding/margin, borders, box model |
+| Typography | [`${CLAUDE_SKILL_DIR}/references/typography.md`] | Font properties, text spacing, styling, decoration, layout |
+| Backgrounds | [`${CLAUDE_SKILL_DIR}/references/backgrounds-and-effects.md`] | Gradients, shadows, rings, opacity, SVG, filters |
+| Transforms | [`${CLAUDE_SKILL_DIR}/references/transforms-and-animations.md`] | Transitions, animations, 2D/3D transforms, masks |
+| Framework | [`${CLAUDE_SKILL_DIR}/references/framework-integration.md`] | Preflight, CSS Modules, class binding (React, Vue, Svelte) |
 
 ## Entry Point and Installation
 
@@ -276,8 +276,8 @@ Use flex for 1D flow, grid for 2D placement. `gap` over margin hacks.
 - Gap: `gap-<n>`, `gap-x-<n>`, `gap-y-<n>` — works in both flex and grid
 - `isolate` creates a new stacking context without `z-index`
 
-See `references/layout.md` for full display, position, flexbox, grid,
-alignment, order, and visibility utility catalogs.
+See `${CLAUDE_SKILL_DIR}/references/layout.md` for full display, position,
+flexbox, grid, alignment, order, and visibility utility catalogs.
 
 ## Sizing and Spacing
 
@@ -304,7 +304,8 @@ Customize: `@theme { --spacing: 4px; }`.
 
 **v4 scale shift:** `rounded` without suffix maps to `xs` size (was `md` in v3).
 Per-side, per-corner, and logical variants (`rounded-s-*`, `rounded-ss-*`)
-available. See `references/sizing-and-spacing.md` for the full scale table.
+available. See `${CLAUDE_SKILL_DIR}/references/sizing-and-spacing.md` for the full
+scale table.
 
 ### Outlines and Box Model
 
@@ -313,8 +314,9 @@ available. See `references/sizing-and-spacing.md` for the full scale table.
 - `box-border` (default), `box-content`; `overflow-auto`, `overflow-clip`
 - `overscroll-contain` prevents scroll chaining
 
-See `references/sizing-and-spacing.md` for the full spacing scale, width/height
-keywords, container scale, viewport units, and box model details.
+See `${CLAUDE_SKILL_DIR}/references/sizing-and-spacing.md` for the full
+spacing scale, width/height keywords, container scale, viewport units, and
+box model details.
 
 ## Typography
 
@@ -331,8 +333,8 @@ keywords, container scale, viewport units, and box model details.
 - `truncate` for single-line overflow; `line-clamp-<n>` for multi-line
 - Text shadow (v4 new): `text-shadow-sm` through `text-shadow-lg`
 
-See `references/typography.md` for full font properties, text spacing,
-styling, decoration, and text layout utility catalogs.
+See `${CLAUDE_SKILL_DIR}/references/typography.md` for full font properties,
+text spacing, styling, decoration, and text layout utility catalogs.
 
 ## Backgrounds and Effects
 
@@ -352,8 +354,8 @@ styling, decoration, and text layout utility catalogs.
 - `object-cover` + explicit dimensions for images
 - `aspect-square` (1/1), `aspect-video` (16/9), `aspect-3/2`
 
-See `references/backgrounds-and-effects.md` for full gradient, shadow, ring,
-filter, backdrop, and mask utility catalogs.
+See `${CLAUDE_SKILL_DIR}/references/backgrounds-and-effects.md` for full
+gradient, shadow, ring, filter, backdrop, and mask utility catalogs.
 
 ## Transforms and Animations
 
@@ -364,8 +366,8 @@ filter, backdrop, and mask utility catalogs.
 - 3D transforms: parent needs `transform-3d` for `translate-z-*`
 - Backdrop blur for frosted glass: `backdrop-blur-sm bg-white/30`
 
-See `references/transforms-and-animations.md` for full transition, animation,
-2D/3D transform, filter, and mask utility catalogs.
+See `${CLAUDE_SKILL_DIR}/references/transforms-and-animations.md` for full
+transition, animation, 2D/3D transform, filter, and mask utility catalogs.
 
 ## Motion and Accessibility
 

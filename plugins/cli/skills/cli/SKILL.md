@@ -3,7 +3,8 @@ name: cli
 description: >-
   CLI application design: argument conventions, output streams, exit codes,
   configuration hierarchy, interactive modes, and terminal UX. Invoke whenever
-  task involves building command-line tools or terminal applications.
+  task involves any interaction with command-line tools or terminal
+  applications — building, reviewing, debugging, or designing CLI interfaces.
 ---
 
 # CLI Design
@@ -16,12 +17,12 @@ boundaries right and everything else follows.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Arguments | `references/arguments.md` | Full POSIX guidelines, GNU long option table, subcommand patterns, flag design |
-| Output | `references/output.md` | Stream separation details, color codes, ANSI escapes, NO_COLOR spec, pager setup |
-| Exit codes | `references/exit-codes.md` | Standard/extended code tables, signal exit codes, partial success patterns |
-| Interaction | `references/interaction.md` | TTY detection, prompting patterns, confirmation levels, progress display, error format |
-| Configuration | `references/configuration.md` | Full hierarchy, XDG spec, env var catalog, config file formats, secret handling |
-| Signals | `references/signals.md` | Full signal table, SIGPIPE handling, crash-only design, child process signals |
+| Arguments | [`${CLAUDE_SKILL_DIR}/references/arguments.md`] | Full POSIX guidelines, GNU long option table, subcommand patterns, flag design |
+| Output | [`${CLAUDE_SKILL_DIR}/references/output.md`] | Stream separation details, color codes, ANSI escapes, NO_COLOR spec, pager setup |
+| Exit codes | [`${CLAUDE_SKILL_DIR}/references/exit-codes.md`] | Standard/extended code tables, signal exit codes, partial success patterns |
+| Interaction | [`${CLAUDE_SKILL_DIR}/references/interaction.md`] | TTY detection, prompting patterns, confirmation levels, progress display, error format |
+| Configuration | [`${CLAUDE_SKILL_DIR}/references/configuration.md`] | Full hierarchy, XDG spec, env var catalog, config file formats, secret handling |
+| Signals | [`${CLAUDE_SKILL_DIR}/references/signals.md`] | Full signal table, SIGPIPE handling, crash-only design, child process signals |
 
 ## Output Streams
 

@@ -17,12 +17,12 @@ Vite config (aliases, plugins, transforms) so tests run against the same code yo
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Mocking | `references/mocking.md` | Full mocking rules, module mocking patterns, cleanup strategy |
-| Assertions | `references/assertions.md` | Matcher tables, asymmetric matchers, soft assertions |
-| Lifecycle | `references/lifecycle.md` | Hook execution order, test context, setup files, global setup |
-| Configuration | `references/configuration.md` | Config file options, projects, pools, sharding, env vars |
-| Coverage | `references/coverage.md` | Coverage providers, thresholds, ignore comments, performance |
-| Jest migration | `references/jest-migration.md` | Jest API translation, key behavioral differences, Mocha/Sinon |
+| Mocking | [`${CLAUDE_SKILL_DIR}/references/mocking.md`] | Full mocking rules, module mocking patterns, cleanup strategy |
+| Assertions | [`${CLAUDE_SKILL_DIR}/references/assertions.md`] | Matcher tables, asymmetric matchers, soft assertions |
+| Lifecycle | [`${CLAUDE_SKILL_DIR}/references/lifecycle.md`] | Hook execution order, test context, setup files, global setup |
+| Configuration | [`${CLAUDE_SKILL_DIR}/references/configuration.md`] | Config file options, projects, pools, sharding, env vars |
+| Coverage | [`${CLAUDE_SKILL_DIR}/references/coverage.md`] | Coverage providers, thresholds, ignore comments, performance |
+| Jest migration | [`${CLAUDE_SKILL_DIR}/references/jest-migration.md`] | Jest API translation, key behavioral differences, Mocha/Sinon |
 
 ## Test Structure
 
@@ -75,7 +75,7 @@ Vite config (aliases, plugins, transforms) so tests run against the same code yo
 - **`vi.mocked(fn)`** narrows TypeScript types to mock types without runtime changes.
 
 Full mocking rules (auto-mocking, spy mode, `vi.hoisted`, `__mocks__` directory, env/globals
-stubbing, async helpers): see `references/mocking.md`.
+stubbing, async helpers): see `${CLAUDE_SKILL_DIR}/references/mocking.md`.
 
 ## Assertions
 
@@ -105,7 +105,7 @@ stubbing, async helpers): see `references/mocking.md`.
   async code.
 
 Truthiness, number, string/array/object matchers, type checks, spy assertions, custom
-error messages, `expect.unreachable`: see `references/assertions.md`.
+error messages, `expect.unreachable`: see `${CLAUDE_SKILL_DIR}/references/assertions.md`.
 
 ## Snapshots
 
@@ -141,7 +141,7 @@ error messages, `expect.unreachable`: see `references/assertions.md`.
   for teardown.
 
 Hook execution order, test context, hook order config, `provide`/`inject`, and
-global vs setup file comparison: see `references/lifecycle.md`.
+global vs setup file comparison: see `${CLAUDE_SKILL_DIR}/references/lifecycle.md`.
 
 ## Configuration
 
@@ -152,7 +152,7 @@ global vs setup file comparison: see `references/lifecycle.md`.
   Every project must have a unique `name`.
 
 Config file merging, key options table, pools and parallelism, environment variables,
-in-source testing, and sharding: see `references/configuration.md`.
+in-source testing, and sharding: see `${CLAUDE_SKILL_DIR}/references/configuration.md`.
 
 ## Coverage
 
@@ -160,14 +160,14 @@ Set `coverage.include` to catch uncovered files. Use `v8` provider (default, rec
 Set thresholds in config. Run coverage only in CI, not in watch mode.
 
 Provider comparison, reporters, ignore comments, and performance tips:
-see `references/coverage.md`.
+see `${CLAUDE_SKILL_DIR}/references/coverage.md`.
 
 ## Extending Matchers
 
 Define via `expect.extend({ matcherName(received, ...args) {} })`. Return `{ pass, message }`.
 Add TypeScript declarations via `interface Matchers<T>` in `vitest.d.ts`.
 
-Matcher context, TypeScript setup, and diff output: see `references/assertions.md`.
+Matcher context, TypeScript setup, and diff output: see `${CLAUDE_SKILL_DIR}/references/assertions.md`.
 
 ## Jest Migration
 
@@ -176,7 +176,7 @@ explicit exports, `mockReset` restores original impl, auto-mocking requires expl
 `vi.mock()` call, hook return values are teardown functions.
 
 Full API translation table, behavioral differences, and Mocha/Sinon migration:
-see `references/jest-migration.md`.
+see `${CLAUDE_SKILL_DIR}/references/jest-migration.md`.
 
 ## Application
 

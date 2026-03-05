@@ -33,7 +33,7 @@ timers. Let Prometheus control the timing.
 
 ## Naming Metrics
 
-Follow all [naming conventions](naming.md) plus:
+Follow all naming conventions (see `${CLAUDE_SKILL_DIR}/references/naming.md`) plus:
 
 1. **Prefix with exporter name** — `haproxy_up`, `mysql_global_status_threads_connected`
 2. **Use base units** — seconds, bytes. Let grafana convert.

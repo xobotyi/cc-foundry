@@ -23,9 +23,9 @@ use this skill for YouTrack-specific field handling, linking, and categorization
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Query language | `references/query-language.md` | Full search syntax, operators, symbols, relative dates, BNF grammar |
-| Commands | `references/commands.md` | Command syntax, field updates, link/tag commands, work items |
-| Workflows & state machines | `references/workflows.md` | State machine model, rule types, transition properties |
+| Query language | `${CLAUDE_SKILL_DIR}/references/query-language.md` | Full search syntax, operators, symbols, relative dates, BNF grammar |
+| Commands | `${CLAUDE_SKILL_DIR}/references/commands.md` | Command syntax, field updates, link/tag commands, work items |
+| Workflows & state machines | `${CLAUDE_SKILL_DIR}/references/workflows.md` | State machine model, rule types, transition properties |
 
 ## Issue Data Model
 
@@ -182,7 +182,7 @@ YouTrack has its own query language — not Lucene, not JQL. Working-resolution 
 - **Resolved/Unresolved** — keywords, not field values: `#Resolved`, `#Unresolved`
 
 For the full syntax, operators, relative date parameters, and BNF grammar, see
-`references/query-language.md`.
+`${CLAUDE_SKILL_DIR}/references/query-language.md`.
 
 ## Command Essentials
 
@@ -198,7 +198,7 @@ colons, braces, or `#` symbols.
 - **Work item** — `work <type> <date> <duration> <description>`
 - **Sprint** — `Board <name> <sprint>`, or `Board <name> {current sprint}`
 
-For the full command reference and BNF grammar, see `references/commands.md`.
+For the full command reference and BNF grammar, see `${CLAUDE_SKILL_DIR}/references/commands.md`.
 
 ## Discovery Protocol
 

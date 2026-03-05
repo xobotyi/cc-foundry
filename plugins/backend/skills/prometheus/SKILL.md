@@ -19,12 +19,12 @@ expensive rework later.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Metric types | `references/metric-types.md` | Extended type comparison, histogram bucket tuning, summary configuration |
-| Naming | `references/naming.md` | Full naming examples, base units table, character rules, label best practices |
-| Instrumentation | `references/instrumentation.md` | Code patterns per system type, library instrumentation, performance tuning |
-| PromQL | `references/promql.md` | Full operator catalog, vector matching, over-time aggregation, operator precedence |
-| Alerting and rules | `references/alerting-and-rules.md` | Alert design, recording rule naming, aggregation patterns, anti-patterns |
-| Exporters | `references/exporters.md` | Exporter architecture, collectors, help strings, push-based sources |
+| Metric types | [`${CLAUDE_SKILL_DIR}/references/metric-types.md`] | Extended type comparison, histogram bucket tuning, summary configuration |
+| Naming | [`${CLAUDE_SKILL_DIR}/references/naming.md`] | Full naming examples, base units table, character rules, label best practices |
+| Instrumentation | [`${CLAUDE_SKILL_DIR}/references/instrumentation.md`] | Code patterns per system type, library instrumentation, performance tuning |
+| PromQL | [`${CLAUDE_SKILL_DIR}/references/promql.md`] | Full operator catalog, vector matching, over-time aggregation, operator precedence |
+| Alerting and rules | [`${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md`] | Alert design, recording rule naming, aggregation patterns, anti-patterns |
+| Exporters | [`${CLAUDE_SKILL_DIR}/references/exporters.md`] | Exporter architecture, collectors, help strings, push-based sources |
 
 ## Metric Type Selection
 
@@ -93,7 +93,7 @@ Calculates streaming quantiles on the client side. Produces `{quantile="..."}`, 
 3. You know the exact quantiles at instrumentation time
 4. You accept that adding new quantiles requires code changes
 
-**Default choice: histogram.** See `references/metric-types.md` for detailed comparison.
+**Default choice: histogram.** See `${CLAUDE_SKILL_DIR}/references/metric-types.md` for detailed comparison.
 
 ## Naming
 
@@ -116,7 +116,7 @@ is namespace + meaningful name + unit/suffix.
    `sum()` or `avg()` across all dimensions should be meaningful. If nonsensical, split
    into separate metrics.
 
-See `references/naming.md` for base units table, component ordering, and full examples.
+See `${CLAUDE_SKILL_DIR}/references/naming.md` for base units table, component ordering, and full examples.
 
 ## Labels
 
@@ -186,8 +186,8 @@ resource access: request count (counter), error count (counter), latency (histog
 - **Caches:** `cache_requests_total{result="hit|miss"}`, evictions (counter), size (gauge),
   lookup latency (histogram). Also instrument the downstream system.
 
-See `references/instrumentation.md` for threadpool patterns, custom collectors, and
-performance tuning in hot paths.
+See `${CLAUDE_SKILL_DIR}/references/instrumentation.md` for threadpool patterns, custom collectors,
+and performance tuning in hot paths.
 
 ## PromQL
 
@@ -217,8 +217,8 @@ performance tuning in hot paths.
 - **Expensive queries:** bare metric names can expand to thousands of series. Always filter
   or aggregate before graphing. Use recording rules for expensive expressions.
 
-See `references/promql.md` for data types, selectors, aggregation operators, vector
-matching, over-time aggregation, binary operators, and operator precedence.
+See `${CLAUDE_SKILL_DIR}/references/promql.md` for data types, selectors, aggregation operators,
+vector matching, over-time aggregation, binary operators, and operator precedence.
 
 ## Alerting Rules
 
@@ -236,8 +236,8 @@ Only page on latency at one point in the stack — if overall user latency is fi
 page on a slow sub-component. Avoid noisy alerts — if an alert fires and there's nothing
 to do, remove it.
 
-See `references/alerting-and-rules.md` for alert design, naming conventions, and
-recording rule details.
+See `${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md` for alert design, naming conventions,
+and recording rule details.
 
 ## Recording Rules
 
@@ -251,8 +251,8 @@ Pre-compute frequently used or expensive expressions. Format:
 - Use recording rules for dashboard queries that are expensive and queried frequently,
   expressions used in multiple alerts, or complex multi-step aggregations.
 
-See `references/alerting-and-rules.md` for full naming convention and recording rule
-anti-patterns.
+See `${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md` for full naming convention and
+recording rule anti-patterns.
 
 ## Exporters
 
@@ -265,8 +265,8 @@ For your own code, use a client library directly.
 - Drop pre-computed rates, min/max since start, stddev from source systems — export raw
   counters and current values; let Prometheus `rate()` handle the rest
 
-See `references/exporters.md` for architecture, collectors, help strings, label rules,
-and push-based sources.
+See `${CLAUDE_SKILL_DIR}/references/exporters.md` for architecture, collectors, help strings,
+label rules, and push-based sources.
 
 ## Application
 

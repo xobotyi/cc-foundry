@@ -19,15 +19,12 @@ Every PHP file starts with `declare(strict_types=1)`.
 
 ## References
 
-Extended examples, packaging workflows, and detailed rationale for the rules below live in
-`references/`.
-
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Type declarations, union/intersection/DNF, strict_types, variance | [typing.md](references/typing.md) | Full type system coverage, nullable patterns, typed properties and constants, coercion rules |
-| Interfaces, traits, readonly, property hooks, enums, visibility | [oop.md](references/oop.md) | OOP patterns, abstract classes, constructor promotion, lazy objects, magic methods, #[Override] |
-| Fibers, generators, async patterns, event loops | [concurrency.md](references/concurrency.md) | Fiber API, generator coroutines, comparison table, async library guidance |
-| Composer, PSR-4 autoloading, project structure, file headers | [packaging.md](references/packaging.md) | composer.json templates, version constraints, project layouts, namespace conventions |
+| Type system | `${CLAUDE_SKILL_DIR}/references/typing.md` | Union/intersection/DNF types, nullable patterns, typed properties and constants, coercion rules, variance |
+| OOP patterns | `${CLAUDE_SKILL_DIR}/references/oop.md` | Interfaces, traits, readonly, property hooks, enums, constructor promotion, lazy objects, magic methods |
+| Concurrency | `${CLAUDE_SKILL_DIR}/references/concurrency.md` | Fiber API, generator coroutines, comparison table, async library guidance |
+| Packaging | `${CLAUDE_SKILL_DIR}/references/packaging.md` | composer.json templates, version constraints, project layouts, namespace conventions |
 
 ## Naming
 
@@ -96,7 +93,7 @@ class Config
 - **Return types are covariant** — child class can return narrower types.
 - `mixed` return can be narrowed to any type in a subclass.
 
-See [typing.md](references/typing.md) for the complete type system reference.
+See `${CLAUDE_SKILL_DIR}/references/typing.md` for the complete type system reference.
 
 ## Enumerations
 
@@ -334,7 +331,7 @@ Order: `<?php` tag, blank line, `declare(strict_types=1)`, blank line, namespace
 line, `use` imports (classes, then functions, then constants), blank line, code. No leading
 backslash on imports.
 
-See [packaging.md](references/packaging.md) for composer.json templates and PSR-4 mapping.
+See `${CLAUDE_SKILL_DIR}/references/packaging.md` for composer.json templates and PSR-4 mapping.
 
 ## Formatting (PER-CS)
 

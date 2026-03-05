@@ -46,20 +46,20 @@ Article:
 | Complex reasoning fails | Add CoT or use extended thinking | [Reasoning](#4-let-claude-think-chain-of-thought) |
 | Inconsistent results | Add 3-5 examples | [Examples](#2-use-examples-few-shot) |
 | Too verbose | Specify word/sentence limits | [Be Specific](#be-specific) |
-| Security concerns | Validate input, filter output | [security.md](references/security.md) |
+| Security concerns | Validate input, filter output | [`${CLAUDE_SKILL_DIR}/references/security.md`] |
 
 ## References
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Reasoning techniques | [reasoning-techniques.md](references/reasoning-techniques.md) | CoT variants (zero-shot, few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking details, academic citations |
-| Learning paradigms | [learning-paradigms.md](references/learning-paradigms.md) | In-context learning theory, paradigm spectrum details, example ordering research, generated knowledge prompting |
-| Workflow patterns | [workflow-patterns.md](references/workflow-patterns.md) | Prompt chaining examples, iterative refinement cycles, meta prompting templates |
-| Prompt security | [security.md](references/security.md) | Injection attack types, jailbreaking techniques, defense strategies, security checklist |
-| Optimization strategies | [optimization-strategies.md](references/optimization-strategies.md) | Prompting vs RAG vs fine-tuning decision flow, DSPy, cost-benefit analysis |
-| Claude-specific | [claude-specific.md](references/claude-specific.md) | Prefilling examples, system prompt API usage, extended thinking API details, technique combinations |
-| Long context | [long-context.md](references/long-context.md) | Document organization patterns, XML structuring for multi-doc, query patterns, chunking strategies |
-| Agent & tool patterns | [agent-patterns.md](references/agent-patterns.md) | ReAct, PAL, Reflexion, ART implementation patterns, pattern selection table |
+| Reasoning techniques | [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`] | CoT variants (zero-shot, few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking details, academic citations |
+| Learning paradigms | [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`] | In-context learning theory, paradigm spectrum details, example ordering research, generated knowledge prompting |
+| Workflow patterns | [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`] | Prompt chaining examples, iterative refinement cycles, meta prompting templates |
+| Prompt security | [`${CLAUDE_SKILL_DIR}/references/security.md`] | Injection attack types, jailbreaking techniques, defense strategies, security checklist |
+| Optimization strategies | [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`] | Prompting vs RAG vs fine-tuning decision flow, DSPy, cost-benefit analysis |
+| Claude-specific | [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] | Prefilling examples, system prompt API usage, extended thinking API details, technique combinations |
+| Long context | [`${CLAUDE_SKILL_DIR}/references/long-context.md`] | Document organization patterns, XML structuring for multi-doc, query patterns, chunking strategies |
+| Agent & tool patterns | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] | ReAct, PAL, Reflexion, ART implementation patterns, pattern selection table |
 
 ---
 
@@ -133,7 +133,7 @@ Text: "Absolutely love it!" → ?
 | Highly nuanced + complex reasoning | Few-shot + Chain-of-Thought |
 
 Extended paradigm details and ICL theory: see
-[learning-paradigms.md](references/learning-paradigms.md).
+[`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`].
 
 ### 3. Use XML Tags
 
@@ -198,7 +198,7 @@ consider multiple approaches") — not prescriptive steps. Claude's
 creativity often exceeds human-prescribed step sequences.
 
 CoT variants, Tree-of-Thoughts, self-consistency sampling: see
-[reasoning-techniques.md](references/reasoning-techniques.md).
+[`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`].
 
 ### 5. Use Sequential Steps
 
@@ -232,7 +232,7 @@ Precise calculation           → PAL (generate code)
 ```
 
 Agent and tool patterns (ReAct, PAL, Reflexion, ART): see
-[agent-patterns.md](references/agent-patterns.md).
+[`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`].
 
 ---
 
@@ -276,7 +276,7 @@ system="You are a senior security auditor specializing in web applications."
   specific standards
 
 Full API details and technique combinations: see
-[claude-specific.md](references/claude-specific.md).
+[`${CLAUDE_SKILL_DIR}/references/claude-specific.md`].
 
 ---
 
@@ -305,7 +305,7 @@ When working with 20K+ token documents, follow these rules:
   before or as the query.
 
 Document organization patterns, chunking strategies, and query templates:
-see [long-context.md](references/long-context.md).
+see [`${CLAUDE_SKILL_DIR}/references/long-context.md`].
 
 ---
 
@@ -336,7 +336,7 @@ of simpler prompts where each output feeds the next.
 without benefit. Chain when there's a natural validation boundary.
 
 Extended examples and iterative refinement patterns: see
-[workflow-patterns.md](references/workflow-patterns.md).
+[`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`].
 
 ---
 
@@ -359,7 +359,7 @@ data. Fine-tune only when prompt engineering and RAG together can't
 achieve the required quality.
 
 Strategy comparison and cost-benefit analysis: see
-[optimization-strategies.md](references/optimization-strategies.md).
+[`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`].
 
 ---
 
@@ -391,7 +391,7 @@ LLMs process natural language. Defense is about reducing attack surface,
 limiting blast radius, and detecting incidents.
 
 Attack taxonomy, defense implementation details, full checklist: see
-[security.md](references/security.md).
+[`${CLAUDE_SKILL_DIR}/references/security.md`].
 
 ---
 

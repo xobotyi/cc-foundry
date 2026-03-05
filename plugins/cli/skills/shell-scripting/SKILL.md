@@ -1,9 +1,10 @@
 ---
 name: shell-scripting
 description: >-
-  Shell script conventions and defensive patterns: strict mode, quoting,
-  portability, error handling, and common pitfalls. Invoke whenever task
-  involves writing or reviewing shell scripts (.sh, .bash, .zsh files).
+  Shell script conventions, defensive patterns, and correctness rules:
+  strict mode, quoting, portability, error handling, and common pitfalls.
+  Invoke whenever task involves any interaction with shell scripts —
+  writing, reviewing, debugging, or understanding .sh, .bash, .zsh files.
 ---
 
 # Shell Scripting
@@ -18,12 +19,12 @@ Extended examples, code patterns, and lookup tables for the rules below.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Strict mode, error handling, traps, debugging | [strict-mode.md](references/strict-mode.md) | errexit caveats, pipefail examples, trap patterns, temp file safety, debugging techniques |
-| Quoting rules, word splitting, globbing | [quoting.md](references/quoting.md) | Three quoting mechanisms, `"$@"` vs `"$*"`, array expansion, printf vs echo, nested quoting |
-| POSIX sh vs bash, portable constructs | [portability.md](references/portability.md) | Feature comparison table, GNU vs BSD tool differences, portable pattern catalog |
-| Argument parsing, getopts, validation | [arguments.md](references/arguments.md) | getopts template, manual long-option parsing, validation patterns, usage messages, stdin detection |
-| Common shell scripting mistakes | [pitfalls.md](references/pitfalls.md) | Iteration pitfalls, variable pitfalls, test pitfalls, pipeline pitfalls, arithmetic traps |
-| Pure bash/sh alternatives to external commands | [builtins.md](references/builtins.md) | Parameter expansion table, replacing sed/cut/basename/expr, arrays, read patterns, arithmetic |
+| Strict mode, error handling, traps, debugging | [`${CLAUDE_SKILL_DIR}/references/strict-mode.md`] | errexit caveats, pipefail examples, trap patterns, temp file safety, debugging techniques |
+| Quoting rules, word splitting, globbing | [`${CLAUDE_SKILL_DIR}/references/quoting.md`] | Three quoting mechanisms, `"$@"` vs `"$*"`, array expansion, printf vs echo, nested quoting |
+| POSIX sh vs bash, portable constructs | [`${CLAUDE_SKILL_DIR}/references/portability.md`] | Feature comparison table, GNU vs BSD tool differences, portable pattern catalog |
+| Argument parsing, getopts, validation | [`${CLAUDE_SKILL_DIR}/references/arguments.md`] | getopts template, manual long-option parsing, validation patterns, usage messages, stdin detection |
+| Common shell scripting mistakes | [`${CLAUDE_SKILL_DIR}/references/pitfalls.md`] | Iteration pitfalls, variable pitfalls, test pitfalls, pipeline pitfalls, arithmetic traps |
+| Pure bash/sh alternatives to external commands | [`${CLAUDE_SKILL_DIR}/references/builtins.md`] | Parameter expansion table, replacing sed/cut/basename/expr, arrays, read patterns, arithmetic |
 
 ## Script Header
 

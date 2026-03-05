@@ -21,12 +21,12 @@ otherwise. AA includes all A criteria.
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Semantic HTML | `references/semantic-html.md` | Landmarks, headings, images, tables, lists, language markup |
-| ARIA | `references/aria.md` | Roles, states, properties, naming, live regions, common mistakes |
-| Keyboard | `references/keyboard.md` | Focus order, visibility, roving tabindex, focus traps, restoration |
-| Forms | `references/forms.md` | Labels, grouping, required fields, validation, autocomplete |
-| Component patterns | `references/component-patterns.md` | Dialog, tabs, accordion, disclosure, menu, combobox, tooltip |
-| WCAG | `references/wcag.md` | Full WCAG 2.2 AA criteria tables and compliance checklist |
+| Semantic HTML | [`semantic-html.md`](${CLAUDE_SKILL_DIR}/references/semantic-html.md) | Landmarks, headings, images, tables, lists, language markup |
+| ARIA | [`aria.md`](${CLAUDE_SKILL_DIR}/references/aria.md) | Roles, states, properties, naming, live regions, common mistakes |
+| Keyboard | [`keyboard.md`](${CLAUDE_SKILL_DIR}/references/keyboard.md) | Focus order, visibility, roving tabindex, focus traps, restoration |
+| Forms | [`forms.md`](${CLAUDE_SKILL_DIR}/references/forms.md) | Labels, grouping, required fields, validation, autocomplete |
+| Component patterns | [`component-patterns.md`](${CLAUDE_SKILL_DIR}/references/component-patterns.md) | Dialog, tabs, accordion, disclosure, menu, combobox, tooltip |
+| WCAG | [`wcag.md`](${CLAUDE_SKILL_DIR}/references/wcag.md) | Full WCAG 2.2 AA criteria tables and compliance checklist |
 
 ---
 
@@ -46,7 +46,8 @@ ARIA can only approximate.
 - Never duplicate implicit roles (`<main role="main">`, `<nav role="navigation">`).
 - Include all perceivable content within a landmark region.
 
-For the full landmark-to-role mapping table, see `references/semantic-html.md`.
+For the full landmark-to-role mapping table, see
+[`semantic-html.md`](${CLAUDE_SKILL_DIR}/references/semantic-html.md).
 
 ### Headings
 
@@ -80,7 +81,8 @@ term/description pairs. Screen readers announce list type and item count.
 - For decorative images, prefer CSS `background-image` over `<img alt="">`.
 - Use real text, not images of text (WCAG 1.4.5).
 
-For alt treatment by image type, see `references/semantic-html.md`.
+For alt treatment by image type, see
+[`semantic-html.md`](${CLAUDE_SKILL_DIR}/references/semantic-html.md).
 
 ### Language and Page Metadata
 
@@ -132,7 +134,7 @@ tree -- it does not change behavior, keyboard interaction, or appearance.
 Place `aria-expanded` on the trigger element, not the panel.
 
 For widget roles, state/relationship attribute tables, and common ARIA mistakes,
-see `references/aria.md`.
+see [`aria.md`](${CLAUDE_SKILL_DIR}/references/aria.md).
 
 ---
 
@@ -259,7 +261,7 @@ Use `autocomplete` for user data inputs (WCAG 1.3.5): `given-name`,
 ## 6. Component Patterns
 
 For full ARIA structure, keyboard contracts, and code examples for each
-pattern, see `references/component-patterns.md`. Key rules:
+pattern, see [`component-patterns.md`](${CLAUDE_SKILL_DIR}/references/component-patterns.md). Key rules:
 
 - **Dialog** -- use native `<dialog>` with `.showModal()` when possible.
   Focus trap, Escape to close, return focus to trigger on close.
@@ -278,7 +280,7 @@ pattern, see `references/component-patterns.md`. Key rules:
   for non-urgent (polite). Inject into pre-existing container.
 
 For WCAG 2.2 AA compliance checklist with criterion numbers,
-see `references/wcag.md`.
+see [`wcag.md`](${CLAUDE_SKILL_DIR}/references/wcag.md).
 
 ---
 
