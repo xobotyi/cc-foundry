@@ -9,129 +9,69 @@ description: >-
 
 # Code Quality Evaluation
 
-Orchestrate 8 specialized agents for comprehensive code quality evaluation. All agents report
-findings — you apply fixes.
+Orchestrate 8 specialized teammate agents for comprehensive code quality evaluation. Each agent
+is a plugin subagent — spawn them as teammates and aggregate their findings.
 
 ## Agents
 
-All agents are **recommendation-only** — they read code and report, never modify.
+All agents are **read-only** — they analyze code and report findings via SendMessage.
 
-**Evaluation agents** (run in parallel, background):
-
-| Agent | Focus |
-|-------|-------|
-| namer | Naming issues: vague, misleading, type-focused identifiers |
-| code-simplifier | Complexity: duplication, deep nesting, verbose patterns |
-| comment-cleaner | Comment noise, redundancy, missing documentation comments |
-| test-reviewer | Test quality, strategy, leanness, locality |
-| error-handling-reviewer | Error flow: creation, propagation, handling, silent swallowing |
-| security-reviewer | Secrets, injection, input validation, crypto, auth |
-| observability-reviewer | Logging, metrics, tracing, context propagation |
-
-**Documentation agent** (runs last, after fixes):
-
-| Agent | Focus |
-|-------|-------|
-| documenter | Missing, outdated, or insufficient API documentation |
-
-## CRITICAL: Do Not Use TaskOutput
-
-**Never call the `TaskOutput` tool during this workflow.**
-
-How to wait for background agents:
-
-1. Launch agent with `run_in_background=true`
-2. Do nothing — literally output nothing and wait
-3. System notifies you: "Background task completed"
-4. Read the report FILE the agent wrote — not TaskOutput
-
-TaskOutput destroys context efficiency for the entire workflow.
+| Subagent Type | Focus |
+|---------------|-------|
+| `the-crucible:namer` | Naming: misleading, vague, type-encoded, scope-mismatched identifiers |
+| `the-crucible:complexity-reviewer` | Complexity: nesting, flag arguments, duplication, premature abstraction |
+| `the-crucible:comment-reviewer` | Comments: noise, staleness, refactoring signals, commented-out code |
+| `the-crucible:test-reviewer` | Tests: false confidence, implementation coupling, flakiness, coverage gaps |
+| `the-crucible:error-handling-reviewer` | Errors: silent swallowing, context loss, resource leaks, async error loss |
+| `the-crucible:security-reviewer` | Security: injection, access control, secrets, crypto, data exposure |
+| `the-crucible:observability-reviewer` | Observability: logging, metrics, tracing, cardinality, context propagation |
+| `the-crucible:docs-auditor` | Documentation: missing API docs, stale docs, contract gaps |
 
 ## Workflow
 
-### Phase 0: Setup Reports Directory
+### Phase 0: Create Team
 
-Determine the target path from the user's request (the `[path]` argument). Generate a timestamp
-in `YYYYMMDD-HHmmss` format. Create the reports directory inside the target:
-
-```
-mkdir -p {target}/.reviews/{timestamp}
-```
-
-- `{target}` — the path the user specified for review
-- `{timestamp}` — current time as `YYYYMMDD-HHmmss` (e.g., `20260305-143022`)
-
-Reports directory must be inside target — agents can only write within their review scope.
-
-### Phase 1: Evaluate Code (Parallel, Background)
-
-Launch all 7 evaluation agents in parallel using the Agent tool with `run_in_background=true`:
+Create a review team and 8 tasks — one per agent:
 
 ```
-For each agent in [namer, code-simplifier, comment-cleaner,
-                   test-reviewer, error-handling-reviewer,
-                   security-reviewer, observability-reviewer]:
-    Agent(prompt="""
-    You are a {agent} reviewer. Evaluate {target} and report findings.
+TeamCreate(name="code-review")
 
-    Load the review-output skill first: Skill("the-crucible:review-output")
-
-    Write findings to: {reports_dir}/{agent}.md
-    Do NOT modify any code — only report what should change.
-    Do NOT include file contents in the report — only findings.
-    """, run_in_background=true)
+For each agent in the table above:
+    TaskCreate(team_name="code-review", title="{agent_name}", description="Review {target}")
 ```
 
-<agent-assumptions>
-Communicate these to every agent:
-- All tools are functional. Do not test tools before using them.
-- Only call a tool if required to complete the task.
-- Focus on high-signal findings. False positives erode trust.
-</agent-assumptions>
+### Phase 1: Spawn Reviewers
 
-### Phase 2: Read Reports and Present Findings
+Spawn all 8 agents in parallel as teammates using their `subagent_type`. The agent files define
+each reviewer's expertise, patterns, and constraints — the `prompt` parameter only needs to
+specify the target and team context:
 
-After all evaluation agents complete:
+```
+For each agent:
+    Agent(
+        subagent_type="{subagent_type}",
+        prompt="Review all code in {target}. Send your findings to the leader via SendMessage.",
+        team_name="code-review",
+        task_id="{task_id}"
+    )
+```
 
-1. Read all report files from `{reports_dir}/`
-2. Aggregate into summary (Critical / Issues / Recommendations counts)
-3. Present findings to user organized by severity
+### Phase 2: Aggregate and Present Findings
+
+As teammates send messages, aggregate findings:
+
+1. Collect all messages from the 8 reviewers
+2. Deduplicate overlapping findings across agents
+3. Present to user organized by severity (Critical > Issues > Recommendations)
 4. Ask user which issues to address
 
 ### Phase 3: Apply Fixes
 
 Address findings based on user direction:
 
-1. Fix critical issues first
-2. Then issues, then recommendations
-3. User may skip categories or individual findings
-4. Continue until user says to stop or all addressed
-
-This phase is iterative — fix, verify, repeat.
-
-### Phase 4: Documentation Review (After Fixes)
-
-Only after code fixes are complete, run documenter using the Agent tool:
-
-```
-Agent(prompt="""
-You are a documentation reviewer. Evaluate API documentation in {target}.
-
-Load the review-output skill first: Skill("the-crucible:review-output")
-
-Write findings to: {reports_dir}/documenter.md
-Do NOT modify any code — only report what documentation is missing.
-Do NOT include file contents in the report — only findings.
-""", run_in_background=true)
-```
-
-Documentation reviews the fixed code, not the original state. Running it earlier wastes effort on
-outdated code.
-
-### Phase 5: Cleanup
-
-After all work is complete, remove the `.reviews/` directory — reports are temporary artifacts.
-Confirm with the user before deleting.
+1. Fix critical issues first, then issues, then recommendations
+2. User may skip categories or individual findings
+3. Continue until user says to stop or all addressed
 
 ## Usage
 
@@ -142,23 +82,21 @@ Run code quality evaluation on src/auth/
 **Example interaction flow:**
 
 1. User: "Run code quality evaluation on src/auth/"
-2. Skill creates `src/auth/.reviews/20260305-143022/`
-3. 7 agents launch in parallel, each writes a report file
-4. After all complete, read reports and present summary:
-   - "Found 2 critical, 5 issues, 3 recommendations. Which should I address?"
-5. User picks categories or specific findings to fix
-6. After fixes, documenter agent runs on the updated code
-7. Present documentation findings, apply if user agrees
-8. Clean up `.reviews/` directory
+2. Create team "code-review" with 8 tasks
+3. Spawn 8 teammate agents by subagent_type
+4. Teammates send findings via messages
+5. Aggregate and present: "Found 2 critical, 5 issues, 3 recommendations. Which to address?"
+6. User picks categories or specific findings to fix
+7. Apply fixes iteratively
 
 ## Constraints
 
 <constraints>
-- Create reports directory BEFORE launching any agents
-- Reports directory MUST be inside target directory
-- Pass reports directory path to EVERY agent in the prompt
-- All agents are READ-ONLY — they report, caller fixes
-- NEVER use TaskOutput tool — read report FILES directly
-- Wait for background agents by doing nothing until notification
-- Always cleanup `.reviews/` directory after completion
+- Create the team and all tasks BEFORE spawning any agents
+- Use `subagent_type` to spawn agents — their `.md` files define review behavior
+- The `prompt` parameter provides only the target path and team instructions
+- All agents are READ-ONLY — they report, the leader fixes
+- Agents communicate via SendMessage — no file-based reports
+- Deduplicate findings that overlap across agents before presenting
+- Present findings organized by severity, not by agent
 </constraints>

@@ -1,14 +1,14 @@
 {
-  "description": "Quality validation gate — blocks premature task completion",
+  "description": "Quality validation gate — triggers self-evaluation before task completion",
   "hooks": {
     "Stop": [
       {
         "hooks": [
           {
-            "type": "agent",
-            "model": "sonnet",
-            "prompt": "You are a quality validation gate. Evaluate whether the assistant completed the user's request.\n\nHook input: $ARGUMENTS\n\nPROCEDURE:\n1. If stop_hook_active is true in the input, respond immediately: {\"ok\": true}\n2. If the conversation was a simple question, greeting, or discussion (no task execution), respond: {\"ok\": true}\n3. For task work:\n   a. Find and read the quality-validation skill: Glob for \"**/quality-validation/SKILL.md\", then Read it\n   b. Apply every validation criterion from that skill to evaluate the deliverable\n   c. Check every item in the skill's pre-completion checklist\n4. Respond: {\"ok\": true} if complete, or {\"ok\": false, \"reason\": \"what's missing\"} if not\n\nBe strict about completeness. Be lenient about style. Never block for minor improvements.",
-            "timeout": 60
+            "type": "prompt",
+            "prompt": "You are a stop-event classifier. Determine whether the assistant just completed a task for the user or is simply conversing.\n\nHook input: $ARGUMENTS\n\nLook at `last_assistant_message` in the input. Classify it:\n\n1. If `stop_hook_active` is true, respond: {\"ok\": true}\n2. If the message is a greeting, question answer, clarification, status update, acknowledgment, or casual conversation — respond: {\"ok\": true}\n3. If the message reports completing work the user requested (code changes, file creation, documentation, research, refactoring, configuration, design, or any deliverable) — respond:\n\n{\"ok\": false, \"reason\": \"Before finishing, invoke the quality-validation skill to verify your deliverable matches the original request. Then assess whether the changes warrant running the full code-quality-evaluation pipeline (8-agent review) before committing — consider the scope, risk, and complexity of what changed.\"}\n\nBe liberal in classifying as task completion — if the assistant lists what it changed or created, that's task completion. Only classify as non-task when the message is clearly conversational.",
+            "model": "haiku",
+            "timeout": 15
           }
         ]
       }
