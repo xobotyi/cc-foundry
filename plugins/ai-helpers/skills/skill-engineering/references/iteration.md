@@ -14,6 +14,12 @@ Use skill → Observe behavior → Identify gap → Refine → Repeat
 
 ### Activation Issues
 
+**Important:** Native skill activation is unreliable (20-50% without
+enforcement hooks). Description improvements help but don't guarantee
+activation. For details on the systemic issue and mitigation strategies
+(including forced-eval hooks that achieve ~84%), see the
+[troubleshooting reference](${CLAUDE_SKILL_DIR}/references/troubleshooting.md).
+
 | Problem | Cause | Fix |
 |---------|-------|-----|
 | Doesn't trigger | Description misses user's words | Broaden domain claim, add trigger keywords |

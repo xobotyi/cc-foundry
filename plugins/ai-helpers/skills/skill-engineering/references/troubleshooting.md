@@ -55,6 +55,30 @@ Diagnostic guide for skill failures.
 
 ## Activation Issues
 
+### Native Activation Is Unreliable
+
+Skill auto-activation is inherently unreliable. Independent testing
+measured 20-50% activation rates without enforcement hooks. This is a
+systemic limitation, not just a description quality issue.
+
+**Why it happens:** Claude sees skill descriptions in the Skill tool
+definition and must decide to invoke the tool before proceeding. In
+practice, Claude often skips this step and proceeds directly with
+implementation, especially for multi-skill prompts.
+
+**Mitigation strategies:**
+- **Improve descriptions** — necessary but not sufficient (see below)
+- **Enforcement hooks** — `UserPromptSubmit` hooks that force Claude to
+  evaluate each skill before proceeding. Forced-eval hooks (where Claude
+  must explicitly state YES/NO for each skill) achieve ~84% activation.
+  The commitment mechanism — evaluate → commit → activate — is what makes
+  this work.
+- **Manual invocation** — `/skill-name` is always reliable
+
+**Key finding:** simple instruction hooks ("if the prompt matches, use
+the skill") perform no better than no hook at all (~20%). The hook must
+create a structured evaluation and commitment step to be effective.
+
 ### Skill Not Auto-Triggering
 
 **Check description quality:**
@@ -70,13 +94,15 @@ description: >-
 
 **Check for blocking flag:**
 ```yaml
-# This prevents auto-triggering
+# This prevents auto-triggering — also removes description from
+# context entirely, so Claude won't see the skill exists
 disable-model-invocation: true
 ```
 
 **Test with explicit invocation:**
 Try `/skill-name` directly. If that works, the description
-needs better trigger terms.
+needs better trigger terms — but keep in mind that even good
+descriptions achieve imperfect auto-activation.
 
 ### Skill Triggers Too Often
 

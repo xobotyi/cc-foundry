@@ -36,19 +36,25 @@ description: What it does and when to use it
 | `license` | No | License name or reference |
 | `compatibility` | No | 1-500 chars, environment requirements |
 | `metadata` | No | Arbitrary key-value pairs |
-| `allowed-tools` | No | Space-delimited tool list (experimental) |
+| `allowed-tools` | No | Comma-delimited tool list (experimental). In Claude Code, grants tool access without per-use approval while the skill is active. Has no effect in the Agent SDK. |
 
 ### Claude Code Extensions
 
 | Field | Default | Description |
 |-------|---------|-------------|
 | `argument-hint` | — | Hint for autocomplete: `[issue-number]` |
-| `disable-model-invocation` | `false` | Prevent Claude from auto-triggering |
-| `user-invocable` | `true` | Show in `/` menu |
+| `disable-model-invocation` | `false` | Prevent Claude from auto-triggering. Also **removes the description from context entirely** — Claude won't see the skill exists unless explicitly invoked. This frees description budget for other skills. |
+| `user-invocable` | `true` | Show in `/` menu. Setting `false` hides from menu but does NOT block Skill tool access — use `disable-model-invocation` for that. |
 | `model` | inherit | Model override: `sonnet`, `opus`, `haiku` |
 | `context` | — | Set to `fork` for subagent execution |
 | `agent` | general-purpose | Subagent type when `context: fork` |
 | `hooks` | — | Skill-scoped lifecycle hooks |
+
+### Extended Thinking
+
+Include the word `ultrathink` anywhere in the skill content to enable
+extended thinking mode when the skill is active. This is a Claude Code
+keyword that activates deeper reasoning for complex tasks.
 
 ## Name Field Rules
 
@@ -57,6 +63,12 @@ description: What it does and when to use it
 - No consecutive hyphens: `my--skill` is invalid
 - Must match parent directory name
 - Cannot contain: `anthropic`, `claude`
+
+**Naming strategy:** Consider gerund form (verb + -ing) for clarity about
+what the skill does:
+- `processing-pdfs`, `analyzing-spreadsheets`, `managing-databases`
+- Noun phrases also work: `pdf-processing`, `code-review`
+- Avoid vague names: `helper`, `utils`, `tools`
 
 **Valid:**
 ```
@@ -107,6 +119,41 @@ description: Helps with documents  # Too vague
 - Second person: "You can use this to..."
 - XML tags in description
 
+## Skill Discovery and Precedence
+
+### Location Precedence
+
+When skills share the same name across levels, higher-priority
+locations win:
+
+```
+enterprise > personal > project
+```
+
+Plugin skills use a `plugin-name:skill-name` namespace, so they
+cannot conflict with other levels.
+
+### Nested Directory Discovery
+
+Claude Code automatically discovers skills from `.claude/skills/`
+directories in subdirectories. If you edit a file in `packages/frontend/`,
+Claude Code also looks for skills in `packages/frontend/.claude/skills/`.
+This supports monorepo setups where packages have their own skills.
+
+### Instruction Budget
+
+Frontier thinking models reliably follow ~150-200 instructions. Claude
+Code's own system prompt already consumes ~50 of those. As instruction
+count increases, instruction-following quality degrades **uniformly** —
+the model doesn't just ignore later instructions, it begins to follow
+**all** instructions less reliably.
+
+This means: keep SKILL.md focused. A skill with 40 behavioral rules is
+pushing the limits of what the agent can attend to alongside its system
+prompt and other loaded context. If your skill needs that many rules,
+consider whether some are truly behavioral (must stay in SKILL.md) vs.
+catalog content that belongs in references.
+
 ## Body Content Guidelines
 
 The body is injected as a user message when the skill is triggered.
@@ -146,6 +193,9 @@ Apply prompt engineering principles throughout.
   pushes past 500 lines (a 700-line skill with all behavioral rules is
   better than a 400-line skill with critical rules in unread references)
 - Move catalog, lookup, and situational content to reference files
+- Remember the instruction budget: ~150-200 instructions is the
+  reliable ceiling for frontier models, and the system prompt already
+  claims ~50. Every rule in your skill competes for attention.
 
 **Prompt engineering tips:**
 - Use XML tags (`<instructions>`, `<constraints>`, `<output_format>`)
@@ -164,13 +214,23 @@ Files in the skill directory that Claude can read when needed.
 - Content that applies only sometimes
 
 **How to reference:**
+
+Use `${CLAUDE_SKILL_DIR}` for all reference paths. The variable resolves to
+the skill's absolute directory path at load time, so Claude sees unambiguous
+paths it can pass directly to the Read tool.
+
 ```markdown
-For form-filling details, see [FORMS.md](FORMS.md).
-For complete API reference, see [reference/api.md](reference/api.md).
+For form-filling details, see `${CLAUDE_SKILL_DIR}/references/forms.md`.
+For complete API reference, see `${CLAUDE_SKILL_DIR}/references/api.md`.
 ```
 
 **Important:** Keep references one level deep from SKILL.md. Claude may
 partially read deeply nested references.
+
+**Table of contents for long references:** For reference files longer than
+100 lines, include a table of contents at the top. Claude may preview
+files with partial reads (`head -100`); a TOC ensures it can see the full
+scope of available content and decide which sections to read in full.
 
 ## Scripts Directory
 
@@ -249,11 +309,24 @@ is the high-resolution version (extended depth, examples, edge cases).
 | `$ARGUMENTS[N]` | Specific argument by 0-based index |
 | `$N` | Shorthand for `$ARGUMENTS[N]` |
 | `${CLAUDE_SESSION_ID}` | Current session ID |
+| `${CLAUDE_SKILL_DIR}` | Absolute path to the skill's own directory |
 
-**Example:**
+All `${...}` variables are resolved at skill load time — Claude sees the
+expanded value, not the variable syntax.
+
+**`$ARGUMENTS` example:**
 ```markdown
 Fix GitHub issue $ARGUMENTS following our coding standards.
 ```
 
 When user runs `/fix-issue 123`, Claude receives:
 "Fix GitHub issue 123 following our coding standards."
+
+**`${CLAUDE_SKILL_DIR}` example:**
+```markdown
+Read `${CLAUDE_SKILL_DIR}/references/api.md` for the full API reference.
+```
+
+Claude receives the expanded absolute path, eliminating ambiguity about
+where the skill's files live. Use this variable in all reference paths
+and route-to-reference tables instead of relative paths.

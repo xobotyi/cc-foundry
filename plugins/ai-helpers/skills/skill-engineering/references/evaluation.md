@@ -12,6 +12,7 @@ Before deploying a skill, verify:
 - [ ] SKILL.md is behaviorally self-sufficient — no critical rules only in references
 - [ ] References contain only deepening material (examples, catalogs, how-tos)
 - [ ] Route-to-Reference table has Contents column (if references exist)
+- [ ] Degrees of freedom matched to task fragility (high/medium/low)
 - [ ] Instructions are clear and imperative
 - [ ] Instructions use structure (numbered steps/rules, XML tags, headers)
 - [ ] Examples cover normal and edge cases (few-shot prompting)
@@ -142,6 +143,33 @@ For most skills, include at least:
 - **Simple case** — Shows basic functionality
 - **Complex case** — Shows handling of real-world complexity
 - **Edge case** — Shows behavior at boundaries
+
+### Worked Examples Are Refinement Artifacts
+
+Complete input→output worked examples (showing a realistic request and
+the skill's full output) are high-value but rarely available during
+initial skill creation. They typically emerge from real usage: a problem
+is encountered, solved, and the solution documented as an example.
+
+Treat worked examples as a refinement goal, not an initial requirement.
+Populate them during iteration as you observe the skill in use. Pre-existing
+context (existing codebases, prior conversations) can sometimes provide
+material, but this is the exception.
+
+## Evaluation-Driven Development
+
+Build evaluations BEFORE writing extensive documentation:
+
+1. **Identify gaps** — run Claude on representative tasks without the
+   skill. Document specific failures or missing context.
+2. **Create evaluations** — build 3+ scenarios that test these gaps.
+3. **Establish baseline** — measure performance without the skill.
+4. **Write minimal instructions** — only content that addresses observed
+   failures.
+5. **Iterate** — run evaluations, compare against baseline, refine.
+
+This prevents over-engineering. You only add content that addresses
+real failures, not anticipated ones.
 
 ## Testing Protocol
 

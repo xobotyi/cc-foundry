@@ -368,6 +368,53 @@ Open in browser to explore results.
 - Outputs for non-technical stakeholders
 - Complex relationships that need visualization
 
+## Verifiable Intermediate Outputs
+
+For complex, multi-step tasks where Claude makes many decisions,
+add a plan-validate-execute pattern to catch errors early.
+
+### The Pattern
+
+```
+analyze → create plan file → validate plan → execute → verify
+```
+
+Instead of letting Claude apply changes directly, have it first
+produce a structured intermediate artifact (JSON, YAML, markdown
+checklist) that gets validated before execution.
+
+### When to Use
+
+- Batch operations affecting many files
+- Destructive or hard-to-reverse changes
+- Operations with complex validation rules
+- High-stakes tasks where errors are costly
+
+### Example
+
+```markdown
+## Workflow
+
+1. Analyze the input and produce `changes.json`:
+   ```json
+   {"file": "path", "action": "modify", "details": "..."}
+   ```
+
+2. Validate the plan:
+   ```bash
+   python scripts/validate_changes.py changes.json
+   ```
+
+3. If validation fails, fix the plan and re-validate.
+   Only proceed when validation passes.
+
+4. Apply changes from the validated plan.
+```
+
+**Implementation tip:** make validation scripts verbose with specific
+error messages: "Field 'X' not found. Available fields: A, B, C."
+This helps Claude fix issues without guessing.
+
 ## Security Considerations
 
 ### Input Validation in Skills
