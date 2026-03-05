@@ -1,16 +1,17 @@
 ---
 name: skill-engineering
 description: >-
-  Design and iterate Claude Code skills: description triggers activation, instructions shape
-  behavior. Invoke whenever task involves any interaction with Claude Code skills — creating,
-  evaluating, debugging, or understanding how they work.
+  Design and iterate Claude Code skills: SKILL.md structure, description formulas, content
+  architecture, and quality evaluation. Invoke whenever task involves any interaction with
+  Claude Code skills — creating, evaluating, debugging, or understanding how they work.
 ---
 
 # Skill Engineering
 
 Skills are prompt templates that extend Claude with domain expertise.
-They load on-demand: Claude sees only `name` and `description` at startup,
-then loads full SKILL.md content when triggered.
+Description triggers activation; instructions shape behavior. Claude sees
+only `name` and `description` at startup, then loads full SKILL.md content
+when triggered.
 
 <prerequisite>
 **Skills are prompts.** Before writing or improving a skill, invoke
@@ -27,13 +28,13 @@ Skip only for trivial edits (typos, formatting).
 
 | Situation | Reference | Contents |
 |-----------|-----------|----------|
-| SKILL.md format, frontmatter rules, directory layout | [spec.md](references/spec.md) | Frontmatter fields, name rules, string substitutions, progressive disclosure |
-| Creating a skill from scratch | [creation.md](references/creation.md) | Step-by-step process, scope sizing, description examples, archetype templates |
-| Evaluating skill quality (review, audit) | [evaluation.md](references/evaluation.md) | Scoring rubric (5 dimensions), testing protocol, common issues by score range |
-| Skill not triggering, wrong output, refinement | [iteration.md](references/iteration.md) | Activation fixes, output fixes, restructuring, splitting guidance |
-| Multi-file skills, scripts, subagents, hooks | [advanced-patterns.md](references/advanced-patterns.md) | Fork pattern, workflow skills, composable skills, permission scoping |
-| Debugging activation failures, script errors | [troubleshooting.md](references/troubleshooting.md) | Diagnostic steps for structure, activation, output, script, reference issues |
-| Writing persuasive instructions, reasoning | [prompt-techniques.md](references/prompt-techniques.md) | XML tags, chain of thought, format control, instruction strengthening |
+| SKILL.md format, frontmatter rules, directory layout | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | Frontmatter fields, name rules, string substitutions, progressive disclosure, discovery/precedence, instruction budget |
+| Creating a skill from scratch | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Step-by-step process, scope sizing, degrees of freedom, description examples, evaluation-driven development, archetype templates |
+| Evaluating skill quality (review, audit) | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Scoring rubric (5 dimensions), evaluation-driven development, testing protocol, common issues by score range |
+| Skill not triggering, wrong output, refinement | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Activation fixes, output fixes, restructuring, splitting guidance |
+| Multi-file skills, scripts, subagents, hooks | [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] | Fork pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping |
+| Debugging activation failures, script errors | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] | Diagnostic steps for structure, activation reliability, output, script, reference issues |
+| Writing persuasive instructions, reasoning | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | XML tags, chain of thought, format control, instruction strengthening |
 
 Read the relevant reference before proceeding.
 
@@ -63,10 +64,11 @@ description: >-
 **Good — what it does + when with trigger keywords:**
 ```yaml
 description: >-
-  Design and iterate Claude Code skills: description triggers
-  activation, instructions shape behavior. Invoke whenever task
-  involves any interaction with Claude Code skills — creating,
-  evaluating, debugging, or understanding how they work.
+  Design and iterate Claude Code skills: SKILL.md structure,
+  description formulas, content architecture, and quality evaluation.
+  Invoke whenever task involves any interaction with Claude Code
+  skills — creating, evaluating, debugging, or understanding how
+  they work.
 ```
 
 **Bad — vague, no trigger surface:**
@@ -98,7 +100,11 @@ description: >-
   any interaction with X — creating, editing, debugging" beats "Invoke
   when creating, editing, or debugging X."
 - **Aggressive triggering, graceful de-escalation.** Better to trigger
-  and de-escalate inside the skill than to miss activations.
+  and de-escalate inside the skill than to miss activations. Native
+  skill activation is unreliable — measured at 20-50% without enforcement
+  hooks. Well-written descriptions improve odds but don't guarantee
+  activation. Design skills to be useful when loaded, not to depend on
+  perfect auto-activation.
 - **Skill dependencies belong in SKILL.md body, not descriptions.**
   Prerequisites like "load prompt-engineering first" are handled by the
   skill body — putting them in descriptions wastes trigger space.
@@ -150,13 +156,15 @@ and interop patterns.
 ### Route-to-Reference Tables
 
 When a skill has references, include a route table with a **Contents** column
-describing what type of depth the reference provides:
+describing what type of depth the reference provides. Use `${CLAUDE_SKILL_DIR}`
+for all reference paths — it resolves to the skill's absolute directory at load
+time, so the agent sees unambiguous paths it can pass directly to the Read tool.
 
 ```markdown
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Modules | `references/modules.md` | ESM/CJS comparison tables, file extension rules |
-| Streams | `references/streams.md` | Stream types table, pipeline patterns, backpressure |
+| Modules | `${CLAUDE_SKILL_DIR}/references/modules.md` | ESM/CJS comparison tables, file extension rules |
+| Streams | `${CLAUDE_SKILL_DIR}/references/streams.md` | Stream types table, pipeline patterns, backpressure |
 ```
 
 The Contents column tells the agent what's inside, enabling informed read
@@ -190,7 +198,24 @@ skill-name/
 
 ## Writing Instructions
 
-Skills are prompts. Apply prompt engineering fundamentals:
+Skills are prompts. Apply prompt engineering fundamentals.
+
+### Degrees of Freedom
+
+Match instruction specificity to task fragility:
+
+- **High freedom** (text guidance) — multiple approaches are valid, decisions
+  depend on context. "Analyze the code structure and suggest improvements."
+- **Medium freedom** (pseudocode/templates) — a preferred pattern exists but
+  some variation is acceptable. Provide a template with customizable parameters.
+- **Low freedom** (exact scripts) — operations are fragile, consistency is
+  critical, a specific sequence must be followed. "Run exactly this script.
+  Do not modify the command."
+
+Think of it as a bridge vs. an open field: narrow bridge with cliffs needs
+exact guardrails (low freedom); open field needs general direction (high freedom).
+
+### Clarity and Voice
 
 **Be clear and direct.** If a colleague reading your instructions would be
 confused, Claude will be too.
@@ -317,7 +342,7 @@ description: >-
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| [topic] | `references/[file].md` | [type of depth: tables, examples, patterns] |
+| [topic] | `${CLAUDE_SKILL_DIR}/references/[file].md` | [type of depth: tables, examples, patterns] |
 
 ## [Topic Sections]
 
@@ -353,6 +378,7 @@ Before deploying:
 - [ ] SKILL.md is behaviorally self-sufficient — no critical rules only in references
 - [ ] References contain only deepening material (examples, catalogs, how-tos)
 - [ ] Route-to-Reference table has Contents column (if references exist)
+- [ ] Degrees of freedom matched to task fragility (high/medium/low)
 - [ ] Instructions use imperative voice
 - [ ] Instructions structured (XML tags, numbered steps/rules)
 - [ ] At least one input/output example (few-shot) for generative skills

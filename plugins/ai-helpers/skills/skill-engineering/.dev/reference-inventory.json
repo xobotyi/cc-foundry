@@ -1,25 +1,18 @@
 {
   "sources": {
-    "Claude Code: Skills Overview": "https://code.claude.com/docs/en/skills.md",
+    "Claude Code: Skills Documentation": "https://code.claude.com/docs/en/skills.md",
+    "Agent Skills Open Standard: Specification": "https://agentskills.io/specification",
     "Claude API: Agent Skills Overview": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
     "Claude API: Skill Authoring Best Practices": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
-    "Claude API: Skills in the SDK": "https://platform.claude.com/docs/en/agent-sdk/skills.md",
+    "Claude API: Skills in the Agent SDK": "https://platform.claude.com/docs/en/agent-sdk/skills.md",
+    "Claude API: Skills for Enterprise": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/enterprise.md",
+    "Anthropic Engineering: Claude Code Best Practices": "https://www.anthropic.com/engineering/claude-code-best-practices",
+    "Anthropic Engineering: Effective Context Engineering": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
     "Claude Help: How to Create Custom Skills": "https://support.claude.com/en/articles/12512198-how-to-create-custom-skills",
-    "Agent Skills Specification": "https://agentskills.io/specification",
-    "Anthropic: Claude Code Best Practices": "https://www.anthropic.com/engineering/claude-code-best-practices",
-    "Anthropic: Complete Guide to Building Skills (PDF)": "https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf",
-    "Lee Han Chung: First Principles Deep Dive": "https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/",
-    "Mikhail Shilkov: Structure, Prompts, Invocation": "https://mikhail.io/2025/10/claude-code-skills/",
+    "Lee Han Chung: Agent Skills First Principles Deep Dive": "https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/",
+    "Mikhail Shilkov: Skill Tool Wire Format": "https://mikhail.io/2025/10/claude-code-skills/",
     "Scott Spence: Skills Activation Reliability": "https://scottspence.com/posts/how-to-make-claude-code-skills-activate-reliably",
-    "AlexOp: Claude Code Full Stack Explained": "https://alexop.dev/posts/understanding-claude-code-full-stack/",
-    "DataCamp: Claude Skills Tutorial": "https://www.datacamp.com/tutorial/claude-skills",
-    "DataCamp: Claude Code Hooks Guide": "https://www.datacamp.com/tutorial/claude-code-hooks",
-    "Bishoy Labib: Comprehensive Skills Guide": "https://www.bishoylabib.com/posts/claude-skills-comprehensive-guide",
-    "ChatPRD: Skills Workflow Explained": "https://www.chatprd.ai/how-i-ai/claude-skills-explained",
-    "Gend: Claude Skills Practical Guide": "https://www.gend.co/blog/claude-skills-claude-md-guide",
-    "Sid Bharath: Skills Tutorial": "https://www.siddharthbharath.com/claude-skills/",
-    "Tyler Folkman: Context Window Problem Solved": "https://tylerfolkman.substack.com/p/the-complete-guide-to-claude-skills",
-    "HumanLayer: Writing a Good CLAUDE.md": "https://www.humanlayer.dev/blog/writing-a-good-claude-md"
+    "HumanLayer: Instruction-Following Mechanics": "https://www.humanlayer.dev/blog/writing-a-good-claude-md"
   },
-  "lastFetched": "2026-01-31T13:19:05.268Z"
+  "lastFetched": "2026-03-05T12:10:05.174Z"
 }

@@ -82,10 +82,11 @@ description: >-
 **Tool skill:**
 ```yaml
 description: >-
-  Design and iterate Claude Code skills: description triggers
-  activation, instructions shape behavior. Invoke whenever task
-  involves any interaction with Claude Code skills — creating,
-  evaluating, debugging, or understanding how they work.
+  Design and iterate Claude Code skills: SKILL.md structure,
+  description formulas, content architecture, and quality evaluation.
+  Invoke whenever task involves any interaction with Claude Code
+  skills — creating, evaluating, debugging, or understanding how
+  they work.
 ```
 
 **Domain skill:**
@@ -113,10 +114,11 @@ Lists specific verbs → misses valid activations outside that set.
 **Broad domain claim (preferred):**
 ```yaml
 description: >-
-  Design and iterate Claude Code skills: description triggers
-  activation, instructions shape behavior. Invoke whenever task
-  involves any interaction with Claude Code skills — creating,
-  evaluating, debugging, or understanding how they work.
+  Design and iterate Claude Code skills: SKILL.md structure,
+  description formulas, content architecture, and quality evaluation.
+  Invoke whenever task involves any interaction with Claude Code
+  skills — creating, evaluating, debugging, or understanding how
+  they work.
 ```
 Claims domain with "any interaction with X", then lists keywords as
 examples under the broad claim.
@@ -232,7 +234,20 @@ description: >-
 [Input/output pairs showing expected behavior]
 ```
 
-## Step 5: Write Instructions
+## Step 5: Set Degrees of Freedom
+
+Before writing instructions, decide how much latitude the agent should have.
+
+| Level | When to Use | Example |
+|-------|-------------|---------|
+| **High freedom** (text guidance) | Multiple valid approaches, context-dependent decisions | "Analyze the code structure and suggest improvements" |
+| **Medium freedom** (pseudocode/templates) | Preferred pattern exists, some variation acceptable | Provide a template function with customizable parameters |
+| **Low freedom** (exact scripts) | Fragile operations, consistency critical, exact sequence required | "Run exactly: `python scripts/migrate.py --verify --backup`" |
+
+**Rule of thumb:** The more fragile or error-prone the operation, the
+lower the freedom. Code reviews → high. Database migrations → low.
+
+## Step 6: Write Instructions
 
 Skills are prompts—apply prompt engineering fundamentals.
 
@@ -321,7 +336,7 @@ If the user's intent is unclear:
 Do not guess at ambiguous requirements.
 ```
 
-## Step 6: Add Examples
+## Step 7: Add Examples
 
 Examples are the most effective way to communicate expected behavior.
 Few-shot prompting (showing input/output pairs) reliably improves output quality.
@@ -367,7 +382,23 @@ export const Button: React.FC<ButtonProps> = ({
 or specify if you'd like me to create sample data."
 ```
 
-## Step 7: Test Thoroughly
+## Step 8: Test Thoroughly
+
+### Evaluation-Driven Development
+
+Build evaluations BEFORE writing extensive documentation. This ensures
+your skill solves real problems rather than documenting imagined ones.
+
+1. **Identify gaps** — run Claude on representative tasks without a skill.
+   Document specific failures or missing context.
+2. **Create evaluations** — build 3+ scenarios that test these gaps.
+3. **Establish baseline** — measure Claude's performance without the skill.
+4. **Write minimal instructions** — create just enough content to address
+   the gaps and pass evaluations.
+5. **Iterate** — execute evaluations, compare against baseline, refine.
+
+This approach prevents over-engineering: you only add content that
+addresses observed failures, not anticipated ones.
 
 ### Activation Testing
 
