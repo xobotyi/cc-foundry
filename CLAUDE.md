@@ -85,8 +85,12 @@ the repo structure — this procedure contains everything needed.
    - **Add specification pages** alongside tutorial pages for the same topic (e.g.,
      the pyproject.toml specification alongside the "Writing pyproject.toml" guide).
      Tutorials explain the happy path; specs cover edge cases and full field lists.
-   - **Skip community blog posts and tutorials** — they paraphrase official docs,
-     go stale, and add noise. Official docs and canonical style guides are sufficient.
+   - **Skip tutorials** — they paraphrase official docs, go stale, and add noise.
+     Official docs and canonical style guides are sufficient.
+   - **Include blog posts only when they contain original findings** — reverse-
+     engineered internals, undocumented behavior, activation patterns, or novel
+     techniques not covered by official docs. Posts that merely repackage official
+     documentation as a walkthrough are tutorials in disguise — skip them.
    - **Use Perplexity or web search** to discover sources you might not know about,
      but be selective — most results for well-known ecosystems are obvious. The real
      value is for niche tools or discovering lesser-known official doc pages.
