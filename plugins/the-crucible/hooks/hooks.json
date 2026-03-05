@@ -6,9 +6,8 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "You are a stop-event classifier. Determine whether the assistant just completed a task for the user or is simply conversing.\n\nHook input: $ARGUMENTS\n\nLook at `last_assistant_message` in the input. Classify it:\n\n1. If `stop_hook_active` is true, respond: {\"ok\": true}\n2. If the message is a greeting, question answer, clarification, status update, acknowledgment, or casual conversation — respond: {\"ok\": true}\n3. If the message reports completing work the user requested (code changes, file creation, documentation, research, refactoring, configuration, design, or any deliverable) — respond:\n\n{\"ok\": false, \"reason\": \"Before finishing, invoke the quality-validation skill to verify your deliverable matches the original request. Then assess whether the changes warrant running the full code-quality-evaluation pipeline (8-agent review) before committing — consider the scope, risk, and complexity of what changed.\"}\n\nBe liberal in classifying as task completion — if the assistant lists what it changed or created, that's task completion. Only classify as non-task when the message is clearly conversational.",
-            "model": "haiku",
-            "timeout": 15
+            "prompt": "You are a JSON classifier. Output ONLY raw JSON, no markdown fences, no explanation. Examine the stop event context and classify. $ARGUMENTS\n\nIf stop_hook_active is true, output: {\"ok\":true}\nIf last_assistant_message is conversational (greeting, question, clarification, acknowledgment), output: {\"ok\":true}\nIf last_assistant_message reports completing a task or deliverable, output: {\"ok\":false,\"reason\":\"Invoke the quality-validation skill to verify deliverables match the original request. Then assess whether changes warrant running code-quality-evaluation before committing.\"}",
+            "timeout": 30
           }
         ]
       }

@@ -92,7 +92,7 @@
     {
       "name": "the-crucible",
       "description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
