@@ -118,6 +118,9 @@ The body is where you communicate with future readers. It answers:
 - **What** changed beyond the subject
 - **Why** this change was needed
 - **How to verify** if not obvious
+
+Wrap all body lines at 72 characters. This is a hard limit, not a guideline — git tooling
+(log, format-patch, email) assumes 72-char body lines. Trailers are the only exception.
 </body-philosophy>
 
 ### When Body is Essential
