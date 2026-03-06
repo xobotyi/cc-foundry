@@ -20,9 +20,9 @@ outdated instructions instead of adapting to the codebase as discovered.
 ## The Solution
 
 the-blueprint provides a four-stage pipeline that produces artifacts consumable by both humans
-and agents: design documents (problem analysis and solution recommendation), technical designs
-(component mapping and sequencing), decomposition documents (actionable task hierarchies), and
-issue tracker tasks with acceptance criteria.
+and agents: design documents (problem analysis, solution exploration, and committed decisions), technical
+designs (component mapping and sequencing), decomposition documents (actionable task
+hierarchies), and issue tracker tasks with acceptance criteria.
 
 Each stage builds on the previous one with explicit user approval gates. The pipeline
 preserves the reasoning behind decisions, making them discoverable months later when someone
@@ -42,18 +42,20 @@ agents consume them to plan implementation without drifting from intent.
 
 ### design-documents
 
-Problem analysis, solution exploration, and architectural decisions. Produces design documents
-with options comparison, recommendation, and cross-cutting concerns.
+Decision records that explore problems and commit to solutions before implementation. Produces
+design documents with options comparison, committed decisions, and cross-cutting concerns.
+Documents serve as thinking tools (forcing structured analysis), review artifacts (enabling
+pre-implementation feedback), and architecture decision records (preserving rationale).
 
 **Use when:** Creating, updating, reviewing, or asking questions about design documents. Start
 here when beginning the planning pipeline.
 
 ### technical-design
 
-Maps a chosen solution onto the codebase: affected components, tool selection, dependencies,
+Maps a decided solution onto the codebase: affected components, tool selection, dependencies,
 sequencing, and scope boundaries.
 
-**Use when:** A design document has been created and a solution was chosen. This skill
+**Use when:** A design document has been created and a solution was decided. This skill
 translates strategic decisions into component-level planning.
 
 ### task-decomposition
