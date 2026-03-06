@@ -79,8 +79,7 @@ Code quality is checked manually or not at all. This plugin provides a two-level
 pipeline: `quality-validation` checks that deliverables match the original request before
 completion, and `code-quality-evaluation` orchestrates 8 specialized review agents (naming,
 complexity, comments, tests, error handling, security, observability, documentation) that
-evaluate code in parallel. All agents are read-only — they report, you decide. A Stop hook
-automatically validates task completion before Claude reports work as done.
+evaluate code in parallel. All agents are read-only — they report, you decide.
 
 ```
 /plugin install the-crucible

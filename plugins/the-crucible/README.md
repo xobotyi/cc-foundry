@@ -16,20 +16,8 @@ observability — no single reviewer consistently covers all of them.
 
 ## The Solution
 
-the-crucible provides two levels of validation that work together.
-
-### Self-Evaluation on Task Completion
-
-A Stop hook fires whenever Claude finishes responding. A lightweight classifier detects whether
-Claude just completed a task (as opposed to answering a question or having a conversation). When
-it detects task completion, it prompts Claude to pause and evaluate its own work:
-
-- Re-read the original request and compare it against the deliverable
-- Check for incomplete parts, untested assumptions, or missing documentation updates
-- Decide whether the changes are significant enough to warrant full multi-agent review
-
-Claude does this evaluation with its full conversation context — it knows what was asked, what
-was discussed, and what was delivered. The hook just provides the nudge to check before stopping.
+the-crucible provides two levels of validation that work together: task completion checking
+(quality-validation) and multi-agent code review (code-quality-evaluation).
 
 ### Multi-Agent Code Review
 
@@ -66,8 +54,8 @@ intermediate file storage.
 ### quality-validation
 
 Validates task deliverables match original requirements. Applies to any task type — code changes,
-documentation, research, refactoring. The Stop hook prompts Claude to invoke this skill
-automatically on task completion, but you can also invoke it manually at any point.
+documentation, research, refactoring. Invoke manually when you want to verify your work before
+committing or reporting completion.
 
 Validation varies by task type:
 - **Code changes** — run tests if available, trace logic paths, check edge cases and error
@@ -83,8 +71,7 @@ in parallel, aggregates their findings by severity, and presents them for triage
 which issues to fix.
 
 **Use when:** Before committing significant code changes, reviewing pull requests, or evaluating
-code quality on any implementation. The Stop hook may prompt Claude to consider running this after
-task completion — Claude decides based on the scope and risk of the changes.
+code quality on any implementation.
 
 ## Related Plugins
 

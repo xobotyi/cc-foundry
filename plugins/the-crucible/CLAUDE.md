@@ -61,35 +61,6 @@ no intermediate storage — agents send findings directly to the leader.
 - Developer addresses findings in priority order
 - Iterative fix-verify loop
 
-## Hooks
-
-| Event | Type | Purpose |
-|-------|------|---------|
-| `Stop` | `prompt` | Triggers self-evaluation before task completion |
-
-The Stop hook uses a **prompt hook on haiku** as a lightweight classifier. It reads
-`last_assistant_message` and classifies it as either task completion or conversation. For task
-completion, it returns `{"ok": false}` with a self-evaluation prompt that forces the **main
-agent** — which has full conversation context — to compare its deliverable against the original
-request before stopping.
-
-This design exploits a key insight: the main agent already has everything needed to evaluate
-completeness (full conversation history, file access, test runners). It just needs a nudge to
-pause and check. The hook provides that nudge without trying to be the evaluator itself.
-
-**How it works:**
-1. Claude finishes responding → Stop hook fires
-2. Haiku classifies `last_assistant_message` as task completion or conversation (15s timeout)
-3. If conversation → `{"ok": true}` → Claude stops normally
-4. If task completion → `{"ok": false}` with a reason prompting the main agent to:
-   a. Invoke the **quality-validation** skill to verify the deliverable matches the request
-   b. Assess whether the changes warrant the full **code-quality-evaluation** pipeline
-      (8-agent review) based on scope, risk, and complexity
-5. On second pass, `stop_hook_active` is true → `{"ok": true}` → prevents infinite loops
-
-The hook does not embed evaluation logic — it delegates to the skills. The main agent decides
-which level of validation is appropriate given its full context.
-
 ## Relationship to the-blueprint
 
 the-blueprint produces the plan. the-crucible validates the execution.
