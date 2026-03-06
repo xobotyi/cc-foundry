@@ -10,8 +10,8 @@ description: >-
 # Technical Design
 
 High-level technical planning that bridges a design document to task decomposition.
-The input is a design document with a chosen solution. The output is a technical design
-that maps the solution onto the codebase without prescribing implementation details.
+The input is a design document with a decided solution. The output is a technical design
+that maps the decision onto the codebase without prescribing implementation details.
 
 ## Why Technical Design Matters
 
@@ -32,7 +32,7 @@ breakdown. It scopes the territory so that task decomposition can divide it.
 
 Write a technical design when:
 
-- A design document has been created and a solution was chosen
+- A design document has been created and a solution was decided
 - The chosen solution affects multiple components or systems
 - Tool or technology selection is needed before implementation
 - The implementation sequence has non-obvious dependencies
@@ -46,10 +46,10 @@ Skip when:
 
 ### Step 1: Read the Design Document
 
-1. Read the design document's recommendation, constraints, and conditions. A technical
+1. Read the design document's decision, constraints, and conditions. A technical
    design requires a design document as input — if none exists, stop and create one first
    using the `design-documents` skill.
-2. Confirm understanding with the user before proceeding — restate the chosen solution
+2. Confirm understanding with the user before proceeding — restate the decided solution
    in your own terms.
 
 ### Step 2: Identify Affected Components
@@ -124,7 +124,7 @@ that analysis belongs back in the design document.
 # Technical Design: [Feature/Change Name]
 
 **Design Document:** [link to or name of the design document]
-**Chosen Solution:** [brief restatement of the recommended option]
+**Chosen Solution:** [brief restatement of the decided solution]
 
 ## Affected Components
 
@@ -274,28 +274,62 @@ at the module level, describe current/target state per component, map dependenci
 exhaustively, and set explicit scope boundaries. Do not narrate which rules you are
 following.
 
-**When reviewing:** Evaluate the existing technical design against the Quality Checklist.
-For each violation, cite the specific rule, quote the problematic section, and show the
-fix inline. Common review findings:
-- Components identified at too fine a granularity (functions/classes instead of modules)
-- Technical approach contains implementation details (production code, function signatures)
-- Missing components — modules from the design document with no corresponding entry
-- Dependency graph incomplete — components listed in Affected Components but absent from
-  Dependencies and Sequencing
-- Scope boundaries missing or vague
+<enforcement>
+
+**When reviewing or working with an existing technical design**, evaluate it against every
+rule below. Report violations explicitly — do not silently accept a non-compliant document.
+
+**Violations to check:**
+
+1. **Design document link.** Must reference the source design document. If missing, the
+   technical design has no traceable origin.
+2. **Component granularity.** Components must be at the module/package/service level — not
+   individual functions or classes. If function signatures or class names appear in the
+   Affected Components section, cite the violation.
+3. **Implementation details.** Production code, function signatures, or detailed class
+   hierarchies do not belong here. Pseudocode is acceptable for logical changes only.
+   The test: "Does this read like a code review?" If yes, it's too detailed.
+4. **Component coverage.** Every component affected by the design document's decision must
+   appear. Cross-reference the design document — if it mentions a system or module that
+   doesn't appear here, that's a gap.
+5. **Dependency completeness.** Every component from Affected Components must appear in
+   Dependencies and Sequencing. A component listed but not sequenced produces tasks that
+   block each other or start before prerequisites are ready.
+6. **Tool justification.** Tool and technology selections must include brief justification.
+   "We'll use Redis" without "because X" is a violation.
+7. **Scope boundaries.** In-scope and out-of-scope must be explicit. Vague boundaries
+   ("and other related changes") are violations.
+8. **Risks and assumptions.** Must be documented. A technical design with zero risks listed
+   hasn't been critically examined.
+9. **File naming.** Must follow `NN-short-description.technical-design.md` convention with
+   the same number prefix as the parent design document.
+
+**Reporting format:** For each violation, state:
+- Which rule was violated
+- Quote or cite the problematic section
+- What the fix is
+
+Do not present a summary like "overall looks good with minor issues." List every violation.
+If there are no violations, state that explicitly.
+
+</enforcement>
 
 ## After Completion
 
-When the technical design is complete and approved:
+When the user approves the technical design:
 
-1. Prompt the user to proceed with task decomposition:
-   > The technical design is complete. The next step is decomposing it into actionable tasks.
-   > Would you like to proceed with task decomposition?
-2. On confirmation, invoke the `task-decomposition` skill.
+1. Run the Quality Checklist against the document. For each item that fails, report it
+   to the user with the specific violation and proposed fix. Do not proceed until all
+   checklist items pass.
+2. Once the checklist passes, prompt the user to proceed with task decomposition:
+   > The technical design is complete and passes all quality checks. The next step is
+   > decomposing it into actionable tasks. Would you like to proceed with task
+   > decomposition?
+3. On confirmation, invoke the `task-decomposition` skill.
 
 ## Related Skills
 
-- **design-documents** — Produces the input for this skill: the chosen solution with rationale
+- **design-documents** — Produces the input for this skill: the decided solution with rationale
 - **task-decomposition** — Consumes this skill's output: decomposes the technical design into
   tracked work items
 - **task-creation** — Creates individual tasks from decomposition output
