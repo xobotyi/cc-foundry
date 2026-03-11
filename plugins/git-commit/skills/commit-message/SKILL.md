@@ -366,6 +366,38 @@ Each commit is focused and independently reviewable.
 
 </examples>
 
+## Amending Commits
+
+<amend-rule>
+When amending a commit (`git commit --amend`), **rewrite the message as if the commit is new**.
+
+An amended commit replaces the original — it rewrites history. The final message must describe
+what the commit introduces, not the journey of revisions that led to it. There is no "original
+commit" from the reader's perspective; there is only the resulting commit.
+
+**Common violation:** The agent treats the amend as iterative work and writes a message describing
+changes relative to the original commit ("also update the tests", "fix the edge case from the
+previous version", "address review feedback"). This is wrong — the reader has no access to the
+original commit and no context for "also" or "previous."
+
+**Correct approach:** Read the full staged diff after amending, then write a message that describes
+the complete change as a single introduction. Ignore the original message entirely — start fresh.
+
+```
+# WRONG — describes the amend as incremental work
+[parser] fix edge case missed in previous commit
+
+Adds handling for empty input that was overlooked in the initial implementation.
+Also updates tests to cover the new branch.
+
+# RIGHT — describes the complete change
+[parser] handle empty input in token scanner
+
+Empty input previously caused a nil dereference in the scanner loop.
+Returns an empty token list instead.
+```
+</amend-rule>
+
 ## No AI Attribution
 
 <forbidden>
@@ -388,5 +420,6 @@ Commits must appear as regular developer commits.
 - **Body is essential** — single-line commits are rarely acceptable
 - **BREAKING first** — breaking changes start body with `BREAKING:` prefix
 - **Trailers for metadata** — use Title-Case, structured format
+- **Amends rewrite history** — amended messages describe the full change, not the delta
 - **No AI attribution** — commits appear as regular developer work
 </critical>
