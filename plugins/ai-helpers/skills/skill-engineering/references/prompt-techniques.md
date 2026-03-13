@@ -103,20 +103,33 @@ Numbers ensure Claude follows exact sequence.
 
 ## Instruction Placement
 
-**Critical rules go at the end.**
+Models follow a **U-shaped attention curve**: instructions at the beginning
+and end of a document are followed most reliably; middle content suffers
+from attention decay ("lost in the middle"). Research shows performance
+degrades 13.9-85% as input length increases.
 
-Instructions near the context boundary (end of SKILL.md) are followed
-more reliably than those buried in the middle.
+**Placement strategy:**
+- **Top 20% (primacy zone):** Identity/philosophy, critical constraints
+- **Middle:** Detailed rules by topic, route table, examples
+- **Bottom 20% (recency zone):** Reinforced critical rules, quality checks
+
+**Dual-placement for critical rules:** State important rules near the top
+AND reinforce at the end with different phrasing (principle at top,
+checklist item at bottom).
 
 ```markdown
+# My Skill
+
+**Never skip validation.** ← Top: stated as principle
+
 ## Details
 [Long explanation of the domain...]
 
 ## Process
 [Steps to follow...]
 
-## IMPORTANT
-Never skip validation. Always confirm before destructive operations.
+## Critical Rules
+- [ ] Validation completed before any destructive operation ← Bottom: checklist
 ```
 
 ## Chain of Thought
@@ -136,6 +149,60 @@ Then provide your answer in <answer> tags.
 
 **Critical:** Claude must output its thinking. Without outputting
 the thought process, no reasoning improvement occurs.
+
+**CoT trade-off in skills:** Explicit CoT can degrade instruction-following
+by diverting attention from simple constraints (word limits, format rules).
+The longer the reasoning chain, the wider the "contextual gap" between
+instructions and output. For skills that persist across varied requests:
+
+- **Do not** embed blanket "think step by step" in skills
+- **Do** use high-level guidance ("think thoroughly") when reasoning helps
+- **Do** use discrete numbered steps for workflows (enables error
+  self-localization and backtracking)
+- **Avoid** CoT for tasks with many mechanical constraints
+- For reasoning models (Claude 3.7+), adding CoT on top of native
+  reasoning causes "double thinking" — amplifies instruction failures
+
+## Declarative vs Procedural Instructions
+
+Choose instruction style based on what the content demands:
+
+**Declarative** (bullet-list rules, constraints, conventions):
+- Use for behavioral constraints, coding conventions, safety guardrails
+- Models utilize factual constraints more reliably across varied inputs
+- Larger models benefit more from declarative than procedural knowledge
+- Default style for the majority of skill content
+
+**Procedural** (numbered steps, workflows):
+- Use for tasks with strict ordering, multi-step workflows
+- Highly effective for agentic tasks when structured as Hierarchical
+  Task Networks (HTN) — can enable a 20B model to outperform 120B
+- Cap at ~10-15 steps per sequence; decompose beyond that
+- Write in third-person imperative: "Extract the text..." not "I will..."
+
+**The hybrid pattern:** Declarative at top level (identity, constraints),
+procedural for specific workflow sections:
+
+```markdown
+# My Skill
+
+## Conventions              ← Declarative: bullet-list rules
+- Use ESM for all imports
+- Prefer node: prefix
+
+## Workflow                 ← Procedural: numbered steps
+1. Read the configuration
+2. Validate against schema
+3. Generate output
+
+## Critical Rules           ← Declarative: reinforcement
+- Never skip validation
+```
+
+**Key research finding:** Declarative knowledge provides greater performance
+benefits than procedural in the majority of tasks. Procedural outperforms
+only in reasoning tasks with simple logic (elementary arithmetic, basic
+commonsense) and complex multi-step agentic workflows.
 
 ## Format Control
 

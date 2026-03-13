@@ -9,9 +9,11 @@ description: >-
 # Skill Engineering
 
 Skills are prompt templates that extend Claude with domain expertise.
-Description triggers activation; instructions shape behavior. Claude sees
-only `name` and `description` at startup, then loads full SKILL.md content
-when triggered.
+SKILL.md must be **behaviorally self-sufficient** — an agent reading only
+SKILL.md, without loading any references, must be able to do the job
+correctly. References provide depth, not breadth. Description triggers
+activation; instructions shape behavior. Claude sees only `name` and
+`description` at startup, then loads full SKILL.md content when triggered.
 
 <prerequisite>
 **Skills are prompts.** Before writing or improving a skill, invoke
@@ -34,7 +36,7 @@ Skip only for trivial edits (typos, formatting).
 | Skill not triggering, wrong output, refinement | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Activation fixes, output fixes, restructuring, splitting guidance |
 | Multi-file skills, scripts, subagents, hooks | [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] | Fork pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping |
 | Debugging activation failures, script errors | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] | Diagnostic steps for structure, activation reliability, output, script, reference issues |
-| Writing persuasive instructions, reasoning | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | XML tags, chain of thought, format control, instruction strengthening |
+| Writing persuasive instructions, reasoning | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | XML tags, chain of thought, CoT trade-offs, declarative vs procedural, instruction placement, format control, instruction strengthening |
 
 Read the relevant reference before proceeding.
 
@@ -215,6 +217,49 @@ Match instruction specificity to task fragility:
 Think of it as a bridge vs. an open field: narrow bridge with cliffs needs
 exact guardrails (low freedom); open field needs general direction (high freedom).
 
+### Declarative vs Procedural
+
+Choose instruction style based on what the content demands:
+
+- **Declarative** (bullet-list rules, constraints, conventions) — for
+  behavioral boundaries, coding conventions, safety guardrails, formatting
+  rules. Models utilize factual constraints more reliably across varied
+  inputs. Use for the majority of skill content.
+- **Procedural** (numbered steps, workflows) — for tasks with strict
+  ordering requirements, multi-step agent workflows, simple sequential
+  processes. Cap at ~10-15 steps per sequence; decompose beyond that into
+  sub-procedures (Hierarchical Task Networks).
+
+**Default to declarative.** Research shows declarative knowledge provides
+greater performance benefits than procedural in the majority of tasks.
+Reserve numbered steps for workflows where order genuinely matters.
+
+### Instruction Placement
+
+Models follow a **U-shaped attention curve**: instructions at the beginning
+and end of a document are followed most reliably; middle content suffers
+from attention decay.
+
+- **Top 20% (primacy zone):** Identity, philosophy, critical constraints
+- **Middle:** Detailed rules by topic, route table, examples
+- **Bottom 20% (recency zone):** Reinforced critical rules, quality checks
+
+**Dual-placement strategy:** For rules that absolutely must be followed,
+state them near the top AND reinforce at the end. Use different phrasing —
+frame as a principle at the top, as a checklist item at the bottom.
+
+### Every Instruction Must Earn Its Place
+
+Research shows unnecessary requirements reduce task success even when the
+model can follow them. Every instruction competes for attention. Before
+adding a rule, verify the model's default behavior is insufficient — if
+deleting the rule doesn't change output quality, remove it.
+
+This does not mean minimize everything — skills exist to add rules the
+model doesn't know. It means: don't add rules for things the model already
+does well. When auditing a skill, apply the deletion test: "if I remove
+this rule, does output quality measurably change?"
+
 ### Clarity and Voice
 
 **Be clear and direct.** If a colleague reading your instructions would be
@@ -247,10 +292,9 @@ Return as JSON: {"status": "ok|error", "data": [...]}
 ```
 
 **Add examples.** Few-shot prompting is the most reliable way to communicate
-expected behavior. Include input/output pairs.
-
-**Place critical rules at the end.** Instructions near the context boundary
-are followed more reliably.
+expected behavior. Include input/output pairs. Examples calibrate format
+and style — they help the model locate pre-trained patterns, not learn
+new semantics. 3-5 examples is sufficient; returns diminish past 8-16.
 
 **Numbered lists vs bullet lists:**
 - **Numbered lists** — ONLY for sequential steps where order matters:
@@ -379,9 +423,11 @@ Before deploying:
 - [ ] References contain only deepening material (examples, catalogs, how-tos)
 - [ ] Route-to-Reference table has Contents column (if references exist)
 - [ ] Degrees of freedom matched to task fragility (high/medium/low)
+- [ ] Declarative style for constraints/conventions, procedural only for ordered workflows
 - [ ] Instructions use imperative voice
 - [ ] Instructions structured (XML tags, numbered steps/rules)
 - [ ] At least one input/output example (few-shot) for generative skills
-- [ ] Critical rules placed at end
+- [ ] Critical rules in top 20% and/or bottom 20% (not only in middle)
+- [ ] Every instruction earns its place (deletion test: removing it changes output)
 - [ ] Under 500 lines (exceeding is acceptable when all content is behavioral)
 - [ ] Name matches directory (lowercase, hyphens)
