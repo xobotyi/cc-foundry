@@ -244,9 +244,9 @@ After any change:
 
 | Score | Criteria |
 |-------|----------|
-| 20 | SKILL.md behaviorally self-sufficient; references contain only deepening material; route table has Contents column |
-| 15 | Most behavioral rules inline; one or two rules only in references |
-| 10 | Significant behavioral content only in references; agent would produce partial/incorrect output without reading them |
+| 20 | SKILL.md behaviorally self-sufficient; references contain only deepening material; route table has Contents column; critical rules in primacy/recency zones |
+| 15 | Most behavioral rules inline; one or two rules only in references; mostly good placement |
+| 10 | Significant behavioral content only in references; critical rules buried in middle |
 | 5 | SKILL.md is mostly a router; critical rules live in references |
 | 0 | No references exist but SKILL.md is incomplete, or references duplicate SKILL.md body content |
 
@@ -257,6 +257,11 @@ After any change:
 - Are anti-patterns stated as positive directives in the body, or
   duplicated in a separate table?
 - Does the route table include a Contents column?
+- Are critical rules placed in the top 20% or bottom 20% of SKILL.md
+  (not only buried in the middle)?
+- Is instruction style appropriate — declarative for constraints/conventions,
+  procedural only for ordered workflows?
+- Does every instruction earn its place (deletion test)?
 
 ### Interpretation
 

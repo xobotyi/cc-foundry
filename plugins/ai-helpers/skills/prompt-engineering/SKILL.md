@@ -8,8 +8,9 @@ description: >-
 
 # Prompt Engineering
 
-Design effective prompts for LLMs. Apply when crafting skills, agents,
-output styles, system prompts, or any AI instructions.
+**Every prompt is an interface contract — clarity of intent determines
+quality of output.** Apply when crafting skills, agents, output styles,
+system prompts, or any AI instructions.
 
 ## Quick Start
 
@@ -21,20 +22,6 @@ Most prompts need only three things:
 
 Start here. Add complexity only when this fails.
 
-```
-Summarize the following article in 3 bullet points.
-Each bullet should be under 20 words.
-Focus on business implications.
-
-Example output:
-- Revenue increased 15% due to new product line launch
-- Operating costs reduced through automation initiatives
-- Market share expanded in European regions
-
-Article:
-{{ARTICLE}}
-```
-
 ## What's Wrong With Your Prompt?
 
 | Symptom | Fix | Details |
@@ -42,7 +29,7 @@ Article:
 | Wrong format | Add explicit format + example | [Output Format](#output-format) |
 | Missing information | Be more specific about what to include | [Be Specific](#be-specific) |
 | Hallucination | Add context, request citations | [Provide Context](#provide-context) |
-| Ignores instructions | Move instructions to end, use XML tags | [Long Context Rules](#long-context-rules) |
+| Ignores instructions | Place critical rules at top and end, use XML tags | [Persistent Context](#prompting-in-persistent-context) |
 | Complex reasoning fails | Add CoT or use extended thinking | [Reasoning](#4-let-claude-think-chain-of-thought) |
 | Inconsistent results | Add 3-5 examples | [Examples](#2-use-examples-few-shot) |
 | Too verbose | Specify word/sentence limits | [Be Specific](#be-specific) |
@@ -60,6 +47,8 @@ Article:
 | Claude-specific | [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] | Prefilling examples, system prompt API usage, extended thinking API details, technique combinations |
 | Long context | [`${CLAUDE_SKILL_DIR}/references/long-context.md`] | Document organization patterns, XML structuring for multi-doc, query patterns, chunking strategies |
 | Agent & tool patterns | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] | ReAct, PAL, Reflexion, ART implementation patterns, pattern selection table |
+| Agent-authored prompts | [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`] | Workflow for agents writing prompts, decomposition, self-evaluation, failure modes, quality dimensions, optimization patterns |
+| Persistent context | [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`] | How techniques transfer to skills/system prompts, research citations, declarative vs procedural, instruction degradation, few-shot positioning |
 
 ---
 
@@ -105,6 +94,11 @@ Example output:
 
 3-5 examples typically sufficient. Cover edge cases.
 
+Examples function as **calibration**, not teaching — they help the model
+locate pre-trained patterns rather than learn new task semantics. Format,
+label space, and input distribution matter more than perfect label accuracy.
+Performance plateaus after 8-16 examples.
+
 ```
 Text: "Great service!" → Positive
 Text: "Worst purchase ever" → Negative
@@ -121,6 +115,9 @@ Text: "Absolutely love it!" → ?
 - **Prioritize format consistency** over perfect labeling — research shows
   format and input distribution matter as much as label correctness
 - **Wrap in `<examples>` tags** for clear separation from instructions
+- **Position matters in system context** — examples at the start of a
+  system prompt outperform those placed later (primacy bias); in skills,
+  place examples after rules but before the closing section
 
 **Choosing the right paradigm:**
 
@@ -197,6 +194,15 @@ With extended thinking, provide high-level guidance ("think thoroughly,
 consider multiple approaches") — not prescriptive steps. Claude's
 creativity often exceeds human-prescribed step sequences.
 
+**CoT trade-off — reasoning vs. instruction-following:** Explicit CoT
+can degrade adherence to simple constraints (word limits, format rules,
+negative constraints like "no commas"). Reasoning widens the contextual
+gap between instructions and output, diverting attention from mechanical
+rules. Use CoT selectively: beneficial for structural formatting and
+complex logic, harmful for tasks with many simple constraints. For
+reasoning models (Claude 3.7+, o-series), adding CoT on top of native
+reasoning ("double thinking") amplifies the problem.
+
 CoT variants, Tree-of-Thoughts, self-consistency sampling: see
 [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`].
 
@@ -215,7 +221,8 @@ Instructions:
 5. Output only processed messages, separated by "---"
 ```
 
-Numbered steps ensure Claude follows the exact sequence.
+Numbered steps ensure Claude follows the exact sequence. Cap at ~10-15
+steps per sequence; beyond that, decompose into sub-procedures.
 
 ---
 
@@ -233,6 +240,50 @@ Precise calculation           → PAL (generate code)
 
 Agent and tool patterns (ReAct, PAL, Reflexion, ART): see
 [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`].
+
+---
+
+## Prompting in Persistent Context
+
+Techniques behave differently in persistent context (skills, system prompts,
+CLAUDE.md) vs. one-shot user messages. Apply these rules when writing
+instructions that persist across interactions.
+
+**Instruction placement — the U-shaped curve.** Models follow instructions
+at the beginning and end of context most reliably; middle content suffers
+from attention decay ("lost in the middle"). Place identity and critical
+constraints at the top, reinforce critical rules at the end.
+
+**Declarative over procedural for constraints.** Rules, conventions, and
+behavioral boundaries work better as declarative bullet lists than as
+step-by-step procedures. Reserve numbered steps for workflows with strict
+ordering. For complex procedures exceeding ~10-15 steps, decompose into
+sub-procedures (Hierarchical Task Networks) rather than extending a single
+numbered list.
+
+**Domain priming over persona assignment.** "This is a security review
+task" outperforms "You are an expert security auditor." Identity-level
+framing in first position is more stable than role assignment.
+
+**CoT degrades instruction-following in persistent context.** Reasoning
+chains widen the gap between instructions and output, causing the model
+to neglect simple constraints. Use high-level guidance ("think thoroughly")
+rather than prescriptive step-by-step reasoning.
+
+**Few-shot examples calibrate, not teach.** In persistent context,
+examples help the model locate pre-trained patterns — they set format,
+tone, and label space. 3-5 is sufficient; returns diminish past 8-16.
+Place examples near the end of the skill (recency advantage) but not
+in the very last position (reserve that for critical rules).
+
+**Every instruction must earn its place.** Research shows unnecessary
+requirements reduce task success even when the model can follow them.
+Every instruction competes for attention. Before adding a rule, verify
+the model's default behavior is insufficient — if deleting the rule
+doesn't change output quality, remove it.
+
+Full research synthesis: see
+[`${CLAUDE_SKILL_DIR}/references/persistent-context.md`].
 
 ---
 
@@ -258,22 +309,26 @@ Claude continues from `{`, outputting pure JSON without preamble.
 - Use for: format enforcement (JSON, XML, tables), skipping verbose
   introductions, maintaining roleplay consistency
 
-### System Prompts (Roles)
+### System Prompts
 
-Use the `system` parameter to define Claude's role and expertise:
+Use the `system` parameter to define Claude's role and context:
 
 ```python
-system="You are a senior security auditor specializing in web applications."
+system="This is a web application security audit task. Apply OWASP Top 10."
 ```
 
 **System prompt rules:**
-- Be specific about the role — "senior DevOps engineer specializing in
-  Kubernetes at a fintech startup" beats "helpful assistant"
-- Put role/persona in system prompt, task in user message
-- Role prompting activates domain-specific knowledge — "You are a CFO"
-  produces fundamentally different analysis than "You are a data scientist"
-- Combine with expertise markers: years of experience, methodology,
-  specific standards
+- **Prefer domain priming over persona assignment.** "This is a security
+  audit task" is more reliable than "You are a brilliant security expert."
+  Research shows persona prompting is volatile — negated personas often
+  match or exceed positive persona performance. Domain priming provides
+  consistent improvements across models.
+- Put domain context in system prompt, task in user message
+- If using a persona, place it at the very start — identity-level
+  instructions in first position leverage the attention sink phenomenon
+  for stable influence across long conversations
+- Combine domain priming with specificity markers: methodology, standards,
+  constraints ("Apply OWASP Top 10, focus on injection and auth bypass")
 
 Full API details and technique combinations: see
 [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`].
@@ -284,8 +339,10 @@ Full API details and technique combinations: see
 
 When working with 20K+ token documents, follow these rules:
 
-- **Put documents at the top, query at the bottom.** Queries at the end
-  improve response quality by up to 30% with complex multi-document inputs.
+- **Put documents at the top, query at the bottom.** Models exhibit a
+  U-shaped attention curve (primacy + recency bias) — content at the
+  beginning and end is followed most reliably, middle content degrades.
+  Queries at the end improve response quality by up to 30%.
 - **Wrap each document in XML tags** with identifying metadata (source,
   type, date):
   ```xml
@@ -395,6 +452,29 @@ Attack taxonomy, defense implementation details, full checklist: see
 
 ---
 
+## Writing Prompts as an Agent
+
+When you (the AI) are authoring a prompt for another model to execute —
+skills, system prompts, subagent instructions, hook prompts — the process
+differs from human prompt authoring:
+
+1. **Decompose first** — separate role, task, constraints, format, context,
+   and examples into distinct components before writing any text
+2. **Scaffold with XML tags** — never deliver a single-paragraph prompt
+3. **Self-evaluate the draft** — check clarity, specificity, robustness,
+   completeness, and structure before delivering
+4. **Cap refinement at 2-3 cycles** — diminishing returns after that;
+   if not converging, rework the decomposition
+
+**Common agent failure modes:** blob-prompts (unstructured paragraphs),
+confident sub-optimality (plausible but underperforming first drafts),
+instruction inflation (adding without removing), overfitting to examples.
+
+Full workflow, quality scoring dimensions, and optimization patterns: see
+[`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
+
+---
+
 ## Quality Checklist
 
 Before finalizing a prompt:
@@ -406,6 +486,7 @@ Before finalizing a prompt:
 - [ ] Golden rule passed (colleague wouldn't be confused)
 - [ ] Long documents placed at top, query at bottom
 - [ ] XML tags separate distinct components
-- [ ] Critical rules placed at end of prompt
+- [ ] Critical rules in top 20% and/or bottom 20% (not buried in middle)
 - [ ] Security considered (if handling untrusted input)
 - [ ] Right technique chosen (zero-shot → few-shot → CoT → extended thinking)
+- [ ] For persistent context: every instruction earns its place (deletion test)

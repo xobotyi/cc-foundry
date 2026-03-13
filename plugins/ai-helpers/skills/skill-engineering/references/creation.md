@@ -249,7 +249,27 @@ lower the freedom. Code reviews → high. Database migrations → low.
 
 ## Step 6: Write Instructions
 
-Skills are prompts—apply prompt engineering fundamentals.
+Skills are prompts — apply prompt engineering fundamentals.
+
+### Choose Declarative vs Procedural
+
+Default to **declarative** (bullet-list rules, constraints, conventions) for
+the majority of skill content. Models utilize factual constraints more
+reliably across varied inputs.
+
+Use **procedural** (numbered steps) only for workflows with strict ordering.
+Cap at ~10-15 steps per sequence; decompose beyond that into sub-procedures.
+
+```markdown
+## Conventions              ← Declarative: bullet-list rules
+- Use ESM for all imports
+- Prefer `node:` prefix for builtins
+
+## Workflow                 ← Procedural: numbered steps (order matters)
+1. Read the configuration file
+2. Validate against the schema
+3. Generate output files
+```
 
 ### Use Imperative Language
 
@@ -306,20 +326,40 @@ Return: {"status": "ok|error", "data": [...]}
 
 Tags improve instruction following, especially in complex skills.
 
-### Place Critical Rules at the End
+### Place Critical Rules in Primacy and Recency Zones
 
-Instructions near the context boundary are followed more reliably:
+Models follow a **U-shaped attention curve**: instructions at the beginning
+and end of a document are followed most reliably; middle content suffers
+from attention decay.
+
+- **Top 20%:** Identity, philosophy, critical constraints
+- **Middle:** Detailed rules by topic, route table, examples
+- **Bottom 20%:** Reinforced critical rules, quality checks
+
+For rules that absolutely must be followed, use **dual-placement** — state
+them near the top AND reinforce at the end with different phrasing:
 
 ```markdown
-## Background
+# My Skill
+
+**Never skip validation.** ← Top: stated as principle
+
+## Details
 [Domain explanation...]
 
 ## Process
 [Steps...]
 
-## IMPORTANT
-Never skip validation. Always confirm before destructive operations.
+## Critical Rules
+- [ ] Validation completed before any operation ← Bottom: checklist
 ```
+
+### Every Instruction Must Earn Its Place
+
+Before adding a rule, verify the model's default behavior is insufficient.
+If deleting the rule doesn't change output quality, remove it. Research
+shows unnecessary requirements reduce task success — every instruction
+competes for attention.
 
 ### Handle Ambiguity
 
