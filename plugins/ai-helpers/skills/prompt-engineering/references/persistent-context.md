@@ -40,7 +40,10 @@ user-level information. This privilege changes how every technique works:
 ### Few-Shot Examples
 
 **Transfer:** Effective but position-sensitive and interaction-dependent.
+SKILL.md covers practical rules (3-5 examples, ordering, placement). This
+section provides the research findings behind those rules.
 
+**Research findings:**
 - Examples at the **start of a system prompt** consistently outperform those
   placed later — primacy bias is strong and persistent across model families.
 - Examples **strengthen role-oriented prompts** (identity framing like "you
@@ -52,24 +55,9 @@ user-level information. This privilege changes how every technique works:
   performance** relative to zero-shot when the model already has strong
   priors for the domain (e.g., Java code generation). Re-anchor with
   high-constraint specificity if using examples anyway.
-- Examples function as **calibration** — they help the model locate
-  pre-trained patterns by specifying the label space, input distribution,
-  and output format. They do not teach new task semantics. Randomly replacing
-  labels in demonstrations barely hurts performance.
-- Performance plateaus after 8-16 examples. More examples provide diminishing
-  signal — they simply re-confirm what 3-5 already established.
 - **Order sensitivity** is fundamental and does not diminish with model
   scale. The specific sequence of examples can swing performance from
   near-SOTA to random-guess levels.
-
-**Practical rules for skills:**
-- Use 3-5 examples maximum in SKILL.md; offload larger sets to references
-- Place examples after behavioral rules but before the closing section
-- Order from simple → complex, with the most representative example last
-- If the skill frames identity (coding discipline, reviewer persona), examples
-  reinforce it — include them
-- If the skill is purely task-oriented (workflow, data processing), test
-  whether examples help or hurt — they may distract from instructions
 
 **Key papers:** "Where to show Demos in Your Prompt" (Cobbina & Zhou);
 "How Few-shot Demonstrations Affect Prompt-based Defenses" (multiple
@@ -78,8 +66,10 @@ authors); "Rethinking the Role of Demonstrations" (Min et al.)
 ### Chain-of-Thought
 
 **Transfer:** Mixed — frequently degrades instruction-following in
-persistent context.
+persistent context. SKILL.md covers practical rules (no blanket CoT, high-level
+guidance, constraint re-statement). This section provides the research.
 
+**Research findings:**
 - Explicit CoT in a system prompt **degrades instruction adherence** by
   widening the "contextual gap" between instructions and output. Longer
   reasoning chains increase the distance, making constraint retention harder.
@@ -95,17 +85,6 @@ persistent context.
 - Structuring reasoning as **discrete numbered steps** (a "Thought MDP")
   enables models to self-localize errors and backtrack — 20-40%
   self-correction lift vs. unstructured CoT.
-
-**Practical rules for skills:**
-- Do not embed blanket CoT instructions ("think step by step") in skills
-  that persist across varied requests — some requests benefit, many don't
-- Use high-level guidance ("think thoroughly") rather than prescriptive
-  step-by-step reasoning plans
-- For Claude models, prefer adaptive thinking over manual CoT — it
-  calibrates reasoning depth per request
-- If CoT is necessary for a specific sub-task, repeat critical constraints
-  after the reasoning block to re-focus attention
-- For skills with many mechanical constraints, avoid CoT entirely
 
 **Key papers:** "When Thinking Fails" (Li et al.); "Scaling Reasoning,
 Losing Control" (multiple authors); "Diminishing Returns of CoT" (Meincke,
@@ -137,8 +116,10 @@ context.
 ### Role Prompting (Personas)
 
 **Transfer:** Volatile — domain priming is more reliable than persona
-assignment.
+assignment. SKILL.md covers practical rules (domain priming over persona,
+identity framing placement). This section provides the research.
 
+**Research findings:**
 - Assigning expert roles ("You are a brilliant mathematician") often
   **interferes with reasoning** or provides inconsistent gains. Domain
   priming ("This is a mathematics task") provides consistent improvements.
@@ -153,21 +134,16 @@ assignment.
   instability persists. Model-generated domain priming is more reliable
   than model-generated personas.
 
-**Practical rules for skills:**
-- Lead with domain priming, not persona: "This is a Go code review task.
-  Apply Go conventions and idioms." — not "You are an expert Go developer."
-- If identity framing is needed (coding discipline, reviewer role), place
-  it in the very first line of SKILL.md as a philosophy statement
-- Combine domain priming with specificity: methodology, standards,
-  constraints — not years of experience or titles
-
 **Key papers:** "'You are a brilliant mathematician' Does Not Make LLMs
 Act Like One" (Bai, Holtzman, Tan)
 
 ### Sequential Steps
 
 **Transfer:** Highly effective for agentic workflows, with a ceiling.
+SKILL.md covers practical rules (numbered steps for ordering, bullets for
+rules, 10-15 step cap). This section provides the research.
 
+**Research findings:**
 - Decomposing complex goals into **totally ordered subtasks** (Hierarchical
   Task Networks) improves success rates by reducing context complexity at
   each decision point. Can enable a 20B model to outperform a 120B baseline.
@@ -178,13 +154,6 @@ Act Like One" (Bai, Holtzman, Tan)
 - **Performance collapses beyond ~10-15 steps** in a single sequence.
   Decompose via HTN: break complex workflows into sub-procedures, each
   with its own numbered step list.
-
-**Practical rules for skills:**
-- Use numbered steps only for workflows with strict ordering
-- Use bullet lists for rules, conventions, constraints (no ordering)
-- Cap each step sequence at 10-15 steps; split into sub-procedures beyond
-- For workflow skills, structure as phases (each phase is a short step
-  sequence) rather than a single long list
 
 **Key papers:** "Procedural Knowledge Improves Agentic LLM Workflows"
 (Hsiao et al.); "Structure Enables Effective Self-Localization of Errors

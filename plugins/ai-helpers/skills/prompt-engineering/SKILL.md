@@ -12,16 +12,6 @@ description: >-
 quality of output.** Apply when crafting skills, agents, output styles,
 system prompts, or any AI instructions.
 
-## Quick Start
-
-Most prompts need only three things:
-
-- **Clear task** — action verb + objective
-- **Output format** — explicit structure
-- **One example** — if format matters
-
-Start here. Add complexity only when this fails.
-
 ## What's Wrong With Your Prompt?
 
 | Symptom | Fix | Details |
@@ -30,8 +20,8 @@ Start here. Add complexity only when this fails.
 | Missing information | Be more specific about what to include | [Be Specific](#be-specific) |
 | Hallucination | Add context, request citations | [Provide Context](#provide-context) |
 | Ignores instructions | Place critical rules at top and end, use XML tags | [Persistent Context](#prompting-in-persistent-context) |
-| Complex reasoning fails | Add CoT or use extended thinking | [Reasoning](#4-let-claude-think-chain-of-thought) |
-| Inconsistent results | Add 3-5 examples | [Examples](#2-use-examples-few-shot) |
+| Complex reasoning fails | Add CoT or use extended thinking | [Reasoning](#let-claude-think-chain-of-thought) |
+| Inconsistent results | Add 3-5 examples | [Examples](#use-examples-few-shot) |
 | Too verbose | Specify word/sentence limits | [Be Specific](#be-specific) |
 | Security concerns | Validate input, filter output | [`${CLAUDE_SKILL_DIR}/references/security.md`] |
 
@@ -54,9 +44,10 @@ Start here. Add complexity only when this fails.
 
 ## Core Techniques
 
-Use these in order — most problems are solved by #1-3.
+Start with the simplest technique that fits the problem. Most issues are
+solved by the first three.
 
-### 1. Be Clear and Direct
+### Be Clear and Direct
 
 **The golden rule:** Show your prompt to a colleague with minimal
 context. If they're confused, Claude will be too.
@@ -90,7 +81,7 @@ Example output:
 {"name": "Widget Pro", "price": 29.99, "in_stock": true}
 ```
 
-### 2. Use Examples (Few-Shot)
+### Use Examples (Few-Shot)
 
 3-5 examples typically sufficient. Cover edge cases.
 
@@ -132,7 +123,7 @@ Text: "Absolutely love it!" → ?
 Extended paradigm details and ICL theory: see
 [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`].
 
-### 3. Use XML Tags
+### Use XML Tags
 
 Separate components for clarity and parseability:
 
@@ -157,7 +148,7 @@ List risks in <risks> tags, recommendations in <recommendations>.
 - Tags are critical for multi-component prompts — they improve
   instruction following significantly
 
-### 4. Let Claude Think (Chain-of-Thought)
+### Let Claude Think (Chain-of-Thought)
 
 For complex reasoning, ask Claude to show its work:
 
@@ -206,7 +197,7 @@ reasoning ("double thinking") amplifies the problem.
 CoT variants, Tree-of-Thoughts, self-consistency sampling: see
 [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`].
 
-### 5. Use Sequential Steps
+### Use Sequential Steps
 
 For multi-step tasks, number the steps:
 
@@ -222,24 +213,69 @@ Instructions:
 ```
 
 Numbered steps ensure Claude follows the exact sequence. Cap at ~10-15
-steps per sequence; beyond that, decompose into sub-procedures.
+steps per sequence; beyond that, decompose into sub-procedures
+(Hierarchical Task Networks — break a complex workflow into named
+sub-procedures, each with its own short step list).
 
 ---
 
 ## Choosing a Technique
 
+| Need | Technique | Details |
+|------|-----------|---------|
+| Simple task, clear format | Zero-shot | Just ask with clear instructions |
+| Consistent output format | Few-shot (3-5 examples) | [Examples](#use-examples-few-shot) |
+| Complex reasoning | Chain-of-Thought | [Reasoning](#let-claude-think-chain-of-thought) |
+| Very complex / exploratory problem | Extended Thinking | [Reasoning](#let-claude-think-chain-of-thought) |
+| Multi-step workflow | Prompt Chaining | [Chaining Rules](#prompt-chaining-rules) |
+| External information needed | ReAct | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] |
+| Precise calculation | PAL (generate code) | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] |
+| Multi-attempt allowed | Reflexion | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] |
+
+---
+
+## Worked Example: Diagnosing and Fixing a Prompt
+
+<example>
+**Original prompt:**
 ```
-Simple task, clear format     → Zero-shot (just ask)
-Need consistent format        → Few-shot (3-5 examples)
-Complex reasoning             → Chain-of-Thought
-Very complex problem          → Extended Thinking
-Multi-step workflow           → Prompt Chaining
-Need external information     → ReAct (reasoning + tool use)
-Precise calculation           → PAL (generate code)
+You are a helpful assistant. Analyze this code and give me feedback.
+Make sure to be thorough. Also format it nicely.
 ```
 
-Agent and tool patterns (ReAct, PAL, Reflexion, ART): see
-[`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`].
+**Diagnosis (using the table above):**
+- Wrong format → no explicit format specified
+- Missing information → "feedback" and "thorough" are vague
+- Ignores instructions → "format it nicely" is ambiguous
+
+**Fixed prompt:**
+```xml
+<instructions>
+Review the provided code for three categories of issues:
+1. Bugs — logic errors, off-by-one, null handling
+2. Security — injection, auth bypass, data exposure
+3. Performance — unnecessary allocations, O(n^2) loops
+</instructions>
+
+<output_format>
+For each issue found, return:
+- **Location:** file:line
+- **Category:** Bug | Security | Performance
+- **Severity:** Critical | Major | Minor
+- **Fix:** concrete code change (not just description)
+
+If no issues found in a category, state "None found."
+</output_format>
+
+<code>
+{{CODE}}
+</code>
+```
+
+**What changed:** Vague task → specific categories. No format → explicit
+structure with example fields. Persona ("helpful assistant") → removed
+(adds no value). Single paragraph → XML-separated components.
+</example>
 
 ---
 
@@ -368,54 +404,30 @@ see [`${CLAUDE_SKILL_DIR}/references/long-context.md`].
 
 ## Prompt Chaining Rules
 
-When a single prompt can't handle the full task, decompose into a chain
-of simpler prompts where each output feeds the next.
+When a single prompt produces error propagation (one mistake ruins
+everything), decompose into a chain of simpler prompts where each
+output feeds the next.
 
-**When to chain:**
-- Single prompt produces error propagation (one mistake ruins everything)
-- Task has natural decomposition into independent stages
-- You need validation checkpoints between steps
-
-**Design principles:**
 - **Single responsibility** — each prompt does one thing well
 - **Clear interfaces** — define what each step receives and produces
-- **Validation points** — check output quality before passing to next step
-- **Graceful degradation** — handle failures at each step, don't let
-  errors cascade
+- **Validation points** — check output before passing to next step
+- **Chain when there's a natural validation boundary** — avoid
+  over-chaining into steps too small to be useful
 
-**Chain patterns:**
-- **Sequential:** A → B → C (most common)
-- **Branching:** A → (B1 | B2) based on A's output
-- **Aggregating:** (A1, A2, A3) → B (combine parallel outputs)
-- **Looping:** A → B → validate → (pass | retry A)
-
-**Avoid over-chaining** — breaking tasks too small creates overhead
-without benefit. Chain when there's a natural validation boundary.
-
-Extended examples and iterative refinement patterns: see
+Chain patterns (sequential, branching, aggregating, looping),
+iterative refinement, and meta prompting: see
 [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`].
 
 ---
 
-## Optimization Decision
+## When Prompting Isn't Enough
 
-When prompting alone isn't enough:
+Start with prompt engineering. If quality plateaus, consider adding
+**RAG** (need current/accurate external data) or **fine-tuning** (need
+deep domain expertise prompting can't achieve). These compose — combine
+as needed.
 
-```
-Is task within model's knowledge?
-├── Yes → Prompt engineering (you are here)
-│         ├── Sufficient? → Done
-│         └── Need accuracy on domain data? → Add RAG
-└── No → Need deep domain expertise?
-         ├── Yes → Fine-tune (or RAG if data is external)
-         └── No → Improve prompts, add examples
-```
-
-Start with prompting. Add RAG when you need current/accurate external
-data. Fine-tune only when prompt engineering and RAG together can't
-achieve the required quality.
-
-Strategy comparison and cost-benefit analysis: see
+Strategy comparison, decision flow, and cost-benefit analysis: see
 [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`].
 
 ---
@@ -456,21 +468,39 @@ Attack taxonomy, defense implementation details, full checklist: see
 
 When you (the AI) are authoring a prompt for another model to execute —
 skills, system prompts, subagent instructions, hook prompts — the process
-differs from human prompt authoring:
+differs from human prompt authoring. You lack the "this could be better"
+intuition; substitute explicit structure and self-evaluation.
 
-1. **Decompose first** — separate role, task, constraints, format, context,
-   and examples into distinct components before writing any text
-2. **Scaffold with XML tags** — never deliver a single-paragraph prompt
-3. **Self-evaluate the draft** — check clarity, specificity, robustness,
+**Workflow:**
+
+1. **Define the signature** — what the prompt receives, produces, and
+   what success looks like, before writing any text
+2. **Decompose** — separate role, task, constraints, format, context,
+   and examples into distinct components
+3. **Scaffold with XML tags** — never deliver a single-paragraph prompt
+4. **Draft content** — fill the scaffold; start with the constraint
+   envelope, not the task description; use imperative voice throughout
+5. **Self-evaluate** — check clarity, specificity, robustness,
    completeness, and structure before delivering
-4. **Cap refinement at 2-3 cycles** — diminishing returns after that;
-   if not converging, rework the decomposition
+6. **Correct targeted** — fix specific sections, not wholesale rewrites;
+   cap refinement at 2-3 cycles
 
-**Common agent failure modes:** blob-prompts (unstructured paragraphs),
-confident sub-optimality (plausible but underperforming first drafts),
-instruction inflation (adding without removing), overfitting to examples.
+**Avoid these failure modes:**
 
-Full workflow, quality scoring dimensions, and optimization patterns: see
+- **Blob-prompts** — unstructured paragraphs mixing instructions with
+  context. Always decompose before drafting.
+- **Confident sub-optimality** — the first draft looks coherent but
+  underperforms. Score against quality dimensions before delivering.
+- **Instruction inflation** — adding rules to fix failures without
+  removing rules that became redundant. Apply deletion test after
+  every correction.
+- **Persona defaulting** — reflexive "You are an expert X" when domain
+  priming ("This is an X task") is more reliable.
+- **Overfitting to examples** — instructions that reproduce specific
+  examples but fail on novel inputs. Mentally simulate an unseen input.
+
+Extended workflow, optimization patterns (candidate-scoring, failure-
+analysis, bootstrapped demos), and artifact-specific guidance: see
 [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
 
 ---
@@ -489,4 +519,11 @@ Before finalizing a prompt:
 - [ ] Critical rules in top 20% and/or bottom 20% (not buried in middle)
 - [ ] Security considered (if handling untrusted input)
 - [ ] Right technique chosen (zero-shot → few-shot → CoT → extended thinking)
-- [ ] For persistent context: every instruction earns its place (deletion test)
+
+**For persistent context (skills, system prompts, CLAUDE.md):**
+
+- [ ] Every instruction earns its place (deletion test: removing it changes output)
+- [ ] Declarative style for constraints; procedural only for ordered workflows
+- [ ] Domain priming over persona assignment
+- [ ] No blanket CoT — let the model decide reasoning depth per request
+- [ ] Few-shot examples calibrate format/style, not teach known patterns

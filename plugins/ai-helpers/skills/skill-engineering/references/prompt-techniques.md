@@ -1,214 +1,104 @@
-# Prompt Engineering for Skills
+# Prompt Techniques for Skills — Extended Depth
 
-Skills are prompt templates. Apply these techniques to make Claude
-follow your instructions reliably.
+Deepening material for the instruction design rules in SKILL.md. Read SKILL.md
+first — this reference provides research context, trade-off analysis, and edge
+case guidance that goes beyond the working-resolution rules.
 
-**Consider invoking the `prompt-engineering` skill** for deeper guidance
-on any technique described here.
+**Consider invoking the `prompt-engineering` skill** for the full prompt
+engineering toolkit beyond skill-specific application.
 
-## Core Techniques
+## Contents
 
-### Be Clear and Direct
+- [CoT Trade-Offs in Persistent Context](#cot-trade-offs-in-persistent-context)
+- [Instruction Strengthening Patterns](#instruction-strengthening-patterns)
+- [Format Control Techniques](#format-control-techniques)
+- [Security Considerations for Skills](#security-considerations-for-skills)
+- [Debugging Instruction Failures](#debugging-instruction-failures)
 
-The golden rule: if a colleague reading your instructions would be
-confused, Claude will be too.
+---
 
-**Provide context:**
-- What the task results will be used for
-- Who the audience is
-- What success looks like
+## CoT Trade-Offs in Persistent Context
 
-**Be specific:**
+SKILL.md states: "Default to declarative. Reserve numbered steps for workflows
+where order genuinely matters." This section explains the research behind that
+rule and when to break it.
 
-| Vague | Specific |
-|-------|----------|
-| "Summarize this" | "Summarize in 3 bullet points, each under 20 words" |
-| "Make it better" | "Fix grammar errors and reduce word count by 30%" |
-| "Format appropriately" | "Return as JSON with keys: status, data, error" |
+### Why CoT Hurts in Skills
 
-### Use Examples (Few-Shot)
+Explicit Chain-of-Thought in persistent context (skills, system prompts) creates
+a **contextual gap** — the distance between instructions and output grows with
+each reasoning step. Research findings:
 
-Examples are the most reliable way to communicate expected behavior.
-Include 2-4 input/output pairs covering:
+- CoT **diverts constraint attention** — the model over-focuses on high-level
+  content planning and neglects simple mechanical rules (word limits, format
+  requirements, negative constraints like "no commas")
+- Applying CoT to reasoning models (Claude 3.7+, o-series) causes **double
+  thinking** — amplifies instruction-following failures rather than mitigating
+- CoT **does help** with structural formatting (valid JSON, XML tags, markdown
+  syntax) and lexical precision — cases where reasoning acts as a checklist
+- Structuring reasoning as **discrete numbered steps** (a "Thought MDP")
+  enables 20-40% self-correction lift vs. unstructured CoT
 
-- **Simple case** — Basic functionality
-- **Complex case** — Real-world complexity
-- **Edge case** — Boundary behavior
+### Decision Rules for Skill Authors
 
-```markdown
-## Examples
+| Skill characteristic | CoT recommendation |
+|---------------------|-------------------|
+| Many mechanical constraints (format, word limits) | Avoid CoT entirely |
+| Complex multi-step workflow | Use numbered steps (procedural) |
+| Varied request types (coding discipline) | No blanket CoT; let model decide |
+| Specific reasoning sub-task | Scoped CoT with constraint re-statement after |
+| Targets reasoning models (Claude 3.7+) | High-level guidance only ("think thoroughly") |
 
-### Simple Request
-**Input:** "Create a user validation function"
-**Output:**
-\`\`\`typescript
-function validateUser(user: User): ValidationResult {
-  // implementation
-}
-\`\`\`
+### Constraint Re-Statement Pattern
 
-### Edge Case: Empty Input
-**Input:** "Validate this: [empty]"
-**Output:** "Cannot validate empty input. Please provide user data."
-```
-
-Wrap examples in `<examples>` tags for clarity when skills are complex.
-
-### Use XML Tags for Structure
-
-Tags separate components and improve instruction following:
+When a skill needs reasoning for a sub-task, repeat critical constraints
+after the reasoning block to re-focus attention:
 
 ```markdown
-<instructions>
-1. Parse the input configuration
-2. Validate against the schema
-3. Generate output files
-</instructions>
+## Analysis Phase
 
-<constraints>
-- Maximum file size: 10MB
-- Supported formats: JSON, YAML
-- No external network requests
-</constraints>
+Think through the architecture implications in <thinking> tags.
 
-<output_format>
-Return results as:
-\`\`\`json
-{"status": "ok|error", "files": [...], "errors": [...]}
-\`\`\`
-</output_format>
+## Output Phase
+
+After analysis, format your response following these rules:
+- Maximum 3 bullet points per section
+- Each bullet under 25 words
+- No markdown headers in the response body
 ```
 
-**Best practices:**
-- Consistent tag names throughout
-- Reference tags in instructions ("Follow the <constraints>...")
-- Nest for hierarchy: `<outer><inner>...</inner></outer>`
+**Key papers:** "When Thinking Fails" (Li et al.); "Scaling Reasoning,
+Losing Control"; "Diminishing Returns of CoT" (Meincke, Mollick et al.)
 
-### Numbered Sequential Steps
+---
 
-When order matters, use numbered steps:
+## Instruction Strengthening Patterns
 
-```markdown
-## Process
+When Claude ignores instructions despite clear phrasing, escalate
+with these patterns — ordered from least to most aggressive:
 
-1. **Read** — Load input file
-2. **Validate** — Check against schema
-3. **Transform** — Apply conversions
-4. **Output** — Write results
+| Level | Pattern | Example |
+|-------|---------|---------|
+| 1. Restructure | Move to XML tags at end | `<constraints>ALWAYS filter test accounts</constraints>` |
+| 2. Emphasize | Uppercase key word | "ALWAYS filter test accounts" |
+| 3. Negative space | State what NOT to do | "Do NOT include explanatory preamble" |
+| 4. Consequence | State what happens if ignored | "If validation is skipped, the output will corrupt downstream data" |
+| 5. Dual-place | Top + bottom reinforcement | Principle at top, checklist at bottom |
 
-Do not proceed to next step if current step fails.
-```
+**Use sparingly.** If everything is emphasized, nothing is. Reserve strong
+language for rules that repeatedly fail in testing.
 
-Numbers ensure Claude follows exact sequence.
+**Prefer restructuring over emphasis.** Moving a constraint to XML tags at
+the end of a skill is more reliable than capitalizing words in the middle.
+Placement beats emphasis.
 
-## Instruction Placement
+---
 
-Models follow a **U-shaped attention curve**: instructions at the beginning
-and end of a document are followed most reliably; middle content suffers
-from attention decay ("lost in the middle"). Research shows performance
-degrades 13.9-85% as input length increases.
+## Format Control Techniques
 
-**Placement strategy:**
-- **Top 20% (primacy zone):** Identity/philosophy, critical constraints
-- **Middle:** Detailed rules by topic, route table, examples
-- **Bottom 20% (recency zone):** Reinforced critical rules, quality checks
+### Explicit Format with Example
 
-**Dual-placement for critical rules:** State important rules near the top
-AND reinforce at the end with different phrasing (principle at top,
-checklist item at bottom).
-
-```markdown
-# My Skill
-
-**Never skip validation.** ← Top: stated as principle
-
-## Details
-[Long explanation of the domain...]
-
-## Process
-[Steps to follow...]
-
-## Critical Rules
-- [ ] Validation completed before any destructive operation ← Bottom: checklist
-```
-
-## Chain of Thought
-
-For complex reasoning tasks, let Claude think:
-
-```markdown
-## Analysis Process
-
-Think through this step-by-step in <thinking> tags:
-1. What is the input asking for?
-2. What constraints apply?
-3. What are the edge cases?
-
-Then provide your answer in <answer> tags.
-```
-
-**Critical:** Claude must output its thinking. Without outputting
-the thought process, no reasoning improvement occurs.
-
-**CoT trade-off in skills:** Explicit CoT can degrade instruction-following
-by diverting attention from simple constraints (word limits, format rules).
-The longer the reasoning chain, the wider the "contextual gap" between
-instructions and output. For skills that persist across varied requests:
-
-- **Do not** embed blanket "think step by step" in skills
-- **Do** use high-level guidance ("think thoroughly") when reasoning helps
-- **Do** use discrete numbered steps for workflows (enables error
-  self-localization and backtracking)
-- **Avoid** CoT for tasks with many mechanical constraints
-- For reasoning models (Claude 3.7+), adding CoT on top of native
-  reasoning causes "double thinking" — amplifies instruction failures
-
-## Declarative vs Procedural Instructions
-
-Choose instruction style based on what the content demands:
-
-**Declarative** (bullet-list rules, constraints, conventions):
-- Use for behavioral constraints, coding conventions, safety guardrails
-- Models utilize factual constraints more reliably across varied inputs
-- Larger models benefit more from declarative than procedural knowledge
-- Default style for the majority of skill content
-
-**Procedural** (numbered steps, workflows):
-- Use for tasks with strict ordering, multi-step workflows
-- Highly effective for agentic tasks when structured as Hierarchical
-  Task Networks (HTN) — can enable a 20B model to outperform 120B
-- Cap at ~10-15 steps per sequence; decompose beyond that
-- Write in third-person imperative: "Extract the text..." not "I will..."
-
-**The hybrid pattern:** Declarative at top level (identity, constraints),
-procedural for specific workflow sections:
-
-```markdown
-# My Skill
-
-## Conventions              ← Declarative: bullet-list rules
-- Use ESM for all imports
-- Prefer node: prefix
-
-## Workflow                 ← Procedural: numbered steps
-1. Read the configuration
-2. Validate against schema
-3. Generate output
-
-## Critical Rules           ← Declarative: reinforcement
-- Never skip validation
-```
-
-**Key research finding:** Declarative knowledge provides greater performance
-benefits than procedural in the majority of tasks. Procedural outperforms
-only in reasoning tasks with simple logic (elementary arithmetic, basic
-commonsense) and complex multi-step agentic workflows.
-
-## Format Control
-
-### Explicit Format Specification
-
-Always specify output format explicitly:
+Always specify output format explicitly and include a concrete example:
 
 ```markdown
 ## Output Format
@@ -223,51 +113,40 @@ Return results as JSON:
 \`\`\`
 
 Do NOT include markdown formatting around the JSON.
+Do NOT add fields beyond those specified.
 ```
 
-### Prefilling Technique
+### Prefilling Technique (API Skills)
 
-For API skills or structured output, describe prefilling:
+For skills that produce structured output via the API, describe the
+prefilling approach:
 
 ```markdown
 ## Response Format
 
 Begin your response with `{` and return valid JSON only.
-No preamble, no explanation—just the JSON object.
+No preamble, no explanation — just the JSON object.
 ```
 
-## Handling Ambiguity
+### Negative Format Constraints
 
-Tell Claude what to do when instructions aren't clear:
+Explicitly state what the output should NOT contain. Agents writing
+skills often omit this because they focus on what they want:
 
-```markdown
-## Handling Unclear Requests
-
-If the user's intent is unclear:
-1. State what you understood
-2. Ask ONE clarifying question
-3. Wait for confirmation before proceeding
-
-Do NOT guess at ambiguous requirements.
+```
+Do NOT wrap JSON in markdown fences.
+Do NOT include a "Here's the result:" preamble.
+Do NOT add commentary after the structured output.
 ```
 
-## Strengthening Instructions
+---
 
-When Claude ignores instructions, strengthen the language:
+## Security Considerations for Skills
 
-| Weak | Strong |
-|------|--------|
-| "Consider filtering test accounts" | "ALWAYS filter test accounts" |
-| "You might want to validate" | "Validate before proceeding" |
-| "It's good practice to..." | "REQUIRED: ..." |
+Skills may process untrusted user input. When a skill handles external
+data, apply these patterns:
 
-Use sparingly—reserve strong language for truly critical rules.
-
-## Security Considerations
-
-Skills may process untrusted user input. Consider:
-
-### Input Validation
+### Input Validation Block
 
 ```markdown
 ## Input Requirements
@@ -276,9 +155,10 @@ Before processing, verify:
 - File exists and is readable
 - File size is under 10MB
 - Content does not contain executable code
+- File extension matches expected type
 ```
 
-### Scope Boundaries
+### Scope Boundary Block
 
 ```markdown
 ## Boundaries
@@ -293,28 +173,38 @@ Do NOT:
 - Make network requests to unknown hosts
 ```
 
-## Anti-Patterns
+Most skills don't need security blocks. Add them when the skill handles:
+- User-provided file paths or URLs
+- Content from external sources (web scraping, API responses)
+- Operations that could affect files outside the project
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| Prose paragraphs | Key instructions buried | Use numbered steps, headers |
-| "Handle appropriately" | Ambiguous | Specify exact behavior |
-| No examples | Claude guesses | Add input/output pairs |
-| Everything critical | Nothing stands out | Reserve emphasis for essentials |
-| Long instructions | Important bits lost | Split into SKILL.md + references |
+---
 
-## Debugging Instructions
+## Debugging Instruction Failures
+
+When a skill produces wrong output, diagnose with this table before
+adding more instructions (which may make the problem worse):
 
 | Symptom | Likely Cause | Fix |
 |---------|--------------|-----|
-| Wrong format | No format spec | Add explicit example |
-| Missing details | Vague instructions | Be specific about what to include |
-| Ignores constraints | Buried in prose | Move to end, use XML tags |
-| Inconsistent output | Ambiguous guidance | Add examples for each case |
-| Partial completion | Steps not numbered | Use sequential numbered steps |
+| Wrong format | No format specification or example | Add explicit format + example output |
+| Missing details | Instructions too vague | Be specific: "Include X, Y, Z" |
+| Ignores constraints | Constraints buried in prose | Move to `<constraints>` tags at end |
+| Inconsistent output | Ambiguous or conflicting guidance | Add few-shot examples, resolve conflicts |
+| Partial completion | Steps not numbered or unclear | Use numbered sequential steps |
+| Correct but verbose | No negative constraints | Add "Do NOT include..." directives |
+| Works sometimes | Critical rule in attention dead zone | Dual-place: top principle + bottom checklist |
 
-## Related Skills
+### The Fix Hierarchy
 
-- **prompt-engineering** — Full prompt engineering techniques,
-  advanced patterns, reasoning frameworks
-- **output-style-engineering** — If building a persona-style skill
+Try fixes in this order — most issues are solved by #1-3:
+
+1. **Restructure** — move content, add XML tags, fix placement
+2. **Specify** — add format example, concrete constraints, edge cases
+3. **Demonstrate** — add few-shot input/output pairs
+4. **Emphasize** — strengthen language (ALWAYS, NEVER, REQUIRED)
+5. **Split** — decompose into simpler sub-tasks or separate skills
+
+Adding more text (instructions, constraints, rules) should be the last
+resort. Research shows adding unnecessary requirements reduces task success.
+Try restructuring existing content first.

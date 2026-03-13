@@ -188,12 +188,15 @@ Instructions at context end are followed more reliably.
 
 ### References Not Loading
 
-**Use relative paths:**
+**Use `${CLAUDE_SKILL_DIR}` for all reference paths:**
 ```markdown
-# Good
+# Good — resolves to absolute path at load time
+See `${CLAUDE_SKILL_DIR}/references/guide.md`
+
+# Bad — relative path, ambiguous
 See [guide.md](references/guide.md)
 
-# Bad (absolute)
+# Bad — hardcoded absolute path
 See [/full/path/guide.md](/full/path/guide.md)
 ```
 
@@ -206,19 +209,27 @@ Bad: SKILL.md → references/main.md → references/detail.md
 
 **Add explicit read instruction:**
 ```markdown
-Read [guide.md](references/guide.md) completely before proceeding.
+Read `${CLAUDE_SKILL_DIR}/references/guide.md` completely before proceeding.
 ```
 
 ## Context Budget Issues
 
 **Symptoms:**
-- Warning about excluded skills
-- Descriptions truncated
+- Warning about excluded skills in Claude Code output
+- Descriptions truncated in skill metadata
+- Multiple skills loaded but instructions ignored
+
+**Diagnosis:**
+1. Count active skills — each adds ~30-50 metadata tokens at startup
+2. Check SKILL.md line count — target under 500 lines
+3. Check if multiple large skills are co-loaded
 
 **Fixes:**
-- Shorten descriptions (under 200 chars)
-- Move content to references
-- Disable rarely-used skills
+- Shorten descriptions to under 200 characters
+- Move catalog/lookup content from SKILL.md to references
+- Set `disable-model-invocation: true` on rarely-used skills (removes
+  description from context entirely — free activation budget for others)
+- Split overloaded skills into focused ones
 
 ## Getting Help
 

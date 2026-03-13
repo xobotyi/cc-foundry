@@ -3,17 +3,19 @@ name: skill-engineering
 description: >-
   Design and iterate Claude Code skills: SKILL.md structure, description formulas, content
   architecture, and quality evaluation. Invoke whenever task involves any interaction with
-  Claude Code skills — creating, evaluating, debugging, or understanding how they work.
+  Claude Code skills — creating, reviewing, evaluating, debugging, or improving skills.
 ---
 
 # Skill Engineering
 
 Skills are prompt templates that extend Claude with domain expertise.
-SKILL.md must be **behaviorally self-sufficient** — an agent reading only
-SKILL.md, without loading any references, must be able to do the job
-correctly. References provide depth, not breadth. Description triggers
-activation; instructions shape behavior. Claude sees only `name` and
-`description` at startup, then loads full SKILL.md content when triggered.
+A skill lives in `skill-name/SKILL.md` with an optional `references/`
+directory for deepening material. SKILL.md must be **behaviorally
+self-sufficient** — an agent reading only SKILL.md, without loading any
+references, must be able to do the job correctly. References provide depth,
+not breadth. Description triggers activation; instructions shape behavior.
+Claude sees only `name` and `description` at startup, then loads full
+SKILL.md content when triggered.
 
 <prerequisite>
 **Skills are prompts.** Before writing or improving a skill, invoke
@@ -30,13 +32,13 @@ Skip only for trivial edits (typos, formatting).
 
 | Situation | Reference | Contents |
 |-----------|-----------|----------|
-| SKILL.md format, frontmatter rules, directory layout | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | Frontmatter fields, name rules, string substitutions, progressive disclosure, discovery/precedence, instruction budget |
-| Creating a skill from scratch | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Step-by-step process, scope sizing, degrees of freedom, description examples, evaluation-driven development, archetype templates |
+| SKILL.md format, frontmatter rules, directory layout | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | Frontmatter fields, name rules, string substitutions, progressive disclosure mechanics, discovery/precedence, instruction budget |
+| Creating a skill from scratch | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Step-by-step creation workflow, scope sizing guidance, evaluation-driven development process, archetype deep dives with extended structural patterns |
 | Evaluating skill quality (review, audit) | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Scoring rubric (5 dimensions), evaluation-driven development, testing protocol, common issues by score range |
 | Skill not triggering, wrong output, refinement | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Activation fixes, output fixes, restructuring, splitting guidance |
 | Multi-file skills, scripts, subagents, hooks | [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] | Fork pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping |
 | Debugging activation failures, script errors | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] | Diagnostic steps for structure, activation reliability, output, script, reference issues |
-| Writing persuasive instructions, reasoning | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | XML tags, chain of thought, CoT trade-offs, declarative vs procedural, instruction placement, format control, instruction strengthening |
+| Writing persuasive instructions, reasoning | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | CoT trade-off research and decision rules, instruction strengthening escalation patterns, format control techniques, security blocks, debugging instruction failures |
 
 Read the relevant reference before proceeding.
 
@@ -69,8 +71,8 @@ description: >-
   Design and iterate Claude Code skills: SKILL.md structure,
   description formulas, content architecture, and quality evaluation.
   Invoke whenever task involves any interaction with Claude Code
-  skills — creating, evaluating, debugging, or understanding how
-  they work.
+  skills — creating, reviewing, evaluating, debugging, or improving
+  skills.
 ```
 
 **Bad — vague, no trigger surface:**
@@ -173,31 +175,6 @@ The Contents column tells the agent what's inside, enabling informed read
 decisions. Without it, agents either over-read (wasting context) or skip
 (missing content).
 
-### State Rules as Positive Directives
-
-Place rules in the body section where they're contextually relevant. State
-them as positive directives: "Use `pipeline()` for stream composition" — not
-"Don't use `.pipe()`" in a separate anti-pattern table. Separate anti-pattern
-tables duplicate body content and waste tokens.
-
-Keep an anti-pattern table only when the "don't" side is genuinely non-obvious
-from the positive rule (e.g., common migration pitfalls in a version upgrade
-skill where users carry muscle memory from the old version).
-
-## Skill Structure
-
-```
-skill-name/
-├── SKILL.md              # Required: complete behavioral specification
-└── references/           # Optional: deepening material
-    └── *.md
-```
-
-**Locations:**
-- Personal: `~/.claude/skills/<name>/SKILL.md`
-- Project: `.claude/skills/<name>/SKILL.md`
-- Plugin: `<plugin>/skills/<name>/SKILL.md`
-
 ## Writing Instructions
 
 Skills are prompts. Apply prompt engineering fundamentals.
@@ -260,49 +237,25 @@ model doesn't know. It means: don't add rules for things the model already
 does well. When auditing a skill, apply the deletion test: "if I remove
 this rule, does output quality measurably change?"
 
-### Clarity and Voice
+### Numbered Lists vs Bullet Lists
 
-**Be clear and direct.** If a colleague reading your instructions would be
-confused, Claude will be too.
-
-**Use imperative voice:**
-```markdown
-1. Read the input file
-2. Extract entities matching pattern X
-3. Return as JSON with keys: name, type, value
-```
-
-Not:
-```markdown
-You should read the file and then you might want to
-extract some entities from it...
-```
-
-**Use XML tags for structure:**
-```markdown
-<instructions>
-1. Parse the input
-2. Validate against schema
-3. Return results
-</instructions>
-
-<output_format>
-Return as JSON: {"status": "ok|error", "data": [...]}
-</output_format>
-```
-
-**Add examples.** Few-shot prompting is the most reliable way to communicate
-expected behavior. Include input/output pairs. Examples calibrate format
-and style — they help the model locate pre-trained patterns, not learn
-new semantics. 3-5 examples is sufficient; returns diminish past 8-16.
-
-**Numbered lists vs bullet lists:**
 - **Numbered lists** — ONLY for sequential steps where order matters:
   "1. Read input → 2. Validate → 3. Output"
 - **Bullet lists** — for rules, directives, and conventions where there is
   no ordering: "- Use ESM. - Use `node:` prefix..."
 
 If the items can be reordered without changing meaning, use bullets.
+
+### State Rules as Positive Directives
+
+Place rules in the body section where they're contextually relevant. State
+them as positive directives: "Use `pipeline()` for stream composition" — not
+"Don't use `.pipe()`" in a separate anti-pattern table. Separate anti-pattern
+tables duplicate body content and waste tokens.
+
+Keep an anti-pattern table only when the "don't" side is genuinely non-obvious
+from the positive rule (e.g., common migration pitfalls in a version upgrade
+skill where users carry muscle memory from the old version).
 
 ## Skill Archetypes
 
@@ -395,22 +348,28 @@ description: >-
 [Pointers to references for extended examples, lookup tables, edge cases]
 ```
 
-## Core Principles
+## Critical Rules
 
-- **Skills are prompts.** Every prompt engineering principle applies. Use
-  clear structure, examples, XML tags, and explicit format specifications.
+- **Deletion test before adding.** Every rule competes for attention. Before
+  adding a rule to a skill, verify the model's default behavior is insufficient.
+  If removing the rule doesn't change output quality, it shouldn't exist.
 
-- **Description is the trigger.** Claude activates based solely on matching
-  request to description. Vague descriptions → missed activations.
+- **References must not duplicate SKILL.md.** If a reference restates rules
+  already in SKILL.md body, it wastes tokens and creates maintenance burden.
+  References provide genuinely different depth: detailed rubrics, extended
+  examples, full catalogs, comparison tables, edge case coverage.
 
-- **SKILL.md is the discipline.** An agent reading only SKILL.md must be
-  able to do the job correctly. References deepen — they don't complete.
+- **Description is activation, not documentation.** Every token in the
+  description must increase activation probability. Slogans, philosophy,
+  cross-skill dependencies, and filler verbs ("understanding", "assisting")
+  have zero activation value.
 
-- **References are optional depth.** Detailed rubrics, extended examples,
-  full catalogs, niche how-tos. Never core behavioral rules.
+- **Declarative by default.** Use numbered steps only for workflows with
+  strict ordering. Bullet-list rules for everything else. If the items can
+  be reordered without changing meaning, use bullets.
 
-- **One skill, one purpose.** Broad skills produce mediocre results. If
-  scope creeps, split.
+- **One skill, one purpose.** If scope creeps, split. Broad skills produce
+  mediocre results because instructions compete for attention.
 
 ## Quick Checks
 
