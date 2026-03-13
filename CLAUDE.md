@@ -16,6 +16,7 @@ cc-foundry/
 │   ├── the-coder/        # Language-agnostic coding discipline
 │   ├── the-crucible/     # Quality validation and multi-agent code review
 │   ├── the-statusline/   # Session metrics status line
+│   ├── the-workflow/     # Workflow mechanics (handoff across context boundaries)
 │   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
 │   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
 │   ├── cli/              # CLI platform discipline (CLI design, shell scripting)

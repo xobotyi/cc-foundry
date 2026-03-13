@@ -99,6 +99,22 @@ directory changes.
 /plugin install the-statusline
 ```
 
+---
+
+### the-workflow
+
+Work crossing a context boundary — session restart, teammate delegation, async resumption —
+loses critical state. The handoff is either a wall of text that overloads the receiver, or a
+paragraph that drops decisions and constraints. The `handoff` skill guides the agent through
+a structured triage of its context, producing a 500-2000 token transfer document that
+preserves decisions, constraints, resource identifiers, and remaining work while dropping
+intermediate exploration and raw tool output. Two modes: self-handoff (session restart) and
+teammate handoff (delegation with codebase orientation).
+
+```
+/plugin install the-workflow
+```
+
 ## AI Artifact Plugins
 
 ### ai-helpers
