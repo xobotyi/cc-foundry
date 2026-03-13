@@ -1,0 +1,19 @@
+{
+  "name": "the-workflow",
+  "version": "1.0.0",
+  "description": "Workflow mechanics: structured handoff across context boundaries",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-workflow",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "handoff",
+    "context-boundaries",
+    "delegation"
+  ]
+}
