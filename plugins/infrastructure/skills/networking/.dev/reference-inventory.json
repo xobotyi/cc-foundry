@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "nftables Wiki - Quick Reference": "https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes",
+    "nftables Wiki - Configuring Tables": "https://wiki.nftables.org/wiki-nftables/index.php/Configuring_tables",
+    "nftables Wiki - Configuring Chains": "https://wiki.nftables.org/wiki-nftables/index.php/Configuring_chains",
+    "nftables Wiki - Configuring Rules": "https://wiki.nftables.org/wiki-nftables/index.php/Configuring_rules",
+    "WireGuard Conceptual Overview": "https://www.wireguard.com/quickstart/",
+    "Traefik Documentation - Routing": "https://doc.traefik.io/traefik/routing/overview/",
+    "Traefik Documentation - HTTPS and TLS": "https://doc.traefik.io/traefik/https/overview/",
+    "Caddy Documentation - Caddyfile Concepts": "https://caddyserver.com/docs/caddyfile/concepts",
+    "Caddy Documentation - Reverse Proxy": "https://caddyserver.com/docs/caddyfile/directives/reverse_proxy",
+    "Let's Encrypt - How It Works": "https://letsencrypt.org/how-it-works/",
+    "ACME Protocol RFC 8555": "https://www.rfc-editor.org/rfc/rfc8555",
+    "Pi-hole Documentation - Overview": "https://docs.pi-hole.net/",
+    "AdGuard Home Wiki": "https://github.com/AdguardTeam/AdGuardHome/wiki/Getting-Started",
+    "Tailscale Documentation - How It Works": "https://tailscale.com/kb/1151/what-is-tailscale"
+  },
+  "lastFetched": "2026-03-13T19:26:57.765Z"
+}

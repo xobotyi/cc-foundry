@@ -158,6 +158,24 @@ automatically based on file context.
 /plugin install javascript
 ```
 
+### infrastructure
+
+Infrastructure work — Ansible playbooks, Docker containers, Proxmox clusters, network
+segments — requires deep domain knowledge that generic coding assistants lack. Without it,
+agents produce configurations with insecure defaults, no idempotency, and naive networking.
+This plugin provides six skills: `devops` (foundational discipline — what good infrastructure
+looks like, analogous to `the-coder/coding`), `ansible` (playbooks, roles, vault, collections,
+molecule testing), `containers` (Docker/Podman, Compose, image optimization, security),
+`proxmox` (VMs, LXC, storage backends, clustering, API automation), `unraid` (arrays, Docker,
+VMs, shares, plugins), and `networking` (VLANs, firewalls, DNS, reverse proxies, VPN, TLS).
+The devops skill runs in a sandwich pattern: principles first, tool skill, then verification.
+
+```
+/plugin install infrastructure
+```
+
+---
+
 ## Platform Discipline Plugins
 
 ### frontend

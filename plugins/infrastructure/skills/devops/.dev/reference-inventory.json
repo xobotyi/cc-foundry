@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "Google SRE - Monitoring Distributed Systems (Golden Signals)": "https://sre.google/sre-book/monitoring-distributed-systems/",
+    "Google SRE - Release Engineering": "https://sre.google/sre-book/release-engineering/",
+    "Google SRE - Eliminating Toil": "https://sre.google/sre-book/eliminating-toil/",
+    "Google SRE - Service Level Objectives": "https://sre.google/sre-book/service-level-objectives/",
+    "Google SRE - Embracing Risk": "https://sre.google/sre-book/embracing-risk/",
+    "Google SRE Workbook - Configuration Design": "https://sre.google/workbook/configuration-design/",
+    "12-Factor App Methodology": "https://12factor.net/",
+    "OpenGitOps Principles": "https://github.com/open-gitops/documents/blob/main/PRINCIPLES.md",
+    "OpenGitOps Glossary": "https://github.com/open-gitops/documents/blob/main/GLOSSARY.md",
+    "DORA DevOps Capabilities": "https://dora.dev/devops-capabilities/",
+    "DORA Metrics Guide": "https://dora.dev/guides/dora-metrics/",
+    "Pulumi - Infrastructure Testing Concepts": "https://www.pulumi.com/blog/infrastructure-testing-concepts/",
+    "IaC Principles Patterns Practices": "https://itnext.io/principles-patterns-and-practices-for-effective-infrastructure-as-code-e5f7bbe13df1"
+  },
+  "lastFetched": "2026-03-13T19:31:59.020Z"
+}

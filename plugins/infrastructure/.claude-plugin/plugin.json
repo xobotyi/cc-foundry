@@ -1,0 +1,22 @@
+{
+  "name": "infrastructure",
+  "version": "1.0.0",
+  "description": "Infrastructure management discipline: Ansible automation, container orchestration, Proxmox virtualization, Unraid NAS, and network architecture",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/infrastructure",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": [
+    "ansible",
+    "docker",
+    "proxmox",
+    "unraid",
+    "networking",
+    "infrastructure",
+    "devops"
+  ]
+}
