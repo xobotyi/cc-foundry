@@ -24,10 +24,8 @@ Naming convention that creates clear relationships between HTML and CSS.
 - **Blocks** are standalone components: `.card`, `.nav`, `.form`.
 - **Elements** are parts of a block: `.card__header`, `.card__body`.
 - **Modifiers** are variations: `.card--dark`, `.card__title--bold`.
-- **Never nest elements:** `.card__header__title` is wrong.
-  Flatten to `.card__title` or create a new block.
-- **Modifiers don't exist alone.** Always pair with the base class:
-  `class="card card--featured"`.
+- **Never nest elements:** `.card__header__title` is wrong. Flatten to `.card__title` or create a new block.
+- **Modifiers don't exist alone.** Always pair with the base class: `class="card card--featured"`.
 
 ### When to Use BEM
 
@@ -63,8 +61,7 @@ import styles from './Button.module.css';
 
 ### Rules
 
-- **Use simple, descriptive class names.** Scoping eliminates conflict risk.
-  `.button` not `.btn-component-primary-v2`.
+- **Use simple, descriptive class names.** Scoping eliminates conflict risk. `.button` not `.btn-component-primary-v2`.
 - **One module per component.**
 - **Compose shared styles:**
   ```css
@@ -77,8 +74,7 @@ import styles from './Button.module.css';
 
 ## Utility-First CSS
 
-Small, single-purpose classes composed in HTML. Tailwind CSS is the
-primary framework.
+Small, single-purpose classes composed in HTML. Tailwind CSS is the primary framework.
 
 ```html
 <div class="flex items-center gap-4 p-4 rounded-lg bg-white shadow-md">
@@ -201,10 +197,10 @@ utilities/
 
 ### Declaration Order
 
-Group related properties. Within groups, alphabetize or follow
-a consistent convention.
+Group related properties. Within groups, alphabetize or follow a consistent convention.
 
 **Recommended grouping order:**
+
 1. Layout (`display`, `position`, `grid-*`, `flex-*`)
 2. Box model (`width`, `height`, `margin`, `padding`, `border`)
 3. Typography (`font-*`, `text-*`, `color`, `line-height`)
@@ -220,10 +216,8 @@ a consistent convention.
 - **Opening brace on same line** as selector.
 - **Blank line between rules.**
 - **Lowercase everything** (selectors, properties, values, hex colors).
-- **Single quotes** for attribute selectors and font names:
-  `font-family: 'Open Sans', sans-serif`.
-- **No units on zero values:** `margin: 0` not `margin: 0px`
-  (except where required, e.g., `flex: 0 0 0px`).
+- **Single quotes** for attribute selectors and font names: `font-family: 'Open Sans', sans-serif`.
+- **No units on zero values:** `margin: 0` not `margin: 0px` (except where required, e.g., `flex: 0 0 0px`).
 - **Leading zero on decimals:** `opacity: 0.5` not `opacity: .5`.
 - **Shorthand hex where possible:** `#ebc` not `#eebbcc`.
 - **Avoid `!important`.** Use cascade layers or specificity to resolve conflicts.

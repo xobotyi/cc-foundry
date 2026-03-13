@@ -54,19 +54,20 @@ No `tailwind.config.js` in v4. Configuration lives in CSS via `@theme`.
 
 Automatically injected when using `@import "tailwindcss"`. Key behaviors:
 
-| Element | Preflight behavior |
-|---------|-------------------|
-| All elements | `margin: 0; padding: 0; box-sizing: border-box; border: 0 solid` |
-| `h1`–`h6` | Unstyled — same size/weight as body text |
-| `ol`, `ul`, `menu` | No bullets or numbers |
-| `img`, `svg`, `video`, etc. | `display: block; vertical-align: middle` |
-| `img`, `video` | `max-width: 100%; height: auto` |
-| `[hidden]` | `display: none !important` (except `hidden="until-found"`) |
-| Buttons | `cursor: default` (v4; was `cursor: pointer` in v3) |
-| Placeholder text | Current text color at 50% opacity (v4; was `gray-400` in v3) |
-| `<dialog>` | Margins reset to 0 (v4) |
+| Element                     | Preflight behavior                                               |
+| --------------------------- | ---------------------------------------------------------------- |
+| All elements                | `margin: 0; padding: 0; box-sizing: border-box; border: 0 solid` |
+| `h1`–`h6`                   | Unstyled — same size/weight as body text                         |
+| `ol`, `ul`, `menu`          | No bullets or numbers                                            |
+| `img`, `svg`, `video`, etc. | `display: block; vertical-align: middle`                         |
+| `img`, `video`              | `max-width: 100%; height: auto`                                  |
+| `[hidden]`                  | `display: none !important` (except `hidden="until-found"`)       |
+| Buttons                     | `cursor: default` (v4; was `cursor: pointer` in v3)              |
+| Placeholder text            | Current text color at 50% opacity (v4; was `gray-400` in v3)     |
+| `<dialog>`                  | Margins reset to 0 (v4)                                          |
 
 **Extending preflight** — add to `@layer base`:
+
 ```css
 @layer base {
   h1 { font-size: var(--text-2xl); }
@@ -76,6 +77,7 @@ Automatically injected when using `@import "tailwindcss"`. Key behaviors:
 ```
 
 **Disabling preflight** — import parts individually:
+
 ```css
 @layer theme, base, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
@@ -84,6 +86,7 @@ Automatically injected when using `@import "tailwindcss"`. Key behaviors:
 ```
 
 When importing individually, flags go on their respective imports:
+
 ```css
 /* source detection → utilities */
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
@@ -100,14 +103,16 @@ When importing individually, flags go on their respective imports:
 ```
 
 **Third-party conflicts** — override Preflight in `@layer base`:
+
 ```css
 @layer base {
   .google-map * { border-style: none; }
 }
 ```
 
-**Accessibility — unstyled lists:** VoiceOver does not announce `list-style: none` elements as
-lists. Add `role="list"` if the content is semantically a list:
+**Accessibility — unstyled lists:** VoiceOver does not announce `list-style: none` elements as lists. Add `role="list"`
+if the content is semantically a list:
+
 ```html
 <ul role="list">
   <li>One</li>
@@ -129,10 +134,11 @@ export default {
 };
 ```
 
-Sorts classes to canonical order automatically. Do not manually sort. The plugin works with
-custom Tailwind configurations and integrates with every editor that supports Prettier.
+Sorts classes to canonical order automatically. Do not manually sort. The plugin works with custom Tailwind
+configurations and integrates with every editor that supports Prettier.
 
 Before/after example:
+
 ```html
 <!-- before -->
 <button class="text-white px-4 sm:px-8 py-2 bg-sky-700 hover:bg-sky-800">
@@ -148,18 +154,18 @@ Before/after example:
 ### VS Code / Cursor
 
 Install **Tailwind CSS IntelliSense** (`bradlc.vscode-tailwindcss`):
+
 - Autocomplete for utility classes, `@theme` variables, directives
 - Linting for CSS and markup
 - Hover previews (shows generated CSS)
 - Syntax highlighting for `@theme`, `@variant`, `@source`
 
-If native CSS linting flags `@theme` or `@source` as errors, disable CSS validation for the
-project or workspace.
+If native CSS linting flags `@theme` or `@source` as errors, disable CSS validation for the project or workspace.
 
 ### Zed
 
-Built-in Tailwind CSS support (no extension needed): autocomplete, linting, hover previews.
-Prettier plugin works when installed.
+Built-in Tailwind CSS support (no extension needed): autocomplete, linting, hover previews. Prettier plugin works when
+installed.
 
 ### JetBrains (WebStorm, PhpStorm)
 
@@ -169,10 +175,11 @@ Built-in intelligent Tailwind completions in HTML.
 
 ## CSS Modules, Vue/Svelte `<style>` Blocks
 
-**Avoid** using CSS Modules or SFC `<style>` blocks with Tailwind. Each module is processed
-separately — Tailwind runs once per file, causing slower builds and missing `@theme` context.
+**Avoid** using CSS Modules or SFC `<style>` blocks with Tailwind. Each module is processed separately — Tailwind runs
+once per file, causing slower builds and missing `@theme` context.
 
 If you must use `<style>` blocks, import global styles as reference:
+
 ```html
 <!-- Button.vue -->
 <style scoped>
@@ -182,21 +189,22 @@ If you must use `<style>` blocks, import global styles as reference:
 ```
 
 Or use CSS variables directly (preferred — skips Tailwind processing entirely):
+
 ```html
 <style scoped>
   button { background-color: var(--color-blue-500); }
 </style>
 ```
 
-**Do not use Sass, Less, or Stylus with Tailwind v4.** Tailwind is the preprocessor: it handles
-`@import` bundling, nesting (via Lightning CSS), variables, and vendor prefixes. Using both is
-redundant and incompatible.
+**Do not use Sass, Less, or Stylus with Tailwind v4.** Tailwind is the preprocessor: it handles `@import` bundling,
+nesting (via Lightning CSS), variables, and vendor prefixes. Using both is redundant and incompatible.
 
 ---
 
 ## React Class Binding Patterns
 
 **Conditional classes — use object map, not string concatenation:**
+
 ```tsx
 // Static lookup — scanner sees full class names
 const sizes = {
@@ -211,6 +219,7 @@ function Button({ size, children }) {
 ```
 
 **clsx — conditional class composition:**
+
 ```tsx
 import clsx from "clsx";
 
@@ -231,6 +240,7 @@ function Button({ primary, disabled, className, children }) {
 ```
 
 **cva (class-variance-authority) — variant-based component API:**
+
 ```tsx
 import { cva } from "class-variance-authority";
 
@@ -256,6 +266,7 @@ function Button({ intent, size, className, children }) {
 ```
 
 **cn — merge + deduplicate (tailwind-merge + clsx):**
+
 ```tsx
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -271,15 +282,15 @@ function Card({ className, children }) {
 // <Card className="bg-gray-50" /> → bg-gray-50 wins over bg-white
 ```
 
-Use `twMerge` when a component accepts a `className` prop that should override internal
-defaults. Without it, both conflicting classes appear and CSS source order determines the winner
-(which may not be the override).
+Use `twMerge` when a component accepts a `className` prop that should override internal defaults. Without it, both
+conflicting classes appear and CSS source order determines the winner (which may not be the override).
 
 ---
 
 ## Vue / Svelte Class Binding Patterns
 
 **Vue:**
+
 ```html
 <template>
   <!-- Object syntax -->
@@ -291,6 +302,7 @@ defaults. Without it, both conflicting classes appear and CSS source order deter
 ```
 
 **Svelte 5:**
+
 ```svelte
 <script>
   import { cn } from "$lib/utils";
@@ -308,21 +320,23 @@ defaults. Without it, both conflicting classes appear and CSS source order deter
 
 Controls how browser-native UI elements (date pickers, scrollbars, form controls) render.
 
-| Class | CSS |
-|-------|-----|
-| `scheme-light` | `color-scheme: light` |
-| `scheme-dark` | `color-scheme: dark` |
+| Class               | CSS                        |
+| ------------------- | -------------------------- |
+| `scheme-light`      | `color-scheme: light`      |
+| `scheme-dark`       | `color-scheme: dark`       |
 | `scheme-light-dark` | `color-scheme: light dark` |
 | `scheme-only-light` | `color-scheme: only light` |
-| `scheme-only-dark` | `color-scheme: only dark` |
-| `scheme-normal` | `color-scheme: normal` |
+| `scheme-only-dark`  | `color-scheme: only dark`  |
+| `scheme-normal`     | `color-scheme: normal`     |
 
 Apply on `<html>` to match native UI to theme:
+
 ```html
 <html class="scheme-light dark:scheme-dark">
 ```
 
 For explicit dark mode enforcement (no system preference):
+
 ```html
 <html class="scheme-only-dark">
 ```
@@ -333,14 +347,13 @@ For explicit dark mode enforcement (no system preference):
 
 Controls behavior in Windows High Contrast / forced colors mode.
 
-| Class | CSS |
-|-------|-----|
-| `forced-color-adjust-auto` | `forced-color-adjust: auto` — respects forced colors |
+| Class                      | CSS                                                     |
+| -------------------------- | ------------------------------------------------------- |
+| `forced-color-adjust-auto` | `forced-color-adjust: auto` — respects forced colors    |
 | `forced-color-adjust-none` | `forced-color-adjust: none` — opts out of forced colors |
 
-**When to use `forced-color-adjust-none`:** Color swatches, custom radio/checkbox UI, or any
-element where enforcing forced colors would destroy essential visual information (e.g., a color
-picker showing color options).
+**When to use `forced-color-adjust-none`:** Color swatches, custom radio/checkbox UI, or any element where enforcing
+forced colors would destroy essential visual information (e.g., a color picker showing color options).
 
 ```html
 <fieldset>
@@ -355,10 +368,11 @@ picker showing color options).
 </fieldset>
 ```
 
-Always include a `sr-only` text label when using `forced-color-adjust-none` on color UI — the
-visual meaning is lost in forced colors mode, so accessible text is required.
+Always include a `sr-only` text label when using `forced-color-adjust-none` on color UI — the visual meaning is lost in
+forced colors mode, so accessible text is required.
 
 **Restoring at larger breakpoints:**
+
 ```html
 <!-- Custom color swatches on mobile, native select on desktop -->
 <fieldset class="forced-color-adjust-none lg:forced-color-adjust-auto">
@@ -367,10 +381,10 @@ visual meaning is lost in forced colors mode, so accessible text is required.
 </fieldset>
 ```
 
-**Testing:** Enable forced colors in DevTools (Rendering panel → Emulate CSS media feature
-`forced-colors: active`).
+**Testing:** Enable forced colors in DevTools (Rendering panel → Emulate CSS media feature `forced-colors: active`).
 
 **`forced-colors` variant** — apply styles only in forced colors mode:
+
 ```html
 <div class="forced-colors:outline forced-colors:outline-2">
 ```

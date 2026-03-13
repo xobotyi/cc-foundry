@@ -28,13 +28,12 @@ No directory is required. A role with only `files/` or only `tasks/` is valid.
 
 ## defaults/ vs vars/
 
-| Directory | Precedence | Override by | Use for |
-|-----------|-----------|-------------|---------|
-| `defaults/` | Very low | Almost anything | User-configurable knobs (ports, paths, feature flags) |
-| `vars/` | High | Only `extra-vars`, role params, `include_vars` | Internal constants the role needs to function |
+| Directory   | Precedence | Override by                                    | Use for                                               |
+| ----------- | ---------- | ---------------------------------------------- | ----------------------------------------------------- |
+| `defaults/` | Very low   | Almost anything                                | User-configurable knobs (ports, paths, feature flags) |
+| `vars/`     | High       | Only `extra-vars`, role params, `include_vars` | Internal constants the role needs to function         |
 
-Rule: if users should change it, put it in `defaults/`. If the role breaks without it,
-put it in `vars/`.
+Rule: if users should change it, put it in `defaults/`. If the role breaks without it, put it in `vars/`.
 
 ## Using Roles
 
@@ -51,8 +50,7 @@ Three mechanisms with different behaviors:
         nginx_port: 8080
 ```
 
-Static import at parse time. Tags on the role apply to ALL tasks inside. Role
-dependencies in `meta/main.yml` run first.
+Static import at parse time. Tags on the role apply to ALL tasks inside. Role dependencies in `meta/main.yml` run first.
 
 ### `import_role` (static, in tasks section)
 
@@ -77,8 +75,8 @@ tasks:
     when: ansible_facts['os_family'] == 'Debian'
 ```
 
-Dynamic -- evaluated at runtime. Tags on the include apply only to the include
-statement itself, not to tasks inside. Supports `when`, loops.
+Dynamic -- evaluated at runtime. Tags on the include apply only to the include statement itself, not to tasks inside.
+Supports `when`, loops.
 
 ## Platform-Specific Tasks
 
@@ -129,18 +127,18 @@ dependencies:
   - role: ssl_certs
 ```
 
-Dependencies run before the role. Ansible deduplicates: a dependency runs only once per
-play unless parameters differ or `allow_duplicates: true` is set on the dependency role.
+Dependencies run before the role. Ansible deduplicates: a dependency runs only once per play unless parameters differ or
+`allow_duplicates: true` is set on the dependency role.
 
 ## Role Deduplication
 
 Ansible runs each role once per play by default. To run a role multiple times:
+
 - Pass different parameters (the `roles:` keyword compares parameters)
 - Set `allow_duplicates: true` in the role's `meta/main.yml`
 
 ## Naming Conventions
 
 - Role names: lowercase, hyphens for separators (`nginx-proxy`, `ssl-certs`)
-- Prefix all role variables with the role name to avoid collisions:
-  `nginx_port`, `nginx_worker_connections`
+- Prefix all role variables with the role name to avoid collisions: `nginx_port`, `nginx_worker_connections`
 - Prefix all role handlers with the role name: `nginx : Restart nginx`

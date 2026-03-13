@@ -5,6 +5,7 @@ Common patterns and real-world examples for effective subagent design.
 ---
 
 ## Table of Contents
+
 - [Architecture Patterns](#architecture-patterns)
 - [Example Agents](#example-agents)
 - [Human-in-the-Loop Patterns](#human-in-the-loop-patterns)
@@ -27,6 +28,7 @@ debugger         → Diagnoses and fixes issues
 ```
 
 **Benefits:**
+
 - Clear triggers
 - Focused prompts
 - Predictable behavior
@@ -44,6 +46,7 @@ Chain agents for complex workflows (PM → Architect → Implementer).
 ```
 
 **Handoff mechanism:**
+
 ```markdown
 ## Status Management
 - Set status to READY_FOR_ARCH when spec complete
@@ -52,6 +55,7 @@ Chain agents for complex workflows (PM → Architect → Implementer).
 ```
 
 Use hooks to suggest next steps:
+
 ```yaml
 # In settings.json
 hooks:
@@ -70,6 +74,7 @@ Research authentication, database, and API modules in parallel
 ```
 
 **Main agent delegates:**
+
 ```
 Task(Explore) → auth module
 Task(Explore) → database module
@@ -78,8 +83,8 @@ Task(Explore) → API module
 
 Each returns a summary; main agent synthesizes.
 
-**Caution:** Many parallel agents returning detailed results can consume
-significant context. Design agents to return concise summaries.
+**Caution:** Many parallel agents returning detailed results can consume significant context. Design agents to return
+concise summaries.
 
 ### Master-Clone Pattern
 
@@ -91,16 +96,19 @@ Main agent → Task(general-purpose) → Clone handles subtask
 ```
 
 **Benefits:**
+
 - Clones inherit full context from CLAUDE.md
 - Main agent decides delegation dynamically
 - No need to predefine specialized agents
 
 **When to use:**
+
 - Tasks vary widely
 - Can't predict specializations needed
 - Want maximum flexibility
 
 **When to use specialized agents instead:**
+
 - Consistent task types
 - Need strict tool restrictions
 - Want optimized prompts for domain
@@ -156,9 +164,8 @@ When asked about database issues:
 
 ## Example Agents
 
-These examples demonstrate effective prompt structure. Apply
-`prompt-engineering` techniques: numbered steps, checklists, explicit
-output format, and XML tags for complex inputs.
+These examples demonstrate effective prompt structure. Apply `prompt-engineering` techniques: numbered steps,
+checklists, explicit output format, and XML tags for complex inputs.
 
 ### Code Reviewer
 
@@ -386,6 +393,7 @@ Query guidelines:
 ```
 
 Hook script (`./scripts/validate-readonly-query.sh`):
+
 ```bash
 #!/bin/bash
 INPUT=$(cat)
@@ -467,22 +475,29 @@ Generalist (Task) for everything else
 ## Anti-Patterns to Avoid
 
 ### God Agent
+
 Agent that does everything. Hard to trigger correctly, poor at all tasks.
 
 ### Vague Description
+
 "Helps with code" — over-triggers, unclear when to use.
 
 ### Execution in Description
+
 "Steps: 1. Read 2. Analyze 3. Report" — belongs in body, not description.
 
 ### Over-Scoped Tools
+
 Granting Write/Edit to read-only reviewers.
 
 ### No Output Format
+
 Agent returns inconsistent, unparseable results.
 
 ### Infinite Loop Risk
+
 Agent that spawns agents that spawn agents. (Subagents cannot spawn subagents.)
 
 ### Context Hogging
+
 Agent that reads entire codebase for simple queries.

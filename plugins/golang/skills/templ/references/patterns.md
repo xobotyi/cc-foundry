@@ -38,6 +38,7 @@ templ Card(props CardProps) {
 ```
 
 Benefits:
+
 - Template logic stays minimal — no database calls or complex transformations
 - Easy to test — just test `NewCardProps` in pure Go
 - Props struct documents what the template needs
@@ -162,18 +163,17 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 ## Conditional Classes
 
-See [styling.md](styling.md) for all class toggling approaches: `templ.KV`, maps, raw Go
-blocks, and conditional attributes.
+See [styling.md](styling.md) for all class toggling approaches: `templ.KV`, maps, raw Go blocks, and conditional
+attributes.
 
 ## Passing Data to JavaScript
 
 Three approaches, ordered by preference:
 
-1. **Data attributes** — `data-config={ templ.JSONString(data) }`. Preferred for
-   component-scoped data.
+1. **Data attributes** — `data-config={ templ.JSONString(data) }`. Preferred for component-scoped data.
 2. **Script elements** — `@templ.JSONScript("id", data)`. Best for page-level configuration.
-3. **Inline interpolation** — `{{ value }}` inside `<script>`. Least preferred — mixing
-   data and code is harder to maintain.
+3. **Inline interpolation** — `{{ value }}` inside `<script>`. Least preferred — mixing data and code is harder to
+   maintain.
 
 See [javascript.md](javascript.md) for API details and examples.
 
@@ -210,6 +210,5 @@ Useful for gradual migration from `html/template` to templ.
 
 ## Method Components Pattern
 
-Use method components when a component has many configuration options — struct fields are
-self-documenting and can have defaults. See [components.md](components.md) for definition
-syntax and examples.
+Use method components when a component has many configuration options — struct fields are self-documenting and can have
+defaults. See [components.md](components.md) for definition syntax and examples.

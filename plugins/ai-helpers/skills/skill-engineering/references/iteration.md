@@ -1,8 +1,7 @@
 # Skill Iteration
 
-Skills improve through observation and refinement. Apply prompt engineering
-debugging techniques—when Claude doesn't follow instructions, the prompt
-needs work, not stronger language.
+Skills improve through observation and refinement. Apply prompt engineering debugging techniques—when Claude doesn't
+follow instructions, the prompt needs work, not stronger language.
 
 ## Iteration Cycle
 
@@ -14,40 +13,40 @@ Use skill → Observe behavior → Identify gap → Refine → Repeat
 
 ### Activation Issues
 
-**Important:** Native skill activation is unreliable (20-50% without
-enforcement hooks). Description improvements help but don't guarantee
-activation. For details on the systemic issue and mitigation strategies
-(including forced-eval hooks that achieve ~84%), see the
-[troubleshooting reference](${CLAUDE_SKILL_DIR}/references/troubleshooting.md).
+**Important:** Native skill activation is unreliable (20-50% without enforcement hooks). Description improvements help
+but don't guarantee activation. For details on the systemic issue and mitigation strategies (including forced-eval hooks
+that achieve ~84%), see the [troubleshooting reference](${CLAUDE_SKILL_DIR}/references/troubleshooting.md).
 
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| Doesn't trigger | Description misses user's words | Broaden domain claim, add trigger keywords |
-| Triggers too often | Description too broad | Add exclusions: "Use for X, NOT for Y" |
-| Wrong skill activates | Overlapping descriptions | Make descriptions more distinct |
+| Problem               | Cause                           | Fix                                        |
+| --------------------- | ------------------------------- | ------------------------------------------ |
+| Doesn't trigger       | Description misses user's words | Broaden domain claim, add trigger keywords |
+| Triggers too often    | Description too broad           | Add exclusions: "Use for X, NOT for Y"     |
+| Wrong skill activates | Overlapping descriptions        | Make descriptions more distinct            |
 
 ### Output Issues
 
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| Wrong format | No format specification | Add explicit format with example output |
-| Missing details | Instructions vague | Be specific: "Include X, Y, Z" |
-| Ignores instructions | Buried in prose | Move to end, use XML tags, add structure |
-| Inconsistent quality | Ambiguous guidance | Add few-shot examples, resolve conflicts |
-| Partial completion | Steps unclear | Use numbered sequential steps |
-| Ignores constraints | Not emphasized | Place in `<constraints>` tags at end |
+| Problem              | Cause                   | Fix                                      |
+| -------------------- | ----------------------- | ---------------------------------------- |
+| Wrong format         | No format specification | Add explicit format with example output  |
+| Missing details      | Instructions vague      | Be specific: "Include X, Y, Z"           |
+| Ignores instructions | Buried in prose         | Move to end, use XML tags, add structure |
+| Inconsistent quality | Ambiguous guidance      | Add few-shot examples, resolve conflicts |
+| Partial completion   | Steps unclear           | Use numbered sequential steps            |
+| Ignores constraints  | Not emphasized          | Place in `<constraints>` tags at end     |
 
 ## Refinement Patterns
 
 ### Restructuring with XML Tags
 
 Before:
+
 ```markdown
 Filter out test accounts when querying. Also validate
 input and check permissions before running.
 ```
 
 After:
+
 ```markdown
 <constraints>
 - ALWAYS filter test accounts: `WHERE account_type != 'test'`
@@ -59,11 +58,13 @@ After:
 ### Adding Explicit Format
 
 Before:
+
 ```markdown
 Return the analysis results.
 ```
 
 After:
+
 ```markdown
 <output_format>
 Return as JSON:
@@ -76,6 +77,7 @@ Return as JSON:
 ### Moving Critical Rules to End
 
 Before (buried in middle):
+
 ```markdown
 ## Process
 1. Read input
@@ -85,6 +87,7 @@ Before (buried in middle):
 ```
 
 After (at end):
+
 ```markdown
 ## Process
 1. Read input
@@ -98,12 +101,14 @@ NEVER delete without explicit user confirmation.
 ### Broadening Domain Claim
 
 Before — narrow verb list:
+
 ```yaml
 description: >-
   Process PDF files. Use when extracting text or filling forms.
 ```
 
 After — functional description with broad domain claim:
+
 ```yaml
 description: >-
   Extract and transform PDF documents: text extraction, form
@@ -114,10 +119,10 @@ description: >-
 
 ### Narrowing Scope
 
-When a skill triggers too often, add exclusions rather than
-narrowing the domain claim:
+When a skill triggers too often, add exclusions rather than narrowing the domain claim:
 
 Before — too broad, no boundaries:
+
 ```yaml
 description: >-
   Data analysis and processing. Invoke whenever task involves
@@ -125,6 +130,7 @@ description: >-
 ```
 
 After — broad claim with explicit exclusions:
+
 ```yaml
 description: >-
   Tabular data analysis: statistical patterns in structured

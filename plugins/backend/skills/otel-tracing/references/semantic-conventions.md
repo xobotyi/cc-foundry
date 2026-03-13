@@ -1,8 +1,7 @@
 # Semantic Conventions
 
-Semantic conventions standardize span names, attributes, and status across languages
-and libraries. Using conventions enables cross-service analysis without learning each
-library's custom attribute names.
+Semantic conventions standardize span names, attributes, and status across languages and libraries. Using conventions
+enables cross-service analysis without learning each library's custom attribute names.
 
 ## Why Conventions Matter
 
@@ -18,36 +17,38 @@ library's custom attribute names.
 **Span kind:** `SERVER`
 
 **Span name:** `{METHOD} {http.route}` (e.g., `GET /users/:id`)
+
 - If no route available: `{METHOD}` (e.g., `GET`)
 - Never use the full URI path as span name
 
 **Required attributes:**
 
-| Attribute | Example |
-|-----------|---------|
+| Attribute             | Example           |
+| --------------------- | ----------------- |
 | `http.request.method` | `"GET"`, `"POST"` |
-| `url.path` | `"/users/42"` |
-| `url.scheme` | `"https"` |
+| `url.path`            | `"/users/42"`     |
+| `url.scheme`          | `"https"`         |
 
 **Conditionally required:**
 
-| Attribute | Condition | Example |
-|-----------|-----------|---------|
-| `http.route` | If available | `"/users/:id"` |
-| `http.response.status_code` | If response sent | `200` |
-| `error.type` | If error occurred | `"500"`, `"timeout"` |
+| Attribute                   | Condition         | Example              |
+| --------------------------- | ----------------- | -------------------- |
+| `http.route`                | If available      | `"/users/:id"`       |
+| `http.response.status_code` | If response sent  | `200`                |
+| `error.type`                | If error occurred | `"500"`, `"timeout"` |
 
 **Recommended:**
 
-| Attribute | Example |
-|-----------|---------|
-| `server.address` | `"api.example.com"` |
-| `server.port` | `8080` |
-| `client.address` | `"192.168.1.100"` |
-| `user_agent.original` | `"Mozilla/5.0..."` |
-| `network.protocol.version` | `"1.1"`, `"2"` |
+| Attribute                  | Example             |
+| -------------------------- | ------------------- |
+| `server.address`           | `"api.example.com"` |
+| `server.port`              | `8080`              |
+| `client.address`           | `"192.168.1.100"`   |
+| `user_agent.original`      | `"Mozilla/5.0..."`  |
+| `network.protocol.version` | `"1.1"`, `"2"`      |
 
 **Status rules:**
+
 - 1xx, 2xx, 3xx → leave `Unset` (unless other error like network failure)
 - 4xx → leave `Unset` for server spans (client's problem)
 - 5xx → set `Error`
@@ -58,24 +59,27 @@ library's custom attribute names.
 **Span kind:** `CLIENT`
 
 **Span name:** `{METHOD}` (e.g., `GET`)
+
 - Add `{url.template}` if available: `GET /users/{id}`
 
 **Required attributes:**
 
-| Attribute | Example |
-|-----------|---------|
-| `http.request.method` | `"GET"` |
-| `server.address` | `"api.example.com"` |
-| `server.port` | `443` |
-| `url.full` | `"https://api.example.com/users/42"` |
+| Attribute             | Example                              |
+| --------------------- | ------------------------------------ |
+| `http.request.method` | `"GET"`                              |
+| `server.address`      | `"api.example.com"`                  |
+| `server.port`         | `443`                                |
+| `url.full`            | `"https://api.example.com/users/42"` |
 
 **Status rules:**
+
 - 4xx → set `Error` for client spans (server rejected our request)
 - 5xx → set `Error`
 
 ### HTTP Span Example
 
 Client span:
+
 ```
 name: "GET"
 kind: CLIENT
@@ -89,6 +93,7 @@ attributes:
 ```
 
 Corresponding server span:
+
 ```
 name: "GET /webshop/articles/:article_id"
 kind: SERVER
@@ -112,16 +117,17 @@ attributes:
 
 **Key attributes:**
 
-| Attribute | Description | Example |
-|-----------|-------------|---------|
-| `db.system` | Database product identifier | `"postgresql"`, `"redis"` |
-| `db.namespace` | Database name / schema | `"mydb"` |
-| `db.operation.name` | Operation name | `"SELECT"`, `"INSERT"` |
-| `db.query.text` | Sanitized query (opt-in) | `"SELECT * FROM users WHERE id = ?"` |
-| `server.address` | Database server host | `"db.example.com"` |
-| `server.port` | Database server port | `5432` |
+| Attribute           | Description                 | Example                              |
+| ------------------- | --------------------------- | ------------------------------------ |
+| `db.system`         | Database product identifier | `"postgresql"`, `"redis"`            |
+| `db.namespace`      | Database name / schema      | `"mydb"`                             |
+| `db.operation.name` | Operation name              | `"SELECT"`, `"INSERT"`               |
+| `db.query.text`     | Sanitized query (opt-in)    | `"SELECT * FROM users WHERE id = ?"` |
+| `server.address`    | Database server host        | `"db.example.com"`                   |
+| `server.port`       | Database server port        | `5432`                               |
 
 **Rules:**
+
 - Always sanitize queries — replace parameter values with `?` or `$N`
 - `db.query.text` is opt-in due to potential sensitivity
 - Use `db.operation.name` even when the full query is not recorded
@@ -134,11 +140,11 @@ attributes:
 
 **Span name:** `{destination} publish` (e.g., `orders publish`)
 
-| Attribute | Example |
-|-----------|---------|
-| `messaging.system` | `"kafka"`, `"rabbitmq"` |
-| `messaging.destination.name` | `"orders"` |
-| `messaging.operation.type` | `"publish"` |
+| Attribute                    | Example                 |
+| ---------------------------- | ----------------------- |
+| `messaging.system`           | `"kafka"`, `"rabbitmq"` |
+| `messaging.destination.name` | `"orders"`              |
+| `messaging.operation.type`   | `"publish"`             |
 
 ### Consumer Spans
 
@@ -146,11 +152,11 @@ attributes:
 
 **Span name:** `{destination} process` (e.g., `orders process`)
 
-| Attribute | Example |
-|-----------|---------|
-| `messaging.system` | `"kafka"` |
-| `messaging.destination.name` | `"orders"` |
-| `messaging.operation.type` | `"process"` |
+| Attribute                    | Example     |
+| ---------------------------- | ----------- |
+| `messaging.system`           | `"kafka"`   |
+| `messaging.destination.name` | `"orders"`  |
+| `messaging.operation.type`   | `"process"` |
 
 **For batch consumers:** Create one span per batch with links to each producer span.
 
@@ -158,38 +164,36 @@ attributes:
 
 ### Error Reporting
 
-| Attribute | Description | Example |
-|-----------|-------------|---------|
+| Attribute    | Description                 | Example                                                 |
+| ------------ | --------------------------- | ------------------------------------------------------- |
 | `error.type` | Low-cardinality error class | `"timeout"`, `"500"`, `"java.net.UnknownHostException"` |
 
-Set `error.type` when the operation ends with an error. The value should be
-predictable and low-cardinality.
+Set `error.type` when the operation ends with an error. The value should be predictable and low-cardinality.
 
 ### Network Attributes
 
-| Attribute | Description | Example |
-|-----------|-------------|---------|
-| `network.transport` | Transport protocol | `"tcp"`, `"udp"` |
-| `network.protocol.name` | Application protocol | `"http"`, `"grpc"` |
-| `network.protocol.version` | Protocol version | `"1.1"`, `"2"` |
-| `network.peer.address` | Remote peer IP | `"10.0.0.1"` |
-| `network.peer.port` | Remote peer port | `8080` |
+| Attribute                  | Description          | Example            |
+| -------------------------- | -------------------- | ------------------ |
+| `network.transport`        | Transport protocol   | `"tcp"`, `"udp"`   |
+| `network.protocol.name`    | Application protocol | `"http"`, `"grpc"` |
+| `network.protocol.version` | Protocol version     | `"1.1"`, `"2"`     |
+| `network.peer.address`     | Remote peer IP       | `"10.0.0.1"`       |
+| `network.peer.port`        | Remote peer port     | `8080`             |
 
 ### Server/Client Attributes
 
-| Attribute | Context | Description |
-|-----------|---------|-------------|
-| `server.address` | Both | Hostname or IP of the server |
-| `server.port` | Both | Port of the server |
-| `client.address` | Server | IP of the client |
-| `client.port` | Server | Port of the client |
+| Attribute        | Context | Description                  |
+| ---------------- | ------- | ---------------------------- |
+| `server.address` | Both    | Hostname or IP of the server |
+| `server.port`    | Both    | Port of the server           |
+| `client.address` | Server  | IP of the client             |
+| `client.port`    | Server  | Port of the client           |
 
 ## Sampling-Critical Attributes
 
-These attributes SHOULD be provided at span creation time because samplers can only
-see attributes present at creation:
+These attributes SHOULD be provided at span creation time because samplers can only see attributes present at creation:
 
-**HTTP server:** `http.request.method`, `url.path`, `url.scheme`, `server.address`,
-`server.port`, `client.address`, `user_agent.original`
+**HTTP server:** `http.request.method`, `url.path`, `url.scheme`, `server.address`, `server.port`, `client.address`,
+`user_agent.original`
 
 **HTTP client:** `http.request.method`, `url.full`, `server.address`, `server.port`

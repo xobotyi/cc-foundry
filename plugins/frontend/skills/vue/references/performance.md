@@ -1,7 +1,7 @@
 # Performance
 
-Vue is fast by default. Optimize only when profiling reveals a bottleneck.
-Premature optimization creates complexity without measurable benefit.
+Vue is fast by default. Optimize only when profiling reveals a bottleneck. Premature optimization creates complexity
+without measurable benefit.
 
 ## Page Load
 
@@ -31,10 +31,8 @@ const HeavyChart = defineAsyncComponent(
 ### Bundle Size
 
 - Prefer tree-shakable dependencies (`lodash-es` over `lodash`).
-- Vue APIs are tree-shakable — unused features like `<Transition>` are
-  excluded from production builds.
-- Use `<script setup>` — it compiles to more minification-friendly code
-  than Options API.
+- Vue APIs are tree-shakable — unused features like `<Transition>` are excluded from production builds.
+- Use `<script setup>` — it compiles to more minification-friendly code than Options API.
 
 ## Update Performance
 
@@ -81,13 +79,12 @@ Conditionally skip sub-tree updates:
 </div>
 ```
 
-`v-memo` accepts a dependency array. The sub-tree only re-renders when
-a dependency changes. Use on `v-for` lists where most items don't change.
+`v-memo` accepts a dependency array. The sub-tree only re-renders when a dependency changes. Use on `v-for` lists where
+most items don't change.
 
 ### Computed Stability (3.4+)
 
-Computed properties only trigger effects when the returned value actually
-changes:
+Computed properties only trigger effects when the returned value actually changes:
 
 ```ts
 const isEven = computed(() => count.value % 2 === 0)
@@ -118,8 +115,7 @@ const result = computed((oldValue) => {
 
 ### Virtual Scrolling
 
-For lists with 1000+ items, use virtual scrolling — render only visible
-items:
+For lists with 1000+ items, use virtual scrolling — render only visible items:
 
 ```ts
 // Community libraries:
@@ -142,8 +138,8 @@ largeList.value = [...largeList.value, newItem]
 
 ## Component Abstractions
 
-Every component instance has overhead (state, lifecycle, rendering).
-In large lists, avoid unnecessary wrapper components:
+Every component instance has overhead (state, lifecycle, rendering). In large lists, avoid unnecessary wrapper
+components:
 
 ```vue
 <!-- BAD: 100 wrapper components in a list -->

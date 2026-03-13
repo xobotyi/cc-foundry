@@ -2,23 +2,22 @@
 
 ## Execution Environments (EEs)
 
-Container images that bundle Ansible Core, Ansible Runner, collections, and all
-required Python and system-level dependencies into a single portable unit. EEs
-replace traditional virtual environments for running automation.
+Container images that bundle Ansible Core, Ansible Runner, collections, and all required Python and system-level
+dependencies into a single portable unit. EEs replace traditional virtual environments for running automation.
 
 ### When to Use EEs vs Local Installs
 
-| Aspect | Local Install | Execution Environment |
-|--------|---------------|----------------------|
-| Dependency management | Manual, per-node | Bundled in image |
-| Isolation | Shared system libraries | Fully containerized |
-| Scalability | Hard to maintain at scale | Same image everywhere |
-| Use case | Simple setups, ad-hoc tasks | Enterprise, complex deps, teams |
+| Aspect                | Local Install               | Execution Environment           |
+| --------------------- | --------------------------- | ------------------------------- |
+| Dependency management | Manual, per-node            | Bundled in image                |
+| Isolation             | Shared system libraries     | Fully containerized             |
+| Scalability           | Hard to maintain at scale   | Same image everywhere           |
+| Use case              | Simple setups, ad-hoc tasks | Enterprise, complex deps, teams |
 
 ### ansible-builder
 
-The tool for creating custom EEs. Takes an EE definition file as input,
-generates a build context, and produces a container image.
+The tool for creating custom EEs. Takes an EE definition file as input, generates a build context, and produces a
+container image.
 
 ```bash
 pip install ansible-builder
@@ -29,8 +28,7 @@ Requires a container runtime (Podman or Docker) installed.
 
 ### EE Definition File
 
-Configuration in YAML, typically `execution-environment.yml`. Use version 3
-schema for full functionality:
+Configuration in YAML, typically `execution-environment.yml`. Use version 3 schema for full functionality:
 
 ```yaml
 version: 3
@@ -59,6 +57,7 @@ additional_build_steps:
 ```
 
 Key sections:
+
 - **version:** Schema version (use 3)
 - **images:** Base image providing OS and initial packages
 - **dependencies:** Galaxy collections, Python packages, system packages
@@ -67,15 +66,13 @@ Key sections:
 
 ### ansible-navigator
 
-Interactive TUI for playbook development and debugging. Tightly integrated
-with EEs.
+Interactive TUI for playbook development and debugging. Tightly integrated with EEs.
 
 Key features:
-- **Interactive mode:** Drill into task outputs, inspect variables without
-  re-running with verbosity flags
+
+- **Interactive mode:** Drill into task outputs, inspect variables without re-running with verbosity flags
 - **EE switching:** Test playbooks against different EEs for compatibility
-- **Artifact replay:** Saves run artifacts as JSON, shareable with teammates
-  for collaborative debugging
+- **Artifact replay:** Saves run artifacts as JSON, shareable with teammates for collaborative debugging
 - **Check mode:** Dry run results clearly marked in TUI
 
 Configuration (`.ansible-navigator.yml`):
@@ -91,6 +88,7 @@ ansible-navigator:
 ```
 
 Development workflow:
+
 - Run playbooks in interactive mode for real-time inspection
 - Use `--start-at-task` to skip ahead during iterative development
 - Replay artifacts: `ansible-navigator replay artifact.json`
@@ -119,12 +117,14 @@ ansible_collections/{namespace}/{collection_name}/
 ### Metadata Files
 
 **galaxy.yml** -- build and distribution metadata:
+
 - Description, authors, version (semantic versioning, min 1.0.0 for production)
 - Dependencies on other collections
 - Tags for discovery (e.g., `networking`, `security`, `cloud`)
 - License (must be OSI-approved for certification)
 
 **meta/runtime.yml** -- compatibility and routing:
+
 - `requires_ansible` -- supported ansible-core versions
 - `plugin_routing` -- redirects for renamed/moved plugins (backward compat)
 - `action_groups` -- logical groupings of action plugins
@@ -155,19 +155,18 @@ ansible-galaxy collection install -r requirements.yml
 
 - Always use FQCN in playbooks: `community.general.ufw`, not `ufw`
 - Scope installs per project to avoid cross-project version conflicts
-- Vendor for air-gapped environments:
-  `ansible-galaxy collection download -r requirements.yml -p ./collections/`
+- Vendor for air-gapped environments: `ansible-galaxy collection download -r requirements.yml -p ./collections/`
 
 ### FQCN Migration from Standalone Roles
 
 When migrating roles into collections:
+
 1. Move role content into `roles/` directory within the collection
 2. Transition all module references to FQCN
-3. Use `plugin_routing` in `meta/runtime.yml` for backward compatibility:
-   redirects for plugins that were renamed or moved
+3. Use `plugin_routing` in `meta/runtime.yml` for backward compatibility: redirects for plugins that were renamed or
+   moved
 4. Keep roles loosely coupled -- limit hard dependencies on external variables
-5. Extract tasks to `tasks/main.yml`, handlers to `handlers/main.yml`,
-   templates to `templates/`
+5. Extract tasks to `tasks/main.yml`, handlers to `handlers/main.yml`, templates to `templates/`
 
 ### Collection Quality
 

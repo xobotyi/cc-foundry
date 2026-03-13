@@ -4,8 +4,7 @@ Common pitfalls that compile but produce incorrect behavior at runtime.
 
 ## Variable Shadowing
 
-Redeclaring a variable in an inner block hides the outer one. This compiles but silently
-uses the wrong variable:
+Redeclaring a variable in an inner block hides the outer one. This compiles but silently uses the wrong variable:
 
 ```go
 // Bad — err in outer scope never set
@@ -27,8 +26,8 @@ if tracing {
 }
 ```
 
-Be especially careful with `:=` in `if`/`for` blocks. The `err` variable is commonly
-shadowed. Use `go vet -shadow` or `golangci-lint` to detect.
+Be especially careful with `:=` in `if`/`for` blocks. The `err` variable is commonly shadowed. Use `go vet -shadow` or
+`golangci-lint` to detect.
 
 ## Defer
 
@@ -51,8 +50,8 @@ defer notify(&status)
 
 ### Defer in Loops
 
-`defer` runs when the surrounding function returns, not at end of loop iteration.
-Inside a loop, deferred closes accumulate until the function exits:
+`defer` runs when the surrounding function returns, not at end of loop iteration. Inside a loop, deferred closes
+accumulate until the function exits:
 
 ```go
 // Bug — file descriptors leak until function returns
@@ -79,8 +78,8 @@ func processFile(path string) error {
 
 ## Slices: Append Mutation
 
-`append` on a slice with remaining capacity mutates the underlying array. Slices
-derived from the same array see each other's writes:
+`append` on a slice with remaining capacity mutates the underlying array. Slices derived from the same array see each
+other's writes:
 
 ```go
 // Dangerous — s2 and s3 share backing array
@@ -106,8 +105,8 @@ s2 = append(s2, 4)
 
 ### Runes vs Bytes
 
-`len(s)` returns byte count, not rune count. A UTF-8 character can span 1–4 bytes.
-Use `range` over a string to iterate runes, not `s[i]`:
+`len(s)` returns byte count, not rune count. A UTF-8 character can span 1–4 bytes. Use `range` over a string to iterate
+runes, not `s[i]`:
 
 ```go
 s := "café"
@@ -125,8 +124,7 @@ r := []rune(s)[3] // 'é'
 
 ### Concatenation
 
-Use `strings.Builder` when concatenating in a loop. `+=` allocates a new string
-each iteration:
+Use `strings.Builder` when concatenating in a loop. `+=` allocates a new string each iteration:
 
 ```go
 // Bad — O(n²) allocations
@@ -161,8 +159,7 @@ func (d *Driver) SetTrips(trips []Trip) {
 
 ## Global State
 
-Libraries must not force clients to use global state. Expose instance-based APIs and
-let callers manage lifecycle:
+Libraries must not force clients to use global state. Expose instance-based APIs and let callers manage lifecycle:
 
 ```go
 // Bad — global registry, untestable, order-dependent
@@ -184,18 +181,16 @@ func New() *Registry { return &Registry{plugins: make(map[string]*Plugin)} }
 func (r *Registry) Register(name string, p *Plugin) error { ... }
 ```
 
-Global state is safe only when it is logically constant, stateless (e.g., caches
-where hits and misses are indistinguishable), or has no external side effects.
+Global state is safe only when it is logically constant, stateless (e.g., caches where hits and misses are
+indistinguishable), or has no external side effects.
 
-If you must provide convenience, make the global API a thin proxy to an instance API
-(like `http.Handle` proxying to `http.DefaultServeMux`), and restrict global API
-usage to binaries — never in libraries.
+If you must provide convenience, make the global API a thin proxy to an instance API (like `http.Handle` proxying to
+`http.DefaultServeMux`), and restrict global API usage to binaries — never in libraries.
 
 ## Fixed Bit-Width Types
 
-Use `int8`, `uint16`, `int32`, etc. with caution — they are prone to overflow
-errors. Prefer `int` unless a specific width is required by a protocol, binary
-format, or performance constraint.
+Use `int8`, `uint16`, `int32`, etc. with caution — they are prone to overflow errors. Prefer `int` unless a specific
+width is required by a protocol, binary format, or performance constraint.
 
 ```go
 // Bad — silent overflow risk

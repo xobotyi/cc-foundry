@@ -1,7 +1,7 @@
 # Data Providers Reference
 
-Data providers supply arguments to test methods. Each dataset runs the test once with those
-arguments, producing independent test results.
+Data providers supply arguments to test methods. Each dataset runs the test once with those arguments, producing
+independent test results.
 
 ## Declaration Rules
 
@@ -117,14 +117,14 @@ public function testAdd(int $a, int $b, int $expected): void
 
 ## Constraints and Gotchas
 
-- **All providers execute before any test runs** — including providers for filtered-out tests.
-  Keep providers lightweight.
-- **No mock objects in providers** — mock creation requires the test framework to be
-  initialized, which hasn't happened during provider execution
-- **Data should be scalar/immutable** — providers should return scalars, value objects, or
-  stubs. Never create service objects or complex graphs in providers.
-- **Empty providers** are forbidden in PHPUnit 11 — an `InvalidDataProviderException` is
-  thrown if a provider returns no data
+- **All providers execute before any test runs** — including providers for filtered-out tests. Keep providers
+  lightweight.
+- **No mock objects in providers** — mock creation requires the test framework to be initialized, which hasn't happened
+  during provider execution
+- **Data should be scalar/immutable** — providers should return scalars, value objects, or stubs. Never create service
+  objects or complex graphs in providers.
+- **Empty providers** are forbidden in PHPUnit 11 — an `InvalidDataProviderException` is thrown if a provider returns no
+  data
 - **Duplicate named keys** trigger `InvalidDataProviderException`
 - **No code coverage** is collected during provider execution
 

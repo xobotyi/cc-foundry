@@ -1,20 +1,19 @@
 # PromQL
 
-Prometheus Query Language — a functional language for selecting and aggregating
-time series data. Understanding PromQL's data types, operators, and functions is
-essential for dashboards, alerts, and recording rules.
+Prometheus Query Language — a functional language for selecting and aggregating time series data. Understanding PromQL's
+data types, operators, and functions is essential for dashboards, alerts, and recording rules.
 
 ## Data Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| Instant vector | Set of time series, one sample each, same timestamp | `http_requests_total` |
-| Range vector | Set of time series, range of samples over time | `http_requests_total[5m]` |
-| Scalar | Single numeric float | `3.14` |
-| String | Single string value (currently unused) | `"hello"` |
+| Type           | Description                                         | Example                   |
+| -------------- | --------------------------------------------------- | ------------------------- |
+| Instant vector | Set of time series, one sample each, same timestamp | `http_requests_total`     |
+| Range vector   | Set of time series, range of samples over time      | `http_requests_total[5m]` |
+| Scalar         | Single numeric float                                | `3.14`                    |
+| String         | Single string value (currently unused)              | `"hello"`                 |
 
-Range vectors cannot be graphed directly — they must be passed through a function
-like `rate()` that returns an instant vector.
+Range vectors cannot be graphed directly — they must be passed through a function like `rate()` that returns an instant
+vector.
 
 ## Selectors
 
@@ -28,7 +27,8 @@ http_requests_total{method!="OPTIONS"}                 # negative match
 ```
 
 **Label matchers:**
-- `=`  exact match
+
+- `=` exact match
 - `!=` not equal
 - `=~` regex match (fully anchored: `"foo"` becomes `"^foo$"`)
 - `!~` negative regex match
@@ -70,6 +70,7 @@ irate(http_requests_total[5m])
 ```
 
 **Rules:**
+
 - `rate()` first, then aggregate: `sum(rate(x[5m]))` not `rate(sum(x)[5m])`
 - `rate()` for alerts and slow counters; `irate()` only for graphing volatile counters
 - `increase()` is syntactic sugar for `rate() * range_seconds`
@@ -90,8 +91,8 @@ rate(http_request_duration_seconds_sum[5m])
 rate(http_request_duration_seconds_count[5m])
 ```
 
-**Critical:** When aggregating histogram buckets, always preserve `le` in the
-`by` clause — `histogram_quantile()` requires it.
+**Critical:** When aggregating histogram buckets, always preserve `le` in the `by` clause — `histogram_quantile()`
+requires it.
 
 ### Gauges
 
@@ -131,8 +132,7 @@ quantile_over_time(0.95, metric[1h])  # 95th percentile over time
 
 ## Aggregation Operators
 
-All aggregation operators take an instant vector and return a new vector with
-fewer elements.
+All aggregation operators take an instant vector and return a new vector with fewer elements.
 
 ```promql
 sum(v)              # sum across dimensions
@@ -157,8 +157,7 @@ sum by (job, method) (rate(http_requests_total[5m]))
 sum without (instance) (rate(http_requests_total[5m]))
 ```
 
-Prefer `without` when aggregating away a few labels — it preserves all other
-labels including `job`, avoiding conflicts.
+Prefer `without` when aggregating away a few labels — it preserves all other labels including `job`, avoiding conflicts.
 
 ## Binary Operators
 
@@ -201,8 +200,7 @@ method_code:http_errors:rate5m{code="500"} / ignoring(code) method:http_requests
 method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:rate5m
 ```
 
-**`on(labels)`** — match only on listed labels.
-**`ignoring(labels)`** — match on all labels except listed.
+**`on(labels)`** — match only on listed labels. **`ignoring(labels)`** — match on all labels except listed.
 **`group_left` / `group_right`** — enable many-to-one matching.
 
 ## Operator Precedence (highest to lowest)
@@ -242,13 +240,13 @@ absent(up{job="critical-service"} == 1)
 
 ### Staleness
 
-Prometheus returns the most recent sample within the lookback period (default 5
-minutes). If a series stops being scraped, it goes stale and disappears from queries.
+Prometheus returns the most recent sample within the lookback period (default 5 minutes). If a series stops being
+scraped, it goes stale and disappears from queries.
 
 ### Rate Window Size
 
-`rate()` needs at least two samples in the range. With a 15s scrape interval,
-`rate(x[30s])` may have only 2 points. Use `rate(x[5m])` or wider for reliability.
+`rate()` needs at least two samples in the range. With a 15s scrape interval, `rate(x[30s])` may have only 2 points. Use
+`rate(x[5m])` or wider for reliability.
 
 Rule of thumb: range should be at least 4x the scrape interval.
 

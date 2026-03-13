@@ -6,8 +6,7 @@ Variables, naming, declarations, equality, type coercion, and modern syntax patt
 
 ### `const` by Default
 
-Use `const` for all bindings. Switch to `let` only when reassignment is required.
-Never use `var`.
+Use `const` for all bindings. Switch to `let` only when reassignment is required. Never use `var`.
 
 ```js
 // Good
@@ -18,13 +17,13 @@ let attempts = 0;
 var count = 0;
 ```
 
-`const` does not make values immutable — it prevents reassignment of the binding.
-Objects and arrays declared with `const` can still be mutated.
+`const` does not make values immutable — it prevents reassignment of the binding. Objects and arrays declared with
+`const` can still be mutated.
 
 ### Block Scoping
 
-`let` and `const` are block-scoped. `var` is function-scoped and hoisted to the
-function top, which causes bugs in loops and conditionals:
+`let` and `const` are block-scoped. `var` is function-scoped and hoisted to the function top, which causes bugs in loops
+and conditionals:
 
 ```js
 // Bug — var is shared across all iterations
@@ -58,18 +57,17 @@ Group `const` declarations first, then `let` declarations.
 
 ### Conventions
 
-| Entity | Style | Examples |
-|--------|-------|----------|
-| Variables, functions | camelCase | `userName`, `fetchData` |
-| Classes, constructors | PascalCase | `UserService`, `HttpClient` |
-| Constants (true constants) | SCREAMING_SNAKE_CASE | `MAX_RETRIES`, `API_BASE_URL` |
-| Private fields/methods | `#` prefix (class) | `#count`, `#validate()` |
-| Boolean variables | `is`/`has`/`can`/`should` prefix | `isValid`, `hasAccess` |
-| File names | kebab-case or camelCase | `user-service.js`, `userService.js` |
+| Entity                     | Style                            | Examples                            |
+| -------------------------- | -------------------------------- | ----------------------------------- |
+| Variables, functions       | camelCase                        | `userName`, `fetchData`             |
+| Classes, constructors      | PascalCase                       | `UserService`, `HttpClient`         |
+| Constants (true constants) | SCREAMING_SNAKE_CASE             | `MAX_RETRIES`, `API_BASE_URL`       |
+| Private fields/methods     | `#` prefix (class)               | `#count`, `#validate()`             |
+| Boolean variables          | `is`/`has`/`can`/`should` prefix | `isValid`, `hasAccess`              |
+| File names                 | kebab-case or camelCase          | `user-service.js`, `userService.js` |
 
-**True constants** are values known at compile time and never computed at runtime.
-A variable that holds a value returned from a function is not a constant — use
-camelCase for those:
+**True constants** are values known at compile time and never computed at runtime. A variable that holds a value
+returned from a function is not a constant — use camelCase for those:
 
 ```js
 // SCREAMING_SNAKE — known at compile time
@@ -83,8 +81,7 @@ const defaultTimeout = config.timeout ?? 5000;
 
 ### Descriptive Names
 
-Names should reveal intent. Avoid abbreviations unless universally understood
-(`url`, `id`, `err`, `ctx`, `req`, `res`).
+Names should reveal intent. Avoid abbreviations unless universally understood (`url`, `id`, `err`, `ctx`, `req`, `res`).
 
 ```js
 // Bad
@@ -96,8 +93,8 @@ const now = new Date();
 const double = (value) => value * 2;
 ```
 
-Short names are acceptable in short scopes: loop indices (`i`, `j`), arrow
-function params in simple callbacks (`x => x.id`).
+Short names are acceptable in short scopes: loop indices (`i`, `j`), arrow function params in simple callbacks
+(`x => x.id`).
 
 ### Avoid Redundant Context
 
@@ -139,8 +136,7 @@ false == "0" // true
 null == undefined // true
 ```
 
-Use strict equality (`===`) everywhere. The only acceptable use of `==` is
-checking for `null` or `undefined` together:
+Use strict equality (`===`) everywhere. The only acceptable use of `==` is checking for `null` or `undefined` together:
 
 ```js
 // Acceptable — checks both null and undefined
@@ -152,15 +148,14 @@ if (value === null || value === undefined) { ... }
 
 ### Falsy Values
 
-These are falsy in JavaScript: `false`, `0`, `-0`, `0n`, `""`, `null`,
-`undefined`, `NaN`.
+These are falsy in JavaScript: `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined`, `NaN`.
 
 Everything else is truthy, including `[]`, `{}`, and `"0"`.
 
 ### Nullish Coalescing Over `||`
 
-Use `??` when you want to default only on `null`/`undefined`. Use `||` only when
-you want to default on all falsy values:
+Use `??` when you want to default only on `null`/`undefined`. Use `||` only when you want to default on all falsy
+values:
 
 ```js
 // Bug — || treats 0 and "" as falsy
@@ -180,8 +175,8 @@ const result = callback?.();
 const item = arr?.[index];
 ```
 
-Don't overuse — if a value should always exist, accessing it directly is better
-because it surfaces bugs rather than hiding them.
+Don't overuse — if a value should always exist, accessing it directly is better because it surfaces bugs rather than
+hiding them.
 
 ## Modern Syntax
 

@@ -2,8 +2,8 @@
 
 ## Ansible Vault Overview
 
-Vault encrypts sensitive data (passwords, keys, certificates) so it can live alongside
-playbooks in version control. Encryption uses AES-256.
+Vault encrypts sensitive data (passwords, keys, certificates) so it can live alongside playbooks in version control.
+Encryption uses AES-256.
 
 ## Encryption Scope
 
@@ -42,10 +42,8 @@ Use `encrypt_string` when only a few values in a file need protection.
 
 Best practice for managing encrypted variables with visible names:
 
-1. Create `group_vars/<group>/vars.yml` with all variable names (including
-   sensitive ones)
-2. Create `group_vars/<group>/vault.yml` with the actual secret values,
-   prefixed with `vault_`
+1. Create `group_vars/<group>/vars.yml` with all variable names (including sensitive ones)
+2. Create `group_vars/<group>/vault.yml` with the actual secret values, prefixed with `vault_`
 3. Reference vault values from vars:
 
 ```yaml
@@ -77,11 +75,11 @@ Vault IDs label which password decrypts which content.
 
 ## Password Sources
 
-| Method | Command | Use case |
-|--------|---------|----------|
-| Prompt | `--vault-id @prompt` | Interactive sessions |
-| File | `--vault-password-file vault_pass.txt` | CI/CD (file in `.gitignore`) |
-| Script | `--vault-password-file vault_pass.py` | Fetch from secrets manager |
+| Method | Command                                | Use case                     |
+| ------ | -------------------------------------- | ---------------------------- |
+| Prompt | `--vault-id @prompt`                   | Interactive sessions         |
+| File   | `--vault-password-file vault_pass.txt` | CI/CD (file in `.gitignore`) |
+| Script | `--vault-password-file vault_pass.py`  | Fetch from secrets manager   |
 
 ## Password Automation
 
@@ -119,9 +117,8 @@ Store `VAULT_PASSWORD` as a protected pipeline secret, never in scripts.
 
 ## External Secret Managers
 
-For enterprise or compliance-heavy environments, shift from static encrypted
-vault files to runtime secret fetching via lookup plugins. Secrets are never
-stored on disk -- they are fetched at playbook execution time.
+For enterprise or compliance-heavy environments, shift from static encrypted vault files to runtime secret fetching via
+lookup plugins. Secrets are never stored on disk -- they are fetched at playbook execution time.
 
 ### HashiCorp Vault
 
@@ -143,11 +140,11 @@ stored on disk -- they are fetched at playbook execution time.
 
 ### When to use external managers vs Ansible Vault
 
-| Scenario | Recommendation |
-|----------|---------------|
-| Small team, simple setup | Ansible Vault with `vault_` prefix convention |
-| Enterprise, compliance requirements | External secret manager with lookup plugins |
-| Mixed | Ansible Vault for static config, external manager for rotating secrets |
+| Scenario                            | Recommendation                                                         |
+| ----------------------------------- | ---------------------------------------------------------------------- |
+| Small team, simple setup            | Ansible Vault with `vault_` prefix convention                          |
+| Enterprise, compliance requirements | External secret manager with lookup plugins                            |
+| Mixed                               | Ansible Vault for static config, external manager for rotating secrets |
 
 ## Content Signing and Verification
 
@@ -158,17 +155,20 @@ Prevent unauthorized tampering with automation code using cryptographic signing.
 `ansible-sign` uses GPG to sign and verify project content:
 
 1. Create `MANIFEST.in` in project root specifying files to protect:
+
    ```
    include inventory
    recursive-include playbooks *.yml
    ```
 
 2. Sign the project:
+
    ```bash
    ansible-sign project gpg-sign .
    ```
-   Creates `.ansible-sign/sha256sum.txt` (checksum manifest) and
-   `.ansible-sign/sha256sum.txt.sig` (detached GPG signature).
+
+   Creates `.ansible-sign/sha256sum.txt` (checksum manifest) and `.ansible-sign/sha256sum.txt.sig` (detached GPG
+   signature).
 
 3. Verify locally:
    ```bash
@@ -180,8 +180,7 @@ Prevent unauthorized tampering with automation code using cryptographic signing.
 - Add GPG public key as a "GPG Public Key" credential in AAP
 - Set the "Content signature validation credential" on the project
 - On sync, controller verifies signature and recalculates checksums
-- If any file changed, was added, or was removed: project update fails,
-  no jobs launch
+- If any file changed, was added, or was removed: project update fails, no jobs launch
 
 ### Automated Signing in CI
 
@@ -191,14 +190,15 @@ export ANSIBLE_SIGN_GPG_PASSPHRASE="${VAULT_GPG_PASSPHRASE}"
 ansible-sign project gpg-sign .
 ```
 
-Exit codes: 0 = success, 1 = general failure, 2 = checksum mismatch,
-3 = signature verification failure, 4 = signing process failure.
+Exit codes: 0 = success, 1 = general failure, 2 = checksum mismatch, 3 = signature verification failure, 4 = signing
+process failure.
 
 ## CIS Benchmark Automation
 
 ### Hardening Roles
 
 Use community-vetted CIS roles (e.g., `ansible-lockdown` project):
+
 - Customization via `defaults/main.yml` or extra vars -- never edit tasks
 - Tags for precision: `level1-memberserver`, `level2-domaincontroller`
 - Idempotent: rerun at any time to detect and correct configuration drift
@@ -213,6 +213,7 @@ Use community-vetted CIS roles (e.g., `ansible-lockdown` project):
 ### Security Smells in IaC
 
 Common security anti-patterns detected by linting and scanning:
+
 - Insecure configuration: allowing root login over SSH
 - Command injection: unsanitized user input in shell commands
 - Credential exposure: plaintext secrets in playbooks
@@ -221,9 +222,8 @@ Common security anti-patterns detected by linting and scanning:
 
 ## Audit
 
-Track vault access with a wrapper script that logs who decrypts what and when.
-In regulated industries, combine Ansible's audit trails with SIEM/logging
-integration to prove infrastructure compliance from Git history.
+Track vault access with a wrapper script that logs who decrypts what and when. In regulated industries, combine
+Ansible's audit trails with SIEM/logging integration to prove infrastructure compliance from Git history.
 
 ## Security Practices
 

@@ -11,6 +11,7 @@ ansible-lint playbooks/ roles/
 ```
 
 Key rules it enforces:
+
 - FQCN usage
 - Named tasks
 - Explicit state parameters
@@ -26,13 +27,11 @@ Progressive profiles for content quality:
 
 - **basic** -- syntax, YAML formatting
 - **moderate** -- deprecated modules, unnamed tasks
-- **safety** -- security-related checks (root login, plaintext secrets,
-  command injection, input validation)
+- **safety** -- security-related checks (root login, plaintext secrets, command injection, input validation)
 - **shared** -- team collaboration standards
 - **production** -- enforces ALL rules; required for Red Hat Ansible certification
 
-For certified collections, pass the `production` profile with zero warnings:
-`ansible-lint --profile production`
+For certified collections, pass the `production` profile with zero warnings: `ansible-lint --profile production`
 
 ### Syntax checking
 
@@ -40,8 +39,7 @@ For certified collections, pass the `production` profile with zero warnings:
 ansible-playbook --syntax-check site.yml
 ```
 
-Parses playbooks without executing. Catches YAML errors, undefined roles, invalid
-module arguments.
+Parses playbooks without executing. Catches YAML errors, undefined roles, invalid module arguments.
 
 ### Check mode (dry run)
 
@@ -49,13 +47,13 @@ module arguments.
 ansible-playbook --check --diff site.yml
 ```
 
-Reports what would change without making changes. `--diff` shows file content
-changes. Not all modules support check mode -- test to verify.
+Reports what would change without making changes. `--diff` shows file content changes. Not all modules support check
+mode -- test to verify.
 
 ## Molecule
 
-Testing framework for Ansible roles and collections. Provides provisioning,
-role application, verification, idempotency testing, and cleanup.
+Testing framework for Ansible roles and collections. Provides provisioning, role application, verification, idempotency
+testing, and cleanup.
 
 ### Lifecycle
 
@@ -76,20 +74,19 @@ When you run `molecule test`, it executes stages in order:
 
 ### Drivers
 
-| Driver | Speed | Realism | Use when |
-|--------|-------|---------|----------|
-| Docker | Fast | Limited systemd | Local dev, CI, no kernel interaction |
-| Podman | Fast | Rootless, SELinux | RHEL/enterprise, restricted Docker |
-| Vagrant | Slow | Full VM, real systemd | Roles needing real kernel or systemd |
-| Cloud (EC2/Azure/GCE) | Slow | Production-like | Cloud API interactions, hardware-specific |
-| Delegated | Varies | Custom | Enterprise (default in Molecule 6), custom infra |
+| Driver                | Speed  | Realism               | Use when                                         |
+| --------------------- | ------ | --------------------- | ------------------------------------------------ |
+| Docker                | Fast   | Limited systemd       | Local dev, CI, no kernel interaction             |
+| Podman                | Fast   | Rootless, SELinux     | RHEL/enterprise, restricted Docker               |
+| Vagrant               | Slow   | Full VM, real systemd | Roles needing real kernel or systemd             |
+| Cloud (EC2/Azure/GCE) | Slow   | Production-like       | Cloud API interactions, hardware-specific        |
+| Delegated             | Varies | Custom                | Enterprise (default in Molecule 6), custom infra |
 
-Podman is gaining traction because it is rootless and daemonless, reducing the
-security attack surface. It is the native choice for RHEL environments and
-supports SELinux natively.
+Podman is gaining traction because it is rootless and daemonless, reducing the security attack surface. It is the native
+choice for RHEL environments and supports SELinux natively.
 
-The **delegated** driver (default in Molecule 6) uses Ansible itself to provision
-test infrastructure, unifying the testing framework with the automation platform.
+The **delegated** driver (default in Molecule 6) uses Ansible itself to provision test infrastructure, unifying the
+testing framework with the automation platform.
 
 ### Multiple Scenarios
 
@@ -113,6 +110,7 @@ molecule/
 ```
 
 Key scenario patterns:
+
 - **Default** -- validates core "out of the box" functionality
 - **Clustered** -- tests multi-node HA, network connectivity, distributed logic
 - **Upgrade** -- tests migration from older versions, data integrity
@@ -122,12 +120,11 @@ Run a specific scenario: `molecule test -s ha-cluster`
 
 ### Verifiers
 
-**Ansible verifier (default):** Uses playbooks with `assert` module. No Python
-knowledge needed -- familiar YAML syntax for playbook writers.
+**Ansible verifier (default):** Uses playbooks with `assert` module. No Python knowledge needed -- familiar YAML syntax
+for playbook writers.
 
-**Testinfra (optional, Python-based):** Uses `pytest` for parallel test
-execution and granular multi-failure reporting. Better for complex validation
-where many checks need to run independently. Install separately with
+**Testinfra (optional, Python-based):** Uses `pytest` for parallel test execution and granular multi-failure reporting.
+Better for complex validation where many checks need to run independently. Install separately with
 `pip install testinfra`.
 
 ### Converge Playbook
@@ -208,8 +205,7 @@ molecule:
       junit: molecule/**/report.xml
 ```
 
-Matrix builds run scenarios in parallel across runners -- testing five distros
-does not take five times as long.
+Matrix builds run scenarios in parallel across runners -- testing five distros does not take five times as long.
 
 ### ansible-test (Collections)
 
@@ -222,8 +218,8 @@ ansible-test units                      # unit tests
 ansible-test integration                # integration tests
 ```
 
-Passing all sanity tests is mandatory for collection certification. Use
-`galaxy-importer` in CI to replicate automation hub import checks before upload.
+Passing all sanity tests is mandatory for collection certification. Use `galaxy-importer` in CI to replicate automation
+hub import checks before upload.
 
 ### Testing Strategy
 
@@ -246,9 +242,8 @@ Increase parallel host execution (default is 5):
 forks = 20
 ```
 
-Starting point: 2-4x CPU core count of the control node. For 50-100 hosts,
-15-25 forks works well. Larger environments: 30-50 forks if the control node
-has sufficient resources. Monitor memory usage when scaling.
+Starting point: 2-4x CPU core count of the control node. For 50-100 hosts, 15-25 forks works well. Larger environments:
+30-50 forks if the control node has sufficient resources. Monitor memory usage when scaling.
 
 ### SSH Pipelining and Multiplexing
 
@@ -263,18 +258,16 @@ ssh_args = -o ControlMaster=auto -o ControlPersist=60s
 
 - **Pipelining** executes many commands over a single connection
 - **ControlMaster** reuses SSH connections across tasks
-- **ControlPersist=60s** keeps idle connections for 60 seconds (use 300s for
-  long playbooks)
+- **ControlPersist=60s** keeps idle connections for 60 seconds (use 300s for long playbooks)
 - Requires `requiretty` disabled in sudoers on target hosts
 
 ### Mitogen Strategy Plugin
 
-Third-party plugin that replaces Ansible's default SSH-based module execution
-with an efficient RPC protocol. Makes playbooks **1.5x to 7x faster**.
+Third-party plugin that replaces Ansible's default SSH-based module execution with an efficient RPC protocol. Makes
+playbooks **1.5x to 7x faster**.
 
-How it works: instead of per-task SSH connect -> SFTP transfer -> execute ->
-cleanup, Mitogen bootstraps a persistent Python interpreter on the remote host
-and sends task code via binary RPC. This eliminates most per-task overhead.
+How it works: instead of per-task SSH connect -> SFTP transfer -> execute -> cleanup, Mitogen bootstraps a persistent
+Python interpreter on the remote host and sends task code via binary RPC. This eliminates most per-task overhead.
 
 ```ini
 # ansible.cfg
@@ -286,14 +279,14 @@ strategy = mitogen_linear    # or mitogen_free
 Find the path: `python3 -c "import ansible_mitogen; print(ansible_mitogen.__path__[0])"`
 
 Production recommendations:
+
 - Start with `mitogen_linear`, test thoroughly
 - Compare outputs between stock and Mitogen for each playbook
 - Keep a fallback path to stock Ansible
 - Monitor control node memory (Mitogen uses more due to persistent interpreters)
 - Mitogen compatibility can lag behind new ansible-core releases
 
-Most impactful for playbooks with many small tasks where per-task SSH overhead
-dominates execution time.
+Most impactful for playbooks with many small tasks where per-task SSH overhead dominates execution time.
 
 ### Fact Caching
 
@@ -333,14 +326,14 @@ Disable when not needed or gather only what you need:
 
 ### Strategy Plugins
 
-**Linear (default):** All hosts complete each task before moving to next. Safe
-but creates unnecessary waiting when tasks have different execution speeds.
+**Linear (default):** All hosts complete each task before moving to next. Safe but creates unnecessary waiting when
+tasks have different execution speeds.
 
-**Free:** Faster hosts proceed without waiting for slower ones. Ideal for
-independent tasks with no inter-host dependencies.
+**Free:** Faster hosts proceed without waiting for slower ones. Ideal for independent tasks with no inter-host
+dependencies.
 
-**Mitogen variants:** `mitogen_linear` and `mitogen_free` provide the same
-execution logic with vastly superior connection performance.
+**Mitogen variants:** `mitogen_linear` and `mitogen_free` provide the same execution logic with vastly superior
+connection performance.
 
 ### Callback Plugins for Observability
 
@@ -351,17 +344,16 @@ callbacks_enabled = timer, profile_tasks, profile_roles
 stdout_callback = yaml
 ```
 
-| Plugin | Purpose |
-|--------|---------|
-| `timer` | Total playbook execution time |
-| `profile_tasks` | Per-task timing to identify bottlenecks |
-| `profile_roles` | Timing at the role level |
-| `dense` | Compressed output for large-scale runs |
-| `yaml` | Structured YAML output (easier to read) |
-| `json` | JSON output for external tool consumption |
+| Plugin          | Purpose                                   |
+| --------------- | ----------------------------------------- |
+| `timer`         | Total playbook execution time             |
+| `profile_tasks` | Per-task timing to identify bottlenecks   |
+| `profile_roles` | Timing at the role level                  |
+| `dense`         | Compressed output for large-scale runs    |
+| `yaml`          | Structured YAML output (easier to read)   |
+| `json`          | JSON output for external tool consumption |
 
-**Profile before optimizing.** `profile_tasks` identifies real bottlenecks --
-do not optimize blindly.
+**Profile before optimizing.** `profile_tasks` identifies real bottlenecks -- do not optimize blindly.
 
 ### Serial Batching
 
@@ -373,8 +365,8 @@ Process hosts in staged batches to avoid overloading central resources:
   serial: "20%"    # or [1, 5, "100%"] for canary pattern
 ```
 
-Prevents overwhelming package repositories, SSH connection limits, or other
-shared infrastructure during large deployments.
+Prevents overwhelming package repositories, SSH connection limits, or other shared infrastructure during large
+deployments.
 
 ### Production-Ready ansible.cfg
 
@@ -396,6 +388,7 @@ ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o PreferredAuthenticatio
 ### Memory Optimization
 
 Large inventories consume significant memory. Strategies to reduce:
+
 - Disable `gather_facts` when not needed
 - Minimize `group_vars`/`host_vars` file count
 - Avoid storing large data structures in `set_fact`

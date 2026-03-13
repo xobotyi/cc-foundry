@@ -5,6 +5,7 @@ Step-by-step guide to creating effective subagents.
 ---
 
 ## Table of Contents
+
 - [Two Approaches](#two-approaches)
 - [Creation Process](#creation-process)
 - [Common Agent Types](#common-agent-types)
@@ -30,8 +31,7 @@ Recommended for getting started:
 → Save
 ```
 
-Claude generates the system prompt based on your description.
-Press `e` to open in editor and customize.
+Claude generates the system prompt based on your description. Press `e` to open in editor and customize.
 
 ### 2. Manual (write the file)
 
@@ -47,33 +47,34 @@ mkdir -p ~/.claude/agents
 touch ~/.claude/agents/my-agent.md
 ```
 
-**Note:** Manually created agents load on session start. Use `/agents`
-to load immediately without restart.
+**Note:** Manually created agents load on session start. Use `/agents` to load immediately without restart.
 
 ## Creation Process
 
 ### Step 1: Define the Purpose
 
 Answer these questions:
+
 - What specific task does this agent handle?
 - When should Claude delegate to it?
 - What tools does it need?
 - What output format should it produce?
 
-**Single responsibility principle:** Each agent should excel at ONE task.
-If you're listing multiple unrelated capabilities, split into separate agents.
+**Single responsibility principle:** Each agent should excel at ONE task. If you're listing multiple unrelated
+capabilities, split into separate agents.
 
 ### Step 2: Write the Description
 
-The description is CRITICAL. Claude uses ONLY `name` and `description`
-to decide whether to delegate.
+The description is CRITICAL. Claude uses ONLY `name` and `description` to decide whether to delegate.
 
 **Template:**
+
 ```
 [What it does in 1 sentence]. [When to use it].
 ```
 
 **Examples:**
+
 ```yaml
 # Good: specific role + clear trigger
 description: "Expert code review specialist. Proactively reviews code for
@@ -90,6 +91,7 @@ description: "Debugging specialist for errors, test failures, and unexpected
 ```
 
 **Anti-patterns:**
+
 ```yaml
 # Bad: too vague
 description: "Helps with code"
@@ -105,33 +107,31 @@ description: "Code review. Keywords: review, quality, lint, security"
 
 **Principle:** Grant minimum necessary permissions.
 
-| Agent Type | Recommended Tools |
-|------------|-------------------|
-| Read-only (reviewers, analysts) | `Read, Grep, Glob` |
-| Research (with web) | `Read, Grep, Glob, WebFetch, WebSearch` |
-| Code writers | `Read, Write, Edit, Bash, Glob, Grep` |
-| Documentation | `Read, Write, Edit, Glob, Grep, WebFetch` |
+| Agent Type                      | Recommended Tools                         |
+| ------------------------------- | ----------------------------------------- |
+| Read-only (reviewers, analysts) | `Read, Grep, Glob`                        |
+| Research (with web)             | `Read, Grep, Glob, WebFetch, WebSearch`   |
+| Code writers                    | `Read, Write, Edit, Bash, Glob, Grep`     |
+| Documentation                   | `Read, Write, Edit, Glob, Grep, WebFetch` |
 
-**If omitted:** Inherits ALL tools from main conversation (including MCP).
-Be intentional — don't leave it blank unless you want full access.
+**If omitted:** Inherits ALL tools from main conversation (including MCP). Be intentional — don't leave it blank unless
+you want full access.
 
 ### Step 4: Choose the Model
 
-| Model | When to Use |
-|-------|-------------|
-| `haiku` | Quick searches, docs, simple analysis |
-| `sonnet` | Everyday coding, debugging, refactoring |
-| `opus` | Architecture decisions, security audits, complex reasoning |
-| `inherit` | Match parent (default) |
+| Model     | When to Use                                                |
+| --------- | ---------------------------------------------------------- |
+| `haiku`   | Quick searches, docs, simple analysis                      |
+| `sonnet`  | Everyday coding, debugging, refactoring                    |
+| `opus`    | Architecture decisions, security audits, complex reasoning |
+| `inherit` | Match parent (default)                                     |
 
-**Cost consideration:** Haiku is significantly cheaper. Use it for
-high-volume, straightforward tasks.
+**Cost consideration:** Haiku is significantly cheaper. Use it for high-volume, straightforward tasks.
 
 ### Step 5: Write the System Prompt
 
-The system prompt is where prompt engineering matters most. Apply
-techniques from `prompt-engineering` skill: clear structure, numbered
-steps, XML tags for complex inputs, examples for format compliance.
+The system prompt is where prompt engineering matters most. Apply techniques from `prompt-engineering` skill: clear
+structure, numbered steps, XML tags for complex inputs, examples for format compliance.
 
 Structure your prompt clearly:
 
@@ -161,6 +161,7 @@ You are a [role] specializing in [domain].
 ```
 
 **Best practices:**
+
 - Start with clear role definition
 - Use numbered steps for workflow
 - Include checklists for consistency
@@ -170,11 +171,13 @@ You are a [role] specializing in [domain].
 ### Step 6: Test and Iterate
 
 Test with various inputs:
+
 ```
 Use the [agent-name] subagent to [task]
 ```
 
 Observe:
+
 - Does Claude delegate correctly?
 - Does the agent follow the workflow?
 - Is the output format correct?
@@ -187,6 +190,7 @@ Iterate on the system prompt based on failures.
 For full examples with complete prompts, see `${CLAUDE_SKILL_DIR}/references/patterns.md`.
 
 Common patterns:
+
 - **Code Reviewer** — Read-only analysis after code changes
 - **Debugger** — Root cause analysis with edit permissions
 - **Security Auditor** — Vulnerability scanning (read-only, opus model)

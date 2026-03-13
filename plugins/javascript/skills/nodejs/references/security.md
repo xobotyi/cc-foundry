@@ -6,8 +6,8 @@ Input validation, dependency supply chain, DoS prevention, and secure defaults.
 
 ### Validate Everything from Outside
 
-Never trust user input — request bodies, query params, headers, file uploads,
-environment variables from untrusted sources.
+Never trust user input — request bodies, query params, headers, file uploads, environment variables from untrusted
+sources.
 
 ```js
 // Use a schema validation library (zod, ajv, typebox)
@@ -42,18 +42,17 @@ Set different limits per content type. JSON parsing is more expensive than multi
 
 ### JSON Parsing DoS
 
-`JSON.parse()` is O(n) but blocks the event loop for large inputs. A 50MB JSON string
-takes ~2 seconds to parse.
+`JSON.parse()` is O(n) but blocks the event loop for large inputs. A 50MB JSON string takes ~2 seconds to parse.
 
 Mitigations:
+
 - Limit payload size at the HTTP layer (before parsing)
 - For very large JSON, use streaming parsers (`stream-json`, `@streamparser/json`)
 - Validate `Content-Length` header before reading the body
 
 ## Regex Denial of Service (ReDoS)
 
-Vulnerable regex patterns can take exponential time on crafted input, blocking the
-event loop.
+Vulnerable regex patterns can take exponential time on crafted input, blocking the event loop.
 
 ### Dangerous Patterns
 
@@ -82,13 +81,13 @@ if (filePath.length < 1000) filePath.match(SAFE);
 
 ### Threats
 
-| Attack | Description |
-|--------|-------------|
-| Typosquatting | Package with similar name to popular one (`lodsah` vs `lodash`) |
-| Compromised maintainer | Attacker gains publish access to legitimate package |
-| Lockfile poisoning | Modified lockfile points to malicious version |
-| Dependency confusion | Private package name claimed on public registry |
-| Malicious postinstall | Package runs arbitrary code on `npm install` |
+| Attack                 | Description                                                     |
+| ---------------------- | --------------------------------------------------------------- |
+| Typosquatting          | Package with similar name to popular one (`lodsah` vs `lodash`) |
+| Compromised maintainer | Attacker gains publish access to legitimate package             |
+| Lockfile poisoning     | Modified lockfile points to malicious version                   |
+| Dependency confusion   | Private package name claimed on public registry                 |
+| Malicious postinstall  | Package runs arbitrary code on `npm install`                    |
 
 ### Mitigations
 
@@ -133,8 +132,8 @@ Use `helmet` (Express) or equivalent for security headers:
 
 ### Delegate TLS/gzip to Reverse Proxy
 
-Node.js should not terminate TLS or compress responses in production. Let nginx,
-HAProxy, or a cloud load balancer handle:
+Node.js should not terminate TLS or compress responses in production. Let nginx, HAProxy, or a cloud load balancer
+handle:
 
 - **TLS termination** — CPU-intensive, optimized in native code
 - **gzip/brotli compression** — blocks event loop for large responses
@@ -177,8 +176,7 @@ execFile('ls', [userInput]);
 spawn('ls', [userInput]);
 ```
 
-Never use `exec()` with user-controlled strings. Use `execFile()` or `spawn()` with
-argument arrays.
+Never use `exec()` with user-controlled strings. Use `execFile()` or `spawn()` with argument arrays.
 
 ### Avoid `eval` and Dynamic `require`
 
@@ -194,6 +192,7 @@ require(userInput);   // Module loading as code execution
 ## Process Hardening
 
 - **Run as non-root** — use a dedicated user in Docker:
+
   ```dockerfile
   RUN addgroup --system app && adduser --system --ingroup app app
   USER app
@@ -202,6 +201,7 @@ require(userInput);   // Module loading as code execution
 - **Set `NODE_ENV=production`** — disables debug output, enables optimizations
 
 - **Use `--secure-heap`** for sensitive crypto operations (Linux only):
+
   ```bash
   node --secure-heap=4096 server.js
   ```
@@ -214,6 +214,7 @@ require(userInput);   // Module loading as code execution
 ## Security Checklist
 
 For every HTTP endpoint:
+
 - [ ] Input validated against schema (reject unknown fields)
 - [ ] Request body size limited
 - [ ] No user input in `exec()`, `eval()`, or dynamic `require()`
@@ -221,6 +222,7 @@ For every HTTP endpoint:
 - [ ] Authentication/authorization checked before processing
 
 For every deployment:
+
 - [ ] Dependencies audited (`npm audit`)
 - [ ] Lockfile committed and enforced (`npm ci`)
 - [ ] Secrets in environment variables, not code

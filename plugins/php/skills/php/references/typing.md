@@ -1,17 +1,15 @@
 # PHP Type System
 
-PHP uses a nominal type system with behavioral subtyping checked at compile time and
-type verification at runtime. PHP 8.5+ provides a rich type declaration system covering
-parameters, return types, properties, and class constants.
+PHP uses a nominal type system with behavioral subtyping checked at compile time and type verification at runtime. PHP
+8.5+ provides a rich type declaration system covering parameters, return types, properties, and class constants.
 
 ## Strict Typing
 
-By default, PHP coerces values to the expected scalar type. Enable strict mode per-file
-with `declare(strict_types=1)` at the top of the file. In strict mode, only exact type
-matches are accepted (exception: `int` passes `float` checks).
+By default, PHP coerces values to the expected scalar type. Enable strict mode per-file with `declare(strict_types=1)`
+at the top of the file. In strict mode, only exact type matches are accepted (exception: `int` passes `float` checks).
 
-Strict typing applies to calls made *from within* the declaring file — the caller's
-`strict_types` setting governs coercion behavior, not the callee's.
+Strict typing applies to calls made _from within_ the declaring file — the caller's `strict_types` setting governs
+coercion behavior, not the callee's.
 
 ```php
 <?php
@@ -29,8 +27,8 @@ add(1.5, 2.5); // TypeError
 
 ## Scalar Types
 
-Use short forms: `bool`, `int`, `float`, `string`. Long forms (`boolean`, `integer`,
-`double`) are treated as class names and will cause errors.
+Use short forms: `bool`, `int`, `float`, `string`. Long forms (`boolean`, `integer`, `double`) are treated as class
+names and will cause errors.
 
 ## Union Types (8.0+)
 
@@ -43,8 +41,8 @@ Multiple types joined with `|`: `int|string`, `Foo|Bar|null`.
 
 ## Intersection Types (8.1+)
 
-Class types joined with `&`: `Countable&Traversable`. Only class/interface types allowed
-(no scalars, no `self`/`parent`/`static`).
+Class types joined with `&`: `Countable&Traversable`. Only class/interface types allowed (no scalars, no
+`self`/`parent`/`static`).
 
 ## DNF Types (8.2+)
 
@@ -54,14 +52,12 @@ Disjunctive Normal Form — union of intersections in parentheses:
 function process(array|(ArrayAccess&Traversable) $input): void {}
 ```
 
-Each intersection group must be parenthesized. The overall structure is ORed unions of
-ANDed intersections.
+Each intersection group must be parenthesized. The overall structure is ORed unions of ANDed intersections.
 
 ## Nullable Types
 
 - `?T` is syntactic sugar for `T|null`
-- Prefer `?T` for single-type-plus-null; use full union syntax for multi-type nullables:
-  `int|string|null`
+- Prefer `?T` for single-type-plus-null; use full union syntax for multi-type nullables: `int|string|null`
 
 ## Standalone Types
 
@@ -75,8 +71,8 @@ ANDed intersections.
 
 ## Typed Properties (7.4+)
 
-All property types except `callable` are supported. Typed properties must be initialized
-before access or an `Error` is thrown.
+All property types except `callable` are supported. Typed properties must be initialized before access or an `Error` is
+thrown.
 
 ```php
 class User
@@ -112,7 +108,7 @@ interface HasVersion
 
 - `0 == ""` is `false` as of PHP 8.0 (was `true` before)
 - `0 == "foo"` is `false` as of PHP 8.0
-- String-to-number comparison uses numeric comparison only if *both* are numeric strings
+- String-to-number comparison uses numeric comparison only if _both_ are numeric strings
 - Use `===` and `!==` for strict comparison (no coercion)
 - `is_numeric()` returns `true` for numeric strings including hex and scientific notation
 

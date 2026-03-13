@@ -29,21 +29,21 @@ From lowest to highest (last wins):
 
 ## Practical Guidance
 
-| Want to... | Put variables in... |
-|------------|-------------------|
-| Set overridable defaults | Role `defaults/main.yml` |
-| Set environment-wide values | `group_vars/all.yml` |
-| Set group-specific values | `group_vars/<group>.yml` |
-| Set host-specific values | `host_vars/<host>.yml` |
-| Force a value in a role | Role `vars/main.yml` |
-| Override everything at runtime | `--extra-vars` |
+| Want to...                     | Put variables in...      |
+| ------------------------------ | ------------------------ |
+| Set overridable defaults       | Role `defaults/main.yml` |
+| Set environment-wide values    | `group_vars/all.yml`     |
+| Set group-specific values      | `group_vars/<group>.yml` |
+| Set host-specific values       | `host_vars/<host>.yml`   |
+| Force a value in a role        | Role `vars/main.yml`     |
+| Override everything at runtime | `--extra-vars`           |
 
-Define each variable in ONE place. If you need a variable at multiple levels, understand
-which one wins.
+Define each variable in ONE place. If you need a variable at multiple levels, understand which one wins.
 
 ## Variable Scoping
 
 Three scopes:
+
 - **Global**: config, environment variables, command line, extra vars
 - **Play**: `vars:`, `vars_files:`, `vars_prompt:`, role defaults/vars
 - **Host**: inventory variables, `include_vars`, facts, registered vars
@@ -145,19 +145,19 @@ server {
 
 ### Variable precedence in templates
 
-Templates have access to all variables in scope for the host: play vars, role vars,
-host vars, facts, registered vars, and magic variables.
+Templates have access to all variables in scope for the host: play vars, role vars, host vars, facts, registered vars,
+and magic variables.
 
 ## Magic Variables
 
-| Variable | Value |
-|----------|-------|
-| `inventory_hostname` | Name of the host in inventory |
-| `ansible_host` | Actual connection address |
-| `group_names` | List of groups the host belongs to |
-| `groups` | Dictionary of all groups and their hosts |
-| `hostvars` | Dictionary of all host variables (access other hosts' vars) |
-| `play_hosts` | List of hosts in the current play |
-| `ansible_facts` | Gathered facts for the current host |
-| `playbook_dir` | Directory of the playbook being executed |
-| `role_path` | Path to the current role |
+| Variable             | Value                                                       |
+| -------------------- | ----------------------------------------------------------- |
+| `inventory_hostname` | Name of the host in inventory                               |
+| `ansible_host`       | Actual connection address                                   |
+| `group_names`        | List of groups the host belongs to                          |
+| `groups`             | Dictionary of all groups and their hosts                    |
+| `hostvars`           | Dictionary of all host variables (access other hosts' vars) |
+| `play_hosts`         | List of hosts in the current play                           |
+| `ansible_facts`      | Gathered facts for the current host                         |
+| `playbook_dir`       | Directory of the playbook being executed                    |
+| `role_path`          | Path to the current role                                    |

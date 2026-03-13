@@ -2,8 +2,8 @@
 
 ## Authelia vs Authentik
 
-Both are open-source identity providers for self-hosted environments, providing SSO
-and MFA to protect web applications from unauthorized access.
+Both are open-source identity providers for self-hosted environments, providing SSO and MFA to protect web applications
+from unauthorized access.
 
 ### Authelia
 
@@ -25,14 +25,14 @@ and MFA to protect web applications from unauthorized access.
 
 ### Feature Comparison
 
-| Factor | Authelia | Authentik |
-|--------|----------|-----------|
-| Resource usage | ~30 MB RAM | ~690 MB + PostgreSQL |
-| Config style | YAML files | Web GUI + YAML |
-| Protocol support | OIDC | OIDC, SAML2, LDAP, RADIUS, SCIM |
-| MFA options | TOTP, WebAuthn, Passkeys, Duo | TOTP, WebAuthn + visual flow editor |
-| User portal | Login page only | Full app dashboard |
-| Best for | Lightweight SSO for web apps | Full IdP with SAML/LDAP needs |
+| Factor           | Authelia                      | Authentik                           |
+| ---------------- | ----------------------------- | ----------------------------------- |
+| Resource usage   | ~30 MB RAM                    | ~690 MB + PostgreSQL                |
+| Config style     | YAML files                    | Web GUI + YAML                      |
+| Protocol support | OIDC                          | OIDC, SAML2, LDAP, RADIUS, SCIM     |
+| MFA options      | TOTP, WebAuthn, Passkeys, Duo | TOTP, WebAuthn + visual flow editor |
+| User portal      | Login page only               | Full app dashboard                  |
+| Best for         | Lightweight SSO for web apps  | Full IdP with SAML/LDAP needs       |
 
 ### Decision
 
@@ -66,13 +66,13 @@ labels:
   - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups"
 ```
 
-For enhanced security, connect Traefik to Authelia over TLS with client certificates
-to ensure only authorized proxies communicate with the auth server.
+For enhanced security, connect Traefik to Authelia over TLS with client certificates to ensure only authorized proxies
+communicate with the auth server.
 
 ### Caddy Integration
 
-Caddy can integrate via forward_auth directive or through Tailscale's certificate
-provisioning module for internal services with browser-valid certificates.
+Caddy can integrate via forward_auth directive or through Tailscale's certificate provisioning module for internal
+services with browser-valid certificates.
 
 ## SSO and MFA Patterns
 
@@ -86,15 +86,14 @@ provisioning module for internal services with browser-valid certificates.
 
 Modern standards (2025+) emphasize phishing-resistant MFA:
 
-- **FIDO2/WebAuthn**: Hardware tokens or biometric -- resistant to phishing because
-  verification is bound to the domain. Preferred over TOTP.
-- **TOTP**: Time-based one-time passwords (Google Authenticator, Authy). Widely
-  supported but vulnerable to phishing (user can be tricked into entering code on
-  a fake site).
+- **FIDO2/WebAuthn**: Hardware tokens or biometric -- resistant to phishing because verification is bound to the domain.
+  Preferred over TOTP.
+- **TOTP**: Time-based one-time passwords (Google Authenticator, Authy). Widely supported but vulnerable to phishing
+  (user can be tricked into entering code on a fake site).
 - **Passkeys**: Device-bound credentials. Authelia supports these natively.
 
-Prefer FIDO2/WebAuthn for high-value services. TOTP is acceptable for lower-risk
-services where hardware tokens are impractical.
+Prefer FIDO2/WebAuthn for high-value services. TOTP is acceptable for lower-risk services where hardware tokens are
+impractical.
 
 ## Deployment Patterns
 
@@ -102,22 +101,21 @@ services where hardware tokens are impractical.
 
 Classify services by exposure level:
 
-- **Public with own auth**: Services with strong built-in authentication (Nextcloud,
-  Gitea) -- can be exposed directly with their own login
-- **Public via auth proxy**: Services with weak/no auth -- gate behind
-  Authelia/Authentik before exposing
-- **VPN/LAN only**: Admin panels (router, Proxmox, NAS), password managers,
-  sensitive data -- never expose publicly, access via VPN or management VLAN
+- **Public with own auth**: Services with strong built-in authentication (Nextcloud, Gitea) -- can be exposed directly
+  with their own login
+- **Public via auth proxy**: Services with weak/no auth -- gate behind Authelia/Authentik before exposing
+- **VPN/LAN only**: Admin panels (router, Proxmox, NAS), password managers, sensitive data -- never expose publicly,
+  access via VPN or management VLAN
 
 ### Cloudflare Access Alternative
 
 Cloudflare Access provides a zero-trust layer at the edge:
+
 - Stops traffic at Cloudflare until identity verification passes
 - Supports one-time codes, OAuth2 (GitHub, Google), and custom IdPs
 - Does not replace local auth proxies -- it adds an additional layer
 
 ### Integration with CrowdSec
 
-Layer CrowdSec behind the auth proxy to monitor authentication logs and
-automatically block IPs exhibiting brute-force patterns. CrowdSec's community
-blocklists provide preemptive blocking of known malicious sources.
+Layer CrowdSec behind the auth proxy to monitor authentication logs and automatically block IPs exhibiting brute-force
+patterns. CrowdSec's community blocklists provide preemptive blocking of known malicious sources.

@@ -1,7 +1,6 @@
 # Go Testing
 
-Table-driven tests, assertions, test organization, benchmarks, and integration testing
-strategies.
+Table-driven tests, assertions, test organization, benchmarks, and integration testing strategies.
 
 ## Table-Driven Tests
 
@@ -63,6 +62,7 @@ func TestParse(t *testing.T) {
 ### When NOT to Use Table Tests
 
 Split into separate `Test...` functions when:
+
 - Different cases need different setup or mocking logic
 - Conditional assertions (branching) inside the loop
 - Complex mock configuration per case (`shouldCallX`, `setupMocks func()`)
@@ -73,6 +73,7 @@ Table tests must have uniform logic: every row uses every field.
 ## Subtests
 
 `t.Run` creates subtests with key advantages:
+
 - `t.Fatal` stops only the current subtest, not the parent
 - Run individually: `go test -run=TestParse/valid`
 - Shared setup/teardown via parent function
@@ -140,13 +141,11 @@ func Test_Service(t *testing.T) {
 }
 ```
 
-Default to `require` for error checks and nil guards. Use `assert` for independent
-value checks within the same subtest.
+Default to `require` for error checks and nil guards. Use `assert` for independent value checks within the same subtest.
 
 ### Struct and Slice Comparison
 
-Use testify for struct and slice comparisons — `assert.Equal`/`require.Equal`
-produce readable diffs on failure:
+Use testify for struct and slice comparisons — `assert.Equal`/`require.Equal` produce readable diffs on failure:
 
 ```go
 require.Equal(t, wantUser, gotUser)
@@ -162,8 +161,8 @@ Never use `reflect.DeepEqual` directly — testify wraps it with better output.
 
 In subtests, `t.Fatal` stops only the current subtest.
 
-**Rule**: prefer `t.Error` to report all failures at once. Use `t.Fatal` only for
-setup failures or when a check makes subsequent checks impossible.
+**Rule**: prefer `t.Error` to report all failures at once. Use `t.Fatal` only for setup failures or when a check makes
+subsequent checks impossible.
 
 ## Test Helpers
 
@@ -180,15 +179,14 @@ func readTestFile(t *testing.T, path string) []byte {
 }
 ```
 
-Don't use `t.Helper()` in assert-like wrappers — it hides the connection between
-failure and cause.
+Don't use `t.Helper()` in assert-like wrappers — it hides the connection between failure and cause.
 
 ## Test Error Semantics
 
 - Prefer matching on types (`errors.As`) or sentinels (`errors.Is`)
 - If you don't care about error kind, just check `err != nil`
-- When no sentinel or type exists, use `require.ErrorContains` for substring matching —
-  it's more resilient than exact string comparison
+- When no sentinel or type exists, use `require.ErrorContains` for substring matching — it's more resilient than exact
+  string comparison
 
 ```go
 // Bad — brittle exact string matching
@@ -203,8 +201,8 @@ require.ErrorContains(t, err, "connection refused")
 
 ## t.Fatal and Goroutines
 
-`t.Fatal`, `t.Fatalf`, and `t.FailNow` must only be called from the goroutine running
-the Test function. Calling them from a spawned goroutine is incorrect and will panic.
+`t.Fatal`, `t.Fatalf`, and `t.FailNow` must only be called from the goroutine running the Test function. Calling them
+from a spawned goroutine is incorrect and will panic.
 
 ```go
 // Bad — t.Fatalf from spawned goroutine
@@ -224,8 +222,7 @@ go func() {
 }()
 ```
 
-Note: `t.Parallel()` does NOT create a new goroutine for this purpose — `t.Fatal`
-is still safe in parallel subtests.
+Note: `t.Parallel()` does NOT create a new goroutine for this purpose — `t.Fatal` is still safe in parallel subtests.
 
 ## Test Double Package Naming
 
@@ -240,8 +237,8 @@ type Stub struct{}
 func (Stub) Charge(*creditcard.Card, money.Money) error { return nil }
 ```
 
-When only one type needs doubling, use simple names (`Stub`, `Fake`). When multiple
-types need doubling, prefix with the type name (`StubService`, `StubStoredValue`).
+When only one type needs doubling, use simple names (`Stub`, `Fake`). When multiple types need doubling, prefix with the
+type name (`StubService`, `StubStoredValue`).
 
 Prefix test double variables to distinguish from production types:
 
@@ -251,8 +248,8 @@ var spyCC creditcardtest.Spy // clear that this is a test double
 
 ## Scoped Test Setup
 
-Keep setup scoped to tests that need it. Don't use `init()` or package-level vars
-for test data — it penalizes tests that don't need the setup:
+Keep setup scoped to tests that need it. Don't use `init()` or package-level vars for test data — it penalizes tests
+that don't need the setup:
 
 ```go
 // Bad — all tests pay the cost, even those that don't need data
@@ -289,8 +286,8 @@ func mustLoadDataset(t *testing.T) []byte {
 
 ## Test Cache Safety
 
-Go's test cache uses file mtime and environment values. Writing files in-place or
-modifying env vars breaks caching and can cause CI failures.
+Go's test cache uses file mtime and environment values. Writing files in-place or modifying env vars breaks caching and
+can cause CI failures.
 
 Use scoped helpers:
 
@@ -307,14 +304,13 @@ func TestWriteConfig(t *testing.T) {
 }
 ```
 
-Never write to the source directory in tests — use `t.TempDir()` for temp files
-and `t.Setenv()` for environment variables.
+Never write to the source directory in tests — use `t.TempDir()` for temp files and `t.Setenv()` for environment
+variables.
 
 ## Prefer Live Services Over Mocks
 
-When testing integrations (databases, caches, message brokers), prefer spinning up
-real service instances over synthetic mocks — it's more reliable and catches real
-issues.
+When testing integrations (databases, caches, message brokers), prefer spinning up real service instances over synthetic
+mocks — it's more reliable and catches real issues.
 
 ```go
 func TestRedisCache(t *testing.T) {
@@ -333,13 +329,13 @@ func TestRedisCache(t *testing.T) {
 }
 ```
 
-Gate slow or resource-intensive tests behind environment variables and skip when
-not set. This keeps `go test ./...` fast while CI runs the full suite.
+Gate slow or resource-intensive tests behind environment variables and skip when not set. This keeps `go test ./...`
+fast while CI runs the full suite.
 
 ## Runnable Examples
 
-Write `func Example...` functions for complex APIs. They serve as both
-documentation and tests — godoc renders them, and `go test` verifies them:
+Write `func Example...` functions for complex APIs. They serve as both documentation and tests — godoc renders them, and
+`go test` verifies them:
 
 ```go
 func ExampleConfig_WriteTo() {
@@ -352,8 +348,7 @@ func ExampleConfig_WriteTo() {
 }
 ```
 
-The `// Output:` comment makes the example a test — `go test` fails if output
-doesn't match.
+The `// Output:` comment makes the example a test — `go test` fails if output doesn't match.
 
 ## Race Detection
 
@@ -363,12 +358,11 @@ Always run tests with `-race` for concurrent code:
 go test -race ./...
 ```
 
-The race detector instruments memory accesses at runtime. It catches data races that
-may not manifest during normal execution. Enable in CI — the overhead (~2-10x slower)
-is acceptable for tests.
+The race detector instruments memory accesses at runtime. It catches data races that may not manifest during normal
+execution. Enable in CI — the overhead (~2-10x slower) is acceptable for tests.
 
-Use `//go:build !race` to exclude specific test files from race detection if needed
-(e.g., performance-sensitive benchmarks).
+Use `//go:build !race` to exclude specific test files from race detection if needed (e.g., performance-sensitive
+benchmarks).
 
 ## Avoid Sleeping
 
@@ -395,8 +389,7 @@ case <-time.After(5 * time.Second):
 }
 ```
 
-If synchronization is impossible, use a retry/poll loop with a deadline instead
-of a fixed sleep.
+If synchronization is impossible, use a retry/poll loop with a deadline instead of a fixed sleep.
 
 ## Testing Utilities
 
@@ -453,19 +446,18 @@ func BenchmarkFoo(b *testing.B) {
 ```
 
 Key rules:
+
 - Use `b.Loop()` (Go 1.24+) or `for i := 0; i < b.N; i++` for the benchmark loop
 - Use `b.ResetTimer()` after expensive setup
 - Use `b.ReportAllocs()` to track allocations
-- Ensure the result is used (assign to package-level var) to prevent compiler
-  optimization from eliminating the call
+- Ensure the result is used (assign to package-level var) to prevent compiler optimization from eliminating the call
 - Run with `-benchtime=5s` or use `benchstat` for stable micro-benchmarks
 
 ## Test Naming
 
 ### Function Naming
 
-Use `Test_TypeName` with underscore separator for type-level tests, and `t.Run()`
-for method/scenario subtests:
+Use `Test_TypeName` with underscore separator for type-level tests, and `t.Run()` for method/scenario subtests:
 
 ```go
 func Test_Scanner(t *testing.T) {
@@ -489,9 +481,8 @@ scanner_benchmark_test.go          # Black-box benchmarks
 scanner_benchmark_internal_test.go # White-box benchmarks
 ```
 
-Prefer black-box testing — it validates your public API and catches design issues.
-Use white-box only when testing unexported logic that can't be exercised through
-the public API.
+Prefer black-box testing — it validates your public API and catches design issues. Use white-box only when testing
+unexported logic that can't be exercised through the public API.
 
 ## Block Scoping
 
@@ -517,8 +508,7 @@ func Test_StoreAndRetrieve(t *testing.T) {
 }
 ```
 
-Use `t.Run()` instead when you need parallel execution, selective running, or
-per-scenario reporting.
+Use `t.Run()` instead when you need parallel execution, selective running, or per-scenario reporting.
 
 ## Combining Complementary Operations
 
@@ -536,8 +526,7 @@ func Test_CachePutAndGet(t *testing.T) {
 }
 ```
 
-Split into separate tests only when operations have independent failure modes or
-require different setup.
+Split into separate tests only when operations have independent failure modes or require different setup.
 
 ## Compare Stable Results
 

@@ -4,19 +4,17 @@ Error classes, `error.cause`, process-level error events, and error handling pat
 
 ## Error Categories
 
-| Category | Description | Response |
-|----------|-------------|----------|
-| **Operational** | Bad input, network timeout, file not found | Handle gracefully, respond to caller |
-| **Programmer** | Null deref, assertion failure, type error | Crash and restart — state is unreliable |
+| Category        | Description                                | Response                                |
+| --------------- | ------------------------------------------ | --------------------------------------- |
+| **Operational** | Bad input, network timeout, file not found | Handle gracefully, respond to caller    |
+| **Programmer**  | Null deref, assertion failure, type error  | Crash and restart — state is unreliable |
 
-This distinction drives your error handling strategy. Operational errors are handled
-in-place. Programmer errors mean corrupted state — the safest response is to exit
-and let the process manager restart.
+This distinction drives your error handling strategy. Operational errors are handled in-place. Programmer errors mean
+corrupted state — the safest response is to exit and let the process manager restart.
 
 ## Custom Error Classes
 
-Always extend `Error`. Set a `code` property for programmatic matching (not message
-strings, which change).
+Always extend `Error`. Set a `code` property for programmatic matching (not message strings, which change).
 
 ```js
 class AppError extends Error {
@@ -87,8 +85,8 @@ async function getUser(id) {
 }
 ```
 
-The full chain is visible via `util.inspect()` and structured loggers. Node.js error
-codes use `error.code` (not `error.cause`) for identification.
+The full chain is visible via `util.inspect()` and structured loggers. Node.js error codes use `error.code` (not
+`error.cause`) for identification.
 
 ## Async Error Patterns
 
@@ -149,8 +147,8 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 ```
 
-Since Node.js 15+, unhandled rejections throw by default (`--unhandled-rejections=throw`).
-The process crashes if you don't handle them.
+Since Node.js 15+, unhandled rejections throw by default (`--unhandled-rejections=throw`). The process crashes if you
+don't handle them.
 
 ### `uncaughtException`
 
@@ -178,8 +176,7 @@ process.on('warning', (warning) => {
 
 ## EventEmitter Error Events
 
-All EventEmitters (streams, servers, sockets) emit `'error'` events. An unhandled
-`'error'` event crashes the process.
+All EventEmitters (streams, servers, sockets) emit `'error'` events. An unhandled `'error'` event crashes the process.
 
 ```js
 // BAD — crashes if connection fails
@@ -194,8 +191,8 @@ connection.on('error', (err) => {
 
 ### Streams
 
-Streams are EventEmitters. Always handle their `'error'` event unless using
-`pipeline()` (which handles it automatically):
+Streams are EventEmitters. Always handle their `'error'` event unless using `pipeline()` (which handles it
+automatically):
 
 ```js
 // pipeline handles errors — no manual handler needed
@@ -242,13 +239,13 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|------|
-| `throw "string"` | `throw new Error("message")` |
-| Catch and ignore: `catch (e) {}` | Handle, log, or re-throw with cause |
-| `catch (e) { log(e); throw e }` | Handle once: log OR throw, not both |
-| Resume after `uncaughtException` | Log, cleanup, exit |
-| Match errors by message string | Match by `error.code` or `instanceof` |
-| Nest try/catch deeply | Centralized error handler |
-| Swallow errors in event handlers | Always re-emit or log |
-| `return promise` in try block | `return await promise` |
+| Don't                            | Do                                    |
+| -------------------------------- | ------------------------------------- |
+| `throw "string"`                 | `throw new Error("message")`          |
+| Catch and ignore: `catch (e) {}` | Handle, log, or re-throw with cause   |
+| `catch (e) { log(e); throw e }`  | Handle once: log OR throw, not both   |
+| Resume after `uncaughtException` | Log, cleanup, exit                    |
+| Match errors by message string   | Match by `error.code` or `instanceof` |
+| Nest try/catch deeply            | Centralized error handler             |
+| Swallow errors in event handlers | Always re-emit or log                 |
+| `return promise` in try block    | `return await promise`                |

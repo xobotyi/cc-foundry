@@ -1,7 +1,6 @@
 # Component Patterns
 
-Svelte component conventions, events, snippets, template syntax, context,
-and special elements.
+Svelte component conventions, events, snippets, template syntax, context, and special elements.
 
 ## Component Structure
 
@@ -54,8 +53,7 @@ Use standard event attributes on elements:
 <button onclick={() => count++}>click</button>
 ```
 
-Event attributes are case sensitive. `onclick` listens to the `click` event,
-`onClick` listens to the `Click` event.
+Event attributes are case sensitive. `onclick` listens to the `click` event, `onClick` listens to the `Click` event.
 
 ### Component Events as Callback Props
 
@@ -114,11 +112,10 @@ Combine in a single function (no duplicate attributes):
 
 ### Event Delegation
 
-Svelte uses event delegation for common events (`click`, `input`, `keydown`,
-etc.) -- a single listener at the application root handles events that bubble
-up. When manually dispatching events with delegated listeners, set
-`{ bubbles: true }`. Prefer the `on` function from `svelte/events` over raw
-`addEventListener` to ensure correct ordering and `stopPropagation` behavior.
+Svelte uses event delegation for common events (`click`, `input`, `keydown`, etc.) -- a single listener at the
+application root handles events that bubble up. When manually dispatching events with delegated listeners, set
+`{ bubbles: true }`. Prefer the `on` function from `svelte/events` over raw `addEventListener` to ensure correct
+ordering and `stopPropagation` behavior.
 
 ## Template Syntax
 
@@ -146,9 +143,8 @@ up. When manually dispatching events with delegated listeners, set
 {/each}
 ```
 
-Always provide a key expression `(item.id)` for lists that can change -- it
-enables efficient DOM reconciliation. The `:else` clause renders when the
-array is empty.
+Always provide a key expression `(item.id)` for lists that can change -- it enables efficient DOM reconciliation. The
+`:else` clause renders when the array is empty.
 
 **Key blocks:**
 
@@ -158,8 +154,8 @@ array is empty.
 {/key}
 ```
 
-Destroys and recreates contents when `value` changes. Useful for triggering
-entry transitions or resetting component state.
+Destroys and recreates contents when `value` changes. Useful for triggering entry transitions or resetting component
+state.
 
 **Await blocks:**
 
@@ -173,8 +169,8 @@ entry transitions or resetting component state.
 {/await}
 ```
 
-Short forms: `{#await promise then value}` skips the loading state.
-`{#await promise catch error}` skips both loading and success.
+Short forms: `{#await promise then value}` skips the loading state. `{#await promise catch error}` skips both loading
+and success.
 
 ### Special Tags
 
@@ -186,8 +182,7 @@ Short forms: `{#await promise then value}` skips the loading state.
 
 ### Text Expressions
 
-`{expression}` outputs a stringified, escaped value. `null` and `undefined`
-are omitted.
+`{expression}` outputs a stringified, escaped value. `null` and `undefined` are omitted.
 
 ## Snippets
 
@@ -281,14 +276,13 @@ Use optional chaining or an `{#if}` block for fallback content:
 
 ### Snippet Scope
 
-Snippets follow lexical scoping -- they can reference variables from their
-surrounding scope but are only visible within their declaring block and its
-children.
+Snippets follow lexical scoping -- they can reference variables from their surrounding scope but are only visible within
+their declaring block and its children.
 
 ### Exporting Snippets
 
-Top-level snippets can be exported from a `<script module>` block for use
-in other components, provided they don't reference non-module declarations.
+Top-level snippets can be exported from a `<script module>` block for use in other components, provided they don't
+reference non-module declarations.
 
 ### Typing Snippets
 
@@ -370,8 +364,7 @@ export const [getUserContext, setUserContext] = createContext<User>();
 
 ### `<svelte:boundary>`
 
-Error boundary and async loading wrapper. Prevents rendering errors from
-crashing the entire app.
+Error boundary and async loading wrapper. Prevents rendering errors from crashing the entire app.
 
 ```svelte
 <svelte:boundary>

@@ -1,17 +1,17 @@
 # Reactivity
 
-Vue's reactivity system tracks dependencies at property-access granularity.
-Understanding it prevents the most common Vue bugs.
+Vue's reactivity system tracks dependencies at property-access granularity. Understanding it prevents the most common
+Vue bugs.
 
 ## Choosing a Reactive Primitive
 
-| Primitive | Use When |
-|-----------|----------|
-| `ref()` | **Default choice.** Works with any value type. |
-| `reactive()` | Grouping related state into one object when destructure is not needed. |
-| `shallowRef()` | Large immutable structures, external state integration. |
-| `shallowReactive()` | Root-level-only reactivity on objects. |
-| `computed()` | Derived state. Caches until dependencies change. |
+| Primitive           | Use When                                                               |
+| ------------------- | ---------------------------------------------------------------------- |
+| `ref()`             | **Default choice.** Works with any value type.                         |
+| `reactive()`        | Grouping related state into one object when destructure is not needed. |
+| `shallowRef()`      | Large immutable structures, external state integration.                |
+| `shallowReactive()` | Root-level-only reactivity on objects.                                 |
+| `computed()`        | Derived state. Caches until dependencies change.                       |
 
 ### `ref()` is the Primary API
 
@@ -28,6 +28,7 @@ count.value++
 ```
 
 **Why `ref()` over `reactive()`:**
+
 - Works with primitives (`string`, `number`, `boolean`)
 - Can be destructured from composable returns without losing reactivity
 - Can be reassigned (`count.value = newValue`)
@@ -81,11 +82,11 @@ const fullName = computed({
 ```
 
 **Rules:**
+
 - Keep computed getters pure — no side effects.
 - Split complex computed into smaller ones.
 - Computed caches its value; only recalculates when dependencies change.
-- Computed stability (3.4+): only triggers effects when the returned value
-  actually changes.
+- Computed stability (3.4+): only triggers effects when the returned value actually changes.
 
 ## Watchers
 
@@ -123,8 +124,7 @@ watch(source, callback, { deep: true })
 
 ### `watchEffect()`
 
-Runs immediately, auto-tracks all reactive dependencies accessed during
-execution.
+Runs immediately, auto-tracks all reactive dependencies accessed during execution.
 
 ```ts
 import { ref, watchEffect } from 'vue'
@@ -139,11 +139,11 @@ watchEffect(() => {
 
 **When to use which:**
 
-| Use `watch()` when | Use `watchEffect()` when |
-|--------------------|--------------------------|
-| Need old and new values | Don't need old value |
-| Want lazy execution | Want immediate execution |
-| Watching specific sources | Dependencies are implicit |
+| Use `watch()` when        | Use `watchEffect()` when        |
+| ------------------------- | ------------------------------- |
+| Need old and new values   | Don't need old value            |
+| Want lazy execution       | Want immediate execution        |
+| Watching specific sources | Dependencies are implicit       |
 | Need conditional watching | Effect tracks all accessed refs |
 
 ### Cleanup
@@ -162,8 +162,7 @@ watchEffect((onCleanup) => {
 
 ## Deep Reactivity
 
-`ref()` and `reactive()` are deep by default — nested objects are also
-reactive:
+`ref()` and `reactive()` are deep by default — nested objects are also reactive:
 
 ```ts
 const obj = ref({

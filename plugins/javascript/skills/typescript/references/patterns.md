@@ -4,8 +4,7 @@
 
 ### When to Use `interface`
 
-Use `interface` for object shapes — it has better error messages, IDE support,
-and compiler performance:
+Use `interface` for object shapes — it has better error messages, IDE support, and compiler performance:
 
 ```ts
 interface User {
@@ -43,11 +42,9 @@ type Optional<T> = { [K in keyof T]?: T[K] };
 
 ### Decision Rule
 
-Object shape with known properties? `interface`.
-Everything else? `type`.
+Object shape with known properties? `interface`. Everything else? `type`.
 
-Do not mix arbitrarily — pick one pattern per kind and stay consistent within
-a project.
+Do not mix arbitrarily — pick one pattern per kind and stay consistent within a project.
 
 ## Type Assertions
 
@@ -127,8 +124,7 @@ type MaybeUser = User | null;
 function getUser(id: string): User | null { ... }
 ```
 
-This keeps nullability visible where it matters and prevents it from spreading
-through the codebase.
+This keeps nullability visible where it matters and prevents it from spreading through the codebase.
 
 ### Null Narrowing
 
@@ -158,8 +154,7 @@ enum Direction {
 }
 ```
 
-String enums have meaningful runtime values, predictable behavior, and readable
-debug output.
+String enums have meaningful runtime values, predictable behavior, and readable debug output.
 
 ### Prefer Union Types for Simple Cases
 
@@ -193,8 +188,7 @@ enum Mixed { A = 0, B = "b" } // Never do this
 
 ### Visibility
 
-- Omit `public` — it's the default. Only use `public` on non-readonly
-  constructor parameter properties.
+- Omit `public` — it's the default. Only use `public` on non-readonly constructor parameter properties.
 - Use `private` for internal state, `protected` for subclass access.
 - Use `readonly` on properties that are never reassigned after construction.
 
@@ -244,8 +238,8 @@ class Counter {
 
 ## Structural Typing
 
-TypeScript is structural, not nominal. A value matches a type if it has the
-required properties — the name of the type doesn't matter.
+TypeScript is structural, not nominal. A value matches a type if it has the required properties — the name of the type
+doesn't matter.
 
 ### Annotate for Precision
 
@@ -319,13 +313,12 @@ function handle(x: unknown): unknown;
 function handle(x: unknown): unknown { ... }
 ```
 
-TypeScript picks the first matching overload. General-before-specific hides
-the specific overloads.
+TypeScript picks the first matching overload. General-before-specific hides the specific overloads.
 
 ## Branded Types
 
-TypeScript's structural typing means any `string` is assignable to any other
-`string`-typed variable. Branded types add nominal-like safety:
+TypeScript's structural typing means any `string` is assignable to any other `string`-typed variable. Branded types add
+nominal-like safety:
 
 ```ts
 type UserId = string & { readonly __brand: unique symbol };
@@ -346,25 +339,25 @@ getUser("raw");   // Error: string is not assignable to UserId
 ```
 
 Use branded types when:
+
 - Domain IDs should not be interchangeable (UserId vs OrderId)
 - Validated strings need type-level tracking (Email, URL)
 - Units must not be mixed (Meters vs Kilometers)
 
-Keep the branding mechanism consistent across the project. The `unique symbol`
-pattern is the most robust — `__brand: "UserId"` also works but allows
-cross-assignment between brands with the same string.
+Keep the branding mechanism consistent across the project. The `unique symbol` pattern is the most robust —
+`__brand: "UserId"` also works but allows cross-assignment between brands with the same string.
 
 ## `unknown` vs `any`
 
 ### Decision Table
 
-| Situation | Use |
-|-----------|-----|
-| Value from external source (API, JSON.parse, user input) | `unknown` |
-| Function accepts anything, passes through without touching | `unknown` |
-| Migrating JS to TS incrementally | `any` (temporary, with comment) |
-| Test mock that intentionally bypasses type checking | `any` (with comment) |
-| You're too lazy to type it properly | Fix the types |
+| Situation                                                  | Use                             |
+| ---------------------------------------------------------- | ------------------------------- |
+| Value from external source (API, JSON.parse, user input)   | `unknown`                       |
+| Function accepts anything, passes through without touching | `unknown`                       |
+| Migrating JS to TS incrementally                           | `any` (temporary, with comment) |
+| Test mock that intentionally bypasses type checking        | `any` (with comment)            |
+| You're too lazy to type it properly                        | Fix the types                   |
 
 ### Using `unknown` Safely
 
@@ -386,21 +379,20 @@ function processValue(value: unknown): string {
 
 `{}` means "any non-nullish value" — it's almost never what you want:
 
-| Type | Allows |
-|------|--------|
-| `unknown` | Everything (null, undefined, primitives, objects) |
-| `object` | Non-primitive, non-null values |
-| `{}` | Any non-nullish value (primitives included) |
-| `Record<string, unknown>` | Objects with string keys |
+| Type                      | Allows                                            |
+| ------------------------- | ------------------------------------------------- |
+| `unknown`                 | Everything (null, undefined, primitives, objects) |
+| `object`                  | Non-primitive, non-null values                    |
+| `{}`                      | Any non-nullish value (primitives included)       |
+| `Record<string, unknown>` | Objects with string keys                          |
 
-Prefer `unknown` for opaque values, `Record<string, unknown>` for dict-like
-objects, `object` when you need "any non-primitive".
+Prefer `unknown` for opaque values, `Record<string, unknown>` for dict-like objects, `object` when you need "any
+non-primitive".
 
 ## Callback Types
 
 - Use `void` return for callbacks whose return value is ignored.
-- Don't use optional parameters in callbacks — callers can always ignore
-  extra arguments.
+- Don't use optional parameters in callbacks — callers can always ignore extra arguments.
 
 ```ts
 // Bad:

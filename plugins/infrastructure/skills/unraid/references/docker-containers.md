@@ -4,33 +4,31 @@
 
 - All container data stored in `docker.img` (BTRFS virtual disk image)
 - Default location: `system` share on cache pool for performance
-- Container configurations saved as XML templates on the flash drive at
-  `/boot/config/plugins/dockerMan/templates-user/`
+- Container configurations saved as XML templates on the flash drive at `/boot/config/plugins/dockerMan/templates-user/`
 - Application data stored in `appdata` share, one subfolder per container
 - Unraid does not natively support Docker Compose
 
 ## Network Modes
 
-| Mode | Behavior | When to Use |
-|------|----------|-------------|
-| Bridge (default) | Internal Docker network, only mapped ports accessible | Most applications -- safest option |
-| Host | Shares server's network stack, all ports available | Applications requiring direct network access |
-| None | No network access | Isolated workloads |
-| Custom (macvlan/ipvlan) | Container gets its own LAN IP | Services needing to appear as separate devices |
+| Mode                    | Behavior                                              | When to Use                                    |
+| ----------------------- | ----------------------------------------------------- | ---------------------------------------------- |
+| Bridge (default)        | Internal Docker network, only mapped ports accessible | Most applications -- safest option             |
+| Host                    | Shares server's network stack, all ports available    | Applications requiring direct network access   |
+| None                    | No network access                                     | Isolated workloads                             |
+| Custom (macvlan/ipvlan) | Container gets its own LAN IP                         | Services needing to appear as separate devices |
 
 ### macvlan vs ipvlan Stability
 
-**macvlan on a bridge interface (`br0`) causes kernel call traces and system crashes.**
-This is a longstanding kernel issue. Fixes in order of preference:
+**macvlan on a bridge interface (`br0`) causes kernel call traces and system crashes.** This is a longstanding kernel
+issue. Fixes in order of preference:
 
-1. **Switch to ipvlan** (default since 6.11.5): Settings > Docker (Advanced View) >
-   Docker custom network type > ipvlan. Works for most systems. Some routers (Fritzbox)
-   and network tools (Ubiquiti) may have issues with ipvlan
-2. **Disable bridging on eth0**: Settings > Network Settings > eth0 > Enable Bridging = No.
-   Creates a macvtap network with parent `eth0` instead of `br0`. Avoids call traces and
-   reported to be faster than bridged networking
+1. **Switch to ipvlan** (default since 6.11.5): Settings > Docker (Advanced View) > Docker custom network type > ipvlan.
+   Works for most systems. Some routers (Fritzbox) and network tools (Ubiquiti) may have issues with ipvlan
+2. **Disable bridging on eth0**: Settings > Network Settings > eth0 > Enable Bridging = No. Creates a macvtap network
+   with parent `eth0` instead of `br0`. Avoids call traces and reported to be faster than bridged networking
 
 After disabling bridging:
+
 - Docker containers: change Network type to "Custom: eth0"
 - VMs: change Network Source to "vhost0", ensure MAC address assigned
 - WireGuard tunnels: make a dummy change and save each tunnel
@@ -38,13 +36,13 @@ After disabling bridging:
 
 ### Host Access to Custom Networks
 
-By default, the Unraid host cannot communicate with containers on custom networks
-(macvlan/ipvlan). To enable host-container communication:
+By default, the Unraid host cannot communicate with containers on custom networks (macvlan/ipvlan). To enable
+host-container communication:
 
 Settings > Docker Settings > **Host access to custom networks** > Enabled
 
-Critical for: WireGuard tunnels reaching custom-IP containers, reverse proxies accessing
-custom-network services, any host service communicating with custom-IP containers.
+Critical for: WireGuard tunnels reaching custom-IP containers, reverse proxies accessing custom-network services, any
+host service communicating with custom-IP containers.
 
 ### Custom Docker Networks
 
@@ -55,13 +53,14 @@ docker network create --driver bridge my-network
 ```
 
 Benefits:
+
 - Containers on the same custom network can communicate by container name (DNS)
 - Isolated from containers on other networks
 - Better security segmentation (e.g., separate networks for media vs. databases)
 - Persistent across Docker restarts if created via the Docker tab
 
-**Preserve custom networks**: add network creation commands to a User Script that runs
-at array start to ensure networks survive Docker service restarts.
+**Preserve custom networks**: add network creation commands to a User Script that runs at array start to ensure networks
+survive Docker service restarts.
 
 ### VPN Container Routing
 
@@ -82,16 +81,16 @@ Route container traffic through a dedicated VPN container (e.g., Gluetun):
 
 ## Docker Compose on Unraid
 
-Unraid's native Docker management uses XML templates, not Compose. Docker Compose is
-an advanced, community-supported workflow.
+Unraid's native Docker management uses XML templates, not Compose. Docker Compose is an advanced, community-supported
+workflow.
 
 ### Options for Running Compose
 
-- **Docker-Compose Manager plugin**: install from Community Applications. Provides WebGUI
-  interface for managing Compose stacks and editing YAML files
+- **Docker-Compose Manager plugin**: install from Community Applications. Provides WebGUI interface for managing Compose
+  stacks and editing YAML files
 - **CLI**: run standard `docker-compose` commands via Unraid terminal or SSH
-- **unDOCK-compose**: tool to convert existing Unraid Docker XML templates into Docker
-  Compose YAML files. Useful for migration
+- **unDOCK-compose**: tool to convert existing Unraid Docker XML templates into Docker Compose YAML files. Useful for
+  migration
 
 ### What Compose Enables
 
@@ -102,12 +101,12 @@ an advanced, community-supported workflow.
 
 ### Compose Limitations on Unraid
 
-- Containers launched via Compose appear in the Docker tab but **cannot be edited via
-  the Unraid WebGUI** -- all changes must be made in the YAML file
-- **Action Center** update alerts and automated XML template backups only cover
-  containers installed via Community Applications
-- Unraid's user-friendly template system is designed to avoid CLI complexity -- Compose
-  is explicitly outside standard Unraid documentation and support
+- Containers launched via Compose appear in the Docker tab but **cannot be edited via the Unraid WebGUI** -- all changes
+  must be made in the YAML file
+- **Action Center** update alerts and automated XML template backups only cover containers installed via Community
+  Applications
+- Unraid's user-friendly template system is designed to avoid CLI complexity -- Compose is explicitly outside standard
+  Unraid documentation and support
 
 ## Reverse Proxy Integration
 
@@ -126,8 +125,7 @@ Traefik uses Docker labels for dynamic service discovery and routing:
 - Manual per-service configuration required
 - Does not support dynamic Docker-based discovery like Traefik
 
-Choose Traefik for IaC/automation workflows. Choose NPM for simpler setups or users
-who prefer a GUI.
+Choose Traefik for IaC/automation workflows. Choose NPM for simpler setups or users who prefer a GUI.
 
 ## Volume Mappings
 
@@ -147,8 +145,7 @@ Host: /mnt/user/data           ->  Container: /data        (working data)
 ### Critical Rules
 
 - **Paths are case-sensitive**: `/mnt/user/Media` != `/mnt/user/media`
-- Host paths are created automatically if they don't exist -- unexpected folders indicate
-  misconfigured mappings
+- Host paths are created automatically if they don't exist -- unexpected folders indicate misconfigured mappings
 - Store application data outside the container in the `appdata` share
 - Never hardcode sensitive data in container images -- use environment variables
 
@@ -156,11 +153,11 @@ Host: /mnt/user/data           ->  Container: /data        (working data)
 
 Common variables across containers:
 
-| Variable | Purpose |
-|----------|---------|
+| Variable        | Purpose                                        |
+| --------------- | ---------------------------------------------- |
 | `PUID` / `PGID` | Run container processes as specific user/group |
-| `TZ` | Timezone (e.g., `America/New_York`) |
-| `UMASK` | File permission mask |
+| `TZ`            | Timezone (e.g., `America/New_York`)            |
+| `UMASK`         | File permission mask                           |
 
 Use environment variables for all configuration -- enhances portability and security.
 
@@ -223,5 +220,5 @@ Essential User Scripts for Docker health:
 
 ## Fork Bomb Prevention (Unraid 7+)
 
-Set PID limits per container to prevent resource exhaustion from runaway processes.
-Configure in container advanced settings.
+Set PID limits per container to prevent resource exhaustion from runaway processes. Configure in container advanced
+settings.

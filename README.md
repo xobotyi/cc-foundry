@@ -2,9 +2,8 @@
 
 Plugins that make Claude Code better at its job.
 
-Claude Code is powerful out of the box, but it has gaps. It forgets skills mid-session.
-Commits are messy. Building AI artifacts is trial-and-error. Code ships without validation.
-These plugins fix that.
+Claude Code is powerful out of the box, but it has gaps. It forgets skills mid-session. Commits are messy. Building AI
+artifacts is trial-and-error. Code ships without validation. These plugins fix that.
 
 ## Installation
 
@@ -19,10 +18,9 @@ Add the marketplace, then install any plugin:
 
 ### skill-enforcer
 
-Claude skips skills and forgets about them mid-session. This plugin injects a Skill
-Enforcement Framework via lifecycle hooks that forces Claude to evaluate which skills apply
-at every checkpoint: user prompt, after reading files, after editing, and after loading
-skills. Skills are treated as non-atomic — phase shifts (coding to testing) trigger
+Claude skips skills and forgets about them mid-session. This plugin injects a Skill Enforcement Framework via lifecycle
+hooks that forces Claude to evaluate which skills apply at every checkpoint: user prompt, after reading files, after
+editing, and after loading skills. Skills are treated as non-atomic — phase shifts (coding to testing) trigger
 re-evaluation of unread references from already-loaded skills.
 
 ```
@@ -33,11 +31,10 @@ re-evaluation of unread references from already-loaded skills.
 
 ### git-commit
 
-Messy commits — mixed changes, vague messages, wrong order. The `/commit` command enforces
-an 8-step pipeline: identify logical units in the diff, plan commit order (style to refactor
-to fix to feature), run quality gates, self-review, stage selectively, validate messages
-against conventions, commit, and verify. Each message runs through automated validation
-before execution.
+Messy commits — mixed changes, vague messages, wrong order. The `/commit` command enforces an 8-step pipeline: identify
+logical units in the diff, plan commit order (style to refactor to fix to feature), run quality gates, self-review,
+stage selectively, validate messages against conventions, commit, and verify. Each message runs through automated
+validation before execution.
 
 ```
 /plugin install git-commit
@@ -47,11 +44,10 @@ before execution.
 
 ### the-blueprint
 
-Planning is either too shallow or too detailed. This plugin provides a four-stage pipeline
-that produces artifacts consumable by both humans and agents: design documents (problem
-analysis and recommendation), technical designs (component mapping and sequencing), task
-decomposition (actionable hierarchies with acceptance criteria), and task creation (issue
-tracker items). Each stage builds on the previous with explicit approval gates.
+Planning is either too shallow or too detailed. This plugin provides a four-stage pipeline that produces artifacts
+consumable by both humans and agents: design documents (problem analysis and recommendation), technical designs
+(component mapping and sequencing), task decomposition (actionable hierarchies with acceptance criteria), and task
+creation (issue tracker items). Each stage builds on the previous with explicit approval gates.
 
 ```
 /plugin install the-blueprint
@@ -61,11 +57,10 @@ tracker items). Each stage builds on the previous with explicit approval gates.
 
 ### the-coder
 
-Claude writes code before understanding what exists — guessing APIs, skipping tests,
-multiplying abstractions. This plugin provides a `coding` skill that enforces a
-discovery-first workflow (Discover, Plan, Implement, Verify) and a `software-engineer`
-output style with LSP-first navigation and engineering judgment. Runs before
-language-specific skills as a prerequisite.
+Claude writes code before understanding what exists — guessing APIs, skipping tests, multiplying abstractions. This
+plugin provides a `coding` skill that enforces a discovery-first workflow (Discover, Plan, Implement, Verify) and a
+`software-engineer` output style with LSP-first navigation and engineering judgment. Runs before language-specific
+skills as a prerequisite.
 
 ```
 /plugin install the-coder
@@ -75,11 +70,11 @@ language-specific skills as a prerequisite.
 
 ### the-crucible
 
-Code quality is checked manually or not at all. This plugin provides a two-level validation
-pipeline: `quality-validation` checks that deliverables match the original request before
-completion, and `code-quality-evaluation` orchestrates 8 specialized review agents (naming,
-complexity, comments, tests, error handling, security, observability, documentation) that
-evaluate code in parallel. All agents are read-only — they report, you decide.
+Code quality is checked manually or not at all. This plugin provides a two-level validation pipeline:
+`quality-validation` checks that deliverables match the original request before completion, and
+`code-quality-evaluation` orchestrates 8 specialized review agents (naming, complexity, comments, tests, error handling,
+security, observability, documentation) that evaluate code in parallel. All agents are read-only — they report, you
+decide.
 
 ```
 /plugin install the-crucible
@@ -89,11 +84,10 @@ evaluate code in parallel. All agents are read-only — they report, you decide.
 
 ### the-statusline
 
-No visibility into context window usage, cost, or model. This plugin installs a 3-row
-status line to your user-level Claude configuration showing output style, model, session
-cost, context window remaining, cache hit rate, and current working directory. Color urgency
-increases as context approaches limits. Auto-syncs on every session start and survives agent
-directory changes.
+No visibility into context window usage, cost, or model. This plugin installs a 3-row status line to your user-level
+Claude configuration showing output style, model, session cost, context window remaining, cache hit rate, and current
+working directory. Color urgency increases as context approaches limits. Auto-syncs on every session start and survives
+agent directory changes.
 
 ```
 /plugin install the-statusline
@@ -103,13 +97,12 @@ directory changes.
 
 ### the-workflow
 
-Work crossing a context boundary — session restart, teammate delegation, async resumption —
-loses critical state. The handoff is either a wall of text that overloads the receiver, or a
-paragraph that drops decisions and constraints. The `handoff` skill guides the agent through
-a structured triage of its context, producing a 500-2000 token transfer document that
-preserves decisions, constraints, resource identifiers, and remaining work while dropping
-intermediate exploration and raw tool output. Two modes: self-handoff (session restart) and
-teammate handoff (delegation with codebase orientation).
+Work crossing a context boundary — session restart, teammate delegation, async resumption — loses critical state. The
+handoff is either a wall of text that overloads the receiver, or a paragraph that drops decisions and constraints. The
+`handoff` skill guides the agent through a structured triage of its context, producing a 500-2000 token transfer
+document that preserves decisions, constraints, resource identifiers, and remaining work while dropping intermediate
+exploration and raw tool output. Two modes: self-handoff (session restart) and teammate handoff (delegation with
+codebase orientation).
 
 ```
 /plugin install the-workflow
@@ -119,12 +112,10 @@ teammate handoff (delegation with codebase orientation).
 
 ### ai-helpers
 
-Creating prompts, skills, agents, and output styles is guesswork without structured guidance.
-This plugin provides skills encoding best practices for each artifact type:
-`prompt-engineering` (foundation), `skill-engineering`, `subagent-engineering`,
-`output-style-engineering`, and `claude-code-sdk` (reference). All skills build on
-prompt-engineering fundamentals. Includes an `ai-engineer` output style for collaborative
-artifact work.
+Creating prompts, skills, agents, and output styles is guesswork without structured guidance. This plugin provides
+skills encoding best practices for each artifact type: `prompt-engineering` (foundation), `skill-engineering`,
+`subagent-engineering`, `output-style-engineering`, and `claude-code-sdk` (reference). All skills build on
+prompt-engineering fundamentals. Includes an `ai-engineer` output style for collaborative artifact work.
 
 ```
 /plugin install ai-helpers
@@ -134,11 +125,10 @@ artifact work.
 
 ### golang
 
-Go has strong idioms that differ from other languages — premature abstraction, incorrect
-error handling, interface misuse, and concurrency bugs are common pitfalls. This plugin
-provides a `golang` skill covering conventions, error handling, interfaces, concurrency,
-testing, and project structure, plus a `templ` skill for type-safe HTML templating with
-component composition, attribute handling, and JS integration.
+Go has strong idioms that differ from other languages — premature abstraction, incorrect error handling, interface
+misuse, and concurrency bugs are common pitfalls. This plugin provides a `golang` skill covering conventions, error
+handling, interfaces, concurrency, testing, and project structure, plus a `templ` skill for type-safe HTML templating
+with component composition, attribute handling, and JS integration.
 
 ```
 /plugin install golang
@@ -148,10 +138,9 @@ component composition, attribute handling, and JS integration.
 
 ### javascript
 
-Claude knows JS/TS syntax but defaults to outdated patterns, mixes module systems, and
-ignores runtime-specific APIs. This plugin provides five skills: `javascript` (core language
-conventions), `typescript` (type system and strict mode), `nodejs` (Node.js runtime APIs),
-`bun` (Bun runtime APIs), and `vitest` (testing framework practices). Skills activate
+Claude knows JS/TS syntax but defaults to outdated patterns, mixes module systems, and ignores runtime-specific APIs.
+This plugin provides five skills: `javascript` (core language conventions), `typescript` (type system and strict mode),
+`nodejs` (Node.js runtime APIs), `bun` (Bun runtime APIs), and `vitest` (testing framework practices). Skills activate
 automatically based on file context.
 
 ```
@@ -160,15 +149,14 @@ automatically based on file context.
 
 ### infrastructure
 
-Infrastructure work — Ansible playbooks, Docker containers, Proxmox clusters, network
-segments — requires deep domain knowledge that generic coding assistants lack. Without it,
-agents produce configurations with insecure defaults, no idempotency, and naive networking.
-This plugin provides six skills: `devops` (foundational discipline — what good infrastructure
-looks like, analogous to `the-coder/coding`), `ansible` (playbooks, roles, vault, collections,
-molecule testing), `containers` (Docker/Podman, Compose, image optimization, security),
-`proxmox` (VMs, LXC, storage backends, clustering, API automation), `unraid` (arrays, Docker,
-VMs, shares, plugins), and `networking` (VLANs, firewalls, DNS, reverse proxies, VPN, TLS).
-The devops skill runs in a sandwich pattern: principles first, tool skill, then verification.
+Infrastructure work — Ansible playbooks, Docker containers, Proxmox clusters, network segments — requires deep domain
+knowledge that generic coding assistants lack. Without it, agents produce configurations with insecure defaults, no
+idempotency, and naive networking. This plugin provides six skills: `devops` (foundational discipline — what good
+infrastructure looks like, analogous to `the-coder/coding`), `ansible` (playbooks, roles, vault, collections, molecule
+testing), `containers` (Docker/Podman, Compose, image optimization, security), `proxmox` (VMs, LXC, storage backends,
+clustering, API automation), `unraid` (arrays, Docker, VMs, shares, plugins), and `networking` (VLANs, firewalls, DNS,
+reverse proxies, VPN, TLS). The devops skill runs in a sandwich pattern: principles first, tool skill, then
+verification.
 
 ```
 /plugin install infrastructure
@@ -180,13 +168,11 @@ The devops skill runs in a sandwich pattern: principles first, tool skill, then 
 
 ### frontend
 
-Browser development requires knowledge beyond general programming — CSS layout systems,
-accessibility standards, framework-specific patterns. This plugin provides five skills:
-`css` (conventions, layout, SCSS/SASS, responsive design, methodologies), `react` (component
-patterns, hooks, state, performance, testing), `vue` (Composition API, reactivity,
-composables), `svelte` (Svelte 5 runes, SvelteKit conventions), and `accessibility` (WCAG 2.2,
-ARIA, semantic HTML, keyboard navigation). Keeps platform discipline separate from language
-discipline.
+Browser development requires knowledge beyond general programming — CSS layout systems, accessibility standards,
+framework-specific patterns. This plugin provides five skills: `css` (conventions, layout, SCSS/SASS, responsive design,
+methodologies), `react` (component patterns, hooks, state, performance, testing), `vue` (Composition API, reactivity,
+composables), `svelte` (Svelte 5 runes, SvelteKit conventions), and `accessibility` (WCAG 2.2, ARIA, semantic HTML,
+keyboard navigation). Keeps platform discipline separate from language discipline.
 
 ```
 /plugin install frontend
@@ -196,11 +182,10 @@ discipline.
 
 ### backend
 
-Building reliable services requires consistent approaches to observability and instrumentation.
-This plugin provides four skills: `observability` (three pillars — logging, metrics, tracing —
-their interconnection and high-level practices), `prometheus` (metric types, naming, labels,
-PromQL, alerting), `statsd` (metric types, UDP push model, DogStatsD extensions), and
-`otel-tracing` (spans, context propagation, instrumentation, sampling, semantic conventions).
+Building reliable services requires consistent approaches to observability and instrumentation. This plugin provides
+four skills: `observability` (three pillars — logging, metrics, tracing — their interconnection and high-level
+practices), `prometheus` (metric types, naming, labels, PromQL, alerting), `statsd` (metric types, UDP push model,
+DogStatsD extensions), and `otel-tracing` (spans, context propagation, instrumentation, sampling, semantic conventions).
 Technology-agnostic guidance in `observability`; tool-specific depth in the others.
 
 ```
@@ -211,11 +196,10 @@ Technology-agnostic guidance in `observability`; tool-specific depth in the othe
 
 ### cli
 
-CLI platform discipline — command-line interface design, shell scripting conventions, and
-terminal UX patterns. Two skills cover the full CLI surface: `cli` handles the design layer
-(argument conventions, output streams, exit codes, configuration hierarchy, signal handling)
-for CLIs written in any language, while `shell-scripting` handles the implementation layer
-(strict mode, quoting, portability, error handling) for scripts written in shell.
+CLI platform discipline — command-line interface design, shell scripting conventions, and terminal UX patterns. Two
+skills cover the full CLI surface: `cli` handles the design layer (argument conventions, output streams, exit codes,
+configuration hierarchy, signal handling) for CLIs written in any language, while `shell-scripting` handles the
+implementation layer (strict mode, quoting, portability, error handling) for scripts written in shell.
 
 ```
 /plugin install cli
@@ -223,11 +207,11 @@ for CLIs written in any language, while `shell-scripting` handles the implementa
 
 ### php
 
-PHP language discipline targeting 8.5+. Two skills cover the full PHP surface: `php` handles
-conventions, type declarations (union, intersection, DNF), enums, readonly classes, property
-hooks, closures, Fibers, error handling, Composer, PSR-4/PER-CS, and project structure, while
-`phpunit` handles testing conventions (test structure, data providers, assertions, stubs vs
-mocks, attributes, configuration). Bundled Intelephense LSP for semantic code navigation.
+PHP language discipline targeting 8.5+. Two skills cover the full PHP surface: `php` handles conventions, type
+declarations (union, intersection, DNF), enums, readonly classes, property hooks, closures, Fibers, error handling,
+Composer, PSR-4/PER-CS, and project structure, while `phpunit` handles testing conventions (test structure, data
+providers, assertions, stubs vs mocks, attributes, configuration). Bundled Intelephense LSP for semantic code
+navigation.
 
 ```
 /plugin install php
@@ -237,11 +221,10 @@ mocks, attributes, configuration). Bundled Intelephense LSP for semantic code na
 
 ### python
 
-Python language discipline targeting 3.14+. Two skills cover the full Python surface:
-`python` handles conventions, modern idioms, type annotations (built-in generics, `|` unions,
-protocols), data classes, pattern matching, exception handling, packaging (pyproject.toml, uv,
-ruff), and project structure, while `pytest` handles testing conventions (fixtures, parametrize,
-markers, mocking, async testing, conftest patterns).
+Python language discipline targeting 3.14+. Two skills cover the full Python surface: `python` handles conventions,
+modern idioms, type annotations (built-in generics, `|` unions, protocols), data classes, pattern matching, exception
+handling, packaging (pyproject.toml, uv, ruff), and project structure, while `pytest` handles testing conventions
+(fixtures, parametrize, markers, mocking, async testing, conftest patterns).
 
 ```
 /plugin install python

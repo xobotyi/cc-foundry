@@ -1,7 +1,6 @@
 # Go Idioms
 
-Naming conventions, declaration patterns, interface design, receivers, configuration,
-and type usage.
+Naming conventions, declaration patterns, interface design, receivers, configuration, and type usage.
 
 ## Naming
 
@@ -9,21 +8,21 @@ and type usage.
 
 The distance rule: name length scales with scope distance.
 
-| Scope | Style | Examples |
-|-------|-------|----------|
-| Loop index | Single letter | `i`, `j`, `k` |
-| Short function local | 1-3 chars | `r` (reader), `b` (buffer), `ctx` |
-| Function parameter | Short but clear | `name`, `path`, `opts` |
-| Package-level | Descriptive | `defaultTimeout`, `maxRetries` |
-| Exported | Self-documenting | `ErrNotFound`, `DefaultClient` |
+| Scope                | Style            | Examples                          |
+| -------------------- | ---------------- | --------------------------------- |
+| Loop index           | Single letter    | `i`, `j`, `k`                     |
+| Short function local | 1-3 chars        | `r` (reader), `b` (buffer), `ctx` |
+| Function parameter   | Short but clear  | `name`, `path`, `opts`            |
+| Package-level        | Descriptive      | `defaultTimeout`, `maxRetries`    |
+| Exported             | Self-documenting | `ErrNotFound`, `DefaultClient`    |
 
-**Receivers**: 1-2 letter abbreviation of the type. `c` for `Client`, `s` for `Server`.
-Never `self`, `this`, `me`. Be consistent — if one method uses `c`, all methods use `c`.
+**Receivers**: 1-2 letter abbreviation of the type. `c` for `Client`, `s` for `Server`. Never `self`, `this`, `me`. Be
+consistent — if one method uses `c`, all methods use `c`.
 
 ### Initialisms
 
-All-caps for known initialisms: `URL`, `HTTP`, `ID`, `API`, `SQL`, `XML`.
-In mixed identifiers: `userID`, `httpClient`, `xmlHTTPRequest`.
+All-caps for known initialisms: `URL`, `HTTP`, `ID`, `API`, `SQL`, `XML`. In mixed identifiers: `userID`, `httpClient`,
+`xmlHTTPRequest`.
 
 ### Packages
 
@@ -47,9 +46,8 @@ func (u *User) SetName(n string) { u.name = n }
 
 ### Interface Names
 
-One-method interfaces use method name plus `-er`: `Reader`, `Writer`, `Formatter`,
-`Stringer`. Honor canonical names — if your type has a `String() string` method, call
-it `String`, not `ToString`.
+One-method interfaces use method name plus `-er`: `Reader`, `Writer`, `Formatter`, `Stringer`. Honor canonical names —
+if your type has a `String() string` method, call it `String`, not `ToString`.
 
 ### Constants
 
@@ -77,8 +75,7 @@ const MaxRetries = 12
 
 ### Unexported Globals
 
-Prefix with `_`: `_defaultPort`, `_maxRetries`.
-Exception: error values use `err` prefix: `errNotFound`.
+Prefix with `_`: `_defaultPort`, `_maxRetries`. Exception: error values use `err` prefix: `errNotFound`.
 
 ### Avoid Repetition
 
@@ -267,8 +264,8 @@ type Store interface { Get(ctx context.Context, id string) (*User, error) }
 func NewStore() Store { return &store{} }
 ```
 
-Producers return concrete types. Consumers define the interface they need.
-Don't define interfaces "for mocking" — design APIs testable via real implementations.
+Producers return concrete types. Consumers define the interface they need. Don't define interfaces "for mocking" —
+design APIs testable via real implementations.
 
 ### Small Interfaces
 
@@ -286,12 +283,14 @@ var _ fmt.Stringer = LogOutput(0)
 ### Pointer vs Value
 
 Use a **pointer receiver** when:
+
 - Method mutates the receiver
 - Receiver contains `sync.Mutex` or similar
 - Receiver is a large struct
 - In doubt — default to pointer
 
 Use a **value receiver** when:
+
 - Receiver is a small, immutable value type (like `time.Time`)
 - Receiver is a map, func, or chan (already reference types)
 - All fields are value types with no mutability needs
@@ -331,13 +330,12 @@ func main() {
 
 ## Configuration Patterns
 
-For constructors with 3+ optional parameters, choose between option structs and
-functional options based on usage patterns.
+For constructors with 3+ optional parameters, choose between option structs and functional options based on usage
+patterns.
 
 ### Option Structs
 
-Use when most callers need to specify several options, or options are shared across
-multiple functions:
+Use when most callers need to specify several options, or options are shared across multiple functions:
 
 ```go
 type ReplicationOptions struct {
@@ -357,8 +355,7 @@ Benefits: self-documenting field names, zero-value omission, easy to share and e
 
 ### Functional Options
 
-Use when most callers need zero or few options, there are many options, or options
-require validation:
+Use when most callers need zero or few options, there are many options, or options require validation:
 
 ```go
 type Option interface{ apply(*options) }
@@ -396,13 +393,13 @@ rpc.EnableFailFast()
 
 ### Decision Criteria
 
-| Factor | Option Struct | Functional Options |
-|--------|--------------|-------------------|
-| Most callers need several options | Prefer | Either |
-| Most callers need zero options | Either | Prefer |
-| Options need validation | Either | Prefer |
-| Options shared across functions | Prefer | Either |
-| Third-party extensibility needed | Avoid | Prefer |
+| Factor                            | Option Struct | Functional Options |
+| --------------------------------- | ------------- | ------------------ |
+| Most callers need several options | Prefer        | Either             |
+| Most callers need zero options    | Either        | Prefer             |
+| Options need validation           | Either        | Prefer             |
+| Options shared across functions   | Prefer        | Either             |
+| Third-party extensibility needed  | Avoid         | Prefer             |
 
 ## Doc Comments
 
@@ -445,8 +442,8 @@ type Server struct {
 }
 ```
 
-**Never embed in public API structs** unless the promoted surface is intentional — it
-commits your API to every exported method of the embedded type, including future additions.
+**Never embed in public API structs** unless the promoted surface is intentional — it commits your API to every exported
+method of the embedded type, including future additions.
 
 Embedding in `internal/` types is lower risk since the API surface is private.
 
@@ -455,8 +452,8 @@ Embedding in `internal/` types is lower risk since the API surface is private.
 Distinguish blocking vs non-blocking lifecycle methods:
 
 - **Run** — blocks until the process completes. Caller controls the goroutine.
-- **Start** — returns immediately, spawns an internal goroutine. Accept
-  `context.Context` as the first parameter for cancellation.
+- **Start** — returns immediately, spawns an internal goroutine. Accept `context.Context` as the first parameter for
+  cancellation.
 
 ```go
 // Run blocks — caller decides concurrency
@@ -491,8 +488,8 @@ func Process(data any) error { ... }
 func Process(data interface{}) error { ... }
 ```
 
-Only use `any` when truly accepting any type (marshaling, formatting). If the set
-of types is known, use generics or concrete types.
+Only use `any` when truly accepting any type (marshaling, formatting). If the set of types is known, use generics or
+concrete types.
 
 ### Type Aliases for Semantics
 
@@ -533,5 +530,5 @@ user-service_internal_test.go # white-box tests (package foo)
 - **`init()`**: avoid unless registering plugins. No I/O, no global state mutation.
 - **Mutable globals**: use dependency injection instead.
 - **Passing `*string` or `*io.Reader`**: pass the value directly — it's already small/ref.
-- **Returning typed nil as interface**: a `(*T)(nil)` assigned to an interface is non-nil.
-  Return explicit `nil` when the function returns an interface type.
+- **Returning typed nil as interface**: a `(*T)(nil)` assigned to an interface is non-nil. Return explicit `nil` when
+  the function returns an interface type.

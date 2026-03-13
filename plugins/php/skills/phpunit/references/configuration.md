@@ -1,8 +1,7 @@
 # Configuration Reference
 
-PHPUnit is configured via `phpunit.xml` (or `phpunit.xml.dist` for version-controlled
-defaults). The XML schema is version-specific:
-`https://schema.phpunit.de/11.5/phpunit.xsd`.
+PHPUnit is configured via `phpunit.xml` (or `phpunit.xml.dist` for version-controlled defaults). The XML schema is
+version-specific: `https://schema.phpunit.de/11.5/phpunit.xsd`.
 
 ## Minimal Configuration
 
@@ -31,25 +30,25 @@ defaults). The XML schema is version-specific:
 
 ## Key `<phpunit>` Attributes
 
-| Attribute | Default | Purpose |
-|-----------|---------|---------|
-| `bootstrap` | — | Autoloader script path |
-| `colors` | `false` | Colored output |
-| `cacheDirectory` | — | Cache dir for test results and coverage analysis |
-| `cacheResult` | `true` | Cache test results for defect/duration ordering |
-| `executionOrder` | `default` | Test order: `default`, `random`, `depends,random`, etc. |
-| `stopOnDefect` | `false` | Stop on first error/failure/warning/risky |
-| `stopOnFailure` | `false` | Stop on first failure |
-| `failOnWarning` | `false` | Treat warnings as CI failures |
-| `failOnRisky` | `false` | Treat risky tests as CI failures |
-| `failOnDeprecation` | `false` | Treat deprecations as CI failures |
-| `failOnNotice` | `false` | Treat notices as CI failures |
-| `beStrictAboutTestsThatDoNotTestAnything` | `true` | Mark assertionless tests risky |
-| `beStrictAboutOutputDuringTests` | `false` | Mark tests with output risky |
-| `beStrictAboutCoverageMetadata` | `false` | Mark tests without coverage attrs risky |
-| `processIsolation` | `false` | Run each test in separate PHP process |
-| `backupGlobals` | `false` | Backup/restore global variables per test |
-| `backupStaticProperties` | `false` | Backup/restore static properties per test |
+| Attribute                                 | Default   | Purpose                                                 |
+| ----------------------------------------- | --------- | ------------------------------------------------------- |
+| `bootstrap`                               | —         | Autoloader script path                                  |
+| `colors`                                  | `false`   | Colored output                                          |
+| `cacheDirectory`                          | —         | Cache dir for test results and coverage analysis        |
+| `cacheResult`                             | `true`    | Cache test results for defect/duration ordering         |
+| `executionOrder`                          | `default` | Test order: `default`, `random`, `depends,random`, etc. |
+| `stopOnDefect`                            | `false`   | Stop on first error/failure/warning/risky               |
+| `stopOnFailure`                           | `false`   | Stop on first failure                                   |
+| `failOnWarning`                           | `false`   | Treat warnings as CI failures                           |
+| `failOnRisky`                             | `false`   | Treat risky tests as CI failures                        |
+| `failOnDeprecation`                       | `false`   | Treat deprecations as CI failures                       |
+| `failOnNotice`                            | `false`   | Treat notices as CI failures                            |
+| `beStrictAboutTestsThatDoNotTestAnything` | `true`    | Mark assertionless tests risky                          |
+| `beStrictAboutOutputDuringTests`          | `false`   | Mark tests with output risky                            |
+| `beStrictAboutCoverageMetadata`           | `false`   | Mark tests without coverage attrs risky                 |
+| `processIsolation`                        | `false`   | Run each test in separate PHP process                   |
+| `backupGlobals`                           | `false`   | Backup/restore global variables per test                |
+| `backupStaticProperties`                  | `false`   | Backup/restore static properties per test               |
 
 ## `<testsuites>` Element
 
@@ -71,8 +70,8 @@ Discovery: files matching `*Test.php` in specified directories.
 
 ## `<source>` Element (PHPUnit 11+)
 
-**Replaces** the old `<coverage><include>` filter. Controls both code coverage filtering
-and deprecation/notice/warning source attribution.
+**Replaces** the old `<coverage><include>` filter. Controls both code coverage filtering and deprecation/notice/warning
+source attribution.
 
 ```xml
 <source restrictDeprecations="true"
@@ -92,8 +91,8 @@ and deprecation/notice/warning source attribution.
 - `restrictNotices="true"` — only report notices from your source code
 - `restrictWarnings="true"` — only report warnings from your source code
 
-**Migration from PHPUnit 10:** move `<include>`/`<exclude>` from `<coverage>` to `<source>`.
-`<coverage>` filter is deprecated in 11, removed in 12.
+**Migration from PHPUnit 10:** move `<include>`/`<exclude>` from `<coverage>` to `<source>`. `<coverage>` filter is
+deprecated in 11, removed in 12.
 
 ## `<coverage>` Element
 
@@ -156,6 +155,7 @@ Include or exclude test groups:
 ## Test Execution Order
 
 Configure via `executionOrder` attribute:
+
 - `default` — declaration order
 - `random` — random order (detects hidden dependencies)
 - `depends,random` — respect `#[Depends]`, randomize the rest

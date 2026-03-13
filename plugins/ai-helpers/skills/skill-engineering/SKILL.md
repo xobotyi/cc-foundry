@@ -8,14 +8,11 @@ description: >-
 
 # Skill Engineering
 
-Skills are prompt templates that extend Claude with domain expertise.
-A skill lives in `skill-name/SKILL.md` with an optional `references/`
-directory for deepening material. SKILL.md must be **behaviorally
-self-sufficient** — an agent reading only SKILL.md, without loading any
-references, must be able to do the job correctly. References provide depth,
-not breadth. Description triggers activation; instructions shape behavior.
-Claude sees only `name` and `description` at startup, then loads full
-SKILL.md content when triggered.
+Skills are prompt templates that extend Claude with domain expertise. A skill lives in `skill-name/SKILL.md` with an
+optional `references/` directory for deepening material. SKILL.md must be **behaviorally self-sufficient** — an agent
+reading only SKILL.md, without loading any references, must be able to do the job correctly. References provide depth,
+not breadth. Description triggers activation; instructions shape behavior. Claude sees only `name` and `description` at
+startup, then loads full SKILL.md content when triggered.
 
 <prerequisite>
 **Skills are prompts.** Before writing or improving a skill, invoke
@@ -26,38 +23,39 @@ Skill(ai-helpers:prompt-engineering)
 ```
 
 Skip only for trivial edits (typos, formatting).
+
 </prerequisite>
 
 ## Route to Reference
 
-| Situation | Reference | Contents |
-|-----------|-----------|----------|
-| SKILL.md format, frontmatter rules, directory layout | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | Frontmatter fields, name rules, string substitutions, progressive disclosure mechanics, discovery/precedence, instruction budget |
-| Creating a skill from scratch | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Step-by-step creation workflow, scope sizing guidance, evaluation-driven development process, archetype deep dives with extended structural patterns |
-| Evaluating skill quality (review, audit) | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Scoring rubric (5 dimensions), evaluation-driven development, testing protocol, common issues by score range |
-| Skill not triggering, wrong output, refinement | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Activation fixes, output fixes, restructuring, splitting guidance |
-| Multi-file skills, scripts, subagents, hooks | [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] | Fork pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping |
-| Debugging activation failures, script errors | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] | Diagnostic steps for structure, activation reliability, output, script, reference issues |
-| Writing persuasive instructions, reasoning | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | CoT trade-off research and decision rules, instruction strengthening escalation patterns, format control techniques, security blocks, debugging instruction failures |
+| Situation                                            | Reference                                               | Contents                                                                                                                                                             |
+| ---------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SKILL.md format, frontmatter rules, directory layout | [`${CLAUDE_SKILL_DIR}/references/spec.md`]              | Frontmatter fields, name rules, string substitutions, progressive disclosure mechanics, discovery/precedence, instruction budget                                     |
+| Creating a skill from scratch                        | [`${CLAUDE_SKILL_DIR}/references/creation.md`]          | Step-by-step creation workflow, scope sizing guidance, evaluation-driven development process, archetype deep dives with extended structural patterns                 |
+| Evaluating skill quality (review, audit)             | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`]        | Scoring rubric (5 dimensions), evaluation-driven development, testing protocol, common issues by score range                                                         |
+| Skill not triggering, wrong output, refinement       | [`${CLAUDE_SKILL_DIR}/references/iteration.md`]         | Activation fixes, output fixes, restructuring, splitting guidance                                                                                                    |
+| Multi-file skills, scripts, subagents, hooks         | [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] | Fork pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping                                                                |
+| Debugging activation failures, script errors         | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`]   | Diagnostic steps for structure, activation reliability, output, script, reference issues                                                                             |
+| Writing persuasive instructions, reasoning           | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | CoT trade-off research and decision rules, instruction strengthening escalation patterns, format control techniques, security blocks, debugging instruction failures |
 
 Read the relevant reference before proceeding.
 
 ## Description Formula
 
-The description determines when Claude activates your skill. It's the
-highest-leverage field — poor descriptions cause missed activations.
+The description determines when Claude activates your skill. It's the highest-leverage field — poor descriptions cause
+missed activations.
 
 ```
 [What it does] + [When to invoke — broad domain claim with trigger examples]
 ```
 
-- **What it does** — Functional description of the skill's purpose.
-  State what the skill covers concretely, not a slogan or tagline.
-- **When to invoke** — "Invoke whenever task involves any interaction
-  with X." Claims the domain broadly, then lists specific triggers
-  as examples under the broad claim.
+- **What it does** — Functional description of the skill's purpose. State what the skill covers concretely, not a slogan
+  or tagline.
+- **When to invoke** — "Invoke whenever task involves any interaction with X." Claims the domain broadly, then lists
+  specific triggers as examples under the broad claim.
 
 **Good — functional description + broad claim:**
+
 ```yaml
 description: >-
   Go language conventions, idioms, and toolchain. Invoke when task
@@ -66,6 +64,7 @@ description: >-
 ```
 
 **Good — what it does + when with trigger keywords:**
+
 ```yaml
 description: >-
   Design and iterate Claude Code skills: SKILL.md structure,
@@ -76,11 +75,13 @@ description: >-
 ```
 
 **Bad — vague, no trigger surface:**
+
 ```yaml
 description: Helps with documents
 ```
 
 **Bad — slogan instead of functional description:**
+
 ```yaml
 description: >-
   Speed and simplicity over compatibility layers: Bun runtime
@@ -88,6 +89,7 @@ description: >-
 ```
 
 **Bad — narrow verb list instead of domain claim:**
+
 ```yaml
 description: >-
   Skills for Claude Code. Invoke when creating, editing, debugging,
@@ -96,73 +98,59 @@ description: >-
 
 ### Principles
 
-- **Lead with function, not slogans.** The first sentence must describe
-  what the skill covers. "Node.js runtime conventions, APIs, and
-  ecosystem patterns" — not "Async-first, event-driven". Slogans waste
-  description tokens on zero activation value.
-- **Claim broadly, then list specifics.** "Invoke whenever task involves
-  any interaction with X — creating, editing, debugging" beats "Invoke
-  when creating, editing, or debugging X."
-- **Aggressive triggering, graceful de-escalation.** Better to trigger
-  and de-escalate inside the skill than to miss activations. Native
-  skill activation is unreliable — measured at 20-50% without enforcement
-  hooks. Well-written descriptions improve odds but don't guarantee
-  activation. Design skills to be useful when loaded, not to depend on
+- **Lead with function, not slogans.** The first sentence must describe what the skill covers. "Node.js runtime
+  conventions, APIs, and ecosystem patterns" — not "Async-first, event-driven". Slogans waste description tokens on zero
+  activation value.
+- **Claim broadly, then list specifics.** "Invoke whenever task involves any interaction with X — creating, editing,
+  debugging" beats "Invoke when creating, editing, or debugging X."
+- **Aggressive triggering, graceful de-escalation.** Better to trigger and de-escalate inside the skill than to miss
+  activations. Native skill activation is unreliable — measured at 20-50% without enforcement hooks. Well-written
+  descriptions improve odds but don't guarantee activation. Design skills to be useful when loaded, not to depend on
   perfect auto-activation.
-- **Skill dependencies belong in SKILL.md body, not descriptions.**
-  Prerequisites like "load prompt-engineering first" are handled by the
-  skill body — putting them in descriptions wastes trigger space.
-- **Philosophy belongs in SKILL.md body.** If a skill has a guiding
-  principle ("simplicity over cleverness"), put it as the opening
-  statement in SKILL.md where it shapes behavior — not in the description
-  where it wastes trigger space.
+- **Skill dependencies belong in SKILL.md body, not descriptions.** Prerequisites like "load prompt-engineering first"
+  are handled by the skill body — putting them in descriptions wastes trigger space.
+- **Philosophy belongs in SKILL.md body.** If a skill has a guiding principle ("simplicity over cleverness"), put it as
+  the opening statement in SKILL.md where it shapes behavior — not in the description where it wastes trigger space.
 
 ## Content Architecture
 
-SKILL.md must be **behaviorally self-sufficient**. An agent reading only
-SKILL.md — without loading any references — must be able to do the job
-correctly. References provide depth, not breadth.
+SKILL.md must be **behaviorally self-sufficient**. An agent reading only SKILL.md — without loading any references —
+must be able to do the job correctly. References provide depth, not breadth.
 
 This applies to all skill types, not just coding disciplines.
 
 ### What Goes Where
 
-| Content Type | Location | Rationale |
-|---|---|---|
-| **Behavioral rules** | SKILL.md body | Agent must follow these during work — can't afford a missed reference read |
-| **Catalog/lookup content** | references/ | Agent reads on-demand for specific lookups (API tables, comparison charts) |
-| **Situational content** | references/ | Only needed in specific phases (migration guides, deployment patterns) |
-| **Voluminous structural content** | references/ | Too large to inline, inherently lookup-oriented (schemas, 50+ entry tables) |
+| Content Type                      | Location      | Rationale                                                                   |
+| --------------------------------- | ------------- | --------------------------------------------------------------------------- |
+| **Behavioral rules**              | SKILL.md body | Agent must follow these during work — can't afford a missed reference read  |
+| **Catalog/lookup content**        | references/   | Agent reads on-demand for specific lookups (API tables, comparison charts)  |
+| **Situational content**           | references/   | Only needed in specific phases (migration guides, deployment patterns)      |
+| **Voluminous structural content** | references/   | Too large to inline, inherently lookup-oriented (schemas, 50+ entry tables) |
 
-Behavioral rules are directives an agent must follow to do the work correctly.
-If an agent skipping a reference would produce wrong output, that content is
-behavioral and belongs in SKILL.md.
+Behavioral rules are directives an agent must follow to do the work correctly. If an agent skipping a reference would
+produce wrong output, that content is behavioral and belongs in SKILL.md.
 
 ### Working-Resolution / High-Resolution
 
 When a reference contains both rules and depth, use a two-resolution split:
 
-- **SKILL.md** — working-resolution: the thesis, core rules, summary that
-  enables correct behavior
-- **references/** — high-resolution: detailed rubrics, extended examples,
-  full catalogs, edge case coverage
+- **SKILL.md** — working-resolution: the thesis, core rules, summary that enables correct behavior
+- **references/** — high-resolution: detailed rubrics, extended examples, full catalogs, edge case coverage
 
 The agent works correctly at working resolution. References let it zoom in.
 
-**Example:** A quality assessment skill puts a 6-row checklist with criteria
-and weights in SKILL.md. The reference provides detailed 0-20 scoring rubrics
-for each criterion with examples at each level.
+**Example:** A quality assessment skill puts a 6-row checklist with criteria and weights in SKILL.md. The reference
+provides detailed 0-20 scoring rubrics for each criterion with examples at each level.
 
-**Example:** A Node.js skill puts 17 module system rules in SKILL.md.
-The reference provides ESM/CJS comparison tables, file extension edge cases,
-and interop patterns.
+**Example:** A Node.js skill puts 17 module system rules in SKILL.md. The reference provides ESM/CJS comparison tables,
+file extension edge cases, and interop patterns.
 
 ### Route-to-Reference Tables
 
-When a skill has references, include a route table with a **Contents** column
-describing what type of depth the reference provides. Use `$\{CLAUDE_SKILL_DIR\}`
-for all reference paths — it resolves to the skill's absolute directory at load
-time, so the agent sees unambiguous paths it can pass directly to the Read tool.
+When a skill has references, include a route table with a **Contents** column describing what type of depth the
+reference provides. Use `$\{CLAUDE_SKILL_DIR\}` for all reference paths — it resolves to the skill's absolute directory
+at load time, so the agent sees unambiguous paths it can pass directly to the Read tool.
 
 ```markdown
 | Topic | Reference | Contents |
@@ -171,9 +159,8 @@ time, so the agent sees unambiguous paths it can pass directly to the Read tool.
 | Streams | `$\{CLAUDE_SKILL_DIR\}/references/streams.md` | Stream types table, pipeline patterns, backpressure |
 ```
 
-The Contents column tells the agent what's inside, enabling informed read
-decisions. Without it, agents either over-read (wasting context) or skip
-(missing content).
+The Contents column tells the agent what's inside, enabling informed read decisions. Without it, agents either over-read
+(wasting context) or skip (missing content).
 
 ## Writing Instructions
 
@@ -183,95 +170,82 @@ Skills are prompts. Apply prompt engineering fundamentals.
 
 Match instruction specificity to task fragility:
 
-- **High freedom** (text guidance) — multiple approaches are valid, decisions
-  depend on context. "Analyze the code structure and suggest improvements."
-- **Medium freedom** (pseudocode/templates) — a preferred pattern exists but
-  some variation is acceptable. Provide a template with customizable parameters.
-- **Low freedom** (exact scripts) — operations are fragile, consistency is
-  critical, a specific sequence must be followed. "Run exactly this script.
-  Do not modify the command."
+- **High freedom** (text guidance) — multiple approaches are valid, decisions depend on context. "Analyze the code
+  structure and suggest improvements."
+- **Medium freedom** (pseudocode/templates) — a preferred pattern exists but some variation is acceptable. Provide a
+  template with customizable parameters.
+- **Low freedom** (exact scripts) — operations are fragile, consistency is critical, a specific sequence must be
+  followed. "Run exactly this script. Do not modify the command."
 
-Think of it as a bridge vs. an open field: narrow bridge with cliffs needs
-exact guardrails (low freedom); open field needs general direction (high freedom).
+Think of it as a bridge vs. an open field: narrow bridge with cliffs needs exact guardrails (low freedom); open field
+needs general direction (high freedom).
 
 ### Declarative vs Procedural
 
 Choose instruction style based on what the content demands:
 
-- **Declarative** (bullet-list rules, constraints, conventions) — for
-  behavioral boundaries, coding conventions, safety guardrails, formatting
-  rules. Models utilize factual constraints more reliably across varied
-  inputs. Use for the majority of skill content.
-- **Procedural** (numbered steps, workflows) — for tasks with strict
-  ordering requirements, multi-step agent workflows, simple sequential
-  processes. Cap at ~10-15 steps per sequence; decompose beyond that into
-  sub-procedures (Hierarchical Task Networks).
+- **Declarative** (bullet-list rules, constraints, conventions) — for behavioral boundaries, coding conventions, safety
+  guardrails, formatting rules. Models utilize factual constraints more reliably across varied inputs. Use for the
+  majority of skill content.
+- **Procedural** (numbered steps, workflows) — for tasks with strict ordering requirements, multi-step agent workflows,
+  simple sequential processes. Cap at ~10-15 steps per sequence; decompose beyond that into sub-procedures (Hierarchical
+  Task Networks).
 
-**Default to declarative.** Research shows declarative knowledge provides
-greater performance benefits than procedural in the majority of tasks.
-Reserve numbered steps for workflows where order genuinely matters.
+**Default to declarative.** Research shows declarative knowledge provides greater performance benefits than procedural
+in the majority of tasks. Reserve numbered steps for workflows where order genuinely matters.
 
 ### Instruction Placement
 
-Models follow a **U-shaped attention curve**: instructions at the beginning
-and end of a document are followed most reliably; middle content suffers
-from attention decay.
+Models follow a **U-shaped attention curve**: instructions at the beginning and end of a document are followed most
+reliably; middle content suffers from attention decay.
 
 - **Top 20% (primacy zone):** Identity, philosophy, critical constraints
 - **Middle:** Detailed rules by topic, route table, examples
 - **Bottom 20% (recency zone):** Reinforced critical rules, quality checks
 
-**Dual-placement strategy:** For rules that absolutely must be followed,
-state them near the top AND reinforce at the end. Use different phrasing —
-frame as a principle at the top, as a checklist item at the bottom.
+**Dual-placement strategy:** For rules that absolutely must be followed, state them near the top AND reinforce at the
+end. Use different phrasing — frame as a principle at the top, as a checklist item at the bottom.
 
 ### Every Instruction Must Earn Its Place
 
-Research shows unnecessary requirements reduce task success even when the
-model can follow them. Every instruction competes for attention. Before
-adding a rule, verify the model's default behavior is insufficient — if
-deleting the rule doesn't change output quality, remove it.
+Research shows unnecessary requirements reduce task success even when the model can follow them. Every instruction
+competes for attention. Before adding a rule, verify the model's default behavior is insufficient — if deleting the rule
+doesn't change output quality, remove it.
 
-This does not mean minimize everything — skills exist to add rules the
-model doesn't know. It means: don't add rules for things the model already
-does well. When auditing a skill, apply the deletion test: "if I remove
-this rule, does output quality measurably change?"
+This does not mean minimize everything — skills exist to add rules the model doesn't know. It means: don't add rules for
+things the model already does well. When auditing a skill, apply the deletion test: "if I remove this rule, does output
+quality measurably change?"
 
 ### Numbered Lists vs Bullet Lists
 
-- **Numbered lists** — ONLY for sequential steps where order matters:
-  "1. Read input → 2. Validate → 3. Output"
-- **Bullet lists** — for rules, directives, and conventions where there is
-  no ordering: "- Use ESM. - Use `node:` prefix..."
+- **Numbered lists** — ONLY for sequential steps where order matters: "1. Read input → 2. Validate → 3. Output"
+- **Bullet lists** — for rules, directives, and conventions where there is no ordering: "- Use ESM. - Use `node:`
+  prefix..."
 
 If the items can be reordered without changing meaning, use bullets.
 
 ### State Rules as Positive Directives
 
-Place rules in the body section where they're contextually relevant. State
-them as positive directives: "Use `pipeline()` for stream composition" — not
-"Don't use `.pipe()`" in a separate anti-pattern table. Separate anti-pattern
+Place rules in the body section where they're contextually relevant. State them as positive directives: "Use
+`pipeline()` for stream composition" — not "Don't use `.pipe()`" in a separate anti-pattern table. Separate anti-pattern
 tables duplicate body content and waste tokens.
 
-Keep an anti-pattern table only when the "don't" side is genuinely non-obvious
-from the positive rule (e.g., common migration pitfalls in a version upgrade
-skill where users carry muscle memory from the old version).
+Keep an anti-pattern table only when the "don't" side is genuinely non-obvious from the positive rule (e.g., common
+migration pitfalls in a version upgrade skill where users carry muscle memory from the old version).
 
 ## Skill Archetypes
 
 ### Workflow Skill
 
-Sequential phases with clear inputs/outputs and checkpoints. The SKILL.md
-contains the complete workflow; references provide detailed rubrics, templates,
-or extended checklists. Example: a CLAUDE.md auditor with discover → assess →
+Sequential phases with clear inputs/outputs and checkpoints. The SKILL.md contains the complete workflow; references
+provide detailed rubrics, templates, or extended checklists. Example: a CLAUDE.md auditor with discover → assess →
 report → update phases.
 
 ### Knowledge Skill
 
-Complete specification for a tool, format, or API. Everything inline — the
-agent needs the full spec to do the work. References are rare; when present,
-they hold example collections. Example: a hookify rule-writing skill containing
-the entire rule syntax (~300 lines, no references).
+Complete specification for a tool, format, or API. Everything inline — the agent needs the full spec to do the work.
+References are rare; when present, they hold example collections. Example: a hookify rule-writing skill containing the
+entire rule syntax (~300 lines, no references).
 
 ### Coding Discipline Skill
 
@@ -290,11 +264,10 @@ Conventions and rules for a language, framework, or platform. Structure:
 ```
 
 Key patterns:
-- **Philosophy bookends** — opening statement frames the skill's values;
-  closing maxim reinforces
+
+- **Philosophy bookends** — opening statement frames the skill's values; closing maxim reinforces
 - **Declarative rules as bullet lists** per topic (8-17 rules is typical)
-- **Application section** — "when writing: apply silently; when reviewing:
-  cite violation, show fix inline"
+- **Application section** — "when writing: apply silently; when reviewing: cite violation, show fix inline"
 - **Integration section** — names related skills and their boundaries
 
 ## Quick Templates
@@ -350,26 +323,22 @@ description: >-
 
 ## Critical Rules
 
-- **Deletion test before adding.** Every rule competes for attention. Before
-  adding a rule to a skill, verify the model's default behavior is insufficient.
-  If removing the rule doesn't change output quality, it shouldn't exist.
+- **Deletion test before adding.** Every rule competes for attention. Before adding a rule to a skill, verify the
+  model's default behavior is insufficient. If removing the rule doesn't change output quality, it shouldn't exist.
 
-- **References must not duplicate SKILL.md.** If a reference restates rules
-  already in SKILL.md body, it wastes tokens and creates maintenance burden.
-  References provide genuinely different depth: detailed rubrics, extended
-  examples, full catalogs, comparison tables, edge case coverage.
+- **References must not duplicate SKILL.md.** If a reference restates rules already in SKILL.md body, it wastes tokens
+  and creates maintenance burden. References provide genuinely different depth: detailed rubrics, extended examples,
+  full catalogs, comparison tables, edge case coverage.
 
-- **Description is activation, not documentation.** Every token in the
-  description must increase activation probability. Slogans, philosophy,
-  cross-skill dependencies, and filler verbs ("understanding", "assisting")
-  have zero activation value.
+- **Description is activation, not documentation.** Every token in the description must increase activation probability.
+  Slogans, philosophy, cross-skill dependencies, and filler verbs ("understanding", "assisting") have zero activation
+  value.
 
-- **Declarative by default.** Use numbered steps only for workflows with
-  strict ordering. Bullet-list rules for everything else. If the items can
-  be reordered without changing meaning, use bullets.
+- **Declarative by default.** Use numbered steps only for workflows with strict ordering. Bullet-list rules for
+  everything else. If the items can be reordered without changing meaning, use bullets.
 
-- **One skill, one purpose.** If scope creeps, split. Broad skills produce
-  mediocre results because instructions compete for attention.
+- **One skill, one purpose.** If scope creeps, split. Broad skills produce mediocre results because instructions compete
+  for attention.
 
 ## Quick Checks
 

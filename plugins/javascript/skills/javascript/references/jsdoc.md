@@ -1,11 +1,9 @@
 # JSDoc for JavaScript
 
-Type annotations for pure JavaScript projects using JSDoc comments. These
-annotations are understood by TypeScript's `checkJs` mode, VS Code IntelliSense,
-and other tooling without requiring a TypeScript compilation step.
+Type annotations for pure JavaScript projects using JSDoc comments. These annotations are understood by TypeScript's
+`checkJs` mode, VS Code IntelliSense, and other tooling without requiring a TypeScript compilation step.
 
-For TypeScript projects, use native TS syntax instead — this reference is for
-`.js` files only.
+For TypeScript projects, use native TS syntax instead — this reference is for `.js` files only.
 
 ## Core Tags
 
@@ -25,8 +23,7 @@ const cache = new Map();
 let result = null;
 ```
 
-Use full TypeScript type syntax inside JSDoc types — unions, generics, tuples,
-and utility types all work.
+Use full TypeScript type syntax inside JSDoc types — unions, generics, tuples, and utility types all work.
 
 ### `@param` and `@returns` — Annotate Functions
 
@@ -40,8 +37,7 @@ and utility types all work.
 async function getUser(id, options) { ... }
 ```
 
-Optional parameters use square brackets: `@param {string} [name]` or
-`@param {string} [name="default"]`.
+Optional parameters use square brackets: `@param {string} [name]` or `@param {string} [name="default"]`.
 
 Nested object properties use dot notation:
 
@@ -205,8 +201,7 @@ const Status = {
 };
 ```
 
-JSDoc enums are object literals with typed values — simpler than TypeScript
-enums but sufficient for many use cases.
+JSDoc enums are object literals with typed values — simpler than TypeScript enums but sufficient for many use cases.
 
 ## Documentation Tags
 
@@ -223,14 +218,11 @@ function oldFunction() { ... }
 
 ## Best Practices
 
-- **Annotate public API boundaries** — exported functions, classes, and
-  module-level variables. Internal/private code often needs fewer annotations
-  because types flow from context.
-- **Prefer inline TypeScript syntax** in JSDoc types: `{string | number}`
-  over `{(string|number)}`.
-- **Use `@typedef` for shared shapes** — define once near the top of the file
-  or in a dedicated `types.js` file, then reference with `@type`.
-- **Enable `// @ts-check`** at the top of files (or `checkJs` in
-  `jsconfig.json`) to get type errors in your editor.
-- **Don't annotate the obvious** — if `const x = 5` is clearly a number,
-  skip the `@type`. Annotate when types are ambiguous or at API boundaries.
+- **Annotate public API boundaries** — exported functions, classes, and module-level variables. Internal/private code
+  often needs fewer annotations because types flow from context.
+- **Prefer inline TypeScript syntax** in JSDoc types: `{string | number}` over `{(string|number)}`.
+- **Use `@typedef` for shared shapes** — define once near the top of the file or in a dedicated `types.js` file, then
+  reference with `@type`.
+- **Enable `// @ts-check`** at the top of files (or `checkJs` in `jsconfig.json`) to get type errors in your editor.
+- **Don't annotate the obvious** — if `const x = 5` is clearly a number, skip the `@type`. Annotate when types are
+  ambiguous or at API boundaries.

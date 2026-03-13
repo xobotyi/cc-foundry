@@ -9,18 +9,16 @@ description: >-
 
 # Handoff
 
-A handoff document is a prompt — an instruction set for the receiving agent. Triage
-your context into a structured, information-dense transfer document that preserves
-high-value state and drops noise.
+A handoff document is a prompt — an instruction set for the receiving agent. Triage your context into a structured,
+information-dense transfer document that preserves high-value state and drops noise.
 
 ## Mode
 
 Two modes, determined by who receives the handoff:
 
-- **Self** — receiver shares project knowledge. Task state, decisions, remaining work.
-  Minimal codebase orientation.
-- **Teammate** — receiver may lack project context. Adds codebase orientation,
-  skill/tool recommendations, and convention pointers.
+- **Self** — receiver shares project knowledge. Task state, decisions, remaining work. Minimal codebase orientation.
+- **Teammate** — receiver may lack project context. Adds codebase orientation, skill/tool recommendations, and
+  convention pointers.
 
 If the user doesn't specify, ask.
 
@@ -122,15 +120,13 @@ After generating the handoff, verify:
 - [ ] No raw tool output or intermediate exploration leaked in
 - [ ] Document is under 2000 tokens
 
-If Decisions or Remaining Work is empty when work was done, the triage missed
-something. Re-examine the conversation.
+If Decisions or Remaining Work is empty when work was done, the triage missed something. Re-examine the conversation.
 
 ## Critical Rules
 
-- **No information gathering.** Read only from context already in the conversation.
-  Do not fetch files, search code, or query memory — context may be nearly full.
-- **Rationale with every decision.** A decision without rationale forces re-derivation
-  or blind trust.
-- **Identifiers, not descriptions.** "PR #247" not "the pull request we opened."
-  "src/auth/middleware.ts:42" not "the auth file around line 42."
+- **No information gathering.** Read only from context already in the conversation. Do not fetch files, search code, or
+  query memory — context may be nearly full.
+- **Rationale with every decision.** A decision without rationale forces re-derivation or blind trust.
+- **Identifiers, not descriptions.** "PR #247" not "the pull request we opened." "src/auth/middleware.ts:42" not "the
+  auth file around line 42."
 - **The document is standalone.** The receiver has no access to this conversation.

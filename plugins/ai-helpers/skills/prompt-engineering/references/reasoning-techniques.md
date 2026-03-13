@@ -13,16 +13,13 @@ Deep dive into techniques that enhance LLM reasoning capabilities.
 
 ## Chain-of-Thought (CoT)
 
-CoT prompting guides models through step-by-step reasoning rather than
-jumping directly to answers. It emerged from observing that larger models
-can "think out loud" — and this explicit reasoning improves accuracy on
-complex tasks.
+CoT prompting guides models through step-by-step reasoning rather than jumping directly to answers. It emerged from
+observing that larger models can "think out loud" — and this explicit reasoning improves accuracy on complex tasks.
 
 ### Why It Works
 
-Models trained on massive datasets have learned reasoning patterns, but
-standard prompting doesn't activate them. CoT explicitly requests the
-intermediate steps, providing:
+Models trained on massive datasets have learned reasoning patterns, but standard prompting doesn't activate them. CoT
+explicitly requests the intermediate steps, providing:
 
 - **Grounding** — each step anchors the next
 - **Error detection** — flawed logic becomes visible
@@ -30,14 +27,12 @@ intermediate steps, providing:
 
 ### Variants
 
-**Zero-shot CoT**
-Simply append "Let's think step by step" or "Explain your reasoning."
-No examples needed. Works when model has sufficient domain knowledge.
+**Zero-shot CoT** Simply append "Let's think step by step" or "Explain your reasoning." No examples needed. Works when
+model has sufficient domain knowledge.
 
-The phrase "Let's think step by step" was discovered by Kojima et al.
-(2022) to unlock reasoning without examples. APE (Zhou et al., 2022)
-later found "Let's work this out in a step by step way to be sure we
-have the right answer" performs even better on some benchmarks.
+The phrase "Let's think step by step" was discovered by Kojima et al. (2022) to unlock reasoning without examples. APE
+(Zhou et al., 2022) later found "Let's work this out in a step by step way to be sure we have the right answer" performs
+even better on some benchmarks.
 
 ```
 Q: A bat and ball cost $1.10 total. The bat costs $1.00 more than
@@ -46,8 +41,7 @@ Q: A bat and ball cost $1.10 total. The bat costs $1.00 more than
 Think through this step by step.
 ```
 
-**Few-shot CoT**
-Provide examples that demonstrate the reasoning pattern:
+**Few-shot CoT** Provide examples that demonstrate the reasoning pattern:
 
 ```
 Q: There are 15 trees. Loggers cut down 3, then plant 5 more.
@@ -62,28 +56,27 @@ Q: [Your problem here]
 A: Let me work through this...
 ```
 
-**Auto-CoT** (Zhang et al., 2022)
-Automatically generate reasoning chains without manual effort:
+**Auto-CoT** (Zhang et al., 2022) Automatically generate reasoning chains without manual effort:
 
-1. **Question clustering:** Partition questions into clusters by
-   similarity
+1. **Question clustering:** Partition questions into clusters by similarity
 2. **Demo sampling:** For each cluster, select representative question
 3. **Chain generation:** Use zero-shot CoT to generate reasoning chain
-4. **Heuristic filtering:** Keep chains with reasonable length (~60
-   tokens) and step count (~5 steps) to ensure quality
+4. **Heuristic filtering:** Keep chains with reasonable length (~60 tokens) and step count (~5 steps) to ensure quality
 
-This eliminates hand-crafting while maintaining diversity. Simple
-heuristics filter out complex or error-prone demonstrations.
+This eliminates hand-crafting while maintaining diversity. Simple heuristics filter out complex or error-prone
+demonstrations.
 
 ### When to Use CoT
 
 **Effective for:**
+
 - Arithmetic and math word problems
 - Multi-step logical reasoning
 - Commonsense reasoning requiring inference
 - Tasks where "showing work" matters
 
 **Less effective for:**
+
 - Simple factual recall
 - Tasks with no clear reasoning steps
 - Creative generation (may over-constrain)
@@ -99,63 +92,57 @@ heuristics filter out complex or error-prone demonstrations.
 
 ## Tree-of-Thoughts (ToT)
 
-ToT extends CoT by exploring multiple reasoning paths simultaneously,
-evaluating branches, and backtracking when paths fail. It mimics how
-humans solve complex problems — considering alternatives, not just
-following one thread.
+ToT extends CoT by exploring multiple reasoning paths simultaneously, evaluating branches, and backtracking when paths
+fail. It mimics how humans solve complex problems — considering alternatives, not just following one thread.
 
 ### Core Components
 
-**1. Thought Decomposition**
-Break the problem into atomic reasoning units. Size matters:
+**1. Thought Decomposition** Break the problem into atomic reasoning units. Size matters:
+
 - Too large → can't evaluate properly
 - Too small → overhead without benefit
 
-For a planning task, a "thought" might be one decision point.
-For math, it might be one equation transformation.
+For a planning task, a "thought" might be one decision point. For math, it might be one equation transformation.
 
 **2. Thought Generation**
 
-*Sampling:* Generate multiple independent thoughts from the same state.
-Good when solution space is diverse.
+_Sampling:_ Generate multiple independent thoughts from the same state. Good when solution space is diverse.
 
-*Proposing:* Generate thoughts sequentially, each building on previous.
-Good when thoughts must be consistent.
+_Proposing:_ Generate thoughts sequentially, each building on previous. Good when thoughts must be consistent.
 
 **3. State Evaluation**
 
-*Value-based:* Score each state numerically (1-10) or categorically
-(promising / uncertain / dead-end).
+_Value-based:_ Score each state numerically (1-10) or categorically (promising / uncertain / dead-end).
 
-*Vote-based:* Compare multiple candidates, select best by consensus.
+_Vote-based:_ Compare multiple candidates, select best by consensus.
 
 **4. Search Strategy**
 
-*Breadth-First (BFS):* Explore all branches at current depth before
-going deeper. Find shortest solution path.
+_Breadth-First (BFS):_ Explore all branches at current depth before going deeper. Find shortest solution path.
 
-*Depth-First (DFS):* Follow one branch deeply before backtracking.
-Thorough exploration of each possibility.
+_Depth-First (DFS):_ Follow one branch deeply before backtracking. Thorough exploration of each possibility.
 
 ### ToT vs CoT
 
-| Aspect | CoT | ToT |
-|--------|-----|-----|
-| Paths explored | Single | Multiple |
-| Backtracking | No | Yes |
-| Evaluation | End only | Each step |
-| Complexity | Lower | Higher |
-| Best for | Clear problems | Exploratory problems |
+| Aspect         | CoT            | ToT                  |
+| -------------- | -------------- | -------------------- |
+| Paths explored | Single         | Multiple             |
+| Backtracking   | No             | Yes                  |
+| Evaluation     | End only       | Each step            |
+| Complexity     | Lower          | Higher               |
+| Best for       | Clear problems | Exploratory problems |
 
 ### When to Use ToT
 
 **Ideal for:**
+
 - Puzzles (sudoku, crosswords)
 - Strategic planning
 - Creative writing with multiple valid directions
 - Problems where initial choices constrain later options
 
 **Avoid when:**
+
 - Problem has obvious linear solution
 - Computational budget is tight
 - Speed matters more than optimality
@@ -176,8 +163,7 @@ Thorough exploration of each possibility.
 
 ## Self-Consistency
 
-Instead of taking the first answer, sample multiple reasoning paths
-and select the most frequent conclusion.
+Instead of taking the first answer, sample multiple reasoning paths and select the most frequent conclusion.
 
 ### Mechanism
 
@@ -209,11 +195,13 @@ Majority: 42 (4/5 agreement)
 ### Trade-offs
 
 **Pros:**
+
 - Significant accuracy boost on reasoning tasks
 - Simple to implement
 - No additional training needed
 
 **Cons:**
+
 - Multiplies inference cost (N runs)
 - Only helps when multiple paths to correct answer exist
 - Doesn't help if model consistently makes same error
@@ -229,28 +217,30 @@ Majority: 42 (4/5 agreement)
 
 ## Extended Thinking
 
-A distinct reasoning mode where Claude receives a dedicated "thinking
-budget" separate from output tokens. Different from standard CoT.
+A distinct reasoning mode where Claude receives a dedicated "thinking budget" separate from output tokens. Different
+from standard CoT.
 
 ### How It Differs from CoT
 
-| Aspect | Standard CoT | Extended Thinking |
-|--------|--------------|-------------------|
-| Activation | Prompt ("think step by step") | API parameter |
-| Token budget | Shared with output | Dedicated thinking budget |
-| Prompting style | Prescriptive steps work well | High-level guidance better |
-| Prefilling | Supported | Not supported |
-| Visibility | Thinking in output | Thinking separate from output |
+| Aspect          | Standard CoT                  | Extended Thinking             |
+| --------------- | ----------------------------- | ----------------------------- |
+| Activation      | Prompt ("think step by step") | API parameter                 |
+| Token budget    | Shared with output            | Dedicated thinking budget     |
+| Prompting style | Prescriptive steps work well  | High-level guidance better    |
+| Prefilling      | Supported                     | Not supported                 |
+| Visibility      | Thinking in output            | Thinking separate from output |
 
 ### When to Use Extended Thinking
 
 **Ideal for:**
+
 - Complex STEM problems (math, physics, programming)
 - Constraint optimization (many competing requirements)
 - Strategic planning with frameworks
 - Problems requiring exploration of multiple approaches
 
 **Use standard CoT instead when:**
+
 - Problem is straightforward
 - Budget is constrained
 - Need to prefill response
@@ -259,6 +249,7 @@ budget" separate from output tokens. Different from standard CoT.
 ### Prompting Strategy
 
 **Standard CoT (prescriptive works):**
+
 ```
 Think through this step by step:
 1. First, identify the variables
@@ -267,13 +258,14 @@ Think through this step by step:
 ```
 
 **Extended thinking (high-level better):**
+
 ```
 Please think about this thoroughly. Consider multiple approaches.
 Try different methods if your first approach doesn't work.
 ```
 
-With extended thinking, Claude's creativity in approaching problems
-often exceeds human-prescribed step-by-step guidance.
+With extended thinking, Claude's creativity in approaching problems often exceeds human-prescribed step-by-step
+guidance.
 
 ### Technical Requirements
 
@@ -295,18 +287,17 @@ Fix any issues you find.
 
 This significantly improves correctness on coding and math tasks.
 
-See [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] for full extended
-thinking guidance.
+See [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] for full extended thinking guidance.
 
 ---
 
 ## Model Scale Note
 
-CoT and related reasoning techniques are **emergent abilities** — they
-appear only in sufficiently large models. Wei et al. (2022) showed CoT
-provides no benefit for small models and can even hurt performance.
+CoT and related reasoning techniques are **emergent abilities** — they appear only in sufficiently large models. Wei et
+al. (2022) showed CoT provides no benefit for small models and can even hurt performance.
 
 Rule of thumb: If a model struggles with CoT, try:
+
 - Simpler prompts (zero-shot)
 - More examples (few-shot without CoT)
 - Larger model

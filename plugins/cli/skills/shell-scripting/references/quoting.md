@@ -1,8 +1,7 @@
 # Quoting
 
-Quoting is the #1 source of shell scripting bugs. Unquoted expansions undergo
-word splitting and globbing — two implicit transformations that silently break
-filenames with spaces, glob characters, or special characters.
+Quoting is the #1 source of shell scripting bugs. Unquoted expansions undergo word splitting and globbing — two implicit
+transformations that silently break filenames with spaces, glob characters, or special characters.
 
 ## The Three Quoting Mechanisms
 
@@ -16,8 +15,7 @@ echo 'Backslash: \'         # error: cannot include single quote
 echo 'He said "hello"'     # He said "hello"
 ```
 
-A single quote cannot appear inside single quotes. Use `$'...'` or
-concatenation:
+A single quote cannot appear inside single quotes. Use `$'...'` or concatenation:
 
 ```bash
 echo 'can'\''t'            # can't (end quote, escaped quote, start quote)
@@ -27,6 +25,7 @@ echo $'can\'t'             # can't (ANSI-C quoting, bash extension)
 ### Double Quotes
 
 Preserve most characters literally, but allow these expansions:
+
 - `$variable` and `${variable}` — parameter expansion
 - `$(command)` — command substitution
 - `$(( expr ))` — arithmetic expansion
@@ -54,8 +53,8 @@ $'\u0041' # unicode: A (bash 4.4+)
 
 ## Word Splitting
 
-When a variable or command substitution is **unquoted**, the shell splits the
-result into words using characters in `$IFS` (default: space, tab, newline).
+When a variable or command substitution is **unquoted**, the shell splits the result into words using characters in
+`$IFS` (default: space, tab, newline).
 
 ```bash
 file="my document.txt"
@@ -69,8 +68,7 @@ echo "$output"    # RIGHT: preserves original formatting
 
 ## Globbing (Pathname Expansion)
 
-When a variable or command substitution is **unquoted**, the shell also expands
-glob characters (`*`, `?`, `[...]`).
+When a variable or command substitution is **unquoted**, the shell also expands glob characters (`*`, `?`, `[...]`).
 
 ```bash
 msg="Files: *.txt"
@@ -89,12 +87,10 @@ echo "$msg"       # RIGHT: prints literal "Files: *.txt"
 
 ### Safe to Leave Unquoted
 
-1. **`[[ ]]` left-hand side:** `[[ $var == pattern ]]` (no word splitting
-   inside `[[ ]]`)
+1. **`[[ ]]` left-hand side:** `[[ $var == pattern ]]` (no word splitting inside `[[ ]]`)
 2. **Assignments:** `var=$other_var` (right side of assignment is not split)
 3. **`(( ))` arithmetic:** `(( x + y ))` (arithmetic context, no splitting)
-4. **Integer special variables:** `$?`, `$#`, `$$`, `$!` (guaranteed no
-   spaces, but quoting won't hurt)
+4. **Integer special variables:** `$?`, `$#`, `$$`, `$!` (guaranteed no spaces, but quoting won't hurt)
 5. **Case patterns:** `case $var in ...` (no splitting in case word)
 
 ### `"$@"` vs `"$*"`
@@ -125,8 +121,8 @@ for x in $@; do echo "[$x]"; done
 # [three]
 ```
 
-**Rule:** Use `"$@"` to pass arguments through. Use `"$*"` only when you
-deliberately want to join arguments into a single string.
+**Rule:** Use `"$@"` to pass arguments through. Use `"$*"` only when you deliberately want to join arguments into a
+single string.
 
 ### Array Expansion
 

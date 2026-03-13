@@ -1,7 +1,7 @@
 # Security Hardening
 
-Detailed patterns and examples for container security rules defined in
-SKILL.md. Read this reference for implementation specifics.
+Detailed patterns and examples for container security rules defined in SKILL.md. Read this reference for implementation
+specifics.
 
 ## Non-root Containers
 
@@ -44,8 +44,7 @@ services:
       - /run
 ```
 
-Mount `tmpfs` for directories the app needs to write to (`/tmp`, `/run`,
-`/var/cache`). Everything else is immutable.
+Mount `tmpfs` for directories the app needs to write to (`/tmp`, `/run`, `/var/cache`). Everything else is immutable.
 
 ## Drop Capabilities
 
@@ -64,12 +63,12 @@ services:
 
 Drop all capabilities, then add back only what's needed:
 
-| Capability | Use Case |
-|-----------|----------|
-| `NET_BIND_SERVICE` | Bind to ports < 1024 |
-| `CHOWN` | Change file ownership |
+| Capability          | Use Case                    |
+| ------------------- | --------------------------- |
+| `NET_BIND_SERVICE`  | Bind to ports < 1024        |
+| `CHOWN`             | Change file ownership       |
 | `SETUID` / `SETGID` | Switch users (init systems) |
-| `DAC_OVERRIDE` | Bypass file permissions |
+| `DAC_OVERRIDE`      | Bypass file permissions     |
 
 Most applications need zero capabilities.
 
@@ -86,13 +85,12 @@ services:
       - no-new-privileges:true
 ```
 
-Prevents privilege escalation via setuid/setgid binaries inside the
-container.
+Prevents privilege escalation via setuid/setgid binaries inside the container.
 
 ## Distroless and Minimal Images
 
-Distroless images contain only the application and its runtime
-dependencies — no shell, no package manager, no OS utilities.
+Distroless images contain only the application and its runtime dependencies — no shell, no package manager, no OS
+utilities.
 
 ```dockerfile
 FROM gcr.io/distroless/static-debian12        # Static binaries (Go, Rust)
@@ -133,8 +131,7 @@ secrets:
     file: ./secrets/db_password.txt
 ```
 
-- Never pass secrets via `ENV` — visible in `docker inspect`, logs, and
-  child processes
+- Never pass secrets via `ENV` — visible in `docker inspect`, logs, and child processes
 - Never `COPY` secret files — persisted in image layers permanently
 - Use `--mount=type=secret` for build-time secrets
 - Use Docker secrets or mount secret files at runtime
@@ -147,8 +144,7 @@ trivy image myimage:latest             # Trivy
 grype myimage:latest                   # Grype
 ```
 
-Scan images in CI before pushing to registries. Block images with
-critical/high CVEs.
+Scan images in CI before pushing to registries. Block images with critical/high CVEs.
 
 ## Podman Rootless
 
@@ -157,8 +153,7 @@ Podman runs containers without a daemon and without root by default.
 ### Key differences from Docker
 
 - No daemon — each `podman` command is a direct process
-- Rootless by default — uses user namespaces to map container root to
-  unprivileged host user
+- Rootless by default — uses user namespaces to map container root to unprivileged host user
 - Uses `/etc/subuid` and `/etc/subgid` for UID/GID mapping
 - Systemd integration via `podman generate systemd` or Quadlet files
 
@@ -213,8 +208,8 @@ cosign sign --key cosign.key myregistry/myimage:v1.2.3
 cosign verify --key cosign.pub myregistry/myimage:v1.2.3
 ```
 
-- **Keyless signing** with Sigstore OIDC eliminates key management —
-  signatures use short-lived certificates tied to CI identity
+- **Keyless signing** with Sigstore OIDC eliminates key management — signatures use short-lived certificates tied to CI
+  identity
 - Record signatures in **Rekor** transparency logs for auditability
 - Enforce signature verification in CI before deployment
 
@@ -222,18 +217,17 @@ cosign verify --key cosign.pub myregistry/myimage:v1.2.3
 
 VEX documents distinguish exploitable CVEs from non-exploitable ones:
 
-- A scanner may report 50 CVEs, but VEX can reduce actionable CVEs
-  to near-zero by filtering out those not exploitable in your config
+- A scanner may report 50 CVEs, but VEX can reduce actionable CVEs to near-zero by filtering out those not exploitable
+  in your config
 - Docker Scout reads VEX attestations automatically from OCI layers
 - For Trivy, configure VEX ingestion to reconcile scanner output
 - VEX reduces "security noise" — focus on real risk, not CVE count
 
 ### SLSA provenance
 
-- **SLSA Build Level 3** provides cryptographic proof linking an image
-  to its exact source and build environment
-- Attach provenance as OCI attestation layers — they travel with the
-  image and are verifiable via `cosign verify-attestation`
+- **SLSA Build Level 3** provides cryptographic proof linking an image to its exact source and build environment
+- Attach provenance as OCI attestation layers — they travel with the image and are verifiable via
+  `cosign verify-attestation`
 - Docker Hardened Images (DHIs) ship SLSA L3 provenance by default
 
 ## Container Hardening Checklist

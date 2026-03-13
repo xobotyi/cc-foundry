@@ -1,7 +1,7 @@
 # Runes
 
-Runes are compiler instructions prefixed with `$` that control Svelte's reactivity.
-They are language keywords, not importable functions.
+Runes are compiler instructions prefixed with `$` that control Svelte's reactivity. They are language keywords, not
+importable functions.
 
 ## $state
 
@@ -17,8 +17,7 @@ Declares reactive state. The variable is a plain value, not a wrapper.
 
 ### Deep Reactivity
 
-Arrays and plain objects become deeply reactive proxies. Mutations trigger
-granular updates:
+Arrays and plain objects become deeply reactive proxies. Mutations trigger granular updates:
 
 ```js
 let todos = $state([{ done: false, text: 'add more todos' }]);
@@ -39,8 +38,8 @@ let { done, text } = todos[0];
 
 ### $state in Classes
 
-Use `$state` on class fields or as first assignment in constructor. The compiler
-transforms these into getter/setter pairs on the prototype.
+Use `$state` on class fields or as first assignment in constructor. The compiler transforms these into getter/setter
+pairs on the prototype.
 
 ```js
 class Todo {
@@ -73,8 +72,7 @@ person.age += 1;
 person = { name: 'Heraclitus', age: 50 };
 ```
 
-Use `$state.raw` for large arrays/objects you replace wholesale -- avoids proxy
-overhead.
+Use `$state.raw` for large arrays/objects you replace wholesale -- avoids proxy overhead.
 
 ### $state.snapshot
 
@@ -84,8 +82,7 @@ Take a static copy of a reactive proxy for external APIs:
 console.log($state.snapshot(counter)); // plain object, not Proxy
 ```
 
-Use when passing state to libraries that don't expect proxies (e.g.,
-`structuredClone`, logging).
+Use when passing state to libraries that don't expect proxies (e.g., `structuredClone`, logging).
 
 ### Reactive Built-ins
 
@@ -96,6 +93,7 @@ Import reactive `Set`, `Map`, `Date`, `URL` from `svelte/reactivity`.
 Cannot directly export reassignable `$state`. Two patterns:
 
 **Object property pattern (preferred):**
+
 ```js
 // state.svelte.js
 export const counter = $state({ count: 0 });
@@ -103,6 +101,7 @@ export function increment() { counter.count += 1; }
 ```
 
 **Getter function pattern:**
+
 ```js
 // state.svelte.js
 let count = $state(0);
@@ -133,8 +132,7 @@ let total = $derived.by(() => {
 
 ### Dependencies
 
-Anything read synchronously inside `$derived` is tracked. Use `untrack` to
-exempt specific reads.
+Anything read synchronously inside `$derived` is tracked. Use `untrack` to exempt specific reads.
 
 ### Overriding Derived Values
 
@@ -167,14 +165,12 @@ let { a, b, c } = $derived(stuff());
 
 ### Update Propagation
 
-Push-pull reactivity: dependents are notified immediately (push) but only
-recalculated on read (pull). If the new value is referentially identical to the
-previous value, downstream updates are skipped.
+Push-pull reactivity: dependents are notified immediately (push) but only recalculated on read (pull). If the new value
+is referentially identical to the previous value, downstream updates are skipped.
 
 ## $effect
 
-Side-effect that runs when dependencies change. Runs only in the browser, after
-DOM updates.
+Side-effect that runs when dependencies change. Runs only in the browser, after DOM updates.
 
 ```js
 $effect(() => {
@@ -204,8 +200,7 @@ $effect(() => {
 
 ### $effect.pre
 
-Runs before DOM updates. Same API as `$effect`, different timing. Use for
-pre-DOM manipulation like autoscrolling.
+Runs before DOM updates. Same API as `$effect`, different timing. Use for pre-DOM manipulation like autoscrolling.
 
 ### $effect.tracking
 
@@ -242,8 +237,8 @@ const destroy = $effect.root(() => {
 </script>
 ```
 
-Do not use `$effect` to synchronize two pieces of state -- use `$derived` with
-callback event handlers or function bindings instead.
+Do not use `$effect` to synchronize two pieces of state -- use `$derived` with callback event handlers or function
+bindings instead.
 
 ## $props
 
@@ -276,8 +271,8 @@ Declares component input properties via destructuring:
 
 ### Updating Props
 
-Props can be temporarily overridden by the child. Do NOT mutate prop objects
-unless they are `$bindable`. Use callback props to communicate changes upward.
+Props can be temporarily overridden by the child. Do NOT mutate prop objects unless they are `$bindable`. Use callback
+props to communicate changes upward.
 
 ## $bindable
 
@@ -297,14 +292,12 @@ Parent can optionally use `bind:`:
 <FancyInput bind:value={message} />
 ```
 
-Use sparingly -- overuse makes data flow unpredictable. Prefer callback props
-for most parent-child communication.
+Use sparingly -- overuse makes data flow unpredictable. Prefer callback props for most parent-child communication.
 
 ## $inspect
 
-Development-only debugging rune. Equivalent to `console.log` but re-runs
-whenever its arguments change. Tracks reactive state deeply. Becomes a noop
-in production builds.
+Development-only debugging rune. Equivalent to `console.log` but re-runs whenever its arguments change. Tracks reactive
+state deeply. Becomes a noop in production builds.
 
 ```svelte
 <script>
@@ -335,9 +328,8 @@ The first argument is either `"init"` or `"update"`.
 
 ### $inspect.trace
 
-Traces the surrounding function in development. When an effect or derived
-re-runs, the console shows which reactive state caused the re-execution.
-Must be the first statement in a function body.
+Traces the surrounding function in development. When an effect or derived re-runs, the console shows which reactive
+state caused the re-execution. Must be the first statement in a function body.
 
 ```js
 $effect(() => {
@@ -350,8 +342,7 @@ Accepts an optional label argument for identification.
 
 ## $host
 
-Only available inside custom elements. Provides access to the host element for
-dispatching custom events:
+Only available inside custom elements. Provides access to the host element for dispatching custom events:
 
 ```svelte
 <svelte:options customElement="my-stepper" />

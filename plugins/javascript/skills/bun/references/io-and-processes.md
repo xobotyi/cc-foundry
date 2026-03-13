@@ -4,8 +4,7 @@
 
 ### Reading Files — `Bun.file()`
 
-Creates a lazy `BunFile` reference (conforms to `Blob`). No disk read until content
-is accessed.
+Creates a lazy `BunFile` reference (conforms to `Blob`). No disk read until content is accessed.
 
 ```ts
 const file = Bun.file("data.json");
@@ -43,8 +42,8 @@ await Bun.file("logs.json").delete();
 
 ### Writing Files — `Bun.write()`
 
-Multi-tool for writing. Accepts string, Blob, ArrayBuffer, TypedArray, Response.
-Uses fastest syscall per platform (`copy_file_range`, `sendfile`, `clonefile`).
+Multi-tool for writing. Accepts string, Blob, ArrayBuffer, TypedArray, Response. Uses fastest syscall per platform
+(`copy_file_range`, `sendfile`, `clonefile`).
 
 ```ts
 await Bun.write("output.txt", "hello");                    // string
@@ -82,8 +81,8 @@ await mkdir("path/to/dir", { recursive: true });
 
 ## Shell API — `Bun.$`
 
-Cross-platform bash-like shell with JavaScript interop. Runs in-process (not
-`/bin/sh`). Interpolated values are auto-escaped — injection-safe by default.
+Cross-platform bash-like shell with JavaScript interop. Runs in-process (not `/bin/sh`). Interpolated values are
+auto-escaped — injection-safe by default.
 
 ### Basic Usage
 
@@ -98,12 +97,12 @@ const { stdout, stderr } = await $`cmd`.quiet();   // suppress output
 
 ### Reading Output
 
-| Method | Returns |
-|--------|---------|
-| `.text()` | `string` (auto-quiets) |
-| `.json()` | Parsed JSON |
-| `.lines()` | Async iterator of lines |
-| `.blob()` | `Blob` |
+| Method           | Returns                              |
+| ---------------- | ------------------------------------ |
+| `.text()`        | `string` (auto-quiets)               |
+| `.json()`        | Parsed JSON                          |
+| `.lines()`       | Async iterator of lines              |
+| `.blob()`        | `Blob`                               |
 | `await $\`...\`` | `{ stdout: Buffer, stderr: Buffer }` |
 
 ### Error Handling
@@ -132,8 +131,7 @@ await $`cat < ${Bun.file("input.txt")}`;  // file as stdin
 await $`cat < ${response}`;               // Response body as stdin
 ```
 
-JavaScript objects as redirect targets: `Buffer`, `Uint8Array`, `Bun.file()`,
-`Response`.
+JavaScript objects as redirect targets: `Buffer`, `Uint8Array`, `Bun.file()`, `Response`.
 
 ### Environment and Working Directory
 
@@ -148,8 +146,8 @@ $.cwd("/tmp");
 
 ### Built-in Commands
 
-Cross-platform: `cd`, `ls`, `rm`, `echo`, `pwd`, `cat`, `touch`, `mkdir`, `which`,
-`mv`, `exit`, `true`, `false`, `yes`, `seq`, `dirname`, `basename`.
+Cross-platform: `cd`, `ls`, `rm`, `echo`, `pwd`, `cat`, `touch`, `mkdir`, `which`, `mv`, `exit`, `true`, `false`, `yes`,
+`seq`, `dirname`, `basename`.
 
 ### Security
 
@@ -179,23 +177,23 @@ proc.unref();                      // detach from parent
 
 ### stdin Options
 
-| Value | Description |
-|-------|-------------|
-| `null` | No input (default) |
-| `"pipe"` | Returns `FileSink` for writing |
-| `"inherit"` | Inherit parent stdin |
-| `Bun.file()` | Read from file |
-| `ReadableStream` | Pipe stream |
-| `Response` | Use response body |
+| Value            | Description                    |
+| ---------------- | ------------------------------ |
+| `null`           | No input (default)             |
+| `"pipe"`         | Returns `FileSink` for writing |
+| `"inherit"`      | Inherit parent stdin           |
+| `Bun.file()`     | Read from file                 |
+| `ReadableStream` | Pipe stream                    |
+| `Response`       | Use response body              |
 
 ### stdout/stderr Options
 
-| Value | Description |
-|-------|-------------|
-| `"pipe"` | Default stdout — `ReadableStream` |
-| `"inherit"` | Default stderr — inherit parent |
-| `"ignore"` | Discard |
-| `Bun.file()` | Write to file |
+| Value        | Description                       |
+| ------------ | --------------------------------- |
+| `"pipe"`     | Default stdout — `ReadableStream` |
+| `"inherit"`  | Default stderr — inherit parent   |
+| `"ignore"`   | Discard                           |
+| `Bun.file()` | Write to file                     |
 
 ### AbortSignal and Timeout
 
@@ -242,5 +240,5 @@ worker.postMessage("ping");
 worker.onmessage = (event) => console.log(event.data);
 ```
 
-Workers run in separate threads. Use `postMessage` / `onmessage` for communication.
-Supports `structuredClone` for data transfer.
+Workers run in separate threads. Use `postMessage` / `onmessage` for communication. Supports `structuredClone` for data
+transfer.

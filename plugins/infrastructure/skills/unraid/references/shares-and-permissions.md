@@ -22,11 +22,11 @@ Direct access to individual drives or pools:
 
 ### Critical Rule
 
-**Never copy files between user shares and disk shares** with matching folder names.
-Both views point to the same underlying files -- `cp` and `rsync` cannot distinguish
-them, leading to corruption or data loss.
+**Never copy files between user shares and disk shares** with matching folder names. Both views point to the same
+underlying files -- `cp` and `rsync` cannot distinguish them, leading to corruption or data loss.
 
 Safe practices:
+
 - Copy only between user shares OR only between disk shares
 - Use `rsync -c` to verify copies
 - Use Unassigned Devices plugin for external drives (mount at `/mnt/disks/`)
@@ -35,15 +35,15 @@ Safe practices:
 
 Created automatically when Docker or VM Manager starts:
 
-| Share | Purpose |
-|-------|---------|
+| Share     | Purpose                                                      |
+| --------- | ------------------------------------------------------------ |
 | `appdata` | Docker container working files (one subfolder per container) |
-| `system` | Docker `docker.img` and VM XML templates |
-| `domains` | VM virtual disk images (vdisks) |
-| `isos` | OS installation ISOs for VMs |
+| `system`  | Docker `docker.img` and VM XML templates                     |
+| `domains` | VM virtual disk images (vdisks)                              |
+| `isos`    | OS installation ISOs for VMs                                 |
 
-Do not change permissions on `appdata`, `system`, or `domains`. The `isos` share
-can be made network-accessible for adding ISO files.
+Do not change permissions on `appdata`, `system`, or `domains`. The `isos` share can be made network-accessible for
+adding ISO files.
 
 ## Creating Shares
 
@@ -56,29 +56,28 @@ can be made network-accessible for adding ISO files.
 7. Included/excluded disks (mutually exclusive)
 8. Mover action: direction of data movement
 
-**New shares are not network-visible by default** -- configure SMB/NFS export after
-creation. Export options:
+**New shares are not network-visible by default** -- configure SMB/NFS export after creation. Export options:
+
 - **Yes**: visible in network browse lists and accessible
 - **Yes (Hidden)**: not visible in browse lists, accessible by exact name
 - **No**: completely hidden and inaccessible via that protocol
 
-Use "Yes (Hidden)" for shares that authorized users need but should not be
-discoverable by network scanning.
+Use "Yes (Hidden)" for shares that authorized users need but should not be discoverable by network scanning.
 
 ## SMB Security Levels
 
-| Level | Read | Write | Use Case |
-|-------|------|-------|----------|
-| Public | Everyone | Everyone | Non-sensitive shared media |
-| Secure | Everyone | Authorized users | Collaborative project folders |
+| Level   | Read             | Write            | Use Case                           |
+| ------- | ---------------- | ---------------- | ---------------------------------- |
+| Public  | Everyone         | Everyone         | Non-sensitive shared media         |
+| Secure  | Everyone         | Authorized users | Collaborative project folders      |
 | Private | Authorized users | Authorized users | Sensitive data, personal documents |
 
 ### Windows SMB Considerations
 
 - Windows 10 1709+ blocks Public (guest) SMB shares by default
 - Best practice: always use user accounts with passwords
-- Windows allows only one credential set per server -- use server name for one share
-  and IP address for another as a workaround
+- Windows allows only one credential set per server -- use server name for one share and IP address for another as a
+  workaround
 
 ## NFS Configuration
 

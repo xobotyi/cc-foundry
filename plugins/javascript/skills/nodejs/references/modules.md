@@ -12,16 +12,16 @@ All new Node.js projects should use ESM. Set the package type explicitly:
 }
 ```
 
-This makes all `.js` files in the package parse as ES modules. Without this field,
-`.js` files default to CommonJS (legacy behavior).
+This makes all `.js` files in the package parse as ES modules. Without this field, `.js` files default to CommonJS
+(legacy behavior).
 
 ### File Extensions
 
-| Extension | Always parsed as | Regardless of `"type"` |
-|-----------|-----------------|----------------------|
-| `.mjs` | ES module | Yes |
-| `.cjs` | CommonJS | Yes |
-| `.js` | Depends on `"type"` | No |
+| Extension | Always parsed as    | Regardless of `"type"` |
+| --------- | ------------------- | ---------------------- |
+| `.mjs`    | ES module           | Yes                    |
+| `.cjs`    | CommonJS            | Yes                    |
+| `.js`     | Depends on `"type"` | No                     |
 
 Use `.mjs`/`.cjs` only when you need to mix module systems within a single package.
 
@@ -40,6 +40,7 @@ import fs from 'fs';
 ```
 
 Benefits:
+
 - Unambiguous — clearly a built-in, not an npm package
 - Prevents package name collision attacks
 - Required for some newer built-in modules
@@ -50,13 +51,12 @@ Benefits:
 
 Controls how `.js` files are interpreted:
 
-| Value | `.js` parsed as |
-|-------|----------------|
-| `"module"` | ES module |
-| `"commonjs"` (or absent) | CommonJS |
+| Value                    | `.js` parsed as |
+| ------------------------ | --------------- |
+| `"module"`               | ES module       |
+| `"commonjs"` (or absent) | CommonJS        |
 
-Always set this field explicitly, even in CommonJS packages — future-proofs the
-package and helps tooling.
+Always set this field explicitly, even in CommonJS packages — future-proofs the package and helps tooling.
 
 ### `"exports"` (Recommended for Libraries)
 
@@ -74,6 +74,7 @@ Defines the public API surface. Prevents consumers from importing internal files
 ```
 
 Key behaviors:
+
 - **Encapsulation**: only paths listed in `"exports"` are importable
 - **Supersedes `"main"`**: when both exist, `"exports"` wins
 - **Targets must start with `./`**: relative URLs only
@@ -95,6 +96,7 @@ Serve different code depending on how the package is loaded:
 ```
 
 Condition priority (most specific first): `node-addons` > `node` > `import` > `require`
+
 > `module-sync` > `default`.
 
 Always include `"default"` as a fallback.
@@ -132,21 +134,22 @@ Package-internal import aliases. Must start with `#`:
 ```
 
 Usage:
+
 ```js
 import { connect } from '#db';
 import { slugify } from '#utils/string';
 ```
 
 Benefits:
+
 - Clean internal paths without `../../../`
 - Conditional resolution (platform-specific implementations)
 - No package self-reference needed
 
 ### `"main"` (Legacy)
 
-Single entry point, no encapsulation. Use `"exports"` instead for new packages.
-Keep `"main"` alongside `"exports"` only for backward compatibility with old Node.js
-or bundlers:
+Single entry point, no encapsulation. Use `"exports"` instead for new packages. Keep `"main"` alongside `"exports"` only
+for backward compatibility with old Node.js or bundlers:
 
 ```json
 {
@@ -157,19 +160,19 @@ or bundlers:
 
 ## ESM vs CommonJS Differences
 
-| Feature | ESM | CommonJS |
-|---------|-----|----------|
-| Syntax | `import`/`export` | `require()`/`module.exports` |
-| Loading | Async | Sync |
-| `__dirname` | Not available | Available |
-| `__filename` | Not available | Available |
-| `import.meta.dirname` | Available (Node 21.2+) | Not available |
-| `import.meta.filename` | Available (Node 21.2+) | Not available |
-| `require.main` | Not available | Available |
-| `import.meta.main` | Available (Node 24.2+) | Not available |
-| JSON import | Needs `with { type: 'json' }` | `require('./data.json')` |
-| Top-level await | Supported | Not supported |
-| Live bindings | Yes | No (value copies) |
+| Feature                | ESM                           | CommonJS                     |
+| ---------------------- | ----------------------------- | ---------------------------- |
+| Syntax                 | `import`/`export`             | `require()`/`module.exports` |
+| Loading                | Async                         | Sync                         |
+| `__dirname`            | Not available                 | Available                    |
+| `__filename`           | Not available                 | Available                    |
+| `import.meta.dirname`  | Available (Node 21.2+)        | Not available                |
+| `import.meta.filename` | Available (Node 21.2+)        | Not available                |
+| `require.main`         | Not available                 | Available                    |
+| `import.meta.main`     | Available (Node 24.2+)        | Not available                |
+| JSON import            | Needs `with { type: 'json' }` | `require('./data.json')`     |
+| Top-level await        | Supported                     | Not supported                |
+| Live bindings          | Yes                           | No (value copies)            |
 
 ### Replacing CJS Patterns in ESM
 

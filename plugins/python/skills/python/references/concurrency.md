@@ -1,13 +1,12 @@
 # Concurrency Patterns
 
-Extended patterns for asyncio structured concurrency, task management, and timeout
-handling in Python 3.14+. Complements the rules in SKILL.md with TaskGroup details,
-cancellation semantics, and threading interop.
+Extended patterns for asyncio structured concurrency, task management, and timeout handling in Python 3.14+. Complements
+the rules in SKILL.md with TaskGroup details, cancellation semantics, and threading interop.
 
 ## TaskGroup (Structured Concurrency)
 
-`asyncio.TaskGroup` (3.11+) is the preferred way to run concurrent tasks. It guarantees
-that all tasks complete (or are cancelled) before the `async with` block exits.
+`asyncio.TaskGroup` (3.11+) is the preferred way to run concurrent tasks. It guarantees that all tasks complete (or are
+cancelled) before the `async with` block exits.
 
 ```python
 import asyncio
@@ -50,17 +49,17 @@ async def resilient_fetch(urls: list[str]) -> list[bytes | None]:
     return list(results.values())
 ```
 
-Use `except*` (3.11+) to selectively handle exception types within the group. Unhandled
-exception types are re-raised in a new ExceptionGroup.
+Use `except*` (3.11+) to selectively handle exception types within the group. Unhandled exception types are re-raised in
+a new ExceptionGroup.
 
 ### TaskGroup vs gather
 
-| | TaskGroup | gather |
-|---|-----------|--------|
-| Error behavior | Cancels all tasks on first error | Inconsistent — depends on `return_exceptions` |
-| Structured | Yes — all tasks bound to the `async with` scope | No — tasks can outlive the call |
-| Exception type | `ExceptionGroup` | Single exception or mixed results |
-| Use in new code | Always | Never |
+|                 | TaskGroup                                       | gather                                        |
+| --------------- | ----------------------------------------------- | --------------------------------------------- |
+| Error behavior  | Cancels all tasks on first error                | Inconsistent — depends on `return_exceptions` |
+| Structured      | Yes — all tasks bound to the `async with` scope | No — tasks can outlive the call               |
+| Exception type  | `ExceptionGroup`                                | Single exception or mixed results             |
+| Use in new code | Always                                          | Never                                         |
 
 ## Timeouts
 
@@ -85,9 +84,8 @@ async def fetch_batch(urls: list[str]) -> list[bytes]:
         return [t.result() for t in tasks]
 ```
 
-`timeout` and `timeout_at` raise `TimeoutError` (not `asyncio.TimeoutError`). They
-cancel the current task's scope — nested timeouts work correctly because each creates
-its own cancellation scope.
+`timeout` and `timeout_at` raise `TimeoutError` (not `asyncio.TimeoutError`). They cancel the current task's scope —
+nested timeouts work correctly because each creates its own cancellation scope.
 
 ### wait_for (legacy)
 
@@ -96,13 +94,12 @@ its own cancellation scope.
 result = await asyncio.wait_for(coro, timeout=5.0)
 ```
 
-`wait_for` cancels the awaitable and raises `TimeoutError`. It doesn't support structured
-scoping — `asyncio.timeout` is cleaner.
+`wait_for` cancels the awaitable and raises `TimeoutError`. It doesn't support structured scoping — `asyncio.timeout` is
+cleaner.
 
 ## Task Cancellation
 
-Cancellation in asyncio is cooperative — a cancelled task receives `CancelledError` at
-the next `await` point.
+Cancellation in asyncio is cooperative — a cancelled task receives `CancelledError` at the next `await` point.
 
 ```python
 async def worker(queue: asyncio.Queue[str]) -> None:
@@ -122,11 +119,11 @@ await task  # Raises CancelledError
 ```
 
 **Rules:**
-- Always re-raise `CancelledError` after cleanup — swallowing it breaks structured
-  concurrency and TaskGroup semantics
+
+- Always re-raise `CancelledError` after cleanup — swallowing it breaks structured concurrency and TaskGroup semantics
 - Use `try/finally` for cleanup that must happen regardless of cancellation
-- `asyncio.shield()` protects a coroutine from cancellation of its outer scope — use
-  sparingly, as it breaks structured concurrency guarantees
+- `asyncio.shield()` protects a coroutine from cancellation of its outer scope — use sparingly, as it breaks structured
+  concurrency guarantees
 
 ### Shielding
 
@@ -136,9 +133,8 @@ async def critical_save(data: bytes) -> None:
     await asyncio.shield(database.save(data))
 ```
 
-`shield` prevents the inner coroutine from being cancelled when the outer task is
-cancelled. The outer task still gets `CancelledError`. Use only for operations that
-must not be interrupted (database commits, payment processing).
+`shield` prevents the inner coroutine from being cancelled when the outer task is cancelled. The outer task still gets
+`CancelledError`. Use only for operations that must not be interrupted (database commits, payment processing).
 
 ## Running Sync Code in Threads
 
@@ -151,6 +147,7 @@ async def process_image(path: str) -> bytes:
 ```
 
 `to_thread` runs a sync function in a thread pool and returns an awaitable. Use for:
+
 - Blocking I/O that doesn't have an async API
 - CPU-light processing that would block the event loop
 - Legacy sync code that can't be easily rewritten
@@ -179,13 +176,13 @@ future = asyncio.run_coroutine_threadsafe(
 result = future.result(timeout=5.0)  # Blocks the calling thread
 ```
 
-This is the only safe way to interact with a running event loop from another thread.
-Direct calls to `loop.create_task()` from another thread are not thread-safe.
+This is the only safe way to interact with a running event loop from another thread. Direct calls to
+`loop.create_task()` from another thread are not thread-safe.
 
 ## Eager Task Factory (3.12+)
 
-By default, `create_task()` schedules the coroutine for later execution. The eager task
-factory starts executing the coroutine synchronously up to the first `await`:
+By default, `create_task()` schedules the coroutine for later execution. The eager task factory starts executing the
+coroutine synchronously up to the first `await`:
 
 ```python
 async def main() -> None:
@@ -198,9 +195,8 @@ async def main() -> None:
     # the task is already done here
 ```
 
-Benefits: reduces scheduling overhead for coroutines that complete quickly (cache hits,
-already-available data). The task factory can be restored with
-`loop.set_task_factory(None)`.
+Benefits: reduces scheduling overhead for coroutines that complete quickly (cache hits, already-available data). The
+task factory can be restored with `loop.set_task_factory(None)`.
 
 ## Common Async Patterns
 

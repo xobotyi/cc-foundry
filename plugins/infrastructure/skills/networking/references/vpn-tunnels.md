@@ -2,16 +2,15 @@
 
 ## WireGuard
 
-Modern VPN protocol. ~4,000 lines of code in the Linux kernel module. Fast, simple,
-cryptographically opinionated (no cipher negotiation).
+Modern VPN protocol. ~4,000 lines of code in the Linux kernel module. Fast, simple, cryptographically opinionated (no
+cipher negotiation).
 
 ### Core Concepts
 
 - **Interface**: A virtual network interface (`wg0`) with a private key and listen port.
-- **Peer**: A public key + allowed IPs + optional endpoint. Each peer is identified
-  solely by its public key.
-- **Allowed IPs**: Acts as both routing table and ACL. Only traffic matching a peer's
-  allowed IPs is sent to/accepted from that peer.
+- **Peer**: A public key + allowed IPs + optional endpoint. Each peer is identified solely by its public key.
+- **Allowed IPs**: Acts as both routing table and ACL. Only traffic matching a peer's allowed IPs is sent to/accepted
+  from that peer.
 - **Cryptokey routing**: Packets are routed based on peer public keys, not IP addresses.
 
 ### Key Generation
@@ -22,6 +21,7 @@ wg genkey | tee privatekey | wg pubkey > publickey
 ```
 
 Or generate a preshared key for additional post-quantum security:
+
 ```bash
 wg genpsk > presharedkey
 ```
@@ -57,18 +57,16 @@ systemctl enable wg-quick@wg0  # Persist across reboots
 
 ### Persistent Keepalive
 
-When a peer is behind NAT, set `PersistentKeepalive = 25` to keep the NAT mapping
-alive. Without it, incoming packets may not reach the peer after idle periods. Only
-enable when needed -- it makes WireGuard slightly more chatty.
+When a peer is behind NAT, set `PersistentKeepalive = 25` to keep the NAT mapping alive. Without it, incoming packets
+may not reach the peer after idle periods. Only enable when needed -- it makes WireGuard slightly more chatty.
 
 ### Topologies
 
-- **Hub-and-spoke (star)**: All clients connect to a central server. Simple, but all
-  traffic routes through the hub. Use for remote access VPN.
-- **Site-to-site**: Two servers with static IPs connect networks. AllowedIPs includes
-  the remote subnet. Requires port forwarding (UDP 51820) on both sides.
-- **Full mesh**: Every peer connects to every other peer. Complex to manage manually
-  -- this is where Tailscale excels.
+- **Hub-and-spoke (star)**: All clients connect to a central server. Simple, but all traffic routes through the hub. Use
+  for remote access VPN.
+- **Site-to-site**: Two servers with static IPs connect networks. AllowedIPs includes the remote subnet. Requires port
+  forwarding (UDP 51820) on both sides.
+- **Full mesh**: Every peer connects to every other peer. Complex to manage manually -- this is where Tailscale excels.
 
 ### Use When
 
@@ -80,29 +78,28 @@ enable when needed -- it makes WireGuard slightly more chatty.
 
 ## Tailscale
 
-Mesh VPN built on WireGuard. Adds automatic key management, NAT traversal, ACLs, and
-DNS. The coordination server handles the control plane; data flows peer-to-peer.
+Mesh VPN built on WireGuard. Adds automatic key management, NAT traversal, ACLs, and DNS. The coordination server
+handles the control plane; data flows peer-to-peer.
 
 ### Architecture
 
-- **Coordination server**: Exchanges public keys and network state between devices.
-  Run by Tailscale Inc., or self-host with Headscale.
-- **DERP relays**: Fallback when direct connections fail. Encrypted end-to-end --
-  relays cannot read traffic.
-- **Direct connections**: Tailscale uses STUN and other NAT traversal techniques to
-  establish direct WireGuard tunnels between peers whenever possible.
+- **Coordination server**: Exchanges public keys and network state between devices. Run by Tailscale Inc., or self-host
+  with Headscale.
+- **DERP relays**: Fallback when direct connections fail. Encrypted end-to-end -- relays cannot read traffic.
+- **Direct connections**: Tailscale uses STUN and other NAT traversal techniques to establish direct WireGuard tunnels
+  between peers whenever possible.
 
 ### Key Features
 
-| Feature | Description |
-|---------|-------------|
-| MagicDNS | Automatic DNS names for all devices (`hostname.tailnet-name.ts.net`) |
-| ACLs | Policy engine for access control, defined in JSON/HuJSON |
-| Exit nodes | Route all traffic through a specific device (one-click toggle) |
+| Feature        | Description                                                                         |
+| -------------- | ----------------------------------------------------------------------------------- |
+| MagicDNS       | Automatic DNS names for all devices (`hostname.tailnet-name.ts.net`)                |
+| ACLs           | Policy engine for access control, defined in JSON/HuJSON                            |
+| Exit nodes     | Route all traffic through a specific device (one-click toggle)                      |
 | Subnet routers | Advertise local subnets to the tailnet without installing Tailscale on every device |
-| Taildrop | Peer-to-peer file transfer between tailnet devices |
-| SSH | Tailscale SSH eliminates SSH key management |
-| Funnel | Expose services to the public internet via Tailscale's infrastructure |
+| Taildrop       | Peer-to-peer file transfer between tailnet devices                                  |
+| SSH            | Tailscale SSH eliminates SSH key management                                         |
+| Funnel         | Expose services to the public internet via Tailscale's infrastructure               |
 
 ### Subnet Router Pattern
 
@@ -121,9 +118,8 @@ Then approve the routes in the Tailscale admin console.
 
 ### Headscale (Self-Hosted)
 
-Open-source reimplementation of the Tailscale coordination server. Full control over
-the control plane, but you manage the infrastructure. Tailscale clients connect to
-your Headscale instance instead of Tailscale's servers.
+Open-source reimplementation of the Tailscale coordination server. Full control over the control plane, but you manage
+the infrastructure. Tailscale clients connect to your Headscale instance instead of Tailscale's servers.
 
 ### Use When
 
@@ -135,23 +131,22 @@ your Headscale instance instead of Tailscale's servers.
 
 ## WireGuard vs Tailscale Decision
 
-| Factor | WireGuard | Tailscale |
-|--------|-----------|-----------|
-| Topology | Hub-and-spoke | Full mesh |
-| NAT traversal | Manual port forwarding | Automatic |
-| Key management | Manual | Automatic |
-| Config complexity | High (per-peer config files) | Zero-config (SSO login) |
-| External dependency | None | Coordination server |
-| RAM overhead | ~5 MB (kernel module) | ~30-50 MB (userspace daemon) |
-| DNS | Manual setup | MagicDNS (automatic) |
-| ACLs | iptables / nftables | Built-in policy engine |
-| Cost | Free (GPLv2) | Free up to 100 devices |
+| Factor              | WireGuard                    | Tailscale                    |
+| ------------------- | ---------------------------- | ---------------------------- |
+| Topology            | Hub-and-spoke                | Full mesh                    |
+| NAT traversal       | Manual port forwarding       | Automatic                    |
+| Key management      | Manual                       | Automatic                    |
+| Config complexity   | High (per-peer config files) | Zero-config (SSO login)      |
+| External dependency | None                         | Coordination server          |
+| RAM overhead        | ~5 MB (kernel module)        | ~30-50 MB (userspace daemon) |
+| DNS                 | Manual setup                 | MagicDNS (automatic)         |
+| ACLs                | iptables / nftables          | Built-in policy engine       |
+| Cost                | Free (GPLv2)                 | Free up to 100 devices       |
 
 ### Topology Resilience
 
-Hub-and-spoke has a **single point of failure**: if the hub goes down, the
-entire VPN is unreachable. Mesh (Tailscale) is resilient -- if one node fails,
-all other nodes remain connected to each other. Mesh can also be faster for
+Hub-and-spoke has a **single point of failure**: if the hub goes down, the entire VPN is unreachable. Mesh (Tailscale)
+is resilient -- if one node fails, all other nodes remain connected to each other. Mesh can also be faster for
 device-to-device traffic because it avoids routing through a central bottleneck.
 
 Choose topology based on failure tolerance requirements, not just convenience.
@@ -159,14 +154,14 @@ Choose topology based on failure tolerance requirements, not just convenience.
 ### Hybrid Pattern
 
 Common to run both:
+
 - **Tailscale** for day-to-day remote access to services (mesh, zero-config)
-- **WireGuard** as backup VPN gateway for full-tunnel routing or when Tailscale's
-  coordination server is unreachable
+- **WireGuard** as backup VPN gateway for full-tunnel routing or when Tailscale's coordination server is unreachable
 
 ## High Availability Site-to-Site
 
-For multi-location homelabs requiring redundancy, deploy parallel WireGuard routers
-with dynamic routing for automatic failover.
+For multi-location homelabs requiring redundancy, deploy parallel WireGuard routers with dynamic routing for automatic
+failover.
 
 ### Architecture
 
@@ -180,17 +175,15 @@ Router 2 ---[WG tunnel]--- Router 4
  LAN Router                  LAN Router
 ```
 
-Two independent WireGuard tunnels provide redundancy. OSPF tracks link state and
-reroutes traffic within seconds if one tunnel fails.
+Two independent WireGuard tunnels provide redundancy. OSPF tracks link state and reroutes traffic within seconds if one
+tunnel fails.
 
 ### WireGuard Configuration for OSPF
 
 Key differences from standard WireGuard config:
 
-- **`AllowedIPs = 0.0.0.0/0, ::/0`**: Pass all packets to the peer, letting the
-  routing daemon decide where traffic goes
-- **`Table = off`**: Prevent `wg-quick` from adding static routes that conflict
-  with OSPF's dynamic routing
+- **`AllowedIPs = 0.0.0.0/0, ::/0`**: Pass all packets to the peer, letting the routing daemon decide where traffic goes
+- **`Table = off`**: Prevent `wg-quick` from adding static routes that conflict with OSPF's dynamic routing
 - Each router pair shares a private transit subnet (e.g., `10.99.13.0/24`)
 
 ### BIRD Routing Daemon
@@ -206,6 +199,7 @@ Use BIRD 2.x for OSPF between WireGuard routers:
 ### Failover Behavior
 
 When a WireGuard link fails:
+
 1. OSPF detects link-state change (dead interval, typically 40s)
 2. OSPF updates routing table on all routers
 3. LAN routers reroute traffic through the surviving tunnel
@@ -213,14 +207,12 @@ When a WireGuard link fails:
 
 ### DNS Across Sites
 
-- Use conditional forwarding: Site A's DNS forwards `*.site-b.lan` queries to
-  Site B's DNS server
+- Use conditional forwarding: Site A's DNS forwards `*.site-b.lan` queries to Site B's DNS server
 - Use a real domain (not `.lan` or `.local`) for wildcard SSL certificate support
-- Tailscale alternative: MagicDNS automatically resolves hostnames across the
-  entire tailnet without manual DNS configuration
+- Tailscale alternative: MagicDNS automatically resolves hostnames across the entire tailnet without manual DNS
+  configuration
 
 ## OpenVPN
 
-Legacy. Slower, more complex, larger attack surface than WireGuard. Only choose
-OpenVPN when you specifically need TCP-based tunneling to bypass restrictive firewalls
-that block UDP. For all new deployments, use WireGuard or Tailscale.
+Legacy. Slower, more complex, larger attack surface than WireGuard. Only choose OpenVPN when you specifically need
+TCP-based tunneling to bypass restrictive firewalls that block UDP. For all new deployments, use WireGuard or Tailscale.

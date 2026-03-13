@@ -10,8 +10,7 @@ description: >-
 
 Compare deliverable against intake. The user asked for X — did you deliver X?
 
-This skill applies after task execution, before reporting completion. Partial completion is not
-completion.
+This skill applies after task execution, before reporting completion. Partial completion is not completion.
 
 ## Validation by Task Type
 
@@ -85,21 +84,15 @@ completion.
 
 <failures>
 
-**Solved a different problem:**
-User asked for X, you delivered Y because Y seemed better.
-Fix: deliver X first, then suggest Y as improvement.
+**Solved a different problem:** User asked for X, you delivered Y because Y seemed better. Fix: deliver X first, then
+suggest Y as improvement.
 
-**Incomplete execution:**
-Started the task but didn't finish all parts.
-Fix: re-read request, check each requirement.
+**Incomplete execution:** Started the task but didn't finish all parts. Fix: re-read request, check each requirement.
 
-**Untested assumptions:**
-"This should work" without verification.
-Fix: actually test, run, or trace through the change.
+**Untested assumptions:** "This should work" without verification. Fix: actually test, run, or trace through the change.
 
-**Scope creep unacknowledged:**
-Did extra work without noting it.
-Fix: clearly state what was requested vs. what was added.
+**Scope creep unacknowledged:** Did extra work without noting it. Fix: clearly state what was requested vs. what was
+added.
 
 </failures>
 

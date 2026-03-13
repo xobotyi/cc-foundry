@@ -1,7 +1,7 @@
 # Strict Mode and Error Handling
 
-Defensive shell scripting starts with strict mode. These settings change shell
-behavior from "silently continue on failure" to "stop and report."
+Defensive shell scripting starts with strict mode. These settings change shell behavior from "silently continue on
+failure" to "stop and report."
 
 ## The Strict Mode Header
 
@@ -51,8 +51,7 @@ fi
 
 ### `set -u` (nounset)
 
-Treats unset variables as errors during expansion. This catches typos in
-variable names and missing initializations.
+Treats unset variables as errors during expansion. This catches typos in variable names and missing initializations.
 
 ```bash
 set -u
@@ -65,9 +64,8 @@ echo "${OPTIONAL_VAR:+value_if_set}"   # use alternate if set
 
 ### `set -o pipefail`
 
-By default, a pipeline's exit status is the exit status of the last command.
-With `pipefail`, a pipeline returns the exit status of the rightmost command
-that failed (or 0 if all succeeded).
+By default, a pipeline's exit status is the exit status of the last command. With `pipefail`, a pipeline returns the
+exit status of the rightmost command that failed (or 0 if all succeeded).
 
 ```bash
 set -o pipefail
@@ -86,14 +84,14 @@ echo "${PIPESTATUS[0]} ${PIPESTATUS[1]} ${PIPESTATUS[2]}"
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | General error |
-| 2 | Misuse of shell builtin |
-| 126 | Command not executable |
-| 127 | Command not found |
-| 128+N | Killed by signal N |
+| Code  | Meaning                 |
+| ----- | ----------------------- |
+| 0     | Success                 |
+| 1     | General error           |
+| 2     | Misuse of shell builtin |
+| 126   | Command not executable  |
+| 127   | Command not found       |
+| 128+N | Killed by signal N      |
 
 Return meaningful exit codes from scripts:
 
@@ -112,8 +110,7 @@ die() {
 
 ## Trap-Based Cleanup
 
-Use `trap` to run cleanup code on script exit, regardless of how the script
-terminates:
+Use `trap` to run cleanup code on script exit, regardless of how the script terminates:
 
 ```bash
 cleanup() {
@@ -130,13 +127,13 @@ tmpfile=$(mktemp)
 
 **Trap signals:**
 
-| Signal | When |
-|--------|------|
-| `EXIT` | Script exits (any reason) |
-| `ERR` | Command fails (with `set -e`) |
-| `INT` | Ctrl+C |
-| `TERM` | `kill` (default signal) |
-| `HUP` | Terminal hangup |
+| Signal | When                          |
+| ------ | ----------------------------- |
+| `EXIT` | Script exits (any reason)     |
+| `ERR`  | Command fails (with `set -e`) |
+| `INT`  | Ctrl+C                        |
+| `TERM` | `kill` (default signal)       |
+| `HUP`  | Terminal hangup               |
 
 **Trap rules:**
 
@@ -161,8 +158,7 @@ tmpdir=$(mktemp -d) || die "Failed to create temp dir"
 trap 'rm -rf "$tmpfile" "$tmpdir"' EXIT
 ```
 
-Never use predictable filenames in `/tmp` — this creates race conditions
-and symlink attacks.
+Never use predictable filenames in `/tmp` — this creates race conditions and symlink attacks.
 
 ## Subshell Isolation for `cd`
 

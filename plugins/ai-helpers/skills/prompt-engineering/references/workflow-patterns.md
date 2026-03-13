@@ -11,17 +11,18 @@ Techniques for structuring multi-step prompting workflows.
 
 ## Prompt Chaining
 
-Decompose complex tasks into a sequence of simpler prompts, where
-each prompt's output feeds the next.
+Decompose complex tasks into a sequence of simpler prompts, where each prompt's output feeds the next.
 
 ### Why Chain Prompts
 
 **Single complex prompt problems:**
+
 - Error propagation — one mistake ruins everything
 - Hard to debug — unclear where things went wrong
 - Inconsistent quality — too many requirements at once
 
 **Chaining benefits:**
+
 - Validate at each step
 - Clear failure points
 - Modular, reusable components
@@ -40,6 +41,7 @@ each prompt's output feeds the next.
 ### Example: Document Analysis
 
 **Monolithic (problematic):**
+
 ```
 Read this document. Extract key facts, identify the main argument,
 assess the quality of evidence, note any logical fallacies, and
@@ -47,6 +49,7 @@ write a 200-word critical summary.
 ```
 
 **Chained (better):**
+
 ```
 Chain 1: "Extract the 5 most important facts from this document."
      → [facts]
@@ -113,6 +116,7 @@ Refine outputs through cycles of generation, evaluation, and adjustment.
 ### Refinement Strategies
 
 **Add specificity:**
+
 ```
 v1: "Summarize this article"
 v2: "Summarize this article in 3 bullet points"
@@ -121,6 +125,7 @@ v3: "Summarize this article in 3 bullet points, each under 20 words,
 ```
 
 **Add constraints:**
+
 ```
 v1: "Write a product description"
 v2: "Write a product description. Do not use superlatives.
@@ -128,6 +133,7 @@ v2: "Write a product description. Do not use superlatives.
 ```
 
 **Add examples:**
+
 ```
 v1: "Format the output as JSON"
 v2: "Format the output as JSON like this: {\"name\": \"...\", ...}"
@@ -146,6 +152,7 @@ Drift occurs when refinements stray from the original goal.
 ### Convergence Criteria
 
 Know when to stop:
+
 - Output meets quality threshold (e.g., >90% accuracy)
 - Iterations reach diminishing returns
 - Human validation passes
@@ -155,13 +162,11 @@ Know when to stop:
 
 ## Meta Prompting
 
-Create reusable templates for categories of problems, not individual
-instances.
+Create reusable templates for categories of problems, not individual instances.
 
 ### Concept
 
-Instead of: "Solve 2x + 3 = 7"
-Template: "For any linear equation ax + b = c, follow these steps..."
+Instead of: "Solve 2x + 3 = 7" Template: "For any linear equation ax + b = c, follow these steps..."
 
 The model receives a **methodology**, not just a task.
 
@@ -227,11 +232,9 @@ You are reviewing code for quality issues.
 
 **User-provided:** Human creates the template (most control).
 
-**Recursive (RMP):** Model generates its own template, then solves
-(two-pass: design methodology, then apply it).
+**Recursive (RMP):** Model generates its own template, then solves (two-pass: design methodology, then apply it).
 
-**Conductor:** One model creates templates for specialist models
-(multi-agent orchestration).
+**Conductor:** One model creates templates for specialist models (multi-agent orchestration).
 
 ---
 
@@ -262,10 +265,8 @@ Iterative Refinement (polish final output)
 
 **Over-chaining:** Breaking things too small creates overhead.
 
-**Premature templates:** Creating meta prompts before understanding
-the problem space.
+**Premature templates:** Creating meta prompts before understanding the problem space.
 
-**Iteration without criteria:** Endless refinement with no stopping
-point.
+**Iteration without criteria:** Endless refinement with no stopping point.
 
 **Rigid chains:** No error handling or branching for edge cases.

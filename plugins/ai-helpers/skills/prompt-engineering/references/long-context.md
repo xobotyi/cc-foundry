@@ -1,7 +1,6 @@
 # Long Context Prompting
 
-Strategies for working with Claude's 200K token context window
-effectively.
+Strategies for working with Claude's 200K token context window effectively.
 
 ## Contents
 
@@ -16,8 +15,7 @@ effectively.
 
 ### 1. Document Placement Matters
 
-**Put longform data at the top** — above your query, instructions,
-and examples.
+**Put longform data at the top** — above your query, instructions, and examples.
 
 ```
 [Documents/data here - 20K+ tokens]
@@ -29,8 +27,7 @@ and examples.
 [Query]
 ```
 
-Queries at the end can improve response quality by up to 30%,
-especially with complex multi-document inputs.
+Queries at the end can improve response quality by up to 30%, especially with complex multi-document inputs.
 
 ### 2. Structure with XML
 
@@ -78,8 +75,7 @@ Then, based on these quotes, list diagnostic information
 in <info> tags.
 ```
 
-Quote grounding helps Claude cut through document "noise" and
-anchor its analysis in specific evidence.
+Quote grounding helps Claude cut through document "noise" and anchor its analysis in specific evidence.
 
 ---
 
@@ -100,6 +96,7 @@ anchor its analysis in specific evidence.
 ```
 
 Use metadata attributes that help Claude understand relationships:
+
 - `source` — filename or URL
 - `type` — report, email, code, transcript
 - `date` — temporal ordering
@@ -175,6 +172,7 @@ Cite which document supports each part of your answer.
 ### Reduce Noise
 
 Before including documents:
+
 - Remove boilerplate (headers, footers, navigation)
 - Strip formatting artifacts
 - Summarize or truncate irrelevant sections
@@ -182,6 +180,7 @@ Before including documents:
 ### Chunking Strategy
 
 If total content exceeds context window:
+
 1. Identify most relevant sections
 2. Include full text for critical parts
 3. Summarize less critical sections
@@ -203,6 +202,7 @@ Then, analyze those sections in detail.
 ### Buried Query
 
 **Bad:**
+
 ```
 What are the key findings?
 
@@ -210,6 +210,7 @@ What are the key findings?
 ```
 
 **Good:**
+
 ```
 [50K tokens of documents]
 
@@ -219,12 +220,14 @@ What are the key findings?
 ### Missing Structure
 
 **Bad:**
+
 ```
 Here's some data:
 [raw dump of multiple files concatenated]
 ```
 
 **Good:**
+
 ```xml
 <documents>
   <document index="1" source="file1.txt">...</document>
@@ -235,11 +238,13 @@ Here's some data:
 ### Vague Grounding Request
 
 **Bad:**
+
 ```
 Use the documents to answer.
 ```
 
 **Good:**
+
 ```
 Quote the specific passages that support your answer.
 Use the format: [Document X]: "quote"

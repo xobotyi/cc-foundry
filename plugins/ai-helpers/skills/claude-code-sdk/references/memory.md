@@ -9,14 +9,14 @@ Both load into context at session start. More specific instructions take precede
 
 ## Memory Hierarchy
 
-| Memory Type            | Location                                           | Purpose                                | Shared With                      |
-|------------------------|----------------------------------------------------|----------------------------------------|----------------------------------|
-| Managed policy         | System paths (see below)                           | Organization-wide instructions         | All users in organization        |
-| Project memory         | `./CLAUDE.md` or `./.claude/CLAUDE.md`             | Team-shared project instructions       | Team via source control          |
-| Project rules          | `./.claude/rules/*.md`                             | Modular topic-specific instructions    | Team via source control          |
-| User memory            | `~/.claude/CLAUDE.md`                              | Personal preferences for all projects  | Just you (all projects)          |
-| Project memory (local) | `./CLAUDE.local.md`                                | Personal project-specific preferences  | Just you (current project)       |
-| Auto memory            | `~/.claude/projects/<project>/memory/`             | Claude's automatic notes and learnings | Just you (per project)           |
+| Memory Type            | Location                               | Purpose                                | Shared With                |
+| ---------------------- | -------------------------------------- | -------------------------------------- | -------------------------- |
+| Managed policy         | System paths (see below)               | Organization-wide instructions         | All users in organization  |
+| Project memory         | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Team-shared project instructions       | Team via source control    |
+| Project rules          | `./.claude/rules/*.md`                 | Modular topic-specific instructions    | Team via source control    |
+| User memory            | `~/.claude/CLAUDE.md`                  | Personal preferences for all projects  | Just you (all projects)    |
+| Project memory (local) | `./CLAUDE.local.md`                    | Personal project-specific preferences  | Just you (current project) |
+| Auto memory            | `~/.claude/projects/<project>/memory/` | Claude's automatic notes and learnings | Just you (per project)     |
 
 **Managed policy paths:**
 
@@ -32,12 +32,11 @@ Both load into context at session start. More specific instructions take precede
 
 ## Auto Memory
 
-Claude automatically saves learnings, patterns, and insights as it works. Unlike CLAUDE.md
-(instructions you write for Claude), auto memory contains notes Claude writes for itself.
+Claude automatically saves learnings, patterns, and insights as it works. Unlike CLAUDE.md (instructions you write for
+Claude), auto memory contains notes Claude writes for itself.
 
-**Storage:** `~/.claude/projects/<project>/memory/` — derived from git repository root,
-so all subdirectories share one memory directory. Git worktrees get separate directories.
-Outside a git repo, the working directory is used instead.
+**Storage:** `~/.claude/projects/<project>/memory/` — derived from git repository root, so all subdirectories share one
+memory directory. Git worktrees get separate directories. Outside a git repo, the working directory is used instead.
 
 **Structure:**
 
@@ -83,8 +82,8 @@ See @README for project overview and @package.json for available npm commands.
 - Home directory paths (`~/.claude/...`) work — useful for sharing instructions across worktrees
 - Imports not evaluated inside code spans/blocks
 - Recursive imports supported (max 5 hops)
-- First encounter of external imports triggers one-time approval dialog per project; once
-  declined, imports remain disabled for that project
+- First encounter of external imports triggers one-time approval dialog per project; once declined, imports remain
+  disabled for that project
 - Run `/memory` to see all loaded memory files
 
 ## Memory Lookup
@@ -97,8 +96,7 @@ Claude Code reads memories recursively:
 
 ### Load from Additional Directories
 
-The `--add-dir` flag gives access to additional directories. To also load memory files from
-those directories:
+The `--add-dir` flag gives access to additional directories. To also load memory files from those directories:
 
 ```bash
 CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir ../shared-config
@@ -106,10 +104,10 @@ CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir ../shared-config
 
 ## Commands
 
-| Command   | Action                                              |
-|-----------|-----------------------------------------------------|
+| Command   | Action                                                  |
+| --------- | ------------------------------------------------------- |
 | `/memory` | Open any memory file in system editor; see loaded files |
-| `/init`   | Bootstrap a CLAUDE.md for the current project       |
+| `/init`   | Bootstrap a CLAUDE.md for the current project           |
 
 ## Modular Rules with `.claude/rules/`
 
@@ -125,8 +123,8 @@ your-project/
 │       └── security.md
 ```
 
-All `.md` files in `.claude/rules/` loaded as project memory (same priority as
-`.claude/CLAUDE.md`). Files are discovered recursively; subdirectories are supported.
+All `.md` files in `.claude/rules/` loaded as project memory (same priority as `.claude/CLAUDE.md`). Files are
+discovered recursively; subdirectories are supported.
 
 ### Path-Specific Rules
 
@@ -149,7 +147,7 @@ Rules without `paths` field apply to all files.
 ### Glob Patterns
 
 | Pattern                | Matches                                |
-|------------------------|----------------------------------------|
+| ---------------------- | -------------------------------------- |
 | `**/*.ts`              | All TypeScript files in any directory  |
 | `src/**/*`             | All files under `src/`                 |
 | `*.md`                 | Markdown files in project root         |
@@ -179,13 +177,13 @@ Circular symlinks handled gracefully.
 
 ### User-Level Rules
 
-Personal rules in `~/.claude/rules/` apply to all projects. Loaded before project rules
-(project rules have higher priority).
+Personal rules in `~/.claude/rules/` apply to all projects. Loaded before project rules (project rules have higher
+priority).
 
 ## Organization-Level Management
 
-Deploy centrally managed CLAUDE.md via configuration management (MDM, Group Policy, Ansible)
-to the managed policy location.
+Deploy centrally managed CLAUDE.md via configuration management (MDM, Group Policy, Ansible) to the managed policy
+location.
 
 ## Best Practices
 
@@ -194,6 +192,5 @@ to the managed policy location.
 - **Review periodically**: Update as project evolves
 - **Keep rules focused**: Each file should cover one topic
 - **Use descriptive filenames**: Filename should indicate content
-- **Use conditional rules sparingly**: Only add `paths` when rules truly apply to specific
-  file types
+- **Use conditional rules sparingly**: Only add `paths` when rules truly apply to specific file types
 - **Organize with subdirectories**: Group related rules (e.g., `frontend/`, `backend/`)

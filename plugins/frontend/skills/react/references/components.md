@@ -6,26 +6,24 @@ Pure components, composition patterns, refs, document metadata, and JSX conventi
 
 Build UI in five steps:
 
-1. **Break UI into component hierarchy.** Each component does one thing.
-   If it grows, decompose into subcomponents.
-2. **Build a static version first.** Render UI from data with props only —
-   no state, no interactivity. Lots of typing, no thinking.
-3. **Find minimal state.** For each piece of data, ask: does it change over
-   time? Is it passed from a parent? Can it be computed? If all yes → not state.
-4. **Identify where state lives.** Find every component that renders based on
-   the state. Find their closest common parent. Put state there.
-5. **Add inverse data flow.** Pass state-setter callbacks down so children
-   can update parent state through event handlers.
+1. **Break UI into component hierarchy.** Each component does one thing. If it grows, decompose into subcomponents.
+2. **Build a static version first.** Render UI from data with props only — no state, no interactivity. Lots of typing,
+   no thinking.
+3. **Find minimal state.** For each piece of data, ask: does it change over time? Is it passed from a parent? Can it be
+   computed? If all yes → not state.
+4. **Identify where state lives.** Find every component that renders based on the state. Find their closest common
+   parent. Put state there.
+5. **Add inverse data flow.** Pass state-setter callbacks down so children can update parent state through event
+   handlers.
 
 ## Component Purity
 
 **React assumes every component is a pure function.**
 
 A pure component:
-- **Minds its own business.** Does not change objects or variables that
-  existed before it was called.
-- **Same inputs, same output.** Given the same props + state + context,
-  always returns the same JSX.
+
+- **Minds its own business.** Does not change objects or variables that existed before it was called.
+- **Same inputs, same output.** Given the same props + state + context, always returns the same JSX.
 
 ```tsx
 // BAD — mutates external variable during render
@@ -57,12 +55,12 @@ function TeaGathering() {
 
 ### Where Side Effects Belong
 
-| Side effect type | Where to put it |
-|-----------------|-----------------|
-| User clicks, form submits | Event handlers |
-| Sync with external system (DOM, network) | `useEffect` (last resort) |
-| Data transformation | Compute during render |
-| Shared logic between handlers | Extract a function, call from handlers |
+| Side effect type                         | Where to put it                        |
+| ---------------------------------------- | -------------------------------------- |
+| User clicks, form submits                | Event handlers                         |
+| Sync with external system (DOM, network) | `useEffect` (last resort)              |
+| Data transformation                      | Compute during render                  |
+| Shared logic between handlers            | Extract a function, call from handlers |
 
 **Event handlers don't need to be pure** — they run outside of rendering.
 
@@ -115,8 +113,7 @@ Avoid implicit returns in ref callbacks — use block body `{}` not parentheses:
 
 ## Document Metadata
 
-Render `<title>`, `<meta>`, and `<link>` tags directly in components. React
-hoists them to `<head>` automatically:
+Render `<title>`, `<meta>`, and `<link>` tags directly in components. React hoists them to `<head>` automatically:
 
 ```tsx
 function BlogPost({ post }: { post: Post }) {
@@ -133,19 +130,17 @@ function BlogPost({ post }: { post: Post }) {
 }
 ```
 
-This works with client-only apps, streaming SSR, and Server Components.
-For complex metadata needs (route-based overrides), a metadata library
-may still be useful.
+This works with client-only apps, streaming SSR, and Server Components. For complex metadata needs (route-based
+overrides), a metadata library may still be useful.
 
 ## Custom Elements
 
-React provides full support for custom elements with proper attribute and
-property handling:
+React provides full support for custom elements with proper attribute and property handling:
 
-- **Server rendering:** primitive props (`string`, `number`, `true`) render
-  as attributes. Non-primitive props (`object`, `function`, `false`) are omitted.
-- **Client rendering:** props matching a property on the element instance are
-  assigned as properties; others are assigned as attributes.
+- **Server rendering:** primitive props (`string`, `number`, `true`) render as attributes. Non-primitive props
+  (`object`, `function`, `false`) are omitted.
+- **Client rendering:** props matching a property on the element instance are assigned as properties; others are
+  assigned as attributes.
 
 ```tsx
 <my-component custom-attr="value" items={complexArray} />
@@ -172,8 +167,8 @@ Reduce prop drilling by passing JSX as children:
 </Layout>
 ```
 
-When a wrapper component updates its own state, React knows its `children`
-props haven't changed, so children skip re-rendering.
+When a wrapper component updates its own state, React knows its `children` props haven't changed, so children skip
+re-rendering.
 
 ### Compound Components
 
@@ -216,23 +211,20 @@ FlyOut.List = function List({ children }: { children: React.ReactNode }) {
 
 ### Controlled vs Uncontrolled
 
-- **Controlled:** Parent owns the state, passes value + onChange.
-  Full control, more wiring.
-- **Uncontrolled:** Component manages its own state internally.
-  Less wiring, less flexibility.
+- **Controlled:** Parent owns the state, passes value + onChange. Full control, more wiring.
+- **Uncontrolled:** Component manages its own state internally. Less wiring, less flexibility.
 
-Prefer controlled components when parent needs to coordinate state across
-siblings. Prefer uncontrolled for isolated, self-contained UI.
+Prefer controlled components when parent needs to coordinate state across siblings. Prefer uncontrolled for isolated,
+self-contained UI.
 
 ## Component Body Organization
 
-Separate logic from rendering. The component body handles computation, state, and handler
-definitions. JSX is declarative — it references results, not processes.
+Separate logic from rendering. The component body handles computation, state, and handler definitions. JSX is
+declarative — it references results, not processes.
 
 ### Named Prop Types
 
-Every component with props must have a dedicated named type. Never define prop types
-inline in the function signature:
+Every component with props must have a dedicated named type. Never define prop types inline in the function signature:
 
 ```tsx
 // BAD — inline prop type
@@ -252,8 +244,7 @@ function SavePopover({ names, onCreate }: SavePopoverProps) { ... }
 
 ### Handler Object
 
-Group all event handlers in a single `handle` object. This creates a clear boundary
-between logic and rendering:
+Group all event handlers in a single `handle` object. This creates a clear boundary between logic and rendering:
 
 ```tsx
 const handle = {
@@ -277,8 +268,7 @@ Never inline handler logic in JSX. Reference handlers from the `handle` object.
 
 ### Pre-render Computation
 
-Move list rendering and derived JSX out of the return statement into component body
-variables:
+Move list rendering and derived JSX out of the return statement into component body variables:
 
 ```tsx
 // BAD — iteration logic inside JSX
@@ -322,12 +312,9 @@ const showItems = items.length > 0 && hasPermission && !isLoading;
 ## JSX Conventions
 
 - **Self-closing tags** for components without children: `<Input />`.
-- **Boolean attributes** without value: `<Input disabled />` not
-  `disabled={true}`.
+- **Boolean attributes** without value: `<Input disabled />` not `disabled={true}`.
 - **Fragments** to avoid wrapper divs: `<>...</>` or `<Fragment key={id}>`.
-- **Avoid `&&` with numbers.** `count && <List />` renders `0`.
-  Use `count > 0 && <List />` or ternary.
-- **Never inline handler logic in JSX.** Group all handlers in a `handle`
-  object in the component body (see Handler Object above).
-- **Spread props sparingly.** `{...props}` makes it unclear what a
-  component accepts. Prefer explicit props.
+- **Avoid `&&` with numbers.** `count && <List />` renders `0`. Use `count > 0 && <List />` or ternary.
+- **Never inline handler logic in JSX.** Group all handlers in a `handle` object in the component body (see Handler
+  Object above).
+- **Spread props sparingly.** `{...props}` makes it unclear what a component accepts. Prefer explicit props.
