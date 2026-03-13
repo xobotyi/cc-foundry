@@ -1,0 +1,20 @@
+{
+  "sources": {
+    "PVE Administration Guide - VM Management": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_virtual_machines",
+    "PVE Administration Guide - Container Management": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_pct",
+    "PVE Administration Guide - Storage": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_storage",
+    "PVE Administration Guide - Network Configuration": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_network",
+    "PVE Administration Guide - Cluster Manager": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_pvecm",
+    "PVE Administration Guide - High Availability": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_ha_manager",
+    "PVE Administration Guide - Backup and Restore": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_vzdump",
+    "PVE Administration Guide - Firewall": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_pve_firewall",
+    "PVE Administration Guide - User Management": "https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_user_management",
+    "PVE API Reference": "https://pve.proxmox.com/pve-docs/api-viewer/index.html",
+    "PVE Wiki - Cloud-Init Support": "https://pve.proxmox.com/wiki/Cloud-Init_Support",
+    "PVE Wiki - PCI Passthrough": "https://pve.proxmox.com/wiki/PCI_Passthrough",
+    "PVE Wiki - ZFS on Linux": "https://pve.proxmox.com/wiki/ZFS_on_Linux",
+    "Proxmox Backup Server Documentation": "https://pbs.proxmox.com/docs/introduction.html",
+    "PVE Wiki - Software Defined Network": "https://pve.proxmox.com/wiki/Setup_Simple_Zone_With_SNAT_and_DHCP"
+  },
+  "lastFetched": "2026-03-13T19:29:03.711Z"
+}

@@ -28,7 +28,7 @@
     {
       "name": "ai-helpers",
       "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -232,6 +232,22 @@
       "license": "MIT",
       "keywords": ["php", "conventions", "typing", "oop", "phpunit"],
       "tags": ["language", "php", "coding"]
+    },
+    {
+      "name": "infrastructure",
+      "description": "Infrastructure management discipline: Ansible automation, container orchestration, Proxmox virtualization, Unraid NAS, and network architecture",
+      "version": "1.0.0",
+      "author": {
+        "name": "xobotyi",
+        "email": "xog3@yandex.ru"
+      },
+      "source": "./plugins/infrastructure",
+      "category": "development",
+      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/infrastructure",
+      "repository": "https://github.com/xobotyi/cc-foundry",
+      "license": "MIT",
+      "keywords": ["ansible", "docker", "proxmox", "unraid", "networking", "infrastructure", "devops"],
+      "tags": ["platform", "infrastructure", "devops"]
     },
     {
       "name": "the-workflow",

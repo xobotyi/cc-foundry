@@ -1,0 +1,20 @@
+{
+  "sources": {
+    "Ansible Best Practices": "https://docs.ansible.com/ansible/latest/tips_tricks/ansible_tips_tricks.html",
+    "Playbook Guide": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html",
+    "Role Structure": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html",
+    "Vault Documentation": "https://docs.ansible.com/ansible/latest/vault_guide/index.html",
+    "Collections Documentation": "https://docs.ansible.com/ansible/latest/collections_guide/index.html",
+    "Inventory Guide": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html",
+    "Dynamic Inventory": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_dynamic_inventory.html",
+    "Variable Precedence": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html",
+    "Error Handling Blocks": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html",
+    "Jinja2 Templating": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_templating.html",
+    "Handlers": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html",
+    "Async and Polling": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_async.html",
+    "Delegation and Local Actions": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_delegation.html",
+    "Performance Tuning": "https://docs.ansible.com/ansible/latest/tips_tricks/sample_setup.html",
+    "Molecule Testing": "https://ansible.readthedocs.io/projects/molecule/getting-started/"
+  },
+  "lastFetched": "2026-03-13T19:27:04.290Z"
+}

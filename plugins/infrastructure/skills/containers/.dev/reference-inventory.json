@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "Dockerfile Reference": "https://docs.docker.com/reference/dockerfile/",
+    "Docker Build Best Practices": "https://docs.docker.com/build/building/best-practices/",
+    "Multi-stage Builds": "https://docs.docker.com/build/building/multi-stage/",
+    "Compose Specification": "https://docs.docker.com/reference/compose-file/",
+    "Docker Security Best Practices": "https://docs.docker.com/build/building/best-practices/#security",
+    "Docker Networking Overview": "https://docs.docker.com/engine/network/",
+    "Docker Network Drivers": "https://docs.docker.com/engine/network/drivers/",
+    "Docker Volumes": "https://docs.docker.com/engine/storage/volumes/",
+    "Docker Resource Constraints": "https://docs.docker.com/engine/containers/resource_constraints/",
+    "Dockerfile HEALTHCHECK": "https://docs.docker.com/reference/dockerfile/#healthcheck",
+    "Docker Logging Drivers": "https://docs.docker.com/engine/logging/configure/",
+    "Podman Rootless Tutorial": "https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md",
+    "Podman Docker Compatibility": "https://github.com/containers/podman/blob/main/transfer.md",
+    "OCI Image Specification": "https://github.com/opencontainers/image-spec/blob/main/spec.md"
+  },
+  "lastFetched": "2026-03-13T19:27:25.806Z"
+}
