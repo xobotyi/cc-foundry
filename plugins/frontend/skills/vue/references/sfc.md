@@ -1,7 +1,7 @@
 # Single-File Components
 
-SFCs (`.vue` files) colocate template, logic, and styles in one file.
-They are the recommended authoring format for all non-trivial Vue code.
+SFCs (`.vue` files) colocate template, logic, and styles in one file. They are the recommended authoring format for all
+non-trivial Vue code.
 
 ## Block Order
 
@@ -25,8 +25,8 @@ Always order blocks consistently:
 
 ## `<script setup>`
 
-Everything declared at the top level is available in the template.
-No need for `return` statements or `components` registration.
+Everything declared at the top level is available in the template. No need for `return` statements or `components`
+registration.
 
 ```vue
 <script setup lang="ts">
@@ -64,15 +64,15 @@ Order declarations logically:
 
 These are available without import in `<script setup>`:
 
-| Macro | Purpose |
-|-------|---------|
-| `defineProps()` | Declare component props |
-| `defineEmits()` | Declare component events |
-| `defineExpose()` | Expose public instance properties |
+| Macro             | Purpose                                        |
+| ----------------- | ---------------------------------------------- |
+| `defineProps()`   | Declare component props                        |
+| `defineEmits()`   | Declare component events                       |
+| `defineExpose()`  | Expose public instance properties              |
 | `defineOptions()` | Set component options (`name`, `inheritAttrs`) |
-| `defineSlots()` | Type-check slot props (TS only) |
-| `defineModel()` | Two-way binding (v-model) shorthand |
-| `withDefaults()` | Set defaults for type-based props |
+| `defineSlots()`   | Type-check slot props (TS only)                |
+| `defineModel()`   | Two-way binding (v-model) shorthand            |
+| `withDefaults()`  | Set defaults for type-based props              |
 
 ### `defineOptions()`
 
@@ -91,11 +91,11 @@ defineOptions({
 
 ### Directives
 
-| Shorthand | Full | Purpose |
-|-----------|------|---------|
-| `:prop` | `v-bind:prop` | Bind attribute/prop |
-| `@event` | `v-on:event` | Listen to event |
-| `#slot` | `v-slot:slot` | Named slot |
+| Shorthand | Full          | Purpose             |
+| --------- | ------------- | ------------------- |
+| `:prop`   | `v-bind:prop` | Bind attribute/prop |
+| `@event`  | `v-on:event`  | Listen to event     |
+| `#slot`   | `v-slot:slot` | Named slot          |
 
 Always use shorthands consistently — don't mix `:` and `v-bind:`.
 
@@ -125,8 +125,7 @@ Always use shorthands consistently — don't mix `:` and `v-bind:`.
 <div v-show="isVisible">Toggled frequently</div>
 ```
 
-Use `v-if` for conditions that rarely change. Use `v-show` for frequent
-toggles (avoids mount/unmount cost).
+Use `v-if` for conditions that rarely change. Use `v-show` for frequent toggles (avoids mount/unmount cost).
 
 ### List Rendering
 
@@ -182,9 +181,8 @@ Pre-3.5, use `ref<HTMLInputElement | null>(null)` with matching `ref` name.
 </style>
 ```
 
-Scoped styles use data attributes to scope CSS to the component.
-Child component root elements are affected by both parent and child scoped
-styles.
+Scoped styles use data attributes to scope CSS to the component. Child component root elements are affected by both
+parent and child scoped styles.
 
 ### Deep Selectors
 

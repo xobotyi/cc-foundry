@@ -4,8 +4,8 @@ Config structure, projects, environments, pools, and performance tuning.
 
 ## Config File
 
-Vitest reads `vitest.config.ts` (highest priority) or falls back to `vite.config.ts`.
-Use `defineConfig` from `'vitest/config'` — it includes Vitest type extensions:
+Vitest reads `vitest.config.ts` (highest priority) or falls back to `vite.config.ts`. Use `defineConfig` from
+`'vitest/config'` — it includes Vitest type extensions:
 
 ```ts
 // vitest.config.ts
@@ -33,8 +33,7 @@ export default defineConfig({
 
 ### Merging Configs
 
-When using separate Vitest and Vite configs, merge explicitly — Vitest config
-**overrides**, it does not extend:
+When using separate Vitest and Vite configs, merge explicitly — Vitest config **overrides**, it does not extend:
 
 ```ts
 import { defineConfig, mergeConfig } from 'vitest/config'
@@ -93,8 +92,7 @@ test: {
 }
 ```
 
-`jsdom` and `happy-dom` require separate installation:
-`npm i -D happy-dom` or `npm i -D jsdom`.
+`jsdom` and `happy-dom` require separate installation: `npm i -D happy-dom` or `npm i -D jsdom`.
 
 ### Timeouts
 
@@ -117,13 +115,11 @@ test: {
 }
 ```
 
-**Recommendation:** Enable `restoreMocks: true` at minimum. It clears history and
-restores `vi.spyOn` originals.
+**Recommendation:** Enable `restoreMocks: true` at minimum. It clears history and restores `vi.spyOn` originals.
 
 ## Projects (Multi-Config)
 
-Run different configurations within a single Vitest process. Replaces the deprecated
-`workspace` option (v3.2+).
+Run different configurations within a single Vitest process. Replaces the deprecated `workspace` option (v3.2+).
 
 ```ts
 export default defineConfig({
@@ -164,11 +160,11 @@ export default defineConfig({
 
 ### Pool Types
 
-| Pool | Mechanism | When to Use |
-|------|-----------|-------------|
-| `forks` (default) | `child_process.fork` | Best compatibility, default choice |
-| `threads` | `worker_threads` | Faster for large suites, some packages may break |
-| `vmThreads` | VM context in threads | Isolation + performance (cannot disable isolation) |
+| Pool              | Mechanism             | When to Use                                        |
+| ----------------- | --------------------- | -------------------------------------------------- |
+| `forks` (default) | `child_process.fork`  | Best compatibility, default choice                 |
+| `threads`         | `worker_threads`      | Faster for large suites, some packages may break   |
+| `vmThreads`       | VM context in threads | Isolation + performance (cannot disable isolation) |
 
 ```ts
 test: {
@@ -187,6 +183,7 @@ test: {
 ```
 
 **Performance tips:**
+
 - `isolate: false` — skip per-file isolation for stateless tests (significant speedup).
 - `pool: 'threads'` — faster than `forks` for large suites.
 - `fileParallelism: false` — disable when debugging or tests share state.
@@ -200,8 +197,8 @@ describe.concurrent('suite', () => {
 })
 ```
 
-Use `expect` from the test context (destructured parameter) with concurrent tests
-to ensure correct snapshot and assertion tracking.
+Use `expect` from the test context (destructured parameter) with concurrent tests to ensure correct snapshot and
+assertion tracking.
 
 ## Environment Variables
 
@@ -238,11 +235,10 @@ Config:
 test: { includeSource: ['src/**/*.{js,ts}'] }
 ```
 
-For production builds, define `'import.meta.vitest': 'undefined'` to enable dead code
-elimination. Add `"types": ["vitest/importMeta"]` to `tsconfig.json`.
+For production builds, define `'import.meta.vitest': 'undefined'` to enable dead code elimination. Add
+`"types": ["vitest/importMeta"]` to `tsconfig.json`.
 
-Use in-source testing for small utilities only — use separate test files for complex
-tests.
+Use in-source testing for small utilities only — use separate test files for complex tests.
 
 ## Sharding (CI)
 
@@ -255,5 +251,4 @@ vitest run --reporter=blob --shard=3/3  # machine 3
 vitest run --merge-reports              # merge results
 ```
 
-Vitest splits by file, not by test case. Combine with `--coverage` for merged
-coverage reports.
+Vitest splits by file, not by test case. Combine with `--coverage` for merged coverage reports.

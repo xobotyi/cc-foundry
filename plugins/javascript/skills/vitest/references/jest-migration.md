@@ -4,17 +4,17 @@ Key differences, API mapping, and common gotchas.
 
 ## Quick API Translation
 
-| Jest | Vitest | Notes |
-|------|--------|-------|
-| `jest.fn()` | `vi.fn()` | Same API surface |
-| `jest.spyOn(obj, 'method')` | `vi.spyOn(obj, 'method')` | Same API |
-| `jest.mock('./mod')` | `vi.mock('./mod')` | Factory return differs (see below) |
-| `jest.requireActual('./mod')` | `await vi.importActual('./mod')` | Always async |
-| `jest.useFakeTimers()` | `vi.useFakeTimers()` | Same `@sinonjs/fake-timers` internally |
-| `jest.setTimeout(n)` | `vi.setConfig({ testTimeout: n })` | Different API |
-| `jest.clearAllMocks()` | `vi.clearAllMocks()` | Same behavior |
-| `jest.resetAllMocks()` | `vi.resetAllMocks()` | See `mockReset` difference below |
-| `jest.restoreAllMocks()` | `vi.restoreAllMocks()` | Same concept |
+| Jest                          | Vitest                             | Notes                                  |
+| ----------------------------- | ---------------------------------- | -------------------------------------- |
+| `jest.fn()`                   | `vi.fn()`                          | Same API surface                       |
+| `jest.spyOn(obj, 'method')`   | `vi.spyOn(obj, 'method')`          | Same API                               |
+| `jest.mock('./mod')`          | `vi.mock('./mod')`                 | Factory return differs (see below)     |
+| `jest.requireActual('./mod')` | `await vi.importActual('./mod')`   | Always async                           |
+| `jest.useFakeTimers()`        | `vi.useFakeTimers()`               | Same `@sinonjs/fake-timers` internally |
+| `jest.setTimeout(n)`          | `vi.setConfig({ testTimeout: n })` | Different API                          |
+| `jest.clearAllMocks()`        | `vi.clearAllMocks()`               | Same behavior                          |
+| `jest.resetAllMocks()`        | `vi.resetAllMocks()`               | See `mockReset` difference below       |
+| `jest.restoreAllMocks()`      | `vi.restoreAllMocks()`             | Same concept                           |
 
 ### Type Changes
 
@@ -37,13 +37,11 @@ Jest provides `describe`, `it`, `expect` globally. Vitest requires explicit impo
 import { describe, it, expect, vi } from 'vitest'
 ```
 
-Or enable `globals: true` in config and add `"types": ["vitest/globals"]` to
-`tsconfig.json`.
+Or enable `globals: true` in config and add `"types": ["vitest/globals"]` to `tsconfig.json`.
 
 ### 2. Module Mock Factory Returns an Object
 
-In Jest, the factory return value IS the default export. In Vitest, you must return
-an object with explicit exports:
+In Jest, the factory return value IS the default export. In Vitest, you must return an object with explicit exports:
 
 ```ts
 // Jest
@@ -79,8 +77,8 @@ state === mock.mock  // true in Vitest, false in Jest
 
 ### 5. Auto-Mocking Is Not Automatic
 
-Jest auto-mocks `__mocks__` directories. Vitest requires explicit `vi.mock()` calls.
-To replicate Jest behavior, call `vi.mock` in `setupFiles`:
+Jest auto-mocks `__mocks__` directories. Vitest requires explicit `vi.mock()` calls. To replicate Jest behavior, call
+`vi.mock` in `setupFiles`:
 
 ```ts
 // test/setup.ts
@@ -101,8 +99,8 @@ beforeEach(() => { setActivePinia(createTestingPinia()) })
 
 ### 7. Hook Execution Order
 
-Jest runs hooks sequentially (list order). Vitest uses **stack order** by default
-(reverse for teardown). To match Jest behavior:
+Jest runs hooks sequentially (list order). Vitest uses **stack order** by default (reverse for teardown). To match Jest
+behavior:
 
 ```ts
 test: {
@@ -112,8 +110,7 @@ test: {
 
 ### 8. Test Name Separator
 
-Jest: `"describe title test title"` (space)
-Vitest: `"describe title > test title"` (chevron)
+Jest: `"describe title test title"` (space) Vitest: `"describe title > test title"` (chevron)
 
 ### 9. Snapshot Differences
 

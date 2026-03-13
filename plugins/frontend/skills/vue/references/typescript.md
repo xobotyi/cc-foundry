@@ -1,7 +1,7 @@
 # TypeScript
 
-Vue 3 Composition API is designed for TypeScript. Most types are inferred
-automatically — add explicit annotations only where inference falls short.
+Vue 3 Composition API is designed for TypeScript. Most types are inferred automatically — add explicit annotations only
+where inference falls short.
 
 ## Props
 
@@ -32,9 +32,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 ```
 
-**Note:** Mutable reference type defaults (arrays, objects) must use factory
-functions with `withDefaults` to avoid shared references. This is NOT
-needed with destructure defaults.
+**Note:** Mutable reference type defaults (arrays, objects) must use factory functions with `withDefaults` to avoid
+shared references. This is NOT needed with destructure defaults.
 
 ### Complex Prop Types
 
@@ -136,8 +135,7 @@ const state: State = reactive({
 })
 ```
 
-Don't use `reactive<T>()` generic — the returned type handles ref
-unwrapping differently from the generic parameter.
+Don't use `reactive<T>()` generic — the returned type handles ref unwrapping differently from the generic parameter.
 
 ## Template Refs
 
@@ -237,12 +235,12 @@ const emit = defineEmits<{
 
 ## Utility Types
 
-| Type | Purpose |
-|------|---------|
-| `Ref<T>` | Ref wrapper type |
-| `ComputedRef<T>` | Computed ref type |
-| `MaybeRef<T>` | `T \| Ref<T>` |
-| `MaybeRefOrGetter<T>` | `T \| Ref<T> \| (() => T)` |
-| `InjectionKey<T>` | Typed injection key |
-| `PropType<T>` | Runtime prop type casting |
+| Type                      | Purpose                    |
+| ------------------------- | -------------------------- |
+| `Ref<T>`                  | Ref wrapper type           |
+| `ComputedRef<T>`          | Computed ref type          |
+| `MaybeRef<T>`             | `T \| Ref<T>`              |
+| `MaybeRefOrGetter<T>`     | `T \| Ref<T> \| (() => T)` |
+| `InjectionKey<T>`         | Typed injection key        |
+| `PropType<T>`             | Runtime prop type casting  |
 | `ComponentPublicInstance` | Generic component instance |

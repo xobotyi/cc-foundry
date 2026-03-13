@@ -8,32 +8,31 @@ description: >-
 
 # PHPUnit
 
-**Test behavior, not implementation. Tests are executable documentation — if the test name
-doesn't explain what the code does, rewrite it.**
+**Test behavior, not implementation. Tests are executable documentation — if the test name doesn't explain what the code
+does, rewrite it.**
 
-PHPUnit is PHP's standard testing framework. It uses test case classes extending `TestCase`,
-`setUp()`/`tearDown()` for fixtures, and a rich assertion API. All patterns target PHPUnit 11+
-on PHP 8.5+. Use PHP 8 attributes exclusively — annotations are deprecated in 11, removed
-in 12.
+PHPUnit is PHP's standard testing framework. It uses test case classes extending `TestCase`, `setUp()`/`tearDown()` for
+fixtures, and a rich assertion API. All patterns target PHPUnit 11+ on PHP 8.5+. Use PHP 8 attributes exclusively —
+annotations are deprecated in 11, removed in 12.
 
 ## References
 
-| Topic | Reference | Contents |
-|-------|-----------|----------|
-| Assertion catalog, constraints, exception expectations | [`${CLAUDE_SKILL_DIR}/references/assertions.md`] | Full assertion API grouped by category, constraint system, custom assertions |
-| Test doubles — stubs, mocks, MockBuilder | [`${CLAUDE_SKILL_DIR}/references/mocking.md`] | createStub vs createMock, return config, invocation matchers, argument constraints, MockBuilder |
-| Data providers — static, named, generators | [`${CLAUDE_SKILL_DIR}/references/data-providers.md`] | #[DataProvider], #[TestWith], named datasets, generator providers, external providers |
-| phpunit.xml structure, test suites, source config | [`${CLAUDE_SKILL_DIR}/references/configuration.md`] | XML elements, strict settings, source element, coverage reports, execution order |
+| Topic                                                  | Reference                                            | Contents                                                                                        |
+| ------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Assertion catalog, constraints, exception expectations | [`${CLAUDE_SKILL_DIR}/references/assertions.md`]     | Full assertion API grouped by category, constraint system, custom assertions                    |
+| Test doubles — stubs, mocks, MockBuilder               | [`${CLAUDE_SKILL_DIR}/references/mocking.md`]        | createStub vs createMock, return config, invocation matchers, argument constraints, MockBuilder |
+| Data providers — static, named, generators             | [`${CLAUDE_SKILL_DIR}/references/data-providers.md`] | #[DataProvider], #[TestWith], named datasets, generator providers, external providers           |
+| phpunit.xml structure, test suites, source config      | [`${CLAUDE_SKILL_DIR}/references/configuration.md`]  | XML elements, strict settings, source element, coverage reports, execution order                |
 
 ## Test Structure
 
 ### Discovery and Naming
 
-- **Files:** `*Test.php` in configured test directories. Mirror source structure:
-  `src/Service/PaymentService.php` → `tests/Unit/Service/PaymentServiceTest.php`.
+- **Files:** `*Test.php` in configured test directories. Mirror source structure: `src/Service/PaymentService.php` →
+  `tests/Unit/Service/PaymentServiceTest.php`.
 - **Classes:** `final class PaymentServiceTest extends TestCase`. Always `final`.
-- **Methods:** `test` prefix or `#[Test]` attribute. Describe the behavior:
-  `testReturnsEmptyCollectionWhenNoResults` not `testSearch`.
+- **Methods:** `test` prefix or `#[Test]` attribute. Describe the behavior: `testReturnsEmptyCollectionWhenNoResults`
+  not `testSearch`.
 - **One test class per production class.** Split into Unit/Integration directories.
 
 ### Arrange-Act-Assert
@@ -57,28 +56,26 @@ public function testUserCreationSetsDefaults(): void
 ```
 
 - **One act per test.** If you need multiple acts, write multiple tests.
-- **Comments optional** when phases are obvious. Add them when the test is long enough
-  that phases aren't immediately clear.
+- **Comments optional** when phases are obvious. Add them when the test is long enough that phases aren't immediately
+  clear.
 
 ### Test Granularity
 
-- **One concept per test.** Multiple assertions are fine when they verify the same behavior.
-  Separate tests when behaviors are independent.
-- **Fast by default.** Unit tests should run in milliseconds. Gate slow tests behind
-  groups: `#[Group('slow')]`.
-- **Isolation is mandatory.** Tests must not depend on execution order or shared mutable
-  state. Each test sets up its own world.
+- **One concept per test.** Multiple assertions are fine when they verify the same behavior. Separate tests when
+  behaviors are independent.
+- **Fast by default.** Unit tests should run in milliseconds. Gate slow tests behind groups: `#[Group('slow')]`.
+- **Isolation is mandatory.** Tests must not depend on execution order or shared mutable state. Each test sets up its
+  own world.
 
 ## Fixtures
 
 ### setUp() / tearDown()
 
-- **`setUp()`** runs before each test method on a fresh instance. Create the SUT and its
-  stubs here.
-- **`tearDown()`** runs after each test. Only needed for external resources (files, sockets,
-  DB connections). Not needed for plain object cleanup.
-- **`setUpBeforeClass()` / `tearDownAfterClass()`** run once per class. Use for expensive
-  shared resources (DB connections). Store in `static` properties.
+- **`setUp()`** runs before each test method on a fresh instance. Create the SUT and its stubs here.
+- **`tearDown()`** runs after each test. Only needed for external resources (files, sockets, DB connections). Not needed
+  for plain object cleanup.
+- **`setUpBeforeClass()` / `tearDownAfterClass()`** run once per class. Use for expensive shared resources (DB
+  connections). Store in `static` properties.
 
 ```php
 final class PaymentServiceTest extends TestCase
@@ -96,19 +93,18 @@ final class PaymentServiceTest extends TestCase
 
 ### Fixture Lifecycle
 
-| Method | Scope | Runs |
-|--------|-------|------|
-| `setUpBeforeClass()` | Class | Once before first test |
-| `setUp()` | Method | Before each test |
-| `assertPreConditions()` | Method | After setUp, before test |
+| Method                   | Scope  | Runs                        |
+| ------------------------ | ------ | --------------------------- |
+| `setUpBeforeClass()`     | Class  | Once before first test      |
+| `setUp()`                | Method | Before each test            |
+| `assertPreConditions()`  | Method | After setUp, before test    |
 | `assertPostConditions()` | Method | After test, before tearDown |
-| `tearDown()` | Method | After each test |
-| `tearDownAfterClass()` | Class | Once after last test |
+| `tearDown()`             | Method | After each test             |
+| `tearDownAfterClass()`   | Class  | Once after last test        |
 
-- **Call `parent::setUp()`** when extending abstract test cases — otherwise parent
-  fixture setup is silently skipped.
-- **Use `#[Before]` / `#[After]` attributes** when multiple setup methods are needed
-  (avoids fragile `parent::setUp()` chains).
+- **Call `parent::setUp()`** when extending abstract test cases — otherwise parent fixture setup is silently skipped.
+- **Use `#[Before]` / `#[After]` attributes** when multiple setup methods are needed (avoids fragile `parent::setUp()`
+  chains).
 
 ## Data Providers
 
@@ -172,8 +168,7 @@ public static function boundaryCases(): Generator
 - **Empty providers are forbidden** in PHPUnit 11 — throws `InvalidDataProviderException`.
 - **Multiple providers** can be stacked on one test method — datasets are combined.
 
-See `${CLAUDE_SKILL_DIR}/references/data-providers.md` for external providers, TestDox
-integration, and edge cases.
+See `${CLAUDE_SKILL_DIR}/references/data-providers.md` for external providers, TestDox integration, and edge cases.
 
 ## Assertions
 
@@ -223,8 +218,7 @@ public function testThrowsOnInvalidInput(): void
 ```
 
 - **Call `expectException()` before the throwing code** — it sets up the expectation.
-- **Use `expectExceptionMessage()`** when the exception type is broad — validates the
-  message contains the substring.
+- **Use `expectExceptionMessage()`** when the exception type is broad — validates the message contains the substring.
 - **Use `expectExceptionMessageMatches()`** for regex matching.
 
 ### Deprecation / Error Expectations
@@ -238,8 +232,8 @@ public function testTriggersDeprecation(): void
 }
 ```
 
-See `${CLAUDE_SKILL_DIR}/references/assertions.md` for the full assertion catalog, constraint
-system, and format string assertions.
+See `${CLAUDE_SKILL_DIR}/references/assertions.md` for the full assertion catalog, constraint system, and format string
+assertions.
 
 ## Mocking
 
@@ -300,76 +294,73 @@ $stub->method('fetch')->willReturnMap([
 
 ### Mocking Rules
 
-- **Mock at boundaries.** Mock external services, databases, filesystems, clocks — not
-  internal functions.
+- **Mock at boundaries.** Mock external services, databases, filesystems, clocks — not internal functions.
 - **Don't mock what you own** when a fake or in-memory implementation is available.
-- **Prefer dependency injection** over complex mock setup. Pass collaborators as
-  constructor parameters, stub in tests.
-- **Never mock the thing you're testing.** If you need to mock part of the SUT, the SUT
-  has too many responsibilities — split it.
+- **Prefer dependency injection** over complex mock setup. Pass collaborators as constructor parameters, stub in tests.
+- **Never mock the thing you're testing.** If you need to mock part of the SUT, the SUT has too many responsibilities —
+  split it.
 - **Favour interfaces over classes** for test doubles — fewer limitations, better design.
 - **Do not call `expects()` on stubs** — deprecated in 11, error in 12.
 
-See `${CLAUDE_SKILL_DIR}/references/mocking.md` for MockBuilder, intersection types, invocation
-matchers, and PHP 8.4 property hooks.
+See `${CLAUDE_SKILL_DIR}/references/mocking.md` for MockBuilder, intersection types, invocation matchers, and PHP 8.4
+property hooks.
 
 ## Attributes
 
-PHPUnit 11 uses PHP 8 attributes exclusively. All attributes are in the
-`PHPUnit\Framework\Attributes` namespace.
+PHPUnit 11 uses PHP 8 attributes exclusively. All attributes are in the `PHPUnit\Framework\Attributes` namespace.
 
 ### Test Metadata
 
-| Attribute | Purpose |
-|-----------|---------|
-| `#[Test]` | Mark non-`test*` method as a test |
-| `#[DataProvider('method')]` | Connect a data provider |
-| `#[DataProviderExternal(Class::class, 'method')]` | External data provider |
-| `#[TestWith([args])]` | Inline data provider |
-| `#[TestDox('description')]` | Custom TestDox description |
-| `#[Depends('testMethod')]` | Declare test dependency |
-| `#[Group('name')]` | Assign to group |
-| `#[Ticket('PROJ-123')]` | Link to issue tracker |
+| Attribute                                         | Purpose                           |
+| ------------------------------------------------- | --------------------------------- |
+| `#[Test]`                                         | Mark non-`test*` method as a test |
+| `#[DataProvider('method')]`                       | Connect a data provider           |
+| `#[DataProviderExternal(Class::class, 'method')]` | External data provider            |
+| `#[TestWith([args])]`                             | Inline data provider              |
+| `#[TestDox('description')]`                       | Custom TestDox description        |
+| `#[Depends('testMethod')]`                        | Declare test dependency           |
+| `#[Group('name')]`                                | Assign to group                   |
+| `#[Ticket('PROJ-123')]`                           | Link to issue tracker             |
 
 ### Skip / Conditional
 
-| Attribute | Purpose |
-|-----------|---------|
-| `#[RequiresPhp('>= 8.4')]` | Skip if PHP version doesn't match |
-| `#[RequiresPhpExtension('pdo_pgsql')]` | Skip if extension missing |
-| `#[RequiresOperatingSystemFamily('Linux')]` | Skip on other OS |
-| `#[RequiresFunction('sodium_crypto_sign')]` | Skip if function missing |
-| `#[RequiresMethod(PDO::class, 'sqliteCreateFunction')]` | Skip if method missing |
+| Attribute                                               | Purpose                           |
+| ------------------------------------------------------- | --------------------------------- |
+| `#[RequiresPhp('>= 8.4')]`                              | Skip if PHP version doesn't match |
+| `#[RequiresPhpExtension('pdo_pgsql')]`                  | Skip if extension missing         |
+| `#[RequiresOperatingSystemFamily('Linux')]`             | Skip on other OS                  |
+| `#[RequiresFunction('sodium_crypto_sign')]`             | Skip if function missing          |
+| `#[RequiresMethod(PDO::class, 'sqliteCreateFunction')]` | Skip if method missing            |
 
 ### Coverage
 
-| Attribute | Purpose |
-|-----------|---------|
-| `#[CoversClass(ClassName::class)]` | Test covers this class |
-| `#[CoversFunction('functionName')]` | Test covers this function |
-| `#[CoversMethod(ClassName::class, 'method')]` | Test covers this method |
-| `#[CoversNothing]` | Test contributes no coverage (integration tests) |
-| `#[UsesClass(ClassName::class)]` | Allowed but not covered dependency |
-| `#[UsesFunction('functionName')]` | Allowed but not covered function |
+| Attribute                                     | Purpose                                          |
+| --------------------------------------------- | ------------------------------------------------ |
+| `#[CoversClass(ClassName::class)]`            | Test covers this class                           |
+| `#[CoversFunction('functionName')]`           | Test covers this function                        |
+| `#[CoversMethod(ClassName::class, 'method')]` | Test covers this method                          |
+| `#[CoversNothing]`                            | Test contributes no coverage (integration tests) |
+| `#[UsesClass(ClassName::class)]`              | Allowed but not covered dependency               |
+| `#[UsesFunction('functionName')]`             | Allowed but not covered function                 |
 
 ### Fixture
 
-| Attribute | Purpose |
-|-----------|---------|
-| `#[Before]` | Run method before each test (alternative to setUp) |
-| `#[After]` | Run method after each test (alternative to tearDown) |
-| `#[BeforeClass]` | Run static method before first test |
-| `#[AfterClass]` | Run static method after last test |
-| `#[BackupGlobals(true)]` | Backup/restore globals for this test |
-| `#[BackupStaticProperties(true)]` | Backup/restore static properties |
+| Attribute                         | Purpose                                              |
+| --------------------------------- | ---------------------------------------------------- |
+| `#[Before]`                       | Run method before each test (alternative to setUp)   |
+| `#[After]`                        | Run method after each test (alternative to tearDown) |
+| `#[BeforeClass]`                  | Run static method before first test                  |
+| `#[AfterClass]`                   | Run static method after last test                    |
+| `#[BackupGlobals(true)]`          | Backup/restore globals for this test                 |
+| `#[BackupStaticProperties(true)]` | Backup/restore static properties                     |
 
 ### Test Behavior
 
-| Attribute | Purpose |
-|-----------|---------|
-| `#[DoesNotPerformAssertions]` | Suppress risky test warning |
-| `#[RunInSeparateProcess]` | Isolate in separate PHP process |
-| `#[RunTestsInSeparateProcesses]` | All tests in class run isolated |
+| Attribute                             | Purpose                             |
+| ------------------------------------- | ----------------------------------- |
+| `#[DoesNotPerformAssertions]`         | Suppress risky test warning         |
+| `#[RunInSeparateProcess]`             | Isolate in separate PHP process     |
+| `#[RunTestsInSeparateProcesses]`      | All tests in class run isolated     |
 | `#[Small]` / `#[Medium]` / `#[Large]` | Time limit enforcement (1s/10s/60s) |
 
 ## Test Organization
@@ -391,8 +382,7 @@ tests/
 
 - **Mirror source directory structure** under `tests/Unit/` and `tests/Integration/`.
 - **Unit tests** — no database, no filesystem, no network. Mock all boundaries.
-- **Integration tests** — real dependencies. Mark with `#[CoversNothing]` to avoid
-  polluting coverage metrics.
+- **Integration tests** — real dependencies. Mark with `#[CoversNothing]` to avoid polluting coverage metrics.
 
 ### Test Suites
 
@@ -449,13 +439,11 @@ Run subsets: `phpunit --testsuite unit`, `phpunit --group slow`.
 
 ### Key Configuration Choices
 
-- **`executionOrder="depends,random"`** — randomize test order to catch hidden dependencies
-  while respecting explicit `#[Depends]`.
-- **`beStrictAboutTestsThatDoNotTestAnything="true"`** — flag tests without assertions
-  as risky.
+- **`executionOrder="depends,random"`** — randomize test order to catch hidden dependencies while respecting explicit
+  `#[Depends]`.
+- **`beStrictAboutTestsThatDoNotTestAnything="true"`** — flag tests without assertions as risky.
 - **`failOnDeprecation="true"`** — catch deprecations from your code early.
-- **`<source>` with `restrictDeprecations`** — only surface issues from your code, not
-  vendor dependencies.
+- **`<source>` with `restrictDeprecations`** — only surface issues from your code, not vendor dependencies.
 - **`cacheDirectory`** — add `.phpunit.cache` to `.gitignore`.
 
 ### Code Coverage
@@ -466,20 +454,19 @@ Requires PCOV or Xdebug extension:
 phpunit --coverage-html build/coverage --coverage-clover build/clover.xml
 ```
 
-Use `#[CoversClass]` and `#[UsesClass]` attributes to target coverage precisely.
-With `beStrictAboutCoverageMetadata="true"`, tests without coverage attributes are risky.
+Use `#[CoversClass]` and `#[UsesClass]` attributes to target coverage precisely. With
+`beStrictAboutCoverageMetadata="true"`, tests without coverage attributes are risky.
 
-See `${CLAUDE_SKILL_DIR}/references/configuration.md` for the full XML reference, coverage
-report types, and execution order options.
+See `${CLAUDE_SKILL_DIR}/references/configuration.md` for the full XML reference, coverage report types, and execution
+order options.
 
 ## Application
 
-When **writing** tests: apply all conventions silently — don't narrate each rule being
-followed. Match the project's existing test style. If an existing codebase contradicts a
-convention, follow the codebase and flag the divergence once.
+When **writing** tests: apply all conventions silently — don't narrate each rule being followed. Match the project's
+existing test style. If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.
 
-When **reviewing** tests: cite the specific issue and show the fix inline. Don't lecture —
-state what's wrong and how to fix it.
+When **reviewing** tests: cite the specific issue and show the fix inline. Don't lecture — state what's wrong and how to
+fix it.
 
 ```
 Bad:  "According to PHPUnit best practices, you should use createStub
@@ -489,7 +476,7 @@ Good: "createMock → createStub (no expects() call, stub is sufficient)"
 
 ## Integration
 
-The **php** skill governs language choices; this skill governs PHPUnit testing decisions.
-The **coding** skill governs workflow (discovery, planning, verification).
+The **php** skill governs language choices; this skill governs PHPUnit testing decisions. The **coding** skill governs
+workflow (discovery, planning, verification).
 
 **Test behavior, not implementation. When in doubt, mock less.**

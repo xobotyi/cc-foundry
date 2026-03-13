@@ -25,17 +25,17 @@ const spy = vi.spyOn(obj, 'prop', 'get')
 
 ### Mock Methods (shared by `vi.fn` and `vi.spyOn`)
 
-| Method | Effect |
-|--------|--------|
-| `.mockReturnValue(val)` | Always return `val` |
-| `.mockReturnValueOnce(val)` | Return `val` on next call only |
-| `.mockImplementation(fn)` | Replace implementation |
-| `.mockImplementationOnce(fn)` | Replace for next call only |
-| `.mockResolvedValue(val)` | Return `Promise.resolve(val)` |
-| `.mockRejectedValue(err)` | Return `Promise.reject(err)` |
-| `.mockClear()` | Clear call history, keep implementation |
-| `.mockReset()` | Clear history + reset to original implementation |
-| `.mockRestore()` | Reset + restore original object descriptor (spyOn only) |
+| Method                        | Effect                                                  |
+| ----------------------------- | ------------------------------------------------------- |
+| `.mockReturnValue(val)`       | Always return `val`                                     |
+| `.mockReturnValueOnce(val)`   | Return `val` on next call only                          |
+| `.mockImplementation(fn)`     | Replace implementation                                  |
+| `.mockImplementationOnce(fn)` | Replace for next call only                              |
+| `.mockResolvedValue(val)`     | Return `Promise.resolve(val)`                           |
+| `.mockRejectedValue(err)`     | Return `Promise.reject(err)`                            |
+| `.mockClear()`                | Clear call history, keep implementation                 |
+| `.mockReset()`                | Clear history + reset to original implementation        |
+| `.mockRestore()`              | Reset + restore original object descriptor (spyOn only) |
 
 ### Mock State
 
@@ -58,18 +58,17 @@ test: { restoreMocks: true }
 afterEach(() => { vi.restoreAllMocks() })
 ```
 
-| Config Option | Equivalent | Effect |
-|---------------|------------|--------|
-| `clearMocks` | `vi.clearAllMocks()` | Clear history only |
-| `mockReset` | `vi.resetAllMocks()` | Clear history + reset impl |
+| Config Option  | Equivalent             | Effect                          |
+| -------------- | ---------------------- | ------------------------------- |
+| `clearMocks`   | `vi.clearAllMocks()`   | Clear history only              |
+| `mockReset`    | `vi.resetAllMocks()`   | Clear history + reset impl      |
 | `restoreMocks` | `vi.restoreAllMocks()` | Above + restore spied originals |
 
 ## Module Mocking
 
 ### `vi.mock()` — Replace an Entire Module
 
-**Hoisted to the top of the file.** Always runs before imports, regardless of where
-you write it:
+**Hoisted to the top of the file.** Always runs before imports, regardless of where you write it:
 
 ```ts
 import { fetchUser } from './api'
@@ -157,8 +156,8 @@ vi.mock('./mod', () => ({
 
 ### `__mocks__` Directory
 
-If `__mocks__/module.js` exists alongside the module (or at project root for
-node_modules), `vi.mock('./module')` without a factory uses it automatically.
+If `__mocks__/module.js` exists alongside the module (or at project root for node_modules), `vi.mock('./module')`
+without a factory uses it automatically.
 
 ### Module Mock Pitfall: Internal Calls
 
@@ -168,8 +167,9 @@ export function foo() { return 'foo' }
 export function foobar() { return `${foo()}bar` }
 ```
 
-Mocking `foo` externally does NOT affect `foobar` because `foobar` references
-`foo` directly within the same module. This is by design. Solutions:
+Mocking `foo` externally does NOT affect `foobar` because `foobar` references `foo` directly within the same module.
+This is by design. Solutions:
+
 - Refactor into separate modules
 - Use dependency injection
 - Accept that internal calls are not mockable
@@ -184,8 +184,7 @@ import * as api from './api'
 const spy = vi.spyOn(api, 'fetchUser').mockResolvedValue({ name: 'Bob' })
 ```
 
-This does NOT work in Browser Mode (native ESM is sealed). Use
-`vi.mock('./api', { spy: true })` instead.
+This does NOT work in Browser Mode (native ESM is sealed). Use `vi.mock('./api', { spy: true })` instead.
 
 ## Fake Timers
 
@@ -218,8 +217,7 @@ expect(new Date().getFullYear()).toBe(2024)
 vi.useRealTimers()
 ```
 
-`vi.setSystemTime` works even without `vi.useFakeTimers()` — it will only mock
-`Date.*` calls in that case.
+`vi.setSystemTime` works even without `vi.useFakeTimers()` — it will only mock `Date.*` calls in that case.
 
 ### Config Defaults
 
@@ -232,8 +230,7 @@ test: {
 }
 ```
 
-`nextTick` is not faked by default. Enable explicitly if needed:
-`vi.useFakeTimers({ toFake: ['nextTick'] })`.
+`nextTick` is not faked by default. Enable explicitly if needed: `vi.useFakeTimers({ toFake: ['nextTick'] })`.
 
 ## Environment Variables
 

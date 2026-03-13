@@ -1,12 +1,10 @@
 # SvelteKit
 
-SvelteKit conventions: routing, load functions, form actions, hooks, and
-state management.
+SvelteKit conventions: routing, load functions, form actions, hooks, and state management.
 
 ## Filesystem Routing
 
-Routes are directories under `src/routes/`. Files with `+` prefix are route
-files.
+Routes are directories under `src/routes/`. Files with `+` prefix are route files.
 
 ```
 src/routes/
@@ -97,23 +95,23 @@ Layout load data is available to all child pages.
 
 ### Universal vs Server
 
-| Aspect | +page.js / +layout.js | +page.server.js / +layout.server.js |
-|--------|----------------------|--------------------------------------|
-| Runs on | Server (SSR) + Browser | Server only |
-| Access | `params`, `url`, `fetch` | + `cookies`, `locals`, `request` |
-| Returns | Any value (classes, components) | Serializable data (devalue) |
-| Use for | External APIs, non-secret data | Database, private keys |
+| Aspect  | +page.js / +layout.js           | +page.server.js / +layout.server.js |
+| ------- | ------------------------------- | ----------------------------------- |
+| Runs on | Server (SSR) + Browser          | Server only                         |
+| Access  | `params`, `url`, `fetch`        | + `cookies`, `locals`, `request`    |
+| Returns | Any value (classes, components) | Serializable data (devalue)         |
+| Use for | External APIs, non-secret data  | Database, private keys              |
 
 ### Load Function Input
 
-Both types receive: `params`, `route`, `url`, `fetch`, `setHeaders`, `parent`,
-`depends`, `untrack`.
+Both types receive: `params`, `route`, `url`, `fetch`, `setHeaders`, `parent`, `depends`, `untrack`.
 
 Server loads additionally receive: `cookies`, `locals`, `platform`, `request`.
 
 ### Using fetch in Load
 
 Use the provided `fetch`, not global `fetch`:
+
 - Inherits cookies for same-origin requests
 - Makes relative requests work on server
 - Internal requests bypass HTTP overhead
@@ -140,12 +138,12 @@ export async function load({ params }) {
 {/await}
 ```
 
-Streaming requires platform support (works with Node.js servers and
-edge runtimes; does not work with AWS Lambda).
+Streaming requires platform support (works with Node.js servers and edge runtimes; does not work with AWS Lambda).
 
 ### Rerunning Load Functions
 
 SvelteKit tracks dependencies and only reruns when:
+
 - `params` values change
 - `url` properties change
 - `parent()` was called and parent reran
@@ -293,13 +291,12 @@ export async function handle({ event, resolve }) {
 
 ### Rules
 
-- **No shared state on server.** Module-level variables are shared across
-  requests. Use `event.locals` or context instead.
+- **No shared state on server.** Module-level variables are shared across requests. Use `event.locals` or context
+  instead.
 - **No side effects in load.** Return data, don't write to global state.
-- **Use context for SSR-safe shared state.** Context is per-component-tree,
-  not global.
-- **Components are reused on navigation.** Use `$derived` for values that
-  depend on `data` props -- plain assignments run only once.
+- **Use context for SSR-safe shared state.** Context is per-component-tree, not global.
+- **Components are reused on navigation.** Use `$derived` for values that depend on `data` props -- plain assignments
+  run only once.
 - **Store state in URL** for filter/sort that should survive reload.
 - **Use snapshots** for ephemeral UI state that should survive back/forward.
 
@@ -323,18 +320,18 @@ export async function handle({ event, resolve }) {
 
 ## Key Imports
 
-| Module | Exports |
-|--------|---------|
-| `$app/navigation` | `goto`, `invalidate`, `invalidateAll`, `beforeNavigate`, `afterNavigate` |
-| `$app/state` | `page` (reactive page info), `navigating`, `updated` |
-| `$app/forms` | `enhance`, `applyAction`, `deserialize` |
-| `$app/paths` | `base`, `assets`, `resolveRoute` |
-| `$app/server` | `getRequestEvent`, `read` |
-| `$env/static/private` | Compile-time private env vars |
-| `$env/static/public` | Compile-time public env vars (`PUBLIC_*`) |
-| `$env/dynamic/private` | Runtime private env vars |
-| `$env/dynamic/public` | Runtime public env vars (`PUBLIC_*`) |
-| `$lib` | Alias for `src/lib` |
+| Module                 | Exports                                                                  |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `$app/navigation`      | `goto`, `invalidate`, `invalidateAll`, `beforeNavigate`, `afterNavigate` |
+| `$app/state`           | `page` (reactive page info), `navigating`, `updated`                     |
+| `$app/forms`           | `enhance`, `applyAction`, `deserialize`                                  |
+| `$app/paths`           | `base`, `assets`, `resolveRoute`                                         |
+| `$app/server`          | `getRequestEvent`, `read`                                                |
+| `$env/static/private`  | Compile-time private env vars                                            |
+| `$env/static/public`   | Compile-time public env vars (`PUBLIC_*`)                                |
+| `$env/dynamic/private` | Runtime private env vars                                                 |
+| `$env/dynamic/public`  | Runtime public env vars (`PUBLIC_*`)                                     |
+| `$lib`                 | Alias for `src/lib`                                                      |
 
 ## Performance
 

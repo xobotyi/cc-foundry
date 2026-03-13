@@ -2,8 +2,8 @@
 
 ## Formats
 
-Ansible supports INI and YAML inventory formats natively. YAML is preferred -- it handles
-data types correctly (INI `:vars` sections treat all values as strings).
+Ansible supports INI and YAML inventory formats natively. YAML is preferred -- it handles data types correctly (INI
+`:vars` sections treat all values as strings).
 
 ```yaml
 # YAML inventory
@@ -24,6 +24,7 @@ dbservers:
 ## Default Groups
 
 Two implicit groups always exist:
+
 - `all` -- every host
 - `ungrouped` -- hosts not in any explicit group
 
@@ -44,12 +45,13 @@ staging:
     staging_db:
 ```
 
-Child group variables override parent group variables. Groups at the same level merge
-alphabetically (last wins). Override with `ansible_group_priority`.
+Child group variables override parent group variables. Groups at the same level merge alphabetically (last wins).
+Override with `ansible_group_priority`.
 
 ## Grouping Strategy
 
 Group hosts along three dimensions:
+
 - **What** (function): `webservers`, `dbservers`, `monitoring`
 - **Where** (location): `dc1`, `dc2`, `us_east`, `eu_west`
 - **When** (environment): `production`, `staging`, `development`
@@ -58,8 +60,7 @@ A host can belong to multiple groups across dimensions.
 
 ## Separate Inventories per Environment
 
-Keep production and staging in separate inventory files or directories to prevent
-accidental cross-environment changes:
+Keep production and staging in separate inventory files or directories to prevent accidental cross-environment changes:
 
 ```
 inventories/
@@ -104,8 +105,8 @@ Ansible loads all files in a `group_vars/<group>/` directory alphabetically.
 
 ## Dynamic Inventory
 
-Use inventory plugins (preferred over legacy scripts) for cloud providers.
-Plugins return structured data that Ansible processes natively.
+Use inventory plugins (preferred over legacy scripts) for cloud providers. Plugins return structured data that Ansible
+processes natively.
 
 ### AWS EC2
 
@@ -126,9 +127,8 @@ compose:
   ansible_host: public_ip_address
 ```
 
-Generates groups from tags, instance types, regions, security groups, and
-VPC IDs. Target machines by tag (`tag_Project_myapp`), type (`type_t2_micro`),
-or region.
+Generates groups from tags, instance types, regions, security groups, and VPC IDs. Target machines by tag
+(`tag_Project_myapp`), type (`type_t2_micro`), or region.
 
 ### Azure
 
@@ -147,8 +147,8 @@ conditional_groups:
   linux_vms: "'ubuntu' in image.offer | default('')"
 ```
 
-Uses hostvars from Azure metadata for group membership. The `conditional_groups`
-and `keyed_groups` sections automate group creation from VM properties.
+Uses hostvars from Azure metadata for group membership. The `conditional_groups` and `keyed_groups` sections automate
+group creation from VM properties.
 
 ### GCP
 
@@ -171,8 +171,8 @@ compose:
 
 ### NetBox as Source of Truth
 
-NetBox serves as a single source of truth for hybrid environments. The
-`netbox.netbox.nb_inventory` plugin queries the REST API on every run:
+NetBox serves as a single source of truth for hybrid environments. The `netbox.netbox.nb_inventory` plugin queries the
+REST API on every run:
 
 ```yaml
 # netbox.yml
@@ -188,6 +188,7 @@ group_by:
 ```
 
 Benefits:
+
 - Automatic group updates when custom fields or tags change in NetBox
 - Eliminates inventory drift -- always reflects real-time device state
 - Supports complex grouping via tags, platforms, regions, sites, roles
@@ -196,8 +197,8 @@ Benefits:
 
 Two patterns for using Terraform-provisioned infrastructure with Ansible:
 
-**State file as inventory:** The `cloud.terraform.terraform_state` plugin
-parses Terraform state (local or remote backends like S3):
+**State file as inventory:** The `cloud.terraform.terraform_state` plugin parses Terraform state (local or remote
+backends like S3):
 
 ```yaml
 # terraform.yml
@@ -209,14 +210,12 @@ backend_config:
   region: us-east-1
 ```
 
-**Ansible provider for Terraform:** Define Ansible inventory entries directly
-in Terraform HCL, then use the `cloud.terraform.terraform_provider` plugin.
-Terraform resources link to Ansible hosts without hardcoding IPs.
+**Ansible provider for Terraform:** Define Ansible inventory entries directly in Terraform HCL, then use the
+`cloud.terraform.terraform_provider` plugin. Terraform resources link to Ansible hosts without hardcoding IPs.
 
 ## Constructed Inventory
 
-Build groups dynamically from host metadata using Jinja2 logic. Successor
-to Smart Inventories in AAP.
+Build groups dynamically from host metadata using Jinja2 logic. Successor to Smart Inventories in AAP.
 
 ```yaml
 # constructed.yml
@@ -252,13 +251,12 @@ groups:
 # limit: is_shutdown:&product_dev
 ```
 
-This creates groups from both categories and uses `limit` to return only
-hosts at the intersection.
+This creates groups from both categories and uses `limit` to return only hosts at the intersection.
 
 ## Inventory Caching
 
-For dynamic inventories, caching prevents redundant API calls. A 10,000-host
-dynamic inventory can take 30+ seconds without caching; under 1 second with:
+For dynamic inventories, caching prevents redundant API calls. A 10,000-host dynamic inventory can take 30+ seconds
+without caching; under 1 second with:
 
 ```ini
 # ansible.cfg
@@ -273,19 +271,18 @@ cache_timeout = 3600
 
 Key behavioral parameters set per-host or per-group:
 
-| Parameter | Purpose |
-|-----------|---------|
-| `ansible_host` | IP/hostname to connect to |
-| `ansible_port` | SSH port (default 22) |
-| `ansible_user` | SSH username |
-| `ansible_ssh_private_key_file` | SSH key path |
-| `ansible_connection` | Connection type (`ssh`, `local`, `docker`) |
-| `ansible_python_interpreter` | Python path on target |
-| `ansible_become` | Enable privilege escalation |
-| `ansible_become_method` | Escalation method (`sudo`, `su`, `doas`) |
+| Parameter                      | Purpose                                    |
+| ------------------------------ | ------------------------------------------ |
+| `ansible_host`                 | IP/hostname to connect to                  |
+| `ansible_port`                 | SSH port (default 22)                      |
+| `ansible_user`                 | SSH username                               |
+| `ansible_ssh_private_key_file` | SSH key path                               |
+| `ansible_connection`           | Connection type (`ssh`, `local`, `docker`) |
+| `ansible_python_interpreter`   | Python path on target                      |
+| `ansible_become`               | Enable privilege escalation                |
+| `ansible_become_method`        | Escalation method (`sudo`, `su`, `doas`)   |
 
-Never store `ansible_password` or `ansible_become_password` in plain text -- use
-Vault.
+Never store `ansible_password` or `ansible_become_password` in plain text -- use Vault.
 
 ## Ranges
 
@@ -300,6 +297,5 @@ webservers:
 ## Inventory Load Order
 
 - Command-line: `-i staging -i production` -- production wins on conflicts
-- Directory: files load alphabetically, prefix with numbers for control
-  (`01-cloud.yml`, `02-static.yml`)
+- Directory: files load alphabetically, prefix with numbers for control (`01-cloud.yml`, `02-static.yml`)
 - Mix static and dynamic sources by placing them in the same directory

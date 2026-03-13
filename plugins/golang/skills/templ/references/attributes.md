@@ -17,8 +17,8 @@ Set attributes to Go expressions using `{ }`:
 <div data-id={ fmt.Sprintf("item-%d", id) }></div>
 ```
 
-String values are automatically HTML-attribute-encoded (`<`, `>`, `&`, quotes become
-HTML entities). This doesn't affect behavior.
+String values are automatically HTML-attribute-encoded (`<`, `>`, `&`, quotes become HTML entities). This doesn't affect
+behavior.
 
 Functions returning `(string, error)` propagate errors to `Render()`:
 
@@ -63,9 +63,8 @@ Dynamically set the attribute key:
 <p { "data-" + suffix }="value">Text</p>
 ```
 
-**Warning**: Key expressions don't get type-specific handling. URL attributes
-(`href`) and event handlers (`on*`) defined via key expressions are treated
-as plain strings without special sanitization.
+**Warning**: Key expressions don't get type-specific handling. URL attributes (`href`) and event handlers (`on*`)
+defined via key expressions are treated as plain strings without special sanitization.
 
 ## Spread Attributes
 
@@ -85,12 +84,12 @@ templ Button(attrs templ.Attributes) {
 
 `templ.Attributes` is `map[string]any`. Value behavior:
 
-| Value Type | Rendering |
-|------------|-----------|
-| `string` | `name="value"` |
-| `bool` | `name` (if true) or omitted (if false) |
-| `templ.KeyValue[string, bool]` | `name="value"` if bool is true |
-| `templ.KeyValue[bool, bool]` | `name` if both bools are true |
+| Value Type                     | Rendering                              |
+| ------------------------------ | -------------------------------------- |
+| `string`                       | `name="value"`                         |
+| `bool`                         | `name` (if true) or omitted (if false) |
+| `templ.KeyValue[string, bool]` | `name="value"` if bool is true         |
+| `templ.KeyValue[bool, bool]`   | `name` if both bools are true          |
 
 Spread attributes can be conditional:
 
@@ -104,8 +103,8 @@ Spread attributes can be conditional:
 
 ## URL Attributes
 
-`href`, `src`, `action` auto-sanitize dynamic values. Dangerous schemes like
-`javascript:` are replaced with `about:invalid#TemplFailedSanitizationURL`.
+`href`, `src`, `action` auto-sanitize dynamic values. Dangerous schemes like `javascript:` are replaced with
+`about:invalid#TemplFailedSanitizationURL`.
 
 ```templ
 // Auto-sanitized (safe)
@@ -141,8 +140,8 @@ For URL-containing attributes not recognized by templ (e.g. htmx `hx-get`):
 }>Click</button>
 ```
 
-**Warning**: `templ.JSExpression` bypasses JSON encoding — output goes directly
-to HTML. Only use with trusted, compile-time constants like `"event"` or `"this"`.
+**Warning**: `templ.JSExpression` bypasses JSON encoding — output goes directly to HTML. Only use with trusted,
+compile-time constants like `"event"` or `"this"`.
 
 ## JSON Attributes
 

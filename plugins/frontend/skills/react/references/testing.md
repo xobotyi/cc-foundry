@@ -4,9 +4,8 @@ React Testing Library conventions, query priority, userEvent, and common mistake
 
 ## Philosophy
 
-Tests should resemble how users interact with the application. Query by
-what users see (roles, text, labels), not by implementation details
-(class names, component internals, test IDs).
+Tests should resemble how users interact with the application. Query by what users see (roles, text, labels), not by
+implementation details (class names, component internals, test IDs).
 
 ## Setup
 
@@ -31,21 +30,21 @@ const button = screen.getByRole('button');
 
 Use queries in this order. Prefer the highest-priority query that works:
 
-| Priority | Query | When to use |
-|----------|-------|-------------|
-| 1 | `getByRole` | Almost always — buttons, inputs, headings, links |
-| 2 | `getByLabelText` | Form inputs with associated labels |
-| 3 | `getByPlaceholderText` | When label is absent (not ideal) |
-| 4 | `getByText` | Non-interactive elements (paragraphs, spans) |
-| 5 | `getByDisplayValue` | Current value of filled-in inputs |
-| 6 | `getByAltText` | Images |
-| 7 | `getByTitle` | Rarely — title attribute |
-| 8 | `getByTestId` | Last resort — when nothing else works |
+| Priority | Query                  | When to use                                      |
+| -------- | ---------------------- | ------------------------------------------------ |
+| 1        | `getByRole`            | Almost always — buttons, inputs, headings, links |
+| 2        | `getByLabelText`       | Form inputs with associated labels               |
+| 3        | `getByPlaceholderText` | When label is absent (not ideal)                 |
+| 4        | `getByText`            | Non-interactive elements (paragraphs, spans)     |
+| 5        | `getByDisplayValue`    | Current value of filled-in inputs                |
+| 6        | `getByAltText`         | Images                                           |
+| 7        | `getByTitle`           | Rarely — title attribute                         |
+| 8        | `getByTestId`          | Last resort — when nothing else works            |
 
 ### getByRole Is Your Default
 
-`getByRole` queries by ARIA role and accessible name. It works with
-implicit roles — no need to add `role="button"` to `<button>`:
+`getByRole` queries by ARIA role and accessible name. It works with implicit roles — no need to add `role="button"` to
+`<button>`:
 
 ```tsx
 // <button>Submit</button>
@@ -63,16 +62,15 @@ screen.getByRole('link', { name: /about/i });
 
 ## Query Variants
 
-| Variant | No match | Multiple matches | Use for |
-|---------|----------|------------------|---------|
-| `getBy` | Throws | Throws | Element exists right now |
-| `queryBy` | Returns `null` | Throws | Asserting element does NOT exist |
-| `findBy` | Throws (after timeout) | Throws | Waiting for element to appear |
+| Variant   | No match               | Multiple matches | Use for                          |
+| --------- | ---------------------- | ---------------- | -------------------------------- |
+| `getBy`   | Throws                 | Throws           | Element exists right now         |
+| `queryBy` | Returns `null`         | Throws           | Asserting element does NOT exist |
+| `findBy`  | Throws (after timeout) | Throws           | Waiting for element to appear    |
 
 ### Rules
 
-- **Use `getBy` by default.** It throws a helpful error with the full DOM
-  if the element isn't found.
+- **Use `getBy` by default.** It throws a helpful error with the full DOM if the element isn't found.
 - **Use `queryBy` ONLY to assert non-existence:**
   ```tsx
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -85,8 +83,8 @@ screen.getByRole('link', { name: /about/i });
 
 ## User Interactions
 
-Always prefer `userEvent` over `fireEvent`. It simulates real user behavior
-(keyDown, keyPress, keyUp, focus, blur) rather than dispatching a single event.
+Always prefer `userEvent` over `fireEvent`. It simulates real user behavior (keyDown, keyPress, keyUp, focus, blur)
+rather than dispatching a single event.
 
 ```tsx
 const user = userEvent.setup();
@@ -120,8 +118,8 @@ await user.keyboard('{Enter}');      // Press specific key
 
 ## Testing Actions and Forms
 
-When testing components that use `useActionState` or form Actions, render
-the component and interact with the form as a user would:
+When testing components that use `useActionState` or form Actions, render the component and interact with the form as a
+user would:
 
 ```tsx
 const user = userEvent.setup();
@@ -134,8 +132,8 @@ await user.click(screen.getByRole('button', { name: /submit/i }));
 await screen.findByText('Submitted successfully');
 ```
 
-For components using `useFormStatus`, ensure the component is rendered
-inside a `<form>` with an action prop in your test setup.
+For components using `useFormStatus`, ensure the component is rendered inside a `<form>` with an action prop in your
+test setup.
 
 ## Async Patterns
 
@@ -151,11 +149,10 @@ await waitFor(() => {
 
 ### waitFor Rules
 
-- **Put one assertion per `waitFor` callback.** Multiple assertions
-  cause slower failure detection.
-- **Never put side-effects in `waitFor`.** The callback may run multiple
-  times. Fire events outside, assert inside.
+- **Put one assertion per `waitFor` callback.** Multiple assertions cause slower failure detection.
+- **Never put side-effects in `waitFor`.** The callback may run multiple times. Fire events outside, assert inside.
 - **Prefer `findBy` over `waitFor` + `getBy`:**
+
   ```tsx
   // BAD
   const button = await waitFor(() =>
@@ -165,8 +162,8 @@ await waitFor(() => {
   // GOOD
   const button = await screen.findByRole('button', { name: /submit/i });
   ```
-- **Never pass an empty callback** to `waitFor`. Always wait for a
-  specific assertion.
+
+- **Never pass an empty callback** to `waitFor`. Always wait for a specific assertion.
 
 ## Assertions
 
@@ -185,31 +182,28 @@ expect(element).toHaveValue('hello');
 
 ## Don't Wrap in act Unnecessarily
 
-`render()` and `fireEvent` are already wrapped in `act`. Adding another
-`act` wrapper does nothing. If you see `act` warnings, fix the root cause
-(a state update after the test finishes) instead of wrapping in `act`.
+`render()` and `fireEvent` are already wrapped in `act`. Adding another `act` wrapper does nothing. If you see `act`
+warnings, fix the root cause (a state update after the test finishes) instead of wrapping in `act`.
 
 ## Accessibility in Tests
 
-- **Don't add `role` attributes to native elements.** `<button>` already
-  has `role="button"`.
-- **Make inputs accessible with `type` and `<label>`.** This makes them
-  queryable by role.
-- **Query by role to enforce accessibility.** If you can't query an element
-  by role, it's probably not accessible to screen reader users either.
+- **Don't add `role` attributes to native elements.** `<button>` already has `role="button"`.
+- **Make inputs accessible with `type` and `<label>`.** This makes them queryable by role.
+- **Query by role to enforce accessibility.** If you can't query an element by role, it's probably not accessible to
+  screen reader users either.
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|------|
-| `const { getByRole } = render(...)` | `render(...); screen.getByRole(...)` |
-| `fireEvent.change(input, ...)` | `await user.type(input, ...)` |
-| `screen.queryByRole('alert')` to assert existence | `screen.getByRole('alert')` |
-| `container.querySelector('.btn')` | `screen.getByRole('button')` |
-| `getByTestId` as first choice | `getByRole`, `getByLabelText`, `getByText` |
-| `await waitFor(() => {})` (empty callback) | `await waitFor(() => expect(...))` |
-| Side-effects inside `waitFor` | Fire events outside, assert inside |
-| Multiple assertions in one `waitFor` | One assertion per `waitFor` |
-| Wrapping everything in `act` | Let `render`/`fireEvent` handle it |
-| `role="button"` on `<button>` | Native elements have implicit roles |
-| Manual `afterEach(cleanup)` | Automatic — don't call `cleanup` |
+| Don't                                             | Do                                         |
+| ------------------------------------------------- | ------------------------------------------ |
+| `const { getByRole } = render(...)`               | `render(...); screen.getByRole(...)`       |
+| `fireEvent.change(input, ...)`                    | `await user.type(input, ...)`              |
+| `screen.queryByRole('alert')` to assert existence | `screen.getByRole('alert')`                |
+| `container.querySelector('.btn')`                 | `screen.getByRole('button')`               |
+| `getByTestId` as first choice                     | `getByRole`, `getByLabelText`, `getByText` |
+| `await waitFor(() => {})` (empty callback)        | `await waitFor(() => expect(...))`         |
+| Side-effects inside `waitFor`                     | Fire events outside, assert inside         |
+| Multiple assertions in one `waitFor`              | One assertion per `waitFor`                |
+| Wrapping everything in `act`                      | Let `render`/`fireEvent` handle it         |
+| `role="button"` on `<button>`                     | Native elements have implicit roles        |
+| Manual `afterEach(cleanup)`                       | Automatic — don't call `cleanup`           |

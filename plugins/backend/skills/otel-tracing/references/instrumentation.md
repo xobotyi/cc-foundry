@@ -1,21 +1,23 @@
 # Instrumentation
 
-Instrumentation is how you add tracing to your code. OpenTelemetry supports three
-approaches: automatic, manual (code-based), and hybrid.
+Instrumentation is how you add tracing to your code. OpenTelemetry supports three approaches: automatic, manual
+(code-based), and hybrid.
 
 ## Instrumentation Approaches
 
 ### Automatic Instrumentation
 
-Library hooks or monkey-patching that intercept calls to known libraries (HTTP
-clients, database drivers, messaging systems) and create spans automatically.
+Library hooks or monkey-patching that intercept calls to known libraries (HTTP clients, database drivers, messaging
+systems) and create spans automatically.
 
 **Advantages:**
+
 - Zero code changes for supported libraries
 - Consistent span naming and attribute population
 - Automatic context propagation
 
 **Limitations:**
+
 - Only covers supported libraries
 - Cannot add business-specific attributes
 - May not work in all environments (e.g., some serverless runtimes)
@@ -25,14 +27,16 @@ clients, database drivers, messaging systems) and create spans automatically.
 Explicit span creation using the OpenTelemetry SDK.
 
 **When to use:**
+
 - Business-critical operations with custom attributes
 - Libraries not covered by auto-instrumentation
 - Fine-grained control over span boundaries and attributes
 
 ### Hybrid (Recommended for Production)
 
-Combine automatic instrumentation for infrastructure spans with manual
-instrumentation for business logic. This provides:
+Combine automatic instrumentation for infrastructure spans with manual instrumentation for business logic. This
+provides:
+
 - Automatic context propagation and correlation
 - Infrastructure visibility without code changes
 - Business-specific spans where they matter
@@ -48,6 +52,7 @@ tracer = tracerProvider.getTracer(
 ```
 
 **Rules:**
+
 1. Name the tracer after your library, package, or module — not the application
 2. Include a version string matching your library version
 3. The tracer name appears in telemetry and helps debug instrumentation issues
@@ -177,13 +182,12 @@ span = tracer.startSpan("process_batch",
 
 When adding tracing to a **library** (not an application):
 
-1. **Depend on OpenTelemetry API only** — never the SDK. The API is a no-op without
-   SDK, so your library has zero overhead for users who don't use OTel.
-2. **Use the earliest stable API version** (1.0.*) to minimize dependency conflicts
+1. **Depend on OpenTelemetry API only** — never the SDK. The API is a no-op without SDK, so your library has zero
+   overhead for users who don't use OTel.
+2. **Use the earliest stable API version** (1.0.\*) to minimize dependency conflicts
 3. **Follow semantic conventions** for your domain (HTTP, DB, messaging)
 4. **Set the `schema_url`** to record which semantic convention version you use
-5. **Don't create spans for thin wrappers** — instrument at the logical level, not
-   the network level
+5. **Don't create spans for thin wrappers** — instrument at the logical level, not the network level
 6. **Prefer events over spans** for verbose internal details
 7. **Support optional TracerProvider injection** for testability
 

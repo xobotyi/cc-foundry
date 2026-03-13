@@ -19,8 +19,8 @@ Within each test file:
 
 ### Nested Suites
 
-Hooks follow hierarchical nesting — outer `beforeEach` runs before inner `beforeEach`,
-and outer `afterEach` runs after inner `afterEach`:
+Hooks follow hierarchical nesting — outer `beforeEach` runs before inner `beforeEach`, and outer `afterEach` runs after
+inner `afterEach`:
 
 ```ts
 describe('outer', () => {
@@ -66,9 +66,8 @@ beforeAll(async () => {
 })
 ```
 
-**Teardown return value:** If `beforeAll` or `beforeEach` returns a function, it
-runs as teardown. This is a Vitest-specific feature (not in Jest). Be careful not
-to accidentally return values:
+**Teardown return value:** If `beforeAll` or `beforeEach` returns a function, it runs as teardown. This is a
+Vitest-specific feature (not in Jest). Be careful not to accidentally return values:
 
 ```ts
 beforeEach(() => setupPinia())           // BAD if setupPinia returns something
@@ -126,6 +125,7 @@ it('uses context', ({ expect, task }) => {
 ```
 
 Available properties:
+
 - `expect` — test-scoped expect (required for concurrent + snapshots)
 - `task` — test metadata (name, file, etc.)
 - `onTestFinished(fn)` — register cleanup
@@ -151,8 +151,7 @@ it<TestContext>('queries data', ({ db }) => {
 
 ## Setup Files
 
-Files that run before **each test file**. Use for global hooks, custom matchers,
-or shared setup:
+Files that run before **each test file**. Use for global hooks, custom matchers, or shared setup:
 
 ```ts
 // vitest.config.ts
@@ -176,14 +175,12 @@ expect.extend({ /* ... */ })
 
 - Runs in the **same process** as tests (has access to test globals).
 - Runs **before each test file** (not once globally).
-- Setup files run in **parallel** by default. Set `sequence.setupFiles: 'list'`
-  for sequential execution.
+- Setup files run in **parallel** by default. Set `sequence.setupFiles: 'list'` for sequential execution.
 - Editing a setup file triggers a full re-run in watch mode.
 
 ## Global Setup
 
-Runs once before **any** test workers start. Use for expensive one-time setup
-(database seeding, server startup):
+Runs once before **any** test workers start. Use for expensive one-time setup (database seeding, server startup):
 
 ```ts
 // vitest.config.ts
@@ -206,8 +203,7 @@ export default function setup(project: TestProject) {
 
 ### Sharing Data: `provide` / `inject`
 
-Global setup runs in a **different scope** from tests. Use `provide`/`inject`
-to pass serializable data:
+Global setup runs in a **different scope** from tests. Use `provide`/`inject` to pass serializable data:
 
 ```ts
 // global-setup.ts
@@ -230,13 +226,13 @@ declare module 'vitest' {
 
 ### Global Setup vs Setup Files
 
-| | Global Setup | Setup Files |
-|---|---|---|
-| Scope | Main process | Worker (same as tests) |
-| Runs | Once before all tests | Before each test file |
-| Access test APIs | No | Yes |
-| Share data with tests | `provide`/`inject` | Direct globals |
-| Use for | Server startup, DB seeding | Custom matchers, cleanup hooks |
+|                       | Global Setup               | Setup Files                    |
+| --------------------- | -------------------------- | ------------------------------ |
+| Scope                 | Main process               | Worker (same as tests)         |
+| Runs                  | Once before all tests      | Before each test file          |
+| Access test APIs      | No                         | Yes                            |
+| Share data with tests | `provide`/`inject`         | Direct globals                 |
+| Use for               | Server startup, DB seeding | Custom matchers, cleanup hooks |
 
 ## Concurrent Tests
 
@@ -248,6 +244,7 @@ describe.concurrent('parallel tests', () => {
 ```
 
 Rules:
+
 - Use `expect` from test context (not global) for snapshots and assertions.
 - Each concurrent test gets its own `beforeEach`/`afterEach`.
 - `beforeAll`/`afterAll` still run once, before/after all concurrent tests.

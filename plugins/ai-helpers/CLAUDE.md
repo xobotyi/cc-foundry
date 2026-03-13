@@ -4,18 +4,18 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
 
 ## Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `prompt-engineering` | Prompt design techniques for LLMs |
-| `skill-engineering` | Design and iterate Claude Code skills |
-| `subagent-engineering` | Build and debug Claude Code subagents |
-| `output-style-engineering` | Create Claude Code output styles |
-| `claude-code-sdk` | Reference for Claude Code extensibility |
+| Skill                      | Purpose                                 |
+| -------------------------- | --------------------------------------- |
+| `prompt-engineering`       | Prompt design techniques for LLMs       |
+| `skill-engineering`        | Design and iterate Claude Code skills   |
+| `subagent-engineering`     | Build and debug Claude Code subagents   |
+| `output-style-engineering` | Create Claude Code output styles        |
+| `claude-code-sdk`          | Reference for Claude Code extensibility |
 
 ## Output Styles
 
-| Style | Purpose |
-|-------|---------|
+| Style         | Purpose                                    |
+| ------------- | ------------------------------------------ |
 | `ai-engineer` | Collaborative persona for AI artifact work |
 
 ## Skill Dependencies
@@ -32,33 +32,33 @@ claude-code-sdk (reference)
     └── All engineering skills consult SDK docs for implementation details
 ```
 
-When creating skills, subagents, or output styles, invoke `prompt-engineering` for instruction
-design and `claude-code-sdk` for API/configuration details.
+When creating skills, subagents, or output styles, invoke `prompt-engineering` for instruction design and
+`claude-code-sdk` for API/configuration details.
 
 ## Plugin Scope
 
 This plugin covers AI artifact engineering within Claude Code:
+
 - Creating and improving prompts for any AI context
 - Building Claude Code skills, subagents, and output styles
 - Understanding Claude Code extensibility (plugins, hooks, MCP, settings)
 
 It does not cover:
+
 - General software engineering workflows (see `the-coder`)
 - Language-specific conventions (see language plugins)
 - Git workflows (see `git-commit`)
 
 ## Conventions
 
-**Skill structure:** SKILL.md is the complete behavioral specification — an agent reading only
-SKILL.md must be able to do the job correctly. References provide depth (extended examples,
-catalogs, detailed rubrics), never core behavioral rules. Target under 500 lines; behavioral
-rules count as core and justify exceeding the limit.
+**Skill structure:** SKILL.md is the complete behavioral specification — an agent reading only SKILL.md must be able to
+do the job correctly. References provide depth (extended examples, catalogs, detailed rubrics), never core behavioral
+rules. Target under 500 lines; behavioral rules count as core and justify exceeding the limit.
 
-**Description formula:** `[What it does] + [When to invoke — broad domain claim with trigger
-examples]`
+**Description formula:** `[What it does] + [When to invoke — broad domain claim with trigger examples]`
 
-**Prerequisite pattern:** Skills reference `prompt-engineering` via `<prerequisite>` blocks
-because all AI artifacts are fundamentally prompts.
+**Prerequisite pattern:** Skills reference `prompt-engineering` via `<prerequisite>` blocks because all AI artifacts are
+fundamentally prompts.
 
-**Reference inventory:** Skills with external documentation dependencies maintain
-`.dev/reference-inventory.json` for doc fetching via CLI tools.
+**Reference inventory:** Skills with external documentation dependencies maintain `.dev/reference-inventory.json` for
+doc fetching via CLI tools.

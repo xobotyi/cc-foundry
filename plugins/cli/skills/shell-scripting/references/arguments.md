@@ -1,7 +1,7 @@
 # Argument Parsing
 
-Shell scripts need robust argument parsing to be usable. This reference covers
-`getopts`, manual parsing, and validation patterns.
+Shell scripts need robust argument parsing to be usable. This reference covers `getopts`, manual parsing, and validation
+patterns.
 
 ## `getopts` (POSIX)
 
@@ -33,14 +33,15 @@ shift $((OPTIND - 1))
 ```
 
 **`getopts` rules:**
+
 1. Leading `:` in optstring enables silent error handling
 2. Colon after letter means option takes an argument (`f:`)
 3. `$OPTARG` holds the argument for options that take one
 4. `$OPTIND` is the index of the next argument to process
 5. Always `shift $((OPTIND - 1))` after the loop
 
-**Limitation:** `getopts` only handles short options (`-v`, `-f FILE`). For
-long options (`--verbose`, `--file FILE`), use manual parsing.
+**Limitation:** `getopts` only handles short options (`-v`, `-f FILE`). For long options (`--verbose`, `--file FILE`),
+use manual parsing.
 
 ## Manual Parsing (Long Options)
 
@@ -73,6 +74,7 @@ args+=("$@")
 ```
 
 **Rules:**
+
 1. Always handle `--` to explicitly end option processing
 2. Collect unknown positional arguments into an array
 3. Validate required arguments early

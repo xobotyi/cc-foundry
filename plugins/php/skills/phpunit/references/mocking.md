@@ -1,14 +1,14 @@
 # Test Doubles Reference
 
-PHPUnit distinguishes **stubs** (control return values) from **mocks** (verify interactions).
-Use `createStub()` for stubs. Use `createMock()` for mocks with expectations.
+PHPUnit distinguishes **stubs** (control return values) from **mocks** (verify interactions). Use `createStub()` for
+stubs. Use `createMock()` for mocks with expectations.
 
 ## Creation Methods
 
 ### `createStub(string $type): Stub`
 
-Returns a stub for an interface or extendable class. All methods return auto-generated values
-matching their return type. Configure return values with `willReturn()` etc.
+Returns a stub for an interface or extendable class. All methods return auto-generated values matching their return
+type. Configure return values with `willReturn()` etc.
 
 **Do not call `expects()` on stubs** — triggers deprecation in PHPUnit 11, error in 12.
 
@@ -30,8 +30,7 @@ $stub = $this->createConfiguredStub(Cache::class, [
 
 ### `createMock(string $type): MockObject`
 
-Returns a mock object. Same defaults as `createStub()` but supports `expects()` for
-invocation verification.
+Returns a mock object. Same defaults as `createStub()` but supports `expects()` for invocation verification.
 
 ```php
 $mock = $this->createMock(Logger::class);
@@ -60,14 +59,14 @@ Same as above but returns a mock with expectation support.
 
 Chain after `->method('methodName')`:
 
-| Method | Behavior |
-|--------|----------|
-| `willReturn($v1, $v2, ...)` | Returns values in sequence; last value repeats |
-| `willReturnArgument(int $index)` | Returns the nth argument unchanged |
-| `willReturnSelf()` | Returns the stub/mock itself (fluent interfaces) |
-| `willReturnCallback(callable $cb)` | Delegates to callback |
-| `willReturnMap(array $map)` | Maps `[arg1, arg2, ..., returnValue]` arrays |
-| `willThrowException(Throwable $e)` | Throws exception |
+| Method                             | Behavior                                         |
+| ---------------------------------- | ------------------------------------------------ |
+| `willReturn($v1, $v2, ...)`        | Returns values in sequence; last value repeats   |
+| `willReturnArgument(int $index)`   | Returns the nth argument unchanged               |
+| `willReturnSelf()`                 | Returns the stub/mock itself (fluent interfaces) |
+| `willReturnCallback(callable $cb)` | Delegates to callback                            |
+| `willReturnMap(array $map)`        | Maps `[arg1, arg2, ..., returnValue]` arrays     |
+| `willThrowException(Throwable $e)` | Throws exception                                 |
 
 ### Consecutive returns
 
@@ -80,14 +79,14 @@ $stub->method('fetch')->willReturn('first', 'second', 'third');
 
 Use with `$mock->expects($matcher)`:
 
-| Matcher | Matches when |
-|---------|-------------|
-| `$this->any()` | Zero or more calls |
-| `$this->never()` | Never called |
-| `$this->once()` | Exactly one call |
-| `$this->atLeastOnce()` | One or more calls |
-| `$this->exactly(int $n)` | Exactly n calls |
-| `$this->atMost(int $n)` | At most n calls |
+| Matcher                  | Matches when       |
+| ------------------------ | ------------------ |
+| `$this->any()`           | Zero or more calls |
+| `$this->never()`         | Never called       |
+| `$this->once()`          | Exactly one call   |
+| `$this->atLeastOnce()`   | One or more calls  |
+| `$this->exactly(int $n)` | Exactly n calls    |
+| `$this->atMost(int $n)`  | At most n calls    |
 
 ## Argument Constraints
 
@@ -102,11 +101,11 @@ $mock->expects($this->once())
     );
 ```
 
-Any `PHPUnit\Framework\Constraint\Constraint` works as a `with()` argument. Use
-`$this->callback(fn ($arg) => ...)` for custom matching.
+Any `PHPUnit\Framework\Constraint\Constraint` works as a `with()` argument. Use `$this->callback(fn ($arg) => ...)` for
+custom matching.
 
-**`withConsecutive()` was removed in PHPUnit 10.** For consecutive argument verification,
-use `willReturnCallback()` with manual tracking or multiple `expects()` calls.
+**`withConsecutive()` was removed in PHPUnit 10.** For consecutive argument verification, use `willReturnCallback()`
+with manual tracking or multiple `expects()` calls.
 
 ## MockBuilder (Advanced)
 
@@ -120,6 +119,7 @@ $mock = $this->getMockBuilder(Service::class)
 ```
 
 Key MockBuilder methods (non-deprecated in PHPUnit 11):
+
 - `onlyMethods(array $methods)` — specify which methods to double
 - `setConstructorArgs(array $args)` — pass constructor arguments
 - `disableOriginalConstructor()` / `enableOriginalConstructor()`
@@ -129,6 +129,7 @@ Key MockBuilder methods (non-deprecated in PHPUnit 11):
 - `getMock()` — terminal call, returns the configured mock
 
 **Deprecated in PHPUnit 11 (removed in 12):**
+
 - `addMethods()` — use interfaces or `onlyMethods()` instead
 - `getMockForAbstractClass()` — test concrete classes instead
 - `getMockForTrait()` — test classes using the trait instead

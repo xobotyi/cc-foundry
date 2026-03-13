@@ -10,20 +10,20 @@ description: >-
 
 # StatsD
 
-Choose the right metric type, name it with dot-delimited hierarchy, tag dimensions instead
-of encoding them in names. StatsD is fire-and-forget: UDP means zero latency impact on
-your application, but wrong metric types or bad naming corrupt your data silently.
+Choose the right metric type, name it with dot-delimited hierarchy, tag dimensions instead of encoding them in names.
+StatsD is fire-and-forget: UDP means zero latency impact on your application, but wrong metric types or bad naming
+corrupt your data silently.
 
 ## References
 
-| Topic | Reference | Contents |
-|-------|-----------|----------|
-| Metric types | [`${CLAUDE_SKILL_DIR}/references/metric-types.md`] | Wire format details, type comparison, sampling correction |
-| Naming | [`${CLAUDE_SKILL_DIR}/references/naming.md`] | Graphite namespace mapping, character rules, naming examples |
-| DogStatsD | [`${CLAUDE_SKILL_DIR}/references/dogstatsd.md`] | Events format, service checks, protocol versions, distributions vs histograms |
-| Aggregation | [`${CLAUDE_SKILL_DIR}/references/aggregation.md`] | Flush mechanics, Graphite downsampling, DogStatsD aggregation, timestamps |
-| Client patterns | [`${CLAUDE_SKILL_DIR}/references/client-patterns.md`] | High-throughput tuning, error handling, K8s deployment, UDS configuration |
-| Backends | [`${CLAUDE_SKILL_DIR}/references/backends.md`] | statsd_exporter config, Telegraf setup, migration guides |
+| Topic           | Reference                                             | Contents                                                                      |
+| --------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Metric types    | [`${CLAUDE_SKILL_DIR}/references/metric-types.md`]    | Wire format details, type comparison, sampling correction                     |
+| Naming          | [`${CLAUDE_SKILL_DIR}/references/naming.md`]          | Graphite namespace mapping, character rules, naming examples                  |
+| DogStatsD       | [`${CLAUDE_SKILL_DIR}/references/dogstatsd.md`]       | Events format, service checks, protocol versions, distributions vs histograms |
+| Aggregation     | [`${CLAUDE_SKILL_DIR}/references/aggregation.md`]     | Flush mechanics, Graphite downsampling, DogStatsD aggregation, timestamps     |
+| Client patterns | [`${CLAUDE_SKILL_DIR}/references/client-patterns.md`] | High-throughput tuning, error handling, K8s deployment, UDS configuration     |
+| Backends        | [`${CLAUDE_SKILL_DIR}/references/backends.md`]        | statsd_exporter config, Telegraf setup, migration guides                      |
 
 ## Metric Types
 
@@ -31,22 +31,22 @@ Wire format: `<metric_name>:<value>|<type>[|@<sample_rate>][|#<tags>]`
 
 ### Decision Matrix
 
-| Question | Type |
-|----------|------|
-| How many times did X happen? | Counter (`c`) |
-| What is X right now? | Gauge (`g`) |
-| How long did X take? | Timer (`ms`) |
-| What is the distribution of X? | Histogram (`h`) |
-| How many unique X occurred? | Set (`s`) |
+| Question                              | Type                               |
+| ------------------------------------- | ---------------------------------- |
+| How many times did X happen?          | Counter (`c`)                      |
+| What is X right now?                  | Gauge (`g`)                        |
+| How long did X take?                  | Timer (`ms`)                       |
+| What is the distribution of X?        | Histogram (`h`)                    |
+| How many unique X occurred?           | Set (`s`)                          |
 | What is the global distribution of X? | Distribution (`d`, DogStatsD only) |
 
-Wrong metric type = wrong math at the server. A gauge used as a counter loses data
-between flushes. A counter used as a gauge produces meaningless rates.
+Wrong metric type = wrong math at the server. A gauge used as a counter loses data between flushes. A counter used as a
+gauge produces meaningless rates.
 
 ### Counter (`|c`)
 
-Measures rate of events over time. Server sums all values during flush interval,
-resets to 0 after flush, reports both raw count and per-second rate.
+Measures rate of events over time. Server sums all values during flush interval, resets to 0 after flush, reports both
+raw count and per-second rate.
 
 - Use for: request counts, error counts, event occurrences (cache hits, logins)
 - Sample rate correction: value multiplied by `1/rate`
@@ -54,8 +54,7 @@ resets to 0 after flush, reports both raw count and per-second rate.
 
 ### Gauge (`|g`)
 
-Instantaneous value at a point in time. Server stores last value received,
-retains between flushes (sticky).
+Instantaneous value at a point in time. Server stores last value received, retains between flushes (sticky).
 
 - Use for: queue depth, active connections, memory/CPU usage, thread pool size
 - Signed values (`+N`, `-N`) modify current value incrementally
@@ -64,36 +63,34 @@ retains between flushes (sticky).
 
 ### Timer (`|ms`)
 
-Duration of an operation in milliseconds. Server computes per flush interval:
-count, mean, upper (max), lower (min), sum, stddev, median, configurable
-percentiles (p90, p95, p99).
+Duration of an operation in milliseconds. Server computes per flush interval: count, mean, upper (max), lower (min),
+sum, stddev, median, configurable percentiles (p90, p95, p99).
 
 - Use for: HTTP request latency, DB query duration, function execution time
 - Supports sampling (`|@<rate>`)
 
 ### Histogram (`|h`)
 
-Distribution of values over time. Identical to timer in most implementations.
-DogStatsD treats histograms as the native distribution type.
+Distribution of values over time. Identical to timer in most implementations. DogStatsD treats histograms as the native
+distribution type.
 
 - Use for: request payload sizes, response body sizes, batch sizes
 - Conceptually: timers measure duration, histograms measure arbitrary distributions
 
 ### Set (`|s`)
 
-Count of unique values per flush interval. Server tracks distinct values, reports
-cardinality at flush, resets.
+Count of unique values per flush interval. Server tracks distinct values, reports cardinality at flush, resets.
 
 - Use for: unique users, unique IPs, unique error codes per interval
 - **Do not sample sets** — sampling breaks uniqueness tracking
 
 ### Distribution (`|d`) — DogStatsD Only
 
-Global distribution across all hosts. Raw values sent to Datadog servers (not
-aggregated locally). Use when you need accurate fleet-wide percentiles.
+Global distribution across all hosts. Raw values sent to Datadog servers (not aggregated locally). Use when you need
+accurate fleet-wide percentiles.
 
-See `${CLAUDE_SKILL_DIR}/references/dogstatsd.md` for distributions vs histograms comparison
-and protocol version details.
+See `${CLAUDE_SKILL_DIR}/references/dogstatsd.md` for distributions vs histograms comparison and protocol version
+details.
 
 ## Naming
 
@@ -111,8 +108,8 @@ Example: `myapp.api.request.duration.ms`, `myapp.cache.hit.count.total`
 - Use underscores within path segments: `http_request` not `httpRequest`
 - No dashes — they break Graphite navigation
 
-See `${CLAUDE_SKILL_DIR}/references/naming.md` for Graphite namespace mapping, character
-rules table, and naming anti-patterns.
+See `${CLAUDE_SKILL_DIR}/references/naming.md` for Graphite namespace mapping, character rules table, and naming
+anti-patterns.
 
 ## Tags (DogStatsD)
 
@@ -128,37 +125,35 @@ Format: `metric.name:1|c|#key1:value1,key2:value2` — comma-separated, no space
 
 Set these as global/constant tags on the client — attach to every metric automatically:
 
-| Tag | Purpose | Example |
-|-----|---------|---------|
-| `env` | Deployment environment | `env:production` |
-| `service` | Service name | `service:payment-api` |
-| `version` | Deployed version | `version:2.1.0` |
+| Tag       | Purpose                | Example               |
+| --------- | ---------------------- | --------------------- |
+| `env`     | Deployment environment | `env:production`      |
+| `service` | Service name           | `service:payment-api` |
+| `version` | Deployed version       | `version:2.1.0`       |
 
 ### Tag Cardinality
 
-Rule of thumb: if a tag can have >1000 distinct values, do not use it. Use logs or
-traces for high-cardinality data.
+Rule of thumb: if a tag can have >1000 distinct values, do not use it. Use logs or traces for high-cardinality data.
 
-| Tag | Cardinality | Acceptable? |
-|-----|-------------|-------------|
-| `env:production` | ~3-5 | Yes |
-| `method:GET` | ~7 | Yes |
-| `status_code:200` | ~20-50 | Yes |
-| `endpoint:/api/users` | ~50-200 | Caution |
-| `user_id:12345` | Unbounded | No |
+| Tag                   | Cardinality | Acceptable? |
+| --------------------- | ----------- | ----------- |
+| `env:production`      | ~3-5        | Yes         |
+| `method:GET`          | ~7          | Yes         |
+| `status_code:200`     | ~20-50      | Yes         |
+| `endpoint:/api/users` | ~50-200     | Caution     |
+| `user_id:12345`       | Unbounded   | No          |
 
 ## Aggregation and Flush
 
 The flush cycle determines metric resolution. Default: 10 seconds.
 
 - Counters reset to 0 after flush; gauges are sticky (retain last value)
-- If no counter values received during flush: behavior depends on `deleteCounters`
-  config (default: send 0)
-- Enable client-side aggregation for high-throughput applications (Go v5.0+,
-  Java v3.0+, .NET v7.0+) — pre-aggregates before sending to Agent
+- If no counter values received during flush: behavior depends on `deleteCounters` config (default: send 0)
+- Enable client-side aggregation for high-throughput applications (Go v5.0+, Java v3.0+, .NET v7.0+) — pre-aggregates
+  before sending to Agent
 
-See `${CLAUDE_SKILL_DIR}/references/aggregation.md` for flush mechanics, Graphite
-downsampling rules, DogStatsD aggregation details, and pre-aggregated timestamps.
+See `${CLAUDE_SKILL_DIR}/references/aggregation.md` for flush mechanics, Graphite downsampling rules, DogStatsD
+aggregation details, and pre-aggregated timestamps.
 
 ## Client Patterns
 
@@ -171,49 +166,49 @@ downsampling rules, DogStatsD aggregation details, and pre-aggregated timestamps
 
 ### Buffering
 
-Enable client-side buffering — packs multiple metrics into single UDP packets.
-Reduces syscall overhead in hot paths. Most modern DogStatsD clients buffer by
-default. Call `flush()` before shutdown.
+Enable client-side buffering — packs multiple metrics into single UDP packets. Reduces syscall overhead in hot paths.
+Most modern DogStatsD clients buffer by default. Call `flush()` before shutdown.
 
 ### Sampling
 
-Client randomly decides whether to send each metric based on sample rate. Datagram
-includes `|@<rate>` so server corrects the count.
+Client randomly decides whether to send each metric based on sample rate. Datagram includes `|@<rate>` so server
+corrects the count.
 
-| Volume | Recommendation |
-|--------|---------------|
-| < 1000 metrics/sec | `rate=1.0` (no sampling) |
-| 1000-10000/sec | `rate=0.5` to `0.1` for counters/timers |
-| > 10000/sec | `rate=0.1` or lower; enable client-side aggregation |
+| Volume             | Recommendation                                      |
+| ------------------ | --------------------------------------------------- |
+| < 1000 metrics/sec | `rate=1.0` (no sampling)                            |
+| 1000-10000/sec     | `rate=0.5` to `0.1` for counters/timers             |
+| > 10000/sec        | `rate=0.1` or lower; enable client-side aggregation |
 
 **Never sample gauges or sets** — server cannot correct for these types.
 
-See `${CLAUDE_SKILL_DIR}/references/client-patterns.md` for high-throughput tuning steps,
-error handling, and Kubernetes deployment patterns.
+See `${CLAUDE_SKILL_DIR}/references/client-patterns.md` for high-throughput tuning steps, error handling, and Kubernetes
+deployment patterns.
 
 ## Backends
 
-| Need | Backend |
-|------|---------|
-| Simple, self-hosted graphing | Graphite |
-| Cloud monitoring + APM | Datadog (DogStatsD) |
-| Prometheus ecosystem integration | statsd_exporter |
-| Flexible multi-output pipeline | Telegraf |
-| Migrating StatsD to Prometheus | statsd_exporter with relay |
+| Need                             | Backend                    |
+| -------------------------------- | -------------------------- |
+| Simple, self-hosted graphing     | Graphite                   |
+| Cloud monitoring + APM           | Datadog (DogStatsD)        |
+| Prometheus ecosystem integration | statsd_exporter            |
+| Flexible multi-output pipeline   | Telegraf                   |
+| Migrating StatsD to Prometheus   | statsd_exporter with relay |
 
-See `${CLAUDE_SKILL_DIR}/references/backends.md` for statsd_exporter configuration,
-Telegraf setup, and migration guides.
+See `${CLAUDE_SKILL_DIR}/references/backends.md` for statsd_exporter configuration, Telegraf setup, and migration
+guides.
 
 ## Application
 
 When **writing** StatsD instrumentation:
+
 - Choose the metric type based on what the value represents, not convenience.
 - Apply naming conventions silently — don't narrate each rule.
-- If an existing codebase contradicts a convention, follow the codebase
-  pattern and flag the divergence once.
+- If an existing codebase contradicts a convention, follow the codebase pattern and flag the divergence once.
 - Always configure client-side buffering for production use.
 
 When **reviewing** StatsD instrumentation:
+
 - Check metric type correctness first — most common and most damaging mistake.
 - Verify tag cardinality is bounded.
 - Cite the specific issue and show the fix inline.

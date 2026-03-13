@@ -4,15 +4,15 @@ Error creation, wrapping, matching, structured error types, and error handling p
 
 ## Error Creation Decision Tree
 
-| Caller needs to match? | Message | Use |
-|------------------------|---------|-----|
-| No | Static | `errors.New("not found")` |
-| No | Dynamic | `fmt.Errorf("file %q missing", name)` |
-| Yes | Static | Exported `var ErrNotFound = errors.New(...)` |
-| Yes | Dynamic | Custom error type with `Error()` method |
+| Caller needs to match? | Message | Use                                          |
+| ---------------------- | ------- | -------------------------------------------- |
+| No                     | Static  | `errors.New("not found")`                    |
+| No                     | Dynamic | `fmt.Errorf("file %q missing", name)`        |
+| Yes                    | Static  | Exported `var ErrNotFound = errors.New(...)` |
+| Yes                    | Dynamic | Custom error type with `Error()` method      |
 
-When using a structured error package, sentinels become objects with wrapping
-methods — see [Structured Error Types](#structured-error-types) below.
+When using a structured error package, sentinels become objects with wrapping methods — see
+[Structured Error Types](#structured-error-types) below.
 
 ## Sentinel Errors
 
@@ -64,8 +64,8 @@ func (e *resolveError) Error() string {
 
 ## Structured Error Types
 
-When a project uses a structured error package (e.g., `golib/e`), errors become
-first-class objects with method-based wrapping and key-value metadata fields.
+When a project uses a structured error package (e.g., `golib/e`), errors become first-class objects with method-based
+wrapping and key-value metadata fields.
 
 ### Sentinels as Objects
 
@@ -97,8 +97,7 @@ return ErrValidation.Wrap(err,
 // → "validation failed (user_id=42, retry_count=3): field email is required"
 ```
 
-Use snake_case for field keys. Fields are metadata for machines — the reason
-string is for humans.
+Use snake_case for field keys. Fields are metadata for machines — the reason string is for humans.
 
 ### Creating and Wrapping
 
@@ -144,9 +143,8 @@ Structured errors integrate with loggers via `e.Log()`:
 e.Log(err, logger.Error)
 ```
 
-`e.Log` uses the error's `Reason()` as the log message, the wrapped error as
-the error field, and attached fields as structured log fields. For non-structured
-errors, it falls back to `err.Error()` as the message.
+`e.Log` uses the error's `Reason()` as the log message, the wrapped error as the error field, and attached fields as
+structured log fields. For non-structured errors, it falls back to `err.Error()` as the message.
 
 ### Immutability
 
@@ -162,23 +160,23 @@ return ErrAuth.Wrap(other, fields.F("ip", ip))  // another new instance
 
 ### When to Use Structured Errors
 
-| Situation | Standard `fmt.Errorf` | Structured error package |
-|---|---|---|
-| Simple CLI tools | Sufficient | Overkill |
-| Libraries with public API | Preferred | Either |
-| Services with structured logging | Either | Preferred |
-| Codebase with field-aware observability | Avoid | Preferred |
+| Situation                               | Standard `fmt.Errorf` | Structured error package |
+| --------------------------------------- | --------------------- | ------------------------ |
+| Simple CLI tools                        | Sufficient            | Overkill                 |
+| Libraries with public API               | Preferred             | Either                   |
+| Services with structured logging        | Either                | Preferred                |
+| Codebase with field-aware observability | Avoid                 | Preferred                |
 
-If your project uses a structured error package, prefer it consistently over
-`fmt.Errorf` — mixing approaches fragments error handling patterns.
+If your project uses a structured error package, prefer it consistently over `fmt.Errorf` — mixing approaches fragments
+error handling patterns.
 
 ## Error Wrapping
 
 ### %w vs %v
 
 - **`%w`**: wraps the error. Callers can unwrap with `errors.Is`/`errors.As`. Default choice.
-- **`%v`**: new error with original's text only. Hides the underlying error. Use when the
-  underlying error is an implementation detail.
+- **`%v`**: new error with original's text only. Hides the underlying error. Use when the underlying error is an
+  implementation detail.
 
 ```go
 // Wrap — caller can inspect underlying error
@@ -191,15 +189,17 @@ return fmt.Errorf("process request: %v", err)
 ### When to Wrap
 
 **Wrap** when:
+
 - The caller provided the input that caused the error (e.g., an `io.Reader`)
 - The underlying error is part of your documented API contract
 
 **Don't wrap** when:
+
 - The error source is an implementation detail (e.g., which database you use)
 - Wrapping would commit you to an underlying dependency
 
-Wrapping makes the error part of your API. If you wrap `sql.ErrNoRows`, you can never
-switch databases without breaking callers who check for it.
+Wrapping makes the error part of your API. If you wrap `sql.ErrNoRows`, you can never switch databases without breaking
+callers who check for it.
 
 ### Context in Wrapping
 
@@ -215,8 +215,7 @@ return fmt.Errorf("get user: %w", err)
 
 ### %w Placement
 
-Place `%w` at the end of the format string so error text mirrors chain structure
-(newest-to-oldest):
+Place `%w` at the end of the format string so error text mirrors chain structure (newest-to-oldest):
 
 ```go
 // Good — prints: "read config: open file: permission denied"
@@ -356,6 +355,7 @@ func Lookup(key string) (value string, ok bool)
 ## Don't Panic
 
 Reserve `panic` for truly irrecoverable conditions:
+
 - Violated invariants that indicate a programming error
 - `template.Must` and similar initialization helpers
 
@@ -364,6 +364,7 @@ For everything else, return errors. Even in tests, prefer `t.Fatal` over `panic`
 ## Must Functions
 
 `MustXYZ` names indicate functions that panic on error. Legitimate only for:
+
 - Package-level initialization: `var re = regexp.MustCompile(...)`
 - Test helpers: `mustMarshal(t, v)` (use `t.Fatal`, not `panic`)
 
@@ -396,8 +397,8 @@ if !ok {
 
 ## Defer Errors
 
-Don't silently ignore errors from deferred calls. Common offenders: `f.Close()`,
-`rows.Close()`, `resp.Body.Close()`, `tx.Rollback()`.
+Don't silently ignore errors from deferred calls. Common offenders: `f.Close()`, `rows.Close()`, `resp.Body.Close()`,
+`tx.Rollback()`.
 
 ```go
 // Bad — close error silently dropped
@@ -415,12 +416,12 @@ defer func() {
 defer func() { _ = resp.Body.Close() }()
 ```
 
-When ignoring a defer error, use `_ =` to make it explicit. Add a comment if the
-rationale isn't obvious.
+When ignoring a defer error, use `_ =` to make it explicit. Add a comment if the rationale isn't obvious.
 
 ## Internal Panic/Recover
 
 Panics as internal control flow are acceptable **only** when:
+
 - They never escape across package boundaries
 - A top-level deferred `recover` translates them to returned errors
 - The panic type is distinguishable from unexpected panics
@@ -450,8 +451,8 @@ func Parse(in string) (_ *Node, err error) {
 }
 ```
 
-This pattern is rare — only use for deeply nested internal parsers where plumbing
-error returns adds complexity without value.
+This pattern is rare — only use for deeply nested internal parsers where plumbing error returns adds complexity without
+value.
 
 ## Error Strings
 

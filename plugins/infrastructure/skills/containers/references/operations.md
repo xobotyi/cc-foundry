@@ -9,13 +9,13 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8080/healthz || exit 1
 ```
 
-| Parameter | Default | Purpose |
-|-----------|---------|---------|
-| `--interval` | 30s | Time between checks |
-| `--timeout` | 30s | Max time for a single check |
-| `--start-period` | 0s | Grace period for startup (failures don't count) |
-| `--retries` | 3 | Consecutive failures before `unhealthy` |
-| `--start-interval` | 5s | Interval during start period (Docker 25+) |
+| Parameter          | Default | Purpose                                         |
+| ------------------ | ------- | ----------------------------------------------- |
+| `--interval`       | 30s     | Time between checks                             |
+| `--timeout`        | 30s     | Max time for a single check                     |
+| `--start-period`   | 0s      | Grace period for startup (failures don't count) |
+| `--retries`        | 3       | Consecutive failures before `unhealthy`         |
+| `--start-interval` | 5s      | Interval during start period (Docker 25+)       |
 
 ### Health check patterns by service type
 
@@ -94,21 +94,21 @@ deploy:
       memory: 256M
 ```
 
-Always set memory limits in production. A single container without limits
-can OOM-kill the Docker daemon or other containers.
+Always set memory limits in production. A single container without limits can OOM-kill the Docker daemon or other
+containers.
 
 ## Logging
 
 ### Driver selection
 
-| Driver | Rotation | `docker logs` | Use Case |
-|--------|----------|--------------|----------|
-| `json-file` | Manual | Yes | Default — configure rotation |
-| `local` | Built-in | Yes | Recommended for production |
-| `journald` | Via journald | Yes | Systemd integration |
-| `syslog` | Via syslog | No | Central syslog server |
-| `fluentd` | Via fluentd | No | Log aggregation pipeline |
-| `none` | N/A | No | Disable logging entirely |
+| Driver      | Rotation     | `docker logs` | Use Case                     |
+| ----------- | ------------ | ------------- | ---------------------------- |
+| `json-file` | Manual       | Yes           | Default — configure rotation |
+| `local`     | Built-in     | Yes           | Recommended for production   |
+| `journald`  | Via journald | Yes           | Systemd integration          |
+| `syslog`    | Via syslog   | No            | Central syslog server        |
+| `fluentd`   | Via fluentd  | No            | Log aggregation pipeline     |
+| `none`      | N/A          | No            | Disable logging entirely     |
 
 ### Configure log rotation (critical for production)
 
@@ -137,8 +137,7 @@ services:
 
 - Default `json-file` driver has NO rotation — logs grow until disk is full
 - Use `local` driver for built-in rotation, or configure `json-file` rotation
-- `max-size` per file, `max-file` total files — container gets
-  `max-size * max-file` total log space
+- `max-size` per file, `max-file` total files — container gets `max-size * max-file` total log space
 
 ### Application logging rules
 
@@ -185,12 +184,10 @@ logger.Info("request", zap.String("path", "/api"))
 
 For multi-service deployments, ship logs to a central store:
 
-- **Fluentd / Fluent Bit / Vector** — lightweight collectors that
-  aggregate and forward logs
+- **Fluentd / Fluent Bit / Vector** — lightweight collectors that aggregate and forward logs
 - Use the `fluentd` logging driver or ship via `journald`
 - **EFK stack** (Elasticsearch + Fluentd + Kibana) for searchable logs
-- Configure async mode and retries for remote log drivers to prevent
-  log loss during collector outages
+- Configure async mode and retries for remote log drivers to prevent log loss during collector outages
 
 ## Monitoring
 
@@ -203,6 +200,7 @@ docker system df                  # Disk usage by images/containers/volumes
 ```
 
 For production monitoring:
+
 - Export metrics via **cAdvisor** (Docker) or **podman-exporter** (Podman)
 - Feed into **Prometheus** + **Grafana** dashboards
 - Podman dashboard: Grafana ID 21559
@@ -211,11 +209,11 @@ For production monitoring:
 
 Implement multiple health endpoints for fine-grained monitoring:
 
-| Endpoint | Purpose | Check |
-|----------|---------|-------|
-| `/livez` | Liveness — process is alive | Always 200 if event loop runs |
-| `/readyz` | Readiness — can handle traffic | DB + cache connectivity |
-| `/healthz` | Combined (simple apps) | Basic connectivity check |
+| Endpoint   | Purpose                        | Check                         |
+| ---------- | ------------------------------ | ----------------------------- |
+| `/livez`   | Liveness — process is alive    | Always 200 if event loop runs |
+| `/readyz`  | Readiness — can handle traffic | DB + cache connectivity       |
+| `/healthz` | Combined (simple apps)         | Basic connectivity check      |
 
 Configure Compose health checks against the readiness endpoint:
 
@@ -230,9 +228,8 @@ healthcheck:
 
 ## Quadlet Patterns (Podman systemd Integration)
 
-Quadlet is the declarative model for running containers under systemd.
-Place files in `~/.config/containers/systemd/` (rootless) or
-`/etc/containers/systemd/` (rootful).
+Quadlet is the declarative model for running containers under systemd. Place files in `~/.config/containers/systemd/`
+(rootless) or `/etc/containers/systemd/` (rootful).
 
 ### Container unit
 
@@ -353,12 +350,12 @@ Most Docker CLI commands work identically with Podman:
 alias docker=podman  # Common alias for Podman users
 ```
 
-| Docker | Podman | Notes |
-|--------|--------|-------|
-| `docker compose` | `podman compose` | Podman compose is a wrapper |
-| `docker build` | `podman build` | Uses Buildah under the hood |
-| `docker run` | `podman run` | Rootless by default in Podman |
-| `docker volume` | `podman volume` | Same interface |
+| Docker           | Podman           | Notes                           |
+| ---------------- | ---------------- | ------------------------------- |
+| `docker compose` | `podman compose` | Podman compose is a wrapper     |
+| `docker build`   | `podman build`   | Uses Buildah under the hood     |
+| `docker run`     | `podman run`     | Rootless by default in Podman   |
+| `docker volume`  | `podman volume`  | Same interface                  |
 | `docker network` | `podman network` | Rootless uses pasta/slirp4netns |
 
 ### Key Podman differences

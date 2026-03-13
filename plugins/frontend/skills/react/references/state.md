@@ -1,7 +1,7 @@
 # State Management
 
-useState, useReducer, context, Actions, useActionState, useOptimistic,
-useFormStatus, state placement, and data flow patterns.
+useState, useReducer, context, Actions, useActionState, useOptimistic, useFormStatus, state placement, and data flow
+patterns.
 
 ## State Placement
 
@@ -11,11 +11,10 @@ The most important decision in React state management is **where** state lives.
 
 1. **Does only one component use it?** Keep it local with `useState`.
 2. **Do siblings need it?** Lift to their closest common parent.
-3. **Is prop drilling painful (5+ levels)?** Try composition first —
-   restructure components to pass JSX as `children`.
+3. **Is prop drilling painful (5+ levels)?** Try composition first — restructure components to pass JSX as `children`.
 4. **Still painful after composition?** Use Context with `use()`.
-5. **Is it server data (user profile, search results)?** Use a data-fetching
-   library (react-query, SWR, framework loaders) — not `useState` + `useEffect`.
+5. **Is it server data (user profile, search results)?** Use a data-fetching library (react-query, SWR, framework
+   loaders) — not `useState` + `useEffect`.
 
 ```
 Local state (useState)
@@ -29,13 +28,13 @@ Local state (useState)
 
 These are fundamentally different:
 
-| Category | Examples | Tool |
-|----------|----------|------|
-| **UI state** | Modal open, form input, selected tab | `useState`, `useReducer`, Context |
+| Category         | Examples                                 | Tool                                |
+| ---------------- | ---------------------------------------- | ----------------------------------- |
+| **UI state**     | Modal open, form input, selected tab     | `useState`, `useReducer`, Context   |
 | **Server cache** | User data, search results, API responses | react-query, SWR, framework loaders |
 
-Server cache has inherently different problems — caching, deduplication, race
-conditions, background refetching. Don't reinvent these with raw `useState`.
+Server cache has inherently different problems — caching, deduplication, race conditions, background refetching. Don't
+reinvent these with raw `useState`.
 
 ## useState
 
@@ -72,17 +71,17 @@ const [state, setState] = useState(() => createInitialState());
 
 ## useReducer
 
-Use when state updates are complex — many event handlers modifying the same
-state, or when the next state depends on the previous state in non-trivial ways.
+Use when state updates are complex — many event handlers modifying the same state, or when the next state depends on the
+previous state in non-trivial ways.
 
 ### When to Choose useReducer over useState
 
-| Signal | Tool |
-|--------|------|
-| Single value, simple updates | `useState` |
-| Multiple related values, complex transitions | `useReducer` |
+| Signal                                          | Tool         |
+| ----------------------------------------------- | ------------ |
+| Single value, simple updates                    | `useState`   |
+| Multiple related values, complex transitions    | `useReducer` |
 | Many event handlers doing similar state updates | `useReducer` |
-| Need to test state logic in isolation | `useReducer` |
+| Need to test state logic in isolation           | `useReducer` |
 
 ### Reducer Pattern
 
@@ -111,10 +110,8 @@ const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
 ### Reducer Rules
 
 - **Reducers must be pure.** Same inputs = same output. No side effects.
-- **Each action describes a single user interaction.** Dispatch `reset_form`,
-  not five separate `set_field` actions.
-- **Actions describe what happened, not what to do.** `'added_task'` not
-  `'set_tasks'`.
+- **Each action describes a single user interaction.** Dispatch `reset_form`, not five separate `set_field` actions.
+- **Actions describe what happened, not what to do.** `'added_task'` not `'set_tasks'`.
 - **Always have a `default` that throws** — catch typos early.
 
 ## Context with `use()`
@@ -152,24 +149,21 @@ function useCount() {
 
 ### Context Rules
 
-- **Try props and composition first.** Context is not the first solution
-  to prop drilling.
-- **Keep state close to where it's used.** Not every context belongs at
-  the app root. Page-level or feature-level providers are fine.
-- **Split logically.** User settings context separate from notifications
-  context. Don't put all state in one giant context.
-- **Different contexts don't override each other.** Each `createContext()`
-  is independent.
+- **Try props and composition first.** Context is not the first solution to prop drilling.
+- **Keep state close to where it's used.** Not every context belongs at the app root. Page-level or feature-level
+  providers are fine.
+- **Split logically.** User settings context separate from notifications context. Don't put all state in one giant
+  context.
+- **Different contexts don't override each other.** Each `createContext()` is independent.
 
 ## Actions
 
-Actions are async functions in transitions that handle pending states, errors,
-forms, and optimistic updates automatically.
+Actions are async functions in transitions that handle pending states, errors, forms, and optimistic updates
+automatically.
 
 ### useActionState
 
-Manages state for the result of an Action — like `useReducer` but with
-side effects:
+Manages state for the result of an Action — like `useReducer` but with side effects:
 
 ```tsx
 const [state, dispatch, isPending] = useActionState(
@@ -192,11 +186,11 @@ return (
 ```
 
 **Key behaviors:**
-- When passed to a `<form action>`, React wraps the submission in a
-  transition automatically — no need for `startTransition`.
+
+- When passed to a `<form action>`, React wraps the submission in a transition automatically — no need for
+  `startTransition`.
 - When calling `dispatch` manually (outside a form), wrap in `startTransition`.
-- Actions are queued sequentially — each receives the previous result
-  as `previousState`.
+- Actions are queued sequentially — each receives the previous result as `previousState`.
 - Return error states instead of throwing to prevent skipping queued actions.
 
 ### useOptimistic
@@ -222,9 +216,10 @@ return (
 ```
 
 **Rules:**
+
 - The setter must be called inside `startTransition` or an Action prop.
-- When the Action completes (or fails), the optimistic state reverts to
-  the real `value` — no extra render to "clear" it.
+- When the Action completes (or fails), the optimistic state reverts to the real `value` — no extra render to "clear"
+  it.
 - Use a reducer for complex optimistic updates (e.g., adding to a list):
 
 ```tsx
@@ -239,8 +234,7 @@ const [optimisticTodos, addOptimisticTodo] = useOptimistic(
 
 ### useFormStatus
 
-Reads the submission status of the nearest parent `<form>` — useful for
-design system components:
+Reads the submission status of the nearest parent `<form>` — useful for design system components:
 
 ```tsx
 import { useFormStatus } from 'react-dom';
@@ -255,8 +249,7 @@ function SubmitButton() {
 }
 ```
 
-**Must be called from a component rendered inside a `<form>`.** It does not
-track forms rendered in the same component.
+**Must be called from a component rendered inside a `<form>`.** It does not track forms rendered in the same component.
 
 ## Combining Reducer + Context
 
@@ -278,8 +271,7 @@ function TasksProvider({ children }: { children: ReactNode }) {
 }
 ```
 
-Split into two contexts so components that only dispatch don't re-render
-when task data changes.
+Split into two contexts so components that only dispatch don't re-render when task data changes.
 
 ## Resetting State with key
 
@@ -293,13 +285,13 @@ This is cleaner than using an Effect to reset state on prop change.
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|------|
-| Store computed values in state | Compute during render |
-| Sync state with Effect | Derive values, or compute in event handler |
-| Put all state in a global store | Keep state local, lift only when needed |
-| One giant context for everything | Multiple focused contexts |
-| `useState` + `useEffect` for server data | Data-fetching library |
-| Reset state in Effect on prop change | Use `key` prop |
-| Manual pending/error state for mutations | `useActionState` |
-| Delayed UI during mutations | `useOptimistic` for instant feedback |
+| Don't                                    | Do                                         |
+| ---------------------------------------- | ------------------------------------------ |
+| Store computed values in state           | Compute during render                      |
+| Sync state with Effect                   | Derive values, or compute in event handler |
+| Put all state in a global store          | Keep state local, lift only when needed    |
+| One giant context for everything         | Multiple focused contexts                  |
+| `useState` + `useEffect` for server data | Data-fetching library                      |
+| Reset state in Effect on prop change     | Use `key` prop                             |
+| Manual pending/error state for mutations | `useActionState`                           |
+| Delayed UI during mutations              | `useOptimistic` for instant feedback       |

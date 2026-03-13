@@ -28,11 +28,11 @@ type Component interface {
 }
 ```
 
-Components follow Go visibility rules: uppercase name = exported (public),
-lowercase = unexported (private). Share components across packages by exporting them.
+Components follow Go visibility rules: uppercase name = exported (public), lowercase = unexported (private). Share
+components across packages by exporting them.
 
-**Partial output warning**: A component may write partial output to `io.Writer`
-before returning an error. To guarantee all-or-nothing, render to a buffer first.
+**Partial output warning**: A component may write partial output to `io.Writer` before returning an error. To guarantee
+all-or-nothing, render to a buffer first.
 
 ## Composition with `@`
 
@@ -147,8 +147,8 @@ func button(text string) templ.Component {
 }
 ```
 
-**Warning**: In code-only components, you must escape HTML yourself using
-`templ.EscapeString`. The automatic escaping only applies to `.templ` files.
+**Warning**: In code-only components, you must escape HTML yourself using `templ.EscapeString`. The automatic escaping
+only applies to `.templ` files.
 
 ## Sharing Components
 
@@ -264,8 +264,7 @@ w := new(bytes.Buffer)
 err := templ.RenderFragments(ctx, w, Page(), "content")
 ```
 
-The full template is still executed (all logic runs), but only the fragment's
-output is written.
+The full template is still executed (all logic runs), but only the fragment's output is written.
 
 ### Custom Fragment Keys
 

@@ -4,8 +4,8 @@ Promises, async/await, error handling, and concurrency utilities.
 
 ## async/await First
 
-Use `async`/`await` as the default for asynchronous code. It reads top-to-bottom
-like synchronous code and makes error handling straightforward.
+Use `async`/`await` as the default for asynchronous code. It reads top-to-bottom like synchronous code and makes error
+handling straightforward.
 
 ```js
 // Good — clear sequential flow
@@ -24,12 +24,11 @@ function fetchUserPosts(userId) {
 
 ### Key Rules
 
-- **Always `await` promises.** A missing `await` creates a floating promise —
-  the operation runs but its result and errors are silently lost.
+- **Always `await` promises.** A missing `await` creates a floating promise — the operation runs but its result and
+  errors are silently lost.
 - **Mark the function `async`** if it uses `await`.
-- **Return values, not `return await`.** In a non-try/catch context, `return
-  promise` and `return await promise` behave identically. Use `return await`
-  only inside `try` blocks where you need to catch the awaited error.
+- **Return values, not `return await`.** In a non-try/catch context, `return promise` and `return await promise` behave
+  identically. Use `return await` only inside `try` blocks where you need to catch the awaited error.
 
 ```js
 // Unnecessary await
@@ -51,9 +50,8 @@ async function getUser(id) {
 
 ### try/catch with async/await
 
-Wrap `await` calls in `try`/`catch` when you need to handle errors at that
-level. Don't wrap everything — let errors propagate to a top-level handler
-when possible.
+Wrap `await` calls in `try`/`catch` when you need to handle errors at that level. Don't wrap everything — let errors
+propagate to a top-level handler when possible.
 
 ```js
 // Good — granular error handling where needed
@@ -70,8 +68,7 @@ async function loadConfig() {
 
 ### Never Swallow Errors
 
-Every `catch` must do something meaningful: rethrow, return a fallback, or
-report. An empty `catch` hides bugs.
+Every `catch` must do something meaningful: rethrow, return a fallback, or report. An empty `catch` hides bugs.
 
 ```js
 // Bad — error silently disappears
@@ -131,8 +128,8 @@ try { ... } catch (err) {
 
 ### Unhandled Rejections
 
-Always attach `.catch()` to promise chains that aren't awaited. Unhandled
-rejections crash Node.js and produce console errors in browsers:
+Always attach `.catch()` to promise chains that aren't awaited. Unhandled rejections crash Node.js and produce console
+errors in browsers:
 
 ```js
 // Bad — floating promise, errors lost
@@ -165,8 +162,8 @@ const [users, posts, comments] = await Promise.all([
 ]);
 ```
 
-`Promise.all` rejects as soon as any promise rejects. The other promises
-continue running but their results are not available.
+`Promise.all` rejects as soon as any promise rejects. The other promises continue running but their results are not
+available.
 
 ### Promise.allSettled — When All Results Matter
 
@@ -185,10 +182,9 @@ const successes = results
 
 ### Promise.race and Promise.any
 
-- **`Promise.race`**: resolves/rejects with the first settled promise. Use for
-  timeouts.
-- **`Promise.any`**: resolves with the first fulfilled promise. Rejects only
-  when ALL promises reject. Use for fallbacks.
+- **`Promise.race`**: resolves/rejects with the first settled promise. Use for timeouts.
+- **`Promise.any`**: resolves with the first fulfilled promise. Rejects only when ALL promises reject. Use for
+  fallbacks.
 
 ```js
 // Timeout pattern
@@ -223,8 +219,8 @@ const results = await Promise.all(urls.map((url) => fetch(url)));
 
 ### Avoid the Constructor When Unnecessary
 
-Most async code should compose existing promises with `async`/`await`. Only use
-`new Promise()` to wrap callback-based APIs:
+Most async code should compose existing promises with `async`/`await`. Only use `new Promise()` to wrap callback-based
+APIs:
 
 ```js
 // Unnecessary — already have a promise

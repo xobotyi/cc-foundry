@@ -35,8 +35,8 @@ claude mcp add --transport stdio --env AIRTABLE_API_KEY=YOUR_KEY airtable \
   -- npx -y airtable-mcp-server
 ```
 
-**Important:** All options (`--transport`, `--env`, `--scope`, `--header`) must come before the
-server name. `--` separates server name from the command and its arguments.
+**Important:** All options (`--transport`, `--env`, `--scope`, `--header`) must come before the server name. `--`
+separates server name from the command and its arguments.
 
 **Windows:** Use `cmd /c` wrapper for `npx`:
 
@@ -64,14 +64,13 @@ claude mcp remove github
 
 ## Dynamic Tool Updates
 
-Claude Code supports MCP `list_changed` notifications. When a server sends this notification,
-Claude Code automatically refreshes available tools, prompts, and resources — no reconnection
-needed.
+Claude Code supports MCP `list_changed` notifications. When a server sends this notification, Claude Code automatically
+refreshes available tools, prompts, and resources — no reconnection needed.
 
 ## Installation Scopes
 
 | Scope   | Storage                         | Use Case                            |
-|---------|---------------------------------|-------------------------------------|
+| ------- | ------------------------------- | ----------------------------------- |
 | local   | `~/.claude.json` (project path) | Personal, current project (default) |
 | project | `.mcp.json` in project root     | Team, via version control           |
 | user    | `~/.claude.json`                | Personal, all projects              |
@@ -123,6 +122,7 @@ Supported in `.mcp.json` for `command`, `args`, `env`, `url`, and `headers`:
 ```
 
 **Syntax:**
+
 - `${VAR}` — expands to value
 - `${VAR:-default}` — expands to value or default
 
@@ -143,20 +143,18 @@ claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
 # Follow browser login flow
 ```
 
-Tokens stored securely and refreshed automatically. Use "Clear authentication" in `/mcp` to
-revoke access.
+Tokens stored securely and refreshed automatically. Use "Clear authentication" in `/mcp` to revoke access.
 
 ### Pre-Configured OAuth Credentials
 
-For servers that don't support dynamic client registration (error: "Incompatible auth server:
-does not support dynamic client registration"), register an OAuth app through the server's
-developer portal first.
+For servers that don't support dynamic client registration (error: "Incompatible auth server: does not support dynamic
+client registration"), register an OAuth app through the server's developer portal first.
 
-| Flag              | Purpose                                                   |
-|-------------------|-----------------------------------------------------------|
-| `--client-id`     | OAuth client ID from developer portal                     |
-| `--client-secret` | Prompts for secret with masked input                      |
-| `--callback-port` | Port for redirect URI (`http://localhost:PORT/callback`)  |
+| Flag              | Purpose                                                  |
+| ----------------- | -------------------------------------------------------- |
+| `--client-id`     | OAuth client ID from developer portal                    |
+| `--client-secret` | Prompts for secret with masked input                     |
+| `--callback-port` | Port for redirect URI (`http://localhost:PORT/callback`) |
 
 **Via `claude mcp add`:**
 
@@ -183,6 +181,7 @@ MCP_CLIENT_SECRET=your-secret claude mcp add --transport http \
 ```
 
 **Notes:**
+
 - Client secret stored in system keychain (macOS) or credentials file, not in config
 - For public OAuth clients with no secret, use `--client-id` alone without `--client-secret`
 - OAuth flags only apply to HTTP and SSE transports; no effect on stdio
@@ -222,8 +221,7 @@ claude mcp add-from-claude-desktop
 
 ## Use MCP Servers from Claude.ai
 
-When logged into Claude Code with a Claude.ai account, MCP servers configured in Claude.ai are
-automatically available:
+When logged into Claude Code with a Claude.ai account, MCP servers configured in Claude.ai are automatically available:
 
 - Configure servers at `claude.ai/settings/connectors`
 - On Team/Enterprise plans, only admins can add servers
@@ -252,9 +250,8 @@ Claude Desktop configuration (`claude_desktop_config.json`):
 }
 ```
 
-If `claude` is not in PATH, use the full path (`which claude`). Exposes Claude Code tools
-(View, Edit, LS, etc.) to the MCP client. The client is responsible for user confirmation on
-tool calls.
+If `claude` is not in PATH, use the full path (`which claude`). Exposes Claude Code tools (View, Edit, LS, etc.) to the
+MCP client. The client is responsible for user confirmation on tool calls.
 
 ## Plugin-Provided MCP Servers
 
@@ -287,14 +284,14 @@ Or inline in `plugin.json`:
 ```
 
 | Feature               | Details                                                          |
-|-----------------------|------------------------------------------------------------------|
+| --------------------- | ---------------------------------------------------------------- |
 | Automatic lifecycle   | Starts on plugin enable; requires Claude Code restart on changes |
 | Environment variables | `${CLAUDE_PLUGIN_ROOT}` resolves to plugin directory             |
 | User env access       | Same variables as manually configured servers                    |
 | Transport types       | Supports stdio, SSE, and HTTP                                    |
 
-Plugin servers appear in `/mcp` with indicators showing plugin origin. Managed through plugin
-installation, not `/mcp` commands.
+Plugin servers appear in `/mcp` with indicators showing plugin origin. Managed through plugin installation, not `/mcp`
+commands.
 
 ## MCP Resources
 
@@ -305,8 +302,8 @@ Reference resources with `@` in prompts:
 > Compare @postgres:schema://users with @docs:file://database/user-model
 ```
 
-Format: `@server:protocol://resource/path`. Resources are fetched and included as attachments.
-Fuzzy-searchable in `@` autocomplete.
+Format: `@server:protocol://resource/path`. Resources are fetched and included as attachments. Fuzzy-searchable in `@`
+autocomplete.
 
 ## MCP Prompts as Commands
 
@@ -325,18 +322,17 @@ MCP servers can expose prompts that become slash commands:
 
 ## MCP Tool Search
 
-When MCP tool descriptions exceed 10% of the context window, Tool Search activates
-automatically. Tools load on-demand instead of being preloaded. Requires Sonnet 4+ or Opus 4+
-(Haiku not supported).
+When MCP tool descriptions exceed 10% of the context window, Tool Search activates automatically. Tools load on-demand
+instead of being preloaded. Requires Sonnet 4+ or Opus 4+ (Haiku not supported).
 
 **Configure via `ENABLE_TOOL_SEARCH`:**
 
-| Value      | Behavior                                     |
-|------------|----------------------------------------------|
-| `auto`     | Activate at 10% threshold (default)          |
-| `auto:<N>` | Custom threshold (e.g., `auto:5` = 5%)       |
-| `true`     | Always enabled                               |
-| `false`    | Disabled, all tools loaded upfront           |
+| Value      | Behavior                               |
+| ---------- | -------------------------------------- |
+| `auto`     | Activate at 10% threshold (default)    |
+| `auto:<N>` | Custom threshold (e.g., `auto:5` = 5%) |
+| `true`     | Always enabled                         |
+| `false`    | Disabled, all tools loaded upfront     |
 
 ```bash
 ENABLE_TOOL_SEARCH=auto:5 claude
@@ -352,18 +348,17 @@ Set in `settings.json` `env` field, or disable via `disallowedTools`:
 }
 ```
 
-**For MCP server authors:** Use the server instructions field to describe what category of tasks
-your tools handle and when Claude should search for them. This is the primary signal Tool Search
-uses to discover your server's tools.
+**For MCP server authors:** Use the server instructions field to describe what category of tasks your tools handle and
+when Claude should search for them. This is the primary signal Tool Search uses to discover your server's tools.
 
 ## Environment Variables
 
-| Variable                | Purpose                                        | Default  |
-|-------------------------|------------------------------------------------|----------|
-| `MCP_TIMEOUT`           | Server startup timeout in ms                   | (system) |
-| `MAX_MCP_OUTPUT_TOKENS` | Maximum tokens for MCP tool output             | 25000    |
-| `ENABLE_TOOL_SEARCH`    | Tool search behavior (see above)               | `auto`   |
-| `MCP_CLIENT_SECRET`     | OAuth client secret for non-interactive setup  | —        |
+| Variable                | Purpose                                       | Default  |
+| ----------------------- | --------------------------------------------- | -------- |
+| `MCP_TIMEOUT`           | Server startup timeout in ms                  | (system) |
+| `MAX_MCP_OUTPUT_TOKENS` | Maximum tokens for MCP tool output            | 25000    |
+| `ENABLE_TOOL_SEARCH`    | Tool search behavior (see above)              | `auto`   |
+| `MCP_CLIENT_SECRET`     | OAuth client secret for non-interactive setup | —        |
 
 Output warning threshold is 10,000 tokens; increase limit:
 
@@ -382,11 +377,11 @@ Two options for organizational control over MCP servers:
 
 Deploy for complete control. Users cannot add, modify, or use any other servers.
 
-| Platform    | Path                                                        |
-|-------------|-------------------------------------------------------------|
+| Platform    | Path                                                       |
+| ----------- | ---------------------------------------------------------- |
 | macOS       | `/Library/Application Support/ClaudeCode/managed-mcp.json` |
-| Linux / WSL | `/etc/claude-code/managed-mcp.json`                         |
-| Windows     | `C:\Program Files\ClaudeCode\managed-mcp.json`              |
+| Linux / WSL | `/etc/claude-code/managed-mcp.json`                        |
+| Windows     | `C:\Program Files\ClaudeCode\managed-mcp.json`             |
 
 System-wide paths requiring administrator privileges.
 
@@ -406,13 +401,13 @@ System-wide paths requiring administrator privileges.
 
 ### Option 2: Policy-Based Control (Allowlists / Denylists)
 
-Use `allowedMcpServers` and `deniedMcpServers` in managed settings. Users can add their own
-servers within policy constraints.
+Use `allowedMcpServers` and `deniedMcpServers` in managed settings. Users can add their own servers within policy
+constraints.
 
 **Restriction types (each entry must have exactly one):**
 
 | Type            | Matches                          | Example                                      |
-|-----------------|----------------------------------|----------------------------------------------|
+| --------------- | -------------------------------- | -------------------------------------------- |
 | `serverName`    | Configured server name           | `{"serverName": "github"}`                   |
 | `serverCommand` | Exact command array (stdio only) | `{"serverCommand": ["npx", "-y", "pkg"]}`    |
 | `serverUrl`     | URL pattern with `*` wildcards   | `{"serverUrl": "https://mcp.company.com/*"}` |
@@ -432,6 +427,7 @@ servers within policy constraints.
 ```
 
 **URL wildcard patterns:**
+
 - `https://mcp.company.com/*` — all paths on domain
 - `https://*.example.com/*` — any subdomain
 - `http://localhost:*/*` — any port on localhost
@@ -439,7 +435,7 @@ servers within policy constraints.
 **Allowlist behavior:**
 
 | Value       | Effect                                |
-|-------------|---------------------------------------|
+| ----------- | ------------------------------------- |
 | `undefined` | No restrictions (default)             |
 | `[]`        | Complete lockdown, no servers allowed |
 | List        | Only matching servers allowed         |
@@ -447,20 +443,19 @@ servers within policy constraints.
 **Denylist behavior:**
 
 | Value       | Effect                              |
-|-------------|-------------------------------------|
+| ----------- | ----------------------------------- |
 | `undefined` | No servers blocked (default)        |
 | `[]`        | No servers blocked                  |
 | List        | Matching servers explicitly blocked |
 
 **Precedence rules:**
+
 - Denylist takes absolute precedence over allowlist
 - A server passes if it matches any name, command, or URL entry (unless denied)
-- When `serverCommand` entries exist in allowlist, stdio servers must match a command —
-  cannot pass by name alone
-- When `serverUrl` entries exist in allowlist, remote servers must match a URL pattern —
-  cannot pass by name alone
-- Options 1 and 2 can combine: `managed-mcp.json` has exclusive user control, but
-  allowlists/denylists still filter which managed servers actually load
+- When `serverCommand` entries exist in allowlist, stdio servers must match a command — cannot pass by name alone
+- When `serverUrl` entries exist in allowlist, remote servers must match a URL pattern — cannot pass by name alone
+- Options 1 and 2 can combine: `managed-mcp.json` has exclusive user control, but allowlists/denylists still filter
+  which managed servers actually load
 
 ---
 
@@ -477,8 +472,8 @@ servers within policy constraints.
 ### Authentication Failures
 
 - For OAuth errors: run `/mcp` and use "Clear authentication", then re-authenticate
-- For "does not support dynamic client registration": use pre-configured OAuth credentials
-  with `--client-id` and `--client-secret`
+- For "does not support dynamic client registration": use pre-configured OAuth credentials with `--client-id` and
+  `--client-secret`
 
 ### Tools Not Appearing
 
@@ -489,5 +484,5 @@ servers within policy constraints.
 
 ### Large Output Issues
 
-If MCP tools produce excessive output, set `MAX_MCP_OUTPUT_TOKENS` or configure the server
-to paginate or filter responses.
+If MCP tools produce excessive output, set `MAX_MCP_OUTPUT_TOKENS` or configure the server to paginate or filter
+responses.

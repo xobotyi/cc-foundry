@@ -1,7 +1,7 @@
 # Compose Orchestration
 
-Docker Compose v2 patterns for multi-container applications. Compose
-files use the Compose Specification (no `version:` field needed).
+Docker Compose v2 patterns for multi-container applications. Compose files use the Compose Specification (no `version:`
+field needed).
 
 ## Service Structure
 
@@ -72,14 +72,14 @@ depends_on:
     condition: service_completed_successfully
 ```
 
-| Condition | Waits Until |
-|-----------|-------------|
-| `service_started` | Container started (default) |
-| `service_healthy` | Health check passes |
+| Condition                        | Waits Until                 |
+| -------------------------------- | --------------------------- |
+| `service_started`                | Container started (default) |
+| `service_healthy`                | Health check passes         |
 | `service_completed_successfully` | Container exits with code 0 |
 
-Use `service_healthy` for databases and services that need init time.
-Use `service_completed_successfully` for one-shot tasks like migrations.
+Use `service_healthy` for databases and services that need init time. Use `service_completed_successfully` for one-shot
+tasks like migrations.
 
 ## Environment Variables
 
@@ -150,11 +150,11 @@ services:
       - /data/backups:/backups:ro                 # Read-only bind
 ```
 
-| Type | Syntax | Use Case |
-|------|--------|----------|
-| Named volume | `volname:/path` | Persistent data (databases, uploads) |
-| Bind mount | `./host:/container` | Development, config files |
-| tmpfs | `type: tmpfs` | Ephemeral scratch data, secrets at runtime |
+| Type         | Syntax              | Use Case                                   |
+| ------------ | ------------------- | ------------------------------------------ |
+| Named volume | `volname:/path`     | Persistent data (databases, uploads)       |
+| Bind mount   | `./host:/container` | Development, config files                  |
+| tmpfs        | `type: tmpfs`       | Ephemeral scratch data, secrets at runtime |
 
 - Named volumes survive `docker compose down` (but not `down -v`)
 - Bind mounts for development; named volumes for production
@@ -192,15 +192,14 @@ services:
 
 ## Restart Policies
 
-| Policy | Behavior |
-|--------|----------|
-| `no` | Never restart (default) |
-| `always` | Always restart, including on daemon startup |
-| `unless-stopped` | Like `always`, but not if manually stopped |
+| Policy             | Behavior                                            |
+| ------------------ | --------------------------------------------------- |
+| `no`               | Never restart (default)                             |
+| `always`           | Always restart, including on daemon startup         |
+| `unless-stopped`   | Like `always`, but not if manually stopped          |
 | `on-failure[:max]` | Restart only on non-zero exit, optional retry limit |
 
-Use `unless-stopped` for production services. Use `on-failure` for
-tasks that should retry but eventually give up.
+Use `unless-stopped` for production services. Use `on-failure` for tasks that should retry but eventually give up.
 
 ## Resource Limits
 
@@ -222,8 +221,8 @@ deploy:
 
 ## Secrets
 
-File-based secrets are safer than environment variables — env vars leak
-into `docker inspect`, process listings, and crash dumps.
+File-based secrets are safer than environment variables — env vars leak into `docker inspect`, process listings, and
+crash dumps.
 
 ```yaml
 services:
@@ -244,8 +243,7 @@ secrets:
 - Secrets mount as files at `/run/secrets/<name>` — read-only by default
 - Many official images support `*_FILE` env vars (Postgres, MySQL, etc.)
 - For custom apps, read the secret file path from an env var at startup
-- Granular per-service access — only services that declare the secret
-  can read it
+- Granular per-service access — only services that declare the secret can read it
 
 ## Override Files
 
@@ -286,8 +284,7 @@ project/
 
 ## Zero-downtime Patterns
 
-Standard `docker compose up` stops the old container before starting
-the new one — 10-20 seconds of downtime.
+Standard `docker compose up` stops the old container before starting the new one — 10-20 seconds of downtime.
 
 ### docker-rollout plugin
 
@@ -296,9 +293,8 @@ the new one — 10-20 seconds of downtime.
 docker rollout myservice
 ```
 
-Scales to 2 instances, waits for health check, updates proxy routing,
-then removes the old container. Requires a reverse proxy (Traefik,
-Nginx).
+Scales to 2 instances, waits for health check, updates proxy routing, then removes the old container. Requires a reverse
+proxy (Traefik, Nginx).
 
 ### Blue/green with project names
 
@@ -312,8 +308,7 @@ TAG=v2.0 docker compose -p green up -d
 docker compose -p blue down
 ```
 
-Trade-offs: requires enough resources for both stacks briefly,
-migrations must be backward-compatible.
+Trade-offs: requires enough resources for both stacks briefly, migrations must be backward-compatible.
 
 ### Rollback
 
@@ -322,8 +317,7 @@ migrations must be backward-compatible.
 TAG=v1.9 docker compose up -d
 ```
 
-If migrations were destructive, rollback may be impossible. Use
-additive schema changes and feature flags.
+If migrations were destructive, rollback may be impossible. Use additive schema changes and feature flags.
 
 ## Init Process
 
@@ -335,8 +329,7 @@ services:
     init: true
 ```
 
-Use for any service where the application is not designed to run
-as PID 1 (most applications).
+Use for any service where the application is not designed to run as PID 1 (most applications).
 
 ## Compose Commands
 

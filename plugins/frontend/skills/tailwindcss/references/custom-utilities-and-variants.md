@@ -2,8 +2,8 @@
 
 ## `@utility` — Custom Utility Classes
 
-Custom utilities are inserted into the `utilities` layer automatically. They support all
-variants (`hover:`, `focus:`, `lg:`, etc.) without extra configuration.
+Custom utilities are inserted into the `utilities` layer automatically. They support all variants (`hover:`, `focus:`,
+`lg:`, etc.) without extra configuration.
 
 ### Simple utility
 
@@ -27,8 +27,8 @@ Usage: `content-auto`, `hover:content-auto`, `lg:content-auto`
 
 ### Functional utility (accepts argument via `--value()`)
 
-Use `@utility tab-*` (wildcard) to accept a value. The `--value()` function resolves
-the argument in three modes — any combination can be used in the same rule:
+Use `@utility tab-*` (wildcard) to accept a value. The `--value()` function resolves the argument in three modes — any
+combination can be used in the same rule:
 
 ```css
 @utility tab-* {
@@ -38,27 +38,26 @@ the argument in three modes — any combination can be used in the same rule:
 }
 ```
 
-Unresolved declarations are omitted from output. Multiple `--value()` calls in the same
-`@utility` are tried independently.
+Unresolved declarations are omitted from output. Multiple `--value()` calls in the same `@utility` are tried
+independently.
 
 #### `--value()` resolution modes
 
-| Syntax | Matches | Example class |
-|--------|---------|---------------|
-| `--value(--ns-*)` | Theme key in `--ns-*` namespace | `tab-github` (if `--tab-size-github` exists) |
-| `--value(integer)` | Bare integer | `tab-4`, `tab-76` |
-| `--value(number)` | Bare decimal number | `opacity-75` |
-| `--value(percentage)` | Bare percentage | `opacity-50%` |
-| `--value(ratio)` | Fraction (triggers ratio+modifier handling) | `aspect-3/4` |
-| `--value([integer])` | Arbitrary integer | `tab-[8]` |
-| `--value([length])` | Arbitrary length | `w-[117px]` |
-| `--value([color])` | Arbitrary color | `bg-[#abc]` |
-| `--value([*])` | Any arbitrary value | |
-| `--value("inherit", "initial")` | Literal keyword | `tab-inherit` |
+| Syntax                          | Matches                                     | Example class                                |
+| ------------------------------- | ------------------------------------------- | -------------------------------------------- |
+| `--value(--ns-*)`               | Theme key in `--ns-*` namespace             | `tab-github` (if `--tab-size-github` exists) |
+| `--value(integer)`              | Bare integer                                | `tab-4`, `tab-76`                            |
+| `--value(number)`               | Bare decimal number                         | `opacity-75`                                 |
+| `--value(percentage)`           | Bare percentage                             | `opacity-50%`                                |
+| `--value(ratio)`                | Fraction (triggers ratio+modifier handling) | `aspect-3/4`                                 |
+| `--value([integer])`            | Arbitrary integer                           | `tab-[8]`                                    |
+| `--value([length])`             | Arbitrary length                            | `w-[117px]`                                  |
+| `--value([color])`              | Arbitrary color                             | `bg-[#abc]`                                  |
+| `--value([*])`                  | Any arbitrary value                         |                                              |
+| `--value("inherit", "initial")` | Literal keyword                             | `tab-inherit`                                |
 
-Bare value types: `number`, `integer`, `ratio`, `percentage`.
-Arbitrary value types: `absolute-size`, `angle`, `bg-size`, `color`, `family-name`,
-`generic-name`, `image`, `integer`, `length`, `line-width`, `number`, `percentage`,
+Bare value types: `number`, `integer`, `ratio`, `percentage`. Arbitrary value types: `absolute-size`, `angle`,
+`bg-size`, `color`, `family-name`, `generic-name`, `image`, `integer`, `length`, `line-width`, `number`, `percentage`,
 `position`, `ratio`, `relative-size`, `url`, `vector`, `*`.
 
 #### Multiple modes in one declaration (left-to-right resolution)
@@ -193,8 +192,8 @@ Multiple variants: nest them:
 
 ## `@apply` — Inline Utility Classes into Custom CSS
 
-Use `@apply` to compose utility classes into a custom CSS rule. **Last resort only** —
-prefer template components in React/Vue/Svelte.
+Use `@apply` to compose utility classes into a custom CSS rule. **Last resort only** — prefer template components in
+React/Vue/Svelte.
 
 ```css
 @layer components {
@@ -206,6 +205,7 @@ prefer template components in React/Vue/Svelte.
 ```
 
 Rules:
+
 - Place `@apply`-based classes in `@layer components` so utilities can override them
 - Single-element patterns only — multi-element structures belong in template components
 - Acceptable: third-party library overrides, legacy HTML you don't control
@@ -215,8 +215,8 @@ Rules:
 
 ## `@reference` — Import Without Duplicating CSS
 
-Use `@reference` in Vue/Svelte `<style>` blocks or CSS Modules to access theme vars,
-custom utilities, and custom variants without duplicating output CSS:
+Use `@reference` in Vue/Svelte `<style>` blocks or CSS Modules to access theme vars, custom utilities, and custom
+variants without duplicating output CSS:
 
 ```vue
 <style>
@@ -262,8 +262,8 @@ When using default theme only (no custom `@theme`, `@custom-variant`, `@plugin`)
 @source not inline("{hover:,focus:,}bg-red-{50,{100..900..100},950}");
 ```
 
-`@source inline()` uses brace expansion. Use for CMS/database-driven classes that don't
-appear as static strings in source files.
+`@source inline()` uses brace expansion. Use for CMS/database-driven classes that don't appear as static strings in
+source files.
 
 ---
 
@@ -274,8 +274,8 @@ appear as static strings in source files.
 @plugin "./local-plugin.js";
 ```
 
-`@plugin` accepts package name or local path. Use for legacy or third-party plugins.
-CSS-native `@utility` and `@custom-variant` are preferred over JS plugins for new code.
+`@plugin` accepts package name or local path. Use for legacy or third-party plugins. CSS-native `@utility` and
+`@custom-variant` are preferred over JS plugins for new code.
 
 ---
 
@@ -366,19 +366,19 @@ Also valid in arbitrary values: `py-[calc(--spacing(4)-1px)]`
 
 ### Whitespace in arbitrary values
 
-Use underscore `_` for spaces: `grid-cols-[1fr_500px_2fr]`. URLs preserve underscores.
-Escape with backslash to force underscore: `content-['hello\_world']`.
+Use underscore `_` for spaces: `grid-cols-[1fr_500px_2fr]`. URLs preserve underscores. Escape with backslash to force
+underscore: `content-['hello\_world']`.
 
 ---
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|-----|
-| Dynamic class concat: `` `bg-${color}-500` `` | Static map: `{ blue: "bg-blue-500" }` |
-| `@apply` for multi-element component | Extract a template component |
-| `@apply` as default approach | Use markup utilities; `@apply` is the escape hatch |
-| `bg-[var(--brand)]` | `bg-(--brand)` — v4 shorthand |
-| `@layer components` without utilities override intent | Put component classes in `@layer components` |
-| `@source inline()` for classes visible in source | Let auto-detection handle them |
-| JS plugins for new utilities | Use `@utility` and `@custom-variant` in CSS |
+| Don't                                                 | Do                                                 |
+| ----------------------------------------------------- | -------------------------------------------------- |
+| Dynamic class concat: `` `bg-${color}-500` ``         | Static map: `{ blue: "bg-blue-500" }`              |
+| `@apply` for multi-element component                  | Extract a template component                       |
+| `@apply` as default approach                          | Use markup utilities; `@apply` is the escape hatch |
+| `bg-[var(--brand)]`                                   | `bg-(--brand)` — v4 shorthand                      |
+| `@layer components` without utilities override intent | Put component classes in `@layer components`       |
+| `@source inline()` for classes visible in source      | Let auto-detection handle them                     |
+| JS plugins for new utilities                          | Use `@utility` and `@custom-variant` in CSS        |

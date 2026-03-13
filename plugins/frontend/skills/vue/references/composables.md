@@ -1,14 +1,14 @@
 # Composables
 
-Composables are functions that encapsulate and reuse stateful logic using
-the Composition API. They replace mixins entirely.
+Composables are functions that encapsulate and reuse stateful logic using the Composition API. They replace mixins
+entirely.
 
 ## Naming
 
 - **Always prefix with `use`:** `useMouse`, `useFetch`, `useAuth`.
 - **camelCase:** `useEventListener`, not `use-event-listener`.
-- The `use` prefix signals that the function uses Vue reactivity and
-  must be called within `setup()` or `<script setup>`.
+- The `use` prefix signals that the function uses Vue reactivity and must be called within `setup()` or
+  `<script setup>`.
 
 ## Structure
 
@@ -37,8 +37,7 @@ export function useMouse() {
 
 ## Return Values
 
-**Always return a plain object containing refs.** This allows destructuring
-with retained reactivity:
+**Always return a plain object containing refs.** This allows destructuring with retained reactivity:
 
 ```ts
 // GOOD: plain object with refs
@@ -79,8 +78,7 @@ export function useFetch(url: MaybeRefOrGetter<string>) {
 }
 ```
 
-Calling `toValue()` inside `watchEffect` ensures the reactive source is
-tracked.
+Calling `toValue()` inside `watchEffect` ensures the reactive source is tracked.
 
 Usage:
 
@@ -160,21 +158,22 @@ export function useMouse() {
 ## Usage Restrictions
 
 Composables must be called:
+
 - Inside `<script setup>` (most common)
 - Inside the `setup()` function
 - Synchronously (not inside async callbacks or promises)
 - Inside lifecycle hooks like `onMounted()` is acceptable
 
-**Exception:** `<script setup>` restores the active instance after `await`,
-so composables work after `await` in `<script setup>`.
+**Exception:** `<script setup>` restores the active instance after `await`, so composables work after `await` in
+`<script setup>`.
 
 ## Composables vs Alternatives
 
-| Technique | Drawback |
-|-----------|----------|
-| Mixins | Unclear property sources, namespace collisions, implicit coupling |
-| Renderless components | Extra component instance overhead |
-| Utility functions | No reactive state or lifecycle hooks |
+| Technique             | Drawback                                                          |
+| --------------------- | ----------------------------------------------------------------- |
+| Mixins                | Unclear property sources, namespace collisions, implicit coupling |
+| Renderless components | Extra component instance overhead                                 |
+| Utility functions     | No reactive state or lifecycle hooks                              |
 
-Composables solve all three — they're explicit, namespaced through
-destructuring, and integrate with Vue's reactivity and lifecycle.
+Composables solve all three — they're explicit, namespaced through destructuring, and integrate with Vue's reactivity
+and lifecycle.

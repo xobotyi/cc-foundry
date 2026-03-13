@@ -1,7 +1,7 @@
 # Plugin Ecosystem and Configuration
 
-pytest's plugin ecosystem extends the framework with async support, mocking, parallelism,
-and coverage. Distilled from official plugin documentation.
+pytest's plugin ecosystem extends the framework with async support, mocking, parallelism, and coverage. Distilled from
+official plugin documentation.
 
 ## pytest-asyncio
 
@@ -14,13 +14,12 @@ Enables async test functions and fixtures.
 asyncio_mode = "auto"  # auto-detect async tests (recommended)
 ```
 
-| Mode | Behavior |
-|------|----------|
-| `auto` | Async tests and fixtures detected automatically — no decorator needed |
+| Mode     | Behavior                                                               |
+| -------- | ---------------------------------------------------------------------- |
+| `auto`   | Async tests and fixtures detected automatically — no decorator needed  |
 | `strict` | Requires explicit `@pytest.mark.asyncio` on every async test (default) |
 
-With `auto` mode, any `async def test_*` function is treated as an async test without
-needing `@pytest.mark.asyncio`.
+With `auto` mode, any `async def test_*` function is treated as an async test without needing `@pytest.mark.asyncio`.
 
 ### Event Loop Scope
 
@@ -29,10 +28,10 @@ needing `@pytest.mark.asyncio`.
 asyncio_default_fixture_loop_scope = "session"
 ```
 
-| Scope | Behavior |
-|-------|----------|
-| `function` | Fresh event loop per test (more isolated, default) |
-| `session` | One event loop for the entire test run (faster, shared connections) |
+| Scope      | Behavior                                                            |
+| ---------- | ------------------------------------------------------------------- |
+| `function` | Fresh event loop per test (more isolated, default)                  |
+| `session`  | One event loop for the entire test run (faster, shared connections) |
 
 ### Async Fixtures
 
@@ -49,21 +48,19 @@ async def database():
     await db.disconnect()
 ```
 
-Async fixtures use `yield` for teardown, same as sync fixtures. Both sync and async
-fixtures can be mixed freely — a sync test can use async fixtures and vice versa when
-pytest-asyncio is configured.
+Async fixtures use `yield` for teardown, same as sync fixtures. Both sync and async fixtures can be mixed freely — a
+sync test can use async fixtures and vice versa when pytest-asyncio is configured.
 
 ### Limitations
 
-- Test classes subclassing `unittest.TestCase` are **not supported** — use
-  `unittest.IsolatedAsyncioTestCase` instead or plain pytest async tests
-- When using `scope="session"` on async fixtures, configure
-  `asyncio_default_fixture_loop_scope = "session"` to avoid loop mismatch errors
+- Test classes subclassing `unittest.TestCase` are **not supported** — use `unittest.IsolatedAsyncioTestCase` instead or
+  plain pytest async tests
+- When using `scope="session"` on async fixtures, configure `asyncio_default_fixture_loop_scope = "session"` to avoid
+  loop mismatch errors
 
 ## pytest-mock
 
-Provides the `mocker` fixture — a thin wrapper around `unittest.mock` with automatic
-cleanup after each test.
+Provides the `mocker` fixture — a thin wrapper around `unittest.mock` with automatic cleanup after each test.
 
 ### Core API
 
@@ -76,21 +73,20 @@ def test_sends_email(mocker):
 
 ### Method Reference
 
-| Method | Purpose |
-|--------|---------|
-| `mocker.patch("target")` | Replace target with `MagicMock` |
-| `mocker.patch.object(obj, "attr")` | Patch attribute on a specific object |
-| `mocker.patch.dict(dict_obj, values)` | Temporarily modify dict entries |
-| `mocker.spy(obj, "method")` | Wrap method — track calls while preserving behavior |
-| `mocker.stub(name="stub")` | Create a standalone stub (no spec) |
-| `mocker.MagicMock(spec=Type)` | Create spec-constrained mock |
-| `mocker.AsyncMock(spec=Type)` | Create async-compatible mock |
-| `mocker.patch("target", new_callable=mocker.AsyncMock)` | Patch with async mock |
+| Method                                                  | Purpose                                             |
+| ------------------------------------------------------- | --------------------------------------------------- |
+| `mocker.patch("target")`                                | Replace target with `MagicMock`                     |
+| `mocker.patch.object(obj, "attr")`                      | Patch attribute on a specific object                |
+| `mocker.patch.dict(dict_obj, values)`                   | Temporarily modify dict entries                     |
+| `mocker.spy(obj, "method")`                             | Wrap method — track calls while preserving behavior |
+| `mocker.stub(name="stub")`                              | Create a standalone stub (no spec)                  |
+| `mocker.MagicMock(spec=Type)`                           | Create spec-constrained mock                        |
+| `mocker.AsyncMock(spec=Type)`                           | Create async-compatible mock                        |
+| `mocker.patch("target", new_callable=mocker.AsyncMock)` | Patch with async mock                               |
 
 ### Spy Pattern
 
-Spy wraps the real method — calls pass through to the original implementation, but calls
-are recorded for assertion:
+Spy wraps the real method — calls pass through to the original implementation, but calls are recorded for assertion:
 
 ```python
 def test_spy_on_method(mocker):
@@ -137,9 +133,8 @@ def test_service(mocker):
 
 ### Improved Assertion Errors
 
-pytest-mock enhances mock assertion error messages with introspection. When
-`assert_called_once_with` fails, the error shows the actual calls made, making
-debugging easier than raw `unittest.mock`.
+pytest-mock enhances mock assertion error messages with introspection. When `assert_called_once_with` fails, the error
+shows the actual calls made, making debugging easier than raw `unittest.mock`.
 
 ## pytest-xdist
 
@@ -163,13 +158,13 @@ pytest -n auto --dist loadgroup
 
 ### Distribution Modes
 
-| Mode | Behavior |
-|------|----------|
-| `load` | Distribute tests to workers as they become free (default) |
-| `loadfile` | Group tests by file — each worker runs whole files |
-| `loadgroup` | Group by `@pytest.mark.xdist_group("name")` |
-| `loadscope` | Group by test module/class scope |
-| `no` | Disable distribution (useful for debugging) |
+| Mode        | Behavior                                                  |
+| ----------- | --------------------------------------------------------- |
+| `load`      | Distribute tests to workers as they become free (default) |
+| `loadfile`  | Group tests by file — each worker runs whole files        |
+| `loadgroup` | Group by `@pytest.mark.xdist_group("name")`               |
+| `loadscope` | Group by test module/class scope                          |
+| `no`        | Disable distribution (useful for debugging)               |
 
 ### Configuration
 
@@ -200,8 +195,7 @@ def database(worker_id):
     db.drop()
 ```
 
-`worker_id` is `"master"` when not running under xdist, or `"gw0"`, `"gw1"`, etc.
-when distributed.
+`worker_id` is `"master"` when not running under xdist, or `"gw0"`, `"gw1"`, etc. when distributed.
 
 ## pytest-cov
 
@@ -244,8 +238,8 @@ exclude_lines = [
 - **Run coverage in CI only** — it slows down local development feedback loops
 - **Set `source`** to include untested files in the report (files with zero imports)
 - **Use `branch = true`** to measure branch coverage, not just line coverage
-- **Don't chase 100%** — focus on critical paths. Defensive code and error handlers
-  legitimately need `# pragma: no cover` in some cases
+- **Don't chase 100%** — focus on critical paths. Defensive code and error handlers legitimately need
+  `# pragma: no cover` in some cases
 
 ## Warning Testing Patterns
 
@@ -299,12 +293,11 @@ filterwarnings = [
 ]
 ```
 
-**Precedence:** last matching filter wins. Mark-level filters (`@pytest.mark.filterwarnings`)
-take precedence over config-level filters.
+**Precedence:** last matching filter wins. Mark-level filters (`@pytest.mark.filterwarnings`) take precedence over
+config-level filters.
 
-**Decorator ordering caveat:** decorators evaluate bottom-to-top, so earlier (top)
-`@pytest.mark.filterwarnings` decorators take precedence over later (bottom) ones — the
-reverse of the config file ordering:
+**Decorator ordering caveat:** decorators evaluate bottom-to-top, so earlier (top) `@pytest.mark.filterwarnings`
+decorators take precedence over later (bottom) ones — the reverse of the config file ordering:
 
 ```python
 @pytest.mark.filterwarnings("ignore:api v1")   # higher priority
@@ -339,5 +332,4 @@ pytest -p randomly
 pytest -p randomly --randomly-seed=12345
 ```
 
-Install and enable by default — hidden test dependencies cause intermittent CI failures
-that are expensive to debug.
+Install and enable by default — hidden test dependencies cause intermittent CI failures that are expensive to debug.

@@ -2,8 +2,8 @@
 
 ## Play Structure
 
-A playbook is a list of plays. Each play targets hosts with a pattern and runs tasks in order.
-Execution order within a play using `roles:`:
+A playbook is a list of plays. Each play targets hosts with a pattern and runs tasks in order. Execution order within a
+play using `roles:`:
 
 1. `pre_tasks` (and triggered handlers)
 2. Roles listed in `roles:` (dependencies first)
@@ -12,8 +12,8 @@ Execution order within a play using `roles:`:
 
 ## Naming
 
-Always name plays, tasks, and blocks. Names appear in output and make debugging possible.
-Unnamed tasks produce opaque logs.
+Always name plays, tasks, and blocks. Names appear in output and make debugging possible. Unnamed tasks produce opaque
+logs.
 
 ```yaml
 # Bad: unnamed task
@@ -30,8 +30,8 @@ Unnamed tasks produce opaque logs.
 
 ## State Explicitness
 
-Always specify `state:` even when the module default matches your intent. Different modules
-have different defaults. Explicit state makes playbooks self-documenting.
+Always specify `state:` even when the module default matches your intent. Different modules have different defaults.
+Explicit state makes playbooks self-documenting.
 
 ```yaml
 # Bad: implicit state
@@ -66,11 +66,9 @@ Always use FQCN to avoid module name collisions across collections:
 
 Most modules check desired state before acting. Design all tasks to be idempotent:
 
-- Prefer declarative modules (`ansible.builtin.copy`, `ansible.builtin.template`,
-  `ansible.builtin.service`) over imperative ones (`ansible.builtin.command`,
-  `ansible.builtin.shell`)
-- When using `command`/`shell`, add `creates:`, `removes:`, or `changed_when:` to
-  make them idempotent
+- Prefer declarative modules (`ansible.builtin.copy`, `ansible.builtin.template`, `ansible.builtin.service`) over
+  imperative ones (`ansible.builtin.command`, `ansible.builtin.shell`)
+- When using `command`/`shell`, add `creates:`, `removes:`, or `changed_when:` to make them idempotent
 - Test by running playbooks twice -- second run should report zero changes
 
 ```yaml
@@ -82,16 +80,16 @@ Most modules check desired state before acting. Design all tasks to be idempoten
 
 ## Import vs Include (Static vs Dynamic)
 
-| Aspect | `import_*` (static) | `include_*` (dynamic) |
-|--------|---------------------|----------------------|
-| Parsing | At playbook parse time | At runtime when reached |
-| Tags | Inherited by all imported tasks | Applied only to the include statement |
-| Conditionals | Applied to each imported task | Applied once to the include |
-| Loops | Cannot loop | Can loop |
-| Use when | Structure is fixed, need tag inheritance | Conditional inclusion, looping |
+| Aspect       | `import_*` (static)                      | `include_*` (dynamic)                 |
+| ------------ | ---------------------------------------- | ------------------------------------- |
+| Parsing      | At playbook parse time                   | At runtime when reached               |
+| Tags         | Inherited by all imported tasks          | Applied only to the include statement |
+| Conditionals | Applied to each imported task            | Applied once to the include           |
+| Loops        | Cannot loop                              | Can loop                              |
+| Use when     | Structure is fixed, need tag inheritance | Conditional inclusion, looping        |
 
-Prefer `import_tasks` / `import_role` for predictable execution. Use `include_tasks` /
-`include_role` when you need runtime decisions or loops.
+Prefer `import_tasks` / `import_role` for predictable execution. Use `include_tasks` / `include_role` when you need
+runtime decisions or loops.
 
 ## Batched Execution with serial
 
@@ -155,5 +153,5 @@ group_vars/
 host_vars/
 ```
 
-`site.yml` imports tier playbooks. Tier playbooks map host groups to roles. This enables
-both full-infrastructure runs and targeted tier updates.
+`site.yml` imports tier playbooks. Tier playbooks map host groups to roles. This enables both full-infrastructure runs
+and targeted tier updates.

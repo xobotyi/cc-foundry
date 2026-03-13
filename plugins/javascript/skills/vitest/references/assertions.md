@@ -21,42 +21,42 @@ expect(value, 'should be positive').toBeGreaterThan(0)
 
 ### Equality
 
-| Matcher | Use When |
-|---------|----------|
-| `toBe(val)` | Primitives or same reference (`Object.is`) |
-| `toEqual(val)` | Deep structural equality (ignores `undefined` in expected) |
-| `toStrictEqual(val)` | Deep equality + checks `undefined` keys, sparse arrays, class types |
-| `toMatchObject(subset)` | Object contains at least these properties |
+| Matcher                 | Use When                                                            |
+| ----------------------- | ------------------------------------------------------------------- |
+| `toBe(val)`             | Primitives or same reference (`Object.is`)                          |
+| `toEqual(val)`          | Deep structural equality (ignores `undefined` in expected)          |
+| `toStrictEqual(val)`    | Deep equality + checks `undefined` keys, sparse arrays, class types |
+| `toMatchObject(subset)` | Object contains at least these properties                           |
 
 ### Truthiness
 
-| Matcher | Checks |
-|---------|--------|
-| `toBeTruthy()` | Truthy (not `false`, `0`, `''`, `null`, `undefined`, `NaN`) |
-| `toBeFalsy()` | Falsy |
-| `toBeNull()` | `=== null` |
-| `toBeUndefined()` | `=== undefined` |
-| `toBeDefined()` | `!== undefined` |
-| `toBeNaN()` | `Number.isNaN` |
+| Matcher           | Checks                                                      |
+| ----------------- | ----------------------------------------------------------- |
+| `toBeTruthy()`    | Truthy (not `false`, `0`, `''`, `null`, `undefined`, `NaN`) |
+| `toBeFalsy()`     | Falsy                                                       |
+| `toBeNull()`      | `=== null`                                                  |
+| `toBeUndefined()` | `=== undefined`                                             |
+| `toBeDefined()`   | `!== undefined`                                             |
+| `toBeNaN()`       | `Number.isNaN`                                              |
 
 ### Numbers
 
-| Matcher | Checks |
-|---------|--------|
-| `toBeGreaterThan(n)` | `> n` |
-| `toBeGreaterThanOrEqual(n)` | `>= n` |
-| `toBeLessThan(n)` | `< n` |
-| `toBeCloseTo(n, digits?)` | Floating-point comparison (default 2 decimal digits) |
+| Matcher                     | Checks                                               |
+| --------------------------- | ---------------------------------------------------- |
+| `toBeGreaterThan(n)`        | `> n`                                                |
+| `toBeGreaterThanOrEqual(n)` | `>= n`                                               |
+| `toBeLessThan(n)`           | `< n`                                                |
+| `toBeCloseTo(n, digits?)`   | Floating-point comparison (default 2 decimal digits) |
 
 ### Strings, Arrays, Objects
 
-| Matcher | Checks |
-|---------|--------|
-| `toContain(item)` | Array includes item, or string includes substring |
-| `toContainEqual(obj)` | Array contains item with matching structure |
-| `toHaveLength(n)` | `.length === n` |
-| `toHaveProperty(key, val?)` | Property exists (with optional value check) |
-| `toMatch(regex\|string)` | String matches pattern |
+| Matcher                     | Checks                                            |
+| --------------------------- | ------------------------------------------------- |
+| `toContain(item)`           | Array includes item, or string includes substring |
+| `toContainEqual(obj)`       | Array contains item with matching structure       |
+| `toHaveLength(n)`           | `.length === n`                                   |
+| `toHaveProperty(key, val?)` | Property exists (with optional value check)       |
+| `toMatch(regex\|string)`    | String matches pattern                            |
 
 ### Type Checks
 
@@ -80,15 +80,15 @@ await expect(asyncFn()).rejects.toThrow('message')
 
 ## Spy/Mock Assertions
 
-| Matcher | Checks |
-|---------|--------|
-| `toHaveBeenCalled()` | Called at least once |
-| `toHaveBeenCalledTimes(n)` | Called exactly `n` times |
-| `toHaveBeenCalledWith(...args)` | Called with these args (at least once) |
-| `toHaveBeenLastCalledWith(...args)` | Last call used these args |
-| `toHaveBeenNthCalledWith(n, ...args)` | Nth call (1-indexed) used these args |
-| `toHaveReturned()` | Returned successfully (no throw) |
-| `toHaveReturnedWith(val)` | Returned this value |
+| Matcher                               | Checks                                 |
+| ------------------------------------- | -------------------------------------- |
+| `toHaveBeenCalled()`                  | Called at least once                   |
+| `toHaveBeenCalledTimes(n)`            | Called exactly `n` times               |
+| `toHaveBeenCalledWith(...args)`       | Called with these args (at least once) |
+| `toHaveBeenLastCalledWith(...args)`   | Last call used these args              |
+| `toHaveBeenNthCalledWith(n, ...args)` | Nth call (1-indexed) used these args   |
+| `toHaveReturned()`                    | Returned successfully (no throw)       |
+| `toHaveReturnedWith(val)`             | Returned this value                    |
 
 ## Async Assertions
 
@@ -122,8 +122,7 @@ expect.soft(b).toBe(2)  // also checked
 // both failures reported
 ```
 
-Mix with regular `expect` — a hard `expect` failure stops the test and reports
-all soft failures accumulated so far.
+Mix with regular `expect` — a hard `expect` failure stops the test and reports all soft failures accumulated so far.
 
 ## Asymmetric Matchers
 
@@ -197,8 +196,7 @@ expect(() => fn()).toThrowErrorMatchingInlineSnapshot(`"error msg"`)
 ### Snapshot Best Practices
 
 - **Commit snapshot files.** Review them in PRs like any other code.
-- **Use property matchers** for volatile data (IDs, timestamps):
-  `toMatchSnapshot({ createdAt: expect.any(Date) })`.
+- **Use property matchers** for volatile data (IDs, timestamps): `toMatchSnapshot({ createdAt: expect.any(Date) })`.
 - **Prefer inline snapshots** for small values — easier to review.
 - **Avoid large snapshots** — they become rubber-stamp reviews.
 - Vitest sets `printBasicPrototype: false` by default (cleaner output than Jest).
@@ -233,19 +231,19 @@ declare module 'vitest' {
 }
 ```
 
-Add `vitest.d.ts` to `tsconfig.json` `include`. The `Matchers` interface covers
-`expect().*`, `expect.*` (asymmetric), and `expect.extend` simultaneously.
+Add `vitest.d.ts` to `tsconfig.json` `include`. The `Matchers` interface covers `expect().*`, `expect.*` (asymmetric),
+and `expect.extend` simultaneously.
 
 ### Matcher Context
 
 Inside a matcher function, `this` provides:
+
 - `this.isNot` — `true` if `.not` was used
 - `this.equals(a, b)` — deep equality with asymmetric matcher support
 - `this.utils` — formatting utilities
 - `this.currentTestName` — full test name
 
-Return `{ actual, expected }` alongside `pass` and `message` to get automatic
-diff output on failure.
+Return `{ actual, expected }` alongside `pass` and `message` to get automatic diff output on failure.
 
 ## `expect.unreachable`
 

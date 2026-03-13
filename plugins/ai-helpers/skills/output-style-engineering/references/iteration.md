@@ -22,6 +22,7 @@ Patterns for refining and improving output styles.
 ### 1. Observe
 
 Document specific failure cases:
+
 - What prompt triggered the issue?
 - What response did you get?
 - What response did you expect?
@@ -34,35 +35,34 @@ Identify the root cause (see diagnostic table below).
 ### 3. Hypothesize
 
 Form a specific hypothesis about what's wrong:
+
 - "The persona isn't strong enough to override defaults"
 - "There's no example showing this scenario"
 - "The rule conflicts with another rule"
 
 ### 4. Modify
 
-Make ONE targeted change. Multiple changes make debugging
-impossible.
+Make ONE targeted change. Multiple changes make debugging impossible.
 
 ### 5. Test
 
-Re-run the failing prompt. If fixed, test other scenarios
-for regression.
+Re-run the failing prompt. If fixed, test other scenarios for regression.
 
 ---
 
 ## Diagnostic Table
 
-| Symptom | Likely Cause | Fix |
-|---------|--------------|-----|
-| Reverts to sycophantic tone | Weak persona, no anti-patterns | Add explicit "Never use..." list |
-| Ignores format | Format buried in text | Move format to end, add example |
-| Inconsistent between turns | No multi-turn guidance | Add conversation continuity rules |
+| Symptom                       | Likely Cause                   | Fix                                |
+| ----------------------------- | ------------------------------ | ---------------------------------- |
+| Reverts to sycophantic tone   | Weak persona, no anti-patterns | Add explicit "Never use..." list   |
+| Ignores format                | Format buried in text          | Move format to end, add example    |
+| Inconsistent between turns    | No multi-turn guidance         | Add conversation continuity rules  |
 | Works initially, drifts later | Style reminders not reinforced | Add "maintain throughout" language |
-| Too verbose | No length constraints | Add explicit length limits |
-| Too terse | Over-aggressive brevity rules | Relax constraints, add minimum |
-| Wrong tone in edge cases | Examples don't cover scenario | Add example for failing case |
-| Contradictory behavior | Conflicting instructions | Resolve conflict, prioritize rules |
-| Ignores some rules | Too many instructions | Simplify, consolidate, prioritize |
+| Too verbose                   | No length constraints          | Add explicit length limits         |
+| Too terse                     | Over-aggressive brevity rules  | Relax constraints, add minimum     |
+| Wrong tone in edge cases      | Examples don't cover scenario  | Add example for failing case       |
+| Contradictory behavior        | Conflicting instructions       | Resolve conflict, prioritize rules |
+| Ignores some rules            | Too many instructions          | Simplify, consolidate, prioritize  |
 
 ---
 
@@ -73,11 +73,13 @@ for regression.
 **Problem:** Claude still uses "Great question!" despite instructions.
 
 **Weak fix:**
+
 ```markdown
 Don't be sycophantic.
 ```
 
 **Strong fix:**
+
 ```markdown
 ## Forbidden Phrases (Never Use)
 
@@ -99,11 +101,13 @@ Don't be sycophantic.
 **Problem:** Claude doesn't follow response structure.
 
 **Weak fix:**
+
 ```markdown
 Format responses clearly.
 ```
 
 **Strong fix:**
+
 ```markdown
 ## Response Template
 
@@ -151,8 +155,7 @@ not less.
 
 ### Works for Simple, Fails for Complex
 
-**Problem:** Style holds for simple tasks but breaks down
-for multi-step work.
+**Problem:** Style holds for simple tasks but breaks down for multi-step work.
 
 **Fix:** Add complexity-specific guidance:
 
@@ -175,6 +178,7 @@ match this style?"
 **Problem:** Style has rules that contradict each other.
 
 **Example conflict:**
+
 ```markdown
 - Be direct and concise
 - Always explain your reasoning thoroughly
@@ -257,6 +261,7 @@ understand this concept. Let me break it down for you..."
 If style is too long and rules get ignored, consolidate:
 
 **Before (scattered):**
+
 ```markdown
 - Be direct
 - Don't hedge
@@ -266,6 +271,7 @@ If style is too long and rules get ignored, consolidate:
 ```
 
 **After (consolidated):**
+
 ```markdown
 ## Directness Rule
 
@@ -279,12 +285,14 @@ not caveats. Banned words: "maybe", "perhaps", "might",
 ## When to Rewrite vs Iterate
 
 **Iterate when:**
+
 - Core concept is sound
 - Issues are specific and diagnosable
 - Style works in most cases
 - Problems are at the edges
 
 **Rewrite when:**
+
 - Fundamental misunderstanding of purpose
 - Persona is wrong for the use case
 - Too many conflicting rules
@@ -307,6 +315,7 @@ v1.3: Simplified conflicting length rules
 ```
 
 Or maintain separate versions:
+
 ```
 output-styles/
   direct-professional-v1.md

@@ -1,14 +1,14 @@
 # Transforms, Animations, Filters, Masks, Scroll, Table & Misc
 
-Reference for motion, visual transformation, CSS filters, gradient masks, scroll snapping,
-table layout, and miscellaneous utilities in Tailwind CSS v4.
+Reference for motion, visual transformation, CSS filters, gradient masks, scroll snapping, table layout, and
+miscellaneous utilities in Tailwind CSS v4.
 
 ---
 
 ## Transitions
 
-Apply transitions to specify which properties animate on state change. The default transition
-uses `cubic-bezier(0.4, 0, 0.2, 1)` easing and `150ms` duration.
+Apply transitions to specify which properties animate on state change. The default transition uses
+`cubic-bezier(0.4, 0, 0.2, 1)` easing and `150ms` duration.
 
 ```html
 <!-- Transition common properties -->
@@ -23,28 +23,31 @@ uses `cubic-bezier(0.4, 0, 0.2, 1)` easing and `150ms` duration.
 
 **Transition property utilities:**
 
-| Class | What transitions |
-|-------|-----------------|
-| `transition` | color, bg, border, opacity, shadow, transform, filter, backdrop-filter, display |
-| `transition-all` | all properties |
-| `transition-colors` | color, background-color, border-color, text-decoration-color, fill, stroke, gradients |
-| `transition-opacity` | opacity |
-| `transition-shadow` | box-shadow |
-| `transition-transform` | transform, translate, scale, rotate |
-| `transition-none` | disables transition |
+| Class                  | What transitions                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| `transition`           | color, bg, border, opacity, shadow, transform, filter, backdrop-filter, display       |
+| `transition-all`       | all properties                                                                        |
+| `transition-colors`    | color, background-color, border-color, text-decoration-color, fill, stroke, gradients |
+| `transition-opacity`   | opacity                                                                               |
+| `transition-shadow`    | box-shadow                                                                            |
+| `transition-transform` | transform, translate, scale, rotate                                                   |
+| `transition-none`      | disables transition                                                                   |
 
-**Duration:** `duration-<number>` sets `transition-duration: <number>ms` — e.g., `duration-150`,
-`duration-300`, `duration-700`. Use `duration-initial` to reset.
+**Duration:** `duration-<number>` sets `transition-duration: <number>ms` — e.g., `duration-150`, `duration-300`,
+`duration-700`. Use `duration-initial` to reset.
 
 **Easing:** `ease-linear`, `ease-in`, `ease-out`, `ease-in-out`. Customize in `@theme`:
+
 ```css
 @theme { --ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035); }
 ```
+
 Then use `ease-in-expo`.
 
 **Delay:** `delay-<number>` sets `transition-delay: <number>ms` — e.g., `delay-150`, `delay-300`.
 
 **Reduced motion — always respect user preferences:**
+
 ```html
 <!-- Disable transition for motion-sensitive users -->
 <button class="transition motion-reduce:transition-none ...">...</button>
@@ -56,8 +59,7 @@ Then use `ease-in-expo`.
 
 ## Animations
 
-Built-in animations: `animate-spin`, `animate-ping`, `animate-pulse`, `animate-bounce`,
-`animate-none`.
+Built-in animations: `animate-spin`, `animate-ping`, `animate-pulse`, `animate-bounce`, `animate-none`.
 
 ```html
 <!-- Loading spinner -->
@@ -74,6 +76,7 @@ Built-in animations: `animate-spin`, `animate-ping`, `animate-pulse`, `animate-b
 ```
 
 **Custom animations** — define in `@theme`, include `@keyframes`:
+
 ```css
 @theme {
   --animate-wiggle: wiggle 1s ease-in-out infinite;
@@ -84,14 +87,15 @@ Built-in animations: `animate-spin`, `animate-ping`, `animate-pulse`, `animate-b
   }
 }
 ```
+
 Then use `animate-wiggle`.
 
 ---
 
 ## 2D Transforms
 
-All 2D transforms compose using CSS individual transform properties (`scale`, `rotate`,
-`translate`) — no `transform` function stacking required.
+All 2D transforms compose using CSS individual transform properties (`scale`, `rotate`, `translate`) — no `transform`
+function stacking required.
 
 ### Scale
 
@@ -102,8 +106,8 @@ All 2D transforms compose using CSS individual transform properties (`scale`, `r
 <img class="-scale-x-100 ..." />  <!-- mirror on x -->
 ```
 
-Values are percentages: `scale-50` = 50%, `scale-100` = 100%, `scale-150` = 150%.
-Negative values mirror: `-scale-100` flips on both axes.
+Values are percentages: `scale-50` = 50%, `scale-100` = 100%, `scale-150` = 150%. Negative values mirror: `-scale-100`
+flips on both axes.
 
 ### Rotate
 
@@ -152,8 +156,8 @@ Accepts: spacing scale numbers, fractions (`1/2`, `1/4`, `full`), and `px`.
 
 ### 3D Rotation
 
-Use `rotate-x-<number>`, `rotate-y-<number>`, `rotate-z-<number>` for 3D rotations.
-Combine multiple axes on the same element:
+Use `rotate-x-<number>`, `rotate-y-<number>`, `rotate-z-<number>` for 3D rotations. Combine multiple axes on the same
+element:
 
 ```html
 <img class="rotate-x-50 rotate-z-45 ..." />
@@ -190,21 +194,23 @@ Control the z-plane depth. Apply to the **container** element, not the transform
 </div>
 ```
 
-| Class | Value |
-|-------|-------|
-| `perspective-dramatic` | 100px |
-| `perspective-near` | 300px |
-| `perspective-normal` | 500px |
-| `perspective-midrange` | 800px |
-| `perspective-distant` | 1200px |
-| `perspective-none` | none |
+| Class                  | Value  |
+| ---------------------- | ------ |
+| `perspective-dramatic` | 100px  |
+| `perspective-near`     | 300px  |
+| `perspective-normal`   | 500px  |
+| `perspective-midrange` | 800px  |
+| `perspective-distant`  | 1200px |
+| `perspective-none`     | none   |
 
 Customize in `@theme`:
+
 ```css
 @theme { --perspective-remote: 1800px; }
 ```
 
 **Perspective origin** — where the vanishing point is located:
+
 ```html
 <div class="perspective-near perspective-origin-top-left ...">
 <div class="perspective-near perspective-origin-bottom-right ...">
@@ -223,10 +229,10 @@ Values: `perspective-origin-{center|top|top-right|right|bottom-right|bottom|bott
 
 ## CSS Filters
 
-Filters stack on elements. Combine multiple filter utilities freely — they compose using CSS
-custom properties.
+Filters stack on elements. Combine multiple filter utilities freely — they compose using CSS custom properties.
 
 **Remove all filters:**
+
 ```html
 <img class="blur-md brightness-150 invert md:filter-none" src="..." />
 ```
@@ -248,13 +254,13 @@ Customize: `@theme { --blur-2xs: 2px; }` then use `blur-2xs`.
 
 ### Brightness
 
-`brightness-<number>` — values are percentages: `brightness-50` = 50%, `brightness-100` = 100%,
-`brightness-125`, `brightness-200`. Below 100 darkens; above 100 brightens.
+`brightness-<number>` — values are percentages: `brightness-50` = 50%, `brightness-100` = 100%, `brightness-125`,
+`brightness-200`. Below 100 darkens; above 100 brightens.
 
 ### Contrast
 
-`contrast-<number>` — same scale as brightness. `contrast-0` = grayscale-ish, `contrast-100` =
-normal, `contrast-150` = high contrast.
+`contrast-<number>` — same scale as brightness. `contrast-0` = grayscale-ish, `contrast-100` = normal, `contrast-150` =
+high contrast.
 
 ### Grayscale
 
@@ -279,8 +285,7 @@ normal, `contrast-150` = high contrast.
 
 ### Saturate
 
-`saturate-<number>` — `saturate-0` = desaturated, `saturate-100` = normal, `saturate-150` =
-oversaturated.
+`saturate-<number>` — `saturate-0` = desaturated, `saturate-100` = normal, `saturate-150` = oversaturated.
 
 ### Sepia
 
@@ -291,8 +296,8 @@ oversaturated.
 
 ### Drop Shadow (filter)
 
-Drop shadow applies to element shape including transparent areas — useful for SVG and
-irregular shapes. Use box-shadow for rectangular elements instead.
+Drop shadow applies to element shape including transparent areas — useful for SVG and irregular shapes. Use box-shadow
+for rectangular elements instead.
 
 ```html
 <svg class="drop-shadow-md ...">...</svg>
@@ -301,23 +306,24 @@ irregular shapes. Use box-shadow for rectangular elements instead.
 <svg class="drop-shadow-xl drop-shadow-cyan-500/50 ...">...</svg>  <!-- colored -->
 ```
 
-| Class | Shadow |
-|-------|--------|
-| `drop-shadow-xs` | 0 1px 1px rgb(0 0 0 / 0.05) |
-| `drop-shadow-sm` | 0 1px 2px rgb(0 0 0 / 0.15) |
-| `drop-shadow-md` | 0 3px 3px rgb(0 0 0 / 0.12) |
-| `drop-shadow-lg` | 0 4px 4px rgb(0 0 0 / 0.15) |
-| `drop-shadow-xl` | 0 9px 7px rgb(0 0 0 / 0.1) |
+| Class             | Shadow                        |
+| ----------------- | ----------------------------- |
+| `drop-shadow-xs`  | 0 1px 1px rgb(0 0 0 / 0.05)   |
+| `drop-shadow-sm`  | 0 1px 2px rgb(0 0 0 / 0.15)   |
+| `drop-shadow-md`  | 0 3px 3px rgb(0 0 0 / 0.12)   |
+| `drop-shadow-lg`  | 0 4px 4px rgb(0 0 0 / 0.15)   |
+| `drop-shadow-xl`  | 0 9px 7px rgb(0 0 0 / 0.1)    |
 | `drop-shadow-2xl` | 0 25px 25px rgb(0 0 0 / 0.15) |
 
 ---
 
 ## Backdrop Filters
 
-Backdrop filters apply to the area **behind** the element (blurred glass effect). Combine
-multiple backdrop filter utilities freely.
+Backdrop filters apply to the area **behind** the element (blurred glass effect). Combine multiple backdrop filter
+utilities freely.
 
 **Remove all backdrop filters:**
+
 ```html
 <div class="backdrop-blur-md md:backdrop-filter-none"></div>
 ```
@@ -328,16 +334,15 @@ multiple backdrop filter utilities freely.
 <div class="backdrop-blur-xs backdrop-grayscale ..."></div>
 ```
 
-Available sub-utilities: `backdrop-blur-*`, `backdrop-brightness-*`, `backdrop-contrast-*`,
-`backdrop-grayscale`, `backdrop-hue-rotate-*`, `backdrop-invert`, `backdrop-opacity-*`,
-`backdrop-saturate-*`, `backdrop-sepia`.
+Available sub-utilities: `backdrop-blur-*`, `backdrop-brightness-*`, `backdrop-contrast-*`, `backdrop-grayscale`,
+`backdrop-hue-rotate-*`, `backdrop-invert`, `backdrop-opacity-*`, `backdrop-saturate-*`, `backdrop-sepia`.
 
 ---
 
 ## Masks
 
-Masks control element visibility using gradient or image masks. Tailwind v4 introduces a
-comprehensive mask utility system.
+Masks control element visibility using gradient or image masks. Tailwind v4 introduces a comprehensive mask utility
+system.
 
 ### Image Masks
 
@@ -369,6 +374,7 @@ Mask edges using directional utilities. Default gradient: black (opaque) → tra
 ```
 
 **Angled linear mask:**
+
 ```html
 <div class="mask-linear-50 mask-linear-from-60% mask-linear-to-80% ..."></div>
 <div class="-mask-linear-50 mask-linear-from-60% mask-linear-to-80% ..."></div>
@@ -386,8 +392,8 @@ Mask edges using directional utilities. Default gradient: black (opaque) → tra
 
 **Radial position:** `mask-radial-at-{top-left|top|top-right|left|center|right|bottom-left|bottom|bottom-right}`
 
-**Radial size:** `mask-radial-closest-corner`, `mask-radial-closest-side`,
-`mask-radial-farthest-corner`, `mask-radial-farthest-side`
+**Radial size:** `mask-radial-closest-corner`, `mask-radial-closest-side`, `mask-radial-farthest-corner`,
+`mask-radial-farthest-side`
 
 **Shape:** `mask-circle` (single length size), `mask-ellipse` (two-axis size, default)
 
@@ -405,12 +411,12 @@ Mask edges using directional utilities. Default gradient: black (opaque) → tra
 
 Gradient masks compose using `mask-composite: intersect` by default. Override with:
 
-| Class | Behavior |
-|-------|----------|
-| `mask-add` | union of masks |
-| `mask-subtract` | subtract second from first |
+| Class            | Behavior                                           |
+| ---------------- | -------------------------------------------------- |
+| `mask-add`       | union of masks                                     |
+| `mask-subtract`  | subtract second from first                         |
 | `mask-intersect` | intersection only (default for compound utilities) |
-| `mask-exclude` | XOR — only non-overlapping areas |
+| `mask-exclude`   | XOR — only non-overlapping areas                   |
 
 ### Mask Position and Size
 
@@ -429,8 +435,7 @@ Gradient masks compose using `mask-composite: intersect` by default. Override wi
 
 ## Scroll Snap
 
-Set up scroll snap on the container, alignment on children. Container and children require
-separate utilities.
+Set up scroll snap on the container, alignment on children. Container and children require separate utilities.
 
 ### Container (parent element)
 
@@ -503,8 +508,8 @@ Note: `scroll-behavior` only affects browser-triggered scroll events, not JavaSc
 </table>
 ```
 
-`table-fixed` is useful for preventing layout reflow when data loads and for equal-width
-columns. Undeclared columns in `table-fixed` split remaining width equally.
+`table-fixed` is useful for preventing layout reflow when data loads and for equal-width columns. Undeclared columns in
+`table-fixed` split remaining width equally.
 
 ---
 
@@ -537,19 +542,19 @@ Auto-resize form controls to their content:
 <textarea class="field-sizing-fixed w-80" rows="2">...</textarea>
 ```
 
-`field-sizing-content` is useful for single-line inputs that should grow, or textareas that
-eliminate the need for JavaScript resize logic.
+`field-sizing-content` is useful for single-line inputs that should grow, or textareas that eliminate the need for
+JavaScript resize logic.
 
 ---
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|-----|
-| `transform-gpu` on every element | Only use on animated elements where GPU helps |
-| 3D transforms without `transform-3d` on parent | Add `transform-3d` to parent when using `translate-z-*` |
-| `transition-all` | Use specific transition utilities (`transition-colors`, `transition-transform`) |
-| Animations without `motion-safe` / `motion-reduce` | Wrap animated classes with `motion-safe:` or check `motion-reduce:` |
-| `perspective-*` on the transformed child | Apply perspective to the **parent** container |
-| Multiple masks without checking `mask-composite` | Default is `intersect`; set explicitly if you need other behavior |
-| `snap-x` without also setting snap alignment on children | Always pair container snap type with child snap alignment |
+| Don't                                                    | Do                                                                              |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `transform-gpu` on every element                         | Only use on animated elements where GPU helps                                   |
+| 3D transforms without `transform-3d` on parent           | Add `transform-3d` to parent when using `translate-z-*`                         |
+| `transition-all`                                         | Use specific transition utilities (`transition-colors`, `transition-transform`) |
+| Animations without `motion-safe` / `motion-reduce`       | Wrap animated classes with `motion-safe:` or check `motion-reduce:`             |
+| `perspective-*` on the transformed child                 | Apply perspective to the **parent** container                                   |
+| Multiple masks without checking `mask-composite`         | Default is `intersect`; set explicitly if you need other behavior               |
+| `snap-x` without also setting snap alignment on children | Always pair container snap type with child snap alignment                       |

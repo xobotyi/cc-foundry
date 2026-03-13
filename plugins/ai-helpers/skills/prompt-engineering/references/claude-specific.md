@@ -1,8 +1,7 @@
 # Claude-Specific Techniques
 
-Extended depth for Claude-specific features. For working-resolution rules on
-prefilling, system prompts, and extended thinking, see SKILL.md. This reference
-provides API details, advanced use cases, and technique combinations.
+Extended depth for Claude-specific features. For working-resolution rules on prefilling, system prompts, and extended
+thinking, see SKILL.md. This reference provides API details, advanced use cases, and technique combinations.
 
 ## Contents
 
@@ -13,8 +12,7 @@ provides API details, advanced use cases, and technique combinations.
 
 ## Prefilling — Advanced Use Cases
 
-SKILL.md covers prefilling rules and constraints. This section provides
-advanced patterns for production use.
+SKILL.md covers prefilling rules and constraints. This section provides advanced patterns for production use.
 
 ### Multi-Turn Prefilling
 
@@ -48,19 +46,18 @@ messages=[
 
 ### Prefill Limitations in Practice
 
-- Prefilling the wrong start can constrain Claude's reasoning — if the
-  best answer doesn't begin with your prefill, quality degrades
-- For classification, prefill with the format marker, not a specific class:
-  `"Classification:"` not `"Positive"` — the latter forces the answer
-- JSON prefills (`"{"`) work reliably; deeply nested prefills
-  (`'{"data": {"items": ['`) are fragile
+- Prefilling the wrong start can constrain Claude's reasoning — if the best answer doesn't begin with your prefill,
+  quality degrades
+- For classification, prefill with the format marker, not a specific class: `"Classification:"` not `"Positive"` — the
+  latter forces the answer
+- JSON prefills (`"{"`) work reliably; deeply nested prefills (`'{"data": {"items": ['`) are fragile
 
 ---
 
 ## System Prompts — API Patterns
 
-SKILL.md covers domain priming vs persona and system prompt rules. This
-section provides API-level patterns and advanced configuration.
+SKILL.md covers domain priming vs persona and system prompt rules. This section provides API-level patterns and advanced
+configuration.
 
 ### API Usage
 
@@ -94,42 +91,40 @@ Structure every response as: Summary → Key Findings → Risks → Recommendati
 
 ### System Prompt vs User Message — What Goes Where
 
-| Content | Location | Why |
-|---------|----------|-----|
-| Domain/role | System | Persists across turns, highest instruction priority |
-| Behavioral constraints | System | Must apply to every response |
-| Task description | User | Varies per request |
-| Input data | User | Changes each time |
-| Format examples | Either | System if constant, user if task-specific |
+| Content                | Location | Why                                                 |
+| ---------------------- | -------- | --------------------------------------------------- |
+| Domain/role            | System   | Persists across turns, highest instruction priority |
+| Behavioral constraints | System   | Must apply to every response                        |
+| Task description       | User     | Varies per request                                  |
+| Input data             | User     | Changes each time                                   |
+| Format examples        | Either   | System if constant, user if task-specific           |
 
 ### Domain Priming Impact Example
 
 Without priming: "The contract looks standard."
 
-With `system="This is a legal risk assessment for enterprise software licensing."`:
-"Three critical issues: (1) The indemnification clause in Section 8 is overly
-broad... (2) The liability cap of $500 is grossly inadequate for enterprise
-usage..."
+With `system="This is a legal risk assessment for enterprise software licensing."`: "Three critical issues: (1) The
+indemnification clause in Section 8 is overly broad... (2) The liability cap of $500 is grossly inadequate for
+enterprise usage..."
 
-The improvement comes from domain priming, not persona — specifying the
-task context activates relevant knowledge more reliably than role assignment.
+The improvement comes from domain priming, not persona — specifying the task context activates relevant knowledge more
+reliably than role assignment.
 
 ---
 
 ## Extended Thinking
 
-Extended thinking gives Claude a dedicated "thinking budget" for
-complex problems. Different from standard CoT — requires different
-prompting strategies.
+Extended thinking gives Claude a dedicated "thinking budget" for complex problems. Different from standard CoT —
+requires different prompting strategies.
 
 ### Key Differences from Standard CoT
 
-| Aspect | Standard CoT | Extended Thinking |
-|--------|--------------|-------------------|
-| Activation | Prompt with "think step by step" | API parameter |
-| Budget | Token generation limit | Dedicated thinking budget |
-| Prompting | Prescriptive steps work | High-level guidance better |
-| Prefilling | Supported | Not supported |
+| Aspect     | Standard CoT                     | Extended Thinking          |
+| ---------- | -------------------------------- | -------------------------- |
+| Activation | Prompt with "think step by step" | API parameter              |
+| Budget     | Token generation limit           | Dedicated thinking budget  |
+| Prompting  | Prescriptive steps work          | High-level guidance better |
+| Prefilling | Supported                        | Not supported              |
 
 ### Technical Requirements
 
@@ -140,6 +135,7 @@ prompting strategies.
 ### Prompting Strategy
 
 **Standard prompting (prescriptive):**
+
 ```
 Think through this step by step:
 1. First, identify the variables
@@ -148,14 +144,15 @@ Think through this step by step:
 ```
 
 **Extended thinking prompting (high-level):**
+
 ```
 Please think about this math problem thoroughly and in great detail.
 Consider multiple approaches and show your complete reasoning.
 Try different methods if your first approach doesn't work.
 ```
 
-High-level instructions often outperform prescriptive ones — Claude's
-creativity in approaching problems may exceed human-prescribed steps.
+High-level instructions often outperform prescriptive ones — Claude's creativity in approaching problems may exceed
+human-prescribed steps.
 
 ### Multishot with Extended Thinking
 
@@ -210,18 +207,21 @@ And fix any issues you find.
 ## Combining Techniques
 
 ### Prefill + XML Tags
+
 ```
 User: Analyze this document: <doc>...</doc>
 Assistant (prefill): <analysis>
 ```
 
 ### Role + CoT
+
 ```
 System: You are a financial advisor.
 User: [question] Think step by step.
 ```
 
 ### Role + Structured Output
+
 ```
 System: You are a code reviewer.
 User: Review this code. Output findings in <findings> tags,

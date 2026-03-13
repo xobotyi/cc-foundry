@@ -84,13 +84,13 @@ Don't hesitate to ask if you need anything else!"
 
 **Analysis:**
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Persona Clarity | 7/10 | Professional peer, clear but not deeply characterized |
-| Behavioral Specificity | 9/10 | Concrete forbidden phrases, clear patterns |
-| Example Quality | 8/10 | Good contrast examples |
-| Format Clarity | 7/10 | Basic pattern, could be more detailed |
-| Safeguards | 9/10 | Strong anti-sycophancy rules |
+| Dimension              | Score | Notes                                                 |
+| ---------------------- | ----- | ----------------------------------------------------- |
+| Persona Clarity        | 7/10  | Professional peer, clear but not deeply characterized |
+| Behavioral Specificity | 9/10  | Concrete forbidden phrases, clear patterns            |
+| Example Quality        | 8/10  | Good contrast examples                                |
+| Format Clarity         | 7/10  | Basic pattern, could be more detailed                 |
+| Safeguards             | 9/10  | Strong anti-sycophancy rules                          |
 
 **Key strength:** Explicit forbidden phrases list.
 
@@ -193,13 +193,13 @@ about policy implementation.
 
 **Analysis:**
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Persona Clarity | 8/10 | Clear academic researcher role |
-| Behavioral Specificity | 9/10 | Detailed framework, concrete sections |
-| Example Quality | 9/10 | Full worked example |
-| Format Clarity | 10/10 | Explicit template |
-| Safeguards | 7/10 | Good principles, could add anti-patterns |
+| Dimension              | Score | Notes                                    |
+| ---------------------- | ----- | ---------------------------------------- |
+| Persona Clarity        | 8/10  | Clear academic researcher role           |
+| Behavioral Specificity | 9/10  | Detailed framework, concrete sections    |
+| Example Quality        | 9/10  | Full worked example                      |
+| Format Clarity         | 10/10 | Explicit template                        |
+| Safeguards             | 7/10  | Good principles, could add anti-patterns |
 
 **Key strength:** Detailed output format with template.
 
@@ -301,13 +301,13 @@ works? That understanding is what matters."
 
 **Analysis:**
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Persona Clarity | 9/10 | Clear teaching philosophy |
-| Behavioral Specificity | 9/10 | Explicit question types, escalation pattern |
-| Example Quality | 10/10 | Multiple scenarios including frustration |
-| Format Clarity | 8/10 | Good pattern, output template could be stronger |
-| Safeguards | 9/10 | Clear constraints on when to reveal |
+| Dimension              | Score | Notes                                           |
+| ---------------------- | ----- | ----------------------------------------------- |
+| Persona Clarity        | 9/10  | Clear teaching philosophy                       |
+| Behavioral Specificity | 9/10  | Explicit question types, escalation pattern     |
+| Example Quality        | 10/10 | Multiple scenarios including frustration        |
+| Format Clarity         | 8/10  | Good pattern, output template could be stronger |
+| Safeguards             | 9/10  | Clear constraints on when to reveal             |
 
 **Key strength:** Escalation pattern handling frustration.
 
@@ -405,13 +405,13 @@ own words."
 
 **Analysis:**
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Persona Clarity | 8/10 | Patient tutor, voice-first context |
+| Dimension              | Score | Notes                                   |
+| ---------------------- | ----- | --------------------------------------- |
+| Persona Clarity        | 8/10  | Patient tutor, voice-first context      |
 | Behavioral Specificity | 10/10 | Detailed question formats, pacing rules |
-| Example Quality | 9/10 | Good interaction flow |
-| Format Clarity | 9/10 | Clear session structure |
-| Safeguards | 9/10 | Strong "never code" constraint |
+| Example Quality        | 9/10  | Good interaction flow                   |
+| Format Clarity         | 9/10  | Clear session structure                 |
+| Safeguards             | 9/10  | Strong "never code" constraint          |
 
 **Key strength:** Detailed interaction protocol for unique use case.
 
@@ -489,13 +489,13 @@ When reviewing content:
 
 **Analysis:**
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Persona Clarity | 8/10 | Clear strategist role |
-| Behavioral Specificity | 7/10 | Good framework, could be more specific |
-| Example Quality | 6/10 | Missing full example |
-| Format Clarity | 8/10 | Clear output template |
-| Safeguards | 6/10 | Could add anti-patterns |
+| Dimension              | Score | Notes                                  |
+| ---------------------- | ----- | -------------------------------------- |
+| Persona Clarity        | 8/10  | Clear strategist role                  |
+| Behavioral Specificity | 7/10  | Good framework, could be more specific |
+| Example Quality        | 6/10  | Missing full example                   |
+| Format Clarity         | 8/10  | Clear output template                  |
+| Safeguards             | 6/10  | Could add anti-patterns                |
 
 **Key strength:** Clear analysis framework.
 

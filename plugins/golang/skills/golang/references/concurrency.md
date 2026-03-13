@@ -5,6 +5,7 @@ Goroutine lifecycle, channels, pipelines, synchronization primitives, and data r
 ## Goroutine Lifecycle
 
 Every goroutine must have:
+
 1. A **predictable exit condition** (or a way to signal stop)
 2. A way for other code to **wait for it to finish**
 
@@ -12,8 +13,8 @@ Goroutines that violate this leak memory, hold references, and cause data races.
 
 ### Context-Based Cancellation (Primary)
 
-`context.Context` is the idiomatic mechanism for cancellation propagation in Go.
-Use it as the default for all goroutine lifecycle management:
+`context.Context` is the idiomatic mechanism for cancellation propagation in Go. Use it as the default for all goroutine
+lifecycle management:
 
 ```go
 func (w *Worker) Run(ctx context.Context) error {
@@ -39,8 +40,7 @@ cancel()
 
 ### WaitGroup Pattern (Joining)
 
-Use `sync.WaitGroup` to wait for multiple goroutines to finish — it handles
-joining, not cancellation:
+Use `sync.WaitGroup` to wait for multiple goroutines to finish — it handles joining, not cancellation:
 
 ```go
 var wg sync.WaitGroup
@@ -56,8 +56,8 @@ wg.Wait()
 
 ### Worker With Lifecycle Management
 
-For long-lived goroutines, wrap in a struct. Use `context.Context` for
-cancellation and a done channel or `WaitGroup` for joining:
+For long-lived goroutines, wrap in a struct. Use `context.Context` for cancellation and a done channel or `WaitGroup`
+for joining:
 
 ```go
 type Worker struct {
@@ -91,8 +91,8 @@ func (w *Worker) Wait() {
 
 ### Stop + Done Pattern (Alternative)
 
-When `context.Context` is unavailable (e.g., infrastructure code that predates
-context, or standalone signal channels), use explicit stop/done channels:
+When `context.Context` is unavailable (e.g., infrastructure code that predates context, or standalone signal channels),
+use explicit stop/done channels:
 
 ```go
 stop := make(chan struct{})
@@ -118,7 +118,8 @@ close(stop)
 ```
 
 Prefer `context.Context` over raw stop/done channels in new code.
-```
+
+````
 
 ## Channels vs Mutexes
 
@@ -145,7 +146,7 @@ you must know what prevents the channel from filling and blocking writers.
 ```go
 c := make(chan int)    // unbuffered — synchronous handoff
 c := make(chan int, 1) // buffered — one item of slack
-```
+````
 
 ### Direction in Signatures
 
@@ -159,8 +160,7 @@ func pipe(in <-chan int) <-chan int   // both directions
 
 ## Pipeline Pattern
 
-A pipeline is stages connected by channels. Each stage receives from upstream,
-processes, and sends downstream.
+A pipeline is stages connected by channels. Each stage receives from upstream, processes, and sends downstream.
 
 ```go
 func gen(nums ...int) <-chan int {
@@ -188,8 +188,7 @@ func sq(in <-chan int) <-chan int {
 
 ### Fan-Out, Fan-In
 
-**Fan-out**: multiple goroutines read from the same channel.
-**Fan-in**: merge multiple channels into one.
+**Fan-out**: multiple goroutines read from the same channel. **Fan-in**: merge multiple channels into one.
 
 ```go
 func merge(cs ...<-chan int) <-chan int {
@@ -233,8 +232,8 @@ func sq(done <-chan struct{}, in <-chan int) <-chan int {
 }
 ```
 
-Close `done` to broadcast cancellation to all stages. Prefer `context.Context` over
-raw done channels in production code.
+Close `done` to broadcast cancellation to all stages. Prefer `context.Context` over raw done channels in production
+code.
 
 ### Bounded Parallelism
 
@@ -282,13 +281,12 @@ for {
 }
 ```
 
-For a single-producer scenario, use a single channel or unbuffered channels.
-For multi-producer, drain the work channel after receiving the stop signal.
+For a single-producer scenario, use a single channel or unbuffered channels. For multi-producer, drain the work channel
+after receiving the stop signal.
 
 ### Nil Channels
 
-A nil channel blocks forever on send and receive. Use this to remove cases from
-`select` at runtime:
+A nil channel blocks forever on send and receive. Use this to remove cases from `select` at runtime:
 
 ```go
 func merge(ch1, ch2 <-chan int) <-chan int {
@@ -314,8 +312,7 @@ Setting a channel to `nil` removes it from the `select` — the case will never 
 
 ## errgroup
 
-`golang.org/x/sync/errgroup` manages a group of goroutines with error propagation
-and context cancellation:
+`golang.org/x/sync/errgroup` manages a group of goroutines with error propagation and context cancellation:
 
 ```go
 g, ctx := errgroup.WithContext(ctx)
@@ -337,8 +334,8 @@ Prefer `errgroup` over manual `sync.WaitGroup` + error collection.
 
 ### Don't Propagate Request Context to Background Work
 
-An HTTP request context cancels when the response is sent. Passing it to a background
-goroutine causes premature cancellation:
+An HTTP request context cancels when the response is sent. Passing it to a background goroutine causes premature
+cancellation:
 
 ```go
 // Bug — context cancels when response is written
@@ -356,8 +353,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-`context.WithoutCancel` (Go 1.21+) creates a context that inherits values but not
-cancellation. Use it for fire-and-forget background work.
+`context.WithoutCancel` (Go 1.21+) creates a context that inherits values but not cancellation. Use it for
+fire-and-forget background work.
 
 ## Synchronization
 
@@ -415,8 +412,8 @@ Fix: copy the slice before passing to goroutines.
 
 ### Map/Slice Assignment Doesn't Copy
 
-Assigning a map or slice to a new variable copies the header, not the data.
-Both variables point to the same backing storage:
+Assigning a map or slice to a new variable copies the header, not the data. Both variables point to the same backing
+storage:
 
 ```go
 // Race — balances and m share the same map data
@@ -459,8 +456,7 @@ func (c *Customer) String() string {
 }
 ```
 
-Fix: validate before locking, or format with direct field access (`c.id`) instead
-of `%v`.
+Fix: validate before locking, or format with direct field access (`c.id`) instead of `%v`.
 
 ## Rules
 

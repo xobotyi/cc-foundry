@@ -1,7 +1,6 @@
 # Parametrize Patterns
 
-Extended examples and edge cases for `@pytest.mark.parametrize`, distilled from official
-pytest documentation.
+Extended examples and edge cases for `@pytest.mark.parametrize`, distilled from official pytest documentation.
 
 ## Basic Parametrize
 
@@ -53,8 +52,8 @@ def test_endpoint_access(method: str, auth: bool):
     ...
 ```
 
-Parameters exhaust in the order of decorators — the **last** decorator's values vary
-fastest. For the above: `(GET, True)`, `(POST, True)`, `(PUT, True)`, `(GET, False)`, ...
+Parameters exhaust in the order of decorators — the **last** decorator's values vary fastest. For the above:
+`(GET, True)`, `(POST, True)`, `(PUT, True)`, `(GET, False)`, ...
 
 ## Conditional Skip Within Parametrize
 
@@ -143,10 +142,11 @@ pytest --backend=sqlite --backend=postgres
 ```
 
 **Key rules:**
+
 - `metafunc.parametrize()` has the same interface as `@pytest.mark.parametrize`
 - Cannot call `metafunc.parametrize()` multiple times with overlapping parameter names
-- If the parameter list is empty, the test is skipped (controlled by
-  `empty_parameter_set_mark` config option — default is `skip`)
+- If the parameter list is empty, the test is skipped (controlled by `empty_parameter_set_mark` config option — default
+  is `skip`)
 
 ## Module-Level Parametrize
 
@@ -201,8 +201,8 @@ def test_config_validation(config: Config):
 
 ## Parameter Mutation Warning
 
-Parameter values are passed **as-is** to tests — no copy is made. If a test mutates a
-list or dict parameter, subsequent tests in the same parametrize set see the mutation:
+Parameter values are passed **as-is** to tests — no copy is made. If a test mutates a list or dict parameter, subsequent
+tests in the same parametrize set see the mutation:
 
 ```python
 # BUG — second test sees mutated list
@@ -221,8 +221,8 @@ def test_append_safe(items):
 
 ## Empty Parameter Sets
 
-When a parametrize decorator receives an empty list (e.g., from dynamic generation), the
-behavior is controlled by the `empty_parameter_set_mark` config option:
+When a parametrize decorator receives an empty list (e.g., from dynamic generation), the behavior is controlled by the
+`empty_parameter_set_mark` config option:
 
 ```toml
 [tool.pytest.ini_options]

@@ -1,7 +1,6 @@
 # Learning Paradigms
 
-How models learn from examples within prompts — the spectrum from
-zero examples to many.
+How models learn from examples within prompts — the spectrum from zero examples to many.
 
 ## Contents
 
@@ -22,15 +21,14 @@ Zero-shot → One-shot → Few-shot → Many-shot
 No examples  1 example  3-5 examples  Many examples
 ```
 
-All operate through **in-context learning (ICL)** — the model adapts to
-the task from the prompt alone, without parameter updates.
+All operate through **in-context learning (ICL)** — the model adapts to the task from the prompt alone, without
+parameter updates.
 
 ---
 
 ## Zero-Shot Prompting
 
-Task description only. No examples. Relies entirely on pre-trained
-knowledge.
+Task description only. No examples. Relies entirely on pre-trained knowledge.
 
 ```
 Classify the sentiment of this review as positive, negative,
@@ -56,12 +54,10 @@ was helpful."
 
 **Instruction clarity:** Be explicit about format, constraints, scope.
 
-**Domain priming:** "This is a legal risk assessment task. Apply
-contract law principles." (More reliable than persona assignment —
-see SKILL.md "System Prompts" section.)
+**Domain priming:** "This is a legal risk assessment task. Apply contract law principles." (More reliable than persona
+assignment — see SKILL.md "System Prompts" section.)
 
-**Output anchoring:** "Respond with exactly one word: positive,
-negative, or neutral."
+**Output anchoring:** "Respond with exactly one word: positive, negative, or neutral."
 
 ---
 
@@ -102,40 +98,37 @@ Text: "Best purchase ever!" → ?
 
 ### Why Few-Shot Works
 
-The model recognizes the input→output mapping pattern and applies it
-to new inputs. This is **in-context learning** — temporary task
-adaptation without weight updates.
+The model recognizes the input→output mapping pattern and applies it to new inputs. This is **in-context learning** —
+temporary task adaptation without weight updates.
 
-**Key research insight (Min et al., 2022):** Format and distribution
-matter as much as — sometimes more than — label correctness:
+**Key research insight (Min et al., 2022):** Format and distribution matter as much as — sometimes more than — label
+correctness:
+
 - Label space (the set of possible outputs) matters
 - Input distribution (what examples look like) matters
 - Consistent format helps even with random labels
 - True labels are less important than having any labels
 
-This means: prioritize format consistency and representative examples
-over perfect labeling for every edge case.
+This means: prioritize format consistency and representative examples over perfect labeling for every edge case.
 
 ### Example Selection Strategies
 
 **Diversity:** Cover different categories, edge cases, styles.
 
-**Similarity:** Select examples semantically close to expected inputs
-(use embeddings for matching).
+**Similarity:** Select examples semantically close to expected inputs (use embeddings for matching).
 
-**Difficulty progression:** Simple → moderate → complex ordering
-helps model build understanding.
+**Difficulty progression:** Simple → moderate → complex ordering helps model build understanding.
 
 **Balance:** Equal representation across output classes.
 
 ### Example Ordering
 
 Order affects performance:
+
 - Recency bias: later examples weighted more
 - Primacy effect: first examples set expectations
 
-**Best practice:** Put most representative examples last, edge cases
-in the middle.
+**Best practice:** Put most representative examples last, edge cases in the middle.
 
 ### Optimal Example Count
 
@@ -148,36 +141,32 @@ in the middle.
 
 ## In-Context Learning (ICL)
 
-The mechanism underlying all shot paradigms. Model adapts to task
-from prompt examples without updating parameters.
+The mechanism underlying all shot paradigms. Model adapts to task from prompt examples without updating parameters.
 
 ### How ICL Works
 
 Two leading theories:
 
-**Bayesian Inference View:**
-Model infers a latent "task concept" from examples. More examples →
-higher confidence in task understanding.
+**Bayesian Inference View:** Model infers a latent "task concept" from examples. More examples → higher confidence in
+task understanding.
 
-**Implicit Gradient Descent:**
-Transformer attention simulates learning — behaves "as if" it's
-updating weights based on examples, though parameters stay fixed.
+**Implicit Gradient Descent:** Transformer attention simulates learning — behaves "as if" it's updating weights based on
+examples, though parameters stay fixed.
 
 ### ICL vs Traditional Learning
 
-| Aspect | Traditional ML | In-Context Learning |
-|--------|---------------|---------------------|
-| Training data | Separate phase | In the prompt |
-| Parameters | Updated | Fixed |
-| Generalization | From training | From pre-training + prompt |
-| Cost | Training compute | Inference tokens |
+| Aspect         | Traditional ML   | In-Context Learning        |
+| -------------- | ---------------- | -------------------------- |
+| Training data  | Separate phase   | In the prompt              |
+| Parameters     | Updated          | Fixed                      |
+| Generalization | From training    | From pre-training + prompt |
+| Cost           | Training compute | Inference tokens           |
 
 ### Factors Affecting ICL
 
 **Model scale:** Larger models exhibit stronger ICL.
 
-**Pre-training data:** ICL works because similar patterns were seen
-during training.
+**Pre-training data:** ICL works because similar patterns were seen during training.
 
 **Prompt format:** Must match patterns the model learned.
 
@@ -185,23 +174,20 @@ during training.
 
 ### Context Engineering
 
-Beyond static prompts — dynamically assembling optimal context at
-runtime:
+Beyond static prompts — dynamically assembling optimal context at runtime:
 
 1. **Retrieval:** Pull relevant examples from a database
 2. **Filtering:** Remove low-quality or irrelevant content
 3. **Ordering:** Arrange for optimal comprehension
 4. **Formatting:** Structure for model's learned patterns
 
-This shifts from "write a good prompt" to "build a system that
-constructs good prompts."
+This shifts from "write a good prompt" to "build a system that constructs good prompts."
 
 ---
 
 ## Generated Knowledge Prompting
 
-When you lack examples but need grounding, generate relevant knowledge
-first, then answer using that knowledge.
+When you lack examples but need grounding, generate relevant knowledge first, then answer using that knowledge.
 
 ### The Pattern
 
@@ -232,15 +218,15 @@ not highest.
 ### When to Use
 
 **Ideal for:**
+
 - Commonsense reasoning questions
 - When RAG isn't available
 - Tasks requiring world knowledge activation
 
-**Limitation:** Generated knowledge may be incorrect (model
-hallucination). Works best when model has reliable domain knowledge.
+**Limitation:** Generated knowledge may be incorrect (model hallucination). Works best when model has reliable domain
+knowledge.
 
-See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] for more on knowledge
-generation techniques.
+See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] for more on knowledge generation techniques.
 
 ---
 
@@ -248,13 +234,13 @@ generation techniques.
 
 ### Choosing a Paradigm
 
-| Situation | Recommendation |
-|-----------|----------------|
-| Simple, well-known task | Zero-shot |
-| Need specific format | One-shot |
-| Complex classification | Few-shot (3-5) |
-| Domain-specific task | Few-shot with domain examples |
-| Highly nuanced judgment | Few-shot + CoT |
+| Situation               | Recommendation                |
+| ----------------------- | ----------------------------- |
+| Simple, well-known task | Zero-shot                     |
+| Need specific format    | One-shot                      |
+| Complex classification  | Few-shot (3-5)                |
+| Domain-specific task    | Few-shot with domain examples |
+| Highly nuanced judgment | Few-shot + CoT                |
 
 ### Common Mistakes
 

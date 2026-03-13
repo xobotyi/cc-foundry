@@ -4,13 +4,13 @@ Diagnostic guide for skill failures.
 
 ## Quick Diagnosis
 
-| Symptom | Check |
-|---------|-------|
-| Skill not found | [Structure Issues](#structure-issues) |
-| Skill not triggering | [Activation Issues](#activation-issues) |
-| Wrong output format | [Output Issues](#output-issues) |
-| Scripts failing | [Script Issues](#script-issues) |
-| References not loading | [Reference Issues](#reference-issues) |
+| Symptom                | Check                                   |
+| ---------------------- | --------------------------------------- |
+| Skill not found        | [Structure Issues](#structure-issues)   |
+| Skill not triggering   | [Activation Issues](#activation-issues) |
+| Wrong output format    | [Output Issues](#output-issues)         |
+| Scripts failing        | [Script Issues](#script-issues)         |
+| References not loading | [Reference Issues](#reference-issues)   |
 
 ## Structure Issues
 
@@ -19,6 +19,7 @@ Diagnostic guide for skill failures.
 **Diagnostic steps:**
 
 1. **Verify location:**
+
    ```
    Personal: ~/.claude/skills/<name>/SKILL.md
    Project: .claude/skills/<name>/SKILL.md
@@ -26,6 +27,7 @@ Diagnostic guide for skill failures.
    ```
 
 2. **Verify name matches directory:**
+
    ```yaml
    # Directory: .claude/skills/my-skill/
    ---
@@ -34,6 +36,7 @@ Diagnostic guide for skill failures.
    ```
 
 3. **Check frontmatter syntax:**
+
    ```yaml
    # Valid
    ---
@@ -57,31 +60,28 @@ Diagnostic guide for skill failures.
 
 ### Native Activation Is Unreliable
 
-Skill auto-activation is inherently unreliable. Independent testing
-measured 20-50% activation rates without enforcement hooks. This is a
-systemic limitation, not just a description quality issue.
+Skill auto-activation is inherently unreliable. Independent testing measured 20-50% activation rates without enforcement
+hooks. This is a systemic limitation, not just a description quality issue.
 
-**Why it happens:** Claude sees skill descriptions in the Skill tool
-definition and must decide to invoke the tool before proceeding. In
-practice, Claude often skips this step and proceeds directly with
-implementation, especially for multi-skill prompts.
+**Why it happens:** Claude sees skill descriptions in the Skill tool definition and must decide to invoke the tool
+before proceeding. In practice, Claude often skips this step and proceeds directly with implementation, especially for
+multi-skill prompts.
 
 **Mitigation strategies:**
+
 - **Improve descriptions** — necessary but not sufficient (see below)
-- **Enforcement hooks** — `UserPromptSubmit` hooks that force Claude to
-  evaluate each skill before proceeding. Forced-eval hooks (where Claude
-  must explicitly state YES/NO for each skill) achieve ~84% activation.
-  The commitment mechanism — evaluate → commit → activate — is what makes
-  this work.
+- **Enforcement hooks** — `UserPromptSubmit` hooks that force Claude to evaluate each skill before proceeding.
+  Forced-eval hooks (where Claude must explicitly state YES/NO for each skill) achieve ~84% activation. The commitment
+  mechanism — evaluate → commit → activate — is what makes this work.
 - **Manual invocation** — `/skill-name` is always reliable
 
-**Key finding:** simple instruction hooks ("if the prompt matches, use
-the skill") perform no better than no hook at all (~20%). The hook must
-create a structured evaluation and commitment step to be effective.
+**Key finding:** simple instruction hooks ("if the prompt matches, use the skill") perform no better than no hook at all
+(~20%). The hook must create a structured evaluation and commitment step to be effective.
 
 ### Skill Not Auto-Triggering
 
 **Check description quality:**
+
 ```yaml
 # Bad
 description: Helps with code
@@ -93,20 +93,20 @@ description: >-
 ```
 
 **Check for blocking flag:**
+
 ```yaml
 # This prevents auto-triggering — also removes description from
 # context entirely, so Claude won't see the skill exists
 disable-model-invocation: true
 ```
 
-**Test with explicit invocation:**
-Try `/skill-name` directly. If that works, the description
-needs better trigger terms — but keep in mind that even good
-descriptions achieve imperfect auto-activation.
+**Test with explicit invocation:** Try `/skill-name` directly. If that works, the description needs better trigger terms
+— but keep in mind that even good descriptions achieve imperfect auto-activation.
 
 ### Skill Triggers Too Often
 
 **Add exclusions:**
+
 ```yaml
 description: >-
   Analyze CSV files for patterns.
@@ -114,6 +114,7 @@ description: >-
 ```
 
 **Use domain-specific terms:**
+
 ```yaml
 # Too generic
 description: Analyze data
@@ -127,6 +128,7 @@ description: Statistical analysis of time-series data using pandas
 ### Wrong Format
 
 **Add explicit format section:**
+
 ```markdown
 ## Output Format
 
@@ -143,6 +145,7 @@ Return results as:
 ### Instructions Ignored
 
 **Use clear structure:**
+
 ```markdown
 ## Steps
 
@@ -153,30 +156,31 @@ Return results as:
 Do not proceed to next step if current step fails.
 ```
 
-**Move critical instructions to end:**
-Instructions at context end are followed more reliably.
+**Move critical instructions to end:** Instructions at context end are followed more reliably.
 
 ## Script Issues
 
 ### Script Won't Run
 
 1. **Check executable bit:**
+
    ```bash
    chmod +x scripts/my-script.py
    ```
 
 2. **Check shebang:**
+
    ```python
    #!/usr/bin/env python3
    ```
 
 3. **Test manually:**
+
    ```bash
    python scripts/my-script.py test-input
    ```
 
-4. **Check dependencies:**
-   Are required packages installed?
+4. **Check dependencies:** Are required packages installed?
 
 5. **Check path in SKILL.md:**
    ```markdown
@@ -189,6 +193,7 @@ Instructions at context end are followed more reliably.
 ### References Not Loading
 
 **Use `${CLAUDE_SKILL_DIR}` for all reference paths:**
+
 ```markdown
 # Good — resolves to absolute path at load time
 See `${CLAUDE_SKILL_DIR}/references/guide.md`
@@ -201,6 +206,7 @@ See [/full/path/guide.md](/full/path/guide.md)
 ```
 
 **Keep one level deep:**
+
 ```
 Good: SKILL.md → references/guide.md
 
@@ -208,6 +214,7 @@ Bad: SKILL.md → references/main.md → references/detail.md
 ```
 
 **Add explicit read instruction:**
+
 ```markdown
 Read `${CLAUDE_SKILL_DIR}/references/guide.md` completely before proceeding.
 ```
@@ -215,20 +222,23 @@ Read `${CLAUDE_SKILL_DIR}/references/guide.md` completely before proceeding.
 ## Context Budget Issues
 
 **Symptoms:**
+
 - Warning about excluded skills in Claude Code output
 - Descriptions truncated in skill metadata
 - Multiple skills loaded but instructions ignored
 
 **Diagnosis:**
+
 1. Count active skills — each adds ~30-50 metadata tokens at startup
 2. Check SKILL.md line count — target under 500 lines
 3. Check if multiple large skills are co-loaded
 
 **Fixes:**
+
 - Shorten descriptions to under 200 characters
 - Move catalog/lookup content from SKILL.md to references
-- Set `disable-model-invocation: true` on rarely-used skills (removes
-  description from context entirely — free activation budget for others)
+- Set `disable-model-invocation: true` on rarely-used skills (removes description from context entirely — free
+  activation budget for others)
 - Split overloaded skills into focused ones
 
 ## Getting Help

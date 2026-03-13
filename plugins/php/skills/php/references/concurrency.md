@@ -1,12 +1,12 @@
 # PHP Concurrency
 
-PHP is fundamentally single-threaded. Concurrency primitives provide cooperative
-multitasking within a single request, not parallelism.
+PHP is fundamentally single-threaded. Concurrency primitives provide cooperative multitasking within a single request,
+not parallelism.
 
 ## Fibers (8.1+)
 
-Full-stack, interruptible functions. Unlike generators, fibers can suspend from anywhere
-in the call stack — not just at `yield` points.
+Full-stack, interruptible functions. Unlike generators, fibers can suspend from anywhere in the call stack — not just at
+`yield` points.
 
 ### Core API
 
@@ -27,15 +27,14 @@ $fiber->resume('continue');        // "Resumed with: continue"
 - `$fiber->resume(mixed $value = null): mixed` — resume suspended fiber
 - `$fiber->throw(Throwable $exception): mixed` — throw into suspended fiber
 - `Fiber::suspend(mixed $value = null): mixed` — suspend current fiber (static)
-- `$fiber->isStarted()`, `$fiber->isSuspended()`, `$fiber->isRunning()`,
-  `$fiber->isTerminated()` — state checks
+- `$fiber->isStarted()`, `$fiber->isSuspended()`, `$fiber->isRunning()`, `$fiber->isTerminated()` — state checks
 - `$fiber->getReturn(): mixed` — get return value after termination
 
 **Exceptions:**
 
 - `FiberError` — invalid operation (e.g., resuming a running fiber)
-- Fibers can be suspended inside `array_map()`, `foreach` on iterators, and other
-  callbacks (as of 8.4, also during object destructors)
+- Fibers can be suspended inside `array_map()`, `foreach` on iterators, and other callbacks (as of 8.4, also during
+  object destructors)
 
 ### When to Use Fibers
 
@@ -79,8 +78,8 @@ function run(): void
 
 ## Generators as Coroutines
 
-Generators provide lightweight cooperative multitasking via `yield`, but are stack-less —
-suspension only at `yield` points, not in nested calls.
+Generators provide lightweight cooperative multitasking via `yield`, but are stack-less — suspension only at `yield`
+points, not in nested calls.
 
 ```php
 function fibonacci(): Generator
@@ -118,13 +117,13 @@ $acc->send(20);         // 30
 
 ### Fibers vs Generators
 
-| Aspect | Generators | Fibers |
-|--------|-----------|--------|
-| Suspension point | Only at `yield` | Anywhere in call stack |
-| Return type change | Must return `Generator` | No signature change |
-| Bidirectional data | Via `send()`/`yield` | Via `suspend()`/`resume()` |
-| Use case | Lazy sequences, simple coroutines | Async I/O, event loops |
-| Overhead | Very low | Low (own call stack) |
+| Aspect             | Generators                        | Fibers                     |
+| ------------------ | --------------------------------- | -------------------------- |
+| Suspension point   | Only at `yield`                   | Anywhere in call stack     |
+| Return type change | Must return `Generator`           | No signature change        |
+| Bidirectional data | Via `send()`/`yield`              | Via `suspend()`/`resume()` |
+| Use case           | Lazy sequences, simple coroutines | Async I/O, event loops     |
+| Overhead           | Very low                          | Low (own call stack)       |
 
 ## Async Libraries
 
@@ -134,5 +133,5 @@ For real async PHP, use libraries built on Fibers:
 - **AMPHP** — async framework using Revolt
 - **ReactPHP** — event-driven non-blocking I/O
 
-These libraries handle the scheduling complexity so application code uses `async`/`await`
-style patterns without managing fibers directly.
+These libraries handle the scheduling complexity so application code uses `async`/`await` style patterns without
+managing fibers directly.

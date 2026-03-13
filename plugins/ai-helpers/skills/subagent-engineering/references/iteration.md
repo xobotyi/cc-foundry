@@ -5,6 +5,7 @@ Guide to improving existing subagents based on observed behavior.
 ---
 
 ## Table of Contents
+
 - [Improvement Workflow](#improvement-workflow)
 - [Common Issues and Fixes](#common-issues-and-fixes)
 - [Prompt Refinement Techniques](#prompt-refinement-techniques)
@@ -32,10 +33,12 @@ Guide to improving existing subagents based on observed behavior.
 ### Issue: Agent Doesn't Trigger
 
 **Symptoms:**
+
 - Claude ignores the agent even for matching tasks
 - Have to explicitly say "use the X agent"
 
 **Diagnosis:**
+
 - Description too narrow?
 - Name has typo?
 - Agent not loaded (manual file creation)?
@@ -52,6 +55,7 @@ description: "Code review specialist for quality, style, and best practices.
 ```
 
 Add "use proactively" to encourage automatic delegation:
+
 ```yaml
 description: "Debugger. Use proactively when encountering errors."
 ```
@@ -59,10 +63,12 @@ description: "Debugger. Use proactively when encountering errors."
 ### Issue: Agent Over-Triggers
 
 **Symptoms:**
+
 - Delegates to agent for unrelated tasks
 - Takes over when main conversation would be better
 
 **Diagnosis:**
+
 - Description too vague?
 - Overlaps with other agents?
 
@@ -79,6 +85,7 @@ description: "Security vulnerability scanner for authentication and
 ```
 
 Add explicit boundaries:
+
 ```markdown
 ---
 name: security-reviewer
@@ -89,16 +96,19 @@ description: "Security review for auth code only. NOT for general code review."
 ### Issue: Wrong Output Format
 
 **Symptoms:**
+
 - Output doesn't match expected structure
 - Inconsistent formatting across runs
 
 **Diagnosis:**
+
 - Format not specified clearly?
 - No examples in prompt?
 
 **Fixes:**
 
 Add explicit format specification:
+
 ```markdown
 ## Output Format
 Provide your findings as:
@@ -114,6 +124,7 @@ Provide your findings as:
 ```
 
 Add an example:
+
 ```markdown
 ## Example Output
 
@@ -130,11 +141,13 @@ Add an example:
 ### Issue: Incomplete Task Execution
 
 **Symptoms:**
+
 - Stops before finishing
 - Misses important steps
 - Partial analysis
 
 **Diagnosis:**
+
 - Workflow not explicit enough?
 - Missing checklist?
 - Scope too large?
@@ -142,6 +155,7 @@ Add an example:
 **Fixes:**
 
 Add numbered steps:
+
 ```markdown
 When invoked, follow these steps IN ORDER:
 1. Run git diff to identify changed files
@@ -152,6 +166,7 @@ When invoked, follow these steps IN ORDER:
 ```
 
 Add completion checklist:
+
 ```markdown
 Before returning, verify:
 - [ ] All changed files reviewed
@@ -163,17 +178,20 @@ Before returning, verify:
 ### Issue: Scope Creep
 
 **Symptoms:**
+
 - Agent does more than asked
 - Modifies files when should only read
 - Makes decisions it shouldn't
 
 **Diagnosis:**
+
 - Tools too permissive?
 - Prompt doesn't set boundaries?
 
 **Fixes:**
 
 Restrict tools:
+
 ```yaml
 # Before: full access
 tools: Read, Write, Edit, Bash, Glob, Grep
@@ -183,6 +201,7 @@ tools: Read, Glob, Grep
 ```
 
 Add explicit constraints:
+
 ```markdown
 ## Constraints
 - DO NOT modify any files
@@ -194,17 +213,20 @@ Add explicit constraints:
 ### Issue: Poor Context Efficiency
 
 **Symptoms:**
+
 - Reads too many files
 - Returns verbose output
 - Slow execution
 
 **Diagnosis:**
+
 - No efficiency guidance?
 - Returns raw data instead of synthesis?
 
 **Fixes:**
 
 Add efficiency instructions:
+
 ```markdown
 ## Efficiency Guidelines
 - Use Grep to locate relevant code before reading entire files
@@ -214,6 +236,7 @@ Add efficiency instructions:
 ```
 
 Specify return format:
+
 ```markdown
 ## Return to Parent
 Return a concise summary (max 500 words) containing:
@@ -305,6 +328,7 @@ description: "..."
 ```
 
 Or maintain separate files:
+
 ```
 .claude/agents/
 ├── code-reviewer.md          # Current version
@@ -317,6 +341,7 @@ Or maintain separate files:
 Test changes before committing:
 
 1. Create variant with different name:
+
 ```markdown
 ---
 name: code-reviewer-v2
@@ -344,11 +369,13 @@ Test after each change to isolate impact.
 ## When to Redesign vs. Iterate
 
 **Iterate when:**
+
 - Core concept is sound
 - Issues are specific and fixable
 - Changes are incremental
 
 **Redesign when:**
+
 - Fundamental approach is wrong
 - Multiple major issues
 - Requirements have changed significantly

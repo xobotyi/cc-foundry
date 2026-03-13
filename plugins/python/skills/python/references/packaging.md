@@ -1,8 +1,7 @@
 # Packaging and Project Setup
 
-Extended patterns for Python project configuration, dependency management, and toolchain
-setup targeting Python 3.14+. Complements the rules in SKILL.md with templates, edge
-cases, and tool-specific configuration details.
+Extended patterns for Python project configuration, dependency management, and toolchain setup targeting Python 3.14+.
+Complements the rules in SKILL.md with templates, edge cases, and tool-specific configuration details.
 
 ## pyproject.toml Template
 
@@ -74,14 +73,14 @@ addopts = "-ra -q"
 
 ## Build Backends
 
-| Backend | When to Use |
-|---------|------------|
-| `hatchling` | Default choice for new projects. Fast, configurable, well-maintained. |
-| `flit-core` | Minimal projects with no custom build steps. |
-| `setuptools` | Legacy projects, C extensions, complex build requirements. |
-| `maturin` | Rust extension modules (PyO3). |
-| `uv-build` | Projects already using uv as their primary tool. |
-| `pdm-backend` | If already using PDM as project manager. |
+| Backend       | When to Use                                                           |
+| ------------- | --------------------------------------------------------------------- |
+| `hatchling`   | Default choice for new projects. Fast, configurable, well-maintained. |
+| `flit-core`   | Minimal projects with no custom build steps.                          |
+| `setuptools`  | Legacy projects, C extensions, complex build requirements.            |
+| `maturin`     | Rust extension modules (PyO3).                                        |
+| `uv-build`    | Projects already using uv as their primary tool.                      |
+| `pdm-backend` | If already using PDM as project manager.                              |
 
 Build system declaration examples:
 
@@ -118,8 +117,8 @@ license = "MIT AND (Apache-2.0 OR BSD-2-Clause)"
 license = "LicenseRef-My-Custom-License"
 ```
 
-The older `license = {text = "..."}` table format is deprecated. Supported since
-hatchling 1.27.0, setuptools 77.0.3, flit-core 3.12, uv-build 0.7.19.
+The older `license = {text = "..."}` table format is deprecated. Supported since hatchling 1.27.0, setuptools 77.0.3,
+flit-core 3.12, uv-build 0.7.19.
 
 ## Dynamic Metadata
 
@@ -135,8 +134,8 @@ dynamic = ["version"]
 path = "src/my_package/__init__.py"
 ```
 
-Only use `dynamic` when the value genuinely needs to be computed. Static metadata is
-easier to inspect and more portable across tools.
+Only use `dynamic` when the value genuinely needs to be computed. Static metadata is easier to inspect and more portable
+across tools.
 
 ## uv Workflows
 
@@ -204,8 +203,8 @@ uv run mypy src/
 uv run --python 3.14 python script.py
 ```
 
-`uv run` automatically syncs the environment before execution — it verifies the lockfile
-matches `pyproject.toml` and the environment matches the lockfile.
+`uv run` automatically syncs the environment before execution — it verifies the lockfile matches `pyproject.toml` and
+the environment matches the lockfile.
 
 ### Virtual Environments
 
@@ -255,6 +254,7 @@ my-project/
 ```
 
 **Why src layout:**
+
 - Prevents accidental imports of the package from the project root during testing
 - Forces tests to run against the installed version, catching packaging bugs early
 - Matches how the package will be used by consumers
@@ -271,8 +271,7 @@ my-project/
     └── test_core.py
 ```
 
-Acceptable for small projects, scripts, and applications that won't be distributed
-as packages.
+Acceptable for small projects, scripts, and applications that won't be distributed as packages.
 
 ## Dependency Specification
 
@@ -299,10 +298,10 @@ dependencies = [
 
 ### Rules
 
-- **Libraries:** use `>=` lower bound only. Upper bounds (`<4.0`) create dependency
-  conflicts for consumers. Only add upper bounds for known incompatibilities.
-- **Applications:** can pin exact versions via lock file (`uv.lock`). The lock file
-  handles reproducibility — `pyproject.toml` specifies intent.
+- **Libraries:** use `>=` lower bound only. Upper bounds (`<4.0`) create dependency conflicts for consumers. Only add
+  upper bounds for known incompatibilities.
+- **Applications:** can pin exact versions via lock file (`uv.lock`). The lock file handles reproducibility —
+  `pyproject.toml` specifies intent.
 - **Never use `*` or unbounded dependencies** — they make builds non-reproducible.
 
 ## Entry Points and Plugins
@@ -321,7 +320,7 @@ my-gui = "my_package.gui:main"
 auth = "myapp_auth:AuthPlugin"
 ```
 
-## __init__.py Patterns
+## **init**.py Patterns
 
 ```python
 # Minimal — just define public API
@@ -337,8 +336,7 @@ __all__ = ["Config", "User", "process", "transform"]
 - **Define `__all__`** to control `from package import *` and document the public API.
 - **Sort `__all__` alphabetically** for easy scanning.
 - **Avoid lazy imports in `__init__.py`** unless startup time is critical.
-- **Empty `__init__.py`** is acceptable for packages where users import from submodules
-  directly.
+- **Empty `__init__.py`** is acceptable for packages where users import from submodules directly.
 
 ## ruff Configuration
 
@@ -380,9 +378,8 @@ ignore = [
 
 ### Config Hierarchy
 
-Ruff uses hierarchical config discovery — the closest `pyproject.toml` (with a
-`[tool.ruff]` section), `ruff.toml`, or `.ruff.toml` wins for each file. Configs do
-not merge across levels. Use `extend` to inherit from a parent config:
+Ruff uses hierarchical config discovery — the closest `pyproject.toml` (with a `[tool.ruff]` section), `ruff.toml`, or
+`.ruff.toml` wins for each file. Configs do not merge across levels. Use `extend` to inherit from a parent config:
 
 ```toml
 [tool.ruff]
@@ -390,8 +387,7 @@ extend = "../pyproject.toml"
 line-length = 100  # override just this setting
 ```
 
-When `target-version` is not set, ruff infers it from `requires-python` in the nearest
-`pyproject.toml`.
+When `target-version` is not set, ruff infers it from `requires-python` in the nearest `pyproject.toml`.
 
 ### Formatter Configuration
 

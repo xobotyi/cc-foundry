@@ -4,13 +4,12 @@ Modern Dart Sass with the `@use`/`@forward` module system.
 
 ## Module System
 
-**`@import` is deprecated** as of Dart Sass 1.80.0 and will be removed in
-Dart Sass 3.0.0. Use `@use` and `@forward` exclusively.
+**`@import` is deprecated** as of Dart Sass 1.80.0 and will be removed in Dart Sass 3.0.0. Use `@use` and `@forward`
+exclusively.
 
 ### `@use`
 
-Loads modules with namespaced access. Each module loaded once regardless of
-how many files `@use` it.
+Loads modules with namespaced access. Each module loaded once regardless of how many files `@use` it.
 
 ```scss
 // Load with default namespace (filename)
@@ -31,6 +30,7 @@ how many files `@use` it.
 ```
 
 **Rules:**
+
 - `@use` must appear before any rules except `@forward`.
 - Namespace defaults to the last component of the URL (without extension).
 - Members are scoped to the loading file -- not globally available.
@@ -38,8 +38,7 @@ how many files `@use` it.
 
 ### `@forward`
 
-Re-exports a module's members for downstream consumers. Used to create
-public API entrypoints.
+Re-exports a module's members for downstream consumers. Used to create public API entrypoints.
 
 ```scss
 // _index.scss -- library entrypoint
@@ -49,6 +48,7 @@ public API entrypoints.
 ```
 
 **Adding prefixes:**
+
 ```scss
 // Prefix all forwarded members
 @forward 'buttons' as btn-*;
@@ -56,12 +56,14 @@ public API entrypoints.
 ```
 
 **Controlling visibility:**
+
 ```scss
 @forward 'internal' hide $private-var, secret-mixin;
 @forward 'internal' show $public-var, public-mixin;
 ```
 
 **Configuration passthrough:**
+
 ```scss
 // _opinionated.scss
 @forward 'library' with (
@@ -84,8 +86,7 @@ $font-stack: system-ui, sans-serif !default;
 );
 ```
 
-Configuration applies globally for that module -- all subsequent `@use`
-of the same module see the configured values.
+Configuration applies globally for that module -- all subsequent `@use` of the same module see the configured values.
 
 ### Private Members
 
@@ -125,11 +126,10 @@ styles/
 └── main.scss            # @use 'abstracts', 'base', etc.
 ```
 
-**Index files:** `_index.scss` in a folder loads automatically when you
-`@use` the folder name: `@use 'abstracts'` loads `abstracts/_index.scss`.
+**Index files:** `_index.scss` in a folder loads automatically when you `@use` the folder name: `@use 'abstracts'` loads
+`abstracts/_index.scss`.
 
-**Partials:** Files prefixed with `_` are partials -- not compiled standalone.
-Omit the `_` in `@use` paths.
+**Partials:** Files prefixed with `_` are partials -- not compiled standalone. Omit the `_` in `@use` paths.
 
 ## Built-in Modules
 
@@ -220,8 +220,8 @@ $spacing: (
 }
 ```
 
-**Prefer mixins over `@extend`** in most cases. `@extend` produces
-unexpected selectors and doesn't work across media queries.
+**Prefer mixins over `@extend`** in most cases. `@extend` produces unexpected selectors and doesn't work across media
+queries.
 
 ### Maps for Design Tokens
 
@@ -267,31 +267,32 @@ sass-migrator module --migrate-deps your-entrypoint.scss
 ```
 
 For built-in functions only (leave `@import` for now):
+
 ```bash
 sass-migrator module --built-in-only your-entrypoint.scss
 ```
 
 ### Key Changes
 
-| `@import` | `@use`/`@forward` |
-|-----------|-------------------|
-| Global namespace | Namespaced access |
-| Loads multiple times | Loads once |
-| Variables globally available | Scoped to loading file |
-| `@import "file"` | `@use "file"` |
-| No visibility control | `hide`/`show` in `@forward` |
-| `$var: value !global` | `@use ... with ($var: value)` |
-| `lighten($color, 10%)` | `color.adjust($color, $lightness: 10%)` |
-| `percentage(0.5)` | `math.percentage(0.5)` |
+| `@import`                    | `@use`/`@forward`                       |
+| ---------------------------- | --------------------------------------- |
+| Global namespace             | Namespaced access                       |
+| Loads multiple times         | Loads once                              |
+| Variables globally available | Scoped to loading file                  |
+| `@import "file"`             | `@use "file"`                           |
+| No visibility control        | `hide`/`show` in `@forward`             |
+| `$var: value !global`        | `@use ... with ($var: value)`           |
+| `lighten($color, 10%)`       | `color.adjust($color, $lightness: 10%)` |
+| `percentage(0.5)`            | `math.percentage(0.5)`                  |
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|------|
-| `@import` | `@use` and `@forward` |
-| Global variables without `!default` | `$var: value !default` for configurable modules |
-| `@extend` across components | `@mixin` -- more predictable output |
-| Deep nesting (> 3 levels) | Flatten selectors |
-| `100% / 3` division | `math.div(100%, 3)` |
-| `lighten()` / `darken()` globals | `color.adjust()` from `sass:color` |
-| Barrel files with `@use` of everything | `@forward` in `_index.scss` entrypoints |
+| Don't                                  | Do                                              |
+| -------------------------------------- | ----------------------------------------------- |
+| `@import`                              | `@use` and `@forward`                           |
+| Global variables without `!default`    | `$var: value !default` for configurable modules |
+| `@extend` across components            | `@mixin` -- more predictable output             |
+| Deep nesting (> 3 levels)              | Flatten selectors                               |
+| `100% / 3` division                    | `math.div(100%, 3)`                             |
+| `lighten()` / `darken()` globals       | `color.adjust()` from `sass:color`              |
+| Barrel files with `@use` of everything | `@forward` in `_index.scss` entrypoints         |

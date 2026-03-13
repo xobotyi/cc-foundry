@@ -4,15 +4,15 @@ Structured git commit workflow with atomic commits, message validation, and conv
 
 ## Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `commit` | 8-step commit pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify |
-| `commit-message` | Message formatting conventions and structure rules |
+| Skill            | Purpose                                                                                                               |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `commit`         | 8-step commit pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify |
+| `commit-message` | Message formatting conventions and structure rules                                                                    |
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
+| Script                       | Purpose                                                       |
+| ---------------------------- | ------------------------------------------------------------- |
 | `validate-commit-message.js` | Pre-commit message validation (errors block, warnings advise) |
 
 ## Workflow
@@ -25,8 +25,8 @@ Structured git commit workflow with atomic commits, message validation, and conv
 
 ## Validator Flags
 
-| Flag | Purpose | Example |
-|------|---------|---------|
+| Flag                 | Purpose                                   | Example                           |
+| -------------------- | ----------------------------------------- | --------------------------------- |
 | `--require-trailers` | Comma-separated list of required trailers | `--require-trailers "Task,Fixes"` |
 
 ## Project Configuration
@@ -45,28 +45,30 @@ Project-specific commit guidance here.
 </git-commit-config>
 ```
 
-- **`<validator-args>`** — Flags passed to validator. Each `<flag name="X" value="Y"/>` becomes
-  `--X "Y"`.
-- **`<extra-instructions>`** — Highest priority guidance during commit process. Overrides plugin
-  defaults.
+- **`<validator-args>`** — Flags passed to validator. Each `<flag name="X" value="Y"/>` becomes `--X "Y"`.
+- **`<extra-instructions>`** — Highest priority guidance during commit process. Overrides plugin defaults.
 
 ## Conventions
 
 **Commit message structure:**
+
 - Subject line: `[scope] verb description` (max 72 chars, factual, imperative mood)
 - Body: explains why change was needed, how to verify
 - Trailers: structured metadata (Task, Fixes, Refs, etc.)
 
 **Scope usage:**
+
 - Use for monorepos or multi-component repositories
 - Omit for single-purpose repositories
 - Determined from file paths, not contents
 
 **Breaking changes:**
+
 - Body starts with `BREAKING:` prefix
 - Explains what breaks and migration path
 
 **No AI attribution:**
+
 - No "Generated with Claude Code" or similar
 - No "Co-Authored-By: Claude" trailers
 - Commits appear as regular developer work

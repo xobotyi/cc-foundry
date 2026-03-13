@@ -1,27 +1,26 @@
 # Monkeypatch Patterns
 
-Extended patterns for pytest's `monkeypatch` fixture, distilled from official pytest
-documentation. Covers attribute patching, environment variables, dictionary mutation, and
-scoped patches.
+Extended patterns for pytest's `monkeypatch` fixture, distilled from official pytest documentation. Covers attribute
+patching, environment variables, dictionary mutation, and scoped patches.
 
 ## API Overview
 
 All modifications are automatically undone after the test (or fixture) completes.
 
-| Method | Purpose |
-|--------|---------|
-| `monkeypatch.setattr(obj, name, value)` | Replace attribute on object or module |
-| `monkeypatch.delattr(obj, name)` | Remove attribute |
-| `monkeypatch.setitem(mapping, name, value)` | Set dictionary key |
-| `monkeypatch.delitem(mapping, name)` | Remove dictionary key |
-| `monkeypatch.setenv(name, value)` | Set environment variable |
-| `monkeypatch.delenv(name)` | Remove environment variable |
-| `monkeypatch.syspath_prepend(path)` | Prepend to `sys.path` |
-| `monkeypatch.chdir(path)` | Change working directory |
-| `monkeypatch.context()` | Context manager for scoped patches |
+| Method                                      | Purpose                               |
+| ------------------------------------------- | ------------------------------------- |
+| `monkeypatch.setattr(obj, name, value)`     | Replace attribute on object or module |
+| `monkeypatch.delattr(obj, name)`            | Remove attribute                      |
+| `monkeypatch.setitem(mapping, name, value)` | Set dictionary key                    |
+| `monkeypatch.delitem(mapping, name)`        | Remove dictionary key                 |
+| `monkeypatch.setenv(name, value)`           | Set environment variable              |
+| `monkeypatch.delenv(name)`                  | Remove environment variable           |
+| `monkeypatch.syspath_prepend(path)`         | Prepend to `sys.path`                 |
+| `monkeypatch.chdir(path)`                   | Change working directory              |
+| `monkeypatch.context()`                     | Context manager for scoped patches    |
 
-The `raising` parameter (default `True`) controls whether `KeyError`/`AttributeError`
-is raised when the target doesn't exist. Pass `raising=False` to silently skip.
+The `raising` parameter (default `True`) controls whether `KeyError`/`AttributeError` is raised when the target doesn't
+exist. Pass `raising=False` to silently skip.
 
 ## Patching Functions
 
@@ -139,8 +138,8 @@ def test_missing_key(monkeypatch):
 
 ## Scoped Patches with context()
 
-`monkeypatch.context()` limits patches to a specific block — useful when patching stdlib
-or third-party code that pytest itself uses:
+`monkeypatch.context()` limits patches to a specific block — useful when patching stdlib or third-party code that pytest
+itself uses:
 
 ```python
 import functools
@@ -170,29 +169,26 @@ def no_requests(monkeypatch):
     monkeypatch.delattr("requests.sessions.Session.request")
 ```
 
-Any test that tries to make an HTTP request will get `AttributeError` instead of a
-network call.
+Any test that tries to make an HTTP request will get `AttributeError` instead of a network call.
 
 ## Stdlib Patching Warnings
 
 Patching builtins (`open`, `compile`, etc.) can break pytest internals. If unavoidable:
 
 - Use `monkeypatch.context()` to limit the patch scope
-- Pass `--tb=native --assert=plain --capture=no` to pytest to reduce pytest's own
-  use of patched functions
-- Prefer `mocker.patch` (pytest-mock) for complex patching — it integrates better with
-  pytest's assertion rewriting
+- Pass `--tb=native --assert=plain --capture=no` to pytest to reduce pytest's own use of patched functions
+- Prefer `mocker.patch` (pytest-mock) for complex patching — it integrates better with pytest's assertion rewriting
 
 ## monkeypatch vs mocker.patch
 
-| Aspect | `monkeypatch` | `mocker.patch` |
-|--------|---------------|----------------|
-| **Source** | Built-in pytest fixture | pytest-mock plugin |
-| **Best for** | Env vars, simple attrs, dicts | Complex mocking with assertions |
-| **Auto-restore** | Yes | Yes |
-| **Call tracking** | No | Yes (`assert_called_once_with`, etc.) |
-| **Spec enforcement** | No | Yes (`spec=Type`) |
-| **Async support** | No native async mock | `AsyncMock` |
+| Aspect               | `monkeypatch`                 | `mocker.patch`                        |
+| -------------------- | ----------------------------- | ------------------------------------- |
+| **Source**           | Built-in pytest fixture       | pytest-mock plugin                    |
+| **Best for**         | Env vars, simple attrs, dicts | Complex mocking with assertions       |
+| **Auto-restore**     | Yes                           | Yes                                   |
+| **Call tracking**    | No                            | Yes (`assert_called_once_with`, etc.) |
+| **Spec enforcement** | No                            | Yes (`spec=Type`)                     |
+| **Async support**    | No native async mock          | `AsyncMock`                           |
 
-Use `monkeypatch` for simple value replacement. Use `mocker.patch` when you need call
-tracking, return value configuration, or spec enforcement.
+Use `monkeypatch` for simple value replacement. Use `mocker.patch` when you need call tracking, return value
+configuration, or spec enforcement.

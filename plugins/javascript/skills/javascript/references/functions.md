@@ -6,8 +6,8 @@ Function declarations, arrow functions, closures, scope, and parameter patterns.
 
 ### Arrow Functions by Default
 
-Use arrow functions for anonymous functions and callbacks. Use function
-declarations only when hoisting or `this` binding is needed.
+Use arrow functions for anonymous functions and callbacks. Use function declarations only when hoisting or `this`
+binding is needed.
 
 ```js
 // Callbacks — always arrow
@@ -39,13 +39,12 @@ const transform = (data) => {
 };
 ```
 
-Prefer parentheses around arrow function parameters even when there is only
-one — it makes adding/removing parameters a smaller diff.
+Prefer parentheses around arrow function parameters even when there is only one — it makes adding/removing parameters a
+smaller diff.
 
 ### Arrow Functions and `this`
 
-Arrow functions capture `this` from the enclosing lexical scope. They do NOT
-have their own `this`.
+Arrow functions capture `this` from the enclosing lexical scope. They do NOT have their own `this`.
 
 ```js
 // Good — arrow preserves `this` from class method
@@ -65,8 +64,7 @@ class Timer {
 }
 ```
 
-Never use arrow functions as methods on objects or prototypes — they won't
-have the correct `this`:
+Never use arrow functions as methods on objects or prototypes — they won't have the correct `this`:
 
 ```js
 // Bad — arrow captures module-level this, not the object
@@ -136,8 +134,7 @@ function sum(...numbers) {
 
 ## Closures
 
-A closure is a function that captures variables from its enclosing scope. Every
-function in JavaScript forms a closure.
+A closure is a function that captures variables from its enclosing scope. Every function in JavaScript forms a closure.
 
 ### Factory Pattern
 
@@ -154,8 +151,7 @@ function createCounter(initial = 0) {
 
 ### Loop Closure Pitfall
 
-The classic `var`-in-loop bug is caused by function-scoped `var`. Use `let` or
-`const` in loops to avoid it:
+The classic `var`-in-loop bug is caused by function-scoped `var`. Use `let` or `const` in loops to avoid it:
 
 ```js
 // Bug — var is shared across all closures
@@ -171,9 +167,8 @@ for (let i = 0; i < 5; i++) {
 
 ### Memory Consideration
 
-Closures retain references to outer variables, not copies. Be cautious with
-large objects captured unintentionally — they won't be garbage collected until
-the closure is released.
+Closures retain references to outer variables, not copies. Be cautious with large objects captured unintentionally —
+they won't be garbage collected until the closure is released.
 
 ## Pure Functions
 
@@ -190,13 +185,12 @@ const addItem = (cart, item) => {
 const addItem = (cart, item) => [...cart, item];
 ```
 
-Side effects (DOM manipulation, network calls, logging) should be isolated
-and explicit, not hidden inside data transformation functions.
+Side effects (DOM manipulation, network calls, logging) should be isolated and explicit, not hidden inside data
+transformation functions.
 
 ## Function Size and Composition
 
-Functions should do one thing. If a function name contains "and", it should
-probably be two functions.
+Functions should do one thing. If a function name contains "and", it should probably be two functions.
 
 ```js
 // Bad — does two things
@@ -207,8 +201,8 @@ function validate(user) { ... }
 function save(user) { ... }
 ```
 
-Keep functions short. If a function exceeds ~30 lines, consider extracting
-helpers. Use composition over complex branching:
+Keep functions short. If a function exceeds ~30 lines, consider extracting helpers. Use composition over complex
+branching:
 
 ```js
 const process = pipe(normalize, validate, transform, persist);

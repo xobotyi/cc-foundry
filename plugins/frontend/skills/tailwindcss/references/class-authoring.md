@@ -29,8 +29,8 @@ sm:grid-cols-3              // responsive breakpoint ≥ 40rem
 dark:lg:hover:bg-indigo-600 // dark mode AND ≥ 64rem AND hover
 ```
 
-**v4 stacking order is left-to-right** (v3 was right-to-left). When migrating stacked variants
-involving `*` or `prose-*`, reverse the order.
+**v4 stacking order is left-to-right** (v3 was right-to-left). When migrating stacked variants involving `*` or
+`prose-*`, reverse the order.
 
 ```
 // v3
@@ -45,13 +45,13 @@ first:*:pt-0
 
 Mobile-first: unprefixed utilities apply to all sizes; prefixed apply at that breakpoint and up.
 
-| Prefix | Min-width     |
-|--------|---------------|
-| `sm`   | 40rem (640px) |
-| `md`   | 48rem (768px) |
-| `lg`   | 64rem (1024px)|
-| `xl`   | 80rem (1280px)|
-| `2xl`  | 96rem (1536px)|
+| Prefix | Min-width      |
+| ------ | -------------- |
+| `sm`   | 40rem (640px)  |
+| `md`   | 48rem (768px)  |
+| `lg`   | 64rem (1024px) |
+| `xl`   | 80rem (1280px) |
+| `2xl`  | 96rem (1536px) |
 
 ```html
 <!-- mobile-first: no prefix for base, prefix for larger -->
@@ -65,17 +65,20 @@ Mobile-first: unprefixed utilities apply to all sizes; prefixed apply at that br
 ```
 
 **Range targeting:**
+
 ```html
 <div class="md:max-xl:flex">   <!-- only between md and xl -->
 <div class="md:max-lg:flex">   <!-- only at md breakpoint -->
 ```
 
 **Arbitrary breakpoints:**
+
 ```html
 <div class="min-[320px]:text-center max-[600px]:bg-sky-300">
 ```
 
 **Custom breakpoints via `@theme`:**
+
 ```css
 @theme {
   --breakpoint-xs: 30rem;
@@ -127,6 +130,7 @@ One-off values outside the design system — use sparingly. If repeated, move to
 ```
 
 **CSS variable shorthand (v4):**
+
 ```html
 <!-- v3 syntax — DO NOT USE in v4 -->
 <div class="bg-[--brand-color]">
@@ -136,11 +140,13 @@ One-off values outside the design system — use sparingly. If repeated, move to
 ```
 
 **Arbitrary selectors (last resort):**
+
 ```html
 <div class="[&>[data-active]+span]:text-blue-600">
 ```
 
 **Underscores in arbitrary values represent spaces:**
+
 ```html
 <div class="grid-cols-[max-content_auto]">  <!-- correct v4 -->
 <div class="grid-cols-[max-content,auto]">  <!-- v3 only, broken in v4 -->
@@ -161,6 +167,7 @@ Append `!` to the end of the class name (v4). Prefix `!` (v3 style) is deprecate
 ```
 
 Global important flag (for legacy CSS coexistence):
+
 ```css
 @import "tailwindcss" important;
 ```
@@ -176,11 +183,13 @@ Default: `prefers-color-scheme` media query.
 ```
 
 Manual toggle (class-based):
+
 ```css
 @custom-variant dark (&:where(.dark, .dark *));
 ```
 
 Apply `color-scheme` utility to match browser UI to theme:
+
 ```html
 <html class="scheme-light dark:scheme-dark">
 ```
@@ -259,8 +268,8 @@ not-focus:           <!-- element is NOT focused -->
 
 ## Conflict Resolution
 
-Last class in the generated stylesheet wins, **not** last in the HTML attribute. The stylesheet
-order is fixed by Tailwind's generation — don't rely on attribute order to resolve conflicts.
+Last class in the generated stylesheet wins, **not** last in the HTML attribute. The stylesheet order is fixed by
+Tailwind's generation — don't rely on attribute order to resolve conflicts.
 
 ```html
 <!-- display: grid wins, not flex — even though flex comes last in attribute -->
@@ -268,6 +277,7 @@ order is fixed by Tailwind's generation — don't rely on attribute order to res
 ```
 
 Use conditional rendering instead:
+
 ```jsx
 <div className={gridLayout ? "grid" : "flex"}>
 ```
@@ -276,8 +286,8 @@ Use conditional rendering instead:
 
 ## Dynamic Values from Runtime Sources
 
-Use inline styles for values from DB/API. For hover states on dynamic values, set CSS variables
-inline and reference with utility classes:
+Use inline styles for values from DB/API. For hover states on dynamic values, set CSS variables inline and reference
+with utility classes:
 
 ```jsx
 <button
@@ -290,42 +300,42 @@ inline and reference with utility classes:
 
 ## v3 → v4 Migration Quick Reference
 
-| v3 | v4 |
-|----|-----|
-| `@tailwind base; @tailwind utilities;` | `@import "tailwindcss";` |
-| `!bg-red-500` (prefix `!`) | `bg-red-500!` (suffix `!`) |
-| `bg-[--brand]` | `bg-(--brand)` |
-| `shadow-sm` | `shadow-xs` |
-| `shadow` (bare) | `shadow-sm` |
-| `rounded-sm` | `rounded-xs` |
-| `rounded` (bare) | `rounded-sm` |
-| `blur-sm` | `blur-xs` |
-| `blur` (bare) | `blur-sm` |
-| `outline-none` | `outline-hidden` |
-| `ring` (3px blue) | `ring-3` + `ring-blue-500` |
-| `bg-opacity-50` | `bg-black/50` |
-| `flex-shrink-*` | `shrink-*` |
-| `flex-grow-*` | `grow-*` |
-| `overflow-ellipsis` | `text-ellipsis` |
-| `bg-gradient-to-r` | `bg-linear-to-r` |
-| `theme(colors.red.500)` | `var(--color-red-500)` |
-| `grid-cols-[a,b]` (comma=space) | `grid-cols-[a_b]` (underscore=space) |
-| Stacking: `first:*:pt-0` | Stacking: `*:first:pt-0` |
-| `tailwindcss` PostCSS plugin | `@tailwindcss/postcss` |
-| `tailwindcss` Vite | `@tailwindcss/vite` plugin |
-| `npx tailwindcss` CLI | `npx @tailwindcss/cli` |
+| v3                                     | v4                                   |
+| -------------------------------------- | ------------------------------------ |
+| `@tailwind base; @tailwind utilities;` | `@import "tailwindcss";`             |
+| `!bg-red-500` (prefix `!`)             | `bg-red-500!` (suffix `!`)           |
+| `bg-[--brand]`                         | `bg-(--brand)`                       |
+| `shadow-sm`                            | `shadow-xs`                          |
+| `shadow` (bare)                        | `shadow-sm`                          |
+| `rounded-sm`                           | `rounded-xs`                         |
+| `rounded` (bare)                       | `rounded-sm`                         |
+| `blur-sm`                              | `blur-xs`                            |
+| `blur` (bare)                          | `blur-sm`                            |
+| `outline-none`                         | `outline-hidden`                     |
+| `ring` (3px blue)                      | `ring-3` + `ring-blue-500`           |
+| `bg-opacity-50`                        | `bg-black/50`                        |
+| `flex-shrink-*`                        | `shrink-*`                           |
+| `flex-grow-*`                          | `grow-*`                             |
+| `overflow-ellipsis`                    | `text-ellipsis`                      |
+| `bg-gradient-to-r`                     | `bg-linear-to-r`                     |
+| `theme(colors.red.500)`                | `var(--color-red-500)`               |
+| `grid-cols-[a,b]` (comma=space)        | `grid-cols-[a_b]` (underscore=space) |
+| Stacking: `first:*:pt-0`               | Stacking: `*:first:pt-0`             |
+| `tailwindcss` PostCSS plugin           | `@tailwindcss/postcss`               |
+| `tailwindcss` Vite                     | `@tailwindcss/vite` plugin           |
+| `npx tailwindcss` CLI                  | `npx @tailwindcss/cli`               |
 
-**Border/divide default color changed:** v3 used `gray-200`; v4 uses `currentColor`. Always
-specify a color with `border-*` and `divide-*` utilities.
+**Border/divide default color changed:** v3 used `gray-200`; v4 uses `currentColor`. Always specify a color with
+`border-*` and `divide-*` utilities.
 
-**Gradient variant behavior:** In v4, variant overrides preserve other gradient stops. Use
-`via-none` explicitly to drop a three-stop gradient back to two stops.
+**Gradient variant behavior:** In v4, variant overrides preserve other gradient stops. Use `via-none` explicitly to drop
+a three-stop gradient back to two stops.
 
-**`space-x/y-*` and `divide-x/y-*` selectors changed** (performance fix). Migrate to `gap`
-with flex/grid where possible.
+**`space-x/y-*` and `divide-x/y-*` selectors changed** (performance fix). Migrate to `gap` with flex/grid where
+possible.
 
-**Hover on mobile:** v4 `hover:` only fires when primary input supports hover
-(`@media (hover: hover)`). No action needed; this is a correctness fix.
+**Hover on mobile:** v4 `hover:` only fires when primary input supports hover (`@media (hover: hover)`). No action
+needed; this is a correctness fix.
 
-**Upgrade tool:** `npx @tailwindcss/upgrade` handles most changes automatically. Run on a
-separate branch and review the diff.
+**Upgrade tool:** `npx @tailwindcss/upgrade` handles most changes automatically. Run on a separate branch and review the
+diff.

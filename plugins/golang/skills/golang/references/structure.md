@@ -7,6 +7,7 @@ Package design, import conventions, and managing breaking changes.
 ### `internal/` for Encapsulation
 
 Code in `internal/` cannot be imported by external modules. Use aggressively:
+
 - All server logic belongs in `internal/`
 - Supporting packages not part of your public API
 - Refactor freely without breaking external consumers
@@ -14,12 +15,14 @@ Code in `internal/` cannot be imported by external modules. Use aggressively:
 ### `cmd/` for Commands
 
 Use `cmd/` when a repo has both importable packages and commands:
+
 - Each subdirectory under `cmd/` declares `package main`
 - Install with `go install github.com/user/mod/cmd/tool@latest`
 
 ### Don't Overstructure
 
 Start flat. Add directories only when:
+
 - A package needs internal helpers (`internal/`)
 - Multiple commands exist (`cmd/`)
 - Sub-packages serve distinct, importable purposes
@@ -52,6 +55,7 @@ type Client struct{}
 ### Group Ordering
 
 Two groups separated by blank line:
+
 1. Standard library
 2. Everything else
 
@@ -103,14 +107,14 @@ import (
 ## Function Organization
 
 Within a file, order by:
+
 1. Types, constants, variables
 2. Constructor (`New...`)
 3. Exported methods (grouped by receiver)
 4. Unexported methods (grouped by receiver)
 5. Utility functions
 
-Order functions by rough call order — readers going top-to-bottom should encounter
-callers before callees.
+Order functions by rough call order — readers going top-to-bottom should encounter callers before callees.
 
 ## File Organization
 
@@ -127,8 +131,8 @@ When breaking backward compatibility, follow a staged workflow:
 2. **Migrate callers** from old to new
 3. **Remove old code** when no use cases remain
 
-Each step should be a separate commit. Never combine breaking changes with new
-functionality — reviewers and `git bisect` need clean boundaries.
+Each step should be a separate commit. Never combine breaking changes with new functionality — reviewers and
+`git bisect` need clean boundaries.
 
 For versioned packages, use directory-based versioning:
 

@@ -4,10 +4,10 @@ Providers, configuration, including/excluding files, and ignoring code.
 
 ## Providers
 
-| Provider | Package | Mechanism | Recommendation |
-|----------|---------|-----------|----------------|
-| `v8` (default) | `@vitest/coverage-v8` | V8 engine's native coverage | Recommended — fast, accurate since v3.2 |
-| `istanbul` | `@vitest/coverage-istanbul` | Babel instrumentation | Use when not on V8 (Firefox, Bun) |
+| Provider       | Package                     | Mechanism                   | Recommendation                          |
+| -------------- | --------------------------- | --------------------------- | --------------------------------------- |
+| `v8` (default) | `@vitest/coverage-v8`       | V8 engine's native coverage | Recommended — fast, accurate since v3.2 |
+| `istanbul`     | `@vitest/coverage-istanbul` | Babel instrumentation       | Use when not on V8 (Firefox, Bun)       |
 
 Install the provider package:
 
@@ -43,8 +43,8 @@ export default defineConfig({
 
 ## Including and Excluding Files
 
-**Critical:** Without `coverage.include`, only files loaded during tests appear in
-the report. Set it to catch uncovered files:
+**Critical:** Without `coverage.include`, only files loaded during tests appear in the report. Set it to catch uncovered
+files:
 
 ```ts
 coverage: {
@@ -53,8 +53,7 @@ coverage: {
 }
 ```
 
-Vitest automatically excludes test files (matching `test.include` patterns) from
-coverage.
+Vitest automatically excludes test files (matching `test.include` patterns) from coverage.
 
 ## Reporters
 
@@ -64,11 +63,9 @@ coverage: {
 }
 ```
 
-Common reporters: `text` (terminal), `html` (browser), `lcov` (CI integration),
-`json`, `clover`.
+Common reporters: `text` (terminal), `html` (browser), `lcov` (CI integration), `json`, `clover`.
 
-The `html` reporter integrates with Vitest UI — open the Coverage tab to browse
-results.
+The `html` reporter integrates with Vitest UI — open the Coverage tab to browse results.
 
 ## Thresholds
 
@@ -89,8 +86,7 @@ The test run fails if any threshold is not met.
 
 ## Ignoring Code
 
-Both providers support ignore comments. In TypeScript, add `@preserve` to prevent
-esbuild from stripping the comment:
+Both providers support ignore comments. In TypeScript, add `@preserve` to prevent esbuild from stripping the comment:
 
 ### V8 Ignore Hints
 
@@ -121,13 +117,13 @@ if (process.env.DEBUG) { /* ignored */ }
 
 ## V8 vs Istanbul Comparison
 
-| Factor | V8 | Istanbul |
-|--------|-----|---------|
-| Speed | Faster (no instrumentation) | Slower (Babel transform step) |
-| Memory | Lower | Higher |
-| Accuracy | Identical to Istanbul since v3.2 | Battle-tested since 2012 |
-| Runtime | V8-based only (Node, Chrome) | Any JS runtime |
-| File limiting | Cannot limit — instruments all modules | Can limit to specific files |
+| Factor        | V8                                     | Istanbul                      |
+| ------------- | -------------------------------------- | ----------------------------- |
+| Speed         | Faster (no instrumentation)            | Slower (Babel transform step) |
+| Memory        | Lower                                  | Higher                        |
+| Accuracy      | Identical to Istanbul since v3.2       | Battle-tested since 2012      |
+| Runtime       | V8-based only (Node, Chrome)           | Any JS runtime                |
+| File limiting | Cannot limit — instruments all modules | Can limit to specific files   |
 
 **Default to V8** unless targeting a non-V8 runtime.
 

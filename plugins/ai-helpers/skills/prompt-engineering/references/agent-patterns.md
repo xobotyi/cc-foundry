@@ -14,8 +14,8 @@ Techniques for LLM agents that reason and act in the world.
 
 ## ReAct (Reasoning + Acting)
 
-Interleave reasoning traces with actions. The model thinks about what
-to do, does it, observes the result, then thinks again.
+Interleave reasoning traces with actions. The model thinks about what to do, does it, observes the result, then thinks
+again.
 
 ### The Pattern
 
@@ -39,12 +39,12 @@ Action: Finish[answer]
 
 ### ReAct vs Pure Reasoning
 
-| Aspect | CoT Only | ReAct |
-|--------|----------|-------|
-| External info | None | Retrieved as needed |
+| Aspect        | CoT Only                  | ReAct                            |
+| ------------- | ------------------------- | -------------------------------- |
+| External info | None                      | Retrieved as needed              |
 | Hallucination | Higher (relies on memory) | Lower (grounded in observations) |
-| Flexibility | Fixed knowledge | Dynamic knowledge gathering |
-| Complexity | Simpler | Requires tool integration |
+| Flexibility   | Fixed knowledge           | Dynamic knowledge gathering      |
+| Complexity    | Simpler                   | Requires tool integration        |
 
 ### Implementation
 
@@ -64,12 +64,14 @@ Wait for Observation before next Thought.
 ### When to Use ReAct
 
 **Ideal for:**
+
 - Knowledge-intensive QA (need current/accurate facts)
 - Multi-hop reasoning (answer depends on multiple lookups)
 - Tasks requiring external tool use
 - Decision-making with environmental feedback
 
 **Limitations:**
+
 - Depends on retrieval quality
 - Can get stuck in loops
 - More expensive (multiple tool calls)
@@ -78,8 +80,7 @@ Wait for Observation before next Thought.
 
 ## PAL (Program-Aided Language Models)
 
-Offload computation to a code interpreter. Model generates code instead
-of computing directly.
+Offload computation to a code interpreter. Model generates code instead of computing directly.
 
 ### The Pattern
 
@@ -108,12 +109,14 @@ Output: `11`
 ### When to Use PAL
 
 **Ideal for:**
+
 - Math word problems
 - Date/time calculations
 - Data transformation
 - Any task requiring precise computation
 
 **Avoid when:**
+
 - Task is purely linguistic
 - No code interpreter available
 - Simple enough for direct answer
@@ -151,8 +154,7 @@ Attempt 2:
 
 ### Components
 
-**Actor:** Generates actions based on state + reflections
-**Evaluator:** Scores the result (pass/fail, reward signal)
+**Actor:** Generates actions based on state + reflections **Evaluator:** Scores the result (pass/fail, reward signal)
 **Self-Reflection:** Converts failure into verbal feedback for next attempt
 
 ### Why It Works
@@ -164,12 +166,14 @@ Attempt 2:
 ### When to Use Reflexion
 
 **Ideal for:**
+
 - Sequential decision-making (games, navigation)
 - Programming tasks (iterative debugging)
 - Reasoning with multiple attempts allowed
 - Tasks where trial-and-error is acceptable
 
 **Limitations:**
+
 - Requires multiple attempts (cost)
 - Self-evaluation may be unreliable
 - Memory window limits history
@@ -194,8 +198,7 @@ Current attempt:
 
 ## ART (Automatic Reasoning and Tool-use)
 
-Automatically select reasoning chains and tools from a library based
-on the task.
+Automatically select reasoning chains and tools from a library based on the task.
 
 ### The Pattern
 
@@ -207,12 +210,13 @@ on the task.
 
 ### Key Insight
 
-Don't hand-craft demonstrations for every task. Maintain a library of
-task-specific reasoning patterns and retrieve relevant ones at runtime.
+Don't hand-craft demonstrations for every task. Maintain a library of task-specific reasoning patterns and retrieve
+relevant ones at runtime.
 
 ### When to Use ART
 
 **Ideal for:**
+
 - Many task types with known patterns
 - Generalizing tool use to new tasks
 - Reducing per-task prompt engineering
@@ -256,11 +260,13 @@ Using the fact that golf rewards lowest score, the answer is No.
 ### When to Use
 
 **Ideal for:**
+
 - Commonsense reasoning
 - Questions requiring world knowledge
 - When RAG isn't available but grounding helps
 
 **Limitation:**
+
 - Generated knowledge may be wrong (model hallucination)
 - Two-step adds latency
 
@@ -268,14 +274,14 @@ Using the fact that golf rewards lowest score, the answer is No.
 
 ## Pattern Selection
 
-| Task Type | Pattern |
-|-----------|---------|
-| Need external information | ReAct |
-| Precise calculation | PAL |
-| Multi-attempt allowed | Reflexion |
-| Many similar task types | ART |
-| Commonsense gaps | Generated Knowledge |
-| Simple reasoning | Standard CoT |
+| Task Type                 | Pattern             |
+| ------------------------- | ------------------- |
+| Need external information | ReAct               |
+| Precise calculation       | PAL                 |
+| Multi-attempt allowed     | Reflexion           |
+| Many similar task types   | ART                 |
+| Commonsense gaps          | Generated Knowledge |
+| Simple reasoning          | Standard CoT        |
 
 ## Combining Patterns
 

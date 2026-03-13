@@ -1,7 +1,7 @@
 # Type Annotation Patterns
 
-Extended examples and patterns for Python 3.14+ type annotations. Complements the rules
-in SKILL.md with detailed examples, edge cases, and lesser-used constructs.
+Extended examples and patterns for Python 3.14+ type annotations. Complements the rules in SKILL.md with detailed
+examples, edge cases, and lesser-used constructs.
 
 ## Built-in Generic Syntax
 
@@ -107,13 +107,12 @@ reveal_type(concat(MyStr("a"), MyStr("b")))  # str (not MyStr!)
 concat("one", b"two")  # Error: can't mix str and bytes
 ```
 
-Use bounded when you want subtype preservation. Use constrained when the type must be
-exactly one of a fixed set.
+Use bounded when you want subtype preservation. Use constrained when the type must be exactly one of a fixed set.
 
 ## NewType
 
-Creates a distinct type for the type checker with zero runtime overhead. Unlike type
-aliases (which are interchangeable), `NewType` prevents accidental mixing:
+Creates a distinct type for the type checker with zero runtime overhead. Unlike type aliases (which are
+interchangeable), `NewType` prevents accidental mixing:
 
 ```python
 from typing import NewType
@@ -131,8 +130,8 @@ get_user(42)            # Error — int is not UserId
 result = UserId(1) + UserId(2)  # type is int, not UserId
 ```
 
-Use `NewType` for domain identifiers (user IDs, order IDs, file paths) where mixing
-distinct-but-same-typed values would be a logic error.
+Use `NewType` for domain identifiers (user IDs, order IDs, file paths) where mixing distinct-but-same-typed values would
+be a logic error.
 
 ## ParamSpec for Decorator Signatures
 
@@ -222,15 +221,15 @@ def is_valid_user(data: dict[str, object]) -> TypeGuard[UserDict]:
     return "name" in data and "email" in data
 ```
 
-| | TypeIs | TypeGuard |
-|---|--------|-----------|
-| True branch | intersection of original + narrowed type | exactly the guard type |
-| False branch | excludes the narrowed type | no narrowing |
-| Type relationship | narrowed must be subtype of input | no constraint |
-| Use when | refining an existing type | output type unrelated to input |
+|                   | TypeIs                                   | TypeGuard                      |
+| ----------------- | ---------------------------------------- | ------------------------------ |
+| True branch       | intersection of original + narrowed type | exactly the guard type         |
+| False branch      | excludes the narrowed type               | no narrowing                   |
+| Type relationship | narrowed must be subtype of input        | no constraint                  |
+| Use when          | refining an existing type                | output type unrelated to input |
 
-Prefer `TypeIs` for standard narrowing. Use `TypeGuard` when the narrowed type is
-incompatible with the input (e.g., `list[object]` to `list[str]` — `list` is invariant).
+Prefer `TypeIs` for standard narrowing. Use `TypeGuard` when the narrowed type is incompatible with the input (e.g.,
+`list[object]` to `list[str]` — `list` is invariant).
 
 ## TypedDict
 
@@ -291,8 +290,8 @@ class ExtendedBuilder(Builder):
 # ExtendedBuilder.set_name() returns ExtendedBuilder, not Builder
 ```
 
-Use `Self` for any method that returns `self` — fluent builders, `__enter__`, and
-`@classmethod` alternative constructors.
+Use `Self` for any method that returns `self` — fluent builders, `__enter__`, and `@classmethod` alternative
+constructors.
 
 ## Variance
 
@@ -426,13 +425,10 @@ async def stream_data(url: str) -> AsyncIterator[bytes]:
 ## Common Pitfalls
 
 - **Don't annotate `self` or `cls`** — the type checker infers them.
-- **`tuple[int, ...]`** means variable-length homogeneous tuple. `tuple[int, str]` means
-  exactly two elements of specified types. `tuple[()]` means empty tuple.
-- **`dict[str, Any]`** disables value type checking. Prefer `dict[str, object]` or a
-  TypedDict.
-- **Avoid circular type references** — in 3.14+ with lazy annotation evaluation, forward
-  references resolve automatically. For older versions, use string literals
-  `"ClassName"` or `from __future__ import annotations`.
-- **`object` vs `Any`**: `object` is type-safe (rejects most operations), `Any` is an
-  escape hatch (accepts all operations). Use `object` when you mean "any type but still
-  type-safe."
+- **`tuple[int, ...]`** means variable-length homogeneous tuple. `tuple[int, str]` means exactly two elements of
+  specified types. `tuple[()]` means empty tuple.
+- **`dict[str, Any]`** disables value type checking. Prefer `dict[str, object]` or a TypedDict.
+- **Avoid circular type references** — in 3.14+ with lazy annotation evaluation, forward references resolve
+  automatically. For older versions, use string literals `"ClassName"` or `from __future__ import annotations`.
+- **`object` vs `Any`**: `object` is type-safe (rejects most operations), `Any` is an escape hatch (accepts all
+  operations). Use `object` when you mean "any type but still type-safe."

@@ -1,8 +1,7 @@
 # Generics and Type-Level Programming
 
-Generics allow components to work over a variety of types while preserving type
-safety. Use them to write reusable, type-safe abstractions — but keep them as
-simple as possible.
+Generics allow components to work over a variety of types while preserving type safety. Use them to write reusable,
+type-safe abstractions — but keep them as simple as possible.
 
 ## Generic Functions
 
@@ -67,13 +66,13 @@ TypeScript's standard library includes essential type operators:
 
 ### Object Transformation
 
-| Type | Purpose |
-|------|---------|
-| `Partial<T>` | All properties optional |
-| `Required<T>` | All properties required |
-| `Readonly<T>` | All properties readonly |
-| `Pick<T, Keys>` | Subset of properties |
-| `Omit<T, Keys>` | All except specified properties |
+| Type              | Purpose                                   |
+| ----------------- | ----------------------------------------- |
+| `Partial<T>`      | All properties optional                   |
+| `Required<T>`     | All properties required                   |
+| `Readonly<T>`     | All properties readonly                   |
+| `Pick<T, Keys>`   | Subset of properties                      |
+| `Omit<T, Keys>`   | All except specified properties           |
 | `Record<Keys, T>` | Object with specified keys and value type |
 
 ```ts
@@ -95,11 +94,11 @@ type UserWithoutAge = Omit<User, "age">;
 
 ### Union Manipulation
 
-| Type | Purpose |
-|------|---------|
-| `Exclude<Union, Excluded>` | Remove members from union |
-| `Extract<Union, Extracted>` | Keep only matching members |
-| `NonNullable<T>` | Remove `null` and `undefined` |
+| Type                        | Purpose                       |
+| --------------------------- | ----------------------------- |
+| `Exclude<Union, Excluded>`  | Remove members from union     |
+| `Extract<Union, Extracted>` | Keep only matching members    |
+| `NonNullable<T>`            | Remove `null` and `undefined` |
 
 ```ts
 type T = Exclude<"a" | "b" | "c", "a">; // "b" | "c"
@@ -108,12 +107,12 @@ type U = NonNullable<string | null>;      // string
 
 ### Function Types
 
-| Type | Purpose |
-|------|---------|
-| `ReturnType<T>` | Extract return type |
+| Type            | Purpose                          |
+| --------------- | -------------------------------- |
+| `ReturnType<T>` | Extract return type              |
 | `Parameters<T>` | Extract parameter types as tuple |
-| `Awaited<T>` | Unwrap Promise types recursively |
-| `NoInfer<T>` | Block inference at this position |
+| `Awaited<T>`    | Unwrap Promise types recursively |
+| `NoInfer<T>`    | Block inference at this position |
 
 ```ts
 function fetchUser(id: string): Promise<User> { ... }
@@ -237,44 +236,47 @@ Intrinsic string types: `Uppercase`, `Lowercase`, `Capitalize`, `Uncapitalize`.
 ## Complexity Budget
 
 Type-level programming is powerful but has real costs:
+
 - Every complex type adds cognitive load for all readers
 - IDE performance degrades with deeply nested conditional/mapped types
 - Error messages become cryptic when types are too abstract
 
-**Rule of thumb:** If you can't explain what a type does in one sentence,
-it's too complex. Split it, simplify it, or use explicit interfaces instead.
+**Rule of thumb:** If you can't explain what a type does in one sentence, it's too complex. Split it, simplify it, or
+use explicit interfaces instead.
 
 ### Complexity Tiers
 
-| Tier | Tools | Use When |
-|------|-------|----------|
-| Simple | `interface`, `type` alias, union | Always — default choice |
-| Moderate | `Partial`, `Pick`, `Omit`, `Record` | Well-known transformations |
-| Advanced | Conditional, mapped, template literal | Library code, framework types |
-| Expert | Recursive types, complex `infer` chains | Rarely — last resort |
+| Tier     | Tools                                   | Use When                      |
+| -------- | --------------------------------------- | ----------------------------- |
+| Simple   | `interface`, `type` alias, union        | Always — default choice       |
+| Moderate | `Partial`, `Pick`, `Omit`, `Record`     | Well-known transformations    |
+| Advanced | Conditional, mapped, template literal   | Library code, framework types |
+| Expert   | Recursive types, complex `infer` chains | Rarely — last resort          |
 
 Stay at the lowest tier that solves your problem.
 
 ## Best Practices
 
-- **Use the simplest construct that works.** Interface extension over `Pick`.
-  Explicit properties over mapped types. Repetition is cheaper than complexity.
-- **Mapped and conditional types are powerful but costly** — they hurt readability,
-  IDE performance, and refactoring. Use only when the alternative is worse.
-- **Avoid return-type-only generics.** If a generic parameter appears only in the
-  return type, it cannot be inferred and forces callers to guess.
+- **Use the simplest construct that works.** Interface extension over `Pick`. Explicit properties over mapped types.
+  Repetition is cheaper than complexity.
+- **Mapped and conditional types are powerful but costly** — they hurt readability, IDE performance, and refactoring.
+  Use only when the alternative is worse.
+- **Avoid return-type-only generics.** If a generic parameter appears only in the return type, it cannot be inferred and
+  forces callers to guess.
 - **Prefer built-in utility types** over hand-rolling equivalents.
-- **Keep generic constraints tight** — `<T extends Record<string, unknown>>` is
-  better than `<T extends object>` when you need string keys.
+- **Keep generic constraints tight** — `<T extends Record<string, unknown>>` is better than `<T extends object>` when
+  you need string keys.
 
 ### When to Use Utility Types vs Explicit Interfaces
 
 **Prefer explicit interfaces** when:
+
 - The type represents a distinct domain concept
 - The shape is referenced in many places
 - Readability matters more than DRY
 
 **Use utility types** when:
+
 - Deriving a type from an existing one is unambiguous
 - The transformation is a well-known pattern (e.g., update payload = `Partial<T>`)
 - The source type is the canonical definition

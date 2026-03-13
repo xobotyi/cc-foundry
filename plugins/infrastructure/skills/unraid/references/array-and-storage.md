@@ -4,27 +4,27 @@
 
 Unraid offers three storage approaches, each with distinct trade-offs:
 
-| Approach | Strengths | Weaknesses | Best For |
-|----------|-----------|------------|----------|
-| Traditional array (XFS/BTRFS) | Power-efficient (per-disk spindown), easy expansion, parity protection | Single-disk write speed, no bitrot protection | Media storage, growing collections |
-| ZFS pools | Bitrot protection, self-healing, snapshots, compression, high throughput | Higher RAM/CPU, all disks spin together, complex expansion | Performance-critical data, multi-user access |
-| Hybrid (array + ZFS pools) | Combines strengths of both | More complex configuration | Balanced setups with mixed workloads |
+| Approach                      | Strengths                                                                | Weaknesses                                                 | Best For                                     |
+| ----------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------- | -------------------------------------------- |
+| Traditional array (XFS/BTRFS) | Power-efficient (per-disk spindown), easy expansion, parity protection   | Single-disk write speed, no bitrot protection              | Media storage, growing collections           |
+| ZFS pools                     | Bitrot protection, self-healing, snapshots, compression, high throughput | Higher RAM/CPU, all disks spin together, complex expansion | Performance-critical data, multi-user access |
+| Hybrid (array + ZFS pools)    | Combines strengths of both                                               | More complex configuration                                 | Balanced setups with mixed workloads         |
 
-Unraid 7+ supports **array-free operation** -- servers configured entirely with ZFS/BTRFS
-pools and no traditional array slots. Ideal for all-SSD/NVMe builds.
+Unraid 7+ supports **array-free operation** -- servers configured entirely with ZFS/BTRFS pools and no traditional array
+slots. Ideal for all-SSD/NVMe builds.
 
 ## Write Modes
 
-| Mode | Speed (Typical) | Power Usage | Drives Spinning | Best Use Case |
-|------|-----------------|-------------|-----------------|---------------|
-| Read/Modify/Write (default) | 20-40 MB/s | Low | Only parity + target | Most workloads, energy savings, small writes |
-| Turbo Write (Reconstruct) | 40-120 MB/s | High | All drives | Large file transfers, array rebuilds |
-| Cache Write (SSD/NVMe) | 50-110 MB/s (SSD), 250-900 MB/s (NVMe) | Varies | Cache drives only | Apps, VMs, frequent writes |
+| Mode                        | Speed (Typical)                        | Power Usage | Drives Spinning      | Best Use Case                                |
+| --------------------------- | -------------------------------------- | ----------- | -------------------- | -------------------------------------------- |
+| Read/Modify/Write (default) | 20-40 MB/s                             | Low         | Only parity + target | Most workloads, energy savings, small writes |
+| Turbo Write (Reconstruct)   | 40-120 MB/s                            | High        | All drives           | Large file transfers, array rebuilds         |
+| Cache Write (SSD/NVMe)      | 50-110 MB/s (SSD), 250-900 MB/s (NVMe) | Varies      | Cache drives only    | Apps, VMs, frequent writes                   |
 
 ### Turbo Write
 
-Reads from all data drives to recalculate parity simultaneously. Enable via
-Settings > Disk Settings > Tunable (md_write_method) > Reconstruct Write.
+Reads from all data drives to recalculate parity simultaneously. Enable via Settings > Disk Settings > Tunable
+(md_write_method) > Reconstruct Write.
 
 - **When to use**: large sequential transfers, during rebuilds (all drives already spinning)
 - **When to avoid**: if you want drive spindown for power savings, if any drive is failing
@@ -33,8 +33,8 @@ Settings > Disk Settings > Tunable (md_write_method) > Reconstruct Write.
 
 ### Tunable (md_write_method) for Power Efficiency
 
-Set to **Auto** in Settings > Disk Settings to spin up only parity + target drive during
-writes. Slower but prevents all-drive spinups on every single write operation.
+Set to **Auto** in Settings > Disk Settings to spin up only parity + target drive during writes. Slower but prevents
+all-drive spinups on every single write operation.
 
 ## Parity Protection
 
@@ -52,22 +52,24 @@ The traditional Unraid array uses dedicated parity drives for data protection:
 
 ### Cache Write Acceleration
 
-Data written to SSD/NVMe cache appears immediately in shares while the Mover transfers
-it to the array in the background (default 3:40 AM). Performance expectations:
+Data written to SSD/NVMe cache appears immediately in shares while the Mover transfers it to the array in the background
+(default 3:40 AM). Performance expectations:
 
 - Without cache: average 20-30 MB/s, peaks up to 40 MB/s
 - With SSD cache: 50-110 MB/s
 - With NVMe cache: 250-900 MB/s (can saturate 10GbE)
 
 **Critical**: files on cache are unprotected by parity until moved. Mitigate with:
+
 - Redundant cache pool (multiple SSDs in RAID 1)
 - Mover Tuning plugin to prevent cache overflow
 - CA Appdata Backup for container configuration safety
 
 ### SSD Limitations
 
-**Unraid does not support TRIM/Discard for SSDs in the main array.** This causes
-performance degradation over time. SSDs must be used only in:
+**Unraid does not support TRIM/Discard for SSDs in the main array.** This causes performance degradation over time. SSDs
+must be used only in:
+
 - Cache pools (TRIM works properly)
 - Unassigned Devices (TRIM works properly)
 
@@ -92,13 +94,13 @@ A single high-endurance enterprise NVMe (e.g., Intel P4510) consolidates multipl
 
 ### Cache Pool Performance Comparison
 
-| Feature | Cache Pool (BTRFS) | Cache Pool (ZFS) | Main Array |
-|---------|-------------------|------------------|------------|
-| Read speed | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | HDD: 70-250 MB/s (per disk) |
-| Write speed | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | 20-120 MB/s (mode-dependent) |
-| Data protection | RAID 1 | RAID 1 | Parity-based |
-| Expansion | Mix drive sizes, dynamic add/remove | Limited (cannot remove from RAIDZ) | Add drives freely |
-| Best for | Apps, VMs, frequent writes | Apps, VMs, enterprise workloads | Bulk storage, media |
+| Feature         | Cache Pool (BTRFS)                     | Cache Pool (ZFS)                       | Main Array                   |
+| --------------- | -------------------------------------- | -------------------------------------- | ---------------------------- |
+| Read speed      | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | HDD: 70-250 MB/s (per disk)  |
+| Write speed     | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | 20-120 MB/s (mode-dependent) |
+| Data protection | RAID 1                                 | RAID 1                                 | Parity-based                 |
+| Expansion       | Mix drive sizes, dynamic add/remove    | Limited (cannot remove from RAIDZ)     | Add drives freely            |
+| Best for        | Apps, VMs, frequent writes             | Apps, VMs, enterprise workloads        | Bulk storage, media          |
 
 ### Mover Configuration
 
@@ -106,8 +108,8 @@ The Mover transfers files between primary and secondary storage:
 
 - Schedule via Settings > Scheduler > Mover Settings
 - Direction: Cache > Array (default) or Array > Cache
-- **Mover Tuning plugin**: prevents moves when cache is below threshold, supports
-  age-based filtering (e.g., only move files older than 40 days when cache > 70% full)
+- **Mover Tuning plugin**: prevents moves when cache is below threshold, supports age-based filtering (e.g., only move
+  files older than 40 days when cache > 70% full)
 - Custom User Scripts can run per-share mover operations (bypass Mover Tuning thresholds)
 - Enable mover logging for troubleshooting: Settings > Scheduler > Mover Settings
 - Stop Docker/VMs before manual mover runs if files appear stuck
@@ -122,67 +124,66 @@ Combining cache strategy with spindown saves significant power:
 4. Set md_write_method to Auto (avoids all-drive spinup on writes)
 5. Use custom mover scripts for specific shares
 
-Typical result: array drives spun down 90%+ of the time, ~30-45W savings depending
-on drive count.
+Typical result: array drives spun down 90%+ of the time, ~30-45W savings depending on drive count.
 
 ## Allocation Methods
 
-| Method | Behavior | Best For |
-|--------|----------|----------|
-| High-Water (default) | Progressively fills disks using switch points based on half the largest drive | Media servers, mixed drive sizes |
-| Most-Free | Always writes to disk with most free space | High-throughput workflows, video editing |
-| Fill-Up | Fills disks sequentially until minimum free space threshold | Static archives, identical drive sizes |
+| Method               | Behavior                                                                      | Best For                                 |
+| -------------------- | ----------------------------------------------------------------------------- | ---------------------------------------- |
+| High-Water (default) | Progressively fills disks using switch points based on half the largest drive | Media servers, mixed drive sizes         |
+| Most-Free            | Always writes to disk with most free space                                    | High-throughput workflows, video editing |
+| Fill-Up              | Fills disks sequentially until minimum free space threshold                   | Static archives, identical drive sizes   |
 
-**Minimum Free Space**: set to 2x largest file size. Required for Fill-Up method. Split Level
-takes priority over free space -- may cause "out of space" errors even with available capacity.
+**Minimum Free Space**: set to 2x largest file size. Required for Fill-Up method. Split Level takes priority over free
+space -- may cause "out of space" errors even with available capacity.
 
 ## Split Level
 
 Controls how directory trees span multiple disks:
 
-| Setting | Behavior | Use Case |
-|---------|----------|----------|
-| Auto split any directory | Creates folders on any disk as needed | General data, downloads |
+| Setting                   | Behavior                                | Use Case                       |
+| ------------------------- | --------------------------------------- | ------------------------------ |
+| Auto split any directory  | Creates folders on any disk as needed   | General data, downloads        |
 | Auto split top level only | First-level subfolders stay on one disk | Media libraries (Movies/Title) |
-| Auto split top N levels | N levels managed automatically | Complex nested projects |
-| Manual (no auto split) | Files only go where parent exists | Archives, full manual control |
+| Auto split top N levels   | N levels managed automatically          | Complex nested projects        |
+| Manual (no auto split)    | Files only go where parent exists       | Archives, full manual control  |
 
 ## Disk Management
 
-- **SMART monitoring**: check via Main tab, per-disk SMART reports. Enable notifications
-  for temperature warnings and disk errors
+- **SMART monitoring**: check via Main tab, per-disk SMART reports. Enable notifications for temperature warnings and
+  disk errors
 - **Preclear**: prepare new drives before adding to array (Unassigned Devices Preclear plugin)
-- **Disk replacement**: replace failed drives, rebuild from parity. Run parity check with
-  zero errors before starting. Single parity: one disk at a time. Dual: up to two
+- **Disk replacement**: replace failed drives, rebuild from parity. Run parity check with zero errors before starting.
+  Single parity: one disk at a time. Dual: up to two
 - **Dynamix Cache Dirs plugin**: prevents unnecessary spinups from directory listings
 
 ## ZFS-Specific Configuration
 
-- **Compression**: lz4 is default, minimal overhead even on compressed media. Never use
-  `none` -- wastes space on partial blocks and zero-block detection
-- **Snapshots**: useful for recovery from bad re-encoding operations. Create clones from
-  snapshots to extract files without affecting the original dataset
+- **Compression**: lz4 is default, minimal overhead even on compressed media. Never use `none` -- wastes space on
+  partial blocks and zero-block detection
+- **Snapshots**: useful for recovery from bad re-encoding operations. Create clones from snapshots to extract files
+  without affecting the original dataset
 - **LUKS encryption**: available for ZFS pools and individual drives
 - **Hybrid ZFS pools**: support subpools with advanced allocation profiles
 
 ### ZFS Pool Profiles
 
-| Profile | Redundancy | Performance | Space Efficiency | Recommended Drives |
-|---------|-----------|-------------|------------------|--------------------|
-| Stripe | None | Fast but risky | 100% | Any number |
-| Mirror | 1:1 | Excellent random I/O | 50% | 2+ (add more mirrors) |
-| RAIDZ1 | 1 disk/vdev | Fast sequential | High | 3-6 (max 8) |
-| RAIDZ2 | 2 disks/vdev | Slightly slower writes | Moderate | 6-12 (max 14) |
-| RAIDZ3 | 3 disks/vdev | Most write overhead | Lower | 10-16 (max 20) |
+| Profile | Redundancy   | Performance            | Space Efficiency | Recommended Drives    |
+| ------- | ------------ | ---------------------- | ---------------- | --------------------- |
+| Stripe  | None         | Fast but risky         | 100%             | Any number            |
+| Mirror  | 1:1          | Excellent random I/O   | 50%              | 2+ (add more mirrors) |
+| RAIDZ1  | 1 disk/vdev  | Fast sequential        | High             | 3-6 (max 8)           |
+| RAIDZ2  | 2 disks/vdev | Slightly slower writes | Moderate         | 6-12 (max 14)         |
+| RAIDZ3  | 3 disks/vdev | Most write overhead    | Lower            | 10-16 (max 20)        |
 
 ### ZFS Integration Patterns
 
-| Use Case | Description |
-|----------|-------------|
-| Fast SSD/NVMe pool for appdata | Store appdata share for responsive containers. 2-drive mirror typical |
-| ZFS cache pool | Use ZFS features (snapshots, compression) for cache tier |
-| Daily backup/replication target | Use ZFS send/receive for efficient incremental replication |
-| Snapshot safety net | Point-in-time recovery from accidental deletions or misconfigurations |
+| Use Case                        | Description                                                           |
+| ------------------------------- | --------------------------------------------------------------------- |
+| Fast SSD/NVMe pool for appdata  | Store appdata share for responsive containers. 2-drive mirror typical |
+| ZFS cache pool                  | Use ZFS features (snapshots, compression) for cache tier              |
+| Daily backup/replication target | Use ZFS send/receive for efficient incremental replication            |
+| Snapshot safety net             | Point-in-time recovery from accidental deletions or misconfigurations |
 
 ## Encryption
 

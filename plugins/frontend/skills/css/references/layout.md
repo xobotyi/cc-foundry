@@ -4,16 +4,16 @@ CSS layout with Flexbox and Grid. Choose the right system, apply it correctly.
 
 ## Flexbox vs Grid
 
-| Use | System |
-|-----|--------|
-| One-dimensional flow (row or column) | Flexbox |
-| Two-dimensional layout (rows AND columns) | Grid |
-| Content-driven sizing | Flexbox |
-| Layout-driven sizing | Grid |
+| Use                                           | System  |
+| --------------------------------------------- | ------- |
+| One-dimensional flow (row or column)          | Flexbox |
+| Two-dimensional layout (rows AND columns)     | Grid    |
+| Content-driven sizing                         | Flexbox |
+| Layout-driven sizing                          | Grid    |
 | Component internals (nav items, card content) | Flexbox |
-| Page-level structure, complex arrangements | Grid |
-| Items need to wrap naturally | Flexbox |
-| Precise placement on named lines/areas | Grid |
+| Page-level structure, complex arrangements    | Grid    |
+| Items need to wrap naturally                  | Flexbox |
+| Precise placement on named lines/areas        | Grid    |
 
 Both work together. A grid item can be a flex container and vice versa.
 
@@ -46,6 +46,7 @@ Both work together. A grid item can be a flex container and vice versa.
 ```
 
 **Always use the `flex` shorthand.** It sets intelligent defaults:
+
 - `flex: 1` = `flex: 1 1 0` -- equal sizing from zero basis
 - `flex: auto` = `flex: 1 1 auto` -- grow/shrink from content size
 - `flex: none` = `flex: 0 0 auto` -- fully inflexible
@@ -88,6 +89,7 @@ This is the preferred pattern for content-driven responsive layouts.
 ### Common Patterns
 
 **Space-between with wrapping fallback:**
+
 ```css
 .nav {
   display: flex;
@@ -98,6 +100,7 @@ This is the preferred pattern for content-driven responsive layouts.
 ```
 
 **Alignment shifting wrapping (title + action):**
+
 ```css
 .header {
   display: flex;
@@ -124,6 +127,7 @@ This is the preferred pattern for content-driven responsive layouts.
 ```
 
 **Key functions:**
+
 - `repeat(count, size)` -- repeat track patterns
 - `minmax(min, max)` -- flexible track sizing
 - `fit-content(max)` -- size to content with a cap
@@ -231,13 +235,13 @@ Items placed beyond explicit tracks create implicit tracks:
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|------|
-| `float` for layout | Flexbox or Grid |
-| Flexbox for 2D layouts | Grid |
-| Grid for simple row of items | Flexbox |
-| `grid-auto-flow: dense` without considering a11y | Explicit placement or accept gaps |
-| Hardcoded `px` widths on grid items | `fr`, `minmax()`, or `auto` |
-| Media queries for every breakpoint | `auto-fit`/`auto-fill` + `minmax()` |
-| `order` that breaks logical reading order | Source order matches visual order |
-| `justify-content: space-between` with wrap (orphan gap) | `gap` + `flex-wrap` |
+| Don't                                                   | Do                                  |
+| ------------------------------------------------------- | ----------------------------------- |
+| `float` for layout                                      | Flexbox or Grid                     |
+| Flexbox for 2D layouts                                  | Grid                                |
+| Grid for simple row of items                            | Flexbox                             |
+| `grid-auto-flow: dense` without considering a11y        | Explicit placement or accept gaps   |
+| Hardcoded `px` widths on grid items                     | `fr`, `minmax()`, or `auto`         |
+| Media queries for every breakpoint                      | `auto-fit`/`auto-fill` + `minmax()` |
+| `order` that breaks logical reading order               | Source order matches visual order   |
+| `justify-content: space-between` with wrap (orphan gap) | `gap` + `flex-wrap`                 |

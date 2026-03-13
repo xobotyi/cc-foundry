@@ -6,8 +6,8 @@
 @import "tailwindcss";
 ```
 
-This imports `theme.css` (default tokens), `preflight.css` (base reset), and `utilities.css`.
-No `@tailwind base/components/utilities` — those are v3 syntax.
+This imports `theme.css` (default tokens), `preflight.css` (base reset), and `utilities.css`. No
+`@tailwind base/components/utilities` — those are v3 syntax.
 
 ---
 
@@ -15,12 +15,13 @@ No `@tailwind base/components/utilities` — those are v3 syntax.
 
 `@theme` defines design tokens that generate utility classes. It is **not** equivalent to `:root`.
 
-| Placement | Generates utility classes | Use for |
-|-----------|--------------------------|---------|
-| `@theme { ... }` | Yes | Design tokens that need utility classes |
-| `:root { ... }` | No | CSS vars that don't need utilities |
+| Placement        | Generates utility classes | Use for                                 |
+| ---------------- | ------------------------- | --------------------------------------- |
+| `@theme { ... }` | Yes                       | Design tokens that need utility classes |
+| `:root { ... }`  | No                        | CSS vars that don't need utilities      |
 
 Rules:
+
 - Must be top-level (not nested under selectors or media queries)
 - All values compile to `:root { ... }` CSS vars in output
 - Only used CSS vars are emitted by default (use `static` option to force all)
@@ -33,8 +34,7 @@ Rules:
 @theme inline { ... }    /* inline var() references into utility output */
 ```
 
-Use `@theme inline` when a token references another variable — prevents CSS variable
-resolution failures in the cascade:
+Use `@theme inline` when a token references another variable — prevents CSS variable resolution failures in the cascade:
 
 ```css
 /* Without inline: font-sans may resolve incorrectly in some cascade positions */
@@ -47,29 +47,29 @@ resolution failures in the cascade:
 
 ## Namespaces → Utility Classes
 
-| Namespace | Generated utilities |
-|-----------|---------------------|
-| `--color-*` | `bg-*`, `text-*`, `border-*`, `ring-*`, `fill-*`, `stroke-*`, etc. |
-| `--font-*` | `font-*` (font-family) |
-| `--text-*` | `text-*` (font-size) |
-| `--font-weight-*` | `font-*` (font-weight) |
-| `--tracking-*` | `tracking-*` (letter-spacing) |
-| `--leading-*` | `leading-*` (line-height) |
-| `--breakpoint-*` | Responsive variants: `sm:*`, `md:*`, etc. |
-| `--container-*` | Container query variants: `@sm:*`, and `max-w-*` |
-| `--spacing-*` or `--spacing` | `px-*`, `py-*`, `m-*`, `w-*`, `h-*`, etc. |
-| `--radius-*` | `rounded-*` |
-| `--shadow-*` | `shadow-*` |
-| `--inset-shadow-*` | `inset-shadow-*` |
-| `--drop-shadow-*` | `drop-shadow-*` |
-| `--blur-*` | `blur-*` |
-| `--perspective-*` | `perspective-*` |
-| `--aspect-*` | `aspect-*` |
-| `--ease-*` | `ease-*` |
-| `--animate-*` | `animate-*` |
+| Namespace                    | Generated utilities                                                |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `--color-*`                  | `bg-*`, `text-*`, `border-*`, `ring-*`, `fill-*`, `stroke-*`, etc. |
+| `--font-*`                   | `font-*` (font-family)                                             |
+| `--text-*`                   | `text-*` (font-size)                                               |
+| `--font-weight-*`            | `font-*` (font-weight)                                             |
+| `--tracking-*`               | `tracking-*` (letter-spacing)                                      |
+| `--leading-*`                | `leading-*` (line-height)                                          |
+| `--breakpoint-*`             | Responsive variants: `sm:*`, `md:*`, etc.                          |
+| `--container-*`              | Container query variants: `@sm:*`, and `max-w-*`                   |
+| `--spacing-*` or `--spacing` | `px-*`, `py-*`, `m-*`, `w-*`, `h-*`, etc.                          |
+| `--radius-*`                 | `rounded-*`                                                        |
+| `--shadow-*`                 | `shadow-*`                                                         |
+| `--inset-shadow-*`           | `inset-shadow-*`                                                   |
+| `--drop-shadow-*`            | `drop-shadow-*`                                                    |
+| `--blur-*`                   | `blur-*`                                                           |
+| `--perspective-*`            | `perspective-*`                                                    |
+| `--aspect-*`                 | `aspect-*`                                                         |
+| `--ease-*`                   | `ease-*`                                                           |
+| `--animate-*`                | `animate-*`                                                        |
 
-Breakpoints generate **variants**, not utilities. Colors generate multiple utility families
-(`bg-*`, `text-*`, `border-*`, etc.) from a single namespace.
+Breakpoints generate **variants**, not utilities. Colors generate multiple utility families (`bg-*`, `text-*`,
+`border-*`, etc.) from a single namespace.
 
 ---
 
@@ -123,8 +123,8 @@ Breakpoints generate **variants**, not utilities. Colors generate multiple utili
 
 ### OKLCH format (v4 default)
 
-All v4 default colors use OKLCH. Use OKLCH for custom colors — perceptually uniform,
-works reliably in CSS `color-mix()`.
+All v4 default colors use OKLCH. Use OKLCH for custom colors — perceptually uniform, works reliably in CSS
+`color-mix()`.
 
 ```
 oklch(lightness chroma hue)
@@ -135,15 +135,14 @@ Shorthand: `oklch(72% 0.11 178)` also valid. Default theme uses decimal form.
 
 ### Default palette
 
-22 color families × 11 steps (50–950): `red`, `orange`, `amber`, `yellow`, `lime`, `green`,
-`emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`,
-`rose`, `slate`, `gray`, `zinc`, `neutral`, `stone`. Plus `black` and `white`.
+22 color families × 11 steps (50–950): `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`,
+`sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`, `slate`, `gray`, `zinc`, `neutral`, `stone`.
+Plus `black` and `white`.
 
 ### Color utilities
 
-Every `--color-*` token generates utilities across: `bg-*`, `text-*`, `decoration-*`,
-`border-*`, `outline-*`, `shadow-*`, `inset-shadow-*`, `ring-*`, `inset-ring-*`,
-`accent-*`, `caret-*`, `fill-*`, `stroke-*`.
+Every `--color-*` token generates utilities across: `bg-*`, `text-*`, `decoration-*`, `border-*`, `outline-*`,
+`shadow-*`, `inset-shadow-*`, `ring-*`, `inset-ring-*`, `accent-*`, `caret-*`, `fill-*`, `stroke-*`.
 
 ### Opacity modifier
 
@@ -267,8 +266,8 @@ document.documentElement.classList.toggle(
 
 ## Content Detection (`@source`)
 
-Tailwind auto-scans all project files **except**: `.gitignore`d files, `node_modules`,
-binary files, CSS files, and lock files.
+Tailwind auto-scans all project files **except**: `.gitignore`d files, `node_modules`, binary files, CSS files, and lock
+files.
 
 ### Register additional sources
 
@@ -312,8 +311,8 @@ Reduces scan scope. Use for large directories that don't use Tailwind.
 @source inline("{hover:,}bg-red-{50,{100..900..100},950}");
 ```
 
-`@source inline()` uses brace expansion. Use for: CMS content, database-driven classes,
-classes that exist only at runtime.
+`@source inline()` uses brace expansion. Use for: CMS content, database-driven classes, classes that exist only at
+runtime.
 
 ### Explicitly exclude from generation
 
@@ -355,20 +354,20 @@ const val = getComputedStyle(document.documentElement).getPropertyValue("--shado
 
 ## V3 → V4 Migration Gotchas
 
-| V3 | V4 |
-|----|----|
-| `tailwind.config.js` theme | `@theme { ... }` in CSS |
-| `theme.extend.colors.brand` | `--color-brand: oklch(...)` in `@theme` |
-| `theme(colors.red.500)` | `var(--color-red-500)` |
-| `bg-opacity-50` | `bg-black/50` (opacity modifier) |
-| `bg-gradient-to-r` | `bg-linear-to-r` |
-| `shadow-sm` (v3 small) | `shadow-xs` (scale shifted) |
-| `rounded` (v3 small) | `rounded-sm` (scale shifted) |
-| `!bg-red-500` (important prefix) | `bg-red-500!` (important suffix) |
-| `ring` (3px blue) | `ring-3` (v4 default is 1px currentColor) |
-| `outline-none` | `outline-hidden` |
-| `bg-[var(--brand)]` | `bg-(--brand)` (v4 CSS var shorthand) |
-| `safelist` in config | `@source inline("class-name")` |
+| V3                               | V4                                        |
+| -------------------------------- | ----------------------------------------- |
+| `tailwind.config.js` theme       | `@theme { ... }` in CSS                   |
+| `theme.extend.colors.brand`      | `--color-brand: oklch(...)` in `@theme`   |
+| `theme(colors.red.500)`          | `var(--color-red-500)`                    |
+| `bg-opacity-50`                  | `bg-black/50` (opacity modifier)          |
+| `bg-gradient-to-r`               | `bg-linear-to-r`                          |
+| `shadow-sm` (v3 small)           | `shadow-xs` (scale shifted)               |
+| `rounded` (v3 small)             | `rounded-sm` (scale shifted)              |
+| `!bg-red-500` (important prefix) | `bg-red-500!` (important suffix)          |
+| `ring` (3px blue)                | `ring-3` (v4 default is 1px currentColor) |
+| `outline-none`                   | `outline-hidden`                          |
+| `bg-[var(--brand)]`              | `bg-(--brand)` (v4 CSS var shorthand)     |
+| `safelist` in config             | `@source inline("class-name")`            |
 
-**`@config` directive:** Use only for incremental v3→v4 migration. `corePlugins`,
-`safelist`, and `separator` from JS config are not supported in v4.
+**`@config` directive:** Use only for incremental v3→v4 migration. `corePlugins`, `safelist`, and `separator` from JS
+config are not supported in v4.

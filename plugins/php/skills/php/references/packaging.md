@@ -2,8 +2,8 @@
 
 ## Composer
 
-Composer is the standard dependency manager for PHP. The `composer.json` file is the
-single source of truth for project metadata, dependencies, and autoloading.
+Composer is the standard dependency manager for PHP. The `composer.json` file is the single source of truth for project
+metadata, dependencies, and autoloading.
 
 ### composer.json Essentials
 
@@ -52,8 +52,7 @@ single source of truth for project metadata, dependencies, and autoloading.
 - `2.0.*` — wildcard
 - `dev-main` — branch reference (use only in root package)
 
-Prefer `^` (caret) for dependencies — it allows minor and patch updates while preventing
-breaking changes.
+Prefer `^` (caret) for dependencies — it allows minor and patch updates while preventing breaking changes.
 
 ### Commands
 
@@ -83,6 +82,7 @@ Resulting File Path:         src/Http/Controller/UserController.php
 ```
 
 Rules:
+
 - Namespace separators map to directory separators
 - Filename must match class name exactly (case-sensitive)
 - One class per file
@@ -143,8 +143,7 @@ Every PHP file follows this structure:
 7. Constant-based `use` imports
 8. Code
 
-Each block separated by a single blank line. Import statements must be fully qualified
-(no leading backslash).
+Each block separated by a single blank line. Import statements must be fully qualified (no leading backslash).
 
 ```php
 <?php

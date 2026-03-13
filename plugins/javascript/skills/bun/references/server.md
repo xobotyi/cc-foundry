@@ -55,10 +55,10 @@ Cached for server lifetime. Call `server.reload()` to update.
 
 Two modes with different tradeoffs:
 
-| Pattern | Behavior | Best for |
-|---------|----------|----------|
-| `new Response(await file.bytes())` | Buffered in memory, ETag support, zero I/O | Small static assets |
-| `new Response(Bun.file(path))` | Per-request read, 404 handling, Range support | Large/dynamic files |
+| Pattern                            | Behavior                                      | Best for            |
+| ---------------------------------- | --------------------------------------------- | ------------------- |
+| `new Response(await file.bytes())` | Buffered in memory, ETag support, zero I/O    | Small static assets |
+| `new Response(Bun.file(path))`     | Per-request read, 404 handling, Range support | Large/dynamic files |
 
 Bun uses `sendfile(2)` for zero-copy file transfers when possible.
 
@@ -129,13 +129,13 @@ websocket: {
 
 ### WebSocket Config
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `maxPayloadLength` | 16 MB | Max message size |
-| `idleTimeout` | 120s | Idle disconnect time |
-| `backpressureLimit` | 1 MB | Queue limit before backpressure |
-| `perMessageDeflate` | false | Per-message compression |
-| `publishToSelf` | false | Receive own published messages |
+| Option              | Default | Description                     |
+| ------------------- | ------- | ------------------------------- |
+| `maxPayloadLength`  | 16 MB   | Max message size                |
+| `idleTimeout`       | 120s    | Idle disconnect time            |
+| `backpressureLimit` | 1 MB    | Queue limit before backpressure |
+| `perMessageDeflate` | false   | Per-message compression         |
+| `publishToSelf`     | false   | Receive own published messages  |
 
 ### Pub/Sub
 

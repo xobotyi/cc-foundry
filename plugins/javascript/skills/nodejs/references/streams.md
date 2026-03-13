@@ -4,8 +4,8 @@ Stream types, pipeline, backpressure, and practical patterns.
 
 ## Why Streams
 
-Streams process data incrementally in chunks rather than loading everything into memory.
-Use streams when:
+Streams process data incrementally in chunks rather than loading everything into memory. Use streams when:
+
 - Reading/writing large files
 - Processing HTTP request/response bodies
 - Transforming data pipelines (compress, encrypt, parse)
@@ -15,12 +15,12 @@ Don't use streams when data is already fully in memory — the overhead isn't wo
 
 ## Stream Types
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| `Readable` | Source of data | `fs.createReadStream()`, `http.IncomingMessage` |
-| `Writable` | Destination for data | `fs.createWriteStream()`, `http.ServerResponse` |
-| `Duplex` | Both readable and writable | `net.Socket`, `zlib` streams |
-| `Transform` | Duplex that modifies data | `zlib.createGzip()`, custom parsers |
+| Type        | Purpose                    | Example                                         |
+| ----------- | -------------------------- | ----------------------------------------------- |
+| `Readable`  | Source of data             | `fs.createReadStream()`, `http.IncomingMessage` |
+| `Writable`  | Destination for data       | `fs.createWriteStream()`, `http.ServerResponse` |
+| `Duplex`    | Both readable and writable | `net.Socket`, `zlib` streams                    |
+| `Transform` | Duplex that modifies data  | `zlib.createGzip()`, custom parsers             |
 
 ## pipeline() — The Only Way to Compose Streams
 
@@ -41,6 +41,7 @@ await pipeline(
 ### Why Not `.pipe()`
 
 `.pipe()` does not:
+
 - Propagate errors from source to destination
 - Clean up streams on error (causes resource leaks)
 - Return a promise
@@ -55,13 +56,12 @@ await pipeline(readStream, gzip, writeStream);
 
 ## Backpressure
 
-Backpressure occurs when a writable stream can't consume data as fast as the readable
-produces it. Ignoring backpressure causes unbounded memory growth.
+Backpressure occurs when a writable stream can't consume data as fast as the readable produces it. Ignoring backpressure
+causes unbounded memory growth.
 
 ### How It Works
 
-1. `writable.write(chunk)` returns `false` when the internal buffer exceeds
-   `highWaterMark`
+1. `writable.write(chunk)` returns `false` when the internal buffer exceeds `highWaterMark`
 2. The producer must stop writing and wait for the `'drain'` event
 3. `pipeline()` handles this automatically
 
@@ -84,6 +84,7 @@ async function writeData(writable, chunks) {
 ### `highWaterMark`
 
 Buffer threshold in bytes (or objects in object mode). Defaults:
+
 - 16 KiB for byte streams
 - 16 objects for object mode streams
 
@@ -181,8 +182,7 @@ for await (const chunk of stream) {
 }
 ```
 
-This is the simplest way to consume a readable stream. Backpressure is handled
-automatically.
+This is the simplest way to consume a readable stream. Backpressure is handled automatically.
 
 ## Common Patterns
 
@@ -242,18 +242,19 @@ for await (const line of rl) {
 
 ## Error Handling in Streams
 
-- **Always handle `'error'` events** on streams not managed by `pipeline()`.
-  An unhandled `'error'` event on a stream crashes the process.
+- **Always handle `'error'` events** on streams not managed by `pipeline()`. An unhandled `'error'` event on a stream
+  crashes the process.
 
-- **`pipeline()` handles errors automatically** — cleans up all streams and rejects
-  the promise.
+- **`pipeline()` handles errors automatically** — cleans up all streams and rejects the promise.
 
 - **Destroy streams explicitly** when you need to abort:
+
   ```js
   stream.destroy(new Error('aborted'));
   ```
 
 - **Never ignore the `'error'` event** on EventEmitters:
+
   ```js
   // BAD — crashes process on error
   const stream = createReadStream('maybe-missing.txt');

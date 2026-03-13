@@ -2,14 +2,12 @@
 
 ## Interfaces
 
-All interface methods must be public. Interfaces share a namespace with classes, traits,
-and enums.
+All interface methods must be public. Interfaces share a namespace with classes, traits, and enums.
 
 - Interfaces can extend multiple interfaces: `interface C extends A, B {}`
 - As of 8.4, interfaces can declare property requirements with `get`/`set` hooks
 - Interface constants exist and are overridable since 8.1
-- Avoid constructors in interfaces — they reduce flexibility and are not enforced by
-  inheritance rules
+- Avoid constructors in interfaces — they reduce flexibility and are not enforced by inheritance rules
 
 ```php
 interface Renderable
@@ -50,8 +48,8 @@ Traits provide horizontal code reuse. They cannot be instantiated directly.
 - The `final` modifier can be applied when using a trait method (8.3+)
 - Traits can declare abstract methods, constants, and properties
 
-Prefer interfaces over traits for defining contracts. Use traits for implementation
-sharing that does not fit a class hierarchy.
+Prefer interfaces over traits for defining contracts. Use traits for implementation sharing that does not fit a class
+hierarchy.
 
 ## Readonly Properties (8.1+)
 
@@ -74,8 +72,7 @@ class Money
 
 ## Readonly Classes (8.2+)
 
-All declared properties of a `readonly` class are implicitly readonly. Dynamic properties
-are forbidden.
+All declared properties of a `readonly` class are implicitly readonly. Dynamic properties are forbidden.
 
 ```php
 readonly class Point
@@ -89,8 +86,7 @@ readonly class Point
 
 ## Property Hooks (8.4+)
 
-Attach `get` and `set` logic directly to properties, replacing manual getter/setter
-boilerplate.
+Attach `get` and `set` logic directly to properties, replacing manual getter/setter boilerplate.
 
 ```php
 class Temperature
@@ -151,8 +147,8 @@ $proxy = $reflector->newLazyGhost(function (HeavyService $ghost): void {
 // $proxy is now a HeavyService — initialization runs on first access
 ```
 
-Two strategies: `newLazyGhost()` (initializer fills the object in place) and
-`newLazyProxy()` (initializer returns a fully initialized instance).
+Two strategies: `newLazyGhost()` (initializer fills the object in place) and `newLazyProxy()` (initializer returns a
+fully initialized instance).
 
 ## Constructor Promotion
 
@@ -179,8 +175,8 @@ PHP 8.5 makes `clone` a function and supports property reassignment during cloni
 $updated = clone($original, ['name' => 'New Name']);
 ```
 
-This is especially useful for readonly/value objects where properties cannot normally be
-reassigned after initialization.
+This is especially useful for readonly/value objects where properties cannot normally be reassigned after
+initialization.
 
 ## Enumerations (8.1+)
 
@@ -234,8 +230,8 @@ $status = Status::tryFrom('unknown');    // null
 
 ## The #[Override] Attribute (8.3+)
 
-Marks a method (or property in 8.5+) as intentionally overriding a parent/interface member.
-Compilation fails if no parent declaration exists.
+Marks a method (or property in 8.5+) as intentionally overriding a parent/interface member. Compilation fails if no
+parent declaration exists.
 
 ```php
 class Child extends Parent

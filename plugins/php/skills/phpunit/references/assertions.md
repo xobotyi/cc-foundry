@@ -1,12 +1,12 @@
 # Assertions Reference
 
-PHPUnit assertions are declared static on `PHPUnit\Framework\Assert`, inherited by `TestCase`.
-Invoke as `$this->assertX()`, `self::assertX()`, or the global wrapper `assertX()`.
+PHPUnit assertions are declared static on `PHPUnit\Framework\Assert`, inherited by `TestCase`. Invoke as
+`$this->assertX()`, `self::assertX()`, or the global wrapper `assertX()`.
 
 ## Identity (Strict `===`)
 
-- `assertSame(mixed $expected, mixed $actual[, string $message])` — type + value match;
-  for objects, checks same reference
+- `assertSame(mixed $expected, mixed $actual[, string $message])` — type + value match; for objects, checks same
+  reference
 - `assertNotSame(mixed $expected, mixed $actual[, string $message])`
 
 ## Equality (Loose `==`)
@@ -15,10 +15,9 @@ Invoke as `$this->assertX()`, `self::assertX()`, or the global wrapper `assertX(
 - `assertNotEquals(mixed $expected, mixed $actual[, string $message])`
 - `assertEqualsCanonicalizing(...)` — ignores element order in arrays
 - `assertEqualsIgnoringCase(...)` — case-insensitive string comparison
-- `assertEqualsWithDelta(float $expected, float $actual, float $delta[, string $message])`
-  — floating-point tolerance
-- `assertObjectEquals(object $expected, object $actual, string $method[, string $message])`
-  — calls `$actual->$method($expected)`, asserts it returns `true`
+- `assertEqualsWithDelta(float $expected, float $actual, float $delta[, string $message])` — floating-point tolerance
+- `assertObjectEquals(object $expected, object $actual, string $method[, string $message])` — calls
+  `$actual->$method($expected)`, asserts it returns `true`
 
 ## Boolean
 
@@ -49,10 +48,9 @@ Invoke as `$this->assertX()`, `self::assertX()`, or the global wrapper `assertX(
 - `assertStringNotContainsString(...)` / `assertStringNotContainsStringIgnoringCase(...)`
 - `assertMatchesRegularExpression(string $pattern, string $string[, string $message])`
 - `assertDoesNotMatchRegularExpression(...)`
-- `assertStringMatchesFormat(string $format, string $string[, string $message])`
-  — format placeholders: `%e` (dir sep), `%s` (string), `%S` (optional string),
-  `%a` (anything), `%w` (whitespace), `%i` (integer), `%d` (unsigned int),
-  `%x` (hex), `%f` (float), `%c` (single char)
+- `assertStringMatchesFormat(string $format, string $string[, string $message])` — format placeholders: `%e` (dir sep),
+  `%s` (string), `%S` (optional string), `%a` (anything), `%w` (whitespace), `%i` (integer), `%d` (unsigned int), `%x`
+  (hex), `%f` (float), `%c` (single char)
 - `assertStringEqualsFile(string $expectedFile, string $actualString[, string $message])`
 
 ## Array / Iterable
@@ -67,11 +65,10 @@ Invoke as `$this->assertX()`, `self::assertX()`, or the global wrapper `assertX(
 - `assertNotCount(...)`
 - `assertSameSize(Countable|iterable $expected, Countable|iterable $actual[, string $message])`
 - `assertEmpty(mixed $actual[, string $message])` / `assertNotEmpty(...)`
-- `assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(array $expected, array $actual,
-  array $keysToBeConsidered[, string $message])` — compare arrays considering only
-  specified keys
-- `assertArrayIsIdenticalToArrayIgnoringListOfKeys(array $expected, array $actual,
-  array $keysToBeIgnored[, string $message])` — compare arrays ignoring specified keys
+- `assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(array $expected, array $actual, array $keysToBeConsidered[, string $message])`
+  — compare arrays considering only specified keys
+- `assertArrayIsIdenticalToArrayIgnoringListOfKeys(array $expected, array $actual, array $keysToBeIgnored[, string $message])`
+  — compare arrays ignoring specified keys
 - `assertArrayIsEqualToArrayOnlyConsideringListOfKeys(...)`
 - `assertArrayIsEqualToArrayIgnoringListOfKeys(...)`
 
@@ -128,9 +125,8 @@ $this->assertThat($value, $this->logicalAnd(
 ));
 ```
 
-Logical combinators: `logicalAnd(...)`, `logicalOr(...)`, `logicalNot(Constraint)`,
-`logicalXor(...)`.
+Logical combinators: `logicalAnd(...)`, `logicalOr(...)`, `logicalNot(Constraint)`, `logicalXor(...)`.
 
-Built-in constraints: `isTrue()`, `isFalse()`, `isNull()`, `isEmpty()`, `isInstanceOf()`,
-`equalTo()`, `identicalTo()`, `greaterThan()`, `lessThan()`, `matchesRegularExpression()`,
-`stringContains()`, `arrayHasKey()`, `containsIdentical()`, `callback(callable)`.
+Built-in constraints: `isTrue()`, `isFalse()`, `isNull()`, `isEmpty()`, `isInstanceOf()`, `equalTo()`, `identicalTo()`,
+`greaterThan()`, `lessThan()`, `matchesRegularExpression()`, `stringContains()`, `arrayHasKey()`, `containsIdentical()`,
+`callback(callable)`.

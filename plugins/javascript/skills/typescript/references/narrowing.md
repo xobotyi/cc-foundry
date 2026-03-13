@@ -1,7 +1,7 @@
 # Narrowing and Type Guards
 
-Narrowing is TypeScript's ability to refine types within conditional branches.
-Write code that narrows naturally — the compiler follows your control flow.
+Narrowing is TypeScript's ability to refine types within conditional branches. Write code that narrows naturally — the
+compiler follows your control flow.
 
 ## Built-in Narrowing Constructs
 
@@ -18,8 +18,7 @@ function process(value: string | number) {
 }
 ```
 
-`typeof` returns: `"string"`, `"number"`, `"bigint"`, `"boolean"`, `"symbol"`,
-`"undefined"`, `"object"`, `"function"`.
+`typeof` returns: `"string"`, `"number"`, `"bigint"`, `"boolean"`, `"symbol"`, `"undefined"`, `"object"`, `"function"`.
 
 **Pitfall:** `typeof null === "object"`. Always check for `null` separately.
 
@@ -49,8 +48,8 @@ function move(animal: Fish | Bird) {
 }
 ```
 
-**Note:** Optional properties appear in both branches. If `Human` has `swim?`,
-`"swim" in animal` will narrow to `Fish | Human`, not just `Fish`.
+**Note:** Optional properties appear in both branches. If `Human` has `swim?`, `"swim" in animal` will narrow to
+`Fish | Human`, not just `Fish`.
 
 ### Equality Narrowing
 
@@ -85,8 +84,8 @@ function printAll(strs: string | string[] | null) {
 }
 ```
 
-**Pitfall:** Truthiness checks fail on `""`, `0`, `NaN`, `false`. Prefer explicit
-null checks over truthiness when these values are valid.
+**Pitfall:** Truthiness checks fail on `""`, `0`, `NaN`, `false`. Prefer explicit null checks over truthiness when these
+values are valid.
 
 ## Discriminated Unions
 
@@ -117,8 +116,7 @@ function getArea(shape: Shape): number {
 
 ### Exhaustiveness Checking
 
-Add a `default` branch that assigns to `never` — the compiler will error if you
-add a new variant without handling it:
+Add a `default` branch that assigns to `never` — the compiler will error if you add a new variant without handling it:
 
 ```ts
 function getArea(shape: Shape): number {
@@ -134,8 +132,7 @@ function getArea(shape: Shape): number {
 }
 ```
 
-If you add `Triangle` to `Shape` without a case, TypeScript errors:
-`Type 'Triangle' is not assignable to type 'never'`.
+If you add `Triangle` to `Shape` without a case, TypeScript errors: `Type 'Triangle' is not assignable to type 'never'`.
 
 ## User-Defined Type Guards (Type Predicates)
 

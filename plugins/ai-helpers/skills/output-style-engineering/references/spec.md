@@ -20,10 +20,10 @@ keep-coding-instructions: false
 
 ## Storage Locations
 
-| Location | Path | Scope |
-|----------|------|-------|
-| User-level | `~/.claude/output-styles/*.md` | All projects for this user |
-| Project-level | `.claude/output-styles/*.md` | Anyone in this repo |
+| Location      | Path                           | Scope                      |
+| ------------- | ------------------------------ | -------------------------- |
+| User-level    | `~/.claude/output-styles/*.md` | All projects for this user |
+| Project-level | `.claude/output-styles/*.md`   | Anyone in this repo        |
 
 **Resolution:** Project-level styles with same name override user-level.
 
@@ -61,12 +61,14 @@ description: >-
 - **Purpose:** Whether to retain Claude Code's coding-specific instructions
 
 When `false` (default):
+
 - Removes software engineering specific guidance
 - Removes test verification instructions
 - Removes code quality checks
 - Keeps tool access (Read, Write, Bash, etc.)
 
 When `true`:
+
 - Retains all coding instructions
 - Style adds to rather than replaces coding behavior
 - Use for coding-focused personality adjustments
@@ -104,8 +106,7 @@ When a custom output style is active:
 4. Style body content appended
 5. Periodic reminders injected during conversation
 
-**Important:** Output styles REPLACE rather than augment. To augment,
-use `--append-system-prompt` or CLAUDE.md instead.
+**Important:** Output styles REPLACE rather than augment. To augment, use `--append-system-prompt` or CLAUDE.md instead.
 
 ## Activation Methods
 
@@ -128,6 +129,7 @@ Edit `.claude/settings.local.json`:
 ```
 
 Or at different settings levels:
+
 - `~/.claude/settings.json` (user global)
 - `.claude/settings.json` (project shared)
 - `.claude/settings.local.json` (project local, gitignored)
@@ -150,19 +152,17 @@ Or at different settings levels:
 
 ## Security Note
 
-Output styles replace the system prompt. A maliciously crafted style
-could theoretically attempt to weaken Claude's safeguards. When
-reviewing third-party styles, verify they don't include instructions
-to ignore safety guidelines or bypass restrictions.
+Output styles replace the system prompt. A maliciously crafted style could theoretically attempt to weaken Claude's
+safeguards. When reviewing third-party styles, verify they don't include instructions to ignore safety guidelines or
+bypass restrictions.
 
 ## Comparison to Related Files
 
-| File | Purpose | Loaded When |
-|------|---------|-------------|
+| File         | Purpose                   | Loaded When     |
+| ------------ | ------------------------- | --------------- |
 | Output Style | System prompt replacement | Style activated |
-| CLAUDE.md | Project context | Session starts |
-| Custom Agent | Delegated task handler | Agent invoked |
-| Skill | Task-specific workflow | Skill triggered |
+| CLAUDE.md    | Project context           | Session starts  |
+| Custom Agent | Delegated task handler    | Agent invoked   |
+| Skill        | Task-specific workflow    | Skill triggered |
 
-**Key difference:** Output styles are the ONLY mechanism that replaces
-the main agent's core system prompt.
+**Key difference:** Output styles are the ONLY mechanism that replaces the main agent's core system prompt.

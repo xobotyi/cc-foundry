@@ -1,7 +1,6 @@
 # Fixture Patterns
 
-Extended patterns and lifecycle details for pytest fixtures, distilled from official
-pytest documentation.
+Extended patterns and lifecycle details for pytest fixtures, distilled from official pytest documentation.
 
 ## Fixture Lifecycle
 
@@ -12,10 +11,9 @@ Fixtures execute in dependency order. When test `test_foo(db, user)` runs:
 3. Within the same scope, fixtures initialize in dependency order
 4. After the test completes, teardown runs in reverse order
 
-Fixtures are cached within their scope. If two tests in the same module both request a
-module-scoped fixture, the fixture executes once and both tests receive the same instance.
-Parametrized fixtures are the exception — pytest caches only one instance at a time and
-may invoke a fixture more than once in a given scope.
+Fixtures are cached within their scope. If two tests in the same module both request a module-scoped fixture, the
+fixture executes once and both tests receive the same instance. Parametrized fixtures are the exception — pytest caches
+only one instance at a time and may invoke a fixture more than once in a given scope.
 
 ## Yield Fixtures (Recommended)
 
@@ -29,13 +27,12 @@ def managed_resource():
     resource.release()
 ```
 
-Teardown code after `yield` runs unconditionally — even when the test fails or raises
-an exception. This makes yield fixtures more reliable than try/finally in test bodies.
+Teardown code after `yield` runs unconditionally — even when the test fails or raises an exception. This makes yield
+fixtures more reliable than try/finally in test bodies.
 
 ### Teardown Order
 
-Teardown runs in reverse fixture initialization order. For a test requesting
-`(fix_a, fix_b)`, `fix_b` tears down first:
+Teardown runs in reverse fixture initialization order. For a test requesting `(fix_a, fix_b)`, `fix_b` tears down first:
 
 ```python
 @pytest.fixture
@@ -51,8 +48,8 @@ def fix_b():
 
 ### Error Handling in Yield Fixtures
 
-- If a yield fixture raises **before** `yield`, its teardown code does not run, but all
-  previously-initialized fixtures still tear down normally.
+- If a yield fixture raises **before** `yield`, its teardown code does not run, but all previously-initialized fixtures
+  still tear down normally.
 - If teardown itself can raise, wrap it to avoid masking the original test failure:
 
 ```python
@@ -69,8 +66,8 @@ def db_session():
 
 ### Safe Fixture Structure
 
-Each fixture should perform **one state-changing action** with its corresponding teardown.
-Avoid monolithic fixtures that create multiple resources and try to clean them all up:
+Each fixture should perform **one state-changing action** with its corresponding teardown. Avoid monolithic fixtures
+that create multiple resources and try to clean them all up:
 
 ```python
 # BAD — if create_user raises, browser never closes
@@ -96,14 +93,13 @@ def user(admin_client):
     admin_client.delete_user(u)
 ```
 
-If `user` raises during setup, `browser` still tears down correctly because each fixture
-manages its own lifecycle independently.
+If `user` raises during setup, `browser` still tears down correctly because each fixture manages its own lifecycle
+independently.
 
 ## addfinalizer (Alternative to Yield)
 
-`request.addfinalizer` registers teardown callbacks that run in LIFO order. Unlike yield,
-finalizers execute even if the fixture raises after registration — useful when setup has
-multiple steps that each need independent cleanup:
+`request.addfinalizer` registers teardown callbacks that run in LIFO order. Unlike yield, finalizers execute even if the
+fixture raises after registration — useful when setup has multiple steps that each need independent cleanup:
 
 ```python
 @pytest.fixture
@@ -117,8 +113,8 @@ def complex_resource(request):
     return db
 ```
 
-**Prefer `yield`** for straightforward setup/teardown. Use `addfinalizer` only when you
-need multiple independent cleanup steps where later steps might fail during setup.
+**Prefer `yield`** for straightforward setup/teardown. Use `addfinalizer` only when you need multiple independent
+cleanup steps where later steps might fail during setup.
 
 ## Fixture Factories
 
@@ -147,6 +143,7 @@ def make_order():
 ```
 
 **When to use factories vs direct fixtures:**
+
 - **Direct fixture** — test needs exactly one instance with standard config
 - **Factory** — test needs multiple instances or custom configuration per test
 
@@ -163,8 +160,8 @@ def db_backend(request):
     db.teardown()
 ```
 
-Every test using `db_backend` runs twice — once per parameter value. This is powerful for
-testing the same behavior against multiple backends.
+Every test using `db_backend` runs twice — once per parameter value. This is powerful for testing the same behavior
+against multiple backends.
 
 ### IDs for Parametrized Fixtures
 
@@ -178,8 +175,8 @@ def db_backend(request):
     ...
 ```
 
-IDs can also be a callable that receives the param value and returns a string (or `None`
-to fall back to auto-generated ID):
+IDs can also be a callable that receives the param value and returns a string (or `None` to fall back to auto-generated
+ID):
 
 ```python
 @pytest.fixture(params=[0, 1, 2], ids=lambda val: f"level-{val}")
@@ -201,9 +198,8 @@ def data_set(request):
 
 ### Automatic Test Grouping
 
-pytest minimizes active fixture instances. With parametrized fixtures, all tests run with
-the first parameter value, then finalizers execute before the next value is created. This
-keeps resource usage predictable and avoids interleaving.
+pytest minimizes active fixture instances. With parametrized fixtures, all tests run with the first parameter value,
+then finalizers execute before the next value is created. This keeps resource usage predictable and avoids interleaving.
 
 ## Dynamic Scope
 
@@ -220,8 +216,8 @@ def docker_container():
     yield spawn_container()
 ```
 
-The callable receives `fixture_name` (str) and `config` (pytest config object), executes
-once during fixture definition, and must return a valid scope string.
+The callable receives `fixture_name` (str) and `config` (pytest config object), executes once during fixture definition,
+and must return a valid scope string.
 
 ## Request Object
 
@@ -274,6 +270,7 @@ def clean_db(database):
 ```
 
 **Rules:**
+
 - A fixture can depend on same-scope or broader-scope fixtures
 - A fixture CANNOT depend on narrower-scope fixtures (session cannot use function-scoped)
 - pytest raises `ScopeMismatch` if this rule is violated
@@ -327,5 +324,5 @@ def authenticated_client(async_client, auth_token):
     return async_client
 ```
 
-Each fixture is independently testable and reusable. Prefer composition over monolithic
-fixtures that set up everything at once.
+Each fixture is independently testable and reusable. Prefer composition over monolithic fixtures that set up everything
+at once.

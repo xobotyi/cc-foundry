@@ -1,22 +1,20 @@
 # Responsive Design
 
-Modern responsive CSS: fluid sizing, container queries, media queries,
-and logical properties.
+Modern responsive CSS: fluid sizing, container queries, media queries, and logical properties.
 
 ## Responsive Hierarchy
 
 Use the right tool for each level of responsiveness:
 
-| Level | Tool | When |
-|-------|------|------|
-| Content-driven | Flexbox wrapping, `min()`/`max()`/`clamp()` | Always -- baseline |
-| Container-driven | Container queries, `cqi`/`cqw` units | Component adapts to parent size |
-| Viewport-driven | Media queries, `vw`/`vh`/`dvh` units | Page-level layout changes |
-| User preference | `prefers-*` media queries | Color scheme, motion, contrast |
+| Level            | Tool                                        | When                            |
+| ---------------- | ------------------------------------------- | ------------------------------- |
+| Content-driven   | Flexbox wrapping, `min()`/`max()`/`clamp()` | Always -- baseline              |
+| Container-driven | Container queries, `cqi`/`cqw` units        | Component adapts to parent size |
+| Viewport-driven  | Media queries, `vw`/`vh`/`dvh` units        | Page-level layout changes       |
+| User preference  | `prefers-*` media queries                   | Color scheme, motion, contrast  |
 
-**Design from the inside out:** Start with intrinsic sizing, add container
-queries for component-level adaptation, use media queries only for
-viewport-dependent elements (navigation, full-width sections).
+**Design from the inside out:** Start with intrinsic sizing, add container queries for component-level adaptation, use
+media queries only for viewport-dependent elements (navigation, full-width sections).
 
 ## Fluid Sizing with `clamp()`
 
@@ -109,8 +107,8 @@ Use range syntax (widely supported):
 }
 ```
 
-Avoid the pattern of multiple `max-width` values at different breakpoints.
-It wastes space on intermediate viewport sizes.
+Avoid the pattern of multiple `max-width` values at different breakpoints. It wastes space on intermediate viewport
+sizes.
 
 ### Height Queries
 
@@ -215,16 +213,16 @@ text-align: start;
 
 ### Mapping
 
-| Physical | Logical (horizontal writing mode) |
-|----------|-----------------------------------|
-| `left`/`right` | `inline-start`/`inline-end` |
-| `top`/`bottom` | `block-start`/`block-end` |
-| `width` | `inline-size` |
-| `height` | `block-size` |
-| `margin-left` | `margin-inline-start` |
-| `padding-top` | `padding-block-start` |
-| `border-right` | `border-inline-end` |
-| `text-align: left` | `text-align: start` |
+| Physical           | Logical (horizontal writing mode) |
+| ------------------ | --------------------------------- |
+| `left`/`right`     | `inline-start`/`inline-end`       |
+| `top`/`bottom`     | `block-start`/`block-end`         |
+| `width`            | `inline-size`                     |
+| `height`           | `block-size`                      |
+| `margin-left`      | `margin-inline-start`             |
+| `padding-top`      | `padding-block-start`             |
+| `border-right`     | `border-inline-end`               |
+| `text-align: left` | `text-align: start`               |
 
 ### Shorthand
 
@@ -236,11 +234,13 @@ padding-block: 1rem;        /* same for both */
 ```
 
 **Use logical properties for:**
+
 - Margins, padding, borders (layout-sensitive)
 - Text alignment
 - Positioning offsets (`inset-inline-start` instead of `left`)
 
 **Physical properties are fine for:**
+
 - Visual effects not affected by writing direction (box-shadow offsets)
 - Explicit design decisions that shouldn't flip
 
@@ -263,13 +263,13 @@ img {
 
 ## Anti-Patterns
 
-| Don't | Do |
-|-------|------|
-| Fixed device breakpoints (`768px`, `1024px`) | Content-driven breakpoints in `rem` |
-| `px` for breakpoints | `rem` (respects user font size) |
-| Multiple `max-width` ladder | `width: min(100% - 2rem, 75rem)` |
-| `vw` units without clamp | `clamp(min, preferred, max)` |
-| Font size in `vw` only (blows up on large screens) | `clamp()` with `rem` + `vw` |
+| Don't                                              | Do                                   |
+| -------------------------------------------------- | ------------------------------------ |
+| Fixed device breakpoints (`768px`, `1024px`)       | Content-driven breakpoints in `rem`  |
+| `px` for breakpoints                               | `rem` (respects user font size)      |
+| Multiple `max-width` ladder                        | `width: min(100% - 2rem, 75rem)`     |
+| `vw` units without clamp                           | `clamp(min, preferred, max)`         |
+| Font size in `vw` only (blows up on large screens) | `clamp()` with `rem` + `vw`          |
 | Hiding content with `display: none` at breakpoints | Restructure layout with flexbox/grid |
-| Physical properties for layout | Logical properties |
-| `@media (hover: hover)` without fallback | Progressive enhancement |
+| Physical properties for layout                     | Logical properties                   |
+| `@media (hover: hover)` without fallback           | Progressive enhancement              |

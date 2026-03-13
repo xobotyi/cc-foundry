@@ -5,6 +5,7 @@ Framework for assessing subagent quality and effectiveness.
 ---
 
 ## Table of Contents
+
 - [Evaluation Dimensions](#evaluation-dimensions)
 - [Evaluation Checklist](#evaluation-checklist)
 - [Testing Protocol](#testing-protocol)
@@ -21,19 +22,17 @@ Framework for assessing subagent quality and effectiveness.
 Does Claude delegate to this agent at the right times?
 
 **Test scenarios:**
+
 - Direct invocation: "Use the [agent] to [task]"
 - Implicit match: Describe a task that should trigger delegation
 - Non-match: Describe similar but different tasks (should NOT trigger)
 
-**Scoring:**
-| Outcome | Score | Action |
-|---------|-------|--------|
-| Delegates correctly when should | Good | — |
-| Delegates when shouldn't | Over-triggering | Narrow description |
-| Doesn't delegate when should | Under-triggering | Broaden description |
-| Never delegates | Broken | Check name/description format |
+**Scoring:** | Outcome | Score | Action | |---------|-------|--------| | Delegates correctly when should | Good | — | |
+Delegates when shouldn't | Over-triggering | Narrow description | | Doesn't delegate when should | Under-triggering |
+Broaden description | | Never delegates | Broken | Check name/description format |
 
 **Common issues:**
+
 - Description too vague → over-triggers on unrelated tasks
 - Description too specific → under-triggers on valid tasks
 - Typo in name → never found
@@ -43,30 +42,29 @@ Does Claude delegate to this agent at the right times?
 Does the agent accomplish its intended purpose?
 
 **Evaluate:**
+
 - Does it follow the specified workflow?
 - Does it produce the expected output format?
 - Does it handle edge cases?
 - Does it stay within scope?
 
-**Test matrix:**
-| Input Type | Expected Behavior |
-|------------|-------------------|
-| Happy path | Complete successfully |
-| Edge case | Handle gracefully |
-| Invalid input | Fail clearly with explanation |
-| Out of scope | Recognize and decline |
+**Test matrix:** | Input Type | Expected Behavior | |------------|-------------------| | Happy path | Complete
+successfully | | Edge case | Handle gracefully | | Invalid input | Fail clearly with explanation | | Out of scope |
+Recognize and decline |
 
 ### 3. Output Quality
 
 Is the agent's output useful and actionable?
 
 **Criteria:**
+
 - **Clarity:** Is the output easy to understand?
 - **Completeness:** Does it include all necessary information?
 - **Actionability:** Can the user/parent agent act on it?
 - **Format compliance:** Does it match specified structure?
 
 **Red flags:**
+
 - Raw data dumps without synthesis
 - Missing key information
 - Inconsistent formatting
@@ -77,16 +75,19 @@ Is the agent's output useful and actionable?
 Does the agent use context wisely?
 
 **Measure:**
+
 - How much context does it consume?
 - Does it return concise summaries?
 - Does it avoid unnecessary tool calls?
 
 **Good patterns:**
+
 - Returns synthesized findings, not raw search results
 - Uses parallel tool calls when possible
 - Stops when task is complete
 
 **Bad patterns:**
+
 - Reads entire codebase for simple lookup
 - Returns verbose output to parent
 - Continues working after task is done
@@ -96,36 +97,36 @@ Does the agent use context wisely?
 Does the agent use tools appropriately?
 
 **Check:**
+
 - Uses only granted tools
 - Doesn't attempt dangerous operations
 - Makes efficient use of tools
 - Handles tool errors gracefully
 
-**Scoring:**
-| Behavior | Assessment |
-|----------|------------|
-| Uses minimal necessary tools | Good |
-| Makes redundant tool calls | Inefficient |
-| Attempts blocked tools | Over-scoped |
-| Ignores available useful tools | Under-utilizing |
+**Scoring:** | Behavior | Assessment | |----------|------------| | Uses minimal necessary tools | Good | | Makes
+redundant tool calls | Inefficient | | Attempts blocked tools | Over-scoped | | Ignores available useful tools |
+Under-utilizing |
 
 ## Evaluation Checklist
 
 Run through this checklist for each subagent:
 
 ### Description Quality
+
 - [ ] Clearly states what the agent does
 - [ ] Clearly states when to use it
 - [ ] No execution instructions in description
 - [ ] Under 1024 characters
 
 ### Trigger Behavior
+
 - [ ] Delegates on direct invocation
 - [ ] Delegates on implicit matching tasks
 - [ ] Does NOT delegate on unrelated tasks
 - [ ] Delegation speed is acceptable
 
 ### Task Execution
+
 - [ ] Follows specified workflow
 - [ ] Produces correct output format
 - [ ] Handles happy path correctly
@@ -133,12 +134,14 @@ Run through this checklist for each subagent:
 - [ ] Recognizes out-of-scope requests
 
 ### Output Quality
+
 - [ ] Clear and understandable
 - [ ] Contains necessary information
 - [ ] Actionable by recipient
 - [ ] Consistent format across runs
 
 ### Resource Usage
+
 - [ ] Reasonable context consumption
 - [ ] Efficient tool usage
 - [ ] Concise return to parent
@@ -230,6 +233,7 @@ Use the code-reviewer-v2 to review the authentication module
 ```
 
 Compare:
+
 - Trigger accuracy
 - Output quality
 - Context usage
@@ -261,36 +265,35 @@ Run periodically to catch regressions.
 
 Rate each dimension 1-5:
 
-| Dimension | Score | Weight |
-|-----------|-------|--------|
-| Trigger Accuracy | ? | 25% |
-| Task Completion | ? | 30% |
-| Output Quality | ? | 25% |
-| Context Efficiency | ? | 10% |
-| Tool Usage | ? | 10% |
+| Dimension          | Score | Weight |
+| ------------------ | ----- | ------ |
+| Trigger Accuracy   | ?     | 25%    |
+| Task Completion    | ?     | 30%    |
+| Output Quality     | ?     | 25%    |
+| Context Efficiency | ?     | 10%    |
+| Tool Usage         | ?     | 10%    |
 
 **Overall = weighted average**
 
 **Why these weights?**
-- Task Completion (30%) is highest — an agent that doesn't complete its
-  task fails regardless of other qualities
-- Trigger Accuracy and Output Quality (25% each) — wrong triggers waste
-  time; poor output requires rework
-- Context Efficiency and Tool Usage (10% each) — important for cost and
-  speed, but secondary to correctness
 
-| Score | Rating | Action |
-|-------|--------|--------|
-| 4.5+ | Excellent | Monitor only |
-| 3.5-4.4 | Good | Minor improvements |
-| 2.5-3.4 | Fair | Significant revision needed |
-| <2.5 | Poor | Redesign from scratch |
+- Task Completion (30%) is highest — an agent that doesn't complete its task fails regardless of other qualities
+- Trigger Accuracy and Output Quality (25% each) — wrong triggers waste time; poor output requires rework
+- Context Efficiency and Tool Usage (10% each) — important for cost and speed, but secondary to correctness
+
+| Score   | Rating    | Action                      |
+| ------- | --------- | --------------------------- |
+| 4.5+    | Excellent | Monitor only                |
+| 3.5-4.4 | Good      | Minor improvements          |
+| 2.5-3.4 | Fair      | Significant revision needed |
+| <2.5    | Poor      | Redesign from scratch       |
 
 ## Continuous Monitoring
 
 ### Session Review
 
 After using an agent, note:
+
 - Did it trigger correctly?
 - Was output useful?
 - Any unexpected behavior?
@@ -298,6 +301,7 @@ After using an agent, note:
 ### Periodic Audit
 
 Monthly review:
+
 - Run test suite
 - Check for regressions
 - Update for new requirements

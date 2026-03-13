@@ -1,29 +1,26 @@
 # Module System and Imports
 
-Extended patterns for Python's import system, module organization, and resolution
-mechanics, distilled from the official Python import system documentation.
+Extended patterns for Python's import system, module organization, and resolution mechanics, distilled from the official
+Python import system documentation.
 
 ## Import Resolution Order
 
 When Python encounters `import foo`, the import machinery follows this sequence:
 
-1. **`sys.modules` cache** — previously imported modules return immediately. The cache
-   includes intermediate paths: importing `foo.bar.baz` creates entries for `foo`,
-   `foo.bar`, and `foo.bar.baz`.
-2. **`sys.meta_path` finders** — queried in order. Python's default meta path has three
-   finders: built-in modules, frozen modules, and the path-based finder.
-3. **`sys.path` entries** (via path-based finder) — directories and zip files searched
-   left to right:
+1. **`sys.modules` cache** — previously imported modules return immediately. The cache includes intermediate paths:
+   importing `foo.bar.baz` creates entries for `foo`, `foo.bar`, and `foo.bar.baz`.
+2. **`sys.meta_path` finders** — queried in order. Python's default meta path has three finders: built-in modules,
+   frozen modules, and the path-based finder.
+3. **`sys.path` entries** (via path-based finder) — directories and zip files searched left to right:
    - Script directory (or current directory for `python -m`)
    - `PYTHONPATH` environment variable entries
    - Site-packages directories (where pip/uv install packages)
 
 If no finder returns a module spec, `ModuleNotFoundError` is raised.
 
-**Cache behavior:** `sys.modules` is writable. Deleting a key invalidates the cache
-entry, causing Python to search anew on next import. Setting a key to `None` forces
-`ModuleNotFoundError` on next import. `importlib.reload()` reuses the same module
-object and re-executes its code.
+**Cache behavior:** `sys.modules` is writable. Deleting a key invalidates the cache entry, causing Python to search anew
+on next import. Setting a key to `None` forces `ModuleNotFoundError` on next import. `importlib.reload()` reuses the
+same module object and re-executes its code.
 
 ## Import Styles
 
@@ -58,10 +55,12 @@ from ..auth.tokens import create_token
 ```
 
 **When to use relative imports:**
+
 - Tightly coupled modules within the same package
 - Internal package structure that might be reorganized
 
 **When to use absolute imports:**
+
 - Cross-package imports
 - When the import path documents the dependency clearly
 - In scripts and entry points
@@ -72,8 +71,8 @@ Python has two types of packages:
 
 ### Regular Packages
 
-A directory containing `__init__.py`. When imported, `__init__.py` is implicitly
-executed and its objects bound to names in the package namespace.
+A directory containing `__init__.py`. When imported, `__init__.py` is implicitly executed and its objects bound to names
+in the package namespace.
 
 ```
 parent/
@@ -84,14 +83,13 @@ parent/
         __init__.py
 ```
 
-Importing `parent.one` executes both `parent/__init__.py` and
-`parent/one/__init__.py`.
+Importing `parent.one` executes both `parent/__init__.py` and `parent/one/__init__.py`.
 
 ### Namespace Packages (PEP 420)
 
-Directories without `__init__.py` — composite packages where portions may reside
-in different filesystem locations. Namespace packages use a custom iterable for
-`__path__` that performs a new search on each import attempt if `sys.path` changes.
+Directories without `__init__.py` — composite packages where portions may reside in different filesystem locations.
+Namespace packages use a custom iterable for `__path__` that performs a new search on each import attempt if `sys.path`
+changes.
 
 ```
 company/
@@ -104,10 +102,12 @@ company/
 Both `company.auth.tokens` and `company.billing.invoices` work without `__init__.py`.
 
 **Use namespace packages when:**
+
 - Multiple distributions contribute to the same top-level package
 - You want to split a large package across repositories
 
 **Use regular packages (`__init__.py`) when:**
+
 - Package is a single distribution
 - You need package-level initialization
 - You want to control the public API via `__all__`
@@ -124,9 +124,8 @@ from myapp.services import UserService  # imports services.py
 from myapp.models import User  # imports models.py — circular!
 ```
 
-The module is added to `sys.modules` before its code fully executes. This prevents
-infinite recursion but can cause `ImportError` if the requested name hasn't been
-defined yet when the circular import occurs.
+The module is added to `sys.modules` before its code fully executes. This prevents infinite recursion but can cause
+`ImportError` if the requested name hasn't been defined yet when the circular import occurs.
 
 ### Solutions (in preference order)
 
@@ -170,11 +169,10 @@ class UserService:
         ...
 ```
 
-In Python 3.14+ with lazy annotation evaluation, forward references resolve
-automatically, reducing the need for `TYPE_CHECKING` for annotation purposes.
-The guard remains useful to avoid importing a module's side effects at runtime.
+In Python 3.14+ with lazy annotation evaluation, forward references resolve automatically, reducing the need for
+`TYPE_CHECKING` for annotation purposes. The guard remains useful to avoid importing a module's side effects at runtime.
 
-## __all__ and Public API
+## **all** and Public API
 
 ```python
 # mypackage/__init__.py
@@ -228,6 +226,7 @@ if HAS_NUMPY:
 ## Import Side Effects
 
 Some imports execute code at module time. Rules:
+
 - Minimize module-level side effects — move initialization into functions
 - Side-effect imports (`import mypackage.setup`) must be documented with a comment
 - Never rely on import order for correctness — fragile and hard to debug

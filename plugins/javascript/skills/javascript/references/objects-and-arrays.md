@@ -71,15 +71,14 @@ if (Object.hasOwn(obj, "key")) { ... }
 
 ### Don't Mutate Prototypes
 
-Never extend built-in prototypes (`Array.prototype`, `Object.prototype`, etc.).
-Use utility functions or subclasses instead.
+Never extend built-in prototypes (`Array.prototype`, `Object.prototype`, etc.). Use utility functions or subclasses
+instead.
 
 ## Arrays
 
 ### Prefer Functional Methods
 
-Use `map`, `filter`, `reduce`, `find`, `some`, `every`, `flatMap` over
-manual loops for data transformation:
+Use `map`, `filter`, `reduce`, `find`, `some`, `every`, `flatMap` over manual loops for data transformation:
 
 ```js
 // Bad — imperative
@@ -96,8 +95,7 @@ const active = users.filter((u) => u.active);
 
 - **Always return** in `map`, `filter`, `reduce` callbacks.
 - Use `Array.from(arrayLike)` for array-like objects (not spread).
-- Use `Array.from(iterable, mapFn)` instead of `[...iterable].map(mapFn)` —
-  avoids an intermediate array.
+- Use `Array.from(iterable, mapFn)` instead of `[...iterable].map(mapFn)` — avoids an intermediate array.
 
 ### Spread for Copies
 
@@ -133,8 +131,7 @@ for (const item of items) {
 }
 ```
 
-Don't use `for...in` on arrays — it iterates string keys including inherited
-properties.
+Don't use `for...in` on arrays — it iterates string keys including inherited properties.
 
 ## Destructuring
 
@@ -225,8 +222,7 @@ class Dog extends Animal {
 
 ### Class Guidelines
 
-- **Prefer composition over inheritance.** Use inheritance only for true
-  "is-a" relationships.
+- **Prefer composition over inheritance.** Use inheritance only for true "is-a" relationships.
 - **Use `#private` fields** for encapsulation — not `_` convention.
 - **Methods can return `this`** for fluent/chainable APIs.
 - **No empty constructors.** If the constructor only calls `super()`, omit it.
@@ -234,8 +230,7 @@ class Dog extends Animal {
 
 ### When Not to Use Classes
 
-Don't force classes when plain functions and objects suffice. A class with one
-method is usually a function in disguise:
+Don't force classes when plain functions and objects suffice. A class with one method is usually a function in disguise:
 
 ```js
 // Unnecessary class
@@ -251,16 +246,16 @@ function validate(data) { return schema.parse(data); }
 
 ### Choosing the Right Loop
 
-| Need | Use |
-|------|-----|
-| Transform data → new array | `.map()` |
-| Filter items | `.filter()` |
-| Accumulate to single value | `.reduce()` |
-| Find first match | `.find()` / `.findIndex()` |
-| Check condition | `.some()` / `.every()` |
-| Side effects on each item | `for...of` |
-| Async sequential processing | `for...of` with `await` |
-| Object keys/values | `Object.entries()` + `for...of` |
+| Need                        | Use                             |
+| --------------------------- | ------------------------------- |
+| Transform data → new array  | `.map()`                        |
+| Filter items                | `.filter()`                     |
+| Accumulate to single value  | `.reduce()`                     |
+| Find first match            | `.find()` / `.findIndex()`      |
+| Check condition             | `.some()` / `.every()`          |
+| Side effects on each item   | `for...of`                      |
+| Async sequential processing | `for...of` with `await`         |
+| Object keys/values          | `Object.entries()` + `for...of` |
 
 ### Object Iteration
 
@@ -277,8 +272,8 @@ for (const value of Object.values(obj)) { ... }
 
 ### Map and Set
 
-Use `Map` for key-value collections where keys are not strings, or where
-insertion order matters. Use `Set` for unique value collections:
+Use `Map` for key-value collections where keys are not strings, or where insertion order matters. Use `Set` for unique
+value collections:
 
 ```js
 const cache = new Map();
@@ -288,8 +283,7 @@ const unique = new Set(items);
 const deduped = [...new Set(items)];
 ```
 
-Never use plain objects as maps when keys are user-provided — use `Map` to
-avoid prototype pollution.
+Never use plain objects as maps when keys are user-provided — use `Map` to avoid prototype pollution.
 
 ### Generators
 

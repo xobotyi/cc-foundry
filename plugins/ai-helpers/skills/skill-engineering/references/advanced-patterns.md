@@ -5,6 +5,7 @@
 ### When to Split
 
 Split into multiple files when:
+
 - SKILL.md exceeds 500 lines
 - Content applies only to specific scenarios
 - Detailed reference material needed occasionally
@@ -55,6 +56,7 @@ Claude reads referenced files only when needed.
 ### Script Design Principles
 
 **Handle errors explicitly:**
+
 ```python
 def process_file(path):
     try:
@@ -69,6 +71,7 @@ def process_file(path):
 ```
 
 **Don't punt to Claude:**
+
 ```python
 # Bad: Raises exception for Claude to handle
 def validate(data):
@@ -83,6 +86,7 @@ def validate(data):
 ```
 
 **Document constants:**
+
 ```python
 # Bad: Magic numbers
 TIMEOUT = 47
@@ -184,8 +188,7 @@ Use `!`command\`\` to inject shell output:
 - Recent commits: !`git log --oneline -5`
 ```
 
-The commands execute before Claude sees the skill, replacing placeholders
-with actual output.
+The commands execute before Claude sees the skill, replacing placeholders with actual output.
 
 ### Session Variables
 
@@ -222,22 +225,24 @@ Research $ARGUMENTS thoroughly:
 
 ### Available Agents
 
-| Agent | Best For |
-|-------|----------|
-| `Explore` | Read-only exploration, research |
-| `Plan` | Architecture design, implementation planning |
-| `general-purpose` | Complex multi-step tasks |
-| Custom | Define in `.claude/agents/` |
+| Agent             | Best For                                     |
+| ----------------- | -------------------------------------------- |
+| `Explore`         | Read-only exploration, research              |
+| `Plan`            | Architecture design, implementation planning |
+| `general-purpose` | Complex multi-step tasks                     |
+| Custom            | Define in `.claude/agents/`                  |
 
 ### When to Fork
 
 Fork when:
+
 - Task is computationally heavy
 - Need isolated context (won't pollute main conversation)
 - Want specific model for the task
 - Task is self-contained with clear output
 
 Don't fork when:
+
 - Need access to conversation history
 - Task builds on recent context
 - Simple task that doesn't need isolation
@@ -370,8 +375,8 @@ Open in browser to explore results.
 
 ## Verifiable Intermediate Outputs
 
-For complex, multi-step tasks where Claude makes many decisions,
-add a plan-validate-execute pattern to catch errors early.
+For complex, multi-step tasks where Claude makes many decisions, add a plan-validate-execute pattern to catch errors
+early.
 
 ### The Pattern
 
@@ -379,9 +384,8 @@ add a plan-validate-execute pattern to catch errors early.
 analyze → create plan file → validate plan → execute → verify
 ```
 
-Instead of letting Claude apply changes directly, have it first
-produce a structured intermediate artifact (JSON, YAML, markdown
-checklist) that gets validated before execution.
+Instead of letting Claude apply changes directly, have it first produce a structured intermediate artifact (JSON, YAML,
+markdown checklist) that gets validated before execution.
 
 ### When to Use
 
@@ -392,24 +396,25 @@ checklist) that gets validated before execution.
 
 ### Example
 
-```markdown
+````markdown
 ## Workflow
 
 1. Analyze the input and produce `changes.json`:
    ```json
    {"file": "path", "action": "modify", "details": "..."}
-   ```
+````
 
 2. Validate the plan:
+
    ```bash
    python scripts/validate_changes.py changes.json
    ```
 
-3. If validation fails, fix the plan and re-validate.
-   Only proceed when validation passes.
+3. If validation fails, fix the plan and re-validate. Only proceed when validation passes.
 
 4. Apply changes from the validated plan.
-```
+
+````
 
 **Implementation tip:** make validation scripts verbose with specific
 error messages: "Field 'X' not found. Available fields: A, B, C."
@@ -427,7 +432,7 @@ Before processing, verify:
 - File size is under 10MB
 - File extension matches expected type
 - Content does not contain executable code
-```
+````
 
 ### Limiting Scope
 

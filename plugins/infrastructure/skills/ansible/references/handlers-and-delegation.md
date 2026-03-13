@@ -2,8 +2,8 @@
 
 ## Handlers
 
-Handlers are tasks that run only when notified by a `changed` task. They execute once
-per play, after all tasks complete (or when explicitly flushed).
+Handlers are tasks that run only when notified by a `changed` task. They execute once per play, after all tasks complete
+(or when explicitly flushed).
 
 ### Basic pattern
 
@@ -24,9 +24,8 @@ handlers:
 
 ### Execution order
 
-Handlers run in the order they are **defined** in the `handlers:` section, not the
-order they are notified. Multiple notifications to the same handler result in a single
-execution.
+Handlers run in the order they are **defined** in the `handlers:` section, not the order they are notified. Multiple
+notifications to the same handler result in a single execution.
 
 ### Handler insertion order
 
@@ -83,8 +82,7 @@ tasks:
 
 ### Handler gotchas
 
-- Variables in handler **names** cause problems. Use variables in handler **parameters**
-  instead:
+- Variables in handler **names** cause problems. Use variables in handler **parameters** instead:
 
 ```yaml
 # BAD: variable in handler name
@@ -97,8 +95,7 @@ tasks:
     state: restarted
 ```
 
-- Handlers from roles have global scope. Prefix with role name to avoid conflicts:
-  `role_name : Restart nginx`
+- Handlers from roles have global scope. Prefix with role name to avoid conflicts: `role_name : Restart nginx`
 - Handlers cannot run `import_role` or `include_role`
 - Handlers ignore tags
 
@@ -135,8 +132,8 @@ Equivalent to `delegate_to: 127.0.0.1`.
 
 ### Delegated facts
 
-By default, facts gathered by delegated tasks are assigned to the current host.
-Use `delegate_facts: true` to assign to the delegated host:
+By default, facts gathered by delegated tasks are assigned to the current host. Use `delegate_facts: true` to assign to
+the delegated host:
 
 ```yaml
 - name: Gather facts from DB servers
@@ -148,9 +145,8 @@ Use `delegate_facts: true` to assign to the delegated host:
 
 ### Concurrency with delegation
 
-Delegated tasks still run in parallel (default 5 forks). When multiple hosts delegate
-to the same target (e.g., updating a single file), use `run_once: true` with a loop,
-`serial: 1`, or `throttle: 1` to avoid race conditions.
+Delegated tasks still run in parallel (default 5 forks). When multiple hosts delegate to the same target (e.g., updating
+a single file), use `run_once: true` with a loop, `serial: 1`, or `throttle: 1` to avoid race conditions.
 
 ## Async Tasks
 
@@ -190,10 +186,9 @@ Start task and move on immediately:
 
 ### Async gotchas
 
-- Do not use `poll: 0` with tasks requiring exclusive locks (e.g., package managers)
-  if later tasks touch the same resource
-- Async tasks always report `changed` -- use `changed_when` on the `async_status`
-  check task
+- Do not use `poll: 0` with tasks requiring exclusive locks (e.g., package managers) if later tasks touch the same
+  resource
+- Async tasks always report `changed` -- use `changed_when` on the `async_status` check task
 - With `poll: 0`, clean up async cache manually with `async_status` mode `cleanup`
-- `async` value must be high enough for the task to complete; otherwise the
-  `async_status` check fails because the cache file expires
+- `async` value must be high enough for the task to complete; otherwise the `async_status` check fails because the cache
+  file expires

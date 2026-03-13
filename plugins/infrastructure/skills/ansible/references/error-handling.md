@@ -39,13 +39,14 @@ tasks:
 ### Execution flow
 
 - `block`: runs tasks in order. If any task fails, execution jumps to `rescue`
-- `rescue`: runs only if a task in `block` failed. If rescue succeeds, the play
-  continues as if the original task succeeded
+- `rescue`: runs only if a task in `block` failed. If rescue succeeds, the play continues as if the original task
+  succeeded
 - `always`: runs regardless of block/rescue outcome
 
 ### Rescue variables
 
 Available in `rescue` section:
+
 - `ansible_failed_task` -- the task that failed (access `.name`, `.action`, etc.)
 - `ansible_failed_result` -- the result of the failed task (access `.rc`, `.msg`, etc.)
 
@@ -79,8 +80,7 @@ All tasks in a block inherit directives applied at the block level:
   when: ansible_facts['os_family'] == 'Debian'
 ```
 
-The `when`, `become`, and `become_user` apply to every task in the block. Loops
-cannot be applied at the block level.
+The `when`, `become`, and `become_user` apply to every task in the block. Loops cannot be applied at the block level.
 
 ## Error Control Keywords
 
@@ -124,8 +124,7 @@ Control when a task reports "changed":
 
 ### any_errors_fatal
 
-Stop the entire play if any host fails (useful for rolling updates where partial
-failure is unacceptable):
+Stop the entire play if any host fails (useful for rolling updates where partial failure is unacceptable):
 
 ```yaml
 - name: Critical database migration
@@ -169,15 +168,13 @@ Use `retries` and `delay` with `until` for tasks that may need multiple attempts
 
 ## Rescued vs Failed Reporting
 
-Hosts that fail in `block` but successfully complete their `rescue` tasks are
-reported in Ansible's final output as **"rescued"**, not "failed". This affects
-monitoring and reporting tools that parse Ansible output -- account for it when
-building dashboards or CI/CD pass/fail logic.
+Hosts that fail in `block` but successfully complete their `rescue` tasks are reported in Ansible's final output as
+**"rescued"**, not "failed". This affects monitoring and reporting tools that parse Ansible output -- account for it
+when building dashboards or CI/CD pass/fail logic.
 
 ## Global Result Aggregation
 
-For multi-host deployments, individual host results can be hard to track. Use
-this pattern to produce a single summary:
+For multi-host deployments, individual host results can be hard to track. Use this pattern to produce a single summary:
 
 ```yaml
 tasks:
@@ -214,6 +211,7 @@ tasks:
 ```
 
 Key mechanics:
+
 - Each host stores its status in `_host_status` (set in `block` or `rescue`)
 - The `always` section runs once on localhost, looping over all play hosts
 - `hostvars[item]._host_status` accesses each host's stored result

@@ -24,8 +24,8 @@ Outside `templ` blocks = ordinary Go. Inside = templ syntax.
 
 Output Go values inside templ blocks. Content is automatically HTML-escaped.
 
-Supported types: `string`, numbers (`int`, `uint`, `float32`, `complex64`, etc.),
-booleans, and any type based on these (e.g. `type Name string`).
+Supported types: `string`, numbers (`int`, `uint`, `float32`, `complex64`, etc.), booleans, and any type based on these
+(e.g. `type Name string`).
 
 ```templ
 // Literals
@@ -72,8 +72,8 @@ templ elements render HTML. All tags must be closed.
 <br/>                    // void — templ outputs <br> without /
 ```
 
-templ is aware of void elements (`br`, `hr`, `img`, `input`, etc.) and strips the
-closing `/` in output HTML. But the source must always include it.
+templ is aware of void elements (`br`, `hr`, `img`, `input`, etc.) and strips the closing `/` in output HTML. But the
+source must always include it.
 
 templ automatically minifies HTML output.
 

@@ -16,6 +16,7 @@ Skill(git-commit:commit-message)
 ```
 
 Do not proceed without loading the skill.
+
 </prerequisite>
 
 ## Context
@@ -45,12 +46,11 @@ Project-specific commit guidance goes here.
 
 **Before starting the pipeline**, check project CLAUDE.md for `<git-commit-config>`:
 
-- **`<validator-args>`** — Pass all defined flags directly to the validator.
-  Each `<flag name="X" value="Y"/>` becomes `--X "Y"` in the command.
+- **`<validator-args>`** — Pass all defined flags directly to the validator. Each `<flag name="X" value="Y"/>` becomes
+  `--X "Y"` in the command.
 
-- **`<extra-instructions>`** — Highest priority guidance for this commit process.
-  Follow these instructions throughout the pipeline. They override defaults.
-</project-config>
+- **`<extra-instructions>`** — Highest priority guidance for this commit process. Follow these instructions throughout
+  the pipeline. They override defaults. </project-config>
 
 ## Commit Pipeline
 
@@ -70,8 +70,7 @@ executing any git command, verify you haven't lost the pipeline:
 2. **Which step am I on?**
 3. **Were prior steps completed?**
 
-If uncertain, re-read staged changes with `git diff --cached` to re-anchor.
-</pipeline-awareness>
+If uncertain, re-read staged changes with `git diff --cached` to re-anchor. </pipeline-awareness>
 
 ### 1. Identify Atomic Units
 
@@ -90,22 +89,21 @@ git diff --cached      # Staged only
 - Refactoring mixed with new behavior
 - Unrelated bug fixes bundled together
 
-Each independent change becomes its own commit.
-</atomic-commit-rule>
+Each independent change becomes its own commit. </atomic-commit-rule>
 
 ### 2. Plan Commit Order
 
 For each identified unit, classify and order:
 
-| Type | Order | Description |
-|------|-------|-------------|
-| Style | 1st | Formatting, whitespace, naming |
-| Refactor | 2nd | Code restructuring, no behavior change |
-| Fix | 3rd | Bug corrections |
-| Feature | 4th | New functionality |
-| Docs | any | Documentation only |
-| Test | any | Adding or fixing tests |
-| Chore | any | Build, tooling, dependencies |
+| Type     | Order | Description                            |
+| -------- | ----- | -------------------------------------- |
+| Style    | 1st   | Formatting, whitespace, naming         |
+| Refactor | 2nd   | Code restructuring, no behavior change |
+| Fix      | 3rd   | Bug corrections                        |
+| Feature  | 4th   | New functionality                      |
+| Docs     | any   | Documentation only                     |
+| Test     | any   | Adding or fixing tests                 |
+| Chore    | any   | Build, tooling, dependencies           |
 
 **Commit style/refactor first** — keeps behavior-changing commits clean.
 
@@ -114,20 +112,18 @@ For each identified unit, classify and order:
 <quality-gate>
 **Before committing, ensure code quality checks pass.**
 
-1. **Review context:** Were lint/test/build commands run earlier in this
-   session for the changed files? If yes and they passed, proceed.
+1. **Review context:** Were lint/test/build commands run earlier in this session for the changed files? If yes and they
+   passed, proceed.
 
-2. **If not verified:** Run appropriate quality checks for the project.
-   Use your knowledge of the codebase to determine what checks apply.
-   Scope to changed files when possible for faster feedback.
+2. **If not verified:** Run appropriate quality checks for the project. Use your knowledge of the codebase to determine
+   what checks apply. Scope to changed files when possible for faster feedback.
 
 3. **On failure:** Fix issues before proceeding. Do not commit broken code.
 
 4. **On success:** Continue to self-review.
 
-**After returning from fixes:** Re-read `<pipeline-awareness>` above.
-Verify you're resuming at step 4, not starting over or skipping steps.
-</quality-gate>
+**After returning from fixes:** Re-read `<pipeline-awareness>` above. Verify you're resuming at step 4, not starting
+over or skipping steps. </quality-gate>
 
 ### 4. Self-Review Before Commit
 
@@ -150,10 +146,8 @@ For each logical unit:
 git add <files>
 ```
 
-Do not use `git add -p` or pipe input to interactive commands — these break
-tool permission matching. Stage by explicit file path. If a file contains
-mixed changes, split it in a prior refactoring commit or accept the broader
-staging.
+Do not use `git add -p` or pipe input to interactive commands — these break tool permission matching. Stage by explicit
+file path. If a file contains mixed changes, split it in a prior refactoring commit or accept the broader staging.
 
 ### 6. Validate Message
 
@@ -168,7 +162,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js [validator-args] -
 - Fix any ERROR issues before proceeding
 - WARN issues are recommendations — address if reasonable
 - Do not commit until validation passes without errors
-</mandatory>
+  </mandatory>
 
 ### 7. Commit
 
@@ -187,6 +181,7 @@ After committing, run each as a **separate Bash call**:
 ```bash
 git log -1 --stat
 ```
+
 ```bash
 git status
 ```
@@ -204,12 +199,12 @@ When a commit breaks backward compatibility:
 2. **If breaking in single commit:**
    - Start body with `BREAKING:` prefix
    - Explain what breaks and migration path
-   - Link to migration docs if available
-</breaking-change-process>
+   - Link to migration docs if available </breaking-change-process>
 
 ## Output
 
 After completing all commits, show:
+
 - List of created commits with subjects
 - Current branch status
 - Any remaining uncommitted changes

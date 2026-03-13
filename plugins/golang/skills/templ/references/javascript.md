@@ -15,8 +15,8 @@ templ page() {
 }
 ```
 
-To render a `<script>` tag only once per response, use `templ.OnceHandle`
-(see components reference for render-once details).
+To render a `<script>` tag only once per response, use `templ.OnceHandle` (see components reference for render-once
+details).
 
 ## Passing Go Data to JavaScript
 
@@ -36,8 +36,7 @@ Output:
 <button onclick="alert('Hello, from Go')">Show</button>
 ```
 
-Invalid function names (containing `</script>` or expressions) are sanitized to
-`__templ_invalid_function_name`.
+Invalid function names (containing `</script>` or expressions) are sanitized to `__templ_invalid_function_name`.
 
 Render as a standalone `<script>` element:
 
@@ -67,8 +66,8 @@ Output:
 <button onclick="handler(event, 'message')">Click</button>
 ```
 
-**Security warning**: `templ.JSExpression` outputs directly to HTML without
-encoding. Only use with trusted compile-time constants.
+**Security warning**: `templ.JSExpression` outputs directly to HTML without encoding. Only use with trusted compile-time
+constants.
 
 ### `templ.JSONString` — Data in Attributes
 
@@ -122,13 +121,14 @@ templ greeting(name string) {
 ```
 
 Behavior differs by context:
+
 - **Inside JS strings**: value is string-escaped
 - **Outside JS strings**: value is JSON-encoded (quoted string, number, etc.)
 
 templ auto-escapes to prevent XSS in both cases.
 
-**Prefer `templ.JSONString` or `templ.JSONScript`** over inline interpolation —
-separating data from code is easier to maintain and debug.
+**Prefer `templ.JSONString` or `templ.JSONScript`** over inline interpolation — separating data from code is easier to
+maintain and debug.
 
 ## IIFE Pattern for Scope Isolation
 
@@ -148,8 +148,7 @@ templ Interactive() {
 
 ## Avoiding Inline Event Handlers
 
-Best practice: separate behavior from markup using `templ.OnceHandle` + `data-*`
-attributes + IIFE:
+Best practice: separate behavior from markup using `templ.OnceHandle` + `data-*` attributes + IIFE:
 
 ```templ
 var helloHandle = templ.NewOnceHandle()
@@ -178,6 +177,7 @@ templ hello(label, name string) {
 ```
 
 This pattern:
+
 1. Loads the shared function once via `templ.OnceHandle`
 2. Passes server data via `data-*` attributes
 3. Isolates initialization in an IIFE
@@ -185,8 +185,8 @@ This pattern:
 
 ## `templ.JSUnsafeFuncCall` — Bypass Sanitization
 
-Identical to `templ.JSFuncCall` but skips function name sanitization. Arguments are still
-JSON-encoded. Use only when the sanitizer incorrectly rejects a valid function name.
+Identical to `templ.JSFuncCall` but skips function name sanitization. Arguments are still JSON-encoded. Use only when
+the sanitizer incorrectly rejects a valid function name.
 
 **Never use with user-provided input.** The function name is written directly to HTML output.
 
@@ -201,16 +201,15 @@ templ head() {
 }
 ```
 
-For TypeScript/NPM projects, use `esbuild` to bundle into a single JS file,
-then reference via `<script src="...">`.
+For TypeScript/NPM projects, use `esbuild` to bundle into a single JS file, then reference via `<script src="...">`.
 
 ## Method Summary
 
-| Method | Purpose | Encoding |
-|--------|---------|----------|
-| `templ.JSFuncCall` | Call JS function with Go data | JSON-encoded args |
-| `templ.JSExpression` | Raw JS expression (event, this) | None — raw output |
-| `templ.JSONString` | Go data → JSON string for attributes | JSON + HTML-encoded |
-| `templ.JSONScript` | Go data → `<script type="application/json">` | JSON |
-| `{{ value }}` in scripts | Inline interpolation | Context-dependent |
-| `templ.JSUnsafeFuncCall` | Bypass function name sanitization | None — **security risk** |
+| Method                   | Purpose                                      | Encoding                 |
+| ------------------------ | -------------------------------------------- | ------------------------ |
+| `templ.JSFuncCall`       | Call JS function with Go data                | JSON-encoded args        |
+| `templ.JSExpression`     | Raw JS expression (event, this)              | None — raw output        |
+| `templ.JSONString`       | Go data → JSON string for attributes         | JSON + HTML-encoded      |
+| `templ.JSONScript`       | Go data → `<script type="application/json">` | JSON                     |
+| `{{ value }}` in scripts | Inline interpolation                         | Context-dependent        |
+| `templ.JSUnsafeFuncCall` | Bypass function name sanitization            | None — **security risk** |

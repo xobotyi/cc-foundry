@@ -8,8 +8,8 @@ description: >-
 
 # Output Style Engineering
 
-Output styles replace Claude Code's system prompt, transforming the
-main agent's personality while retaining all tools and capabilities.
+Output styles replace Claude Code's system prompt, transforming the main agent's personality while retaining all tools
+and capabilities.
 
 <prerequisite>
 **Output styles are system prompts.** Before creating or improving
@@ -20,24 +20,26 @@ Skill(ai-helpers:prompt-engineering)
 ```
 
 Skip only for trivial edits (typos, formatting).
+
 </prerequisite>
 
 ## Route to Reference
 
-| Situation | Reference | Contents |
-|-----------|-----------|----------|
-| File format, frontmatter, storage, activation | [`${CLAUDE_SKILL_DIR}/references/spec.md`] | Frontmatter field details, storage paths, activation methods, file naming rules |
-| Creating a style from scratch | [`${CLAUDE_SKILL_DIR}/references/creation.md`] | Full style templates by pattern, testing prompts, creation workflow steps |
-| Evaluating style quality | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol |
-| Style not working, needs refinement | [`${CLAUDE_SKILL_DIR}/references/iteration.md`] | Detailed fix patterns with before/after, refinement techniques, version control |
-| Real-world examples with analysis | [`${CLAUDE_SKILL_DIR}/references/examples.md`] | 5 complete styles with dimensional scoring and improvement notes |
-| Prompt engineering techniques | `prompt-engineering` skill | Instruction design fundamentals |
+| Situation                                     | Reference                                        | Contents                                                                         |
+| --------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| File format, frontmatter, storage, activation | [`${CLAUDE_SKILL_DIR}/references/spec.md`]       | Frontmatter field details, storage paths, activation methods, file naming rules  |
+| Creating a style from scratch                 | [`${CLAUDE_SKILL_DIR}/references/creation.md`]   | Full style templates by pattern, testing prompts, creation workflow steps        |
+| Evaluating style quality                      | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol |
+| Style not working, needs refinement           | [`${CLAUDE_SKILL_DIR}/references/iteration.md`]  | Detailed fix patterns with before/after, refinement techniques, version control  |
+| Real-world examples with analysis             | [`${CLAUDE_SKILL_DIR}/references/examples.md`]   | 5 complete styles with dimensional scoring and improvement notes                 |
+| Prompt engineering techniques                 | `prompt-engineering` skill                       | Instruction design fundamentals                                                  |
 
 ## What Output Styles Change
 
 Output styles **replace** the default system prompt — they don't augment it.
 
 **Replaced:**
+
 - System prompt personality and domain assumptions
 - Task prioritization and interaction patterns
 - Response formatting and tone
@@ -45,6 +47,7 @@ Output styles **replace** the default system prompt — they don't augment it.
 - Coding instructions (unless `keep-coding-instructions: true`)
 
 **Preserved:**
+
 - All tools (Read, Write, Bash, Grep, etc.)
 - CLAUDE.md project context system
 - Sub-agent and custom agent delegation
@@ -52,13 +55,13 @@ Output styles **replace** the default system prompt — they don't augment it.
 
 **Key distinction from other features:**
 
-| Feature | Purpose | System Prompt Impact |
-|---------|---------|---------------------|
-| **Output Style** | Replace main agent personality | Replaces entirely |
-| CLAUDE.md | Add project context | Added as user message after |
-| `--append-system-prompt` | Add instructions | Appends to system prompt |
-| Custom Agents | Specialized sub-tasks | Separate agent context |
-| Skills | On-demand task workflows | Loads when triggered |
+| Feature                  | Purpose                        | System Prompt Impact        |
+| ------------------------ | ------------------------------ | --------------------------- |
+| **Output Style**         | Replace main agent personality | Replaces entirely           |
+| CLAUDE.md                | Add project context            | Added as user message after |
+| `--append-system-prompt` | Add instructions               | Appends to system prompt    |
+| Custom Agents            | Specialized sub-tasks          | Separate agent context      |
+| Skills                   | On-demand task workflows       | Loads when triggered        |
 
 Output styles are the ONLY way to change the main agent's core personality.
 
@@ -66,15 +69,14 @@ Output styles are the ONLY way to change the main agent's core personality.
 
 This field controls whether Claude retains its software engineering guidance.
 
-| Use Case | Setting | Rationale |
-|----------|---------|-----------|
-| Non-coding domain (research, content) | `false` | Remove irrelevant coding guidance |
-| Coding with different tone | `true` | Keep coding skills, change personality |
-| Teaching/learning coding | `true` | Need coding knowledge for lessons |
-| General assistant | `false` | Broader focus, no coding bias |
+| Use Case                              | Setting | Rationale                              |
+| ------------------------------------- | ------- | -------------------------------------- |
+| Non-coding domain (research, content) | `false` | Remove irrelevant coding guidance      |
+| Coding with different tone            | `true`  | Keep coding skills, change personality |
+| Teaching/learning coding              | `true`  | Need coding knowledge for lessons      |
+| General assistant                     | `false` | Broader focus, no coding bias          |
 
-Default is `false`. Set `true` when the style is a personality adjustment
-for coding work rather than a domain shift.
+Default is `false`. Set `true` when the style is a personality adjustment for coding work rather than a domain shift.
 
 ## File Structure
 
@@ -85,12 +87,10 @@ for coding work rather than a domain shift.
     team-style.md
 ```
 
-Filename becomes the style identifier (without `.md`). Activate with
-`/output-style style-name` or via settings. Project-level styles with
-the same name override user-level.
+Filename becomes the style identifier (without `.md`). Activate with `/output-style style-name` or via settings.
+Project-level styles with the same name override user-level.
 
-Full format details, frontmatter fields, activation methods:
-see `${CLAUDE_SKILL_DIR}/references/spec.md`.
+Full format details, frontmatter fields, activation methods: see `${CLAUDE_SKILL_DIR}/references/spec.md`.
 
 ## Writing Style Instructions
 
@@ -98,24 +98,23 @@ Output styles are system prompts. Five components determine quality:
 
 ### 1. Define Persona Clearly
 
-The persona is the single highest-leverage element. A vague persona
-produces inconsistent behavior; a clear one anchors every response.
+The persona is the single highest-leverage element. A vague persona produces inconsistent behavior; a clear one anchors
+every response.
 
 **Vague (fails):** "Be helpful and professional."
 
 **Clear (works):**
+
 ```markdown
 You are a senior technical architect who communicates directly and
 values precision over politeness.
 ```
 
-The test: could two people reading this persona imagine the same
-character? If not, add specificity.
+The test: could two people reading this persona imagine the same character? If not, add specificity.
 
 ### 2. Specify Concrete Behaviors
 
-Abstract instructions ("communicate clearly") get ignored. Concrete
-behaviors are testable and unambiguous.
+Abstract instructions ("communicate clearly") get ignored. Concrete behaviors are testable and unambiguous.
 
 ```markdown
 ## Communication Rules
@@ -126,13 +125,13 @@ behaviors are testable and unambiguous.
 - Open with the answer, not pleasantries
 ```
 
-Each rule should be verifiable: you can check whether a response
-complies or not. If you can't verify it, make it more specific.
+Each rule should be verifiable: you can check whether a response complies or not. If you can't verify it, make it more
+specific.
 
 ### 3. Include Tone Examples
 
-Examples are the most reliable way to communicate expected behavior.
-Show contrast between default Claude and the target style:
+Examples are the most reliable way to communicate expected behavior. Show contrast between default Claude and the target
+style:
 
 ```markdown
 ## Tone Examples
@@ -150,14 +149,12 @@ This Style (use):
 3. [specific issue]"
 ```
 
-Include at least one contrast example. Cover the interaction types
-most likely to trigger default behavior (greetings, requests for
-help, disagreements).
+Include at least one contrast example. Cover the interaction types most likely to trigger default behavior (greetings,
+requests for help, disagreements).
 
 ### 4. Specify Output Format
 
-Without format guidance, response structure varies unpredictably.
-Provide templates for common response types:
+Without format guidance, response structure varies unpredictably. Provide templates for common response types:
 
 ```markdown
 ## Response Format
@@ -171,8 +168,7 @@ When providing solutions:
 
 ### 5. Add Consistency Safeguards
 
-Styles drift mid-conversation. Explicit persistence language prevents
-reversion:
+Styles drift mid-conversation. Explicit persistence language prevents reversion:
 
 ```markdown
 ## Consistency
@@ -189,8 +185,8 @@ If uncertain, default to MORE adherence to this style, not less.
 
 ### Place Critical Rules at End
 
-Instructions near the end of the prompt are followed more reliably.
-Place the rules you absolutely cannot afford to have ignored last:
+Instructions near the end of the prompt are followed more reliably. Place the rules you absolutely cannot afford to have
+ignored last:
 
 ```markdown
 ## Critical Rules
@@ -203,8 +199,8 @@ These rules override all other guidance:
 
 ### Establish Priority Hierarchy
 
-When a style has rules that could conflict (e.g., "be concise" vs.
-"explain your reasoning"), add an explicit priority order:
+When a style has rules that could conflict (e.g., "be concise" vs. "explain your reasoning"), add an explicit priority
+order:
 
 ```markdown
 ## Priority Hierarchy
@@ -218,44 +214,36 @@ When rules conflict, follow this order:
 
 ## Common Style Patterns
 
-**Direct Professional:**
-Remove sycophancy, focus on substance over pleasantries.
-Set `keep-coding-instructions: true`.
+**Direct Professional:** Remove sycophancy, focus on substance over pleasantries. Set `keep-coding-instructions: true`.
 
-**Domain Specialist:**
-Replace coding expertise with domain-specific knowledge
-(content strategy, research analysis, UX design).
-Set `keep-coding-instructions: false`.
+**Domain Specialist:** Replace coding expertise with domain-specific knowledge (content strategy, research analysis, UX
+design). Set `keep-coding-instructions: false`.
 
-**Interaction Mode:**
-Change how Claude engages (voice-first, educational quiz,
-pair programming mentor). Set `keep-coding-instructions`
-based on whether the mode involves coding.
+**Interaction Mode:** Change how Claude engages (voice-first, educational quiz, pair programming mentor). Set
+`keep-coding-instructions` based on whether the mode involves coding.
 
-Full templates for each pattern: see `${CLAUDE_SKILL_DIR}/references/creation.md`.
-Scored examples: see `${CLAUDE_SKILL_DIR}/references/examples.md`.
+Full templates for each pattern: see `${CLAUDE_SKILL_DIR}/references/creation.md`. Scored examples: see
+`${CLAUDE_SKILL_DIR}/references/examples.md`.
 
 ## Evaluating Style Quality
 
 Six dimensions, three weighted 2x (high-leverage):
 
-| Dimension | Weight | What to Check |
-|-----------|--------|---------------|
-| **Persona Clarity** | 2x | Can you describe the persona in one sentence? Would two readers imagine the same character? |
-| **Behavioral Specificity** | 2x | Is every rule verifiable? Are there concrete do/don't examples? |
-| **Example Quality** | 2x | Do examples show contrast (good vs bad)? Do they cover key interaction types? |
-| Output Format | 1x | Would Claude know exactly how to structure responses? |
-| Consistency Safeguards | 1x | Are default behaviors explicitly forbidden with alternatives? |
-| Scope | 1x | Is `keep-coding-instructions` set right? Does the style know what it's for? |
+| Dimension                  | Weight | What to Check                                                                               |
+| -------------------------- | ------ | ------------------------------------------------------------------------------------------- |
+| **Persona Clarity**        | 2x     | Can you describe the persona in one sentence? Would two readers imagine the same character? |
+| **Behavioral Specificity** | 2x     | Is every rule verifiable? Are there concrete do/don't examples?                             |
+| **Example Quality**        | 2x     | Do examples show contrast (good vs bad)? Do they cover key interaction types?               |
+| Output Format              | 1x     | Would Claude know exactly how to structure responses?                                       |
+| Consistency Safeguards     | 1x     | Are default behaviors explicitly forbidden with alternatives?                               |
+| Scope                      | 1x     | Is `keep-coding-instructions` set right? Does the style know what it's for?                 |
 
-**Must have (critical):** Persona defined, core behaviors listed, at least one
-tone example, output format specified.
+**Must have (critical):** Persona defined, core behaviors listed, at least one tone example, output format specified.
 
-**Should have:** Multiple contrast examples, explicit "avoid" list, format
-templates, `keep-coding-instructions` considered.
+**Should have:** Multiple contrast examples, explicit "avoid" list, format templates, `keep-coding-instructions`
+considered.
 
-Detailed per-dimension scoring rubrics and testing protocol:
-see `${CLAUDE_SKILL_DIR}/references/evaluation.md`.
+Detailed per-dimension scoring rubrics and testing protocol: see `${CLAUDE_SKILL_DIR}/references/evaluation.md`.
 
 ## Iterating on Styles
 
@@ -265,52 +253,46 @@ see `${CLAUDE_SKILL_DIR}/references/evaluation.md`.
 Observe → Diagnose → Hypothesize → Modify (ONE change) → Test → Repeat
 ```
 
-Make ONE targeted change per iteration. Multiple changes make
-debugging impossible.
+Make ONE targeted change per iteration. Multiple changes make debugging impossible.
 
 ### Diagnostic Table
 
-| Symptom | Likely Cause | Fix |
-|---------|--------------|-----|
-| Reverts to sycophantic tone | Weak persona, no anti-patterns | Add explicit "Never use..." list with forbidden phrases |
-| Ignores format | Format buried in text | Move format to end, add example |
-| Inconsistent between turns | No persistence language | Add "maintain throughout" with scenario list |
-| Works initially, drifts later | No reinforcement | Add consistency section with override language |
-| Too verbose | No length constraints | Add explicit length limits |
-| Wrong tone in edge cases | Missing example coverage | Add example for the failing scenario |
-| Contradictory behavior | Conflicting instructions | Add priority hierarchy |
-| Ignores some rules | Too many instructions | Consolidate overlapping rules, prioritize |
+| Symptom                       | Likely Cause                   | Fix                                                     |
+| ----------------------------- | ------------------------------ | ------------------------------------------------------- |
+| Reverts to sycophantic tone   | Weak persona, no anti-patterns | Add explicit "Never use..." list with forbidden phrases |
+| Ignores format                | Format buried in text          | Move format to end, add example                         |
+| Inconsistent between turns    | No persistence language        | Add "maintain throughout" with scenario list            |
+| Works initially, drifts later | No reinforcement               | Add consistency section with override language          |
+| Too verbose                   | No length constraints          | Add explicit length limits                              |
+| Wrong tone in edge cases      | Missing example coverage       | Add example for the failing scenario                    |
+| Contradictory behavior        | Conflicting instructions       | Add priority hierarchy                                  |
+| Ignores some rules            | Too many instructions          | Consolidate overlapping rules, prioritize               |
 
 ### Strengthening Techniques
 
-- **Repetition** — Reinforce critical rules across persona, behaviors,
-  examples, and critical rules sections.
+- **Repetition** — Reinforce critical rules across persona, behaviors, examples, and critical rules sections.
 - **Contrast examples** — Show default Claude (avoid) vs this style (use).
-- **Consolidation** — Merge overlapping rules into single authoritative
-  statements. Five scattered "be direct" rules become one "Directness Rule"
-  section.
-- **Escalation patterns** — For teaching/mentoring styles, define how
-  behavior changes when the user is frustrated or explicitly requests
-  a different mode.
+- **Consolidation** — Merge overlapping rules into single authoritative statements. Five scattered "be direct" rules
+  become one "Directness Rule" section.
+- **Escalation patterns** — For teaching/mentoring styles, define how behavior changes when the user is frustrated or
+  explicitly requests a different mode.
 
 ### Rewrite vs Iterate
 
-**Iterate** when the core concept is sound, issues are specific, and the
-style works in most cases.
+**Iterate** when the core concept is sound, issues are specific, and the style works in most cases.
 
-**Rewrite** when the persona is wrong for the use case, more than 50% of
-tests fail, or conflicting rules have made the style unmaintainable.
+**Rewrite** when the persona is wrong for the use case, more than 50% of tests fail, or conflicting rules have made the
+style unmaintainable.
 
-Detailed fix patterns with before/after examples:
-see `${CLAUDE_SKILL_DIR}/references/iteration.md`.
+Detailed fix patterns with before/after examples: see `${CLAUDE_SKILL_DIR}/references/iteration.md`.
 
 ## Built-in Styles
 
-| Style | Purpose | Key Behavior |
-|-------|---------|--------------|
-| **Default** | Software engineering | Concise, code-focused |
-| **Explanatory** | Teaching while coding | Adds "Insight" blocks |
-| **Learning** | Collaborative mentoring | Adds `TODO(human)` markers |
+| Style           | Purpose                 | Key Behavior               |
+| --------------- | ----------------------- | -------------------------- |
+| **Default**     | Software engineering    | Concise, code-focused      |
+| **Explanatory** | Teaching while coding   | Adds "Insight" blocks      |
+| **Learning**    | Collaborative mentoring | Adds `TODO(human)` markers |
 
 ## Quick Start
 

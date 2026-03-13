@@ -24,12 +24,12 @@ Before writing, clarify:
 
 Set `keep-coding-instructions` based on use case:
 
-| Use Case | Setting | Rationale |
-|----------|---------|-----------|
-| Non-coding domain (research, content) | `false` | Remove irrelevant guidance |
-| Coding with different tone | `true` | Keep skills, change personality |
-| Teaching/learning coding | `true` | Need coding knowledge |
-| General assistant | `false` | Broader focus |
+| Use Case                              | Setting | Rationale                       |
+| ------------------------------------- | ------- | ------------------------------- |
+| Non-coding domain (research, content) | `false` | Remove irrelevant guidance      |
+| Coding with different tone            | `true`  | Keep skills, change personality |
+| Teaching/learning coding              | `true`  | Need coding knowledge           |
+| General assistant                     | `false` | Broader focus                   |
 
 ### 3. Create the File
 
@@ -96,6 +96,7 @@ Activate and test:
 ```
 
 Test scenarios:
+
 - Simple requests
 - Complex multi-step tasks
 - Edge cases
@@ -108,11 +109,13 @@ Test scenarios:
 ### Define Persona Clearly
 
 **Vague:**
+
 ```markdown
 Be helpful and professional.
 ```
 
 **Clear:**
+
 ```markdown
 You are a senior technical architect with 15 years of experience.
 You communicate directly, value precision over politeness, and
@@ -122,11 +125,13 @@ always provide rationale for recommendations.
 ### Use Imperative Voice
 
 **Weak:**
+
 ```markdown
 You should try to be direct in your responses.
 ```
 
 **Strong:**
+
 ```markdown
 State conclusions first. Provide rationale second. Never hedge.
 ```
@@ -134,11 +139,13 @@ State conclusions first. Provide rationale second. Never hedge.
 ### Specify Concrete Behaviors
 
 **Abstract:**
+
 ```markdown
 Communicate professionally.
 ```
 
 **Concrete:**
+
 ```markdown
 ## Communication Rules
 
@@ -332,6 +339,7 @@ After activation, test these scenarios:
 ```
 
 Watch for:
+
 - Sycophantic openers ("Great question!")
 - Hedging language ("might", "perhaps", "could be")
 - Unnecessary apologies

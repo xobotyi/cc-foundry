@@ -1,7 +1,7 @@
 # Sampling
 
-Sampling controls which traces are recorded and exported. It is the primary mechanism
-for managing tracing costs without losing visibility.
+Sampling controls which traces are recorded and exported. It is the primary mechanism for managing tracing costs without
+losing visibility.
 
 ## Why Sample
 
@@ -23,23 +23,22 @@ Decision made at trace creation time, before any spans complete.
 
 ### How It Works
 
-The sampler evaluates the trace ID, span name, initial attributes, and parent context
-to decide: record, record-and-sample, or drop.
+The sampler evaluates the trace ID, span name, initial attributes, and parent context to decide: record,
+record-and-sample, or drop.
 
 ### Built-in Head Samplers
 
-| Sampler | Behavior |
-|---------|----------|
-| `AlwaysOn` | Record and sample everything |
-| `AlwaysOff` | Drop everything |
-| `TraceIdRatioBased(ratio)` | Sample based on trace ID hash at given ratio |
-| `ParentBased(root)` | Delegates based on parent sampling decision |
+| Sampler                     | Behavior                                      |
+| --------------------------- | --------------------------------------------- |
+| `AlwaysOn`                  | Record and sample everything                  |
+| `AlwaysOff`                 | Drop everything                               |
+| `TraceIdRatioBased(ratio)`  | Sample based on trace ID hash at given ratio  |
+| `ParentBased(root)`         | Delegates based on parent sampling decision   |
 | `ProbabilitySampler(ratio)` | W3C Trace Context Level 2 consistent sampling |
 
 ### ParentBased Sampler
 
-The most common production configuration. Respects parent sampling decisions while
-allowing custom root sampling:
+The most common production configuration. Respects parent sampling decisions while allowing custom root sampling:
 
 ```
 ParentBased(
@@ -51,22 +50,20 @@ ParentBased(
 )
 ```
 
-**Default SDK sampler:** `ParentBased(root=AlwaysOn)` — samples everything but
-respects parent decisions.
+**Default SDK sampler:** `ParentBased(root=AlwaysOn)` — samples everything but respects parent decisions.
 
 ### Head Sampling Trade-offs
 
-| Advantage | Disadvantage |
-|-----------|-------------|
-| Simple to configure | Cannot inspect full trace before deciding |
-| Low overhead | Cannot ensure all error traces are sampled |
-| Deterministic (same trace ID = same decision) | Cannot sample based on latency |
-| Works at any point in pipeline | Fixed rate, not adaptive |
+| Advantage                                     | Disadvantage                               |
+| --------------------------------------------- | ------------------------------------------ |
+| Simple to configure                           | Cannot inspect full trace before deciding  |
+| Low overhead                                  | Cannot ensure all error traces are sampled |
+| Deterministic (same trace ID = same decision) | Cannot sample based on latency             |
+| Works at any point in pipeline                | Fixed rate, not adaptive                   |
 
 ## Tail Sampling
 
-Decision made after all (or most) spans in a trace have completed. Requires
-collecting all spans before deciding.
+Decision made after all (or most) spans in a trace have completed. Requires collecting all spans before deciding.
 
 ### How It Works
 
@@ -94,13 +91,13 @@ processors:
         probabilistic: { sampling_percentage: 10 }
 ```
 
-| Policy | Use Case |
-|--------|----------|
-| `status_code` | Keep all traces with errors |
-| `latency` | Keep traces exceeding a duration threshold |
-| `probabilistic` | Random baseline sample for general visibility |
+| Policy             | Use Case                                       |
+| ------------------ | ---------------------------------------------- |
+| `status_code`      | Keep all traces with errors                    |
+| `latency`          | Keep traces exceeding a duration threshold     |
+| `probabilistic`    | Random baseline sample for general visibility  |
 | `string_attribute` | Keep traces matching specific attribute values |
-| `always_sample` | Keep all traces (combine with other policies) |
+| `always_sample`    | Keep all traces (combine with other policies)  |
 
 ### Tail Sampling Architecture
 
@@ -112,17 +109,17 @@ processors:
 └─────────┘     └─────────┘     └─────────────────────┘     └─────────┘
 ```
 
-**Critical:** All spans with the same trace ID MUST reach the same collector
-instance. Use a load-balancing exporter that routes by trace ID.
+**Critical:** All spans with the same trace ID MUST reach the same collector instance. Use a load-balancing exporter
+that routes by trace ID.
 
 ### Tail Sampling Trade-offs
 
-| Advantage | Disadvantage |
-|-----------|-------------|
-| Full trace visibility before deciding | Requires buffering all spans (memory) |
-| Can keep all error/slow traces | Needs collector infrastructure |
-| Adaptive to actual trace content | Adds latency before export |
-| Sophisticated filtering | Scaling requires trace-ID-aware load balancing |
+| Advantage                             | Disadvantage                                   |
+| ------------------------------------- | ---------------------------------------------- |
+| Full trace visibility before deciding | Requires buffering all spans (memory)          |
+| Can keep all error/slow traces        | Needs collector infrastructure                 |
+| Adaptive to actual trace content      | Adds latency before export                     |
+| Sophisticated filtering               | Scaling requires trace-ID-aware load balancing |
 
 ## Combined Head + Tail Sampling
 
@@ -135,13 +132,13 @@ This protects the pipeline from overload while still capturing interesting trace
 
 ## Sampling Decision Guidance
 
-| Scenario | Recommended Approach |
-|----------|---------------------|
-| Low volume (< 100 traces/sec) | `AlwaysOn` — keep everything |
-| Medium volume | `ParentBased(TraceIdRatioBased(0.1))` |
+| Scenario                           | Recommended Approach                            |
+| ---------------------------------- | ----------------------------------------------- |
+| Low volume (< 100 traces/sec)      | `AlwaysOn` — keep everything                    |
+| Medium volume                      | `ParentBased(TraceIdRatioBased(0.1))`           |
 | High volume, need error visibility | Tail sampling: keep errors + latency + baseline |
-| High volume, budget constrained | Head sampling at 1-5% + tail for errors |
-| Mixed high/low volume services | Per-service head sampling rates |
+| High volume, budget constrained    | Head sampling at 1-5% + tail for errors         |
+| Mixed high/low volume services     | Per-service head sampling rates                 |
 
 ## Key Principles
 
@@ -150,5 +147,4 @@ This protects the pipeline from overload while still capturing interesting trace
 3. **Use ParentBased** — children should follow parent decisions for complete traces
 4. **Provide attributes at span creation** — samplers cannot see late-added attributes
 5. **Monitor your samplers** — dropped traces mean lost visibility; track drop rates
-6. **Filter health checks** — they're high volume, low value; sample aggressively
-   or filter entirely
+6. **Filter health checks** — they're high volume, low value; sample aggressively or filter entirely

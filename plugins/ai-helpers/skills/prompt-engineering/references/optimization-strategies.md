@@ -13,11 +13,11 @@ Approaches to improving LLM performance for specific use cases.
 
 ## The Three Pillars
 
-| Method | What It Does | Cost | When to Use |
-|--------|--------------|------|-------------|
-| Prompt Engineering | Craft better inputs | Low | Always (foundation) |
-| RAG | Add external knowledge | Medium | Need current/accurate data |
-| Fine-tuning | Train on domain data | High | Need deep domain expertise |
+| Method             | What It Does           | Cost   | When to Use                |
+| ------------------ | ---------------------- | ------ | -------------------------- |
+| Prompt Engineering | Craft better inputs    | Low    | Always (foundation)        |
+| RAG                | Add external knowledge | Medium | Need current/accurate data |
+| Fine-tuning        | Train on domain data   | High   | Need deep domain expertise |
 
 These aren't mutually exclusive — combine for best results.
 
@@ -52,8 +52,7 @@ Optimize inputs to guide model behavior without changing the model.
 
 ## Retrieval-Augmented Generation (RAG)
 
-Connect the LLM to external knowledge bases. Retrieve relevant
-information and include it in the prompt context.
+Connect the LLM to external knowledge bases. Retrieve relevant information and include it in the prompt context.
 
 ### How RAG Works
 
@@ -106,16 +105,14 @@ information and include it in the prompt context.
 
 ### RAG Best Practices
 
-**Chunking:** Split documents into right-sized chunks for retrieval.
-Too small loses context; too large wastes tokens.
+**Chunking:** Split documents into right-sized chunks for retrieval. Too small loses context; too large wastes tokens.
 
-**Embedding quality:** Use good embedding models. Poor embeddings →
-poor retrieval → poor generation.
+**Embedding quality:** Use good embedding models. Poor embeddings → poor retrieval → poor generation.
 
-**Reranking:** After initial retrieval, rerank results for relevance
-before including in prompt.
+**Reranking:** After initial retrieval, rerank results for relevance before including in prompt.
 
 **Context formatting:** Structure retrieved content clearly:
+
 ```
 Based on the following information:
 ---
@@ -132,8 +129,7 @@ Answer the user's question: [query]
 
 ## Fine-Tuning
 
-Train the model on domain-specific data to permanently update its
-parameters.
+Train the model on domain-specific data to permanently update its parameters.
 
 ### How Fine-Tuning Works
 
@@ -146,12 +142,10 @@ parameters.
 
 ### Types
 
-**Full fine-tuning:** Update all model parameters.
-Expensive but maximum adaptation.
+**Full fine-tuning:** Update all model parameters. Expensive but maximum adaptation.
 
-**Parameter-Efficient Fine-Tuning (PEFT):** Update only a subset
-of parameters (LoRA, adapters, prefix tuning).
-Lower cost, often comparable results.
+**Parameter-Efficient Fine-Tuning (PEFT):** Update only a subset of parameters (LoRA, adapters, prefix tuning). Lower
+cost, often comparable results.
 
 ### Strengths
 
@@ -180,12 +174,12 @@ Lower cost, often comparable results.
 
 ## DSPy: Programmatic Optimization
 
-Framework that replaces manual prompt engineering with programmatic
-optimization.
+Framework that replaces manual prompt engineering with programmatic optimization.
 
 ### Core Idea
 
 Instead of writing prompts, define:
+
 - **Signatures:** Input/output specifications
 - **Modules:** Processing steps
 - **Metrics:** How to evaluate quality
@@ -248,16 +242,15 @@ Is task within model's knowledge?
 
 **Fine-tuned + RAG:** Domain-adapted model with current knowledge.
 
-**Fine-tuned + Prompt Engineering:** Even fine-tuned models need
-good prompts for best results.
+**Fine-tuned + Prompt Engineering:** Even fine-tuned models need good prompts for best results.
 
 ### Cost-Benefit Analysis
 
-| Approach | Setup Cost | Ongoing Cost | Flexibility | Quality Ceiling |
-|----------|------------|--------------|-------------|-----------------|
-| Prompt only | Low | Low | High | Medium |
-| + RAG | Medium | Medium | Medium | High |
-| + Fine-tuning | High | Low | Low | Highest |
-| All three | Highest | Medium | Medium | Highest |
+| Approach      | Setup Cost | Ongoing Cost | Flexibility | Quality Ceiling |
+| ------------- | ---------- | ------------ | ----------- | --------------- |
+| Prompt only   | Low        | Low          | High        | Medium          |
+| + RAG         | Medium     | Medium       | Medium      | High            |
+| + Fine-tuning | High       | Low          | Low         | Highest         |
+| All three     | Highest    | Medium       | Medium      | Highest         |
 
 Start simple, add complexity only when needed.

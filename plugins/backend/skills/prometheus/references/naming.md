@@ -1,7 +1,7 @@
 # Naming Conventions
 
-Naming is the contract between instrumentation and consumption. A well-named metric
-is self-documenting — someone unfamiliar with the system should guess what it measures.
+Naming is the contract between instrumentation and consumption. A well-named metric is self-documenting — someone
+unfamiliar with the system should guess what it measures.
 
 ## Metric Name Structure
 
@@ -41,15 +41,15 @@ myapp_orders_processed_total         # Application-specific metrics
 
 Always use base units. Let visualization tools handle conversion.
 
-| Family | Base Unit | Not This |
-|--------|-----------|----------|
-| Time | seconds | milliseconds, microseconds |
-| Data size | bytes | kilobytes, megabytes |
-| Temperature | celsius | fahrenheit |
-| Length | meters | kilometers |
-| Mass | grams | kilograms |
-| Percent | ratio (0-1) | percentage (0-100) |
-| Energy | joules | watts (export joules counter, compute power via `rate()`) |
+| Family      | Base Unit   | Not This                                                  |
+| ----------- | ----------- | --------------------------------------------------------- |
+| Time        | seconds     | milliseconds, microseconds                                |
+| Data size   | bytes       | kilobytes, megabytes                                      |
+| Temperature | celsius     | fahrenheit                                                |
+| Length      | meters      | kilometers                                                |
+| Mass        | grams       | kilograms                                                 |
+| Percent     | ratio (0-1) | percentage (0-100)                                        |
+| Energy      | joules      | watts (export joules counter, compute power via `rate()`) |
 
 ### Unit Suffix
 
@@ -63,13 +63,13 @@ disk_usage_ratio                     # ratio 0-1
 
 ### Type Suffix
 
-| Type | Suffix | Example |
-|------|--------|---------|
-| Counter | `_total` | `http_requests_total` |
-| Counter with unit | `_<unit>_total` | `process_cpu_seconds_total` |
-| Info metric | `_info` | `myapp_build_info` |
-| Timestamp | `_timestamp_seconds` | `job_last_success_timestamp_seconds` |
-| Boolean-like | (use gauge, 0 or 1) | `myapp_healthy` |
+| Type              | Suffix               | Example                              |
+| ----------------- | -------------------- | ------------------------------------ |
+| Counter           | `_total`             | `http_requests_total`                |
+| Counter with unit | `_<unit>_total`      | `process_cpu_seconds_total`          |
+| Info metric       | `_info`              | `myapp_build_info`                   |
+| Timestamp         | `_timestamp_seconds` | `job_last_success_timestamp_seconds` |
+| Boolean-like      | (use gauge, 0 or 1)  | `myapp_healthy`                      |
 
 ### Name Ordering for Sorting
 
@@ -85,8 +85,8 @@ prometheus_tsdb_head_truncations_total
 
 ### Semantic Consistency
 
-A metric MUST represent the same logical thing across all its label dimensions.
-Test: `sum()` or `avg()` across all dimensions should be meaningful.
+A metric MUST represent the same logical thing across all its label dimensions. Test: `sum()` or `avg()` across all
+dimensions should be meaningful.
 
 ```
 # Good — all dimensions measure the same thing (request duration)
@@ -116,20 +116,19 @@ api_http_requests_total{operation="delete"}
 
 - **Unbounded values** — user IDs, email addresses, full URLs, query strings
 - **High cardinality** — anything above ~100 unique values per metric
-- **Label names in metric names** — `http_requests_by_method_total` is redundant
-  if there's a `method` label
+- **Label names in metric names** — `http_requests_by_method_total` is redundant if there's a `method` label
 
 ### Cardinality Guidelines
 
-| Cardinality | Guidance |
-|-------------|----------|
-| < 10 | Safe for most metrics |
-| 10-100 | Acceptable, monitor growth |
-| 100-1000 | Investigate alternatives |
-| > 1000 | Move analysis out of Prometheus |
+| Cardinality | Guidance                        |
+| ----------- | ------------------------------- |
+| < 10        | Safe for most metrics           |
+| 10-100      | Acceptable, monitor growth      |
+| 100-1000    | Investigate alternatives        |
+| > 1000      | Move analysis out of Prometheus |
 
-**Cardinality math:** Total time series = metric cardinality x number of targets.
-A metric with 100 label combinations across 1000 targets = 100,000 time series.
+**Cardinality math:** Total time series = metric cardinality x number of targets. A metric with 100 label combinations
+across 1000 targets = 100,000 time series.
 
 ### Reserved Labels
 
@@ -142,9 +141,7 @@ A metric with 100 label combinations across 1000 targets = 100,000 time series.
 
 1. **Minimal labels.** Every label is a dimension users must consider in PromQL.
 2. **Stable label values.** Avoid labels that change frequently.
-3. **Initialize all combinations.** Export 0 for known label sets to prevent
-   missing metrics.
-4. **Separate read/write.** Use separate metrics rather than a `direction` label
-   — users typically care about one at a time.
-5. **No "total" label value.** Don't include a `total` or empty aggregation
-   label — rely on Prometheus `sum()` instead.
+3. **Initialize all combinations.** Export 0 for known label sets to prevent missing metrics.
+4. **Separate read/write.** Use separate metrics rather than a `direction` label — users typically care about one at a
+   time.
+5. **No "total" label value.** Don't include a `total` or empty aggregation label — rely on Prometheus `sum()` instead.

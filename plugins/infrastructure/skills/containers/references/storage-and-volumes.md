@@ -2,12 +2,12 @@
 
 ## Storage Types
 
-| Type | Managed By | Persists | Host Access | Use Case |
-|------|-----------|----------|-------------|----------|
-| Named volume | Docker | Yes | Via `docker volume` | Database data, persistent state |
-| Anonymous volume | Docker | Until container removed | No | Temporary per-container data |
-| Bind mount | User | N/A (is host FS) | Direct | Development, config injection |
-| tmpfs | Kernel | No (RAM only) | No | Secrets, scratch data, caches |
+| Type             | Managed By | Persists                | Host Access         | Use Case                        |
+| ---------------- | ---------- | ----------------------- | ------------------- | ------------------------------- |
+| Named volume     | Docker     | Yes                     | Via `docker volume` | Database data, persistent state |
+| Anonymous volume | Docker     | Until container removed | No                  | Temporary per-container data    |
+| Bind mount       | User       | N/A (is host FS)        | Direct              | Development, config injection   |
+| tmpfs            | Kernel     | No (RAM only)           | No                  | Secrets, scratch data, caches   |
 
 ## Named Volumes
 
@@ -116,8 +116,7 @@ docker run --rm \
 
 ## Volume Permissions
 
-Common issue: container user cannot write to mounted volume because
-UID/GID doesn't match.
+Common issue: container user cannot write to mounted volume because UID/GID doesn't match.
 
 ### Fix at build time
 
@@ -153,8 +152,7 @@ Mount a subdirectory of a volume instead of the entire volume:
 docker run --mount source=logs,target=/var/log/app,volume-subpath=app1 myimage
 ```
 
-Useful for sharing one volume across multiple containers with isolated
-subdirectories.
+Useful for sharing one volume across multiple containers with isolated subdirectories.
 
 ## VOLUME Instruction in Dockerfile
 
@@ -164,12 +162,9 @@ VOLUME ["/data"]
 
 - Creates an anonymous volume at the specified path
 - Data at that path is not included in image layers
-- **Avoid in application Dockerfiles** — creates anonymous volumes that
-  accumulate and are hard to manage
-- Appropriate for database images where data must not be in the writable
-  layer
-- Named volumes in `compose.yml` or `docker run -v` override the
-  `VOLUME` instruction
+- **Avoid in application Dockerfiles** — creates anonymous volumes that accumulate and are hard to manage
+- Appropriate for database images where data must not be in the writable layer
+- Named volumes in `compose.yml` or `docker run -v` override the `VOLUME` instruction
 
 ## Cleanup
 
@@ -179,35 +174,28 @@ docker volume prune --all        # Remove ALL unused volumes (including named)
 docker system prune --volumes    # Full cleanup including volumes
 ```
 
-Dangling anonymous volumes accumulate silently. Run `docker volume prune`
-periodically.
+Dangling anonymous volumes accumulate silently. Run `docker volume prune` periodically.
 
 ## Storage Drivers
 
-The storage driver manages the container's layered filesystem using
-copy-on-write. Writing to the container's writable layer is slower
-than writing to a volume — never store databases or logs in the
-container layer.
+The storage driver manages the container's layered filesystem using copy-on-write. Writing to the container's writable
+layer is slower than writing to a volume — never store databases or logs in the container layer.
 
-| Driver | Use Case | Notes |
-|--------|----------|-------|
-| `overlay2` | Default for Docker on Linux | Best performance, recommended |
-| `fuse-overlayfs` | Rootless Podman (legacy) | Slower than native overlay |
+| Driver             | Use Case                       | Notes                               |
+| ------------------ | ------------------------------ | ----------------------------------- |
+| `overlay2`         | Default for Docker on Linux    | Best performance, recommended       |
+| `fuse-overlayfs`   | Rootless Podman (legacy)       | Slower than native overlay          |
 | `overlay` (native) | Rootless Podman (kernel 5.12+) | Matches Docker overlay2 performance |
-| `btrfs` / `zfs` | Specialized host filesystems | Use when host FS requires it |
-| `vfs` | Fallback / nested builds | No CoW — simple but least efficient |
+| `btrfs` / `zfs`    | Specialized host filesystems   | Use when host FS requires it        |
+| `vfs`              | Fallback / nested builds       | No CoW — simple but least efficient |
 
 ### Performance best practices
 
-- **Never write heavy data to the container layer.** Use named volumes
-  for databases, uploads, and logs. The union filesystem adds overhead
-  on every write.
-- **Use native overlay for rootless Podman.** On kernel 5.12+, configure
-  `driver = "overlay"` in `storage.conf` to avoid fuse-overlayfs
-  performance penalties.
-- **Monitor disk usage.** `docker system df` shows space by images,
-  containers, and volumes. Set alerts on production hosts.
-- **For nested builds (container-in-container):** Mount a host volume
-  to `/var/lib/containers/storage` instead of relying on
-  fuse-overlayfs. Or use `driver = "vfs"` as a faster-than-fuse
-  fallback.
+- **Never write heavy data to the container layer.** Use named volumes for databases, uploads, and logs. The union
+  filesystem adds overhead on every write.
+- **Use native overlay for rootless Podman.** On kernel 5.12+, configure `driver = "overlay"` in `storage.conf` to avoid
+  fuse-overlayfs performance penalties.
+- **Monitor disk usage.** `docker system df` shows space by images, containers, and volumes. Set alerts on production
+  hosts.
+- **For nested builds (container-in-container):** Mount a host volume to `/var/lib/containers/storage` instead of
+  relying on fuse-overlayfs. Or use `driver = "vfs"` as a faster-than-fuse fallback.

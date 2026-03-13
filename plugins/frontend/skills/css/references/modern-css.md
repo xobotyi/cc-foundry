@@ -1,7 +1,6 @@
 # Modern CSS Features
 
-Nesting, cascade layers, container queries, `:has()`, custom properties, and
-view transitions.
+Nesting, cascade layers, container queries, `:has()`, custom properties, and view transitions.
 
 ## CSS Nesting
 
@@ -27,17 +26,14 @@ Native CSS nesting eliminates the need for preprocessors in many cases.
 
 ### Rules
 
-- **Use `&` for pseudo-classes/elements and compound selectors.**
-  `&:hover`, `&::before`, `&.active`.
+- **Use `&` for pseudo-classes/elements and compound selectors.** `&:hover`, `&::before`, `&.active`.
 - **Omit `&` for descendant selectors.** `.card { .title {} }` works.
-- **`&` is required when the nested selector starts with a type selector.**
-  `& p {}` not `p {}` (without `&`, starts a new rule).
+- **`&` is required when the nested selector starts with a type selector.** `& p {}` not `p {}` (without `&`, starts a
+  new rule).
 - **Nesting at-rules works.** `@media`, `@supports`, `@container` nest directly.
-- **Specificity:** `:is()` wrapping applies. `.card { .title {} }` has same
-  specificity as `.card .title`, but nested `:is(.card) .title` specificity
-  may differ. Be aware of specificity changes.
-- **Max depth: 3 levels.** Deeper nesting creates specificity issues and
-  couples CSS to DOM structure.
+- **Specificity:** `:is()` wrapping applies. `.card { .title {} }` has same specificity as `.card .title`, but nested
+  `:is(.card) .title` specificity may differ. Be aware of specificity changes.
+- **Max depth: 3 levels.** Deeper nesting creates specificity issues and couples CSS to DOM structure.
 
 ## Cascade Layers (`@layer`)
 
@@ -53,6 +49,7 @@ Layers give explicit control over cascade priority without specificity hacks.
 ```
 
 Priority (lowest to highest):
+
 1. `reset` layer
 2. `defaults` layer
 3. `components` layer
@@ -60,6 +57,7 @@ Priority (lowest to highest):
 5. Un-layered styles (highest normal priority)
 
 **`!important` reverses layer order:**
+
 1. `!important reset` (highest important priority)
 2. `!important defaults`
 3. `!important components`
@@ -95,13 +93,11 @@ Priority (lowest to highest):
 
 - **Declare all layers at the top of the stylesheet** in a single statement.
 - **Typical ordering:** `reset, defaults, themes, components, utilities`.
-- **Import third-party CSS into sub-layers:**
-  `@import url('bootstrap.css') layer(vendor.bootstrap);`
+- **Import third-party CSS into sub-layers:** `@import url('bootstrap.css') layer(vendor.bootstrap);`
 - **Use `revert-layer`** to roll back to the previous layer's value.
-- **`!important` in low layers is intentional** -- it means "this style is
-  essential, don't override."
-- **Don't create layers per-component.** Layers manage cascade priority
-  between categories (reset vs component vs utility), not scope.
+- **`!important` in low layers is intentional** -- it means "this style is essential, don't override."
+- **Don't create layers per-component.** Layers manage cascade priority between categories (reset vs component vs
+  utility), not scope.
 
 ## Container Queries
 
@@ -134,14 +130,14 @@ Style components based on their container's size, not the viewport.
 
 ### Container Query Units
 
-| Unit | Meaning |
-|------|---------|
-| `cqw` | 1% of container width |
-| `cqh` | 1% of container height |
-| `cqi` | 1% of container inline size |
-| `cqb` | 1% of container block size |
-| `cqmin` | smaller of `cqi` or `cqb` |
-| `cqmax` | larger of `cqi` or `cqb` |
+| Unit    | Meaning                     |
+| ------- | --------------------------- |
+| `cqw`   | 1% of container width       |
+| `cqh`   | 1% of container height      |
+| `cqi`   | 1% of container inline size |
+| `cqb`   | 1% of container block size  |
+| `cqmin` | smaller of `cqi` or `cqb`   |
+| `cqmax` | larger of `cqi` or `cqb`    |
 
 ```css
 /* Fluid font size based on container, not viewport */
@@ -152,12 +148,10 @@ Style components based on their container's size, not the viewport.
 
 ### When to Use
 
-- **Container queries:** Components that appear in different-width contexts
-  (cards in sidebar vs main content, widgets in dashboards).
-- **Media queries:** Viewport-dependent elements (site header, navigation,
-  full-width sections).
-- **Flexbox/grid intrinsic sizing:** Simple responsive adjustments
-  (wrapping, auto-fit grids).
+- **Container queries:** Components that appear in different-width contexts (cards in sidebar vs main content, widgets
+  in dashboards).
+- **Media queries:** Viewport-dependent elements (site header, navigation, full-width sections).
+- **Flexbox/grid intrinsic sizing:** Simple responsive adjustments (wrapping, auto-fit grids).
 
 ## The `:has()` Selector
 
@@ -187,10 +181,9 @@ h1:has(+ h2) {
 
 ### Performance Rules
 
-- **Anchor to specific elements, not `body`, `:root`, or `*`.**
-  Broad anchors force expensive re-evaluation on every DOM change.
-- **Use direct child (`>`) or sibling (`+`, `~`) combinators** inside
-  `:has()` to limit traversal scope.
+- **Anchor to specific elements, not `body`, `:root`, or `*`.** Broad anchors force expensive re-evaluation on every DOM
+  change.
+- **Use direct child (`>`) or sibling (`+`, `~`) combinators** inside `:has()` to limit traversal scope.
 - **Cannot nest `:has()` inside `:has()`.**
 - **Pseudo-elements are not valid** inside `:has()`.
 
@@ -219,8 +212,7 @@ body:has(.sidebar-open) { /* ... */ }
 ### Rules
 
 - **Define on `:root` for globals.** Scope to components for local overrides.
-- **Always provide fallbacks** for component-level variables:
-  `var(--button-bg, var(--color-primary))`.
+- **Always provide fallbacks** for component-level variables: `var(--button-bg, var(--color-primary))`.
 - **Case-sensitive.** `--my-color` differs from `--My-Color`.
 - **Custom properties inherit** by default (unlike most CSS properties).
 - **Use `@property` for typed variables:**
@@ -234,6 +226,7 @@ body:has(.sidebar-open) { /* ... */ }
 ```
 
 `@property` enables:
+
 - Type checking (invalid values fall back to `initial-value`)
 - Controlled inheritance (`inherits: false`)
 - Animatable custom properties (critical for transitions)

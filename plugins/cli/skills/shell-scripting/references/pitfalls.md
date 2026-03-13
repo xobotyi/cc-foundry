@@ -1,7 +1,7 @@
 # Common Pitfalls
 
-A catalog of frequent shell scripting mistakes, drawn from Greg Wooledge's
-BashPitfalls, ShellCheck warnings, and real-world bugs.
+A catalog of frequent shell scripting mistakes, drawn from Greg Wooledge's BashPitfalls, ShellCheck warnings, and
+real-world bugs.
 
 ## Iteration Pitfalls
 
@@ -243,8 +243,7 @@ rm "./$file"
 
 ### Forgetting `--` with commands
 
-Many commands interpret arguments starting with `-` as options. Always use
-`--` before variable filenames:
+Many commands interpret arguments starting with `-` as options. Always use `--` before variable filenames:
 
 ```bash
 cp -- "$src" "$dst"

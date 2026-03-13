@@ -4,8 +4,7 @@ SQLite, WebSockets, bundler, plugins, and utilities.
 
 ## SQLite — `bun:sqlite`
 
-Native high-performance SQLite3 driver. Synchronous API. 3-6x faster than
-`better-sqlite3`.
+Native high-performance SQLite3 driver. Synchronous API. 3-6x faster than `better-sqlite3`.
 
 ### Database
 
@@ -99,11 +98,11 @@ if (!result.success) {
 
 ### Targets
 
-| Target | Use case |
-|--------|----------|
-| `"bun"` | Bun server apps. Inlines `bun:*` imports. |
-| `"browser"` | Client-side. Standard web APIs only. |
-| `"node"` | Node.js apps. Preserves `node:*` imports. |
+| Target      | Use case                                  |
+| ----------- | ----------------------------------------- |
+| `"bun"`     | Bun server apps. Inlines `bun:*` imports. |
+| `"browser"` | Client-side. Standard web APIs only.      |
+| `"node"`    | Node.js apps. Preserves `node:*` imports. |
 
 ### HTML Entrypoints
 
@@ -114,8 +113,7 @@ await Bun.build({
 });
 ```
 
-Processes `<script>`, `<link>`, and `<img>` tags. Supports CSS, TypeScript,
-Tailwind.
+Processes `<script>`, `<link>`, and `<img>` tags. Supports CSS, TypeScript, Tailwind.
 
 ## Plugins — `Bun.plugin()`
 
@@ -143,8 +141,8 @@ preload = ["./plugins/yaml.ts"]
 
 ## Macros
 
-Compile-time code execution. Functions imported with `{ type: "macro" }` run at
-bundle time and their return value is inlined:
+Compile-time code execution. Functions imported with `{ type: "macro" }` run at bundle time and their return value is
+inlined:
 
 ```ts
 // macro.ts
