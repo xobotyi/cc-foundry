@@ -160,15 +160,15 @@ and interop patterns.
 ### Route-to-Reference Tables
 
 When a skill has references, include a route table with a **Contents** column
-describing what type of depth the reference provides. Use `${CLAUDE_SKILL_DIR}`
+describing what type of depth the reference provides. Use `$\{CLAUDE_SKILL_DIR\}`
 for all reference paths — it resolves to the skill's absolute directory at load
 time, so the agent sees unambiguous paths it can pass directly to the Read tool.
 
 ```markdown
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| Modules | `${CLAUDE_SKILL_DIR}/references/modules.md` | ESM/CJS comparison tables, file extension rules |
-| Streams | `${CLAUDE_SKILL_DIR}/references/streams.md` | Stream types table, pipeline patterns, backpressure |
+| Modules | `$\{CLAUDE_SKILL_DIR\}/references/modules.md` | ESM/CJS comparison tables, file extension rules |
+| Streams | `$\{CLAUDE_SKILL_DIR\}/references/streams.md` | Stream types table, pipeline patterns, backpressure |
 ```
 
 The Contents column tells the agent what's inside, enabling informed read
@@ -339,7 +339,7 @@ description: >-
 
 | Topic | Reference | Contents |
 |-------|-----------|----------|
-| [topic] | `${CLAUDE_SKILL_DIR}/references/[file].md` | [type of depth: tables, examples, patterns] |
+| [topic] | `$\{CLAUDE_SKILL_DIR\}/references/[file].md` | [type of depth: tables, examples, patterns] |
 
 ## [Topic Sections]
 
