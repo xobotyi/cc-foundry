@@ -1,27 +1,19 @@
 # Skill Quality Evaluation
 
-Skills are prompts. Evaluate them using prompt engineering criteria.
+Detailed scoring rubrics and evaluation procedures. For the quick deployment
+checklist, see the "Quick Checks" section in SKILL.md.
 
-## Quick Evaluation Checklist
+## Contents
 
-Before deploying a skill, verify:
-
-- [ ] Description leads with what the skill does (not a slogan)
-- [ ] Description claims domain broadly ("whenever task involves")
-- [ ] Description lists specific trigger keywords as examples
-- [ ] SKILL.md is behaviorally self-sufficient — no critical rules only in references
-- [ ] References contain only deepening material (examples, catalogs, how-tos)
-- [ ] Route-to-Reference table has Contents column (if references exist)
-- [ ] Degrees of freedom matched to task fragility (high/medium/low)
-- [ ] Instructions are clear and imperative
-- [ ] Instructions use structure (numbered steps/rules, XML tags, headers)
-- [ ] Examples cover normal and edge cases (few-shot prompting)
-- [ ] Critical rules placed at end of SKILL.md
-- [ ] Output format explicitly specified (if applicable)
-- [ ] Under 500 lines (behavioral rules count as core; exceeding is acceptable)
-- [ ] References are one level deep (no nested chains)
-- [ ] Scope is focused (one purpose)
-- [ ] Tested with varied inputs
+- [Description Quality](#description-quality)
+- [Instruction Quality](#instruction-quality)
+- [Progressive Disclosure](#progressive-disclosure)
+- [Scope Assessment](#scope-assessment)
+- [Example Quality](#example-quality)
+- [Evaluation-Driven Development](#evaluation-driven-development)
+- [Testing Protocol](#testing-protocol)
+- [Scoring Rubric](#scoring-rubric)
+- [Common Issues by Score Range](#common-issues-by-score-range)
 
 ## Description Quality
 

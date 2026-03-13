@@ -426,30 +426,19 @@ across varied user requests.
 ## Writing Persistent Artifacts
 
 When the prompt being written will persist (skills, system prompts,
-CLAUDE.md), apply these additional rules on top of the general workflow:
-
-**Structure for the U-shaped curve.** Place identity and critical
-constraints in the top 20%, reinforce at the bottom 20%. Detailed rules
-and examples go in the middle — they're still read, just with less
-persistent attention.
-
-**Default to declarative.** Constraints, conventions, and behavioral rules
-as bullet lists. Reserve numbered steps for workflows with strict ordering.
-Cap step sequences at ~10-15; decompose beyond that.
+CLAUDE.md), apply the persistent-context rules from SKILL.md (placement
+strategy, declarative defaults, deletion test, CoT avoidance) plus these
+agent-specific additions:
 
 **Test with varied requests.** A persistent prompt serves many different
 user requests. Simulate at least 3 very different requests and verify the
 prompt handles all of them. An API prompt needs to handle one request well;
 a skill needs to handle hundreds.
 
-**Apply the deletion test.** For every rule in the artifact, ask: "does
-the model produce worse output without this?" If not, the rule is
-attention cost with no value. This is especially important for skills
-because unnecessary instructions reduce task success in persistent context.
-
-**Avoid blanket CoT.** Don't embed "think step by step" in artifacts that
-will face varied requests. Some benefit from reasoning, some are harmed.
-Prefer adaptive thinking or request-specific reasoning.
+**Audit after each correction cycle.** Agents adding rules to fix failures
+rarely remove existing rules that became redundant. After each correction,
+re-read the full prompt and apply the deletion test to every instruction —
+not just the new ones.
 
 ---
 

@@ -85,39 +85,15 @@ my--skill          # consecutive hyphens
 claude-helper      # reserved word
 ```
 
-## Description Best Practices
+## Description Field
 
-The description is the **primary signal** for skill activation. Claude
-reads all skill descriptions at startup and matches your request against
-them.
+See SKILL.md "Description Formula" for the formula, principles, and
+good/bad examples. This section covers only spec-level constraints.
 
-**Structure:**
-```
-[What it does] [When to use it/trigger scenarios]
-```
-
-**Good:**
-```yaml
-description: >-
-  Extract text and tables from PDF files, fill forms, merge documents.
-  Use when working with PDF files or when the user mentions PDFs,
-  forms, or document extraction.
-```
-
-**Bad:**
-```yaml
-description: Helps with documents  # Too vague
-```
-
-**Include:**
-- Specific capabilities
-- Trigger keywords users might say
-- File types or domains covered
-
-**Avoid:**
-- Vague terms: "helps with", "assists"
+**Avoid in descriptions:**
 - Second person: "You can use this to..."
-- XML tags in description
+- XML tags (descriptions are plain text)
+- Reserved words in skill names that might confuse activation
 
 ## Skill Discovery and Precedence
 
@@ -157,51 +133,18 @@ catalog content that belongs in references.
 ## Body Content Guidelines
 
 The body is injected as a user message when the skill is triggered.
-Apply prompt engineering principles throughout.
-
-**Recommended structure:**
-```markdown
-# [Purpose Statement]
-
-## Quick Start
-[Minimal guidance to get started]
-
-## Instructions
-[Detailed steps, numbered if sequential]
-[Use XML tags for multi-part instructions]
-
-## Examples
-[Input/output pairs for clarity — few-shot prompting]
-
-## Output Format
-[Explicit format specification with example]
-
-## Edge Cases
-[What to do in unusual situations]
-
-## References
-[Links to reference files for deep dives]
-
-## CRITICAL
-[Most important rules — placement at end improves compliance]
-```
+See SKILL.md "Content Architecture" and "Writing Instructions" for
+behavioral rules on what goes where and how to write instructions.
+This section covers spec-level details only.
 
 **Token budget:**
 - Target under 500 lines for instruction core
 - Aim for < 5000 tokens
 - Behavioral rules count as core — they stay in SKILL.md even if that
-  pushes past 500 lines (a 700-line skill with all behavioral rules is
-  better than a 400-line skill with critical rules in unread references)
-- Move catalog, lookup, and situational content to reference files
+  pushes past 500 lines
 - Remember the instruction budget: ~150-200 instructions is the
   reliable ceiling for frontier models, and the system prompt already
-  claims ~50. Every rule in your skill competes for attention.
-
-**Prompt engineering tips:**
-- Use XML tags (`<instructions>`, `<constraints>`, `<output_format>`)
-- Place critical rules at the end
-- Include few-shot examples
-- Be specific about output format
+  claims ~50
 
 ## Reference Files
 
@@ -278,28 +221,14 @@ Skills use three-level loading:
 | 2. Instructions | Skill triggered | < 5000 | SKILL.md body |
 | 3. Resources | As referenced | Unlimited | scripts/, references/, assets/ |
 
-**Design for this:** SKILL.md (Level 2) must be behaviorally self-sufficient.
-An agent that reads only SKILL.md must produce correct output. References
-(Level 3) provide depth — detailed rubrics, extended examples, full catalogs,
-niche how-tos — but never core behavioral rules.
+See SKILL.md "Content Architecture" for the behavioral rules on what goes
+where (behavioral self-sufficiency, working-resolution vs high-resolution
+split, route-to-reference tables). This section covers the technical loading
+mechanics only.
 
 Agents do not reliably load references. Design for that reality: put every
 rule and directive the agent needs in SKILL.md. Use references for content
 that enriches but isn't required for correctness.
-
-**Content classification for the split:**
-
-| Content Type | Location | Example |
-|---|---|---|
-| Behavioral rules | SKILL.md | "Use `pipeline()` not `.pipe()`" |
-| Catalog/lookup | references/ | API tables, comparison charts |
-| Situational | references/ | Migration guides, deployment patterns |
-| Voluminous structural | references/ | Schemas, 50+ entry tables |
-
-**Working-resolution / high-resolution:** When a reference covers a topic
-that also has rules in SKILL.md, the SKILL.md version is the
-working-resolution summary (enough for correct behavior) and the reference
-is the high-resolution version (extended depth, examples, edge cases).
 
 ## String Substitutions
 

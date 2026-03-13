@@ -56,7 +56,9 @@ was helpful."
 
 **Instruction clarity:** Be explicit about format, constraints, scope.
 
-**Role priming:** "You are an expert legal analyst..."
+**Domain priming:** "This is a legal risk assessment task. Apply
+contract law principles." (More reliable than persona assignment —
+see SKILL.md "System Prompts" section.)
 
 **Output anchoring:** "Respond with exactly one word: positive,
 negative, or neutral."

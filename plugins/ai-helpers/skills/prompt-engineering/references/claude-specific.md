@@ -1,123 +1,118 @@
 # Claude-Specific Techniques
 
-Techniques unique to Claude or requiring Claude-specific implementation.
+Extended depth for Claude-specific features. For working-resolution rules on
+prefilling, system prompts, and extended thinking, see SKILL.md. This reference
+provides API details, advanced use cases, and technique combinations.
 
 ## Contents
 
-- [Prefilling](#prefilling)
-- [System Prompts (Role Prompting)](#system-prompts-role-prompting)
+- [Prefilling — Advanced Use Cases](#prefilling--advanced-use-cases)
+- [System Prompts — API Patterns](#system-prompts--api-patterns)
 - [Extended Thinking](#extended-thinking)
 - [Combining Techniques](#combining-techniques)
 
-## Prefilling
+## Prefilling — Advanced Use Cases
 
-Control Claude's response by providing the start of the assistant
-message. Claude continues from where you leave off.
+SKILL.md covers prefilling rules and constraints. This section provides
+advanced patterns for production use.
 
-### How It Works
+### Multi-Turn Prefilling
+
+Maintain format consistency across a conversation by prefilling each turn:
+
+```python
+# Turn 1
+messages=[
+    {"role": "user", "content": "Analyze revenue data: ..."},
+    {"role": "assistant", "content": '{"analysis":'}
+]
+
+# Turn 2 — same prefill maintains JSON format
+messages=[
+    {"role": "user", "content": "Now analyze cost data: ..."},
+    {"role": "assistant", "content": '{"analysis":'}
+]
+```
+
+### Prefill + XML for Structured Extraction
+
+Combine prefilling with XML tags to enforce multi-section output:
 
 ```python
 messages=[
-    {"role": "user", "content": "Extract data as JSON: ..."},
-    {"role": "assistant", "content": "{"}  # Prefill
+    {"role": "user", "content": "Review this PR: <code>...</code>"},
+    {"role": "assistant", "content": "<review>\n<summary>"}
 ]
-# Claude continues: "name": "...", "price": "..."}
+# Claude continues with summary, then findings, etc.
 ```
 
-### Use Cases
+### Prefill Limitations in Practice
 
-**Skip preambles:**
-```
-Prefill: "{"
-→ Claude outputs pure JSON, no "Here's the JSON:"
-```
-
-**Enforce format:**
-```
-Prefill: "| Name | Price |"
-→ Claude continues with table rows
-```
-
-**Maintain character:**
-```
-Prefill: "[Sherlock Holmes]"
-→ Claude stays in character even after many turns
-```
-
-**Force specific start:**
-```
-Prefill: "The answer is"
-→ Claude completes with the answer directly
-```
-
-### Constraints
-
-- **No trailing whitespace** — `"As an AI "` (with space) causes error
-- **Not available with extended thinking** — use standard mode only
-- **Short prefills work best** — a few words, not paragraphs
-
-### When to Use
-
-- Output format critical (JSON, XML, tables)
-- Need to skip verbose introductions
-- Roleplay consistency over long conversations
-- Forcing specific answer structure
+- Prefilling the wrong start can constrain Claude's reasoning — if the
+  best answer doesn't begin with your prefill, quality degrades
+- For classification, prefill with the format marker, not a specific class:
+  `"Classification:"` not `"Positive"` — the latter forces the answer
+- JSON prefills (`"{"`) work reliably; deeply nested prefills
+  (`'{"data": {"items": ['`) are fragile
 
 ---
 
-## System Prompts (Role Prompting)
+## System Prompts — API Patterns
 
-Use the `system` parameter to define Claude's role. This is the most
-powerful way to shape Claude's persona and expertise.
+SKILL.md covers domain priming vs persona and system prompt rules. This
+section provides API-level patterns and advanced configuration.
 
 ### API Usage
 
 ```python
 response = client.messages.create(
     model="claude-sonnet-4-5-20250929",
-    system="You are a senior security auditor at a Fortune 500 company.",
+    system="This is a web application security audit. Apply OWASP Top 10.",
     messages=[{"role": "user", "content": "Review this code..."}]
 )
 ```
 
-### Why It Works
+### Multi-Section System Prompts
 
-Role prompting activates domain-specific knowledge and reasoning
-patterns. "You are a CFO" produces different analysis than
-"You are a data scientist" for the same financial data.
+For complex applications, structure the system prompt with clear sections:
 
-### Best Practices
+```python
+system = """
+<domain>Enterprise financial analysis for quarterly reporting.</domain>
 
-**Be specific:**
-```
-# Weak
-You are a helpful assistant.
+<constraints>
+- All figures must cite their source document
+- Flag any year-over-year change exceeding 15%
+- Use GAAP terminology throughout
+</constraints>
 
-# Strong
-You are a senior DevOps engineer specializing in Kubernetes
-at a fintech startup handling PCI-DSS compliance.
-```
-
-**Put role in system, task in user:**
-```
-System: "You are a legal contract analyst..."
-User: "Review this NDA for risks..."
+<output_format>
+Structure every response as: Summary → Key Findings → Risks → Recommendations
+</output_format>
+"""
 ```
 
-**Combine with expertise markers:**
-```
-You are an expert [domain] specialist with 15 years experience.
-You approach problems methodically and cite specific regulations.
-```
+### System Prompt vs User Message — What Goes Where
 
-### Impact Example
+| Content | Location | Why |
+|---------|----------|-----|
+| Domain/role | System | Persists across turns, highest instruction priority |
+| Behavioral constraints | System | Must apply to every response |
+| Task description | User | Varies per request |
+| Input data | User | Changes each time |
+| Format examples | Either | System if constant, user if task-specific |
 
-Without role: "The contract looks standard."
+### Domain Priming Impact Example
 
-With "You are General Counsel of a Fortune 500 tech company":
-"I've identified three critical issues: (1) The indemnification
-clause in Section 8 is overly broad... (2) The liability cap of
-$500 is grossly inadequate for enterprise usage..."
+Without priming: "The contract looks standard."
+
+With `system="This is a legal risk assessment for enterprise software licensing."`:
+"Three critical issues: (1) The indemnification clause in Section 8 is overly
+broad... (2) The liability cap of $500 is grossly inadequate for enterprise
+usage..."
+
+The improvement comes from domain priming, not persona — specifying the
+task context activates relevant knowledge more reliably than role assignment.
 
 ---
 
