@@ -4,13 +4,11 @@ Diagnostic guide for skill failures.
 
 ## Quick Diagnosis
 
-| Symptom                | Check                                   |
-| ---------------------- | --------------------------------------- |
-| Skill not found        | [Structure Issues](#structure-issues)   |
-| Skill not triggering   | [Activation Issues](#activation-issues) |
-| Wrong output format    | [Output Issues](#output-issues)         |
-| Scripts failing        | [Script Issues](#script-issues)         |
-| References not loading | [Reference Issues](#reference-issues)   |
+- **Skill not found** → [Structure Issues](#structure-issues)
+- **Skill not triggering** → [Activation Issues](#activation-issues)
+- **Wrong output format** → [Output Issues](#output-issues)
+- **Scripts failing** → [Script Issues](#script-issues)
+- **References not loading** → [Reference Issues](#reference-issues)
 
 ## Structure Issues
 

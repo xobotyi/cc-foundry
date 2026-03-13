@@ -29,26 +29,26 @@ description: What it does and when to use it
 
 ## Frontmatter Fields
 
-| Field           | Required | Constraints                                                                                                                                                      |
-| --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`          | Yes      | 1-64 chars, lowercase, hyphens only, must match directory                                                                                                        |
-| `description`   | Yes      | 1-1024 chars, describes what AND when                                                                                                                            |
-| `license`       | No       | License name or reference                                                                                                                                        |
-| `compatibility` | No       | 1-500 chars, environment requirements                                                                                                                            |
-| `metadata`      | No       | Arbitrary key-value pairs                                                                                                                                        |
-| `allowed-tools` | No       | Comma-delimited tool list (experimental). In Claude Code, grants tool access without per-use approval while the skill is active. Has no effect in the Agent SDK. |
+- `name` (required): 1-64 chars, lowercase, hyphens only, must match directory
+- `description` (required): 1-1024 chars, describes what AND when
+- `license`: License name or reference
+- `compatibility`: 1-500 chars, environment requirements
+- `metadata`: Arbitrary key-value pairs
+- `allowed-tools`: Comma-delimited tool list (experimental). In Claude Code, grants tool access without per-use approval
+  while the skill is active. Has no effect in the Agent SDK.
 
 ### Claude Code Extensions
 
-| Field                      | Default         | Description                                                                                                                                                                                                |
-| -------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `argument-hint`            | —               | Hint for autocomplete: `[issue-number]`                                                                                                                                                                    |
-| `disable-model-invocation` | `false`         | Prevent Claude from auto-triggering. Also **removes the description from context entirely** — Claude won't see the skill exists unless explicitly invoked. This frees description budget for other skills. |
-| `user-invocable`           | `true`          | Show in `/` menu. Setting `false` hides from menu but does NOT block Skill tool access — use `disable-model-invocation` for that.                                                                          |
-| `model`                    | inherit         | Model override: `sonnet`, `opus`, `haiku`                                                                                                                                                                  |
-| `context`                  | —               | Set to `fork` for subagent execution                                                                                                                                                                       |
-| `agent`                    | general-purpose | Subagent type when `context: fork`                                                                                                                                                                         |
-| `hooks`                    | —               | Skill-scoped lifecycle hooks                                                                                                                                                                               |
+- `argument-hint`: Hint for autocomplete: `[issue-number]`
+- `disable-model-invocation` (default: `false`): Prevent Claude from auto-triggering. Also **removes the description
+  from context entirely** — Claude won't see the skill exists unless explicitly invoked. This frees description budget
+  for other skills.
+- `user-invocable` (default: `true`): Show in `/` menu. Setting `false` hides from menu but does NOT block Skill tool
+  access — use `disable-model-invocation` for that.
+- `model` (default: inherit): Model override: `sonnet`, `opus`, `haiku`
+- `context`: Set to `fork` for subagent execution
+- `agent` (default: general-purpose): Subagent type when `context: fork`
+- `hooks`: Skill-scoped lifecycle hooks
 
 ### Extended Thinking
 
@@ -226,13 +226,11 @@ SKILL.md. Use references for content that enriches but isn't required for correc
 
 ## String Substitutions
 
-| Variable               | Description                                |
-| ---------------------- | ------------------------------------------ |
-| `$ARGUMENTS`           | All arguments passed when invoking         |
-| `$ARGUMENTS[N]`        | Specific argument by 0-based index         |
-| `$N`                   | Shorthand for `$ARGUMENTS[N]`              |
-| `${CLAUDE_SESSION_ID}` | Current session ID                         |
-| `${CLAUDE_SKILL_DIR}`  | Absolute path to the skill's own directory |
+- `$ARGUMENTS`: All arguments passed when invoking
+- `$ARGUMENTS[N]`: Specific argument by 0-based index
+- `$N`: Shorthand for `$ARGUMENTS[N]`
+- `${CLAUDE_SESSION_ID}`: Current session ID
+- `${CLAUDE_SKILL_DIR}`: Absolute path to the skill's own directory
 
 All `${...}` variables are resolved at skill load time — Claude sees the expanded value, not the variable syntax.
 

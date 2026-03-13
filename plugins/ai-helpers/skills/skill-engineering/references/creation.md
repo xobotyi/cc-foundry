@@ -264,11 +264,15 @@ This prevents skills from conflicting and gives the agent clear precedence rules
 
 ## Common Creation Mistakes
 
-| Mistake                            | Why it happens                             | Fix                                                                |
-| ---------------------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
-| Writing references first           | Seems logical to gather depth before rules | Write SKILL.md first — it defines what depth is needed             |
-| Duplicating SKILL.md in references | Copy-paste habit, fear of missing content  | Each reference must provide content SKILL.md doesn't have          |
-| Over-scoping initial version       | Trying to cover all cases upfront          | Start with the 3 most common scenarios, expand later               |
-| Skipping evaluation                | "I know what the skill needs"              | Run Claude without the skill first — failures reveal real gaps     |
-| Writing 40+ rules                  | More rules = more thorough (false)         | More rules = more attention competition. Apply deletion test.      |
-| Procedural style for everything    | Steps feel more concrete                   | Declarative for constraints, procedural only for ordered workflows |
+- **Writing references first** — seems logical to gather depth before rules. Fix: write SKILL.md first — it defines what
+  depth is needed
+- **Duplicating SKILL.md in references** — copy-paste habit, fear of missing content. Fix: each reference must provide
+  content SKILL.md doesn't have
+- **Over-scoping initial version** — trying to cover all cases upfront. Fix: start with the 3 most common scenarios,
+  expand later
+- **Skipping evaluation** — "I know what the skill needs." Fix: run Claude without the skill first — failures reveal
+  real gaps
+- **Writing 40+ rules** — more rules = more thorough (false). Fix: more rules = more attention competition. Apply
+  deletion test
+- **Procedural style for everything** — steps feel more concrete. Fix: declarative for constraints, procedural only for
+  ordered workflows
