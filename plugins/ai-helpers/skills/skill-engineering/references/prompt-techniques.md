@@ -37,13 +37,11 @@ between instructions and output grows with each reasoning step. Research finding
 
 ### Decision Rules for Skill Authors
 
-| Skill characteristic                              | CoT recommendation                            |
-| ------------------------------------------------- | --------------------------------------------- |
-| Many mechanical constraints (format, word limits) | Avoid CoT entirely                            |
-| Complex multi-step workflow                       | Use numbered steps (procedural)               |
-| Varied request types (coding discipline)          | No blanket CoT; let model decide              |
-| Specific reasoning sub-task                       | Scoped CoT with constraint re-statement after |
-| Targets reasoning models (Claude 3.7+)            | High-level guidance only ("think thoroughly") |
+- **Many mechanical constraints** (format, word limits): Avoid CoT entirely
+- **Complex multi-step workflow**: Use numbered steps (procedural)
+- **Varied request types** (coding discipline): No blanket CoT; let model decide
+- **Specific reasoning sub-task**: Scoped CoT with constraint re-statement after
+- **Targets reasoning models** (Claude 3.7+): High-level guidance only ("think thoroughly")
 
 ### Constraint Re-Statement Pattern
 
@@ -73,13 +71,11 @@ After analysis, format your response following these rules:
 When Claude ignores instructions despite clear phrasing, escalate with these patterns — ordered from least to most
 aggressive:
 
-| Level             | Pattern                       | Example                                                             |
-| ----------------- | ----------------------------- | ------------------------------------------------------------------- |
-| 1. Restructure    | Move to XML tags at end       | `<constraints>ALWAYS filter test accounts</constraints>`            |
-| 2. Emphasize      | Uppercase key word            | "ALWAYS filter test accounts"                                       |
-| 3. Negative space | State what NOT to do          | "Do NOT include explanatory preamble"                               |
-| 4. Consequence    | State what happens if ignored | "If validation is skipped, the output will corrupt downstream data" |
-| 5. Dual-place     | Top + bottom reinforcement    | Principle at top, checklist at bottom                               |
+1. **Restructure** — move to XML tags at end: `<constraints>ALWAYS filter test accounts</constraints>`
+2. **Emphasize** — uppercase key word: "ALWAYS filter test accounts"
+3. **Negative space** — state what NOT to do: "Do NOT include explanatory preamble"
+4. **Consequence** — state what happens if ignored: "If validation is skipped, the output will corrupt downstream data"
+5. **Dual-place** — top + bottom reinforcement: principle at top, checklist at bottom
 
 **Use sparingly.** If everything is emphasized, nothing is. Reserve strong language for rules that repeatedly fail in
 testing.
@@ -179,15 +175,13 @@ Most skills don't need security blocks. Add them when the skill handles:
 When a skill produces wrong output, diagnose with this table before adding more instructions (which may make the problem
 worse):
 
-| Symptom             | Likely Cause                         | Fix                                          |
-| ------------------- | ------------------------------------ | -------------------------------------------- |
-| Wrong format        | No format specification or example   | Add explicit format + example output         |
-| Missing details     | Instructions too vague               | Be specific: "Include X, Y, Z"               |
-| Ignores constraints | Constraints buried in prose          | Move to `<constraints>` tags at end          |
-| Inconsistent output | Ambiguous or conflicting guidance    | Add few-shot examples, resolve conflicts     |
-| Partial completion  | Steps not numbered or unclear        | Use numbered sequential steps                |
-| Correct but verbose | No negative constraints              | Add "Do NOT include..." directives           |
-| Works sometimes     | Critical rule in attention dead zone | Dual-place: top principle + bottom checklist |
+- **Wrong format** — no format specification or example. Fix: add explicit format + example output
+- **Missing details** — instructions too vague. Fix: be specific: "Include X, Y, Z"
+- **Ignores constraints** — constraints buried in prose. Fix: move to `<constraints>` tags at end
+- **Inconsistent output** — ambiguous or conflicting guidance. Fix: add few-shot examples, resolve conflicts
+- **Partial completion** — steps not numbered or unclear. Fix: use numbered sequential steps
+- **Correct but verbose** — no negative constraints. Fix: add "Do NOT include..." directives
+- **Works sometimes** — critical rule in attention dead zone. Fix: dual-place: top principle + bottom checklist
 
 ### The Fix Hierarchy
 

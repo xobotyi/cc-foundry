@@ -17,22 +17,18 @@ Use skill → Observe behavior → Identify gap → Refine → Repeat
 but don't guarantee activation. For details on the systemic issue and mitigation strategies (including forced-eval hooks
 that achieve ~84%), see the [troubleshooting reference](${CLAUDE_SKILL_DIR}/references/troubleshooting.md).
 
-| Problem               | Cause                           | Fix                                        |
-| --------------------- | ------------------------------- | ------------------------------------------ |
-| Doesn't trigger       | Description misses user's words | Broaden domain claim, add trigger keywords |
-| Triggers too often    | Description too broad           | Add exclusions: "Use for X, NOT for Y"     |
-| Wrong skill activates | Overlapping descriptions        | Make descriptions more distinct            |
+- **Doesn't trigger** — description misses user's words. Fix: broaden domain claim, add trigger keywords
+- **Triggers too often** — description too broad. Fix: add exclusions: "Use for X, NOT for Y"
+- **Wrong skill activates** — overlapping descriptions. Fix: make descriptions more distinct
 
 ### Output Issues
 
-| Problem              | Cause                   | Fix                                      |
-| -------------------- | ----------------------- | ---------------------------------------- |
-| Wrong format         | No format specification | Add explicit format with example output  |
-| Missing details      | Instructions vague      | Be specific: "Include X, Y, Z"           |
-| Ignores instructions | Buried in prose         | Move to end, use XML tags, add structure |
-| Inconsistent quality | Ambiguous guidance      | Add few-shot examples, resolve conflicts |
-| Partial completion   | Steps unclear           | Use numbered sequential steps            |
-| Ignores constraints  | Not emphasized          | Place in `<constraints>` tags at end     |
+- **Wrong format** — no format specification. Fix: add explicit format with example output
+- **Missing details** — instructions vague. Fix: be specific: "Include X, Y, Z"
+- **Ignores instructions** — buried in prose. Fix: move to end, use XML tags, add structure
+- **Inconsistent quality** — ambiguous guidance. Fix: add few-shot examples, resolve conflicts
+- **Partial completion** — steps unclear. Fix: use numbered sequential steps
+- **Ignores constraints** — not emphasized. Fix: place in `<constraints>` tags at end
 
 ## Refinement Patterns
 

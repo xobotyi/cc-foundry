@@ -28,15 +28,21 @@ Skip only for trivial edits (typos, formatting).
 
 ## Route to Reference
 
-| Situation                                            | Reference                                               | Contents                                                                                                                                                             |
-| ---------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SKILL.md format, frontmatter rules, directory layout | [`${CLAUDE_SKILL_DIR}/references/spec.md`]              | Frontmatter fields, name rules, string substitutions, progressive disclosure mechanics, discovery/precedence, instruction budget                                     |
-| Creating a skill from scratch                        | [`${CLAUDE_SKILL_DIR}/references/creation.md`]          | Step-by-step creation workflow, scope sizing guidance, evaluation-driven development process, archetype deep dives with extended structural patterns                 |
-| Evaluating skill quality (review, audit)             | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`]        | Scoring rubric (5 dimensions), evaluation-driven development, testing protocol, common issues by score range                                                         |
-| Skill not triggering, wrong output, refinement       | [`${CLAUDE_SKILL_DIR}/references/iteration.md`]         | Activation fixes, output fixes, restructuring, splitting guidance                                                                                                    |
-| Multi-file skills, scripts, subagents, hooks         | [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] | Fork pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping                                                                |
-| Debugging activation failures, script errors         | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`]   | Diagnostic steps for structure, activation reliability, output, script, reference issues                                                                             |
-| Writing persuasive instructions, reasoning           | [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] | CoT trade-off research and decision rules, instruction strengthening escalation patterns, format control techniques, security blocks, debugging instruction failures |
+- **SKILL.md format, frontmatter rules, directory layout** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] Frontmatter
+  fields, name rules, string substitutions, progressive disclosure mechanics, discovery/precedence, instruction budget
+- **Creating a skill from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Step-by-step creation workflow,
+  scope sizing guidance, evaluation-driven development process, archetype deep dives with extended structural patterns
+- **Evaluating skill quality (review, audit)** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Scoring rubric (5
+  dimensions), evaluation-driven development, testing protocol, common issues by score range
+- **Skill not triggering, wrong output, refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Activation fixes,
+  output fixes, restructuring, splitting guidance
+- **Multi-file skills, scripts, subagents, hooks** — [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] Fork
+  pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping
+- **Debugging activation failures, script errors** — [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] Diagnostic
+  steps for structure, activation reliability, output, script, reference issues
+- **Writing persuasive instructions, reasoning** — [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] CoT trade-off
+  research and decision rules, instruction strengthening escalation patterns, format control techniques, security
+  blocks, debugging instruction failures
 
 Read the relevant reference before proceeding.
 
@@ -121,12 +127,11 @@ This applies to all skill types, not just coding disciplines.
 
 ### What Goes Where
 
-| Content Type                      | Location      | Rationale                                                                   |
-| --------------------------------- | ------------- | --------------------------------------------------------------------------- |
-| **Behavioral rules**              | SKILL.md body | Agent must follow these during work — can't afford a missed reference read  |
-| **Catalog/lookup content**        | references/   | Agent reads on-demand for specific lookups (API tables, comparison charts)  |
-| **Situational content**           | references/   | Only needed in specific phases (migration guides, deployment patterns)      |
-| **Voluminous structural content** | references/   | Too large to inline, inherently lookup-oriented (schemas, 50+ entry tables) |
+- **Behavioral rules** → SKILL.md body — agent must follow these during work; can't afford a missed reference read
+- **Catalog/lookup content** → references/ — agent reads on-demand for specific lookups (API tables, comparison charts)
+- **Situational content** → references/ — only needed in specific phases (migration guides, deployment patterns)
+- **Voluminous structural content** → references/ — too large to inline, inherently lookup-oriented (schemas, 50+ entry
+  tables)
 
 Behavioral rules are directives an agent must follow to do the work correctly. If an agent skipping a reference would
 produce wrong output, that content is behavioral and belongs in SKILL.md.
@@ -146,21 +151,37 @@ provides detailed 0-20 scoring rubrics for each criterion with examples at each 
 **Example:** A Node.js skill puts 17 module system rules in SKILL.md. The reference provides ESM/CJS comparison tables,
 file extension edge cases, and interop patterns.
 
-### Route-to-Reference Tables
+### Structured Data Formats
 
-When a skill has references, include a route table with a **Contents** column describing what type of depth the
-reference provides. Use `$\{CLAUDE_SKILL_DIR\}` for all reference paths — it resolves to the skill's absolute directory
-at load time, so the agent sees unambiguous paths it can pass directly to the Read tool.
+Format choice measurably affects LLM comprehension — up to 16pp between formats on identical content. Choose format by
+data type:
+
+- **Key-value lists** for lookup/routing data where each entry is independent: route tables, tool references, scoring
+  rubrics, configuration mappings
+- **Markdown tables** for genuinely 2D comparison data where cross-criteria scanning IS the point: decision matrices,
+  feature comparisons, naming convention tables
+
+KV lists outperform tables for lookup tasks (+8.8pp accuracy) because explicit key-value pairing eliminates
+column-header-to-cell inference. Tables outperform KV for comparison tasks because grid structure enables cross-row
+scanning.
+
+**Default to KV lists. Use tables only when removing a column would lose comparative meaning.**
+
+### Route-to-Reference Lists
+
+When a skill has references, include a route list describing what depth each reference provides. Use
+`$\{CLAUDE_SKILL_DIR\}` for all reference paths — it resolves to the skill's absolute directory at load time, so the
+agent sees unambiguous paths it can pass directly to the Read tool.
 
 ```markdown
-| Topic | Reference | Contents |
-|-------|-----------|----------|
-| Modules | `$\{CLAUDE_SKILL_DIR\}/references/modules.md` | ESM/CJS comparison tables, file extension rules |
-| Streams | `$\{CLAUDE_SKILL_DIR\}/references/streams.md` | Stream types table, pipeline patterns, backpressure |
+- **Modules** — `$\{CLAUDE_SKILL_DIR\}/references/modules.md`
+  ESM/CJS comparison tables, file extension rules, interop patterns
+- **Streams** — `$\{CLAUDE_SKILL_DIR\}/references/streams.md`
+  Stream types table, pipeline patterns, backpressure handling
 ```
 
-The Contents column tells the agent what's inside, enabling informed read decisions. Without it, agents either over-read
-(wasting context) or skip (missing content).
+Each entry names the topic, provides the path, and describes the contents — enabling informed read decisions. Without
+content descriptions, agents either over-read (wasting context) or skip (missing depth).
 
 ## Writing Instructions
 
@@ -200,7 +221,7 @@ Models follow a **U-shaped attention curve**: instructions at the beginning and 
 reliably; middle content suffers from attention decay.
 
 - **Top 20% (primacy zone):** Identity, philosophy, critical constraints
-- **Middle:** Detailed rules by topic, route table, examples
+- **Middle:** Detailed rules by topic, route list, examples
 - **Bottom 20% (recency zone):** Reinforced critical rules, quality checks
 
 **Dual-placement strategy:** For rules that absolutely must be followed, state them near the top AND reinforce at the
@@ -256,7 +277,7 @@ Conventions and rules for a language, framework, or platform. Structure:
 
 [Philosophy statement — one line]
 
-## References (route table with Contents column)
+## References (route list with content descriptions)
 ## [Topic sections with declarative rules as bullet lists]
 ## Application (writing mode vs reviewing mode)
 ## Integration (relationship to other skills)
@@ -310,9 +331,8 @@ description: >-
 
 ## References
 
-| Topic | Reference | Contents |
-|-------|-----------|----------|
-| [topic] | `$\{CLAUDE_SKILL_DIR\}/references/[file].md` | [type of depth: tables, examples, patterns] |
+- **[topic]** — `$\{CLAUDE_SKILL_DIR\}/references/[file].md`
+  [type of depth: tables, examples, patterns]
 
 ## [Topic Sections]
 
@@ -349,7 +369,8 @@ Before deploying:
 - [ ] Description lists specific trigger keywords as examples
 - [ ] SKILL.md is behaviorally self-sufficient — no critical rules only in references
 - [ ] References contain only deepening material (examples, catalogs, how-tos)
-- [ ] Route-to-Reference table has Contents column (if references exist)
+- [ ] Route-to-Reference list describes each reference's contents (if references exist)
+- [ ] KV lists for lookups/routes, tables only for genuinely 2D comparisons
 - [ ] Degrees of freedom matched to task fragility (high/medium/low)
 - [ ] Declarative style for constraints/conventions, procedural only for ordered workflows
 - [ ] Instructions use imperative voice

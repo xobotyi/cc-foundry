@@ -225,12 +225,10 @@ Research $ARGUMENTS thoroughly:
 
 ### Available Agents
 
-| Agent             | Best For                                     |
-| ----------------- | -------------------------------------------- |
-| `Explore`         | Read-only exploration, research              |
-| `Plan`            | Architecture design, implementation planning |
-| `general-purpose` | Complex multi-step tasks                     |
-| Custom            | Define in `.claude/agents/`                  |
+- `Explore`: Read-only exploration, research
+- `Plan`: Architecture design, implementation planning
+- `general-purpose`: Complex multi-step tasks
+- Custom: Define in `.claude/agents/`
 
 ### When to Fork
 

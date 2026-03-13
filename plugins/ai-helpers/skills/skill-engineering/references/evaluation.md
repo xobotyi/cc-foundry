@@ -194,60 +194,52 @@ After any change:
 
 ### Description (20 points)
 
-| Score | Criteria                                              |
-| ----- | ----------------------------------------------------- |
-| 20    | Specific capabilities + clear triggers + right length |
-| 15    | Mostly complete, minor improvements possible          |
-| 10    | Vague on either capabilities or triggers              |
-| 5     | Very vague, missing key information                   |
-| 0     | Missing or actively misleading                        |
+- 20: Specific capabilities + clear triggers + right length
+- 15: Mostly complete, minor improvements possible
+- 10: Vague on either capabilities or triggers
+- 5: Very vague, missing key information
+- 0: Missing or actively misleading
 
 ### Instructions (20 points)
 
-| Score | Criteria                                                        |
-| ----- | --------------------------------------------------------------- |
-| 20    | Clear, imperative, structured (XML tags/steps), explicit format |
-| 15    | Mostly clear, minor ambiguities, format specified               |
-| 10    | Understandable but verbose or missing structure                 |
-| 5     | Confusing structure, significant gaps, no format                |
-| 0     | Unclear or contradictory                                        |
+- 20: Clear, imperative, structured (XML tags/steps), explicit format
+- 15: Mostly clear, minor ambiguities, format specified
+- 10: Understandable but verbose or missing structure
+- 5: Confusing structure, significant gaps, no format
+- 0: Unclear or contradictory
 
 ### Examples (20 points)
 
-| Score | Criteria                                          |
-| ----- | ------------------------------------------------- |
-| 20    | Comprehensive coverage, realistic, well-formatted |
-| 15    | Good coverage, minor gaps                         |
-| 10    | Basic coverage, missing edge cases                |
-| 5     | Minimal examples, not representative              |
-| 0     | No examples or misleading examples                |
+- 20: Comprehensive coverage, realistic, well-formatted
+- 15: Good coverage, minor gaps
+- 10: Basic coverage, missing edge cases
+- 5: Minimal examples, not representative
+- 0: No examples or misleading examples
 
 ### Structure (20 points)
 
-| Score | Criteria                                             |
-| ----- | ---------------------------------------------------- |
-| 20    | Right scope, proper organization, appropriate length |
-| 15    | Minor structural issues                              |
-| 10    | Too long or too short, scope issues                  |
-| 5     | Poor organization, wrong scope                       |
-| 0     | Fundamentally broken structure                       |
+- 20: Right scope, proper organization, appropriate length
+- 15: Minor structural issues
+- 10: Too long or too short, scope issues
+- 5: Poor organization, wrong scope
+- 0: Fundamentally broken structure
 
 ### Content Placement (20 points)
 
-| Score | Criteria                                                                                                                                                    |
-| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 20    | SKILL.md behaviorally self-sufficient; references contain only deepening material; route table has Contents column; critical rules in primacy/recency zones |
-| 15    | Most behavioral rules inline; one or two rules only in references; mostly good placement                                                                    |
-| 10    | Significant behavioral content only in references; critical rules buried in middle                                                                          |
-| 5     | SKILL.md is mostly a router; critical rules live in references                                                                                              |
-| 0     | No references exist but SKILL.md is incomplete, or references duplicate SKILL.md body content                                                               |
+- 20: SKILL.md behaviorally self-sufficient; references contain only deepening material; route list describes each
+  reference's contents; KV lists for lookups, tables only for 2D comparisons; critical rules in primacy/recency zones
+- 15: Most behavioral rules inline; one or two rules only in references; mostly good placement
+- 10: Significant behavioral content only in references; critical rules buried in middle
+- 5: SKILL.md is mostly a router; critical rules live in references
+- 0: No references exist but SKILL.md is incomplete, or references duplicate SKILL.md body content
 
 **What to check:**
 
 - Can an agent produce correct output reading only SKILL.md?
 - Do references contain depth (examples, catalogs, rubrics) or breadth (rules, directives)?
 - Are anti-patterns stated as positive directives in the body, or duplicated in a separate table?
-- Does the route table include a Contents column?
+- Does the route list describe each reference's contents?
+- Are KV lists used for lookups/routes, tables reserved for 2D comparisons?
 - Are critical rules placed in the top 20% or bottom 20% of SKILL.md (not only buried in the middle)?
 - Is instruction style appropriate — declarative for constraints/conventions, procedural only for ordered workflows?
 - Does every instruction earn its place (deletion test)?
@@ -267,7 +259,8 @@ After any change:
 - Missing one edge case example
 - Instructions slightly verbose
 - One or two behavioral rules only in references
-- Route table missing Contents column
+- Route list missing content descriptions
+- Tables used for lookup data that should be KV lists
 
 ### 50-69 (Moderate Issues)
 
