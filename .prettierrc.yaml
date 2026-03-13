@@ -1,0 +1,17 @@
+printWidth: 120
+useTabs: true
+tabWidth: 2
+proseWrap: always
+
+overrides:
+  - files:
+      - "**/skills/**/*.md"
+      - "**/CLAUDE.md"
+    options:
+      parser: mdx
+      embeddedLanguageFormatting: "off"
+
+  - files:
+      - "**/README.md"
+    options:
+      parser: markdown

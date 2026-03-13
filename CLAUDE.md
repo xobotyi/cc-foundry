@@ -1,7 +1,7 @@
 # cc-foundry
 
-Claude Code plugin development repository. Contains plugins that extend Claude Code with
-domain-specific skills, output styles, hooks, and workflow automation.
+Claude Code plugin development repository. Contains plugins that extend Claude Code with domain-specific skills, output
+styles, hooks, and workflow automation.
 
 ## Structure
 
@@ -36,135 +36,137 @@ Each plugin has its own `CLAUDE.md` with plugin-specific context.
 Follow this procedure to add a skill to an existing plugin. Do not explore or research
 the repo structure — this procedure contains everything needed.
 
-1. **Read the target plugin's CLAUDE.md** — understand existing skills, scope boundaries,
-   and conventions. Read one existing SKILL.md in the same plugin to match the tone and
-   structure.
+1.  **Read the target plugin's CLAUDE.md** — understand existing skills, scope boundaries, and conventions. Read one
+    existing SKILL.md in the same plugin to match the tone and structure.
 
-2. **Invoke `skill-engineering`** — load the skill before writing anything. It contains
-   the description formula, content architecture rules, and archetype templates.
+2.  **Invoke `skill-engineering`** — load the skill before writing anything. It contains the description formula,
+    content architecture rules, and archetype templates.
 
-3. **Scaffold the directory:**
-   ```
-   plugins/<plugin>/skills/<skill-name>/
-   ├── SKILL.md              # Written last — needs reference material first
-   ├── references/            # Optional: deepening material
-   └── .dev/
-       └── reference-inventory.json  # Optional: external doc sources
-   ```
+3.  **Scaffold the directory:**
 
-4. **Populate references** (if the skill needs external documentation):
-   a. Create `.dev/reference-inventory.json`:
-      ```json
-      {
-        "sources": {
-          "Topic Name": "https://example.com/docs/page.md"
-        }
+    ```
+    plugins/<plugin>/skills/<skill-name>/
+    ├── SKILL.md              # Written last — needs reference material first
+    ├── references/            # Optional: deepening material
+    └── .dev/
+        └── reference-inventory.json  # Optional: external doc sources
+    ```
+
+4.  **Populate references** (if the skill needs external documentation): a. Create `.dev/reference-inventory.json`:
+
+    ```json
+    {
+      "sources": {
+        "Topic Name": "https://example.com/docs/page.md"
       }
-      ```
-   b. Fetch docs from repo root:
-      ```bash
-      cd .dev && yarn cli docs-fetch <path-to-inventory.json>
-      ```
-      URLs ending in `.md`/`.mdx` fetch as raw markdown. Others convert from HTML.
-   c. Distill fetched content into `references/*.md` files.
+    }
+    ```
 
-   Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
+    b. Fetch docs from repo root:
 
-   <reference-inventory-guidance>
-   **Building a quality inventory:**
+    ```bash
+    cd .dev && yarn cli docs-fetch <path-to-inventory.json>
+    ```
 
-   The inventory is the foundation of reference quality. Never write references from
-   training data alone — always ground them in fetched official documentation.
+    URLs ending in `.md`/`.mdx` fetch as raw markdown. Others convert from HTML. c. Distill fetched content into
+    `references/*.md` files.
 
-   - **Start with official docs.** For languages: standard library reference pages
-     (e.g., `docs.python.org/3.14/library/typing.html`). For tools: the tool's own
-     docs site (e.g., `docs.astral.sh/ruff/configuration/`). For frameworks: the
-     framework's how-to and API reference pages.
-   - **Add the canonical style guide** if one exists (e.g., PEP 8, Google Style Guide,
-     Effective Go). These are high-signal sources for convention-oriented skills.
-   - **Add "What's New" pages** when targeting a specific language version — they
-     document the exact features and syntax changes the skill should cover.
-   - **Add specification pages** alongside tutorial pages for the same topic (e.g.,
-     the pyproject.toml specification alongside the "Writing pyproject.toml" guide).
-     Tutorials explain the happy path; specs cover edge cases and full field lists.
-   - **Skip tutorials** — they paraphrase official docs, go stale, and add noise.
-     Official docs and canonical style guides are sufficient.
-   - **Include blog posts only when they contain original findings** — reverse-
-     engineered internals, undocumented behavior, activation patterns, or novel
-     techniques not covered by official docs. Posts that merely repackage official
-     documentation as a walkthrough are tutorials in disguise — skip them.
-   - **Use Perplexity or web search** to discover sources you might not know about,
-     but be selective — most results for well-known ecosystems are obvious. The real
-     value is for niche tools or discovering lesser-known official doc pages.
-   - **10–15 sources per skill is typical.** More is fine if each source covers a
-     distinct topic. Fewer is fine for narrow skills.
-   </reference-inventory-guidance>
+    Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
 
-5. **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content.
-   SKILL.md must be behaviorally self-sufficient. References provide depth, not breadth.
-   Writing the skill last ensures it's informed by the distilled reference material.
+          <reference-inventory-guidance>
 
-6. **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable),
-   plugin README.md (skill listing), root CLAUDE.md structure diagram (only if new plugin).
+    **Building a quality inventory:**
 
-7. **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and
-   root `.claude-plugin/marketplace.json`.
-</workflow>
+    The inventory is the foundation of reference quality. Never write references from training data alone — always
+    ground them in fetched official documentation.
+    - **Start with official docs.** For languages: standard library reference pages (e.g.,
+      `docs.python.org/3.14/library/typing.html`). For tools: the tool's own docs site (e.g.,
+      `docs.astral.sh/ruff/configuration/`). For frameworks: the framework's how-to and API reference pages.
+    - **Add the canonical style guide** if one exists (e.g., PEP 8, Google Style Guide, Effective Go). These are
+      high-signal sources for convention-oriented skills.
+    - **Add "What's New" pages** when targeting a specific language version — they document the exact features and
+      syntax changes the skill should cover.
+    - **Add specification pages** alongside tutorial pages for the same topic (e.g., the pyproject.toml specification
+      alongside the "Writing pyproject.toml" guide). Tutorials explain the happy path; specs cover edge cases and full
+      field lists.
+    - **Skip tutorials** — they paraphrase official docs, go stale, and add noise. Official docs and canonical style
+      guides are sufficient.
+    - **Include blog posts only when they contain original findings** — reverse- engineered internals, undocumented
+      behavior, activation patterns, or novel techniques not covered by official docs. Posts that merely repackage
+      official documentation as a walkthrough are tutorials in disguise — skip them.
+    - **Use Perplexity or web search** to discover sources you might not know about, but be selective — most results for
+      well-known ecosystems are obvious. The real value is for niche tools or discovering lesser-known official doc
+      pages.
+    - **10–15 sources per skill is typical.** More is fine if each source covers a distinct topic. Fewer is fine for
+      narrow skills. </reference-inventory-guidance>
+
+5.  **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content. SKILL.md must be behaviorally
+    self-sufficient. References provide depth, not breadth. Writing the skill last ensures it's informed by the
+    distilled reference material.
+
+6.  **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable), plugin README.md (skill
+    listing), root CLAUDE.md structure diagram (only if new plugin).
+
+7.  **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and root
+    `.claude-plugin/marketplace.json`.
+    </workflow>
 
 ## Conventions
 
 <conventions>
 **Formatting:**
-- Wrap all markdown and instruction files at 100–120 characters per line
+- The repo uses Prettier for markdown formatting (`.prettierrc.yaml` at root)
+- After editing any `.md` file, run `yarn dlx prettier --write <file>` before committing
+- SKILL.md and CLAUDE.md files use the MDX parser (block-level XML tag support)
+- README.md files use the standard markdown parser
+- Do not format files in `.dev/reference/` — those are raw fetched docs
 
 **Skill structure:**
+
 - Router pattern: SKILL.md routes to `references/` for detailed content
 - Keep SKILL.md under 500 lines; move depth to references
 
 **Development artifacts:**
+
 - `.dev/` directories contain build tooling and source materials
 - `.dev/reference/` holds fetched docs (raw source, not shipped as-is)
 - `references/` holds processed content (shipped with plugin)
 
 **Plugin context:**
+
 - Each plugin has `CLAUDE.md` explaining its components
 - Each plugin has `README.md` for user-facing documentation
 
-**Plugin documentation style:**
-Both `CLAUDE.md` and `README.md` must be written in explanatory style — prose that tells the
-reader what exists, how it works, and why it's structured that way. Tables and bullet lists
-support the explanation; they don't replace it.
+**Plugin documentation style:** Both `CLAUDE.md` and `README.md` must be written in explanatory style — prose that tells
+the reader what exists, how it works, and why it's structured that way. Tables and bullet lists support the explanation;
+they don't replace it.
 
-- **CLAUDE.md** — Claude's internal reference. Explain the plugin's components (skills, hooks,
-  output styles), how they relate to each other, what conventions apply, and where scope
-  boundaries are. The goal is that Claude can read this file and understand the plugin well
-  enough to work with it correctly without needless research.
-- **README.md** — user-facing documentation. Frame the plugin around the problem it solves
-  ("The Problem" / "The Solution"), explain what each skill does and when to use it, show
-  relationships between skills. The goal is that a human can read this file and decide
-  whether to install the plugin.
+- **CLAUDE.md** — Claude's internal reference. Explain the plugin's components (skills, hooks, output styles), how they
+  relate to each other, what conventions apply, and where scope boundaries are. The goal is that Claude can read this
+  file and understand the plugin well enough to work with it correctly without needless research.
+- **README.md** — user-facing documentation. Frame the plugin around the problem it solves ("The Problem" / "The
+  Solution"), explain what each skill does and when to use it, show relationships between skills. The goal is that a
+  human can read this file and decide whether to install the plugin.
 
-Don't write documentation as flat inventories. Explain the *why* and the connections, not
-just the *what*.
+Don't write documentation as flat inventories. Explain the _why_ and the connections, not just the _what_.
 
-**Documentation maintenance:**
-After any significant change to a plugin, update its documentation before committing:
+**Documentation maintenance:** After any significant change to a plugin, update its documentation before committing:
 
-- **Plugin CLAUDE.md** — update when: adding/removing/renaming skills, output styles, hooks,
-  or commands; changing skill purpose, scope, or dependencies; adding/removing conventions.
-  This file is Claude's internal reference — keep it accurate to what exists.
-- **Plugin README.md** — update when: any change that affects what users see or install.
-  Same triggers as CLAUDE.md, plus installation instructions or usage examples.
-- **Root CLAUDE.md** — update the structure diagram when: adding/removing a plugin, or
-  changing a plugin's one-line purpose.
-- **Root README.md** — update the plugin listing when: adding/removing a plugin, or
-  changing a plugin's purpose or skill roster significantly enough that the summary
-  paragraph no longer describes it accurately.
+- **Plugin CLAUDE.md** — update when: adding/removing/renaming skills, output styles, hooks, or commands; changing skill
+  purpose, scope, or dependencies; adding/removing conventions. This file is Claude's internal reference — keep it
+  accurate to what exists.
+- **Plugin README.md** — update when: any change that affects what users see or install. Same triggers as CLAUDE.md,
+  plus installation instructions or usage examples.
+- **Root CLAUDE.md** — update the structure diagram when: adding/removing a plugin, or changing a plugin's one-line
+  purpose.
+- **Root README.md** — update the plugin listing when: adding/removing a plugin, or changing a plugin's purpose or skill
+  roster significantly enough that the summary paragraph no longer describes it accurately.
 
-Do not defer documentation to a separate task. Update docs in the same work session as
-the code change, ideally in the same commit or immediately following commit.
+Do not defer documentation to a separate task. Update docs in the same work session as the code change, ideally in the
+same commit or immediately following commit.
 
 **Installation instructions:**
+
 - All plugin READMEs must use marketplace commands:
   ```
   /plugin marketplace add xobotyi/cc-foundry
@@ -173,14 +175,16 @@ the code change, ideally in the same commit or immediately following commit.
 - Do not use manual cp/ln installation methods
 
 **Version management:**
-- Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and
-  the repo-root `.claude-plugin/marketplace.json` (which lists all plugins in a single file)
+
+- Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and the repo-root
+  `.claude-plugin/marketplace.json` (which lists all plugins in a single file)
 - Update both files when bumping versions
 
 **Licensing:**
+
 - Every plugin must contain a copy of the root `LICENSE` file in its directory
 - When adding a new plugin, copy `LICENSE` from the repository root into the plugin directory
-</conventions>
+  </conventions>
 
 <git-commit-config>
 <extra-instructions>
