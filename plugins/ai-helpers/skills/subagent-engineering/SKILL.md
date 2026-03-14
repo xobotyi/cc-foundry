@@ -24,14 +24,18 @@ Skip only for trivial edits (typos, formatting).
 
 ## Route to Reference
 
-| Situation                         | Reference                                             | Contents                                                                               |
-| --------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Full frontmatter field reference  | [`${CLAUDE_SKILL_DIR}/references/spec.md`]            | All fields with constraints, hooks schema, CLI-defined agents, storage locations       |
-| Step-by-step creation walkthrough | [`${CLAUDE_SKILL_DIR}/references/creation.md`]        | Detailed process, common agent type templates, proactive delegation                    |
-| Quality scoring and testing       | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`]      | 5-dimension scoring rubric with weights, testing protocol (5 levels), benchmarking     |
-| Improving an existing subagent    | [`${CLAUDE_SKILL_DIR}/references/iteration.md`]       | Prompt refinement techniques, A/B testing, version control, redesign criteria          |
-| Diagnosing failures               | [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] | Diagnostic steps, error message catalog, debug mode                                    |
-| Architecture and examples         | [`${CLAUDE_SKILL_DIR}/references/patterns.md`]        | Full agent examples, pipeline/parallel/master-clone patterns, multi-agent coordination |
+- **Full frontmatter field reference** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] All fields with constraints, hooks
+  schema, CLI-defined agents, storage locations
+- **Step-by-step creation walkthrough** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Detailed process, common agent
+  type templates, proactive delegation
+- **Quality scoring and testing** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] 5-dimension scoring rubric with
+  weights, testing protocol (5 levels), benchmarking
+- **Improving an existing subagent** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Prompt refinement techniques, A/B
+  testing, version control, redesign criteria
+- **Diagnosing failures** — [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] Diagnostic steps, error message
+  catalog, debug mode
+- **Architecture and examples** — [`${CLAUDE_SKILL_DIR}/references/patterns.md`] Full agent examples,
+  pipeline/parallel/master-clone patterns, multi-agent coordination
 
 Read the relevant reference for extended depth. The rules below are sufficient for correct work without loading
 references.
@@ -144,12 +148,10 @@ tools). Be intentional — don't leave it blank unless you want full access.
 
 **Principle: grant minimum necessary permissions.**
 
-| Agent Type                      | Recommended Tools                         |
-| ------------------------------- | ----------------------------------------- |
-| Read-only (reviewers, analysts) | `Read, Grep, Glob`                        |
-| Research (with web)             | `Read, Grep, Glob, WebFetch, WebSearch`   |
-| Code writers                    | `Read, Write, Edit, Bash, Glob, Grep`     |
-| Documentation                   | `Read, Write, Edit, Glob, Grep, WebFetch` |
+- `Read-only (reviewers, analysts)`: `Read, Grep, Glob`
+- `Research (with web)`: `Read, Grep, Glob, WebFetch, WebSearch`
+- `Code writers`: `Read, Write, Edit, Bash, Glob, Grep`
+- `Documentation`: `Read, Write, Edit, Glob, Grep, WebFetch`
 
 Available built-in tools: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task` (main agent
 only), `NotebookEdit`.
@@ -158,22 +160,18 @@ Use `disallowedTools` when you want most tools but need to exclude a few.
 
 ### `model`
 
-| Value     | When to Use                                                |
-| --------- | ---------------------------------------------------------- |
-| `haiku`   | Quick searches, docs, simple analysis — fast and cheap     |
-| `sonnet`  | Everyday coding, debugging, refactoring                    |
-| `opus`    | Architecture decisions, security audits, complex reasoning |
-| `inherit` | Match parent model (default if omitted)                    |
+- `haiku`: Quick searches, docs, simple analysis — fast and cheap
+- `sonnet`: Everyday coding, debugging, refactoring
+- `opus`: Architecture decisions, security audits, complex reasoning
+- `inherit`: Match parent model (default if omitted)
 
 ### `permissionMode`
 
-| Mode                | Behavior                                     |
-| ------------------- | -------------------------------------------- |
-| `default`           | Standard permission checking                 |
-| `acceptEdits`       | Auto-accept file edits                       |
-| `dontAsk`           | Auto-deny prompts (allowed tools still work) |
-| `bypassPermissions` | Skip all permission checks                   |
-| `plan`              | Plan mode (read-only exploration)            |
+- `default`: Standard permission checking
+- `acceptEdits`: Auto-accept file edits
+- `dontAsk`: Auto-deny prompts (allowed tools still work)
+- `bypassPermissions`: Skip all permission checks
+- `plan`: Plan mode (read-only exploration)
 
 **Security rules:**
 
@@ -258,13 +256,11 @@ You are a [role] specializing in [domain].
 
 ## Built-in Subagents
 
-| Agent                 | Model    | Purpose                               |
-| --------------------- | -------- | ------------------------------------- |
-| **Explore**           | Haiku    | Fast, read-only codebase exploration  |
-| **Plan**              | Inherits | Research for plan mode                |
-| **general-purpose**   | Inherits | Complex multi-step tasks              |
-| **Bash**              | Inherits | Command execution in separate context |
-| **claude-code-guide** | Haiku    | Questions about Claude Code features  |
+- **Explore** (Haiku): Fast, read-only codebase exploration
+- **Plan** (Inherits): Research for plan mode
+- **general-purpose** (Inherits): Complex multi-step tasks
+- **Bash** (Inherits): Command execution in separate context
+- **claude-code-guide** (Haiku): Questions about Claude Code features
 
 ## Evaluation Criteria
 

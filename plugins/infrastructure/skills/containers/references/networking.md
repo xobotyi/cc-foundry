@@ -2,15 +2,13 @@
 
 ## Network Driver Selection
 
-| Driver                  | Isolation       | Performance | Use Case                                    |
-| ----------------------- | --------------- | ----------- | ------------------------------------------- |
-| `bridge` (user-defined) | Container-level | Good        | Default for single-host apps                |
-| `bridge` (default)      | Container-level | Good        | Quick testing only — no DNS                 |
-| `host`                  | None            | Native      | Performance-critical (no NAT overhead)      |
-| `macvlan`               | Full L2         | Native      | Containers need LAN presence (unique MAC)   |
-| `ipvlan` (L2)           | Full L2         | Native      | Like macvlan but shared MAC (switch limits) |
-| `ipvlan` (L3)           | Full L3         | Native      | Routed container networking                 |
-| `none`                  | Complete        | N/A         | Security-sensitive isolated workloads       |
+- **`bridge` (user-defined)** — Container-level isolation, good performance: Default for single-host apps
+- **`bridge` (default)** — Container-level isolation, good performance: Quick testing only — no DNS
+- **`host`** — No isolation, native performance: Performance-critical workloads (no NAT overhead)
+- **`macvlan`** — Full L2 isolation, native performance: Containers need LAN presence (unique MAC)
+- **`ipvlan` (L2)** — Full L2 isolation, native performance: Like macvlan but shared MAC (switch limits)
+- **`ipvlan` (L3)** — Full L3 isolation, native performance: Routed container networking
+- **`none`** — Complete isolation: Security-sensitive isolated workloads
 
 ## Bridge Networks (Default Choice)
 

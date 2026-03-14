@@ -27,14 +27,23 @@ queries and returning NXDOMAIN for blocked domains.
 
 ### Decision Criteria
 
-| Factor                  | Pi-hole                   | AdGuard Home    |
-| ----------------------- | ------------------------- | --------------- |
-| Encrypted DNS (DoH/DoT) | Requires separate setup   | Built-in        |
-| Per-client rules        | Limited                   | Full support    |
-| DHCP server             | Yes                       | Yes             |
-| Community/ecosystem     | Larger, more blocklists   | Growing         |
-| Resource usage          | Lower                     | Slightly higher |
-| Upstream DNS encryption | Requires Unbound/dnscrypt | Native          |
+**Pi-hole:**
+
+- Encrypted DNS (DoH/DoT): Requires separate setup
+- Per-client rules: Limited
+- DHCP server: Yes
+- Community/ecosystem: Larger, more blocklists
+- Resource usage: Lower
+- Upstream DNS encryption: Requires Unbound/dnscrypt
+
+**AdGuard Home:**
+
+- Encrypted DNS (DoH/DoT): Built-in
+- Per-client rules: Full support
+- DHCP server: Yes
+- Community/ecosystem: Growing
+- Resource usage: Slightly higher
+- Upstream DNS encryption: Native
 
 ### Deployment Patterns
 

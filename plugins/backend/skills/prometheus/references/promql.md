@@ -5,12 +5,10 @@ data types, operators, and functions is essential for dashboards, alerts, and re
 
 ## Data Types
 
-| Type           | Description                                         | Example                   |
-| -------------- | --------------------------------------------------- | ------------------------- |
-| Instant vector | Set of time series, one sample each, same timestamp | `http_requests_total`     |
-| Range vector   | Set of time series, range of samples over time      | `http_requests_total[5m]` |
-| Scalar         | Single numeric float                                | `3.14`                    |
-| String         | Single string value (currently unused)              | `"hello"`                 |
+- `instant vector`: Set of time series, one sample each, same timestamp — e.g., `http_requests_total`
+- `range vector`: Set of time series, range of samples over time — e.g., `http_requests_total[5m]`
+- `scalar`: Single numeric float — e.g., `3.14`
+- `string`: Single string value (currently unused) — e.g., `"hello"`
 
 Range vectors cannot be graphed directly — they must be passed through a function like `rate()` that returns an instant
 vector.

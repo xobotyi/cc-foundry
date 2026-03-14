@@ -45,13 +45,11 @@ first:*:pt-0
 
 Mobile-first: unprefixed utilities apply to all sizes; prefixed apply at that breakpoint and up.
 
-| Prefix | Min-width      |
-| ------ | -------------- |
-| `sm`   | 40rem (640px)  |
-| `md`   | 48rem (768px)  |
-| `lg`   | 64rem (1024px) |
-| `xl`   | 80rem (1280px) |
-| `2xl`  | 96rem (1536px) |
+- **`sm`** — 40rem (640px)
+- **`md`** — 48rem (768px)
+- **`lg`** — 64rem (1024px)
+- **`xl`** — 80rem (1280px)
+- **`2xl`** — 96rem (1536px)
 
 ```html
 <!-- mobile-first: no prefix for base, prefix for larger -->
@@ -300,30 +298,28 @@ with utility classes:
 
 ## v3 → v4 Migration Quick Reference
 
-| v3                                     | v4                                   |
-| -------------------------------------- | ------------------------------------ |
-| `@tailwind base; @tailwind utilities;` | `@import "tailwindcss";`             |
-| `!bg-red-500` (prefix `!`)             | `bg-red-500!` (suffix `!`)           |
-| `bg-[--brand]`                         | `bg-(--brand)`                       |
-| `shadow-sm`                            | `shadow-xs`                          |
-| `shadow` (bare)                        | `shadow-sm`                          |
-| `rounded-sm`                           | `rounded-xs`                         |
-| `rounded` (bare)                       | `rounded-sm`                         |
-| `blur-sm`                              | `blur-xs`                            |
-| `blur` (bare)                          | `blur-sm`                            |
-| `outline-none`                         | `outline-hidden`                     |
-| `ring` (3px blue)                      | `ring-3` + `ring-blue-500`           |
-| `bg-opacity-50`                        | `bg-black/50`                        |
-| `flex-shrink-*`                        | `shrink-*`                           |
-| `flex-grow-*`                          | `grow-*`                             |
-| `overflow-ellipsis`                    | `text-ellipsis`                      |
-| `bg-gradient-to-r`                     | `bg-linear-to-r`                     |
-| `theme(colors.red.500)`                | `var(--color-red-500)`               |
-| `grid-cols-[a,b]` (comma=space)        | `grid-cols-[a_b]` (underscore=space) |
-| Stacking: `first:*:pt-0`               | Stacking: `*:first:pt-0`             |
-| `tailwindcss` PostCSS plugin           | `@tailwindcss/postcss`               |
-| `tailwindcss` Vite                     | `@tailwindcss/vite` plugin           |
-| `npx tailwindcss` CLI                  | `npx @tailwindcss/cli`               |
+- **`@tailwind base; @tailwind utilities;`** → `@import "tailwindcss";`
+- **`!bg-red-500`** (prefix `!`) → `bg-red-500!` (suffix `!`)
+- **`bg-[--brand]`** → `bg-(--brand)`
+- **`shadow-sm`** → `shadow-xs`
+- **`shadow`** (bare) → `shadow-sm`
+- **`rounded-sm`** → `rounded-xs`
+- **`rounded`** (bare) → `rounded-sm`
+- **`blur-sm`** → `blur-xs`
+- **`blur`** (bare) → `blur-sm`
+- **`outline-none`** → `outline-hidden`
+- **`ring`** (3px blue) → `ring-3` + `ring-blue-500`
+- **`bg-opacity-50`** → `bg-black/50`
+- **`flex-shrink-*`** → `shrink-*`
+- **`flex-grow-*`** → `grow-*`
+- **`overflow-ellipsis`** → `text-ellipsis`
+- **`bg-gradient-to-r`** → `bg-linear-to-r`
+- **`theme(colors.red.500)`** → `var(--color-red-500)`
+- **`grid-cols-[a,b]`** (comma=space) → `grid-cols-[a_b]` (underscore=space)
+- **Stacking: `first:*:pt-0`** → `*:first:pt-0`
+- **`tailwindcss` PostCSS plugin** → `@tailwindcss/postcss`
+- **`tailwindcss` Vite** → `@tailwindcss/vite` plugin
+- **`npx tailwindcss` CLI** → `npx @tailwindcss/cli`
 
 **Border/divide default color changed:** v3 used `gray-200`; v4 uses `currentColor`. Always specify a color with
 `border-*` and `divide-*` utilities.

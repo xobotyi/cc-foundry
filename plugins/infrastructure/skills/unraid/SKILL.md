@@ -17,14 +17,23 @@ Understand the storage layer before touching Docker, VMs, or shares.
 
 Extended configuration details, command examples, and decision tables live in `${CLAUDE_SKILL_DIR}/references/`.
 
-| Topic                                                                                 | Reference                                                     | Contents                                                                                                                                                        |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Array, parity, pools, ZFS, mover, allocation, disk management, performance tuning     | [`${CLAUDE_SKILL_DIR}/references/array-and-storage.md`]       | Storage architecture comparison table, write modes with speed benchmarks, cache strategies, allocation methods, split level, ZFS configuration, SSD limitations |
-| Docker networking, volumes, startup, templates, VPN routing, Compose, reverse proxies | [`${CLAUDE_SKILL_DIR}/references/docker-containers.md`]       | Network mode table, macvlan vs ipvlan stability, custom networks, Docker Compose workflows, Traefik integration, VPN container routing, fork bomb prevention    |
-| VM creation, GPU passthrough, IOMMU, snapshots, templates, performance tuning         | [`${CLAUDE_SKILL_DIR}/references/vm-management.md`]           | BIOS/machine type tables, vDisk types, GPU passthrough setup, IOMMU group risks, ACS override caveats, CPU pinning, IOThreads, NUMA, SR-IOV, VM backup          |
-| User/disk shares, SMB/NFS, access control, default shares                             | [`${CLAUDE_SKILL_DIR}/references/shares-and-permissions.md`]  | Security level table, share creation workflow, export visibility options, Windows SMB considerations, flash device security                                     |
-| Community Applications, essential plugins, User Scripts, scheduling                   | [`${CLAUDE_SKILL_DIR}/references/plugins-and-scripts.md`]     | Plugin catalog with NUT/Tips and Tweaks, script scheduling options, automation patterns, Docker template XML, notification agents, heartbeat monitoring         |
-| Security hardening, networking, remote access, backup strategy, UPS, API              | [`${CLAUDE_SKILL_DIR}/references/security-and-networking.md`] | SSL hardening, port security, remote access methods, 3-2-1 backup rule, offsite tools (Borgmatic/Kopia/Restic), UPS/NUT integration, GraphQL API, MCP agent     |
+- `array-and-storage.md` — Array, parity, pools, ZFS, mover, allocation, disk management, performance tuning. Storage
+  architecture comparison, write modes with speed benchmarks, cache strategies, allocation methods, split level, ZFS
+  configuration, SSD limitations
+- `docker-containers.md` — Docker networking, volumes, startup, templates, VPN routing, Compose, reverse proxies.
+  Network modes, macvlan vs ipvlan stability, custom networks, Docker Compose workflows, Traefik integration, VPN
+  container routing, fork bomb prevention
+- `vm-management.md` — VM creation, GPU passthrough, IOMMU, snapshots, templates, performance tuning. BIOS/machine
+  types, vDisk types, GPU passthrough setup, IOMMU group risks, ACS override caveats, CPU pinning, IOThreads, NUMA,
+  SR-IOV, VM backup
+- `shares-and-permissions.md` — User/disk shares, SMB/NFS, access control, default shares. Security levels, share
+  creation workflow, export visibility options, Windows SMB considerations, flash device security
+- `plugins-and-scripts.md` — Community Applications, essential plugins, User Scripts, scheduling. Plugin catalog with
+  NUT/Tips and Tweaks, script scheduling options, automation patterns, Docker template XML, notification agents,
+  heartbeat monitoring
+- `security-and-networking.md` — Security hardening, networking, remote access, backup strategy, UPS, API. SSL
+  hardening, port security, remote access methods, 3-2-1 backup rule, offsite tools (Borgmatic/Kopia/Restic), UPS/NUT
+  integration, GraphQL API, MCP agent
 
 ## Storage Architecture
 
@@ -47,11 +56,9 @@ Unraid 7+ supports **array-free operation** for all-SSD/NVMe builds using only p
 
 ### Write Modes
 
-| Mode                        | Speed       | Power             | Use Case                        |
-| --------------------------- | ----------- | ----------------- | ------------------------------- |
-| Read/Modify/Write (default) | 20-40 MB/s  | Low (2 drives)    | Most workloads, energy savings  |
-| Turbo Write (Reconstruct)   | 40-120 MB/s | High (all drives) | Large transfers, array rebuilds |
-| Cache Write (SSD/NVMe)      | 50-900 MB/s | Varies            | Apps, VMs, frequent writes      |
+- **Read/Modify/Write** (default) — 20-40 MB/s, low power (2 drives). Most workloads, energy savings
+- **Turbo Write** (Reconstruct) — 40-120 MB/s, high power (all drives). Large transfers, array rebuilds
+- **Cache Write** (SSD/NVMe) — 50-900 MB/s, varies. Apps, VMs, frequent writes
 
 Enable Turbo Write: Settings > Disk Settings > Tunable (md_write_method).
 
@@ -78,12 +85,10 @@ Enable Turbo Write: Settings > Disk Settings > Tunable (md_write_method).
 
 ### Network Modes
 
-| Mode                    | When to Use                                            |
-| ----------------------- | ------------------------------------------------------ |
-| Bridge (default)        | Most applications -- safest, only mapped ports exposed |
-| Host                    | Application requires direct network stack access       |
-| Custom (macvlan/ipvlan) | Service needs its own LAN IP (Pi-hole, Home Assistant) |
-| None                    | Isolated workloads with no network needs               |
+- **Bridge** (default) — Most applications; safest, only mapped ports exposed
+- **Host** — Application requires direct network stack access
+- **Custom** (macvlan/ipvlan) — Service needs its own LAN IP (Pi-hole, Home Assistant)
+- **None** — Isolated workloads with no network needs
 
 Only modify the **host port** in bridge mode, not the container port.
 
@@ -192,11 +197,9 @@ corruption if guest and host address spaces overlap. Use only when you understan
 
 ### Security Levels
 
-| Level   | Read             | Write            | Use Case                                           |
-| ------- | ---------------- | ---------------- | -------------------------------------------------- |
-| Public  | Everyone         | Everyone         | Non-sensitive media (Windows 10+ blocks guest SMB) |
-| Secure  | Everyone         | Authorized users | Collaborative folders                              |
-| Private | Authorized users | Authorized users | Sensitive data                                     |
+- **Public** — Read: everyone, Write: everyone. Non-sensitive media (Windows 10+ blocks guest SMB)
+- **Secure** — Read: everyone, Write: authorized users. Collaborative folders
+- **Private** — Read: authorized users, Write: authorized users. Sensitive data
 
 - Create dedicated user accounts for share access (root cannot access network shares)
 - Windows allows only one credential per server -- use name for one share, IP for another
@@ -211,19 +214,17 @@ Do not change permissions on `appdata`, `system`, or `domains`. Only `isos` shou
 
 ### Essential Plugins
 
-| Plugin                    | Purpose                                          |
-| ------------------------- | ------------------------------------------------ |
-| Community Applications    | App store interface -- install first             |
-| CA Appdata Backup/Restore | Container config and appdata backup              |
-| Fix Common Problems       | Configuration error and security risk alerts     |
-| Unassigned Devices        | Mount drives outside array/pools                 |
-| Dynamix Cache Dirs        | Prevent unnecessary drive spinups                |
-| Dynamix System Temp       | Hardware temperature monitoring                  |
-| File Integrity            | Bitrot detection and data integrity verification |
-| Mover Tuning              | Advanced mover schedule and threshold control    |
-| Tips and Tweaks           | System-level performance optimizations           |
-| NUT (Network UPS Tools)   | UPS monitoring and graceful shutdown             |
-| User Scripts              | Custom automation via scheduled shell scripts    |
+- **Community Applications** — App store interface; install first
+- **CA Appdata Backup/Restore** — Container config and appdata backup
+- **Fix Common Problems** — Configuration error and security risk alerts
+- **Unassigned Devices** — Mount drives outside array/pools
+- **Dynamix Cache Dirs** — Prevent unnecessary drive spinups
+- **Dynamix System Temp** — Hardware temperature monitoring
+- **File Integrity** — Bitrot detection and data integrity verification
+- **Mover Tuning** — Advanced mover schedule and threshold control
+- **Tips and Tweaks** — System-level performance optimizations
+- **NUT (Network UPS Tools)** — UPS monitoring and graceful shutdown
+- **User Scripts** — Custom automation via scheduled shell scripts
 
 ### User Scripts
 

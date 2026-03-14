@@ -19,16 +19,14 @@
 }
 ```
 
-| Option                     | Why                                                      |
-| -------------------------- | -------------------------------------------------------- |
-| `esModuleInterop`          | Fixes CJS/ESM interop issues                             |
-| `skipLibCheck`             | Skips `.d.ts` checking for performance                   |
-| `target: "es2022"`         | Stable target; prefer over `esnext`                      |
-| `allowJs`                  | Allows `.js` imports in TS projects                      |
-| `resolveJsonModule`        | Enables JSON imports with type safety                    |
-| `moduleDetection: "force"` | Treats all files as modules (avoids block-scope errors)  |
-| `isolatedModules`          | Prevents features unsafe in single-file transpilation    |
-| `verbatimModuleSyntax`     | Forces `import type`/`export type` for type-only imports |
+- **`esModuleInterop`** → Fixes CJS/ESM interop issues
+- **`skipLibCheck`** → Skips `.d.ts` checking for performance
+- **`target: "es2022"`** → Stable target; prefer over `esnext`
+- **`allowJs`** → Allows `.js` imports in TS projects
+- **`resolveJsonModule`** → Enables JSON imports with type safety
+- **`moduleDetection: "force"`** → Treats all files as modules (avoids block-scope errors)
+- **`isolatedModules`** → Prevents features unsafe in single-file transpilation
+- **`verbatimModuleSyntax`** → Forces `import type`/`export type` for type-only imports
 
 ### Strictness (All Projects)
 
@@ -42,11 +40,9 @@
 }
 ```
 
-| Option                     | Why                                                |
-| -------------------------- | -------------------------------------------------- |
-| `strict`                   | Enables all strict checks. Non-negotiable.         |
-| `noUncheckedIndexedAccess` | Array/object index access returns `T \| undefined` |
-| `noImplicitOverride`       | Requires `override` keyword on overridden methods  |
+- **`strict`** → Enables all strict checks. Non-negotiable.
+- **`noUncheckedIndexedAccess`** → Array/object index access returns `T | undefined`
+- **`noImplicitOverride`** → Requires `override` keyword on overridden methods
 
 **Optional strictness** (add per project preference):
 
@@ -151,13 +147,11 @@ ES modules are the only supported module system. `namespace` is legacy.
 
 ## Array Type Syntax
 
-| Element type            | Syntax             | Example                           |
-| ----------------------- | ------------------ | --------------------------------- |
-| Simple (alphanumeric)   | `T[]`              | `string[]`, `number[]`, `User[]`  |
-| Complex (union, object) | `Array<T>`         | `Array<string \| number>`         |
-| Readonly simple         | `readonly T[]`     | `readonly string[]`               |
-| Readonly complex        | `ReadonlyArray<T>` | `ReadonlyArray<string \| number>` |
-| Nested simple           | `T[][]`            | `string[][]`                      |
+- **Simple element type** → `T[]` — e.g. `string[]`, `number[]`, `User[]`
+- **Complex element type (union, object)** → `Array<T>` — e.g. `Array<string | number>`
+- **Readonly simple** → `readonly T[]` — e.g. `readonly string[]`
+- **Readonly complex** → `ReadonlyArray<T>` — e.g. `ReadonlyArray<string | number>`
+- **Nested simple** → `T[][]` — e.g. `string[][]`
 
 ## Compiler Directives
 

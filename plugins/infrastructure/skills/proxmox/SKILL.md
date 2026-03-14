@@ -18,14 +18,18 @@ redundant where it matters, and automated where possible.**
 
 ## Route to Reference
 
-| Topic                 | Reference                                               | Contents                                                                                                                                                  |
-| --------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| VM and LXC management | [`${CLAUDE_SKILL_DIR}/references/vm-and-lxc.md`]        | VM vs LXC comparison table, configuration options, template workflows, linked vs full clone trade-offs                                                    |
-| Storage backends      | [`${CLAUDE_SKILL_DIR}/references/storage-backends.md`]  | Backend capability matrix, ZFS tuning (ARC/L2ARC/SLOG/volblocksize), Ceph configuration, LVM-Thin monitoring, storage selection decision tree             |
-| Networking            | [`${CLAUDE_SKILL_DIR}/references/networking.md`]        | Bridge configuration, VLAN layout, bonding modes, SDN zones (VXLAN/EVPN), MTU considerations, OVS vs Linux bridge, firewall lockout prevention            |
-| Clustering and HA     | [`${CLAUDE_SKILL_DIR}/references/clustering-and-ha.md`] | Corosync configuration, quorum math, QDevice setup, split-brain prevention, fencing methods, HA groups, migration, quorum loss recovery                   |
-| API and automation    | [`${CLAUDE_SKILL_DIR}/references/api-automation.md`]    | REST API architecture, pvesh/qm/pct reference, Terraform patterns, cloud-init customization (cicustom, network v2), hookscript lifecycle, CI/CD pipelines |
-| Backup strategies     | [`${CLAUDE_SKILL_DIR}/references/backup-strategies.md`] | vzdump modes, PBS architecture, encryption key management, garbage collection safety, verification jobs, retention policies, off-site sync patterns       |
+- **VM and LXC management** — [`${CLAUDE_SKILL_DIR}/references/vm-and-lxc.md`]: VM vs LXC comparison table,
+  configuration options, template workflows, linked vs full clone trade-offs
+- **Storage backends** — [`${CLAUDE_SKILL_DIR}/references/storage-backends.md`]: Backend capability matrix, ZFS tuning
+  (ARC/L2ARC/SLOG/volblocksize), Ceph configuration, LVM-Thin monitoring, storage selection decision tree
+- **Networking** — [`${CLAUDE_SKILL_DIR}/references/networking.md`]: Bridge configuration, VLAN layout, bonding modes,
+  SDN zones (VXLAN/EVPN), MTU considerations, OVS vs Linux bridge, firewall lockout prevention
+- **Clustering and HA** — [`${CLAUDE_SKILL_DIR}/references/clustering-and-ha.md`]: Corosync configuration, quorum math,
+  QDevice setup, split-brain prevention, fencing methods, HA groups, migration, quorum loss recovery
+- **API and automation** — [`${CLAUDE_SKILL_DIR}/references/api-automation.md`]: REST API architecture, pvesh/qm/pct
+  reference, Terraform patterns, cloud-init customization (cicustom, network v2), hookscript lifecycle, CI/CD pipelines
+- **Backup strategies** — [`${CLAUDE_SKILL_DIR}/references/backup-strategies.md`]: vzdump modes, PBS architecture,
+  encryption key management, garbage collection safety, verification jobs, retention policies, off-site sync patterns
 
 ---
 
@@ -76,13 +80,11 @@ redundant where it matters, and automated where possible.**
 
 ### Backend Selection
 
-| Need                                        | Backend              |
-| ------------------------------------------- | -------------------- |
-| Local redundancy, data integrity, snapshots | **ZFS**              |
-| Local snapshots/clones without ZFS overhead | **LVM-Thin**         |
-| Shared storage for HA clusters (3+ nodes)   | **Ceph**             |
-| Simple shared storage (existing NAS/SAN)    | **NFS** or **iSCSI** |
-| Deduplicated backups                        | **PBS**              |
+- **Local redundancy, data integrity, snapshots** → ZFS
+- **Local snapshots/clones without ZFS overhead** → LVM-Thin
+- **Shared storage for HA clusters (3+ nodes)** → Ceph
+- **Simple shared storage (existing NAS/SAN)** → NFS or iSCSI
+- **Deduplicated backups** → PBS
 
 ### ZFS Rules
 
@@ -142,12 +144,10 @@ per-VLAN bridges. The VLAN-aware checkbox must be explicitly enabled — it is o
 
 ### Traffic Separation
 
-| Traffic               | Minimum bandwidth                    |
-| --------------------- | ------------------------------------ |
-| Management / Corosync | 1GbE (dedicated)                     |
-| Ceph cluster + public | 10GbE (dedicated), 25GbE recommended |
-| Migration             | 10GbE (recommended)                  |
-| Guest                 | Depends on workload                  |
+- **Management / Corosync** — 1GbE (dedicated)
+- **Ceph cluster + public** — 10GbE (dedicated), 25GbE recommended
+- **Migration** — 10GbE (recommended)
+- **Guest** — depends on workload
 
 **Critical rule:** Never combine Corosync traffic with high-bandwidth Ceph or migration traffic on a single 1GbE link.
 Corosync is latency-sensitive — network contention causes cluster instability and false fencing.
@@ -236,14 +236,12 @@ If the cluster loses quorum, `pmxcfs` becomes read-only — no VM operations are
 
 ### CLI Tools
 
-| Tool         | Purpose                         |
-| ------------ | ------------------------------- |
-| `pvesh`      | Direct REST API access from CLI |
-| `qm`         | VM lifecycle management         |
-| `pct`        | Container lifecycle management  |
-| `ha-manager` | HA resource management          |
-| `pvecm`      | Cluster management              |
-| `pvesm`      | Storage management              |
+- **`pvesh`** — direct REST API access from CLI
+- **`qm`** — VM lifecycle management
+- **`pct`** — container lifecycle management
+- **`ha-manager`** — HA resource management
+- **`pvecm`** — cluster management
+- **`pvesm`** — storage management
 
 ### Terraform
 
@@ -469,19 +467,27 @@ Configure at Datacenter > Notifications.
 These anti-patterns are non-obvious traps that the positive rules above do not fully convey — common mistakes where the
 "right" approach is counterintuitive.
 
-| Anti-Pattern                                   | Risk                                                       | Fix                                              |
-| ---------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------ |
-| Running Docker directly on the PVE host        | Conflicts with PVE networking/storage, complicates updates | Run Docker inside a VM or LXC container          |
-| Swap on ZFS zvol                               | Blocks server during backups, high I/O load                | Partition a physical disk for swap               |
-| Using `host` CPU type in mixed clusters        | Live migration fails on different CPU generations          | Use `x86-64-v2-AES` or lowest common model       |
-| LACP bonds for Corosync with default rate      | 90s failover exceeds fencing timeout (~60s)                | Set `bond-lacp-rate fast` on node and switch     |
-| Load-balancing bond modes for Corosync         | Asymmetric connectivity causes mass fencing                | Use `active-backup` or LACP with fast rate       |
-| Using no-subscription repo in production       | Less validated packages, potential instability             | Use Enterprise repository for production         |
-| Updating all cluster nodes simultaneously      | Watchdog fences nodes during CRM/LRM freeze                | Update one node at a time, verify each           |
-| Unbounded ZFS ARC on VM hosts                  | ARC silently consumes RAM, VMs crash from OOM              | Cap ARC explicitly in `/etc/modprobe.d/zfs.conf` |
-| VXLAN with default MTU 1500                    | 50-byte encapsulation overhead causes fragmentation        | Set VNet MTU to 1450 (1370 with IPSEC)           |
-| Storing PBS encryption key on backed-up system | Key lost when system fails, backups irrecoverable          | Store key in password manager + offline backup   |
-| Shared remote user for multiple PBS sync jobs  | Jobs delete each other's snapshots with `remove-vanished`  | Dedicated remote user per sync job               |
+- **Running Docker directly on the PVE host** — conflicts with PVE networking/storage, complicates updates → run Docker
+  inside a VM or LXC container
+- **Swap on ZFS zvol** — blocks server during backups, high I/O load → partition a physical disk for swap
+- **Using `host` CPU type in mixed clusters** — live migration fails on different CPU generations → use `x86-64-v2-AES`
+  or lowest common model
+- **LACP bonds for Corosync with default rate** — 90s failover exceeds fencing timeout (~60s) → set
+  `bond-lacp-rate fast` on node and switch
+- **Load-balancing bond modes for Corosync** — asymmetric connectivity causes mass fencing → use `active-backup` or LACP
+  with fast rate
+- **Using no-subscription repo in production** — less validated packages, potential instability → use Enterprise
+  repository for production
+- **Updating all cluster nodes simultaneously** — watchdog fences nodes during CRM/LRM freeze → update one node at a
+  time, verify each
+- **Unbounded ZFS ARC on VM hosts** — ARC silently consumes RAM, VMs crash from OOM → cap ARC explicitly in
+  `/etc/modprobe.d/zfs.conf`
+- **VXLAN with default MTU 1500** — 50-byte encapsulation overhead causes fragmentation → set VNet MTU to 1450 (1370
+  with IPSEC)
+- **Storing PBS encryption key on backed-up system** — key lost when system fails, backups irrecoverable → store key in
+  password manager + offline backup
+- **Shared remote user for multiple PBS sync jobs** — jobs delete each other's snapshots with `remove-vanished` →
+  dedicated remote user per sync job
 
 ---
 

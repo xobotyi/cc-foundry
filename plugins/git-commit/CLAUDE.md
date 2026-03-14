@@ -4,16 +4,13 @@ Structured git commit workflow with atomic commits, message validation, and conv
 
 ## Skills
 
-| Skill            | Purpose                                                                                                               |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `commit`         | 8-step commit pipeline: identify units → plan order → quality gate → self-review → stage → validate → commit → verify |
-| `commit-message` | Message formatting conventions and structure rules                                                                    |
+- **`commit`** — 8-step commit pipeline: identify units → plan order → quality gate → self-review → stage → validate →
+  commit → verify
+- **`commit-message`** — Message formatting conventions and structure rules
 
 ## Scripts
 
-| Script                       | Purpose                                                       |
-| ---------------------------- | ------------------------------------------------------------- |
-| `validate-commit-message.js` | Pre-commit message validation (errors block, warnings advise) |
+- **`validate-commit-message.js`** — Pre-commit message validation (errors block, warnings advise)
 
 ## Workflow
 
@@ -25,9 +22,7 @@ Structured git commit workflow with atomic commits, message validation, and conv
 
 ## Validator Flags
 
-| Flag                 | Purpose                                   | Example                           |
-| -------------------- | ----------------------------------------- | --------------------------------- |
-| `--require-trailers` | Comma-separated list of required trailers | `--require-trailers "Task,Fixes"` |
+- **`--require-trailers`** — Comma-separated list of required trailers (e.g., `--require-trailers "Task,Fixes"`)
 
 ## Project Configuration
 

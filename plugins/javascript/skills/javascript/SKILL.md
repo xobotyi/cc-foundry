@@ -15,14 +15,18 @@ save characters.
 
 ## References
 
-| Topic                                       | Reference                                                | Contents                                                                           |
-| ------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Functions, closures, composition            | [`${CLAUDE_SKILL_DIR}/references/functions.md`]          | Arrow function examples, closure patterns, early return, parameter destructuring   |
-| Async patterns, error handling, concurrency | [`${CLAUDE_SKILL_DIR}/references/async.md`]              | Promise.all/race/any examples, cancellation, custom error classes, for-await       |
-| Objects, arrays, iteration, Map/Set         | [`${CLAUDE_SKILL_DIR}/references/objects-and-arrays.md`] | Iteration decision table, destructuring patterns, immutable updates, generators    |
-| ES modules, imports, barrel files           | [`${CLAUDE_SKILL_DIR}/references/modules.md`]            | Import ordering, barrel file rationale, directory import pitfalls, dynamic imports |
-| JSDoc typing, full tag catalog              | [`${CLAUDE_SKILL_DIR}/references/jsdoc.md`]              | Full tag reference (@callback, @template, @enum), type assertions, class modifiers |
-| General JS idioms and edge cases            | [`${CLAUDE_SKILL_DIR}/references/idioms.md`]             | Variable/naming examples, equality coercion table, modern syntax patterns          |
+- **Functions, closures, composition** → [`${CLAUDE_SKILL_DIR}/references/functions.md`] — Arrow function examples,
+  closure patterns, early return, parameter destructuring
+- **Async patterns, error handling, concurrency** → [`${CLAUDE_SKILL_DIR}/references/async.md`] — Promise.all/race/any
+  examples, cancellation, custom error classes, for-await
+- **Objects, arrays, iteration, Map/Set** → [`${CLAUDE_SKILL_DIR}/references/objects-and-arrays.md`] — Iteration
+  decision table, destructuring patterns, immutable updates, generators
+- **ES modules, imports, barrel files** → [`${CLAUDE_SKILL_DIR}/references/modules.md`] — Import ordering, barrel file
+  rationale, directory import pitfalls, dynamic imports
+- **JSDoc typing, full tag catalog** → [`${CLAUDE_SKILL_DIR}/references/jsdoc.md`] — Full tag reference (@callback,
+  @template, @enum), type assertions, class modifiers
+- **General JS idioms and edge cases** → [`${CLAUDE_SKILL_DIR}/references/idioms.md`] — Variable/naming examples,
+  equality coercion table, modern syntax patterns
 
 ## Variables and Declarations
 
@@ -244,16 +248,15 @@ resolution, type inference, scope rules, and project boundaries — text search 
 
 ### Tool Routing
 
-| Task                                            | LSP Operation        | Why LSP over text search                                      |
-| ----------------------------------------------- | -------------------- | ------------------------------------------------------------- |
-| Find where a function/class/variable is defined | `goToDefinition`     | Resolves imports, re-exports, aliases                         |
-| Find all usages of a symbol                     | `findReferences`     | Scope-aware, no false positives from string matches           |
-| Get type signature, docs, or return types       | `hover`              | Instant type info without reading source files                |
-| List all exports/symbols in a file              | `documentSymbol`     | Structured output vs grepping for `function`/`class`/`export` |
-| Find a symbol by name across the project        | `workspaceSymbol`    | Searches all modules                                          |
-| Find implementations of an interface            | `goToImplementation` | Knows the type system                                         |
-| Find what calls a function                      | `incomingCalls`      | Precise call graph across module boundaries                   |
-| Find what a function calls                      | `outgoingCalls`      | Structured dependency map                                     |
+- **Find where a function/class/variable is defined** → `goToDefinition` — Resolves imports, re-exports, aliases
+- **Find all usages of a symbol** → `findReferences` — Scope-aware, no false positives from string matches
+- **Get type signature, docs, or return types** → `hover` — Instant type info without reading source files
+- **List all exports/symbols in a file** → `documentSymbol` — Structured output vs grepping for
+  `function`/`class`/`export`
+- **Find a symbol by name across the project** → `workspaceSymbol` — Searches all modules
+- **Find implementations of an interface** → `goToImplementation` — Knows the type system
+- **Find what calls a function** → `incomingCalls` — Precise call graph across module boundaries
+- **Find what a function calls** → `outgoingCalls` — Structured dependency map
 
 **Grep/Glob remain appropriate for:** text in comments, string literals, log messages, TODO markers, config values, env
 vars, CSS classes, file name patterns, URLs, error message text.

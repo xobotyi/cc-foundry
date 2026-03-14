@@ -74,14 +74,12 @@ sprawling paragraphs that mix context, instructions, and constraints.
 
 **Separate these concerns:**
 
-| Component            | What it contains                     | Example                           |
-| -------------------- | ------------------------------------ | --------------------------------- |
-| **Role/domain**      | Domain priming (not persona)         | "This is a security audit task"   |
-| **Task description** | Primary action verb + objective      | "Review code for vulnerabilities" |
-| **Constraints**      | Formal rules the output must satisfy | "Max 5 findings, severity-ranked" |
-| **Output format**    | Exact structure of the response      | JSON schema, XML tags, template   |
-| **Context**          | Information needed but not acted on  | API docs, prior conversation      |
-| **Examples**         | Input/output demonstrations          | 1-3 few-shot pairs                |
+- **Role/domain** — Domain priming (not persona). Example: "This is a security audit task"
+- **Task description** — Primary action verb + objective. Example: "Review code for vulnerabilities"
+- **Constraints** — Formal rules the output must satisfy. Example: "Max 5 findings, severity-ranked"
+- **Output format** — Exact structure of the response. Example: JSON schema, XML tags, template
+- **Context** — Information needed but not acted on. Example: API docs, prior conversation
+- **Examples** — Input/output demonstrations. Example: 1-3 few-shot pairs
 
 **Why decompose first:** Research on multi-agentic prompt optimization shows that decoupling the primary task
 description from granular constraints allows each to be refined independently. This is the "signature" concept from DSPy
@@ -210,16 +208,14 @@ prompts on each iteration often introduce new problems while fixing old ones.
 
 **Common corrections:**
 
-| Issue found            | Correction                                                      |
-| ---------------------- | --------------------------------------------------------------- |
-| Vague constraint       | Replace with measurable criterion: "concise" → "under 50 words" |
-| Missing format example | Add one input/output pair showing exact structure               |
-| Blob paragraph         | Split into XML-tagged sections                                  |
-| Hedging language       | Replace conditionals with imperatives                           |
-| Implicit assumption    | Make it an explicit constraint or context item                  |
-| Redundant instructions | Remove the weaker duplicate                                     |
-| Persona assignment     | Replace with domain priming                                     |
-| Prescriptive CoT       | Replace with high-level guidance or remove                      |
+- **Vague constraint** — Replace with measurable criterion: "concise" → "under 50 words"
+- **Missing format example** — Add one input/output pair showing exact structure
+- **Blob paragraph** — Split into XML-tagged sections
+- **Hedging language** — Replace conditionals with imperatives
+- **Implicit assumption** — Make it an explicit constraint or context item
+- **Redundant instructions** — Remove the weaker duplicate
+- **Persona assignment** — Replace with domain priming
+- **Prescriptive CoT** — Replace with high-level guidance or remove
 
 ---
 
@@ -295,17 +291,18 @@ progress after N cycles."
 Score agent-generated prompts on these dimensions. A production-grade prompt should be strong on all — weakness in any
 one can cause failures.
 
-| Dimension            | Question to ask                              | Red flag                                                 |
-| -------------------- | -------------------------------------------- | -------------------------------------------------------- |
-| **Clarity**          | One interpretation per instruction?          | "Appropriately," "as needed," "relevant"                 |
-| **Specificity**      | Constraints measurable and verifiable?       | No word counts, no format examples, no success criteria  |
-| **Robustness**       | Minor input variations → consistent outputs? | Assumes specific input length, format, or content        |
-| **Brevity**          | Every token earning its place?               | Redundant instructions, hedging, unnecessary preamble    |
-| **Completeness**     | Everything needed is provided?               | References to context not included, implicit assumptions |
-| **Generalizability** | Works beyond specific examples?              | Instructions describe examples rather than the pattern   |
-| **Structure**        | Components separated with boundaries?        | Single paragraph mixing instructions and constraints     |
-| **Placement**        | Critical rules in primacy/recency zones?     | Important rules buried in middle of long document        |
-| **Security**         | Untrusted input boundaries marked?           | User input mixed with instructions without delimiters    |
+- **Clarity** — One interpretation per instruction? Red flag: "Appropriately," "as needed," "relevant"
+- **Specificity** — Constraints measurable and verifiable? Red flag: No word counts, no format examples, no success
+  criteria
+- **Robustness** — Minor input variations → consistent outputs? Red flag: Assumes specific input length, format, or
+  content
+- **Brevity** — Every token earning its place? Red flag: Redundant instructions, hedging, unnecessary preamble
+- **Completeness** — Everything needed is provided? Red flag: References to context not included, implicit assumptions
+- **Generalizability** — Works beyond specific examples? Red flag: Instructions describe examples rather than the
+  pattern
+- **Structure** — Components separated with boundaries? Red flag: Single paragraph mixing instructions and constraints
+- **Placement** — Critical rules in primacy/recency zones? Red flag: Important rules buried in middle of long document
+- **Security** — Untrusted input boundaries marked? Red flag: User input mixed with instructions without delimiters
 
 ### Minimum Viable Quality
 
@@ -404,13 +401,13 @@ the new ones.
 
 ## Applying This to Claude Code Artifacts
 
-| Artifact            | Key decomposition                                     | Priority dimensions                                |
-| ------------------- | ----------------------------------------------------- | -------------------------------------------------- |
-| **Skill SKILL.md**  | Instructions vs references, declarative vs procedural | Clarity, placement, completeness, generalizability |
-| **Output style**    | Persona vs formatting vs examples                     | Robustness, brevity, consistency                   |
-| **Subagent prompt** | Task vs tools vs constraints vs termination           | Specificity, completeness, security                |
-| **Hook prompt**     | Trigger vs action vs output format                    | Brevity (token budget), specificity                |
-| **System prompt**   | Domain priming vs rules vs constraints                | All dimensions — highest leverage                  |
+- **Skill SKILL.md** — Decompose: instructions vs references, declarative vs procedural. Priority: clarity, placement,
+  completeness, generalizability
+- **Output style** — Decompose: persona vs formatting vs examples. Priority: robustness, brevity, consistency
+- **Subagent prompt** — Decompose: task vs tools vs constraints vs termination. Priority: specificity, completeness,
+  security
+- **Hook prompt** — Decompose: trigger vs action vs output format. Priority: brevity (token budget), specificity
+- **System prompt** — Decompose: domain priming vs rules vs constraints. Priority: all dimensions — highest leverage
 
 For each artifact type, define the signature (inputs → outputs) and decompose the artifact-specific concerns before
 generating any text.

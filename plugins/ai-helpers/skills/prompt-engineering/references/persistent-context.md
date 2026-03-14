@@ -168,14 +168,16 @@ knowledge** ("knowing how" — step-by-step workflows, strategies).
 
 ### When to Use Each
 
-| Task Type                           | Better Style         | Why                                                                                    |
-| ----------------------------------- | -------------------- | -------------------------------------------------------------------------------------- |
-| Behavioral constraints, conventions | **Declarative**      | Models utilize factual constraints more reliably across varied inputs                  |
-| Safety guardrails, formatting rules | **Declarative**      | Explicit rules are more robust for enforcing boundaries                                |
-| Simple sequential workflows         | **Procedural**       | Clear strategy is highly effective for reproducible logical paths                      |
-| Complex multi-step agent tasks      | **Procedural (HTN)** | Task decomposition prevents looping and reduces per-step complexity                    |
-| Complex logic / reasoning           | **Declarative**      | Models struggle to follow intricate multi-step plans; facts are more reliably utilized |
-| Broad specialized domains           | **Declarative**      | Knowledge hints outperform process hints for most STEM, humanities, legal tasks        |
+- Behavioral constraints, conventions — **Declarative**. Models utilize factual constraints more reliably across varied
+  inputs
+- Safety guardrails, formatting rules — **Declarative**. Explicit rules are more robust for enforcing boundaries
+- Simple sequential workflows — **Procedural**. Clear strategy is highly effective for reproducible logical paths
+- Complex multi-step agent tasks — **Procedural (HTN)**. Task decomposition prevents looping and reduces per-step
+  complexity
+- Complex logic / reasoning — **Declarative**. Models struggle to follow intricate multi-step plans; facts are more
+  reliably utilized
+- Broad specialized domains — **Declarative**. Knowledge hints outperform process hints for most STEM, humanities, legal
+  tasks
 
 ### The Hybrid Pattern
 

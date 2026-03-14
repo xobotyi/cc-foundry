@@ -46,22 +46,22 @@ metadata, dependencies, and autoloading.
 
 ### Version Constraints
 
-- `^2.0` — compatible with 2.x (>=2.0, <3.0) — preferred for most dependencies
-- `~2.1` — next significant release (>=2.1, <2.2 for patch, or >=2.1, <3.0 for minor)
-- `>=2.0 <3.0` — explicit range
-- `2.0.*` — wildcard
-- `dev-main` — branch reference (use only in root package)
+- **`^2.0`** — compatible with 2.x (>=2.0, <3.0) — preferred for most dependencies
+- **`~2.1`** — next significant release (>=2.1, <2.2 for patch, or >=2.1, <3.0 for minor)
+- **`>=2.0 <3.0`** — explicit range
+- **`2.0.*`** — wildcard
+- **`dev-main`** — branch reference (use only in root package)
 
 Prefer `^` (caret) for dependencies — it allows minor and patch updates while preventing breaking changes.
 
 ### Commands
 
-- `composer install` — install from lock file (CI, production)
-- `composer update` — update dependencies, regenerate lock file (development)
-- `composer require vendor/package` — add dependency
-- `composer require --dev vendor/package` — add dev dependency
-- `composer dump-autoload -o` — regenerate optimized autoloader
-- `composer run-script test` — run defined script
+- **`composer install`** — install from lock file (CI, production)
+- **`composer update`** — update dependencies, regenerate lock file (development)
+- **`composer require vendor/package`** — add dependency
+- **`composer require --dev vendor/package`** — add dev dependency
+- **`composer dump-autoload -o`** — regenerate optimized autoloader
+- **`composer run-script test`** — run defined script
 
 ### Lock File
 

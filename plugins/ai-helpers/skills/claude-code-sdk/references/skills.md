@@ -26,12 +26,10 @@ skill-name/
 
 **Locations:**
 
-| Location   | Path                               | Scope                     |
-| ---------- | ---------------------------------- | ------------------------- |
-| Enterprise | Managed settings                   | All users in organization |
-| Personal   | `~/.claude/skills/<name>/SKILL.md` | All your projects         |
-| Project    | `.claude/skills/<name>/SKILL.md`   | This project only         |
-| Plugin     | `<plugin>/skills/<name>/SKILL.md`  | Where plugin is enabled   |
+- Enterprise — managed settings. Scope: all users in organization.
+- Personal — `~/.claude/skills/<name>/SKILL.md`. Scope: all your projects.
+- Project — `.claude/skills/<name>/SKILL.md`. Scope: this project only.
+- Plugin — `<plugin>/skills/<name>/SKILL.md`. Scope: where plugin is enabled.
 
 Priority: enterprise > personal > project. Plugin skills use `plugin-name:skill-name` namespace and cannot conflict with
 other levels.
@@ -54,12 +52,10 @@ CLAUDE.md files from `--add-dir` directories are **not** loaded by default. Set
 
 Skill content falls into two categories that guide frontmatter choices:
 
-| Pattern               | Purpose                                                  | Typical invocation | `context` | `disable-model-invocation` |
-| --------------------- | -------------------------------------------------------- | ------------------ | --------- | -------------------------- |
-| **Reference content** | Knowledge Claude applies to current work (conventions,   | Auto or manual     | (inline)  | `false`                    |
-|                       | patterns, style guides)                                  |                    |           |                            |
-| **Task content**      | Step-by-step instructions for a specific action (deploy, | Manual (`/name`)   | `fork`    | `true`                     |
-|                       | commit, generate)                                        |                    |           |                            |
+- **Reference content** — knowledge Claude applies to current work (conventions, patterns, style guides). Typical
+  invocation: auto or manual. `context`: inline. `disable-model-invocation`: `false`.
+- **Task content** — step-by-step instructions for a specific action (deploy, commit, generate). Typical invocation:
+  manual (`/name`). `context`: `fork`. `disable-model-invocation`: `true`.
 
 Reference content runs inline so Claude uses it alongside conversation context. Task content often runs in a subagent
 and should use `disable-model-invocation: true` to prevent Claude from triggering it automatically.
@@ -86,27 +82,24 @@ hooks:
 ---
 ```
 
-| Field                      | Required    | Description                                                                           |
-| -------------------------- | ----------- | ------------------------------------------------------------------------------------- |
-| `name`                     | No          | Display name (defaults to directory name). Lowercase, hyphens, max 64 chars.          |
-| `description`              | Recommended | What the skill does and when to use it. Claude uses this for auto-invocation. If      |
-|                            |             | omitted, uses the first paragraph of markdown content.                                |
-| `argument-hint`            | No          | Hint shown during autocomplete (e.g., `[issue-number]`).                              |
-| `disable-model-invocation` | No          | `true` = only user can invoke. Removes skill from Claude's context. Default: `false`. |
-| `user-invocable`           | No          | `false` = hide from `/` menu. Claude can still auto-invoke. Default: `true`.          |
-| `allowed-tools`            | No          | Tools Claude can use without per-use approval when skill is active.                   |
-| `model`                    | No          | Model to use when skill is active.                                                    |
-| `context`                  | No          | `fork` = run in isolated subagent context.                                            |
-| `agent`                    | No          | Subagent type when `context: fork` (`Explore`, `Plan`, `general-purpose`, or custom). |
-| `hooks`                    | No          | Hooks scoped to skill lifecycle. Cleaned up when skill finishes.                      |
+- `name` — Display name (defaults to directory name). Lowercase, hyphens, max 64 chars. Required: No.
+- `description` — What the skill does and when to use it. Claude uses this for auto-invocation. If omitted, uses the
+  first paragraph of markdown content. Required: Recommended.
+- `argument-hint` — Hint shown during autocomplete (e.g., `[issue-number]`). Required: No.
+- `disable-model-invocation` — `true` = only user can invoke. Removes skill from Claude's context. Default: `false`.
+  Required: No.
+- `user-invocable` — `false` = hide from `/` menu. Claude can still auto-invoke. Default: `true`. Required: No.
+- `allowed-tools` — Tools Claude can use without per-use approval when skill is active. Required: No.
+- `model` — Model to use when skill is active. Required: No.
+- `context` — `fork` = run in isolated subagent context. Required: No.
+- `agent` — Subagent type when `context: fork` (`Explore`, `Plan`, `general-purpose`, or custom). Required: No.
+- `hooks` — Hooks scoped to skill lifecycle. Cleaned up when skill finishes. Required: No.
 
 ## Invocation Control
 
-| Frontmatter                      | You can invoke | Claude can invoke | When loaded into context                    |
-| -------------------------------- | -------------- | ----------------- | ------------------------------------------- |
-| (default)                        | Yes            | Yes               | Description always; full skill when invoked |
-| `disable-model-invocation: true` | Yes            | No                | Neither description nor full skill          |
-| `user-invocable: false`          | No             | Yes               | Description always; full skill when invoked |
+- **(default)** — you: yes / Claude: yes — description always loaded; full skill when invoked
+- **`disable-model-invocation: true`** — you: yes / Claude: no — neither description nor full skill loaded
+- **`user-invocable: false`** — you: no / Claude: yes — description always loaded; full skill when invoked
 
 **Key distinction:** `user-invocable: false` hides from the `/` menu but does **not** block the Skill tool. Claude can
 still auto-invoke it. To block programmatic invocation entirely, use `disable-model-invocation: true`.
@@ -131,12 +124,10 @@ of 16,000 characters. Run `/context` to check for warnings about excluded skills
 
 ## String Substitutions
 
-| Variable               | Description                                                     |
-| ---------------------- | --------------------------------------------------------------- |
-| `$ARGUMENTS`           | All arguments passed when invoking                              |
-| `$ARGUMENTS[N]`        | Specific argument by 0-based index                              |
-| `$N`                   | Shorthand for `$ARGUMENTS[N]` (e.g., `$0`, `$1`)                |
-| `${CLAUDE_SESSION_ID}` | Current session ID (useful for logging, session-specific files) |
+- `$ARGUMENTS` — All arguments passed when invoking
+- `$ARGUMENTS[N]` — Specific argument by 0-based index
+- `$N` — Shorthand for `$ARGUMENTS[N]` (e.g., `$0`, `$1`)
+- `${CLAUDE_SESSION_ID}` — Current session ID (useful for logging, session-specific files)
 
 If `$ARGUMENTS` is not present in the skill content, arguments are appended as `ARGUMENTS: <value>` — Claude still sees
 the input.
@@ -250,11 +241,9 @@ extend what's possible in a single prompt.
 
 ## Share Skills
 
-| Method             | Mechanism                                   | Audience             |
-| ------------------ | ------------------------------------------- | -------------------- |
-| **Project skills** | Commit `.claude/skills/` to version control | Project contributors |
-| **Plugins**        | Create `skills/` directory in a plugin      | Plugin users         |
-| **Managed**        | Deploy via managed settings                 | Organization-wide    |
+- **Project skills** — Commit `.claude/skills/` to version control. Audience: Project contributors.
+- **Plugins** — Create `skills/` directory in a plugin. Audience: Plugin users.
+- **Managed** — Deploy via managed settings. Audience: Organization-wide.
 
 ## Troubleshooting
 

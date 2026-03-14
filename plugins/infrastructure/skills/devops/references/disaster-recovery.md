@@ -28,12 +28,11 @@ can tolerate a 24-hour RPO. Over-engineering recovery for non-critical component
 Categorize services by criticality to determine the appropriate recovery architecture. Different tiers justify different
 infrastructure costs and complexity.
 
-| Tier                  | Criticality            | Recovery Architecture         | RTO Target | Cost           |
-| --------------------- | ---------------------- | ----------------------------- | ---------- | -------------- |
-| 1 — Mission-critical  | Revenue/safety impact  | Hot standby or shared active  | Minutes    | High (near 2x) |
-| 2 — Business-critical | Significant disruption | Warm standby                  | < 1 hour   | Medium         |
-| 3 — Important         | Productivity impact    | Cold standby with IaC rebuild | < 4 hours  | Low            |
-| 4 — Non-critical      | Minimal impact         | Restore from backup           | < 24 hours | Minimal        |
+- **Tier 1 — Mission-critical** (revenue/safety impact): Hot standby or shared active — RTO: minutes — Cost: high (near
+  2x)
+- **Tier 2 — Business-critical** (significant disruption): Warm standby — RTO: < 1 hour — Cost: medium
+- **Tier 3 — Important** (productivity impact): Cold standby with IaC rebuild — RTO: < 4 hours — Cost: low
+- **Tier 4 — Non-critical** (minimal impact): Restore from backup — RTO: < 24 hours — Cost: minimal
 
 **Architecture trade-offs:**
 

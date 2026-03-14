@@ -25,14 +25,23 @@ from unauthorized access.
 
 ### Feature Comparison
 
-| Factor           | Authelia                      | Authentik                           |
-| ---------------- | ----------------------------- | ----------------------------------- |
-| Resource usage   | ~30 MB RAM                    | ~690 MB + PostgreSQL                |
-| Config style     | YAML files                    | Web GUI + YAML                      |
-| Protocol support | OIDC                          | OIDC, SAML2, LDAP, RADIUS, SCIM     |
-| MFA options      | TOTP, WebAuthn, Passkeys, Duo | TOTP, WebAuthn + visual flow editor |
-| User portal      | Login page only               | Full app dashboard                  |
-| Best for         | Lightweight SSO for web apps  | Full IdP with SAML/LDAP needs       |
+**Authelia:**
+
+- Resource usage: ~30 MB RAM
+- Config style: YAML files
+- Protocol support: OIDC
+- MFA options: TOTP, WebAuthn, Passkeys, Duo
+- User portal: Login page only
+- Best for: Lightweight SSO for web apps
+
+**Authentik:**
+
+- Resource usage: ~690 MB + PostgreSQL
+- Config style: Web GUI + YAML
+- Protocol support: OIDC, SAML2, LDAP, RADIUS, SCIM
+- MFA options: TOTP, WebAuthn + visual flow editor
+- User portal: Full app dashboard
+- Best for: Full IdP with SAML/LDAP needs
 
 ### Decision
 

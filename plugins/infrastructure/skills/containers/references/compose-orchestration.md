@@ -72,11 +72,9 @@ depends_on:
     condition: service_completed_successfully
 ```
 
-| Condition                        | Waits Until                 |
-| -------------------------------- | --------------------------- |
-| `service_started`                | Container started (default) |
-| `service_healthy`                | Health check passes         |
-| `service_completed_successfully` | Container exits with code 0 |
+- **`service_started`** — Container started (default)
+- **`service_healthy`** — Health check passes
+- **`service_completed_successfully`** — Container exits with code 0
 
 Use `service_healthy` for databases and services that need init time. Use `service_completed_successfully` for one-shot
 tasks like migrations.
@@ -150,11 +148,9 @@ services:
       - /data/backups:/backups:ro                 # Read-only bind
 ```
 
-| Type         | Syntax              | Use Case                                   |
-| ------------ | ------------------- | ------------------------------------------ |
-| Named volume | `volname:/path`     | Persistent data (databases, uploads)       |
-| Bind mount   | `./host:/container` | Development, config files                  |
-| tmpfs        | `type: tmpfs`       | Ephemeral scratch data, secrets at runtime |
+- **Named volume** — `volname:/path`: Persistent data (databases, uploads)
+- **Bind mount** — `./host:/container`: Development, config files
+- **tmpfs** — `type: tmpfs`: Ephemeral scratch data, secrets at runtime
 
 - Named volumes survive `docker compose down` (but not `down -v`)
 - Bind mounts for development; named volumes for production
@@ -192,12 +188,10 @@ services:
 
 ## Restart Policies
 
-| Policy             | Behavior                                            |
-| ------------------ | --------------------------------------------------- |
-| `no`               | Never restart (default)                             |
-| `always`           | Always restart, including on daemon startup         |
-| `unless-stopped`   | Like `always`, but not if manually stopped          |
-| `on-failure[:max]` | Restart only on non-zero exit, optional retry limit |
+- **`no`** — Never restart (default)
+- **`always`** — Always restart, including on daemon startup
+- **`unless-stopped`** — Like `always`, but not if manually stopped
+- **`on-failure[:max]`** — Restart only on non-zero exit, optional retry limit
 
 Use `unless-stopped` for production services. Use `on-failure` for tasks that should retry but eventually give up.
 

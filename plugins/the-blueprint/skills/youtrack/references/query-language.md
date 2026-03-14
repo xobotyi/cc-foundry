@@ -7,50 +7,46 @@ syntax for structured search.
 
 Base attributes set automatically by YouTrack:
 
-| Attribute         | Value              | Returns                                             |
-| ----------------- | ------------------ | --------------------------------------------------- |
-| `project`         | project name or ID | Issues in the specified project                     |
-| `created`         | date or period     | Issues created on date or within period             |
-| `updated`         | date or period     | Issues last changed on date or within period        |
-| `resolved date`   | date or period     | Issues resolved on date or within period            |
-| `reporter`        | user or group      | Issues created by the specified user                |
-| `updater`         | user or group      | Issues last updated by the specified user           |
-| `commenter`       | user or group      | Issues commented by the specified user              |
-| `commented`       | date or period     | Issues with comments added on date or within period |
-| `summary`         | text               | Issues matching text in summary                     |
-| `description`     | text               | Issues matching text in description                 |
-| `comments`        | text               | Issues matching text in comments                    |
-| `code`            | text               | Issues matching text in code-formatted blocks       |
-| `tag`             | tag name           | Issues with the specified tag                       |
-| `visible to`      | user or group      | Issues visible to the specified user/group          |
-| `voter`           | user or group      | Issues voted on by the specified user               |
-| `saved search`    | name               | Issues matching a saved search                      |
-| `issue ID`        | issue ID           | Exact issue by ID                                   |
-| `links`           | issue ID           | Issues linked to the specified issue                |
-| `looks like`      | issue ID           | Issues with similar summary/description text        |
-| `mentions`        | issue ID or user   | Issues mentioning the specified issue or user       |
-| `mentioned in`    | issue ID           | Issues referenced in the target issue               |
-| `attachments`     | filename           | Issues with matching attachment filenames           |
-| `attachment text` | text               | Issues with matching text in image attachments      |
-| `vcs changes`     | commit hash        | Issues linked to the specified commit               |
-| `Board <name>`    | sprint name        | Issues assigned to the specified sprint             |
-| `Gantt`           | chart name         | Issues assigned to the specified Gantt chart        |
-| `document type`   | Issue or Ticket    | Filter by document type                             |
+- **`project`** (project name or ID) — issues in the specified project
+- **`created`** (date or period) — issues created on date or within period
+- **`updated`** (date or period) — issues last changed on date or within period
+- **`resolved date`** (date or period) — issues resolved on date or within period
+- **`reporter`** (user or group) — issues created by the specified user
+- **`updater`** (user or group) — issues last updated by the specified user
+- **`commenter`** (user or group) — issues commented by the specified user
+- **`commented`** (date or period) — issues with comments added on date or within period
+- **`summary`** (text) — issues matching text in summary
+- **`description`** (text) — issues matching text in description
+- **`comments`** (text) — issues matching text in comments
+- **`code`** (text) — issues matching text in code-formatted blocks
+- **`tag`** (tag name) — issues with the specified tag
+- **`visible to`** (user or group) — issues visible to the specified user/group
+- **`voter`** (user or group) — issues voted on by the specified user
+- **`saved search`** (name) — issues matching a saved search
+- **`issue ID`** (issue ID) — exact issue by ID
+- **`links`** (issue ID) — issues linked to the specified issue
+- **`looks like`** (issue ID) — issues with similar summary/description text
+- **`mentions`** (issue ID or user) — issues mentioning the specified issue or user
+- **`mentioned in`** (issue ID) — issues referenced in the target issue
+- **`attachments`** (filename) — issues with matching attachment filenames
+- **`attachment text`** (text) — issues with matching text in image attachments
+- **`vcs changes`** (commit hash) — issues linked to the specified commit
+- **`Board <name>`** (sprint name) — issues assigned to the specified sprint
+- **`Gantt`** (chart name) — issues assigned to the specified Gantt chart
+- **`document type`** (Issue or Ticket) — filter by document type
 
 ## Default Custom Field Attributes
 
 These correspond to default fields — actual names may be customized per-project:
 
-| Attribute           | Value                           | Aliases                |
-| ------------------- | ------------------------------- | ---------------------- |
-| `Assignee`          | user or group                   | `for`, `assigned to`   |
-| `State`             | value, `Resolved`, `Unresolved` | —                      |
-| `Priority`          | value                           | —                      |
-| `Type`              | value                           | —                      |
-| `Subsystem`         | value                           | `in`                   |
-| `Affected versions` | value                           | `affects`, `affecting` |
-| `Fix versions`      | value                           | `fix for`, `fixed in`  |
-| `Fixed in build`    | value                           | `fixed in build`       |
+- **`Assignee`** (user or group) — aliases: `for`, `assigned to`
+- **`State`** (value, `Resolved`, `Unresolved`)
+- **`Priority`** (value)
+- **`Type`** (value)
+- **`Subsystem`** (value) — alias: `in`
+- **`Affected versions`** (value) — aliases: `affects`, `affecting`
+- **`Fix versions`** (value) — aliases: `fix for`, `fixed in`
+- **`Fixed in build`** (value) — alias: `fixed in build`
 
 Any custom field can be searched with `<field name>: <value>`. Enclose names with spaces in braces:
 `{My Custom Field}: value`.
@@ -61,15 +57,13 @@ Empty field search: `<field name>: {No <field name>}` or `has: -<field name>`.
 
 Search by link type using inward or outward names:
 
-| Syntax                      | Returns                              |
-| --------------------------- | ------------------------------------ |
-| `depends on: PROJ-123`      | Issues that depend on PROJ-123       |
-| `is required for: PROJ-123` | Issues required for PROJ-123         |
-| `subtask of: PROJ-123`      | Subtasks of PROJ-123                 |
-| `parent for: PROJ-123`      | Parent issues of PROJ-123            |
-| `duplicates: PROJ-123`      | Issues that duplicate PROJ-123       |
-| `relates to: PROJ-123`      | Issues related to PROJ-123           |
-| `links: PROJ-123`           | Issues linked to PROJ-123 (any type) |
+- **`depends on: PROJ-123`** — issues that depend on PROJ-123
+- **`is required for: PROJ-123`** — issues required for PROJ-123
+- **`subtask of: PROJ-123`** — subtasks of PROJ-123
+- **`parent for: PROJ-123`** — parent issues of PROJ-123
+- **`duplicates: PROJ-123`** — issues that duplicate PROJ-123
+- **`relates to: PROJ-123`** — issues related to PROJ-123
+- **`links: PROJ-123`** — issues linked to PROJ-123 (any type)
 
 **Sub-query syntax** — find issues linked to issues matching a query:
 
@@ -96,25 +90,21 @@ Example: `has: {subtask of}` — issues that are subtasks. Example: `has: -{subt
 
 ## Time Tracking Search
 
-| Attribute          | Value          | Returns                                  |
-| ------------------ | -------------- | ---------------------------------------- |
-| `work`             | text           | Issues with matching text in work items  |
-| `work author`      | user           | Issues with work items by user           |
-| `work type`        | value          | Issues with work items of specified type |
-| `work date`        | date or period | Issues with work items in timeframe      |
-| `work <attribute>` | value          | Issues with custom work item attribute   |
+- **`work`** (text) — issues with matching text in work items
+- **`work author`** (user) — issues with work items by user
+- **`work type`** (value) — issues with work items of specified type
+- **`work date`** (date or period) — issues with work items in timeframe
+- **`work <attribute>`** (value) — issues with custom work item attribute
 
 ## Keywords
 
 Keywords are used as single values with `#` or `-` prefix:
 
-| Keyword      | Meaning                                                               |
-| ------------ | --------------------------------------------------------------------- |
-| `me` / `my`  | Current user — works with any user-type attribute                     |
-| `Resolved`   | Issues where all state-type fields are in resolved values             |
-| `Unresolved` | Issues where any state-type field is unresolved                       |
-| `Released`   | Version field values marked as released (use with version attributes) |
-| `Archived`   | Version field values marked as archived (use with version attributes) |
+- **`me` / `my`** — current user; works with any user-type attribute
+- **`Resolved`** — issues where all state-type fields are in resolved values
+- **`Unresolved`** — issues where any state-type field is unresolved
+- **`Released`** — version field values marked as released (use with version attributes)
+- **`Archived`** — version field values marked as archived (use with version attributes)
 
 `#me` alone returns issues assigned to, reported by, or commented by the current user (including custom user-type
 fields).
@@ -146,15 +136,13 @@ in: Ktor #Critical or in: Kotlin #Major and for: me
 
 ## Symbols
 
-| Symbol | Purpose                          | Example                                         |
-| ------ | -------------------------------- | ----------------------------------------------- |
-| `-`    | Exclude value                    | `#unresolved -minor`                            |
-| `#`    | Single value reference           | `#me #Unresolved`                               |
-| `,`    | Separate values                  | `State: Open, {In Progress}`                    |
-| `..`   | Range                            | `created: 2024-01-01 .. 2024-12-31`             |
-| `*`    | Wildcard (zero+ chars)           | `tag: refactoring*`, `created: * .. 2024-01-01` |
-| `?`    | Single char wildcard (text only) | `description: prioriti?e`                       |
-| `{ }`  | Enclose values with spaces       | `tag: {to be tested}`                           |
+- **`-`** — exclude value — e.g., `#unresolved -minor`
+- **`#`** — single value reference — e.g., `#me #Unresolved`
+- **`,`** — separate values — e.g., `State: Open, {In Progress}`
+- **`..`** — range — e.g., `created: 2024-01-01 .. 2024-12-31`
+- **`*`** — wildcard (zero+ chars) — e.g., `tag: refactoring*`, `created: * .. 2024-01-01`
+- **`?`** — single char wildcard (text only) — e.g., `description: prioriti?e`
+- **`{ }`** — enclose values with spaces — e.g., `tag: {to be tested}`
 
 ## Date and Period Values
 
@@ -162,16 +150,14 @@ in: Ktor #Critical or in: Kotlin #Major and for: me
 
 **Predefined relative dates:**
 
-| Parameter                                        | Meaning                                            |
-| ------------------------------------------------ | -------------------------------------------------- |
-| `Now`                                            | Current instant                                    |
-| `Today` / `Tomorrow` / `Yesterday`               | Calendar day                                       |
-| `Monday` .. `Sunday`                             | Day of current week                                |
-| `{Last working day}`                             | Most recent working day per time tracking settings |
-| `{This week}` / `{Last week}` / `{Next week}`    | Mon 00:00 – Sun 23:59                              |
-| `{Two weeks ago}` / `{Three weeks ago}`          | Calendar week periods                              |
-| `{This month}` / `{Last month}` / `{Next month}` | Full calendar months                               |
-| `Older`                                          | Jan 1, 1970 to end of month two months ago         |
+- **`Now`** — current instant
+- **`Today` / `Tomorrow` / `Yesterday`** — calendar day
+- **`Monday` .. `Sunday`** — day of current week
+- **`{Last working day}`** — most recent working day per time tracking settings
+- **`{This week}` / `{Last week}` / `{Next week}`** — Mon 00:00 – Sun 23:59
+- **`{Two weeks ago}` / `{Three weeks ago}`** — calendar week periods
+- **`{This month}` / `{Last month}` / `{Next month}`** — full calendar months
+- **`Older`** — Jan 1, 1970 to end of month two months ago
 
 **Custom relative dates:**
 

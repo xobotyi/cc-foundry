@@ -16,16 +16,14 @@ spawn them as teammates and aggregate their findings.
 
 All agents are **read-only** — they analyze code and report findings via SendMessage.
 
-| Subagent Type                          | Focus                                                                      |
-| -------------------------------------- | -------------------------------------------------------------------------- |
-| `the-crucible:namer`                   | Naming: misleading, vague, type-encoded, scope-mismatched identifiers      |
-| `the-crucible:complexity-reviewer`     | Complexity: nesting, flag arguments, duplication, premature abstraction    |
-| `the-crucible:comment-reviewer`        | Comments: noise, staleness, refactoring signals, commented-out code        |
-| `the-crucible:test-reviewer`           | Tests: false confidence, implementation coupling, flakiness, coverage gaps |
-| `the-crucible:error-handling-reviewer` | Errors: silent swallowing, context loss, resource leaks, async error loss  |
-| `the-crucible:security-reviewer`       | Security: injection, access control, secrets, crypto, data exposure        |
-| `the-crucible:observability-reviewer`  | Observability: logging, metrics, tracing, cardinality, context propagation |
-| `the-crucible:docs-auditor`            | Documentation: missing API docs, stale docs, contract gaps                 |
+- `the-crucible:namer` — Naming: misleading, vague, type-encoded, scope-mismatched identifiers
+- `the-crucible:complexity-reviewer` — Complexity: nesting, flag arguments, duplication, premature abstraction
+- `the-crucible:comment-reviewer` — Comments: noise, staleness, refactoring signals, commented-out code
+- `the-crucible:test-reviewer` — Tests: false confidence, implementation coupling, flakiness, coverage gaps
+- `the-crucible:error-handling-reviewer` — Errors: silent swallowing, context loss, resource leaks, async error loss
+- `the-crucible:security-reviewer` — Security: injection, access control, secrets, crypto, data exposure
+- `the-crucible:observability-reviewer` — Observability: logging, metrics, tracing, cardinality, context propagation
+- `the-crucible:docs-auditor` — Documentation: missing API docs, stale docs, contract gaps
 
 ## Workflow
 

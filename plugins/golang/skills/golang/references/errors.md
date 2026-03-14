@@ -4,12 +4,10 @@ Error creation, wrapping, matching, structured error types, and error handling p
 
 ## Error Creation Decision Tree
 
-| Caller needs to match? | Message | Use                                          |
-| ---------------------- | ------- | -------------------------------------------- |
-| No                     | Static  | `errors.New("not found")`                    |
-| No                     | Dynamic | `fmt.Errorf("file %q missing", name)`        |
-| Yes                    | Static  | Exported `var ErrNotFound = errors.New(...)` |
-| Yes                    | Dynamic | Custom error type with `Error()` method      |
+- **No match needed, static message** — `errors.New("not found")`
+- **No match needed, dynamic message** — `fmt.Errorf("file %q missing", name)`
+- **Caller must match, static message** — exported `var ErrNotFound = errors.New(...)`
+- **Caller must match, dynamic message** — custom error type with `Error()` method
 
 When using a structured error package, sentinels become objects with wrapping methods — see
 [Structured Error Types](#structured-error-types) below.
@@ -160,12 +158,10 @@ return ErrAuth.Wrap(other, fields.F("ip", ip))  // another new instance
 
 ### When to Use Structured Errors
 
-| Situation                               | Standard `fmt.Errorf` | Structured error package |
-| --------------------------------------- | --------------------- | ------------------------ |
-| Simple CLI tools                        | Sufficient            | Overkill                 |
-| Libraries with public API               | Preferred             | Either                   |
-| Services with structured logging        | Either                | Preferred                |
-| Codebase with field-aware observability | Avoid                 | Preferred                |
+- **Simple CLI tools** — standard `fmt.Errorf` is sufficient; structured error package is overkill
+- **Libraries with public API** — prefer standard `fmt.Errorf`; structured package is either
+- **Services with structured logging** — either works; structured package preferred
+- **Codebase with field-aware observability** — avoid standard `fmt.Errorf`; use structured package
 
 If your project uses a structured error package, prefer it consistently over `fmt.Errorf` — mixing approaches fragments
 error handling patterns.

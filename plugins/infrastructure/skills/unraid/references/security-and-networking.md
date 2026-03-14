@@ -14,11 +14,9 @@
 
 Disable unless explicitly required:
 
-| Service    | Risk                                             | Action                                             |
-| ---------- | ------------------------------------------------ | -------------------------------------------------- |
-| Telnet     | Plaintext console access                         | Settings > Management Access > Use TELNET = No     |
-| FTP        | Unencrypted credentials and data                 | Settings > Network Services > FTP Server > Disable |
-| USB Export | Physical access attack vector, license key theft | Main > Flash > USB Security > Export = No          |
+- **Telnet** — Plaintext console access. Settings > Management Access > Use TELNET = No
+- **FTP** — Unencrypted credentials and data. Settings > Network Services > FTP Server > Disable
+- **USB Export** — Physical access attack vector, license key theft. Main > Flash > USB Security > Export = No
 
 ### WebGUI Hardening
 
@@ -34,24 +32,21 @@ Disable unless explicitly required:
 
 ### Port Forwarding Risks
 
-| Port(s)  | Service    | Risk                              | Safer Alternative     |
-| -------- | ---------- | --------------------------------- | --------------------- |
-| 80/443   | WebGUI     | Exposes management interface      | VPN or Tailscale      |
-| 445      | SMB        | Exposes file shares, flash device | VPN                   |
-| 111/2049 | NFS        | Exposes NFS shares                | VPN                   |
-| 22/23    | SSH/Telnet | Console access exposure           | SSH keys + VPN        |
-| 57xx     | VNC        | VM console exposure               | VPN or Unraid Connect |
+- **80/443** (WebGUI) — Exposes management interface. Use VPN or Tailscale instead
+- **445** (SMB) — Exposes file shares, flash device. Use VPN instead
+- **111/2049** (NFS) — Exposes NFS shares. Use VPN instead
+- **22/23** (SSH/Telnet) — Console access exposure. Use SSH keys + VPN instead
+- **57xx** (VNC) — VM console exposure. Use VPN or Unraid Connect instead
 
 **Never place the server in your router's DMZ.**
 
 ### Remote Access Methods
 
-| Method                  | Description                                                                                |
-| ----------------------- | ------------------------------------------------------------------------------------------ |
-| Tailscale (recommended) | Built-in plugin (native in 7.0), creates secure private tailnet, no port forwarding needed |
-| WireGuard VPN           | Built into Unraid, encrypted tunnel, advanced routing control                              |
-| OpenVPN                 | Available as plugin or Docker container                                                    |
-| Unraid Connect          | Remote WebGUI access via encrypted proxy, requires port forward on router                  |
+- **Tailscale** (recommended) — Built-in plugin (native in 7.0), creates secure private tailnet, no port forwarding
+  needed
+- **WireGuard VPN** — Built into Unraid, encrypted tunnel, advanced routing control
+- **OpenVPN** — Available as plugin or Docker container
+- **Unraid Connect** — Remote WebGUI access via encrypted proxy, requires port forward on router
 
 ### Tailscale Integration (Unraid 7+)
 
@@ -66,14 +61,12 @@ Disable unless explicitly required:
 
 Configure via Settings > VPN Manager. Connection types:
 
-| Connection Type         | Use Case                                                        |
-| ----------------------- | --------------------------------------------------------------- |
-| Remote access to server | Access Unraid WebGUI and services remotely                      |
-| Remote access to LAN    | Access all LAN devices as if on local network                   |
-| Server to server        | Encrypted link between Unraid servers for backup/sharing        |
-| LAN to LAN              | Connect entire networks through central server                  |
-| VPN tunneled            | Route specific containers through commercial VPN                |
-| Remote tunneled         | Route all internet traffic through Unraid on untrusted networks |
+- **Remote access to server** — Access Unraid WebGUI and services remotely
+- **Remote access to LAN** — Access all LAN devices as if on local network
+- **Server to server** — Encrypted link between Unraid servers for backup/sharing
+- **LAN to LAN** — Connect entire networks through central server
+- **VPN tunneled** — Route specific containers through commercial VPN
+- **Remote tunneled** — Route all internet traffic through Unraid on untrusted networks
 
 For complex networks (custom-IP containers, strict VM networking):
 
@@ -111,11 +104,9 @@ For complex networks (custom-IP containers, strict VM networking):
 
 ### Network File Sharing Protocols
 
-| Protocol      | Best For                                                    |
-| ------------- | ----------------------------------------------------------- |
-| SMB           | Windows/macOS networks, mixed environments, VM storage      |
-| NFS           | Linux/Unix clients, small file operations, static workloads |
-| FTP/FTPS/SFTP | Cross-platform legacy transfers (prefer SFTP for security)  |
+- **SMB** — Windows/macOS networks, mixed environments, VM storage
+- **NFS** — Linux/Unix clients, small file operations, static workloads
+- **FTP/FTPS/SFTP** — Cross-platform legacy transfers (prefer SFTP for security)
 
 AFP support removed in Unraid 6.9+. Enable Enhanced macOS interoperability in Settings > SMB for Time Machine
 compatibility.
@@ -172,15 +163,13 @@ Versioned backup tools provide:
 
 ### Backup Coverage Checklist
 
-| Data                        | Tool                                          | Frequency                        |
-| --------------------------- | --------------------------------------------- | -------------------------------- |
-| Flash drive (/boot)         | Appdata Backup plugin or User Script + rclone | Daily                            |
-| Appdata (container configs) | CA Appdata Backup/Restore                     | Daily/weekly, containers stopped |
-| VM XML + NVRAM              | User Script                                   | Weekly                           |
-| VM state                    | VM Backup plugin or QCOW2 snapshots           | Before changes                   |
-| ZFS datasets                | ZFS snapshot + rsync to array                 | Daily (zero-downtime)            |
-| Critical personal data      | Borgmatic/Kopia/Restic to offsite             | Daily                            |
-| Media library               | Parity protection + optional offsite          | As needed                        |
+- **Flash drive** (/boot) — Appdata Backup plugin or User Script + rclone. Daily
+- **Appdata** (container configs) — CA Appdata Backup/Restore. Daily/weekly, containers stopped
+- **VM XML + NVRAM** — User Script. Weekly
+- **VM state** — VM Backup plugin or QCOW2 snapshots. Before changes
+- **ZFS datasets** — ZFS snapshot + rsync to array. Daily (zero-downtime)
+- **Critical personal data** — Borgmatic/Kopia/Restic to offsite. Daily
+- **Media library** — Parity protection + optional offsite. As needed
 
 ### ZFS Snapshot Backups
 
@@ -240,13 +229,11 @@ community-driven developer tooling.
 
 Go-based plugin providing comprehensive system monitoring and control:
 
-| Interface  | Description                                                        |
-| ---------- | ------------------------------------------------------------------ |
-| REST API   | HTTP endpoints for synchronous queries                             |
-| WebSocket  | Real-time event streaming for live updates                         |
-| Prometheus | Native `/metrics` endpoint with 41 metrics for Grafana             |
-| MQTT       | Event publishing for IoT/Home Assistant integration                |
-| MCP        | 54 tools for AI agent integration (LLM-powered monitoring/control) |
+- **REST API** — HTTP endpoints for synchronous queries
+- **WebSocket** — Real-time event streaming for live updates
+- **Prometheus** — Native `/metrics` endpoint with 41 metrics for Grafana
+- **MQTT** — Event publishing for IoT/Home Assistant integration
+- **MCP** — 54 tools for AI agent integration (LLM-powered monitoring/control)
 
 **Monitoring capabilities**: CPU, RAM, temperatures, array status, per-disk metrics, SMART data, Docker containers, VMs,
 UPS status, GPU metrics, user shares, ZFS pools, notifications.

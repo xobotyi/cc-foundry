@@ -5,13 +5,11 @@ Vue bugs.
 
 ## Choosing a Reactive Primitive
 
-| Primitive           | Use When                                                               |
-| ------------------- | ---------------------------------------------------------------------- |
-| `ref()`             | **Default choice.** Works with any value type.                         |
-| `reactive()`        | Grouping related state into one object when destructure is not needed. |
-| `shallowRef()`      | Large immutable structures, external state integration.                |
-| `shallowReactive()` | Root-level-only reactivity on objects.                                 |
-| `computed()`        | Derived state. Caches until dependencies change.                       |
+- **`ref()`** — Default choice. Works with any value type.
+- **`reactive()`** — Grouping related state into one object when destructure is not needed.
+- **`shallowRef()`** — Large immutable structures, external state integration.
+- **`shallowReactive()`** — Root-level-only reactivity on objects.
+- **`computed()`** — Derived state. Caches until dependencies change.
 
 ### `ref()` is the Primary API
 

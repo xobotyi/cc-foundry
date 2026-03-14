@@ -98,11 +98,9 @@ if (!result.success) {
 
 ### Targets
 
-| Target      | Use case                                  |
-| ----------- | ----------------------------------------- |
-| `"bun"`     | Bun server apps. Inlines `bun:*` imports. |
-| `"browser"` | Client-side. Standard web APIs only.      |
-| `"node"`    | Node.js apps. Preserves `node:*` imports. |
+- **`"bun"`** — Bun server apps. Inlines `bun:*` imports.
+- **`"browser"`** — Client-side. Standard web APIs only.
+- **`"node"`** — Node.js apps. Preserves `node:*` imports.
 
 ### HTML Entrypoints
 

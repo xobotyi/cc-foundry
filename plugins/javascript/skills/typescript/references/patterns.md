@@ -351,13 +351,11 @@ Keep the branding mechanism consistent across the project. The `unique symbol` p
 
 ### Decision Table
 
-| Situation                                                  | Use                             |
-| ---------------------------------------------------------- | ------------------------------- |
-| Value from external source (API, JSON.parse, user input)   | `unknown`                       |
-| Function accepts anything, passes through without touching | `unknown`                       |
-| Migrating JS to TS incrementally                           | `any` (temporary, with comment) |
-| Test mock that intentionally bypasses type checking        | `any` (with comment)            |
-| You're too lazy to type it properly                        | Fix the types                   |
+- **Value from external source (API, JSON.parse, user input)** → `unknown`
+- **Function accepts anything, passes through without touching** → `unknown`
+- **Migrating JS to TS incrementally** → `any` (temporary, with comment)
+- **Test mock that intentionally bypasses type checking** → `any` (with comment)
+- **Too lazy to type it properly** → Fix the types
 
 ### Using `unknown` Safely
 
@@ -379,12 +377,10 @@ function processValue(value: unknown): string {
 
 `{}` means "any non-nullish value" — it's almost never what you want:
 
-| Type                      | Allows                                            |
-| ------------------------- | ------------------------------------------------- |
-| `unknown`                 | Everything (null, undefined, primitives, objects) |
-| `object`                  | Non-primitive, non-null values                    |
-| `{}`                      | Any non-nullish value (primitives included)       |
-| `Record<string, unknown>` | Objects with string keys                          |
+- **`unknown`** → Everything (null, undefined, primitives, objects)
+- **`object`** → Non-primitive, non-null values
+- **`{}`** → Any non-nullish value (primitives included)
+- **`Record<string, unknown>`** → Objects with string keys
 
 Prefer `unknown` for opaque values, `Record<string, unknown>` for dict-like objects, `object` when you need "any
 non-primitive".

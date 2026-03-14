@@ -35,12 +35,10 @@ The default propagation format. Uses two HTTP headers:
 00-a0892f3577b34da6a3ce929d0e0e4736-f03067aa0ba902b7-01
 ```
 
-| Field       | Size   | Description                              |
-| ----------- | ------ | ---------------------------------------- |
-| version     | 2 hex  | Always `00` for current spec             |
-| trace-id    | 32 hex | 16-byte globally unique trace identifier |
-| parent-id   | 16 hex | 8-byte span identifier of the caller     |
-| trace-flags | 2 hex  | Bit flags; `01` = sampled                |
+- **version** (2 hex) — Always `00` for current spec
+- **trace-id** (32 hex) — 16-byte globally unique trace identifier
+- **parent-id** (16 hex) — 8-byte span identifier of the caller
+- **trace-flags** (2 hex) — Bit flags; `01` = sampled
 
 ### tracestate
 
@@ -133,10 +131,8 @@ baggage crosses process boundaries.
 
 ## Propagator Selection
 
-| Propagator       | When to Use                                       |
-| ---------------- | ------------------------------------------------- |
-| W3C TraceContext | Default — use everywhere                          |
-| W3C Baggage      | When you need cross-service key-value propagation |
-| B3 (Zipkin)      | Interop with Zipkin-based systems only            |
-| Jaeger           | Legacy — deprecated, migrate to W3C TraceContext  |
-| Composite        | When you need multiple propagators active         |
+- **W3C TraceContext** — Default — use everywhere
+- **W3C Baggage** — When you need cross-service key-value propagation
+- **B3 (Zipkin)** — Interop with Zipkin-based systems only
+- **Jaeger** — Legacy — deprecated, migrate to W3C TraceContext
+- **Composite** — When you need multiple propagators active

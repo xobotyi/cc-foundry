@@ -107,15 +107,13 @@ Multiple values are combined in output:
 
 Supported types for style values:
 
-| Type                                  | Example                                 |
-| ------------------------------------- | --------------------------------------- |
-| `string`                              | `"background-color: red"`               |
-| `templ.SafeCSS`                       | Bypasses sanitization                   |
-| `map[string]string`                   | `map[string]string{"color": "red"}`     |
-| `map[string]templ.SafeCSSProperty`    | Map with unsanitized values             |
-| `templ.KeyValue[string, bool]`        | Conditional: include CSS if true        |
-| `templ.KeyValue[templ.SafeCSS, bool]` | Conditional unsanitized CSS             |
-| Functions returning any above         | Single function may return `(T, error)` |
+- `string` — e.g. `"background-color: red"`
+- `templ.SafeCSS` — bypasses sanitization
+- `map[string]string` — e.g. `map[string]string{"color": "red"}`
+- `map[string]templ.SafeCSSProperty` — map with unsanitized values
+- `templ.KeyValue[string, bool]` — conditional: include CSS if true
+- `templ.KeyValue[templ.SafeCSS, bool]` — conditional unsanitized CSS
+- Functions returning any above — single function may return `(T, error)`
 
 ### Map Pattern
 
@@ -265,13 +263,11 @@ Saves bandwidth by serving CSS once instead of per-request `<style>` tags.
 
 ## Pattern Summary
 
-| Pattern               | Best For                                          |
-| --------------------- | ------------------------------------------------- |
-| Static string         | Simple, unchanging classes/styles                 |
-| `templ.KV`            | Conditional toggling of single class/style        |
-| `map[string]bool`     | Multiple conditional classes                      |
-| Raw Go `{{ }}` block  | Complex class logic with intermediate variables   |
-| Conditional attribute | Replacing full attribute value based on condition |
-| `map[string]string`   | Computed style sets                               |
-| `css` blocks          | Component-scoped CSS with deduplication           |
-| `templ.SafeCSS`       | Trusted dynamic CSS bypassing sanitization        |
+- Static string — simple, unchanging classes/styles
+- `templ.KV` — conditional toggling of single class/style
+- `map[string]bool` — multiple conditional classes
+- Raw Go `{{ }}` block — complex class logic with intermediate variables
+- Conditional attribute — replacing full attribute value based on condition
+- `map[string]string` — computed style sets
+- `css` blocks — component-scoped CSS with deduplication
+- `templ.SafeCSS` — trusted dynamic CSS bypassing sanitization

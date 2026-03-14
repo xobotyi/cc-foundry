@@ -21,42 +21,34 @@ expect(value, 'should be positive').toBeGreaterThan(0)
 
 ### Equality
 
-| Matcher                 | Use When                                                            |
-| ----------------------- | ------------------------------------------------------------------- |
-| `toBe(val)`             | Primitives or same reference (`Object.is`)                          |
-| `toEqual(val)`          | Deep structural equality (ignores `undefined` in expected)          |
-| `toStrictEqual(val)`    | Deep equality + checks `undefined` keys, sparse arrays, class types |
-| `toMatchObject(subset)` | Object contains at least these properties                           |
+- **`toBe(val)`** — primitives or same reference (`Object.is`)
+- **`toEqual(val)`** — deep structural equality (ignores `undefined` in expected)
+- **`toStrictEqual(val)`** — deep equality + checks `undefined` keys, sparse arrays, class types
+- **`toMatchObject(subset)`** — object contains at least these properties
 
 ### Truthiness
 
-| Matcher           | Checks                                                      |
-| ----------------- | ----------------------------------------------------------- |
-| `toBeTruthy()`    | Truthy (not `false`, `0`, `''`, `null`, `undefined`, `NaN`) |
-| `toBeFalsy()`     | Falsy                                                       |
-| `toBeNull()`      | `=== null`                                                  |
-| `toBeUndefined()` | `=== undefined`                                             |
-| `toBeDefined()`   | `!== undefined`                                             |
-| `toBeNaN()`       | `Number.isNaN`                                              |
+- **`toBeTruthy()`** — truthy (not `false`, `0`, `''`, `null`, `undefined`, `NaN`)
+- **`toBeFalsy()`** — falsy
+- **`toBeNull()`** — `=== null`
+- **`toBeUndefined()`** — `=== undefined`
+- **`toBeDefined()`** — `!== undefined`
+- **`toBeNaN()`** — `Number.isNaN`
 
 ### Numbers
 
-| Matcher                     | Checks                                               |
-| --------------------------- | ---------------------------------------------------- |
-| `toBeGreaterThan(n)`        | `> n`                                                |
-| `toBeGreaterThanOrEqual(n)` | `>= n`                                               |
-| `toBeLessThan(n)`           | `< n`                                                |
-| `toBeCloseTo(n, digits?)`   | Floating-point comparison (default 2 decimal digits) |
+- **`toBeGreaterThan(n)`** — `> n`
+- **`toBeGreaterThanOrEqual(n)`** — `>= n`
+- **`toBeLessThan(n)`** — `< n`
+- **`toBeCloseTo(n, digits?)`** — floating-point comparison (default 2 decimal digits)
 
 ### Strings, Arrays, Objects
 
-| Matcher                     | Checks                                            |
-| --------------------------- | ------------------------------------------------- |
-| `toContain(item)`           | Array includes item, or string includes substring |
-| `toContainEqual(obj)`       | Array contains item with matching structure       |
-| `toHaveLength(n)`           | `.length === n`                                   |
-| `toHaveProperty(key, val?)` | Property exists (with optional value check)       |
-| `toMatch(regex\|string)`    | String matches pattern                            |
+- **`toContain(item)`** — array includes item, or string includes substring
+- **`toContainEqual(obj)`** — array contains item with matching structure
+- **`toHaveLength(n)`** — `.length === n`
+- **`toHaveProperty(key, val?)`** — property exists (with optional value check)
+- **`toMatch(regex|string)`** — string matches pattern
 
 ### Type Checks
 
@@ -80,15 +72,13 @@ await expect(asyncFn()).rejects.toThrow('message')
 
 ## Spy/Mock Assertions
 
-| Matcher                               | Checks                                 |
-| ------------------------------------- | -------------------------------------- |
-| `toHaveBeenCalled()`                  | Called at least once                   |
-| `toHaveBeenCalledTimes(n)`            | Called exactly `n` times               |
-| `toHaveBeenCalledWith(...args)`       | Called with these args (at least once) |
-| `toHaveBeenLastCalledWith(...args)`   | Last call used these args              |
-| `toHaveBeenNthCalledWith(n, ...args)` | Nth call (1-indexed) used these args   |
-| `toHaveReturned()`                    | Returned successfully (no throw)       |
-| `toHaveReturnedWith(val)`             | Returned this value                    |
+- **`toHaveBeenCalled()`** — called at least once
+- **`toHaveBeenCalledTimes(n)`** — called exactly `n` times
+- **`toHaveBeenCalledWith(...args)`** — called with these args (at least once)
+- **`toHaveBeenLastCalledWith(...args)`** — last call used these args
+- **`toHaveBeenNthCalledWith(n, ...args)`** — Nth call (1-indexed) used these args
+- **`toHaveReturned()`** — returned successfully (no throw)
+- **`toHaveReturnedWith(val)`** — returned this value
 
 ## Async Assertions
 

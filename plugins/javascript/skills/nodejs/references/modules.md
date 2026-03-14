@@ -17,11 +17,9 @@ This makes all `.js` files in the package parse as ES modules. Without this fiel
 
 ### File Extensions
 
-| Extension | Always parsed as    | Regardless of `"type"` |
-| --------- | ------------------- | ---------------------- |
-| `.mjs`    | ES module           | Yes                    |
-| `.cjs`    | CommonJS            | Yes                    |
-| `.js`     | Depends on `"type"` | No                     |
+- `.mjs` — always ES module, regardless of `"type"`
+- `.cjs` — always CommonJS, regardless of `"type"`
+- `.js` — depends on `"type"` field
 
 Use `.mjs`/`.cjs` only when you need to mix module systems within a single package.
 
@@ -51,10 +49,8 @@ Benefits:
 
 Controls how `.js` files are interpreted:
 
-| Value                    | `.js` parsed as |
-| ------------------------ | --------------- |
-| `"module"`               | ES module       |
-| `"commonjs"` (or absent) | CommonJS        |
+- `"module"` → ES module
+- `"commonjs"` (or absent) → CommonJS
 
 Always set this field explicitly, even in CommonJS packages — future-proofs the package and helps tooling.
 

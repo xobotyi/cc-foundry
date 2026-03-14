@@ -95,15 +95,13 @@ Each independent change becomes its own commit. </atomic-commit-rule>
 
 For each identified unit, classify and order:
 
-| Type     | Order | Description                            |
-| -------- | ----- | -------------------------------------- |
-| Style    | 1st   | Formatting, whitespace, naming         |
-| Refactor | 2nd   | Code restructuring, no behavior change |
-| Fix      | 3rd   | Bug corrections                        |
-| Feature  | 4th   | New functionality                      |
-| Docs     | any   | Documentation only                     |
-| Test     | any   | Adding or fixing tests                 |
-| Chore    | any   | Build, tooling, dependencies           |
+- **Style (1st)** — Formatting, whitespace, naming
+- **Refactor (2nd)** — Code restructuring, no behavior change
+- **Fix (3rd)** — Bug corrections
+- **Feature (4th)** — New functionality
+- **Docs (any)** — Documentation only
+- **Test (any)** — Adding or fixing tests
+- **Chore (any)** — Build, tooling, dependencies
 
 **Commit style/refactor first** — keeps behavior-changing commits clean.
 

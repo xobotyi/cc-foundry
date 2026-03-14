@@ -7,17 +7,15 @@ timing, identity, and causal relationships.
 
 Every span contains:
 
-| Field                | Description                                            |
-| -------------------- | ------------------------------------------------------ |
-| Name                 | Low-cardinality identifier for the class of operation  |
-| SpanContext          | Immutable: trace ID, span ID, trace flags, trace state |
-| Parent span ID       | Empty for root spans; links child to parent            |
-| SpanKind             | `SERVER`, `CLIENT`, `INTERNAL`, `PRODUCER`, `CONSUMER` |
-| Start/end timestamps | Wall-clock time of operation boundaries                |
-| Attributes           | Key-value metadata about the operation                 |
-| Events               | Timestamped annotations within the span                |
-| Links                | References to spans in other (or same) traces          |
-| Status               | `Unset`, `Error`, or `Ok`                              |
+- **Name** — Low-cardinality identifier for the class of operation
+- **SpanContext** — Immutable: trace ID, span ID, trace flags, trace state
+- **Parent span ID** — Empty for root spans; links child to parent
+- **SpanKind** — `SERVER`, `CLIENT`, `INTERNAL`, `PRODUCER`, `CONSUMER`
+- **Start/end timestamps** — Wall-clock time of operation boundaries
+- **Attributes** — Key-value metadata about the operation
+- **Events** — Timestamped annotations within the span
+- **Links** — References to spans in other (or same) traces
+- **Status** — `Unset`, `Error`, or `Ok`
 
 ## Span Naming
 
@@ -53,13 +51,11 @@ in backends.
 
 SpanKind describes the relationship between spans in a trace. It tells backends how to assemble the trace tree.
 
-| Kind       | Direction | Style               | Example                               |
-| ---------- | --------- | ------------------- | ------------------------------------- |
-| `SERVER`   | Incoming  | Request/response    | HTTP handler, gRPC server method      |
-| `CLIENT`   | Outgoing  | Request/response    | HTTP client call, DB query, gRPC call |
-| `PRODUCER` | Outgoing  | Fire-and-forget     | Enqueue message, schedule job         |
-| `CONSUMER` | Incoming  | Deferred processing | Dequeue message, process job          |
-| `INTERNAL` | Neither   | In-process          | Business logic, computation           |
+- `SERVER` (Incoming, Request/response) — HTTP handler, gRPC server method
+- `CLIENT` (Outgoing, Request/response) — HTTP client call, DB query, gRPC call
+- `PRODUCER` (Outgoing, Fire-and-forget) — Enqueue message, schedule job
+- `CONSUMER` (Incoming, Deferred processing) — Dequeue message, process job
+- `INTERNAL` (Neither, In-process) — Business logic, computation
 
 **Rules:**
 
@@ -78,11 +74,9 @@ SpanKind describes the relationship between spans in a trace. It tells backends 
 
 ## Span Status
 
-| Status  | Meaning                           | When to set                                        |
-| ------- | --------------------------------- | -------------------------------------------------- |
-| `Unset` | Operation completed without error | Default — don't change on success                  |
-| `Error` | Operation failed                  | When an error occurs; include description          |
-| `Ok`    | Explicitly marked successful      | Only to override a previous `Error`; rarely needed |
+- `Unset` — Operation completed without error. Default — don't change on success.
+- `Error` — Operation failed. When an error occurs; include description.
+- `Ok` — Explicitly marked successful. Only to override a previous `Error`; rarely needed.
 
 **Rules:**
 

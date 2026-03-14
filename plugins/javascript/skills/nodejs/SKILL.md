@@ -14,13 +14,16 @@ Node.js rewards async-first, stream-oriented code. If your Node.js code fights t
 
 ## References
 
-| Topic          | Reference                                        | Contents                                                                      |
-| -------------- | ------------------------------------------------ | ----------------------------------------------------------------------------- |
-| Module system  | [`${CLAUDE_SKILL_DIR}/references/modules.md`]    | ESM/CJS comparison tables, file extension rules, conditional exports patterns |
-| Event loop     | [`${CLAUDE_SKILL_DIR}/references/event-loop.md`] | Phase order, execution priority, blocking operations table, worker pool       |
-| Streams        | [`${CLAUDE_SKILL_DIR}/references/streams.md`]    | Stream types table, pipeline patterns, backpressure details                   |
-| Error handling | [`${CLAUDE_SKILL_DIR}/references/errors.md`]     | Error categories table, global handlers, centralized error handling           |
-| Security       | [`${CLAUDE_SKILL_DIR}/references/security.md`]   | Supply chain threats table, HTTP security headers, process hardening          |
+- **Module system** — [`${CLAUDE_SKILL_DIR}/references/modules.md`]: ESM/CJS comparison tables, file extension rules,
+  conditional exports patterns
+- **Event loop** — [`${CLAUDE_SKILL_DIR}/references/event-loop.md`]: Phase order, execution priority, blocking
+  operations table, worker pool
+- **Streams** — [`${CLAUDE_SKILL_DIR}/references/streams.md`]: Stream types table, pipeline patterns, backpressure
+  details
+- **Error handling** — [`${CLAUDE_SKILL_DIR}/references/errors.md`]: Error categories table, global handlers,
+  centralized error handling
+- **Security** — [`${CLAUDE_SKILL_DIR}/references/security.md`]: Supply chain threats table, HTTP security headers,
+  process hardening
 
 ## Module System
 

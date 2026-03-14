@@ -320,18 +320,16 @@ export async function handle({ event, resolve }) {
 
 ## Key Imports
 
-| Module                 | Exports                                                                  |
-| ---------------------- | ------------------------------------------------------------------------ |
-| `$app/navigation`      | `goto`, `invalidate`, `invalidateAll`, `beforeNavigate`, `afterNavigate` |
-| `$app/state`           | `page` (reactive page info), `navigating`, `updated`                     |
-| `$app/forms`           | `enhance`, `applyAction`, `deserialize`                                  |
-| `$app/paths`           | `base`, `assets`, `resolveRoute`                                         |
-| `$app/server`          | `getRequestEvent`, `read`                                                |
-| `$env/static/private`  | Compile-time private env vars                                            |
-| `$env/static/public`   | Compile-time public env vars (`PUBLIC_*`)                                |
-| `$env/dynamic/private` | Runtime private env vars                                                 |
-| `$env/dynamic/public`  | Runtime public env vars (`PUBLIC_*`)                                     |
-| `$lib`                 | Alias for `src/lib`                                                      |
+- `$app/navigation` — `goto`, `invalidate`, `invalidateAll`, `beforeNavigate`, `afterNavigate`
+- `$app/state` — `page` (reactive page info), `navigating`, `updated`
+- `$app/forms` — `enhance`, `applyAction`, `deserialize`
+- `$app/paths` — `base`, `assets`, `resolveRoute`
+- `$app/server` — `getRequestEvent`, `read`
+- `$env/static/private` — Compile-time private env vars
+- `$env/static/public` — Compile-time public env vars (`PUBLIC_*`)
+- `$env/dynamic/private` — Runtime private env vars
+- `$env/dynamic/public` — Runtime public env vars (`PUBLIC_*`)
+- `$lib` — Alias for `src/lib`
 
 ## Performance
 

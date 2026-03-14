@@ -27,9 +27,12 @@ Does Claude delegate to this agent at the right times?
 - Implicit match: Describe a task that should trigger delegation
 - Non-match: Describe similar but different tasks (should NOT trigger)
 
-**Scoring:** | Outcome | Score | Action | |---------|-------|--------| | Delegates correctly when should | Good | — | |
-Delegates when shouldn't | Over-triggering | Narrow description | | Doesn't delegate when should | Under-triggering |
-Broaden description | | Never delegates | Broken | Check name/description format |
+**Scoring:**
+
+- **Delegates correctly when should** — Good: no action needed
+- **Delegates when shouldn't** — Over-triggering: narrow description
+- **Doesn't delegate when should** — Under-triggering: broaden description
+- **Never delegates** — Broken: check name/description format
 
 **Common issues:**
 
@@ -103,9 +106,12 @@ Does the agent use tools appropriately?
 - Makes efficient use of tools
 - Handles tool errors gracefully
 
-**Scoring:** | Behavior | Assessment | |----------|------------| | Uses minimal necessary tools | Good | | Makes
-redundant tool calls | Inefficient | | Attempts blocked tools | Over-scoped | | Ignores available useful tools |
-Under-utilizing |
+**Scoring:**
+
+- **Uses minimal necessary tools** — Good
+- **Makes redundant tool calls** — Inefficient
+- **Attempts blocked tools** — Over-scoped
+- **Ignores available useful tools** — Under-utilizing
 
 ## Evaluation Checklist
 
@@ -265,13 +271,11 @@ Run periodically to catch regressions.
 
 Rate each dimension 1-5:
 
-| Dimension          | Score | Weight |
-| ------------------ | ----- | ------ |
-| Trigger Accuracy   | ?     | 25%    |
-| Task Completion    | ?     | 30%    |
-| Output Quality     | ?     | 25%    |
-| Context Efficiency | ?     | 10%    |
-| Tool Usage         | ?     | 10%    |
+- **Trigger Accuracy**: weight 25%
+- **Task Completion**: weight 30%
+- **Output Quality**: weight 25%
+- **Context Efficiency**: weight 10%
+- **Tool Usage**: weight 10%
 
 **Overall = weighted average**
 
@@ -281,12 +285,10 @@ Rate each dimension 1-5:
 - Trigger Accuracy and Output Quality (25% each) — wrong triggers waste time; poor output requires rework
 - Context Efficiency and Tool Usage (10% each) — important for cost and speed, but secondary to correctness
 
-| Score   | Rating    | Action                      |
-| ------- | --------- | --------------------------- |
-| 4.5+    | Excellent | Monitor only                |
-| 3.5-4.4 | Good      | Minor improvements          |
-| 2.5-3.4 | Fair      | Significant revision needed |
-| <2.5    | Poor      | Redesign from scratch       |
+- **4.5+**: Excellent — monitor only
+- **3.5–4.4**: Good — minor improvements
+- **2.5–3.4**: Fair — significant revision needed
+- **<2.5**: Poor — redesign from scratch
 
 ## Continuous Monitoring
 

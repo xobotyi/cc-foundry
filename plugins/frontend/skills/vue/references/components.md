@@ -288,13 +288,11 @@ const theme = inject(ThemeKey, ref('light')) // with default
 
 ### Naming Patterns
 
-| Pattern             | Example                                 | When                       |
-| ------------------- | --------------------------------------- | -------------------------- |
-| Multi-word          | `TodoItem`                              | Always (except root `App`) |
-| Base prefix         | `BaseButton`, `BaseIcon`                | Presentational components  |
-| Parent prefix       | `TodoListItem`, `TodoListItemButton`    | Tightly coupled children   |
-| Highest-level first | `SearchButtonClear`, `SearchInputQuery` | Groups related components  |
-| Full words          | `StudentDashboardSettings`              | Always — no abbreviations  |
+- **Multi-word** (`TodoItem`) — Always (except root `App`)
+- **Base prefix** (`BaseButton`, `BaseIcon`) — Presentational components
+- **Parent prefix** (`TodoListItem`, `TodoListItemButton`) — Tightly coupled children
+- **Highest-level first** (`SearchButtonClear`, `SearchInputQuery`) — Groups related components
+- **Full words** (`StudentDashboardSettings`) — Always — no abbreviations
 
 ### In JS/TS
 

@@ -171,19 +171,17 @@ Never let focus fall to `document.body` -- this causes a complete loss of keyboa
 
 ## Keyboard Patterns by Widget
 
-| Widget      | Keys                      | Behavior                       |
-| ----------- | ------------------------- | ------------------------------ |
-| Button      | Enter, Space              | Activate                       |
-| Link        | Enter                     | Navigate                       |
-| Checkbox    | Space                     | Toggle checked state           |
-| Radio group | Arrow keys                | Move selection between options |
-| Tabs        | Arrow keys                | Switch active tab              |
-| Menu        | Arrow keys, Enter         | Navigate items, activate       |
-| Dialog      | Tab (trapped), Escape     | Navigate within, close         |
-| Accordion   | Enter/Space               | Toggle expanded section        |
-| Combobox    | Arrow keys, Enter, Escape | Navigate list, select, close   |
-| Slider      | Arrow keys                | Adjust value                   |
-| Tree view   | Arrow keys                | Navigate, expand/collapse      |
+- **Button** — Enter, Space: activate
+- **Link** — Enter: navigate
+- **Checkbox** — Space: toggle checked state
+- **Radio group** — Arrow keys: move selection between options
+- **Tabs** — Arrow keys: switch active tab
+- **Menu** — Arrow keys, Enter: navigate items, activate
+- **Dialog** — Tab (trapped), Escape: navigate within, close
+- **Accordion** — Enter/Space: toggle expanded section
+- **Combobox** — Arrow keys, Enter, Escape: navigate list, select, close
+- **Slider** — Arrow keys: adjust value
+- **Tree view** — Arrow keys: navigate, expand/collapse
 
 ## Disabled Elements
 

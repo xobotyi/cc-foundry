@@ -344,14 +344,12 @@ callbacks_enabled = timer, profile_tasks, profile_roles
 stdout_callback = yaml
 ```
 
-| Plugin          | Purpose                                   |
-| --------------- | ----------------------------------------- |
-| `timer`         | Total playbook execution time             |
-| `profile_tasks` | Per-task timing to identify bottlenecks   |
-| `profile_roles` | Timing at the role level                  |
-| `dense`         | Compressed output for large-scale runs    |
-| `yaml`          | Structured YAML output (easier to read)   |
-| `json`          | JSON output for external tool consumption |
+- **`timer`** — Total playbook execution time
+- **`profile_tasks`** — Per-task timing to identify bottlenecks
+- **`profile_roles`** — Timing at the role level
+- **`dense`** — Compressed output for large-scale runs
+- **`yaml`** — Structured YAML output (easier to read)
+- **`json`** — JSON output for external tool consumption
 
 **Profile before optimizing.** `profile_tasks` identifies real bottlenecks -- do not optimize blindly.
 

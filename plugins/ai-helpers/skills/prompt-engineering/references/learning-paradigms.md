@@ -234,13 +234,11 @@ See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] for more on knowledge g
 
 ### Choosing a Paradigm
 
-| Situation               | Recommendation                |
-| ----------------------- | ----------------------------- |
-| Simple, well-known task | Zero-shot                     |
-| Need specific format    | One-shot                      |
-| Complex classification  | Few-shot (3-5)                |
-| Domain-specific task    | Few-shot with domain examples |
-| Highly nuanced judgment | Few-shot + CoT                |
+- Simple, well-known task — Zero-shot
+- Need specific format — One-shot
+- Complex classification — Few-shot (3-5)
+- Domain-specific task — Few-shot with domain examples
+- Highly nuanced judgment — Few-shot + CoT
 
 ### Common Mistakes
 

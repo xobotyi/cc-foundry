@@ -292,13 +292,11 @@ bypassing all checks.
 
 ## Common Failure Patterns
 
-| Pattern                  | Fix                                                       |
-| ------------------------ | --------------------------------------------------------- |
-| Kitchen sink session     | `/clear` between unrelated tasks                          |
-| Correcting over and over | After 2 fails, `/clear` and write better initial prompt   |
-| Over-specified CLAUDE.md | Ruthlessly prune; convert satisfied rules to hooks        |
-| Trust-then-verify gap    | Always provide verification (tests, scripts, screenshots) |
-| Infinite exploration     | Scope narrowly or use subagents to protect main context   |
+- **Kitchen sink session** — `/clear` between unrelated tasks
+- **Correcting over and over** — after 2 fails, `/clear` and write better initial prompt
+- **Over-specified CLAUDE.md** — ruthlessly prune; convert satisfied rules to hooks
+- **Trust-then-verify gap** — always provide verification (tests, scripts, screenshots)
+- **Infinite exploration** — scope narrowly or use subagents to protect main context
 
 ## Develop Intuition
 

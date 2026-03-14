@@ -19,23 +19,23 @@ Every PHP file starts with `declare(strict_types=1)`.
 
 ## References
 
-| Topic        | Reference                                       | Contents                                                                                                  |
-| ------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Type system  | `${CLAUDE_SKILL_DIR}/references/typing.md`      | Union/intersection/DNF types, nullable patterns, typed properties and constants, coercion rules, variance |
-| OOP patterns | `${CLAUDE_SKILL_DIR}/references/oop.md`         | Interfaces, traits, readonly, property hooks, enums, constructor promotion, lazy objects, magic methods   |
-| Concurrency  | `${CLAUDE_SKILL_DIR}/references/concurrency.md` | Fiber API, generator coroutines, comparison table, async library guidance                                 |
-| Packaging    | `${CLAUDE_SKILL_DIR}/references/packaging.md`   | composer.json templates, version constraints, project layouts, namespace conventions                      |
+- **Type system** → `${CLAUDE_SKILL_DIR}/references/typing.md` — Union/intersection/DNF types, nullable patterns, typed
+  properties and constants, coercion rules, variance
+- **OOP patterns** → `${CLAUDE_SKILL_DIR}/references/oop.md` — Interfaces, traits, readonly, property hooks, enums,
+  constructor promotion, lazy objects, magic methods
+- **Concurrency** → `${CLAUDE_SKILL_DIR}/references/concurrency.md` — Fiber API, generator coroutines, comparison table,
+  async library guidance
+- **Packaging** → `${CLAUDE_SKILL_DIR}/references/packaging.md` — composer.json templates, version constraints, project
+  layouts, namespace conventions
 
 ## Naming
 
-| Entity                             | Style               | Examples                              |
-| ---------------------------------- | ------------------- | ------------------------------------- |
-| Classes, interfaces, traits, enums | PascalCase          | `UserService`, `Renderable`, `Status` |
-| Methods, functions                 | camelCase           | `findById`, `getFullName`             |
-| Properties, variables              | camelCase           | `$userName`, `$isActive`              |
-| Constants (class and global)       | UPPER_SNAKE_CASE    | `MAX_RETRIES`, `DEFAULT_LOCALE`       |
-| Namespaces                         | PascalCase segments | `App\Http\Controller`                 |
-| Enum cases                         | PascalCase          | `Status::Active`, `Suit::Hearts`      |
+- **Classes, interfaces, traits, enums** — PascalCase: `UserService`, `Renderable`, `Status`
+- **Methods, functions** — camelCase: `findById`, `getFullName`
+- **Properties, variables** — camelCase: `$userName`, `$isActive`
+- **Constants (class and global)** — UPPER_SNAKE_CASE: `MAX_RETRIES`, `DEFAULT_LOCALE`
+- **Namespaces** — PascalCase segments: `App\Http\Controller`
+- **Enum cases** — PascalCase: `Status::Active`, `Suit::Hearts`
 
 - **Descriptive names.** `$userCount` not `$n`. Short names (`$i`, `$k`, `$v`) only in tiny scopes (loops, array
   operations).
@@ -355,16 +355,14 @@ boundaries — text search does not.
 
 ### Tool Routing
 
-| Task                                            | LSP Operation        | Why LSP over text search                            |
-| ----------------------------------------------- | -------------------- | --------------------------------------------------- |
-| Find where a function/class is defined          | `goToDefinition`     | Resolves `use` statements, aliases, namespace paths |
-| Find all usages of a symbol                     | `findReferences`     | Scope-aware, no false positives from string matches |
-| Get type signature or docs                      | `hover`              | Instant type info without reading source files      |
-| List all symbols in a file                      | `documentSymbol`     | Structured output — classes, methods, constants     |
-| Find a symbol by name across project            | `workspaceSymbol`    | Searches all namespaces and Composer dependencies   |
-| Find concrete classes implementing an interface | `goToImplementation` | Knows the type hierarchy                            |
-| Find what calls a function                      | `incomingCalls`      | Precise call graph across namespace boundaries      |
-| Find what a function calls                      | `outgoingCalls`      | Structured dependency map                           |
+- **Find where a function/class is defined** → `goToDefinition` — resolves `use` statements, aliases, namespace paths
+- **Find all usages of a symbol** → `findReferences` — scope-aware, no false positives from string matches
+- **Get type signature or docs** → `hover` — instant type info without reading source files
+- **List all symbols in a file** → `documentSymbol` — structured output: classes, methods, constants
+- **Find a symbol by name across project** → `workspaceSymbol` — searches all namespaces and Composer dependencies
+- **Find concrete classes implementing an interface** → `goToImplementation` — knows the type hierarchy
+- **Find what calls a function** → `incomingCalls` — precise call graph across namespace boundaries
+- **Find what a function calls** → `outgoingCalls` — structured dependency map
 
 **Grep/Glob remain appropriate for:** text in comments, string literals, log messages, TODO markers, config values, env
 vars, file name patterns, URLs, error message text — anything that isn't a PHP identifier.

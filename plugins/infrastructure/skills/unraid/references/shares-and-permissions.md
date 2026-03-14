@@ -35,12 +35,10 @@ Safe practices:
 
 Created automatically when Docker or VM Manager starts:
 
-| Share     | Purpose                                                      |
-| --------- | ------------------------------------------------------------ |
-| `appdata` | Docker container working files (one subfolder per container) |
-| `system`  | Docker `docker.img` and VM XML templates                     |
-| `domains` | VM virtual disk images (vdisks)                              |
-| `isos`    | OS installation ISOs for VMs                                 |
+- `appdata` — Docker container working files (one subfolder per container)
+- `system` — Docker `docker.img` and VM XML templates
+- `domains` — VM virtual disk images (vdisks)
+- `isos` — OS installation ISOs for VMs
 
 Do not change permissions on `appdata`, `system`, or `domains`. The `isos` share can be made network-accessible for
 adding ISO files.
@@ -66,11 +64,9 @@ Use "Yes (Hidden)" for shares that authorized users need but should not be disco
 
 ## SMB Security Levels
 
-| Level   | Read             | Write            | Use Case                           |
-| ------- | ---------------- | ---------------- | ---------------------------------- |
-| Public  | Everyone         | Everyone         | Non-sensitive shared media         |
-| Secure  | Everyone         | Authorized users | Collaborative project folders      |
-| Private | Authorized users | Authorized users | Sensitive data, personal documents |
+- **Public** — Read: everyone, Write: everyone. Non-sensitive shared media
+- **Secure** — Read: everyone, Write: authorized users. Collaborative project folders
+- **Private** — Read: authorized users, Write: authorized users. Sensitive data, personal documents
 
 ### Windows SMB Considerations
 

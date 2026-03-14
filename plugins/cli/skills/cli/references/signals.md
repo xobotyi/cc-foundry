@@ -5,20 +5,18 @@ SKILL.md with full signal tables and implementation patterns.
 
 ## Common Signals
 
-| Signal     | Number | Default Action | Purpose                            |
-| ---------- | ------ | -------------- | ---------------------------------- |
-| `SIGHUP`   | 1      | Terminate      | Terminal hangup / config reload    |
-| `SIGINT`   | 2      | Terminate      | Interrupt from keyboard (Ctrl-C)   |
-| `SIGQUIT`  | 3      | Core dump      | Quit from keyboard (Ctrl-\)        |
-| `SIGABRT`  | 6      | Core dump      | Abort signal (from `abort()`)      |
-| `SIGKILL`  | 9      | Terminate      | Unblockable kill                   |
-| `SIGPIPE`  | 13     | Terminate      | Broken pipe (write to closed pipe) |
-| `SIGTERM`  | 15     | Terminate      | Polite termination request         |
-| `SIGTSTP`  | 20     | Stop           | Terminal stop (Ctrl-Z)             |
-| `SIGCONT`  | 18     | Continue       | Resume after stop                  |
-| `SIGUSR1`  | 10     | Terminate      | User-defined                       |
-| `SIGUSR2`  | 12     | Terminate      | User-defined                       |
-| `SIGWINCH` | 28     | Ignore         | Terminal window size change        |
+- `SIGHUP` (1) — Terminate: terminal hangup / config reload
+- `SIGINT` (2) — Terminate: interrupt from keyboard (Ctrl-C)
+- `SIGQUIT` (3) — Core dump: quit from keyboard (Ctrl-\)
+- `SIGABRT` (6) — Core dump: abort signal (from `abort()`)
+- `SIGKILL` (9) — Terminate: unblockable kill
+- `SIGPIPE` (13) — Terminate: broken pipe (write to closed pipe)
+- `SIGTERM` (15) — Terminate: polite termination request
+- `SIGTSTP` (20) — Stop: terminal stop (Ctrl-Z)
+- `SIGCONT` (18) — Continue: resume after stop
+- `SIGUSR1` (10) — Terminate: user-defined
+- `SIGUSR2` (12) — Terminate: user-defined
+- `SIGWINCH` (28) — Ignore: terminal window size change
 
 ## SIGINT (Ctrl-C)
 

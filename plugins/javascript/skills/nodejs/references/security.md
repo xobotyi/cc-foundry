@@ -81,13 +81,11 @@ if (filePath.length < 1000) filePath.match(SAFE);
 
 ### Threats
 
-| Attack                 | Description                                                     |
-| ---------------------- | --------------------------------------------------------------- |
-| Typosquatting          | Package with similar name to popular one (`lodsah` vs `lodash`) |
-| Compromised maintainer | Attacker gains publish access to legitimate package             |
-| Lockfile poisoning     | Modified lockfile points to malicious version                   |
-| Dependency confusion   | Private package name claimed on public registry                 |
-| Malicious postinstall  | Package runs arbitrary code on `npm install`                    |
+- **Typosquatting** — package with similar name to popular one (`lodsah` vs `lodash`)
+- **Compromised maintainer** — attacker gains publish access to legitimate package
+- **Lockfile poisoning** — modified lockfile points to malicious version
+- **Dependency confusion** — private package name claimed on public registry
+- **Malicious postinstall** — package runs arbitrary code on `npm install`
 
 ### Mitigations
 

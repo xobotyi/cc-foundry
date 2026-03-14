@@ -87,15 +87,16 @@ This avoids blocking Server Component rendering — the promise streams to the c
 
 **You don't need an Effect for:**
 
-| Situation                     | Instead of Effect                               | Do this                                   |
-| ----------------------------- | ----------------------------------------------- | ----------------------------------------- |
-| Transform data for rendering  | `useEffect(() => setFiltered(...))`             | Compute during render                     |
-| Handle user events            | `useEffect(() => { if (submitted) post(...) })` | Call in event handler                     |
-| Reset state on prop change    | `useEffect(() => setComment(''), [userId])`     | Use `key={userId}`                        |
-| Adjust state on prop change   | `useEffect(() => setSelection(null), [items])`  | Compute: `items.find(...)`                |
-| Notify parent of state change | `useEffect(() => onChange(value), [value])`     | Call `onChange` in handler                |
-| Share logic between handlers  | `useEffect` with flags                          | Extract function, call from both handlers |
-| Chain state updates           | Multiple Effects triggering each other          | Calculate all state in one event handler  |
+- **Transform data for rendering** — instead of `useEffect(() => setFiltered(...))`. Fix: compute during render
+- **Handle user events** — instead of `useEffect(() => { if (submitted) post(...) })`. Fix: call in event handler
+- **Reset state on prop change** — instead of `useEffect(() => setComment(''), [userId])`. Fix: use `key={userId}`
+- **Adjust state on prop change** — instead of `useEffect(() => setSelection(null), [items])`. Fix: compute
+  `items.find(...)`
+- **Notify parent of state change** — instead of `useEffect(() => onChange(value), [value])`. Fix: call `onChange` in
+  handler
+- **Share logic between handlers** — instead of `useEffect` with flags. Fix: extract function, call from both handlers
+- **Chain state updates** — instead of multiple Effects triggering each other. Fix: calculate all state in one event
+  handler
 
 **You DO need an Effect for:**
 

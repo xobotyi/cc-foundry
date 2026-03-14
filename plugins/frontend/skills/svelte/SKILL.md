@@ -15,11 +15,10 @@ References contain extended examples, rationale, and edge cases for each topic.
 
 ## References
 
-| Topic      | Reference                                        | Contents                                                       |
-| ---------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| Runes      | [`${CLAUDE_SKILL_DIR}/references/runes.md`]      | `$state`, `$derived`, `$effect`, `$props`, `$bindable` details |
-| Components | [`${CLAUDE_SKILL_DIR}/references/components.md`] | Snippets, events, context, special elements                    |
-| SvelteKit  | [`${CLAUDE_SKILL_DIR}/references/sveltekit.md`]  | Routing, load functions, form actions, hooks, imports          |
+- **Runes** — [`${CLAUDE_SKILL_DIR}/references/runes.md`]: `$state`, `$derived`, `$effect`, `$props`, `$bindable`
+  details
+- **Components** — [`${CLAUDE_SKILL_DIR}/references/components.md`]: Snippets, events, context, special elements
+- **SvelteKit** — [`${CLAUDE_SKILL_DIR}/references/sveltekit.md`]: Routing, load functions, form actions, hooks, imports
 
 ## Runes
 
@@ -215,16 +214,14 @@ Components are functions, not classes:
 
 ### Route Files
 
-| File                | Purpose                                             |
-| ------------------- | --------------------------------------------------- |
-| `+page.svelte`      | Page component (receives `data` from load)          |
-| `+page.js`          | Universal load (server + browser)                   |
-| `+page.server.js`   | Server-only load + form actions                     |
-| `+layout.svelte`    | Layout wrapper (must render `{@render children()}`) |
-| `+layout.js`        | Layout universal load                               |
-| `+layout.server.js` | Layout server load                                  |
-| `+error.svelte`     | Error boundary                                      |
-| `+server.js`        | API endpoint (GET, POST, etc.)                      |
+- `+page.svelte` — Page component (receives `data` from load)
+- `+page.js` — Universal load (server + browser)
+- `+page.server.js` — Server-only load + form actions
+- `+layout.svelte` — Layout wrapper (must render `{@render children()}`)
+- `+layout.js` — Layout universal load
+- `+layout.server.js` — Layout server load
+- `+error.svelte` — Error boundary
+- `+server.js` — API endpoint (GET, POST, etc.)
 
 Key rules: all files can run on the server. All run on the client except `+server` files. `+layout` and `+error` apply
 to subdirectories too.

@@ -84,14 +84,12 @@ echo "${PIPESTATUS[0]} ${PIPESTATUS[1]} ${PIPESTATUS[2]}"
 
 ## Exit Codes
 
-| Code  | Meaning                 |
-| ----- | ----------------------- |
-| 0     | Success                 |
-| 1     | General error           |
-| 2     | Misuse of shell builtin |
-| 126   | Command not executable  |
-| 127   | Command not found       |
-| 128+N | Killed by signal N      |
+- **0** — Success
+- **1** — General error
+- **2** — Misuse of shell builtin
+- **126** — Command not executable
+- **127** — Command not found
+- **128+N** — Killed by signal N
 
 Return meaningful exit codes from scripts:
 
@@ -127,13 +125,11 @@ tmpfile=$(mktemp)
 
 **Trap signals:**
 
-| Signal | When                          |
-| ------ | ----------------------------- |
-| `EXIT` | Script exits (any reason)     |
-| `ERR`  | Command fails (with `set -e`) |
-| `INT`  | Ctrl+C                        |
-| `TERM` | `kill` (default signal)       |
-| `HUP`  | Terminal hangup               |
+- **`EXIT`** — Script exits (any reason)
+- **`ERR`** — Command fails (with `set -e`)
+- **`INT`** — Ctrl+C
+- **`TERM`** — `kill` (default signal)
+- **`HUP`** — Terminal hangup
 
 **Trap rules:**
 

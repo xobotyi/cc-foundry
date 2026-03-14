@@ -13,31 +13,38 @@ agents, output styles, system prompts, or any AI instructions.
 
 ## What's Wrong With Your Prompt?
 
-| Symptom                 | Fix                                               | Details                                                |
-| ----------------------- | ------------------------------------------------- | ------------------------------------------------------ |
-| Wrong format            | Add explicit format + example                     | [Output Format](#output-format)                        |
-| Missing information     | Be more specific about what to include            | [Be Specific](#be-specific)                            |
-| Hallucination           | Add context, request citations                    | [Provide Context](#provide-context)                    |
-| Ignores instructions    | Place critical rules at top and end, use XML tags | [Persistent Context](#prompting-in-persistent-context) |
-| Complex reasoning fails | Add CoT or use extended thinking                  | [Reasoning](#let-claude-think-chain-of-thought)        |
-| Inconsistent results    | Add 3-5 examples                                  | [Examples](#use-examples-few-shot)                     |
-| Too verbose             | Specify word/sentence limits                      | [Be Specific](#be-specific)                            |
-| Security concerns       | Validate input, filter output                     | [`${CLAUDE_SKILL_DIR}/references/security.md`]         |
+- **Wrong format** — Add explicit format + example. See [Output Format](#output-format)
+- **Missing information** — Be more specific about what to include. See [Be Specific](#be-specific)
+- **Hallucination** — Add context, request citations. See [Provide Context](#provide-context)
+- **Ignores instructions** — Place critical rules at top and end, use XML tags. See
+  [Persistent Context](#prompting-in-persistent-context)
+- **Complex reasoning fails** — Add CoT or use extended thinking. See [Reasoning](#let-claude-think-chain-of-thought)
+- **Inconsistent results** — Add 3-5 examples. See [Examples](#use-examples-few-shot)
+- **Too verbose** — Specify word/sentence limits. See [Be Specific](#be-specific)
+- **Security concerns** — Validate input, filter output. See [`${CLAUDE_SKILL_DIR}/references/security.md`]
 
 ## References
 
-| Topic                   | Reference                                                     | Contents                                                                                                                                       |
-| ----------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reasoning techniques    | [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`]    | CoT variants (zero-shot, few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking details, academic citations                    |
-| Learning paradigms      | [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`]      | In-context learning theory, paradigm spectrum details, example ordering research, generated knowledge prompting                                |
-| Workflow patterns       | [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`]       | Prompt chaining examples, iterative refinement cycles, meta prompting templates                                                                |
-| Prompt security         | [`${CLAUDE_SKILL_DIR}/references/security.md`]                | Injection attack types, jailbreaking techniques, defense strategies, security checklist                                                        |
-| Optimization strategies | [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`] | Prompting vs RAG vs fine-tuning decision flow, DSPy, cost-benefit analysis                                                                     |
-| Claude-specific         | [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`]         | Prefilling examples, system prompt API usage, extended thinking API details, technique combinations                                            |
-| Long context            | [`${CLAUDE_SKILL_DIR}/references/long-context.md`]            | Document organization patterns, XML structuring for multi-doc, query patterns, chunking strategies                                             |
-| Agent & tool patterns   | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]          | ReAct, PAL, Reflexion, ART implementation patterns, pattern selection table                                                                    |
-| Agent-authored prompts  | [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`]  | Workflow for agents writing prompts, decomposition, self-evaluation, failure modes, quality dimensions, optimization patterns                  |
-| Persistent context      | [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`]      | How techniques transfer to skills/system prompts, research citations, declarative vs procedural, instruction degradation, few-shot positioning |
+- **Reasoning techniques** — [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`] CoT variants (zero-shot,
+  few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking details, academic citations
+- **Learning paradigms** — [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`] In-context learning theory, paradigm
+  spectrum details, example ordering research, generated knowledge prompting
+- **Workflow patterns** — [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`] Prompt chaining examples, iterative
+  refinement cycles, meta prompting templates
+- **Prompt security** — [`${CLAUDE_SKILL_DIR}/references/security.md`] Injection attack types, jailbreaking techniques,
+  defense strategies, security checklist
+- **Optimization strategies** — [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`] Prompting vs RAG vs
+  fine-tuning decision flow, DSPy, cost-benefit analysis
+- **Claude-specific** — [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] Prefilling examples, system prompt API
+  usage, extended thinking API details, technique combinations
+- **Long context** — [`${CLAUDE_SKILL_DIR}/references/long-context.md`] Document organization patterns, XML structuring
+  for multi-doc, query patterns, chunking strategies
+- **Agent & tool patterns** — [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] ReAct, PAL, Reflexion, ART
+  implementation patterns, pattern selection table
+- **Agent-authored prompts** — [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`] Workflow for agents writing
+  prompts, decomposition, self-evaluation, failure modes, quality dimensions, optimization patterns
+- **Persistent context** — [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`] How techniques transfer to
+  skills/system prompts, research citations, declarative vs procedural, instruction degradation, few-shot positioning
 
 ---
 
@@ -109,13 +116,11 @@ Text: "Absolutely love it!" → ?
 
 **Choosing the right paradigm:**
 
-| Situation                                 | Approach                      |
-| ----------------------------------------- | ----------------------------- |
-| Simple, well-known task                   | Zero-shot (just ask)          |
-| Need specific output format               | One-shot (1 example)          |
-| Complex classification / nuanced judgment | Few-shot (3-5 examples)       |
-| Domain-specific task                      | Few-shot with domain examples |
-| Highly nuanced + complex reasoning        | Few-shot + Chain-of-Thought   |
+- Simple, well-known task — Zero-shot (just ask)
+- Need specific output format — One-shot (1 example)
+- Complex classification / nuanced judgment — Few-shot (3-5 examples)
+- Domain-specific task — Few-shot with domain examples
+- Highly nuanced + complex reasoning — Few-shot + Chain-of-Thought
 
 Extended paradigm details and ICL theory: see [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`].
 
@@ -209,16 +214,14 @@ step list).
 
 ## Choosing a Technique
 
-| Need                               | Technique               | Details                                              |
-| ---------------------------------- | ----------------------- | ---------------------------------------------------- |
-| Simple task, clear format          | Zero-shot               | Just ask with clear instructions                     |
-| Consistent output format           | Few-shot (3-5 examples) | [Examples](#use-examples-few-shot)                   |
-| Complex reasoning                  | Chain-of-Thought        | [Reasoning](#let-claude-think-chain-of-thought)      |
-| Very complex / exploratory problem | Extended Thinking       | [Reasoning](#let-claude-think-chain-of-thought)      |
-| Multi-step workflow                | Prompt Chaining         | [Chaining Rules](#prompt-chaining-rules)             |
-| External information needed        | ReAct                   | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] |
-| Precise calculation                | PAL (generate code)     | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] |
-| Multi-attempt allowed              | Reflexion               | [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] |
+- Simple task, clear format — Zero-shot. Just ask with clear instructions
+- Consistent output format — Few-shot (3-5 examples). See [Examples](#use-examples-few-shot)
+- Complex reasoning — Chain-of-Thought. See [Reasoning](#let-claude-think-chain-of-thought)
+- Very complex / exploratory problem — Extended Thinking. See [Reasoning](#let-claude-think-chain-of-thought)
+- Multi-step workflow — Prompt Chaining. See [Chaining Rules](#prompt-chaining-rules)
+- External information needed — ReAct. See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
+- Precise calculation — PAL (generate code). See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
+- Multi-attempt allowed — Reflexion. See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
 
 ---
 

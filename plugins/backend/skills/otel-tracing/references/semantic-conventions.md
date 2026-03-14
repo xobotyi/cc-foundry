@@ -23,29 +23,23 @@ enables cross-service analysis without learning each library's custom attribute 
 
 **Required attributes:**
 
-| Attribute             | Example           |
-| --------------------- | ----------------- |
-| `http.request.method` | `"GET"`, `"POST"` |
-| `url.path`            | `"/users/42"`     |
-| `url.scheme`          | `"https"`         |
+- `http.request.method` — e.g., `"GET"`, `"POST"`
+- `url.path` — e.g., `"/users/42"`
+- `url.scheme` — e.g., `"https"`
 
 **Conditionally required:**
 
-| Attribute                   | Condition         | Example              |
-| --------------------------- | ----------------- | -------------------- |
-| `http.route`                | If available      | `"/users/:id"`       |
-| `http.response.status_code` | If response sent  | `200`                |
-| `error.type`                | If error occurred | `"500"`, `"timeout"` |
+- `http.route` (if available) — e.g., `"/users/:id"`
+- `http.response.status_code` (if response sent) — e.g., `200`
+- `error.type` (if error occurred) — e.g., `"500"`, `"timeout"`
 
 **Recommended:**
 
-| Attribute                  | Example             |
-| -------------------------- | ------------------- |
-| `server.address`           | `"api.example.com"` |
-| `server.port`              | `8080`              |
-| `client.address`           | `"192.168.1.100"`   |
-| `user_agent.original`      | `"Mozilla/5.0..."`  |
-| `network.protocol.version` | `"1.1"`, `"2"`      |
+- `server.address` — e.g., `"api.example.com"`
+- `server.port` — e.g., `8080`
+- `client.address` — e.g., `"192.168.1.100"`
+- `user_agent.original` — e.g., `"Mozilla/5.0..."`
+- `network.protocol.version` — e.g., `"1.1"`, `"2"`
 
 **Status rules:**
 
@@ -64,12 +58,10 @@ enables cross-service analysis without learning each library's custom attribute 
 
 **Required attributes:**
 
-| Attribute             | Example                              |
-| --------------------- | ------------------------------------ |
-| `http.request.method` | `"GET"`                              |
-| `server.address`      | `"api.example.com"`                  |
-| `server.port`         | `443`                                |
-| `url.full`            | `"https://api.example.com/users/42"` |
+- `http.request.method` — e.g., `"GET"`
+- `server.address` — e.g., `"api.example.com"`
+- `server.port` — e.g., `443`
+- `url.full` — e.g., `"https://api.example.com/users/42"`
 
 **Status rules:**
 
@@ -117,14 +109,12 @@ attributes:
 
 **Key attributes:**
 
-| Attribute           | Description                 | Example                              |
-| ------------------- | --------------------------- | ------------------------------------ |
-| `db.system`         | Database product identifier | `"postgresql"`, `"redis"`            |
-| `db.namespace`      | Database name / schema      | `"mydb"`                             |
-| `db.operation.name` | Operation name              | `"SELECT"`, `"INSERT"`               |
-| `db.query.text`     | Sanitized query (opt-in)    | `"SELECT * FROM users WHERE id = ?"` |
-| `server.address`    | Database server host        | `"db.example.com"`                   |
-| `server.port`       | Database server port        | `5432`                               |
+- `db.system` — Database product identifier (e.g., `"postgresql"`, `"redis"`)
+- `db.namespace` — Database name / schema (e.g., `"mydb"`)
+- `db.operation.name` — Operation name (e.g., `"SELECT"`, `"INSERT"`)
+- `db.query.text` — Sanitized query, opt-in (e.g., `"SELECT * FROM users WHERE id = ?"`)
+- `server.address` — Database server host (e.g., `"db.example.com"`)
+- `server.port` — Database server port (e.g., `5432`)
 
 **Rules:**
 
@@ -140,11 +130,9 @@ attributes:
 
 **Span name:** `{destination} publish` (e.g., `orders publish`)
 
-| Attribute                    | Example                 |
-| ---------------------------- | ----------------------- |
-| `messaging.system`           | `"kafka"`, `"rabbitmq"` |
-| `messaging.destination.name` | `"orders"`              |
-| `messaging.operation.type`   | `"publish"`             |
+- `messaging.system` — e.g., `"kafka"`, `"rabbitmq"`
+- `messaging.destination.name` — e.g., `"orders"`
+- `messaging.operation.type` — e.g., `"publish"`
 
 ### Consumer Spans
 
@@ -152,11 +140,9 @@ attributes:
 
 **Span name:** `{destination} process` (e.g., `orders process`)
 
-| Attribute                    | Example     |
-| ---------------------------- | ----------- |
-| `messaging.system`           | `"kafka"`   |
-| `messaging.destination.name` | `"orders"`  |
-| `messaging.operation.type`   | `"process"` |
+- `messaging.system` — e.g., `"kafka"`
+- `messaging.destination.name` — e.g., `"orders"`
+- `messaging.operation.type` — e.g., `"process"`
 
 **For batch consumers:** Create one span per batch with links to each producer span.
 
@@ -164,30 +150,24 @@ attributes:
 
 ### Error Reporting
 
-| Attribute    | Description                 | Example                                                 |
-| ------------ | --------------------------- | ------------------------------------------------------- |
-| `error.type` | Low-cardinality error class | `"timeout"`, `"500"`, `"java.net.UnknownHostException"` |
+- `error.type` — Low-cardinality error class (e.g., `"timeout"`, `"500"`, `"java.net.UnknownHostException"`)
 
 Set `error.type` when the operation ends with an error. The value should be predictable and low-cardinality.
 
 ### Network Attributes
 
-| Attribute                  | Description          | Example            |
-| -------------------------- | -------------------- | ------------------ |
-| `network.transport`        | Transport protocol   | `"tcp"`, `"udp"`   |
-| `network.protocol.name`    | Application protocol | `"http"`, `"grpc"` |
-| `network.protocol.version` | Protocol version     | `"1.1"`, `"2"`     |
-| `network.peer.address`     | Remote peer IP       | `"10.0.0.1"`       |
-| `network.peer.port`        | Remote peer port     | `8080`             |
+- `network.transport` — Transport protocol (e.g., `"tcp"`, `"udp"`)
+- `network.protocol.name` — Application protocol (e.g., `"http"`, `"grpc"`)
+- `network.protocol.version` — Protocol version (e.g., `"1.1"`, `"2"`)
+- `network.peer.address` — Remote peer IP (e.g., `"10.0.0.1"`)
+- `network.peer.port` — Remote peer port (e.g., `8080`)
 
 ### Server/Client Attributes
 
-| Attribute        | Context | Description                  |
-| ---------------- | ------- | ---------------------------- |
-| `server.address` | Both    | Hostname or IP of the server |
-| `server.port`    | Both    | Port of the server           |
-| `client.address` | Server  | IP of the client             |
-| `client.port`    | Server  | Port of the client           |
+- `server.address` (both) — Hostname or IP of the server
+- `server.port` (both) — Port of the server
+- `client.address` (server only) — IP of the client
+- `client.port` (server only) — Port of the client
 
 ## Sampling-Critical Attributes
 

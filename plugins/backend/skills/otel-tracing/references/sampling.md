@@ -28,13 +28,11 @@ record-and-sample, or drop.
 
 ### Built-in Head Samplers
 
-| Sampler                     | Behavior                                      |
-| --------------------------- | --------------------------------------------- |
-| `AlwaysOn`                  | Record and sample everything                  |
-| `AlwaysOff`                 | Drop everything                               |
-| `TraceIdRatioBased(ratio)`  | Sample based on trace ID hash at given ratio  |
-| `ParentBased(root)`         | Delegates based on parent sampling decision   |
-| `ProbabilitySampler(ratio)` | W3C Trace Context Level 2 consistent sampling |
+- `AlwaysOn` — Record and sample everything
+- `AlwaysOff` — Drop everything
+- `TraceIdRatioBased(ratio)` — Sample based on trace ID hash at given ratio
+- `ParentBased(root)` — Delegates based on parent sampling decision
+- `ProbabilitySampler(ratio)` — W3C Trace Context Level 2 consistent sampling
 
 ### ParentBased Sampler
 
@@ -91,13 +89,11 @@ processors:
         probabilistic: { sampling_percentage: 10 }
 ```
 
-| Policy             | Use Case                                       |
-| ------------------ | ---------------------------------------------- |
-| `status_code`      | Keep all traces with errors                    |
-| `latency`          | Keep traces exceeding a duration threshold     |
-| `probabilistic`    | Random baseline sample for general visibility  |
-| `string_attribute` | Keep traces matching specific attribute values |
-| `always_sample`    | Keep all traces (combine with other policies)  |
+- `status_code` — Keep all traces with errors
+- `latency` — Keep traces exceeding a duration threshold
+- `probabilistic` — Random baseline sample for general visibility
+- `string_attribute` — Keep traces matching specific attribute values
+- `always_sample` — Keep all traces (combine with other policies)
 
 ### Tail Sampling Architecture
 
@@ -132,13 +128,11 @@ This protects the pipeline from overload while still capturing interesting trace
 
 ## Sampling Decision Guidance
 
-| Scenario                           | Recommended Approach                            |
-| ---------------------------------- | ----------------------------------------------- |
-| Low volume (< 100 traces/sec)      | `AlwaysOn` — keep everything                    |
-| Medium volume                      | `ParentBased(TraceIdRatioBased(0.1))`           |
-| High volume, need error visibility | Tail sampling: keep errors + latency + baseline |
-| High volume, budget constrained    | Head sampling at 1-5% + tail for errors         |
-| Mixed high/low volume services     | Per-service head sampling rates                 |
+- **Low volume (< 100 traces/sec)** — `AlwaysOn` — keep everything
+- **Medium volume** — `ParentBased(TraceIdRatioBased(0.1))`
+- **High volume, need error visibility** — Tail sampling: keep errors + latency + baseline
+- **High volume, budget constrained** — Head sampling at 1-5% + tail for errors
+- **Mixed high/low volume services** — Per-service head sampling rates
 
 ## Key Principles
 

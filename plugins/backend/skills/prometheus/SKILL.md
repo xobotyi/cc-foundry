@@ -16,14 +16,18 @@ right at instrumentation time prevents expensive rework later.
 
 ## References
 
-| Topic              | Reference                                                | Contents                                                                           |
-| ------------------ | -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Metric types       | [`${CLAUDE_SKILL_DIR}/references/metric-types.md`]       | Extended type comparison, histogram bucket tuning, summary configuration           |
-| Naming             | [`${CLAUDE_SKILL_DIR}/references/naming.md`]             | Full naming examples, base units table, character rules, label best practices      |
-| Instrumentation    | [`${CLAUDE_SKILL_DIR}/references/instrumentation.md`]    | Code patterns per system type, library instrumentation, performance tuning         |
-| PromQL             | [`${CLAUDE_SKILL_DIR}/references/promql.md`]             | Full operator catalog, vector matching, over-time aggregation, operator precedence |
-| Alerting and rules | [`${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md`] | Alert design, recording rule naming, aggregation patterns, anti-patterns           |
-| Exporters          | [`${CLAUDE_SKILL_DIR}/references/exporters.md`]          | Exporter architecture, collectors, help strings, push-based sources                |
+- **Metric types** — [`${CLAUDE_SKILL_DIR}/references/metric-types.md`] Extended type comparison, histogram bucket
+  tuning, summary configuration
+- **Naming** — [`${CLAUDE_SKILL_DIR}/references/naming.md`] Full naming examples, base units table, character rules,
+  label best practices
+- **Instrumentation** — [`${CLAUDE_SKILL_DIR}/references/instrumentation.md`] Code patterns per system type, library
+  instrumentation, performance tuning
+- **PromQL** — [`${CLAUDE_SKILL_DIR}/references/promql.md`] Full operator catalog, vector matching, over-time
+  aggregation, operator precedence
+- **Alerting and rules** — [`${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md`] Alert design, recording rule naming,
+  aggregation patterns, anti-patterns
+- **Exporters** — [`${CLAUDE_SKILL_DIR}/references/exporters.md`] Exporter architecture, collectors, help strings,
+  push-based sources
 
 ## Metric Type Selection
 
@@ -125,12 +129,10 @@ separate metrics per status. Do not put label names in metric names.
 Every unique label combination is a new time series. Each costs RAM, CPU, disk, and network. **Cardinality math:** total
 series = metric cardinality x number of targets.
 
-| Range    | Guidance                        |
-| -------- | ------------------------------- |
-| < 10     | Safe for most metrics           |
-| 10-100   | Acceptable, monitor growth      |
-| 100-1000 | Investigate alternatives        |
-| > 1000   | Move analysis out of Prometheus |
+- `< 10`: Safe for most metrics
+- `10-100`: Acceptable, monitor growth
+- `100-1000`: Investigate alternatives
+- `> 1000`: Move analysis out of Prometheus
 
 ### Label Best Practices
 
@@ -213,12 +215,10 @@ over-time aggregation, binary operators, and operator precedence.
 
 Alert on **symptoms** (user-visible impact), not causes. Use dashboards to pinpoint causes after an alert fires.
 
-| System Type        | Alert On                                                                |
-| ------------------ | ----------------------------------------------------------------------- |
-| Online-serving     | High latency, high error rate (user-facing, high in the stack)          |
-| Offline processing | Data taking too long to get through the system                          |
-| Batch jobs         | Job has not succeeded recently enough (>= 2x normal cycle)              |
-| Capacity           | Approaching resource limits that will cause outage without intervention |
+- **Online-serving** — High latency, high error rate (user-facing, high in the stack)
+- **Offline processing** — Data taking too long to get through the system
+- **Batch jobs** — Job has not succeeded recently enough (>= 2x normal cycle)
+- **Capacity** — Approaching resource limits that will cause outage without intervention
 
 Only page on latency at one point in the stack — if overall user latency is fine, don't page on a slow sub-component.
 Avoid noisy alerts — if an alert fires and there's nothing to do, remove it.

@@ -274,14 +274,12 @@ Using the fact that golf rewards lowest score, the answer is No.
 
 ## Pattern Selection
 
-| Task Type                 | Pattern             |
-| ------------------------- | ------------------- |
-| Need external information | ReAct               |
-| Precise calculation       | PAL                 |
-| Multi-attempt allowed     | Reflexion           |
-| Many similar task types   | ART                 |
-| Commonsense gaps          | Generated Knowledge |
-| Simple reasoning          | Standard CoT        |
+- Need external information — ReAct
+- Precise calculation — PAL
+- Multi-attempt allowed — Reflexion
+- Many similar task types — ART
+- Commonsense gaps — Generated Knowledge
+- Simple reasoning — Standard CoT
 
 ## Combining Patterns
 

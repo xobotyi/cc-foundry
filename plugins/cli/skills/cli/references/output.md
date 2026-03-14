@@ -142,17 +142,15 @@ ANSI escape sequences start with `ESC[` (hex `\x1B[`), known as CSI (Control Seq
 
 Common SGR (Select Graphic Rendition) codes:
 
-| Code | Effect            |
-| ---- | ----------------- |
-| `0`  | Reset all         |
-| `1`  | Bold              |
-| `2`  | Dim               |
-| `3`  | Italic            |
-| `4`  | Underline         |
-| `31` | Red foreground    |
-| `32` | Green foreground  |
-| `33` | Yellow foreground |
-| `34` | Blue foreground   |
+- `0` — Reset all
+- `1` — Bold
+- `2` — Dim
+- `3` — Italic
+- `4` — Underline
+- `31` — Red foreground
+- `32` — Green foreground
+- `33` — Yellow foreground
+- `34` — Blue foreground
 
 Example: `\x1B[1;31mERROR\x1B[0m` prints "ERROR" in bold red, then resets.
 

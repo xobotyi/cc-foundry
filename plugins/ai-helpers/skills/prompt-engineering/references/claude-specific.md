@@ -91,13 +91,11 @@ Structure every response as: Summary → Key Findings → Risks → Recommendati
 
 ### System Prompt vs User Message — What Goes Where
 
-| Content                | Location | Why                                                 |
-| ---------------------- | -------- | --------------------------------------------------- |
-| Domain/role            | System   | Persists across turns, highest instruction priority |
-| Behavioral constraints | System   | Must apply to every response                        |
-| Task description       | User     | Varies per request                                  |
-| Input data             | User     | Changes each time                                   |
-| Format examples        | Either   | System if constant, user if task-specific           |
+- `Domain/role` → System. Persists across turns, highest instruction priority
+- `Behavioral constraints` → System. Must apply to every response
+- `Task description` → User. Varies per request
+- `Input data` → User. Changes each time
+- `Format examples` → Either. System if constant, user if task-specific
 
 ### Domain Priming Impact Example
 

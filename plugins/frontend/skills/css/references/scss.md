@@ -274,16 +274,14 @@ sass-migrator module --built-in-only your-entrypoint.scss
 
 ### Key Changes
 
-| `@import`                    | `@use`/`@forward`                       |
-| ---------------------------- | --------------------------------------- |
-| Global namespace             | Namespaced access                       |
-| Loads multiple times         | Loads once                              |
-| Variables globally available | Scoped to loading file                  |
-| `@import "file"`             | `@use "file"`                           |
-| No visibility control        | `hide`/`show` in `@forward`             |
-| `$var: value !global`        | `@use ... with ($var: value)`           |
-| `lighten($color, 10%)`       | `color.adjust($color, $lightness: 10%)` |
-| `percentage(0.5)`            | `math.percentage(0.5)`                  |
+- Global namespace → namespaced access
+- Loads multiple times → loads once
+- Variables globally available → scoped to loading file
+- `@import "file"` → `@use "file"`
+- No visibility control → `hide`/`show` in `@forward`
+- `$var: value !global` → `@use ... with ($var: value)`
+- `lighten($color, 10%)` → `color.adjust($color, $lightness: 10%)`
+- `percentage(0.5)` → `math.percentage(0.5)`
 
 ## Anti-Patterns
 

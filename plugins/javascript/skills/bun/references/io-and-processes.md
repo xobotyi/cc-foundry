@@ -97,13 +97,11 @@ const { stdout, stderr } = await $`cmd`.quiet();   // suppress output
 
 ### Reading Output
 
-| Method           | Returns                              |
-| ---------------- | ------------------------------------ |
-| `.text()`        | `string` (auto-quiets)               |
-| `.json()`        | Parsed JSON                          |
-| `.lines()`       | Async iterator of lines              |
-| `.blob()`        | `Blob`                               |
-| `await $\`...\`` | `{ stdout: Buffer, stderr: Buffer }` |
+- **`.text()`** — `string` (auto-quiets)
+- **`.json()`** — Parsed JSON
+- **`.lines()`** — Async iterator of lines
+- **`.blob()`** — `Blob`
+- **`` await $`...` ``** — `{ stdout: Buffer, stderr: Buffer }`
 
 ### Error Handling
 
@@ -177,23 +175,19 @@ proc.unref();                      // detach from parent
 
 ### stdin Options
 
-| Value            | Description                    |
-| ---------------- | ------------------------------ |
-| `null`           | No input (default)             |
-| `"pipe"`         | Returns `FileSink` for writing |
-| `"inherit"`      | Inherit parent stdin           |
-| `Bun.file()`     | Read from file                 |
-| `ReadableStream` | Pipe stream                    |
-| `Response`       | Use response body              |
+- **`null`** — No input (default)
+- **`"pipe"`** — Returns `FileSink` for writing
+- **`"inherit"`** — Inherit parent stdin
+- **`Bun.file()`** — Read from file
+- **`ReadableStream`** — Pipe stream
+- **`Response`** — Use response body
 
 ### stdout/stderr Options
 
-| Value        | Description                       |
-| ------------ | --------------------------------- |
-| `"pipe"`     | Default stdout — `ReadableStream` |
-| `"inherit"`  | Default stderr — inherit parent   |
-| `"ignore"`   | Discard                           |
-| `Bun.file()` | Write to file                     |
+- **`"pipe"`** — Default stdout — `ReadableStream`
+- **`"inherit"`** — Default stderr — inherit parent
+- **`"ignore"`** — Discard
+- **`Bun.file()`** — Write to file
 
 ### AbortSignal and Timeout
 

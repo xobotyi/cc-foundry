@@ -17,12 +17,14 @@ annotations are deprecated in 11, removed in 12.
 
 ## References
 
-| Topic                                                  | Reference                                            | Contents                                                                                        |
-| ------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Assertion catalog, constraints, exception expectations | [`${CLAUDE_SKILL_DIR}/references/assertions.md`]     | Full assertion API grouped by category, constraint system, custom assertions                    |
-| Test doubles — stubs, mocks, MockBuilder               | [`${CLAUDE_SKILL_DIR}/references/mocking.md`]        | createStub vs createMock, return config, invocation matchers, argument constraints, MockBuilder |
-| Data providers — static, named, generators             | [`${CLAUDE_SKILL_DIR}/references/data-providers.md`] | #[DataProvider], #[TestWith], named datasets, generator providers, external providers           |
-| phpunit.xml structure, test suites, source config      | [`${CLAUDE_SKILL_DIR}/references/configuration.md`]  | XML elements, strict settings, source element, coverage reports, execution order                |
+- **Assertion catalog, constraints, exception expectations** → [`${CLAUDE_SKILL_DIR}/references/assertions.md`] — Full
+  assertion API grouped by category, constraint system, custom assertions
+- **Test doubles — stubs, mocks, MockBuilder** → [`${CLAUDE_SKILL_DIR}/references/mocking.md`] — createStub vs
+  createMock, return config, invocation matchers, argument constraints, MockBuilder
+- **Data providers — static, named, generators** → [`${CLAUDE_SKILL_DIR}/references/data-providers.md`]
+  — #[DataProvider], #[TestWith], named datasets, generator providers, external providers
+- **phpunit.xml structure, test suites, source config** → [`${CLAUDE_SKILL_DIR}/references/configuration.md`] — XML
+  elements, strict settings, source element, coverage reports, execution order
 
 ## Test Structure
 
@@ -93,14 +95,12 @@ final class PaymentServiceTest extends TestCase
 
 ### Fixture Lifecycle
 
-| Method                   | Scope  | Runs                        |
-| ------------------------ | ------ | --------------------------- |
-| `setUpBeforeClass()`     | Class  | Once before first test      |
-| `setUp()`                | Method | Before each test            |
-| `assertPreConditions()`  | Method | After setUp, before test    |
-| `assertPostConditions()` | Method | After test, before tearDown |
-| `tearDown()`             | Method | After each test             |
-| `tearDownAfterClass()`   | Class  | Once after last test        |
+- **`setUpBeforeClass()`** — Class scope; once before first test
+- **`setUp()`** — Method scope; before each test
+- **`assertPreConditions()`** — Method scope; after setUp, before test
+- **`assertPostConditions()`** — Method scope; after test, before tearDown
+- **`tearDown()`** — Method scope; after each test
+- **`tearDownAfterClass()`** — Class scope; once after last test
 
 - **Call `parent::setUp()`** when extending abstract test cases — otherwise parent fixture setup is silently skipped.
 - **Use `#[Before]` / `#[After]` attributes** when multiple setup methods are needed (avoids fragile `parent::setUp()`
@@ -311,57 +311,47 @@ PHPUnit 11 uses PHP 8 attributes exclusively. All attributes are in the `PHPUnit
 
 ### Test Metadata
 
-| Attribute                                         | Purpose                           |
-| ------------------------------------------------- | --------------------------------- |
-| `#[Test]`                                         | Mark non-`test*` method as a test |
-| `#[DataProvider('method')]`                       | Connect a data provider           |
-| `#[DataProviderExternal(Class::class, 'method')]` | External data provider            |
-| `#[TestWith([args])]`                             | Inline data provider              |
-| `#[TestDox('description')]`                       | Custom TestDox description        |
-| `#[Depends('testMethod')]`                        | Declare test dependency           |
-| `#[Group('name')]`                                | Assign to group                   |
-| `#[Ticket('PROJ-123')]`                           | Link to issue tracker             |
+- **`#[Test]`** — Mark non-`test*` method as a test
+- **`#[DataProvider('method')]`** — Connect a data provider
+- **`#[DataProviderExternal(Class::class, 'method')]`** — External data provider
+- **`#[TestWith([args])]`** — Inline data provider
+- **`#[TestDox('description')]`** — Custom TestDox description
+- **`#[Depends('testMethod')]`** — Declare test dependency
+- **`#[Group('name')]`** — Assign to group
+- **`#[Ticket('PROJ-123')]`** — Link to issue tracker
 
 ### Skip / Conditional
 
-| Attribute                                               | Purpose                           |
-| ------------------------------------------------------- | --------------------------------- |
-| `#[RequiresPhp('>= 8.4')]`                              | Skip if PHP version doesn't match |
-| `#[RequiresPhpExtension('pdo_pgsql')]`                  | Skip if extension missing         |
-| `#[RequiresOperatingSystemFamily('Linux')]`             | Skip on other OS                  |
-| `#[RequiresFunction('sodium_crypto_sign')]`             | Skip if function missing          |
-| `#[RequiresMethod(PDO::class, 'sqliteCreateFunction')]` | Skip if method missing            |
+- **`#[RequiresPhp('>= 8.4')]`** — Skip if PHP version doesn't match
+- **`#[RequiresPhpExtension('pdo_pgsql')]`** — Skip if extension missing
+- **`#[RequiresOperatingSystemFamily('Linux')]`** — Skip on other OS
+- **`#[RequiresFunction('sodium_crypto_sign')]`** — Skip if function missing
+- **`#[RequiresMethod(PDO::class, 'sqliteCreateFunction')]`** — Skip if method missing
 
 ### Coverage
 
-| Attribute                                     | Purpose                                          |
-| --------------------------------------------- | ------------------------------------------------ |
-| `#[CoversClass(ClassName::class)]`            | Test covers this class                           |
-| `#[CoversFunction('functionName')]`           | Test covers this function                        |
-| `#[CoversMethod(ClassName::class, 'method')]` | Test covers this method                          |
-| `#[CoversNothing]`                            | Test contributes no coverage (integration tests) |
-| `#[UsesClass(ClassName::class)]`              | Allowed but not covered dependency               |
-| `#[UsesFunction('functionName')]`             | Allowed but not covered function                 |
+- **`#[CoversClass(ClassName::class)]`** — Test covers this class
+- **`#[CoversFunction('functionName')]`** — Test covers this function
+- **`#[CoversMethod(ClassName::class, 'method')]`** — Test covers this method
+- **`#[CoversNothing]`** — Test contributes no coverage (integration tests)
+- **`#[UsesClass(ClassName::class)]`** — Allowed but not covered dependency
+- **`#[UsesFunction('functionName')]`** — Allowed but not covered function
 
 ### Fixture
 
-| Attribute                         | Purpose                                              |
-| --------------------------------- | ---------------------------------------------------- |
-| `#[Before]`                       | Run method before each test (alternative to setUp)   |
-| `#[After]`                        | Run method after each test (alternative to tearDown) |
-| `#[BeforeClass]`                  | Run static method before first test                  |
-| `#[AfterClass]`                   | Run static method after last test                    |
-| `#[BackupGlobals(true)]`          | Backup/restore globals for this test                 |
-| `#[BackupStaticProperties(true)]` | Backup/restore static properties                     |
+- **`#[Before]`** — Run method before each test (alternative to setUp)
+- **`#[After]`** — Run method after each test (alternative to tearDown)
+- **`#[BeforeClass]`** — Run static method before first test
+- **`#[AfterClass]`** — Run static method after last test
+- **`#[BackupGlobals(true)]`** — Backup/restore globals for this test
+- **`#[BackupStaticProperties(true)]`** — Backup/restore static properties
 
 ### Test Behavior
 
-| Attribute                             | Purpose                             |
-| ------------------------------------- | ----------------------------------- |
-| `#[DoesNotPerformAssertions]`         | Suppress risky test warning         |
-| `#[RunInSeparateProcess]`             | Isolate in separate PHP process     |
-| `#[RunTestsInSeparateProcesses]`      | All tests in class run isolated     |
-| `#[Small]` / `#[Medium]` / `#[Large]` | Time limit enforcement (1s/10s/60s) |
+- **`#[DoesNotPerformAssertions]`** — Suppress risky test warning
+- **`#[RunInSeparateProcess]`** — Isolate in separate PHP process
+- **`#[RunTestsInSeparateProcesses]`** — All tests in class run isolated
+- **`#[Small]` / `#[Medium]` / `#[Large]`** — Time limit enforcement (1s/10s/60s)
 
 ## Test Organization
 

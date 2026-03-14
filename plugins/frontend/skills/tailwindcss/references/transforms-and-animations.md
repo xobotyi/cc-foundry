@@ -23,15 +23,13 @@ Apply transitions to specify which properties animate on state change. The defau
 
 **Transition property utilities:**
 
-| Class                  | What transitions                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------- |
-| `transition`           | color, bg, border, opacity, shadow, transform, filter, backdrop-filter, display       |
-| `transition-all`       | all properties                                                                        |
-| `transition-colors`    | color, background-color, border-color, text-decoration-color, fill, stroke, gradients |
-| `transition-opacity`   | opacity                                                                               |
-| `transition-shadow`    | box-shadow                                                                            |
-| `transition-transform` | transform, translate, scale, rotate                                                   |
-| `transition-none`      | disables transition                                                                   |
+- **`transition`** — color, bg, border, opacity, shadow, transform, filter, backdrop-filter, display
+- **`transition-all`** — all properties
+- **`transition-colors`** — color, background-color, border-color, text-decoration-color, fill, stroke, gradients
+- **`transition-opacity`** — opacity
+- **`transition-shadow`** — box-shadow
+- **`transition-transform`** — transform, translate, scale, rotate
+- **`transition-none`** — disables transition
 
 **Duration:** `duration-<number>` sets `transition-duration: <number>ms` — e.g., `duration-150`, `duration-300`,
 `duration-700`. Use `duration-initial` to reset.
@@ -194,14 +192,12 @@ Control the z-plane depth. Apply to the **container** element, not the transform
 </div>
 ```
 
-| Class                  | Value  |
-| ---------------------- | ------ |
-| `perspective-dramatic` | 100px  |
-| `perspective-near`     | 300px  |
-| `perspective-normal`   | 500px  |
-| `perspective-midrange` | 800px  |
-| `perspective-distant`  | 1200px |
-| `perspective-none`     | none   |
+- **`perspective-dramatic`** — 100px
+- **`perspective-near`** — 300px
+- **`perspective-normal`** — 500px
+- **`perspective-midrange`** — 800px
+- **`perspective-distant`** — 1200px
+- **`perspective-none`** — none
 
 Customize in `@theme`:
 
@@ -306,14 +302,12 @@ for rectangular elements instead.
 <svg class="drop-shadow-xl drop-shadow-cyan-500/50 ...">...</svg>  <!-- colored -->
 ```
 
-| Class             | Shadow                        |
-| ----------------- | ----------------------------- |
-| `drop-shadow-xs`  | 0 1px 1px rgb(0 0 0 / 0.05)   |
-| `drop-shadow-sm`  | 0 1px 2px rgb(0 0 0 / 0.15)   |
-| `drop-shadow-md`  | 0 3px 3px rgb(0 0 0 / 0.12)   |
-| `drop-shadow-lg`  | 0 4px 4px rgb(0 0 0 / 0.15)   |
-| `drop-shadow-xl`  | 0 9px 7px rgb(0 0 0 / 0.1)    |
-| `drop-shadow-2xl` | 0 25px 25px rgb(0 0 0 / 0.15) |
+- **`drop-shadow-xs`** — 0 1px 1px rgb(0 0 0 / 0.05)
+- **`drop-shadow-sm`** — 0 1px 2px rgb(0 0 0 / 0.15)
+- **`drop-shadow-md`** — 0 3px 3px rgb(0 0 0 / 0.12)
+- **`drop-shadow-lg`** — 0 4px 4px rgb(0 0 0 / 0.15)
+- **`drop-shadow-xl`** — 0 9px 7px rgb(0 0 0 / 0.1)
+- **`drop-shadow-2xl`** — 0 25px 25px rgb(0 0 0 / 0.15)
 
 ---
 
@@ -411,12 +405,10 @@ Mask edges using directional utilities. Default gradient: black (opaque) → tra
 
 Gradient masks compose using `mask-composite: intersect` by default. Override with:
 
-| Class            | Behavior                                           |
-| ---------------- | -------------------------------------------------- |
-| `mask-add`       | union of masks                                     |
-| `mask-subtract`  | subtract second from first                         |
-| `mask-intersect` | intersection only (default for compound utilities) |
-| `mask-exclude`   | XOR — only non-overlapping areas                   |
+- **`mask-add`** — union of masks
+- **`mask-subtract`** — subtract second from first
+- **`mask-intersect`** — intersection only (default for compound utilities)
+- **`mask-exclude`** — XOR — only non-overlapping areas
 
 ### Mask Position and Size
 

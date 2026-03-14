@@ -17,26 +17,23 @@ runtime-only validation. References contain extended examples, rationale, and ed
 
 ## References
 
-| Topic       | Reference                                         | Contents                                                   |
-| ----------- | ------------------------------------------------- | ---------------------------------------------------------- |
-| Reactivity  | [`${CLAUDE_SKILL_DIR}/references/reactivity.md`]  | Ref unwrapping, watchers, computed edge cases              |
-| SFC         | [`${CLAUDE_SKILL_DIR}/references/sfc.md`]         | Full compiler macros catalog, scoped styles, template refs |
-| Components  | [`${CLAUDE_SKILL_DIR}/references/components.md`]  | Props, emits, slots, provide/inject                        |
-| Composables | [`${CLAUDE_SKILL_DIR}/references/composables.md`] | Design patterns, composition, restrictions                 |
-| TypeScript  | [`${CLAUDE_SKILL_DIR}/references/typescript.md`]  | Full utility types table, generic components, event typing |
-| Performance | [`${CLAUDE_SKILL_DIR}/references/performance.md`] | Update optimization, large lists, profiling                |
+- **Reactivity** — [`${CLAUDE_SKILL_DIR}/references/reactivity.md`]: Ref unwrapping, watchers, computed edge cases
+- **SFC** — [`${CLAUDE_SKILL_DIR}/references/sfc.md`]: Full compiler macros catalog, scoped styles, template refs
+- **Components** — [`${CLAUDE_SKILL_DIR}/references/components.md`]: Props, emits, slots, provide/inject
+- **Composables** — [`${CLAUDE_SKILL_DIR}/references/composables.md`]: Design patterns, composition, restrictions
+- **TypeScript** — [`${CLAUDE_SKILL_DIR}/references/typescript.md`]: Full utility types table, generic components, event
+  typing
+- **Performance** — [`${CLAUDE_SKILL_DIR}/references/performance.md`]: Update optimization, large lists, profiling
 
 ## Reactivity
 
 ### Choosing a Reactive Primitive
 
-| Primitive           | Use when                                                |
-| ------------------- | ------------------------------------------------------- |
-| `ref()`             | **Default choice.** Works with any value type.          |
-| `reactive()`        | Grouping related state when destructure is not needed.  |
-| `shallowRef()`      | Large immutable structures, external state integration. |
-| `shallowReactive()` | Root-level-only reactivity on objects.                  |
-| `computed()`        | Derived state. Caches until dependencies change.        |
+- **`ref()`** — Default choice. Works with any value type.
+- **`reactive()`** — Grouping related state when destructure is not needed.
+- **`shallowRef()`** — Large immutable structures, external state integration.
+- **`shallowReactive()`** — Root-level-only reactivity on objects.
+- **`computed()`** — Derived state. Caches until dependencies change.
 
 ### `ref()` Is the Primary API
 
@@ -124,11 +121,9 @@ catalog in `${CLAUDE_SKILL_DIR}/references/sfc.md`.
 
 **Directive shorthands** — use consistently, don't mix:
 
-| Shorthand | Full          | Purpose             |
-| --------- | ------------- | ------------------- |
-| `:prop`   | `v-bind:prop` | Bind attribute/prop |
-| `@event`  | `v-on:event`  | Listen to event     |
-| `#slot`   | `v-slot:slot` | Named slot          |
+- **`:prop`** (`v-bind:prop`) — Bind attribute/prop
+- **`@event`** (`v-on:event`) — Listen to event
+- **`#slot`** (`v-slot:slot`) — Named slot
 
 **Conditional rendering:**
 
@@ -248,11 +243,9 @@ Composables can call other composables — build complex logic by composing simp
 
 ### Composables vs Alternatives
 
-| Technique             | Drawback                                                          |
-| --------------------- | ----------------------------------------------------------------- |
-| Mixins                | Unclear property sources, namespace collisions, implicit coupling |
-| Renderless components | Extra component instance overhead                                 |
-| Utility functions     | No reactive state or lifecycle hooks                              |
+- **Mixins** — Unclear property sources, namespace collisions, implicit coupling
+- **Renderless components** — Extra component instance overhead
+- **Utility functions** — No reactive state or lifecycle hooks
 
 Composables are explicit, namespaced through destructuring, and integrate with Vue's reactivity and lifecycle.
 

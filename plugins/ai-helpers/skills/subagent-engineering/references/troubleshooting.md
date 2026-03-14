@@ -16,16 +16,14 @@ Diagnose and fix common subagent problems.
 
 ## Quick Diagnosis
 
-| Symptom                  | Likely Cause                   | Solution                                |
-| ------------------------ | ------------------------------ | --------------------------------------- |
-| Agent never triggers     | Name typo, vague description   | Check spec, broaden description         |
-| Agent triggers too often | Description too broad          | Narrow scope, add boundaries            |
-| Wrong output format      | No format spec in prompt       | Add explicit format + example           |
-| Stops mid-task           | Unclear workflow, no checklist | Add numbered steps, completion criteria |
-| Scope creep              | Too many tools, no constraints | Restrict tools, add boundaries          |
-| Permission errors        | Wrong tools granted            | Check `tools` field, add needed tools   |
-| Hook not firing          | Wrong event/matcher            | Check hooks configuration               |
-| Agent not loaded         | Manual file not reloaded       | Restart session or use `/agents`        |
+- **Agent never triggers** — Name typo or vague description. Fix: check spec, broaden description
+- **Agent triggers too often** — Description too broad. Fix: narrow scope, add boundaries
+- **Wrong output format** — No format spec in prompt. Fix: add explicit format + example
+- **Stops mid-task** — Unclear workflow, no checklist. Fix: add numbered steps, completion criteria
+- **Scope creep** — Too many tools, no constraints. Fix: restrict tools, add boundaries
+- **Permission errors** — Wrong tools granted. Fix: check `tools` field, add needed tools
+- **Hook not firing** — Wrong event/matcher. Fix: check hooks configuration
+- **Agent not loaded** — Manual file not reloaded. Fix: restart session or use `/agents`
 
 ## Detailed Troubleshooting
 
@@ -296,8 +294,10 @@ chmod +x ./scripts/validate.sh
 
 4. **Check script path:** Paths are relative to working directory.
 
-5. **Check hook event:** | Event | When | |-------|------| | `PreToolUse` | Before tool execution | | `PostToolUse` |
-   After tool execution | | `Stop` | When agent finishes |
+5. **Check hook event:**
+   - `PreToolUse`: Before tool execution
+   - `PostToolUse`: After tool execution
+   - `Stop`: When agent finishes
 
 6. **Test script manually:**
 

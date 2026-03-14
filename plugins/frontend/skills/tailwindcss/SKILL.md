@@ -30,17 +30,24 @@ no JavaScript configuration file. Constrain yourself to the design system; break
 
 ## References
 
-| Topic            | Reference                                                           | Contents                                                        |
-| ---------------- | ------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Theme            | [`${CLAUDE_SKILL_DIR}/references/theme-configuration.md`]           | Theme tokens, `@theme` options, namespace mapping, color system |
-| Class authoring  | [`${CLAUDE_SKILL_DIR}/references/class-authoring.md`]               | Class composition, variants, dark mode, breakpoints             |
-| Custom utilities | [`${CLAUDE_SKILL_DIR}/references/custom-utilities-and-variants.md`] | `@utility`, `@custom-variant`, directives, `@source`            |
-| Layout           | [`${CLAUDE_SKILL_DIR}/references/layout.md`]                        | Display, position, flexbox, grid, alignment, order utilities    |
-| Sizing           | [`${CLAUDE_SKILL_DIR}/references/sizing-and-spacing.md`]            | Spacing scale, width/height, padding/margin, borders, box model |
-| Typography       | [`${CLAUDE_SKILL_DIR}/references/typography.md`]                    | Font properties, text spacing, styling, decoration, layout      |
-| Backgrounds      | [`${CLAUDE_SKILL_DIR}/references/backgrounds-and-effects.md`]       | Gradients, shadows, rings, opacity, SVG, filters                |
-| Transforms       | [`${CLAUDE_SKILL_DIR}/references/transforms-and-animations.md`]     | Transitions, animations, 2D/3D transforms, masks                |
-| Framework        | [`${CLAUDE_SKILL_DIR}/references/framework-integration.md`]         | Preflight, CSS Modules, class binding (React, Vue, Svelte)      |
+- **Theme** — [`${CLAUDE_SKILL_DIR}/references/theme-configuration.md`]: Theme tokens, `@theme` options, namespace
+  mapping, color system
+- **Class authoring** — [`${CLAUDE_SKILL_DIR}/references/class-authoring.md`]: Class composition, variants, dark mode,
+  breakpoints
+- **Custom utilities** — [`${CLAUDE_SKILL_DIR}/references/custom-utilities-and-variants.md`]: `@utility`,
+  `@custom-variant`, directives, `@source`
+- **Layout** — [`${CLAUDE_SKILL_DIR}/references/layout.md`]: Display, position, flexbox, grid, alignment, order
+  utilities
+- **Sizing** — [`${CLAUDE_SKILL_DIR}/references/sizing-and-spacing.md`]: Spacing scale, width/height, padding/margin,
+  borders, box model
+- **Typography** — [`${CLAUDE_SKILL_DIR}/references/typography.md`]: Font properties, text spacing, styling, decoration,
+  layout
+- **Backgrounds** — [`${CLAUDE_SKILL_DIR}/references/backgrounds-and-effects.md`]: Gradients, shadows, rings, opacity,
+  SVG, filters
+- **Transforms** — [`${CLAUDE_SKILL_DIR}/references/transforms-and-animations.md`]: Transitions, animations, 2D/3D
+  transforms, masks
+- **Framework** — [`${CLAUDE_SKILL_DIR}/references/framework-integration.md`]: Preflight, CSS Modules, class binding
+  (React, Vue, Svelte)
 
 ## Entry Point and Installation
 
@@ -67,32 +74,28 @@ no JavaScript configuration file. Constrain yourself to the design system; break
 
 ### `@theme` Options
 
-| Option              | Behavior                                      |
-| ------------------- | --------------------------------------------- |
-| `@theme { }`        | Default: only emit used vars                  |
-| `@theme static { }` | Always emit all vars                          |
-| `@theme inline { }` | Inline `var()` references into utility output |
+- **`@theme { }`** — Default: only emit used vars
+- **`@theme static { }`** — Always emit all vars
+- **`@theme inline { }`** — Inline `var()` references into utility output
 
 Use `@theme inline` when a token references another variable — prevents CSS variable resolution failures in the cascade.
 
 ### Namespace → Utility Mapping
 
-| Namespace                         | Generated utilities                                                |
-| --------------------------------- | ------------------------------------------------------------------ |
-| `--color-*`                       | `bg-*`, `text-*`, `border-*`, `ring-*`, `fill-*`, `stroke-*`, etc. |
-| `--font-*`                        | `font-*` (family)                                                  |
-| `--text-*`                        | `text-*` (size)                                                    |
-| `--font-weight-*`                 | `font-*` (weight)                                                  |
-| `--tracking-*`                    | `tracking-*`                                                       |
-| `--leading-*`                     | `leading-*`                                                        |
-| `--breakpoint-*`                  | Responsive variants: `sm:*`, `md:*`                                |
-| `--container-*`                   | Container query variants: `@sm:*`, and `max-w-*`                   |
-| `--spacing-*` or `--spacing`      | `px-*`, `py-*`, `m-*`, `w-*`, `h-*`, etc.                          |
-| `--radius-*`                      | `rounded-*`                                                        |
-| `--shadow-*` / `--inset-shadow-*` | `shadow-*` / `inset-shadow-*`                                      |
-| `--blur-*`                        | `blur-*`                                                           |
-| `--ease-*`                        | `ease-*`                                                           |
-| `--animate-*`                     | `animate-*`                                                        |
+- **`--color-*`** → `bg-*`, `text-*`, `border-*`, `ring-*`, `fill-*`, `stroke-*`, etc.
+- **`--font-*`** → `font-*` (family)
+- **`--text-*`** → `text-*` (size)
+- **`--font-weight-*`** → `font-*` (weight)
+- **`--tracking-*`** → `tracking-*`
+- **`--leading-*`** → `leading-*`
+- **`--breakpoint-*`** → Responsive variants: `sm:*`, `md:*`
+- **`--container-*`** → Container query variants: `@sm:*`, and `max-w-*`
+- **`--spacing-*` or `--spacing`** → `px-*`, `py-*`, `m-*`, `w-*`, `h-*`, etc.
+- **`--radius-*`** → `rounded-*`
+- **`--shadow-*` / `--inset-shadow-*`** → `shadow-*` / `inset-shadow-*`
+- **`--blur-*`** → `blur-*`
+- **`--ease-*`** → `ease-*`
+- **`--animate-*`** → `animate-*`
 
 Breakpoints generate variants, not utilities. Colors generate multiple utility families from a single namespace.
 
@@ -140,11 +143,11 @@ Put `@theme` in a standalone CSS file and `@import` it after `@import "tailwindc
 
 Unprefixed = all sizes. Prefix = that breakpoint **and up**.
 
-| Prefix | Min-width      | Prefix | Min-width      |
-| ------ | -------------- | ------ | -------------- |
-| `sm:`  | 40rem (640px)  | `xl:`  | 80rem (1280px) |
-| `md:`  | 48rem (768px)  | `2xl:` | 96rem (1536px) |
-| `lg:`  | 64rem (1024px) |        |                |
+- **`sm:`** — 40rem (640px)
+- **`md:`** — 48rem (768px)
+- **`lg:`** — 64rem (1024px)
+- **`xl:`** — 80rem (1280px)
+- **`2xl:`** — 96rem (1536px)
 
 - Don't use `sm:` to mean "mobile only" — it means 640px and up
 - Unprefixed for mobile base, override at breakpoints

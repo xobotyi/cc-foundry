@@ -16,12 +16,14 @@ rich plugin ecosystem. All patterns target Python 3.14+.
 
 ## References
 
-| Topic                                        | Reference                                         | Contents                                                                                  |
-| -------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Fixture patterns, scope, factories, teardown | [`${CLAUDE_SKILL_DIR}/references/fixtures.md`]    | Fixture lifecycle, yield fixtures, factory pattern, request object, parametrized fixtures |
-| Parametrize patterns, indirect, IDs          | [`${CLAUDE_SKILL_DIR}/references/parametrize.md`] | Multi-parameter examples, indirect fixtures, custom IDs, stacking decorators              |
-| Monkeypatch patterns, scoped patches         | [`${CLAUDE_SKILL_DIR}/references/monkeypatch.md`] | API overview, attribute/env/dict patching, scoped monkeypatch, common recipes             |
-| Plugin ecosystem and configuration           | [`${CLAUDE_SKILL_DIR}/references/plugins.md`]     | pytest-asyncio, pytest-mock, pytest-xdist, pytest-cov configuration patterns              |
+- **Fixture patterns, scope, factories, teardown** — [`${CLAUDE_SKILL_DIR}/references/fixtures.md`]: Fixture lifecycle,
+  yield fixtures, factory pattern, request object, parametrized fixtures
+- **Parametrize patterns, indirect, IDs** — [`${CLAUDE_SKILL_DIR}/references/parametrize.md`]: Multi-parameter examples,
+  indirect fixtures, custom IDs, stacking decorators
+- **Monkeypatch patterns, scoped patches** — [`${CLAUDE_SKILL_DIR}/references/monkeypatch.md`]: API overview,
+  attribute/env/dict patching, scoped monkeypatch, common recipes
+- **Plugin ecosystem and configuration** — [`${CLAUDE_SKILL_DIR}/references/plugins.md`]: pytest-asyncio, pytest-mock,
+  pytest-xdist, pytest-cov configuration patterns
 
 ## Test Structure
 
@@ -118,12 +120,10 @@ def test_inactive_users_excluded(make_user):
 
 ### Fixture Scope
 
-| Scope      | Lifetime             | Use For                                       |
-| ---------- | -------------------- | --------------------------------------------- |
-| `function` | Each test (default)  | Most fixtures — cheap setup, isolation        |
-| `class`    | All tests in a class | Shared expensive setup within a test class    |
-| `module`   | All tests in a file  | Database connection per test file             |
-| `session`  | Entire test run      | Server startup, heavy resource initialization |
+- **`function`** — Each test (default). Most fixtures — cheap setup, isolation.
+- **`class`** — All tests in a class. Shared expensive setup within a test class.
+- **`module`** — All tests in a file. Database connection per test file.
+- **`session`** — Entire test run. Server startup, heavy resource initialization.
 
 - **Session-scoped fixtures** must be in `conftest.py` at the root test directory.
 - **Don't mix scopes carelessly.** A function-scoped fixture cannot depend on a function-scoped fixture that modifies
@@ -131,16 +131,14 @@ def test_inactive_users_excluded(make_user):
 
 ### Built-in Fixtures
 
-| Fixture            | Purpose                                                             |
-| ------------------ | ------------------------------------------------------------------- |
-| `tmp_path`         | `Path` to a temporary directory unique to the test (function scope) |
-| `tmp_path_factory` | Factory for creating temp directories (session scope)               |
-| `capsys`           | Capture `sys.stdout`/`sys.stderr` writes                            |
-| `capfd`            | Capture file descriptor 1/2 output (catches C-level writes)         |
-| `caplog`           | Capture `logging` output with access to records                     |
-| `monkeypatch`      | Dynamic attribute/env/dict patching with automatic restore          |
-| `request`          | Fixture metadata: `.param`, `.node`, `.config`, `.fspath`           |
-| `pytestconfig`     | Access to the pytest config object                                  |
+- **`tmp_path`** — `Path` to a temporary directory unique to the test (function scope)
+- **`tmp_path_factory`** — Factory for creating temp directories (session scope)
+- **`capsys`** — Capture `sys.stdout`/`sys.stderr` writes
+- **`capfd`** — Capture file descriptor 1/2 output (catches C-level writes)
+- **`caplog`** — Capture `logging` output with access to records
+- **`monkeypatch`** — Dynamic attribute/env/dict patching with automatic restore
+- **`request`** — Fixture metadata: `.param`, `.node`, `.config`, `.fspath`
+- **`pytestconfig`** — Access to the pytest config object
 
 See `${CLAUDE_SKILL_DIR}/references/fixtures.md` for fixture lifecycle details, parametrized fixtures, and advanced
 patterns.
@@ -421,14 +419,12 @@ asyncio_mode = "auto"              # pytest-asyncio: auto-detect async tests
 
 ## Plugin Ecosystem
 
-| Plugin            | Purpose                                           |
-| ----------------- | ------------------------------------------------- |
-| `pytest-asyncio`  | Async test support with `@pytest.mark.asyncio`    |
-| `pytest-mock`     | `mocker` fixture wrapping `unittest.mock`         |
-| `pytest-cov`      | Coverage reporting (`--cov=src`)                  |
-| `pytest-xdist`    | Parallel test execution (`-n auto`)               |
-| `pytest-httpx`    | Mock `httpx` requests in tests                    |
-| `pytest-randomly` | Randomize test order to catch hidden dependencies |
+- **`pytest-asyncio`** — Async test support with `@pytest.mark.asyncio`
+- **`pytest-mock`** — `mocker` fixture wrapping `unittest.mock`
+- **`pytest-cov`** — Coverage reporting (`--cov=src`)
+- **`pytest-xdist`** — Parallel test execution (`-n auto`)
+- **`pytest-httpx`** — Mock `httpx` requests in tests
+- **`pytest-randomly`** — Randomize test order to catch hidden dependencies
 
 See `${CLAUDE_SKILL_DIR}/references/plugins.md` for configuration patterns and usage details.
 

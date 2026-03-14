@@ -235,12 +235,10 @@ const emit = defineEmits<{
 
 ## Utility Types
 
-| Type                      | Purpose                    |
-| ------------------------- | -------------------------- |
-| `Ref<T>`                  | Ref wrapper type           |
-| `ComputedRef<T>`          | Computed ref type          |
-| `MaybeRef<T>`             | `T \| Ref<T>`              |
-| `MaybeRefOrGetter<T>`     | `T \| Ref<T> \| (() => T)` |
-| `InjectionKey<T>`         | Typed injection key        |
-| `PropType<T>`             | Runtime prop type casting  |
-| `ComponentPublicInstance` | Generic component instance |
+- **`Ref<T>`** — Ref wrapper type
+- **`ComputedRef<T>`** — Computed ref type
+- **`MaybeRef<T>`** — `T | Ref<T>`
+- **`MaybeRefOrGetter<T>`** — `T | Ref<T> | (() => T)`
+- **`InjectionKey<T>`** — Typed injection key
+- **`PropType<T>`** — Runtime prop type casting
+- **`ComponentPublicInstance`** — Generic component instance

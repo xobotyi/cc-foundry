@@ -42,14 +42,18 @@ development, convenience, or "temporary" setups.
 
 ## References
 
-| Topic                 | Reference                                                   | Contents                                                                                                                                           |
-| --------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dockerfile patterns   | [`${CLAUDE_SKILL_DIR}/references/dockerfile-patterns.md`]   | Multi-stage templates, layer optimization, base image table, .dockerignore, ENTRYPOINT/CMD, BuildKit cache mounts, signal handling, OCI labels     |
-| Compose orchestration | [`${CLAUDE_SKILL_DIR}/references/compose-orchestration.md`] | Service structure, depends_on conditions, env vars, secrets, networks, volumes, profiles, restart policies, override files, zero-downtime patterns |
-| Security hardening    | [`${CLAUDE_SKILL_DIR}/references/security-hardening.md`]    | Non-root patterns, read-only FS, capabilities, distroless, secrets, scanning, supply chain security, SBOM, image signing, VEX, hardening checklist |
-| Networking            | [`${CLAUDE_SKILL_DIR}/references/networking.md`]            | Driver selection table, bridge/host/macvlan/ipvlan usage, port publishing, DNS, multi-network, common mistakes, iptables bypass                    |
-| Storage and volumes   | [`${CLAUDE_SKILL_DIR}/references/storage-and-volumes.md`]   | Volume types table, named/bind/tmpfs, NFS/CIFS drivers, backup/restore, permissions, storage drivers, performance                                  |
-| Operations            | [`${CLAUDE_SKILL_DIR}/references/operations.md`]            | Health checks, resource constraints, logging drivers, structured logging, debugging, monitoring, Quadlet patterns, Docker/Podman CLI compat        |
+- **Dockerfile patterns** — [`${CLAUDE_SKILL_DIR}/references/dockerfile-patterns.md`]: Multi-stage templates, layer
+  optimization, base image selection, .dockerignore, ENTRYPOINT/CMD, BuildKit cache mounts, signal handling, OCI labels
+- **Compose orchestration** — [`${CLAUDE_SKILL_DIR}/references/compose-orchestration.md`]: Service structure, depends_on
+  conditions, env vars, secrets, networks, volumes, profiles, restart policies, override files, zero-downtime patterns
+- **Security hardening** — [`${CLAUDE_SKILL_DIR}/references/security-hardening.md`]: Non-root patterns, read-only FS,
+  capabilities, distroless, secrets, scanning, supply chain security, SBOM, image signing, VEX, hardening checklist
+- **Networking** — [`${CLAUDE_SKILL_DIR}/references/networking.md`]: Driver selection, bridge/host/macvlan/ipvlan usage,
+  port publishing, DNS, multi-network, common mistakes, iptables bypass
+- **Storage and volumes** — [`${CLAUDE_SKILL_DIR}/references/storage-and-volumes.md`]: Volume types, named/bind/tmpfs,
+  NFS/CIFS drivers, backup/restore, permissions, storage drivers, performance
+- **Operations** — [`${CLAUDE_SKILL_DIR}/references/operations.md`]: Health checks, resource constraints, logging
+  drivers, structured logging, debugging, monitoring, Quadlet patterns, Docker/Podman CLI compat
 
 ## Dockerfile Rules
 

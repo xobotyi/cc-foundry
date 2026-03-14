@@ -15,14 +15,18 @@ transforms) so tests run against the same code you ship.
 
 ## References
 
-| Topic          | Reference                                            | Contents                                                      |
-| -------------- | ---------------------------------------------------- | ------------------------------------------------------------- |
-| Mocking        | [`${CLAUDE_SKILL_DIR}/references/mocking.md`]        | Full mocking rules, module mocking patterns, cleanup strategy |
-| Assertions     | [`${CLAUDE_SKILL_DIR}/references/assertions.md`]     | Matcher tables, asymmetric matchers, soft assertions          |
-| Lifecycle      | [`${CLAUDE_SKILL_DIR}/references/lifecycle.md`]      | Hook execution order, test context, setup files, global setup |
-| Configuration  | [`${CLAUDE_SKILL_DIR}/references/configuration.md`]  | Config file options, projects, pools, sharding, env vars      |
-| Coverage       | [`${CLAUDE_SKILL_DIR}/references/coverage.md`]       | Coverage providers, thresholds, ignore comments, performance  |
-| Jest migration | [`${CLAUDE_SKILL_DIR}/references/jest-migration.md`] | Jest API translation, key behavioral differences, Mocha/Sinon |
+- **Mocking** — [`${CLAUDE_SKILL_DIR}/references/mocking.md`]: Full mocking rules, module mocking patterns, cleanup
+  strategy
+- **Assertions** — [`${CLAUDE_SKILL_DIR}/references/assertions.md`]: Matcher tables, asymmetric matchers, soft
+  assertions
+- **Lifecycle** — [`${CLAUDE_SKILL_DIR}/references/lifecycle.md`]: Hook execution order, test context, setup files,
+  global setup
+- **Configuration** — [`${CLAUDE_SKILL_DIR}/references/configuration.md`]: Config file options, projects, pools,
+  sharding, env vars
+- **Coverage** — [`${CLAUDE_SKILL_DIR}/references/coverage.md`]: Coverage providers, thresholds, ignore comments,
+  performance
+- **Jest migration** — [`${CLAUDE_SKILL_DIR}/references/jest-migration.md`]: Jest API translation, key behavioral
+  differences, Mocha/Sinon
 
 ## Test Structure
 
@@ -74,12 +78,10 @@ see `${CLAUDE_SKILL_DIR}/references/mocking.md`.
 
 ### Value Matchers
 
-| Matcher                 | Use When                                                            |
-| ----------------------- | ------------------------------------------------------------------- |
-| `toBe(val)`             | Primitives or same reference (`Object.is`)                          |
-| `toEqual(val)`          | Deep structural equality (ignores `undefined` in expected)          |
-| `toStrictEqual(val)`    | Deep equality + checks `undefined` keys, sparse arrays, class types |
-| `toMatchObject(subset)` | Object contains at least these properties                           |
+- **`toBe(val)`** — primitives or same reference (`Object.is`)
+- **`toEqual(val)`** — deep structural equality (ignores `undefined` in expected)
+- **`toStrictEqual(val)`** — deep equality + checks `undefined` keys, sparse arrays, class types
+- **`toMatchObject(subset)`** — object contains at least these properties
 
 ### Core Rules
 

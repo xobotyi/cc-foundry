@@ -75,11 +75,9 @@ Vault IDs label which password decrypts which content.
 
 ## Password Sources
 
-| Method | Command                                | Use case                     |
-| ------ | -------------------------------------- | ---------------------------- |
-| Prompt | `--vault-id @prompt`                   | Interactive sessions         |
-| File   | `--vault-password-file vault_pass.txt` | CI/CD (file in `.gitignore`) |
-| Script | `--vault-password-file vault_pass.py`  | Fetch from secrets manager   |
+- **Prompt** (`--vault-id @prompt`) — Interactive sessions
+- **File** (`--vault-password-file vault_pass.txt`) — CI/CD (file in `.gitignore`)
+- **Script** (`--vault-password-file vault_pass.py`) — Fetch from secrets manager
 
 ## Password Automation
 

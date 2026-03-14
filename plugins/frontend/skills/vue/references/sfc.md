@@ -64,15 +64,13 @@ Order declarations logically:
 
 These are available without import in `<script setup>`:
 
-| Macro             | Purpose                                        |
-| ----------------- | ---------------------------------------------- |
-| `defineProps()`   | Declare component props                        |
-| `defineEmits()`   | Declare component events                       |
-| `defineExpose()`  | Expose public instance properties              |
-| `defineOptions()` | Set component options (`name`, `inheritAttrs`) |
-| `defineSlots()`   | Type-check slot props (TS only)                |
-| `defineModel()`   | Two-way binding (v-model) shorthand            |
-| `withDefaults()`  | Set defaults for type-based props              |
+- **`defineProps()`** — Declare component props
+- **`defineEmits()`** — Declare component events
+- **`defineExpose()`** — Expose public instance properties
+- **`defineOptions()`** — Set component options (`name`, `inheritAttrs`)
+- **`defineSlots()`** — Type-check slot props (TS only)
+- **`defineModel()`** — Two-way binding (v-model) shorthand
+- **`withDefaults()`** — Set defaults for type-based props
 
 ### `defineOptions()`
 
@@ -91,11 +89,9 @@ defineOptions({
 
 ### Directives
 
-| Shorthand | Full          | Purpose             |
-| --------- | ------------- | ------------------- |
-| `:prop`   | `v-bind:prop` | Bind attribute/prop |
-| `@event`  | `v-on:event`  | Listen to event     |
-| `#slot`   | `v-slot:slot` | Named slot          |
+- **`:prop`** (`v-bind:prop`) — Bind attribute/prop
+- **`@event`** (`v-on:event`) — Listen to event
+- **`#slot`** (`v-slot:slot`) — Named slot
 
 Always use shorthands consistently — don't mix `:` and `v-bind:`.
 

@@ -6,12 +6,10 @@ Modern responsive CSS: fluid sizing, container queries, media queries, and logic
 
 Use the right tool for each level of responsiveness:
 
-| Level            | Tool                                        | When                            |
-| ---------------- | ------------------------------------------- | ------------------------------- |
-| Content-driven   | Flexbox wrapping, `min()`/`max()`/`clamp()` | Always -- baseline              |
-| Container-driven | Container queries, `cqi`/`cqw` units        | Component adapts to parent size |
-| Viewport-driven  | Media queries, `vw`/`vh`/`dvh` units        | Page-level layout changes       |
-| User preference  | `prefers-*` media queries                   | Color scheme, motion, contrast  |
+- **Content-driven** — Flexbox wrapping, `min()`/`max()`/`clamp()`: always -- baseline
+- **Container-driven** — Container queries, `cqi`/`cqw` units: component adapts to parent size
+- **Viewport-driven** — Media queries, `vw`/`vh`/`dvh` units: page-level layout changes
+- **User preference** — `prefers-*` media queries: color scheme, motion, contrast
 
 **Design from the inside out:** Start with intrinsic sizing, add container queries for component-level adaptation, use
 media queries only for viewport-dependent elements (navigation, full-width sections).
@@ -213,16 +211,14 @@ text-align: start;
 
 ### Mapping
 
-| Physical           | Logical (horizontal writing mode) |
-| ------------------ | --------------------------------- |
-| `left`/`right`     | `inline-start`/`inline-end`       |
-| `top`/`bottom`     | `block-start`/`block-end`         |
-| `width`            | `inline-size`                     |
-| `height`           | `block-size`                      |
-| `margin-left`      | `margin-inline-start`             |
-| `padding-top`      | `padding-block-start`             |
-| `border-right`     | `border-inline-end`               |
-| `text-align: left` | `text-align: start`               |
+- `left` / `right` → `inline-start` / `inline-end`
+- `top` / `bottom` → `block-start` / `block-end`
+- `width` → `inline-size`
+- `height` → `block-size`
+- `margin-left` → `margin-inline-start`
+- `padding-top` → `padding-block-start`
+- `border-right` → `border-inline-end`
+- `text-align: left` → `text-align: start`
 
 ### Shorthand
 

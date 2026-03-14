@@ -82,14 +82,12 @@ templ Button(attrs templ.Attributes) {
 })
 ```
 
-`templ.Attributes` is `map[string]any`. Value behavior:
+`templ.Attributes` is `map[string]any`. Value rendering by type:
 
-| Value Type                     | Rendering                              |
-| ------------------------------ | -------------------------------------- |
-| `string`                       | `name="value"`                         |
-| `bool`                         | `name` (if true) or omitted (if false) |
-| `templ.KeyValue[string, bool]` | `name="value"` if bool is true         |
-| `templ.KeyValue[bool, bool]`   | `name` if both bools are true          |
+- `string` → `name="value"`
+- `bool` → `name` (if true) or omitted (if false)
+- `templ.KeyValue[string, bool]` → `name="value"` if bool is true
+- `templ.KeyValue[bool, bool]` → `name` if both bools are true
 
 Spread attributes can be conditional:
 

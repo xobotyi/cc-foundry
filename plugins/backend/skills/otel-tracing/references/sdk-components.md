@@ -111,13 +111,11 @@ BatchSpanProcessor(
 
 **Tuning guidance:**
 
-| Symptom                      | Adjustment                                    |
-| ---------------------------- | --------------------------------------------- |
-| Spans dropped (queue full)   | Increase `maxQueueSize`                       |
-| High memory usage            | Decrease `maxQueueSize`                       |
-| Spans arrive late at backend | Decrease `scheduledDelayMillis`               |
-| Too many export calls        | Increase `maxExportBatchSize`                 |
-| Exports timing out           | Increase `exportTimeoutMillis` or fix network |
+- **Spans dropped (queue full)** — Increase `maxQueueSize`
+- **High memory usage** — Decrease `maxQueueSize`
+- **Spans arrive late at backend** — Decrease `scheduledDelayMillis`
+- **Too many export calls** — Increase `maxExportBatchSize`
+- **Exports timing out** — Increase `exportTimeoutMillis` or fix network
 
 ### Multiple Processors
 
@@ -140,13 +138,11 @@ Serializes and transmits spans to a backend. The exporter is the end of the proc
 
 ### Common Exporters
 
-| Exporter         | Use Case                                                      |
-| ---------------- | ------------------------------------------------------------- |
-| OTLP (gRPC/HTTP) | Standard — send to OTel Collector or OTLP-compatible backends |
-| Console/Stdout   | Development — print spans to terminal                         |
-| Jaeger           | Direct export to Jaeger (deprecated; use OTLP)                |
-| Zipkin           | Direct export to Zipkin                                       |
-| In-Memory        | Testing — capture spans for assertions                        |
+- **OTLP (gRPC/HTTP)** — Standard — send to OTel Collector or OTLP-compatible backends
+- **Console/Stdout** — Development — print spans to terminal
+- **Jaeger** — Direct export to Jaeger (deprecated; use OTLP)
+- **Zipkin** — Direct export to Zipkin
+- **In-Memory** — Testing — capture spans for assertions
 
 **OTLP is the recommended exporter** for production. Send to an OpenTelemetry Collector which then routes to your
 backend(s).
@@ -171,12 +167,10 @@ A `Resource` describes the entity producing telemetry. Attached to all spans fro
 
 **Essential resource attributes:**
 
-| Attribute                     | Description          | Example             |
-| ----------------------------- | -------------------- | ------------------- |
-| `service.name`                | Logical service name | `"payment-service"` |
-| `service.version`             | Service version      | `"2.1.0"`           |
-| `deployment.environment.name` | Environment          | `"production"`      |
-| `host.name`                   | Hostname             | `"web-01"`          |
+- `service.name` — Logical service name (e.g., `"payment-service"`)
+- `service.version` — Service version (e.g., `"2.1.0"`)
+- `deployment.environment.name` — Environment (e.g., `"production"`)
+- `host.name` — Hostname (e.g., `"web-01"`)
 
 **Rules:**
 
@@ -221,13 +215,11 @@ provider = TracerProvider(
 
 Many SDKs support configuration via environment variables:
 
-| Variable                      | Description                     | Example                      |
-| ----------------------------- | ------------------------------- | ---------------------------- |
-| `OTEL_SERVICE_NAME`           | Service name resource attribute | `"my-service"`               |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLP exporter endpoint          | `"http://collector:4317"`    |
-| `OTEL_TRACES_SAMPLER`         | Sampler type                    | `"parentbased_traceidratio"` |
-| `OTEL_TRACES_SAMPLER_ARG`     | Sampler argument                | `"0.1"`                      |
-| `OTEL_TRACES_EXPORTER`        | Exporter type                   | `"otlp"`                     |
+- `OTEL_SERVICE_NAME` — Service name resource attribute (e.g., `"my-service"`)
+- `OTEL_EXPORTER_OTLP_ENDPOINT` — OTLP exporter endpoint (e.g., `"http://collector:4317"`)
+- `OTEL_TRACES_SAMPLER` — Sampler type (e.g., `"parentbased_traceidratio"`)
+- `OTEL_TRACES_SAMPLER_ARG` — Sampler argument (e.g., `"0.1"`)
+- `OTEL_TRACES_EXPORTER` — Exporter type (e.g., `"otlp"`)
 
 ## OpenTelemetry Collector
 

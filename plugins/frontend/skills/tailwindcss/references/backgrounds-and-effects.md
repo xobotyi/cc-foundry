@@ -4,16 +4,14 @@
 
 Apply theme colors with `bg-{color}-{shade}`. Use the `/` opacity modifier — never `bg-opacity-*`.
 
-| Class             | CSS                                                          |
-| ----------------- | ------------------------------------------------------------ |
-| `bg-white`        | `background-color: var(--color-white)`                       |
-| `bg-blue-500`     | `background-color: var(--color-blue-500)`                    |
-| `bg-transparent`  | `background-color: transparent`                              |
-| `bg-inherit`      | `background-color: inherit`                                  |
-| `bg-current`      | `background-color: currentColor`                             |
-| `bg-blue-500/50`  | `background-color: oklch(... / 0.5)` — opacity modifier      |
-| `bg-(--my-color)` | `background-color: var(--my-color)` — CSS variable shorthand |
-| `bg-[#316ff6]`    | `background-color: #316ff6` — arbitrary value                |
+- **`bg-white`** — `background-color: var(--color-white)`
+- **`bg-blue-500`** — `background-color: var(--color-blue-500)`
+- **`bg-transparent`** — `background-color: transparent`
+- **`bg-inherit`** — `background-color: inherit`
+- **`bg-current`** — `background-color: currentColor`
+- **`bg-blue-500/50`** — `background-color: oklch(... / 0.5)` — opacity modifier
+- **`bg-(--my-color)`** — `background-color: var(--my-color)` — CSS variable shorthand
+- **`bg-[#316ff6]`** — `background-color: #316ff6` — arbitrary value
 
 **v4 rule:** `bg-opacity-50` is removed. Always use `bg-color/50`.
 
@@ -33,37 +31,31 @@ Remove with `bg-none`.
 
 `bg-gradient-to-r` is the **v3** form. In v4 use `bg-linear-*`.
 
-| Class                  | CSS                                                   |
-| ---------------------- | ----------------------------------------------------- |
-| `bg-linear-to-r`       | `linear-gradient(to right, var(--tw-gradient-stops))` |
-| `bg-linear-to-br`      | `linear-gradient(to bottom right, ...)`               |
-| `bg-linear-45`         | `linear-gradient(45deg in oklab, ...)`                |
-| `bg-linear-to-r/srgb`  | interpolate in sRGB color space                       |
-| `bg-linear-to-r/oklch` | interpolate in oklch (perceptually uniform hues)      |
+- **`bg-linear-to-r`** — `linear-gradient(to right, var(--tw-gradient-stops))`
+- **`bg-linear-to-br`** — `linear-gradient(to bottom right, ...)`
+- **`bg-linear-45`** — `linear-gradient(45deg in oklab, ...)`
+- **`bg-linear-to-r/srgb`** — interpolate in sRGB color space
+- **`bg-linear-to-r/oklch`** — interpolate in oklch (perceptually uniform hues)
 
 Default interpolation is **oklab**. Directions: `t`, `tr`, `r`, `br`, `b`, `bl`, `l`, `tl`.
 
 ### Radial & Conic Gradients
 
-| Class                    | Example                      |
-| ------------------------ | ---------------------------- |
-| `bg-radial`              | center radial gradient       |
-| `bg-radial-[at_50%_75%]` | positioned radial gradient   |
-| `bg-conic`               | conic starting at 0°         |
-| `bg-conic-180`           | conic starting at 180°       |
-| `bg-conic/decreasing`    | decreasing hue interpolation |
+- **`bg-radial`** — center radial gradient
+- **`bg-radial-[at_50%_75%]`** — positioned radial gradient
+- **`bg-conic`** — conic starting at 0°
+- **`bg-conic-180`** — conic starting at 180°
+- **`bg-conic/decreasing`** — decreasing hue interpolation
 
 ### Gradient Color Stops
 
-| Class              | Effect                   |
-| ------------------ | ------------------------ |
-| `from-indigo-500`  | start color              |
-| `via-purple-500`   | mid color                |
-| `to-pink-500`      | end color                |
-| `from-10%`         | start position           |
-| `via-30%`          | mid position             |
-| `to-90%`           | end position             |
-| `from-blue-500/50` | start color with opacity |
+- **`from-indigo-500`** — start color
+- **`via-purple-500`** — mid color
+- **`to-pink-500`** — end color
+- **`from-10%`** — start position
+- **`via-30%`** — mid position
+- **`to-90%`** — end position
+- **`from-blue-500/50`** — start color with opacity
 
 Stops support the same opacity modifier syntax as `bg-*`.
 
@@ -89,42 +81,34 @@ Stops support the same opacity modifier syntax as `bg-*`.
 
 ### Size
 
-| Class                  | CSS                        |
-| ---------------------- | -------------------------- |
-| `bg-cover`             | `background-size: cover`   |
-| `bg-contain`           | `background-size: contain` |
-| `bg-auto`              | `background-size: auto`    |
-| `bg-size-[auto_100px]` | arbitrary size             |
+- **`bg-cover`** — `background-size: cover`
+- **`bg-contain`** — `background-size: contain`
+- **`bg-auto`** — `background-size: auto`
+- **`bg-size-[auto_100px]`** — arbitrary size
 
 ### Position
 
-| Class                           | CSS                                 |
-| ------------------------------- | ----------------------------------- |
-| `bg-center`                     | `background-position: center`       |
-| `bg-top`                        | `background-position: top`          |
-| `bg-bottom-right`               | `background-position: bottom right` |
-| `bg-position-[center_top_1rem]` | arbitrary position                  |
+- **`bg-center`** — `background-position: center`
+- **`bg-top`** — `background-position: top`
+- **`bg-bottom-right`** — `background-position: bottom right`
+- **`bg-position-[center_top_1rem]`** — arbitrary position
 
 All 9 positions: `top-left`, `top`, `top-right`, `left`, `center`, `right`, `bottom-left`, `bottom`, `bottom-right`.
 
 ### Repeat
 
-| Class             | CSS                                            |
-| ----------------- | ---------------------------------------------- |
-| `bg-repeat`       | `background-repeat: repeat`                    |
-| `bg-repeat-x`     | repeat horizontally                            |
-| `bg-repeat-y`     | repeat vertically                              |
-| `bg-repeat-space` | repeat without clipping                        |
-| `bg-repeat-round` | repeat without clipping, stretch to avoid gaps |
-| `bg-no-repeat`    | no repeat                                      |
+- **`bg-repeat`** — `background-repeat: repeat`
+- **`bg-repeat-x`** — repeat horizontally
+- **`bg-repeat-y`** — repeat vertically
+- **`bg-repeat-space`** — repeat without clipping
+- **`bg-repeat-round`** — repeat without clipping, stretch to avoid gaps
+- **`bg-no-repeat`** — no repeat
 
 ### Attachment
 
-| Class       | CSS                                  |
-| ----------- | ------------------------------------ |
-| `bg-fixed`  | fixed relative to viewport           |
-| `bg-local`  | scrolls with container and viewport  |
-| `bg-scroll` | scrolls with viewport, not container |
+- **`bg-fixed`** — fixed relative to viewport
+- **`bg-local`** — scrolls with container and viewport
+- **`bg-scroll`** — scrolls with viewport, not container
 
 ---
 
@@ -132,12 +116,10 @@ All 9 positions: `top-left`, `top`, `top-right`, `left`, `center`, `right`, `bot
 
 ### Clip — where background is painted
 
-| Class             | CSS                            |
-| ----------------- | ------------------------------ |
-| `bg-clip-border`  | `background-clip: border-box`  |
-| `bg-clip-padding` | `background-clip: padding-box` |
-| `bg-clip-content` | `background-clip: content-box` |
-| `bg-clip-text`    | `background-clip: text`        |
+- **`bg-clip-border`** — `background-clip: border-box`
+- **`bg-clip-padding`** — `background-clip: padding-box`
+- **`bg-clip-content`** — `background-clip: content-box`
+- **`bg-clip-text`** — `background-clip: text`
 
 Gradient text requires `bg-clip-text text-transparent`:
 
@@ -149,11 +131,9 @@ Gradient text requires `bg-clip-text text-transparent`:
 
 ### Origin — background-position reference box
 
-| Class               | CSS                                        |
-| ------------------- | ------------------------------------------ |
-| `bg-origin-border`  | `background-origin: border-box`            |
-| `bg-origin-padding` | `background-origin: padding-box` (default) |
-| `bg-origin-content` | `background-origin: content-box`           |
+- **`bg-origin-border`** — `background-origin: border-box`
+- **`bg-origin-padding`** — `background-origin: padding-box` (default)
+- **`bg-origin-content`** — `background-origin: content-box`
 
 ---
 
@@ -161,21 +141,19 @@ Gradient text requires `bg-clip-text text-transparent`:
 
 Blend background image with background color.
 
-| Class                                                                             | Mode        |
-| --------------------------------------------------------------------------------- | ----------- |
-| `bg-blend-normal`                                                                 | normal      |
-| `bg-blend-multiply`                                                               | multiply    |
-| `bg-blend-screen`                                                                 | screen      |
-| `bg-blend-overlay`                                                                | overlay     |
-| `bg-blend-darken`                                                                 | darken      |
-| `bg-blend-lighten`                                                                | lighten     |
-| `bg-blend-color-dodge`                                                            | color-dodge |
-| `bg-blend-color-burn`                                                             | color-burn  |
-| `bg-blend-hard-light`                                                             | hard-light  |
-| `bg-blend-soft-light`                                                             | soft-light  |
-| `bg-blend-difference`                                                             | difference  |
-| `bg-blend-exclusion`                                                              | exclusion   |
-| `bg-blend-hue` / `bg-blend-saturation` / `bg-blend-color` / `bg-blend-luminosity` | HSL modes   |
+- **`bg-blend-normal`** — normal
+- **`bg-blend-multiply`** — multiply
+- **`bg-blend-screen`** — screen
+- **`bg-blend-overlay`** — overlay
+- **`bg-blend-darken`** — darken
+- **`bg-blend-lighten`** — lighten
+- **`bg-blend-color-dodge`** — color-dodge
+- **`bg-blend-color-burn`** — color-burn
+- **`bg-blend-hard-light`** — hard-light
+- **`bg-blend-soft-light`** — soft-light
+- **`bg-blend-difference`** — difference
+- **`bg-blend-exclusion`** — exclusion
+- **`bg-blend-hue` / `bg-blend-saturation` / `bg-blend-color` / `bg-blend-luminosity`** — HSL modes
 
 ---
 
@@ -185,13 +163,11 @@ Blend background image with background color.
 
 The shadow scale shifted by one step from v3. Map old classes to new:
 
-| v3 class       | v4 class                  | CSS value                       |
-| -------------- | ------------------------- | ------------------------------- |
-| `shadow` (1px) | `shadow-2xs`              | `0 1px rgb(0 0 0 / 0.05)`       |
-| `shadow-sm`    | `shadow-xs`               | `0 1px 2px 0 rgb(0 0 0 / 0.05)` |
-| `shadow-md`→   | `shadow-sm`               | `0 1px 3px 0 / 0 1px 2px -1px`  |
-| `shadow-lg`→   | `shadow-md` / `shadow-lg` | larger                          |
-| —              | `shadow-xl`, `shadow-2xl` | largest                         |
+- **`shadow`** (v3 1px) → `shadow-2xs` — `0 1px rgb(0 0 0 / 0.05)`
+- **`shadow-sm`** (v3) → `shadow-xs` — `0 1px 2px 0 rgb(0 0 0 / 0.05)`
+- **`shadow-md`** (v3) → `shadow-sm` — `0 1px 3px 0 / 0 1px 2px -1px`
+- **`shadow-lg`** (v3) → `shadow-md` / `shadow-lg` — larger
+- (new) **`shadow-xl`**, **`shadow-2xl`** — largest
 
 **Do not write `shadow-sm` expecting v3 behavior — it maps to v4 `shadow-xs`.**
 
@@ -205,12 +181,10 @@ The shadow scale shifted by one step from v3. Map old classes to new:
 
 ### Inset shadow
 
-| Class               | CSS                                 |
-| ------------------- | ----------------------------------- |
-| `inset-shadow-2xs`  | `inset 0 1px rgb(0 0 0 / 0.05)`     |
-| `inset-shadow-xs`   | `inset 0 1px 1px rgb(0 0 0 / 0.05)` |
-| `inset-shadow-sm`   | `inset 0 2px 4px rgb(0 0 0 / 0.05)` |
-| `inset-shadow-none` | remove inset shadow                 |
+- **`inset-shadow-2xs`** — `inset 0 1px rgb(0 0 0 / 0.05)`
+- **`inset-shadow-xs`** — `inset 0 1px 1px rgb(0 0 0 / 0.05)`
+- **`inset-shadow-sm`** — `inset 0 2px 4px rgb(0 0 0 / 0.05)`
+- **`inset-shadow-none`** — remove inset shadow
 
 Default inset opacity is 5% — increase with `/50` modifier.
 
@@ -218,14 +192,12 @@ Default inset opacity is 5% — increase with `/50` modifier.
 
 `ring` default is **1px currentColor** in v4 (not 3px blue as in v3).
 
-| Class              | CSS                         |
-| ------------------ | --------------------------- |
-| `ring`             | `0 0 0 1px` in currentColor |
-| `ring-2`           | `0 0 0 2px`                 |
-| `ring-blue-500`    | ring in blue-500            |
-| `ring-blue-500/50` | ring with opacity           |
-| `inset-ring`       | `inset 0 0 0 1px`           |
-| `inset-ring-2`     | `inset 0 0 0 2px`           |
+- **`ring`** — `0 0 0 1px` in currentColor
+- **`ring-2`** — `0 0 0 2px`
+- **`ring-blue-500`** — ring in blue-500
+- **`ring-blue-500/50`** — ring with opacity
+- **`inset-ring`** — `inset 0 0 0 1px`
+- **`inset-ring-2`** — `inset 0 0 0 2px`
 
 Remove: `shadow-none`, `inset-shadow-none`, `ring-0`, `inset-ring-0`.
 
@@ -252,14 +224,12 @@ when you need to affect the whole element subtree.
 
 Controls how element content blends with the stacking context behind it.
 
-| Class                                              | Mode                |
-| -------------------------------------------------- | ------------------- |
-| `mix-blend-multiply`                               | multiply            |
-| `mix-blend-screen`                                 | screen              |
-| `mix-blend-overlay`                                | overlay             |
-| `mix-blend-darken` / `mix-blend-lighten`           | darken/lighten      |
-| `mix-blend-plus-darker` / `mix-blend-plus-lighter` | plus modes          |
-| (same set as bg-blend-\*)                          | all CSS blend modes |
+- **`mix-blend-multiply`** — multiply
+- **`mix-blend-screen`** — screen
+- **`mix-blend-overlay`** — overlay
+- **`mix-blend-darken` / `mix-blend-lighten`** — darken/lighten
+- **`mix-blend-plus-darker` / `mix-blend-plus-lighter`** — plus modes
+- (same set as `bg-blend-*`) — all CSS blend modes
 
 Use `isolate` on a parent to create a new stacking context and contain blending:
 
@@ -305,12 +275,10 @@ Overrides browser default for checkboxes, radio buttons, progress bars.
 
 ### Fill
 
-| Class              | CSS                           |
-| ------------------ | ----------------------------- |
-| `fill-blue-500`    | `fill: var(--color-blue-500)` |
-| `fill-current`     | `fill: currentColor`          |
-| `fill-none`        | `fill: none`                  |
-| `fill-transparent` | `fill: transparent`           |
+- **`fill-blue-500`** — `fill: var(--color-blue-500)`
+- **`fill-current`** — `fill: currentColor`
+- **`fill-none`** — `fill: none`
+- **`fill-transparent`** — `fill: transparent`
 
 `fill-current` is the idiomatic pattern for icon components — SVG inherits the parent's text color automatically:
 
@@ -322,14 +290,12 @@ Overrides browser default for checkboxes, radio buttons, progress bars.
 
 ### Stroke
 
-| Class             | CSS                             |
-| ----------------- | ------------------------------- |
-| `stroke-cyan-500` | `stroke: var(--color-cyan-500)` |
-| `stroke-current`  | `stroke: currentColor`          |
-| `stroke-none`     | `stroke: none`                  |
-| `stroke-1`        | `stroke-width: 1`               |
-| `stroke-2`        | `stroke-width: 2`               |
-| `stroke-[1.5]`    | `stroke-width: 1.5` (arbitrary) |
+- **`stroke-cyan-500`** — `stroke: var(--color-cyan-500)`
+- **`stroke-current`** — `stroke: currentColor`
+- **`stroke-none`** — `stroke: none`
+- **`stroke-1`** — `stroke-width: 1`
+- **`stroke-2`** — `stroke-width: 2`
+- **`stroke-[1.5]`** — `stroke-width: 1.5` (arbitrary)
 
 ---
 
@@ -346,15 +312,13 @@ Overrides browser default for checkboxes, radio buttons, progress bars.
 
 Common cursors:
 
-| Class                             | Use               |
-| --------------------------------- | ----------------- |
-| `cursor-pointer`                  | clickable element |
-| `cursor-not-allowed`              | disabled state    |
-| `cursor-wait` / `cursor-progress` | loading states    |
-| `cursor-grab` / `cursor-grabbing` | drag handles      |
-| `cursor-text`                     | text input        |
-| `cursor-move`                     | draggable items   |
-| `cursor-none`                     | hide cursor       |
+- **`cursor-pointer`** — clickable element
+- **`cursor-not-allowed`** — disabled state
+- **`cursor-wait` / `cursor-progress`** — loading states
+- **`cursor-grab` / `cursor-grabbing`** — drag handles
+- **`cursor-text`** — text input
+- **`cursor-move`** — draggable items
+- **`cursor-none`** — hide cursor
 
 Arbitrary: `cursor-[url(hand.cur),_pointer]`.
 
@@ -369,36 +333,30 @@ Children still receive events. Use to make decorative overlays non-interactive.
 
 ### Resize
 
-| Class         | CSS                                 |
-| ------------- | ----------------------------------- |
-| `resize-none` | prevent resize                      |
-| `resize`      | both directions                     |
-| `resize-y`    | vertical only (common for textarea) |
-| `resize-x`    | horizontal only                     |
+- **`resize-none`** — prevent resize
+- **`resize`** — both directions
+- **`resize-y`** — vertical only (common for textarea)
+- **`resize-x`** — horizontal only
 
 ### User Select
 
-| Class         | CSS                    |
-| ------------- | ---------------------- |
-| `select-none` | prevent text selection |
-| `select-text` | allow text selection   |
-| `select-all`  | select all on click    |
-| `select-auto` | browser default        |
+- **`select-none`** — prevent text selection
+- **`select-text`** — allow text selection
+- **`select-all`** — select all on click
+- **`select-auto`** — browser default
 
 ### Touch Action
 
 Controls scroll/zoom on touch devices.
 
-| Class                                | CSS                             |
-| ------------------------------------ | ------------------------------- |
-| `touch-auto`                         | browser default                 |
-| `touch-none`                         | disable all touch interactions  |
-| `touch-pan-x`                        | horizontal pan only             |
-| `touch-pan-y`                        | vertical pan only               |
-| `touch-pan-left` / `touch-pan-right` | directional pan                 |
-| `touch-pan-up` / `touch-pan-down`    | directional pan                 |
-| `touch-pinch-zoom`                   | pinch zoom only                 |
-| `touch-manipulation`                 | pan + pinch, no double-tap zoom |
+- **`touch-auto`** — browser default
+- **`touch-none`** — disable all touch interactions
+- **`touch-pan-x`** — horizontal pan only
+- **`touch-pan-y`** — vertical pan only
+- **`touch-pan-left` / `touch-pan-right`** — directional pan
+- **`touch-pan-up` / `touch-pan-down`** — directional pan
+- **`touch-pinch-zoom`** — pinch zoom only
+- **`touch-manipulation`** — pan + pinch, no double-tap zoom
 
 ---
 
@@ -408,13 +366,11 @@ For replaced elements (`<img>`, `<video>`) inside a sized container.
 
 ### Object Fit
 
-| Class               | Behavior                       |
-| ------------------- | ------------------------------ |
-| `object-cover`      | fill container, crop if needed |
-| `object-contain`    | fit inside, letterbox          |
-| `object-fill`       | stretch to fill (distorts)     |
-| `object-scale-down` | shrink to fit, never enlarge   |
-| `object-none`       | natural size, no scaling       |
+- **`object-cover`** — fill container, crop if needed
+- **`object-contain`** — fit inside, letterbox
+- **`object-fill`** — stretch to fill (distorts)
+- **`object-scale-down`** — shrink to fit, never enlarge
+- **`object-none`** — natural size, no scaling
 
 Pattern: always pair with explicit dimensions.
 
@@ -433,13 +389,11 @@ Arbitrary: `object-[25%_75%]`.
 
 ## 13. Aspect Ratio
 
-| Class           | CSS                                 |
-| --------------- | ----------------------------------- |
-| `aspect-square` | `1 / 1`                             |
-| `aspect-video`  | `16 / 9`                            |
-| `aspect-auto`   | `auto`                              |
-| `aspect-3/2`    | `3 / 2` (arbitrary ratio shorthand) |
-| `aspect-[4/3]`  | arbitrary                           |
+- **`aspect-square`** — `1 / 1`
+- **`aspect-video`** — `16 / 9`
+- **`aspect-auto`** — `auto`
+- **`aspect-3/2`** — `3 / 2` (arbitrary ratio shorthand)
+- **`aspect-[4/3]`** — arbitrary
 
 ```html
 <img class="aspect-3/2 w-full object-cover" src="..." />
@@ -452,13 +406,11 @@ Arbitrary: `object-[25%_75%]`.
 
 Multi-column layout — items flow into columns automatically.
 
-| Class          | CSS                                      |
-| -------------- | ---------------------------------------- |
-| `columns-3`    | 3 columns                                |
-| `columns-xs`   | column width ≈ 20rem (320px), count auto |
-| `columns-sm`   | column width ≈ 24rem (384px)             |
-| `columns-md`   | column width ≈ 28rem (448px)             |
-| `columns-auto` | `columns: auto`                          |
+- **`columns-3`** — 3 columns
+- **`columns-xs`** — column width ≈ 20rem (320px), count auto
+- **`columns-sm`** — column width ≈ 24rem (384px)
+- **`columns-md`** — column width ≈ 28rem (448px)
+- **`columns-auto`** — `columns: auto`
 
 Set gap with `gap-{size}` (the standard gap utilities):
 

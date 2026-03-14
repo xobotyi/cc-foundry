@@ -5,14 +5,12 @@ third-party providers.
 
 ## Model Aliases
 
-| Alias        | Resolves To             | Notes                                         |
-| ------------ | ----------------------- | --------------------------------------------- |
-| `default`    | Depends on account tier | Always available, even with `availableModels` |
-| `sonnet`     | Latest Sonnet (4.6)     | Daily coding tasks                            |
-| `opus`       | Latest Opus (4.6)       | Complex reasoning tasks                       |
-| `haiku`      | Latest Haiku            | Fast, simple tasks                            |
-| `sonnet[1m]` | Sonnet with 1M context  | Long sessions, large codebases                |
-| `opusplan`   | Opus + Sonnet hybrid    | Opus in plan mode, Sonnet in execution        |
+- `default` — depends on account tier. Always available, even with `availableModels`.
+- `sonnet` — latest Sonnet (4.6). Daily coding tasks.
+- `opus` — latest Opus (4.6). Complex reasoning tasks.
+- `haiku` — latest Haiku. Fast, simple tasks.
+- `sonnet[1m]` — Sonnet with 1M context. Long sessions, large codebases.
+- `opusplan` — Opus + Sonnet hybrid. Opus in plan mode, Sonnet in execution.
 
 Aliases always track the latest version. Pin with full model name (e.g., `claude-opus-4-6`) or override env vars.
 
@@ -22,23 +20,19 @@ Aliases always track the latest version. Pin with full model name (e.g., `claude
 
 Methods listed by precedence (highest first):
 
-| Method            | Syntax                         | Scope             |
-| ----------------- | ------------------------------ | ----------------- |
-| `/model` command  | `/model <alias\|name>`         | Current session   |
-| `--model` flag    | `claude --model <alias\|name>` | Startup           |
-| `ANTHROPIC_MODEL` | Environment variable           | Shell environment |
-| Settings `model`  | `"model": "opus"` in settings  | Persistent        |
+- `/model` command — syntax: `/model <alias|name>`. Scope: current session.
+- `--model` flag — syntax: `claude --model <alias|name>`. Scope: startup.
+- `ANTHROPIC_MODEL` — environment variable. Scope: shell environment.
+- Settings `model` — `"model": "opus"` in settings. Scope: persistent.
 
 ---
 
 ## Default Model by Account Type
 
-| Account Type        | Default Model                   |
-| ------------------- | ------------------------------- |
-| Max, Team Premium   | Opus 4.6                        |
-| Pro, Team Standard  | Sonnet 4.6                      |
-| Pay-as-you-go (API) | Sonnet 4.5                      |
-| Enterprise          | Opus 4.6 available, not default |
+- Max, Team Premium — Opus 4.6
+- Pro, Team Standard — Sonnet 4.6
+- Pay-as-you-go (API) — Sonnet 4.5
+- Enterprise — Opus 4.6 available, not default
 
 Claude Code may auto-fallback from Opus to Sonnet at usage thresholds.
 
@@ -67,10 +61,8 @@ Set `availableModels` in managed or policy settings to restrict selectable model
 
 Automated hybrid that switches models based on plan mode state:
 
-| Mode      | Model Used | Purpose                         |
-| --------- | ---------- | ------------------------------- |
-| Plan mode | `opus`     | Complex reasoning, architecture |
-| Execution | `sonnet`   | Code generation, implementation |
+- Plan mode — `opus`. Complex reasoning, architecture.
+- Execution — `sonnet`. Code generation, implementation.
 
 Set via any model-setting method: `/model opusplan`, `--model opusplan`, `ANTHROPIC_MODEL=opusplan`, or
 `"model": "opusplan"` in settings.
@@ -81,19 +73,15 @@ Set via any model-setting method: `/model opusplan`, `--model opusplan`, `ANTHRO
 
 Control Opus 4.6 adaptive reasoning depth. Only supported on Opus.
 
-| Level    | Behavior                                       |
-| -------- | ---------------------------------------------- |
-| `low`    | Faster, cheaper — straightforward tasks        |
-| `medium` | Balanced reasoning                             |
-| `high`   | Deepest reasoning — complex problems (default) |
+- `low` — faster, cheaper; straightforward tasks
+- `medium` — balanced reasoning
+- `high` — deepest reasoning; complex problems (default)
 
 **Setting effort:**
 
-| Method               | How                                          |
-| -------------------- | -------------------------------------------- |
-| `/model` picker      | Left/right arrow keys for effort slider      |
-| Environment variable | `CLAUDE_CODE_EFFORT_LEVEL=low\|medium\|high` |
-| Settings             | `"effortLevel": "low\|medium\|high"`         |
+- `/model` picker — left/right arrow keys for effort slider
+- Environment variable — `CLAUDE_CODE_EFFORT_LEVEL=low|medium|high`
+- Settings — `"effortLevel": "low|medium|high"`
 
 ---
 
@@ -109,10 +97,8 @@ usage, not subscription.
 
 **Availability:**
 
-| Account Type                | Access                       |
-| --------------------------- | ---------------------------- |
-| API / pay-as-you-go         | Full access                  |
-| Pro, Max, Teams, Enterprise | Requires extra usage enabled |
+- API / pay-as-you-go — full access
+- Pro, Max, Teams, Enterprise — requires extra usage enabled
 
 ---
 
@@ -121,12 +107,10 @@ usage, not subscription.
 Override which concrete model each alias resolves to. Values must be full model names (or provider-specific
 equivalents).
 
-| Variable                         | Controls                                     |
-| -------------------------------- | -------------------------------------------- |
-| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `opus` alias; `opusplan` in plan mode        |
-| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `sonnet` alias; `opusplan` in execution mode |
-| `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `haiku` alias; background functionality      |
-| `CLAUDE_CODE_SUBAGENT_MODEL`     | Model used by subagents                      |
+- `ANTHROPIC_DEFAULT_OPUS_MODEL` — `opus` alias; `opusplan` in plan mode
+- `ANTHROPIC_DEFAULT_SONNET_MODEL` — `sonnet` alias; `opusplan` in execution mode
+- `ANTHROPIC_DEFAULT_HAIKU_MODEL` — `haiku` alias; background functionality
+- `CLAUDE_CODE_SUBAGENT_MODEL` — model used by subagents
 
 `ANTHROPIC_SMALL_FAST_MODEL` is deprecated — use `ANTHROPIC_DEFAULT_HAIKU_MODEL`.
 
@@ -137,11 +121,9 @@ equivalents).
 When using Bedrock, Vertex AI, or Foundry, pin all three alias overrides to provider-specific version IDs. Without
 pinning, new Anthropic model releases can silently break users who lack access to the latest version.
 
-| Provider  | Example value for `ANTHROPIC_DEFAULT_OPUS_MODEL` |
-| --------- | ------------------------------------------------ |
-| Bedrock   | `us.anthropic.claude-opus-4-6-v1`                |
-| Vertex AI | `claude-opus-4-6`                                |
-| Foundry   | `claude-opus-4-6`                                |
+- Bedrock — `us.anthropic.claude-opus-4-6-v1`
+- Vertex AI — `claude-opus-4-6`
+- Foundry — `claude-opus-4-6`
 
 Apply the same pattern to `ANTHROPIC_DEFAULT_SONNET_MODEL` and `ANTHROPIC_DEFAULT_HAIKU_MODEL`.
 
@@ -153,12 +135,10 @@ Apply the same pattern to `ANTHROPIC_DEFAULT_SONNET_MODEL` and `ANTHROPIC_DEFAUL
 
 Claude Code uses prompt caching by default. Disable globally or per-model tier.
 
-| Variable                        | Effect                                        |
-| ------------------------------- | --------------------------------------------- |
-| `DISABLE_PROMPT_CACHING`        | `1` to disable all caching (overrides others) |
-| `DISABLE_PROMPT_CACHING_HAIKU`  | `1` to disable for Haiku only                 |
-| `DISABLE_PROMPT_CACHING_SONNET` | `1` to disable for Sonnet only                |
-| `DISABLE_PROMPT_CACHING_OPUS`   | `1` to disable for Opus only                  |
+- `DISABLE_PROMPT_CACHING` — `1` to disable all caching (overrides others)
+- `DISABLE_PROMPT_CACHING_HAIKU` — `1` to disable for Haiku only
+- `DISABLE_PROMPT_CACHING_SONNET` — `1` to disable for Sonnet only
+- `DISABLE_PROMPT_CACHING_OPUS` — `1` to disable for Opus only
 
 Global `DISABLE_PROMPT_CACHING` takes precedence over per-model variables.
 
@@ -166,7 +146,5 @@ Global `DISABLE_PROMPT_CACHING` takes precedence over per-model variables.
 
 ## Checking Current Model
 
-| Method      | How                                      |
-| ----------- | ---------------------------------------- |
-| Status line | If configured (see statusline reference) |
-| `/status`   | Shows model and account information      |
+- Status line — if configured (see statusline reference)
+- `/status` — shows model and account information

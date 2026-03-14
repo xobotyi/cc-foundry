@@ -7,14 +7,12 @@ type.
 
 ### Standard Homelab Segments
 
-| VLAN | Purpose       | Trust Level | Example Devices                             |
-| ---- | ------------- | ----------- | ------------------------------------------- |
-| 10   | Management    | High        | Hypervisors, switches, routers, IPMI/iLO    |
-| 20   | Trusted / Lab | High        | VMs, Docker hosts, Kubernetes nodes         |
-| 30   | IoT           | Low         | Smart home, cameras, sensors, media players |
-| 40   | Guest         | None        | Guest Wi-Fi, visitor devices                |
-| 50   | Storage       | High        | NAS, iSCSI targets, backup servers          |
-| 99   | DMZ           | Medium      | Publicly exposed services                   |
+- VLAN 10 — Management (High trust): hypervisors, switches, routers, IPMI/iLO
+- VLAN 20 — Trusted / Lab (High trust): VMs, Docker hosts, Kubernetes nodes
+- VLAN 30 — IoT (Low trust): smart home, cameras, sensors, media players
+- VLAN 40 — Guest (No trust): guest Wi-Fi, visitor devices
+- VLAN 50 — Storage (High trust): NAS, iSCSI targets, backup servers
+- VLAN 99 — DMZ (Medium trust): publicly exposed services
 
 Adapt to your environment. The specific VLAN IDs don't matter -- consistency does.
 

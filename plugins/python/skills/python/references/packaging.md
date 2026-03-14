@@ -73,14 +73,12 @@ addopts = "-ra -q"
 
 ## Build Backends
 
-| Backend       | When to Use                                                           |
-| ------------- | --------------------------------------------------------------------- |
-| `hatchling`   | Default choice for new projects. Fast, configurable, well-maintained. |
-| `flit-core`   | Minimal projects with no custom build steps.                          |
-| `setuptools`  | Legacy projects, C extensions, complex build requirements.            |
-| `maturin`     | Rust extension modules (PyO3).                                        |
-| `uv-build`    | Projects already using uv as their primary tool.                      |
-| `pdm-backend` | If already using PDM as project manager.                              |
+- **`hatchling`** — default choice for new projects: fast, configurable, well-maintained
+- **`flit-core`** — minimal projects with no custom build steps
+- **`setuptools`** — legacy projects, C extensions, complex build requirements
+- **`maturin`** — Rust extension modules (PyO3)
+- **`uv-build`** — projects already using uv as their primary tool
+- **`pdm-backend`** — if already using PDM as project manager
 
 Build system declaration examples:
 

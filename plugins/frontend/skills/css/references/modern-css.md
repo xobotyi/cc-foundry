@@ -130,14 +130,12 @@ Style components based on their container's size, not the viewport.
 
 ### Container Query Units
 
-| Unit    | Meaning                     |
-| ------- | --------------------------- |
-| `cqw`   | 1% of container width       |
-| `cqh`   | 1% of container height      |
-| `cqi`   | 1% of container inline size |
-| `cqb`   | 1% of container block size  |
-| `cqmin` | smaller of `cqi` or `cqb`   |
-| `cqmax` | larger of `cqi` or `cqb`    |
+- `cqw` — 1% of container width
+- `cqh` — 1% of container height
+- `cqi` — 1% of container inline size
+- `cqb` — 1% of container block size
+- `cqmin` — smaller of `cqi` or `cqb`
+- `cqmax` — larger of `cqi` or `cqb`
 
 ```css
 /* Fluid font size based on container, not viewport */

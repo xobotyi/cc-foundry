@@ -169,11 +169,9 @@ Composables must be called:
 
 ## Composables vs Alternatives
 
-| Technique             | Drawback                                                          |
-| --------------------- | ----------------------------------------------------------------- |
-| Mixins                | Unclear property sources, namespace collisions, implicit coupling |
-| Renderless components | Extra component instance overhead                                 |
-| Utility functions     | No reactive state or lifecycle hooks                              |
+- **Mixins** — Unclear property sources, namespace collisions, implicit coupling
+- **Renderless components** — Extra component instance overhead
+- **Utility functions** — No reactive state or lifecycle hooks
 
 Composables solve all three — they're explicit, namespaced through destructuring, and integrate with Vue's reactivity
 and lifecycle.

@@ -17,19 +17,17 @@ Auto-discovers: `*.test.{js,jsx,ts,tsx}`, `*_test.*`, `*.spec.*`, `*_spec.*`.
 
 ### Key CLI Flags
 
-| Flag                 | Default | Description                                   |
-| -------------------- | ------- | --------------------------------------------- |
-| `--timeout`          | 5000    | Per-test timeout (ms)                         |
-| `--bail`             | -       | Stop after N failures                         |
-| `--retry`            | 0       | Retry failed tests N times                    |
-| `--concurrent`       | false   | Run tests in parallel                         |
-| `--max-concurrency`  | 20      | Max parallel tests                            |
-| `--rerun-each`       | 0       | Run each test N extra times                   |
-| `--randomize`        | false   | Random execution order                        |
-| `--seed`             | -       | Reproducible random order                     |
-| `--update-snapshots` | false   | Update snapshot files                         |
-| `--preload`          | -       | Scripts to run before tests                   |
-| `--reporter=junit`   | -       | JUnit XML output (needs `--reporter-outfile`) |
+- **`--timeout`** (default: 5000) — Per-test timeout (ms)
+- **`--bail`** — Stop after N failures
+- **`--retry`** (default: 0) — Retry failed tests N times
+- **`--concurrent`** (default: false) — Run tests in parallel
+- **`--max-concurrency`** (default: 20) — Max parallel tests
+- **`--rerun-each`** (default: 0) — Run each test N extra times
+- **`--randomize`** (default: false) — Random execution order
+- **`--seed`** — Reproducible random order
+- **`--update-snapshots`** (default: false) — Update snapshot files
+- **`--preload`** — Scripts to run before tests
+- **`--reporter=junit`** — JUnit XML output (needs `--reporter-outfile`)
 
 ### AI Agent Mode
 
@@ -62,17 +60,15 @@ Timed-out tests throw uncatchable exceptions. Child processes spawned in the tes
 
 ### Test Modifiers
 
-| Modifier                      | Effect                                         |
-| ----------------------------- | ---------------------------------------------- |
-| `test.skip(name, fn)`         | Skip this test                                 |
-| `test.todo(name, fn)`         | Mark as TODO (not run)                         |
-| `test.only(name, fn)`         | Run only this test (needs `--only`)            |
-| `test.if(cond)(name, fn)`     | Run if condition is truthy                     |
-| `test.skipIf(cond)(name, fn)` | Skip if condition is truthy                    |
-| `test.todoIf(cond)(name, fn)` | TODO if condition is truthy                    |
-| `test.failing(name, fn)`      | Pass if test fails, fail if it passes          |
-| `test.concurrent(name, fn)`   | Run concurrently (even without `--concurrent`) |
-| `test.serial(name, fn)`       | Force sequential (even with `--concurrent`)    |
+- **`test.skip(name, fn)`** — Skip this test
+- **`test.todo(name, fn)`** — Mark as TODO (not run)
+- **`test.only(name, fn)`** — Run only this test (needs `--only`)
+- **`test.if(cond)(name, fn)`** — Run if condition is truthy
+- **`test.skipIf(cond)(name, fn)`** — Skip if condition is truthy
+- **`test.todoIf(cond)(name, fn)`** — TODO if condition is truthy
+- **`test.failing(name, fn)`** — Pass if test fails, fail if it passes
+- **`test.concurrent(name, fn)`** — Run concurrently (even without `--concurrent`)
+- **`test.serial(name, fn)`** — Force sequential (even with `--concurrent`)
 
 Modifiers chain: `test.failing.each([...])("name %d", fn)`.
 
@@ -162,17 +158,15 @@ fn.mock.results;   // [{ type: "return", value: 42 }]
 
 ### Mock Methods
 
-| Method                        | Description                           |
-| ----------------------------- | ------------------------------------- |
-| `.mockImplementation(fn)`     | Set implementation                    |
-| `.mockImplementationOnce(fn)` | Set for next call only                |
-| `.mockReturnValue(val)`       | Set return value                      |
-| `.mockReturnValueOnce(val)`   | Set for next call only                |
-| `.mockResolvedValue(val)`     | Set resolved promise value            |
-| `.mockRejectedValue(val)`     | Set rejected promise value            |
-| `.mockClear()`                | Clear call history                    |
-| `.mockReset()`                | Clear history + remove implementation |
-| `.mockRestore()`              | Restore original implementation       |
+- **`.mockImplementation(fn)`** — Set implementation
+- **`.mockImplementationOnce(fn)`** — Set for next call only
+- **`.mockReturnValue(val)`** — Set return value
+- **`.mockReturnValueOnce(val)`** — Set for next call only
+- **`.mockResolvedValue(val)`** — Set resolved promise value
+- **`.mockRejectedValue(val)`** — Set rejected promise value
+- **`.mockClear()`** — Clear call history
+- **`.mockReset()`** — Clear history + remove implementation
+- **`.mockRestore()`** — Restore original implementation
 
 ### Spies
 

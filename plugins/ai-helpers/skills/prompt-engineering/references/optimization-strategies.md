@@ -13,11 +13,9 @@ Approaches to improving LLM performance for specific use cases.
 
 ## The Three Pillars
 
-| Method             | What It Does           | Cost   | When to Use                |
-| ------------------ | ---------------------- | ------ | -------------------------- |
-| Prompt Engineering | Craft better inputs    | Low    | Always (foundation)        |
-| RAG                | Add external knowledge | Medium | Need current/accurate data |
-| Fine-tuning        | Train on domain data   | High   | Need deep domain expertise |
+- **Prompt Engineering** — Craft better inputs. Cost: low. Use: always (foundation)
+- **RAG** — Add external knowledge. Cost: medium. Use: need current/accurate data
+- **Fine-tuning** — Train on domain data. Cost: high. Use: need deep domain expertise
 
 These aren't mutually exclusive — combine for best results.
 

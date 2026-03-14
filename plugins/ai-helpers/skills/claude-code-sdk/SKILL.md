@@ -14,19 +14,28 @@ debugging any Claude Code extension mechanism.
 
 ## References
 
-| Topic          | Reference                                            | Contents                                                                                                                                                       |
-| -------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Skills         | [`${CLAUDE_SKILL_DIR}/references/skills.md`]         | Frontmatter fields, invocation control matrix, string substitutions, dynamic context injection, subagent execution, nested discovery, sharing                  |
-| Subagents      | [`${CLAUDE_SKILL_DIR}/references/subagents.md`]      | Built-in agents table, frontmatter fields, permission modes, tool control, preloading skills, persistent memory, worktree isolation, CLI-defined agents, teams |
-| Plugins        | [`${CLAUDE_SKILL_DIR}/references/plugins.md`]        | Plugin manifest schema, component paths, marketplace schema, source types, strict mode, version resolution, LSP server table, caching, validation              |
-| Hooks          | [`${CLAUDE_SKILL_DIR}/references/hooks.md`]          | All 15 event details (input fields, output schemas, exit code behavior), matcher patterns, hook types (command/prompt/agent), async hooks, security            |
-| MCP            | [`${CLAUDE_SKILL_DIR}/references/mcp.md`]            | Server installation (HTTP/SSE/stdio), scopes, OAuth authentication, environment variable expansion, managed MCP config, tool search, plugin-provided servers   |
-| Memory         | [`${CLAUDE_SKILL_DIR}/references/memory.md`]         | CLAUDE.md hierarchy and loading, auto memory structure, import syntax, modular rules with path scoping, organization-level management                          |
-| Model config   | [`${CLAUDE_SKILL_DIR}/references/model-config.md`]   | Model aliases, setting methods, effort levels, extended context (1M), opusplan mode, third-party provider pinning, prompt caching env vars                     |
-| Output styles  | [`${CLAUDE_SKILL_DIR}/references/output-styles.md`]  | Built-in styles, frontmatter fields, keep-coding-instructions flag, comparison with CLAUDE.md/agents/skills                                                    |
-| Settings       | [`${CLAUDE_SKILL_DIR}/references/settings.md`]       | Scope hierarchy, permission rule syntax, sandbox config, common settings table, environment variables (API, behavior, feature toggles, paths), tools list      |
-| Status line    | [`${CLAUDE_SKILL_DIR}/references/statusline.md`]     | Configuration, JSON input schema with all fields, ANSI colors, clickable links, caching, plugin delivery                                                       |
-| Best practices | [`${CLAUDE_SKILL_DIR}/references/best-practices.md`] | Context management, verification patterns, explore-plan-code workflow, CLAUDE.md authoring, session management, automation/scaling                             |
+- **Skills** — [`${CLAUDE_SKILL_DIR}/references/skills.md`] Frontmatter fields, invocation control matrix, string
+  substitutions, dynamic context injection, subagent execution, nested discovery, sharing
+- **Subagents** — [`${CLAUDE_SKILL_DIR}/references/subagents.md`] Built-in agents table, frontmatter fields, permission
+  modes, tool control, preloading skills, persistent memory, worktree isolation, CLI-defined agents, teams
+- **Plugins** — [`${CLAUDE_SKILL_DIR}/references/plugins.md`] Plugin manifest schema, component paths, marketplace
+  schema, source types, strict mode, version resolution, LSP server table, caching, validation
+- **Hooks** — [`${CLAUDE_SKILL_DIR}/references/hooks.md`] All 15 event details (input fields, output schemas, exit code
+  behavior), matcher patterns, hook types (command/prompt/agent), async hooks, security
+- **MCP** — [`${CLAUDE_SKILL_DIR}/references/mcp.md`] Server installation (HTTP/SSE/stdio), scopes, OAuth
+  authentication, environment variable expansion, managed MCP config, tool search, plugin-provided servers
+- **Memory** — [`${CLAUDE_SKILL_DIR}/references/memory.md`] CLAUDE.md hierarchy and loading, auto memory structure,
+  import syntax, modular rules with path scoping, organization-level management
+- **Model config** — [`${CLAUDE_SKILL_DIR}/references/model-config.md`] Model aliases, setting methods, effort levels,
+  extended context (1M), opusplan mode, third-party provider pinning, prompt caching env vars
+- **Output styles** — [`${CLAUDE_SKILL_DIR}/references/output-styles.md`] Built-in styles, frontmatter fields,
+  keep-coding-instructions flag, comparison with CLAUDE.md/agents/skills
+- **Settings** — [`${CLAUDE_SKILL_DIR}/references/settings.md`] Scope hierarchy, permission rule syntax, sandbox config,
+  common settings table, environment variables (API, behavior, feature toggles, paths), tools list
+- **Status line** — [`${CLAUDE_SKILL_DIR}/references/statusline.md`] Configuration, JSON input schema with all fields,
+  ANSI colors, clickable links, caching, plugin delivery
+- **Best practices** — [`${CLAUDE_SKILL_DIR}/references/best-practices.md`] Context management, verification patterns,
+  explore-plan-code workflow, CLAUDE.md authoring, session management, automation/scaling
 
 Read the relevant reference before making detailed changes. The rules below cover the decision framework; references
 provide field-level schemas and implementation details.
@@ -104,21 +113,19 @@ causes friction or failure.
 
 When creating a skill, the content pattern determines frontmatter:
 
-| Pattern                                   | `context` | `disable-model-invocation` | Typical trigger |
-| ----------------------------------------- | --------- | -------------------------- | --------------- |
-| Reference content (conventions, patterns) | (inline)  | `false`                    | Auto or manual  |
-| Task content (deploy, generate, commit)   | `fork`    | `true`                     | Manual only     |
+- **Reference content** (conventions, patterns) — `context`: inline, `disable-model-invocation`: `false`. Trigger: auto
+  or manual.
+- **Task content** (deploy, generate, commit) — `context`: `fork`, `disable-model-invocation`: `true`. Trigger: manual
+  only.
 
 Reference content runs inline so Claude uses it alongside conversation context. Task content runs in a subagent — the
 skill content becomes the subagent's prompt, and it has no access to conversation history.
 
 ### Skill Invocation Control
 
-| Frontmatter                      | User invokes | Claude invokes | Context load                                |
-| -------------------------------- | ------------ | -------------- | ------------------------------------------- |
-| (default)                        | Yes          | Yes            | Description always; full skill when invoked |
-| `disable-model-invocation: true` | Yes          | No             | Neither description nor full skill          |
-| `user-invocable: false`          | No           | Yes            | Description always; full skill when invoked |
+- **(default)** — user: yes, Claude: yes. Description always loaded; full skill when invoked.
+- **`disable-model-invocation: true`** — user: yes, Claude: no. Neither description nor full skill loaded.
+- **`user-invocable: false`** — user: no, Claude: yes. Description always loaded; full skill when invoked.
 
 `user-invocable: false` hides from `/` menu but does not block the Skill tool. To block programmatic invocation
 entirely, use `disable-model-invocation: true`.
@@ -128,13 +135,11 @@ excluded skills.
 
 ### Subagent Selection
 
-| Need                                       | Solution                                   |
-| ------------------------------------------ | ------------------------------------------ |
-| Read-only codebase exploration             | Built-in `Explore` agent                   |
-| Plan mode research                         | Built-in `Plan` agent                      |
-| Complex multi-step task with tools         | Built-in `general-purpose` agent           |
-| Specialized role with custom system prompt | Custom agent in `.claude/agents/`          |
-| Skill that runs in isolation               | Skill with `context: fork` + `agent` field |
+- **Read-only codebase exploration** — built-in `Explore` agent
+- **Plan mode research** — built-in `Plan` agent
+- **Complex multi-step task with tools** — built-in `general-purpose` agent
+- **Specialized role with custom system prompt** — custom agent in `.claude/agents/`
+- **Skill that runs in isolation** — skill with `context: fork` + `agent` field
 
 Skills with `context: fork` write the task in the skill and pick an agent type. Custom subagents get their own system
 prompt and load skills as reference content. Use custom subagents when the agent needs a persistent identity, tool
@@ -142,11 +147,9 @@ restrictions, or persistent memory across sessions.
 
 ### Hook Type Selection
 
-| Type      | Use when                                            | Timeout |
-| --------- | --------------------------------------------------- | ------- |
-| `command` | Deterministic check (lint, validate, format)        | 600s    |
-| `prompt`  | LLM judgment on hook input data alone               | 30s     |
-| `agent`   | LLM judgment that needs file inspection or commands | 60s     |
+- **`command`** — deterministic check (lint, validate, format). Timeout: 600s
+- **`prompt`** — LLM judgment on hook input data alone. Timeout: 30s
+- **`agent`** — LLM judgment that needs file inspection or commands. Timeout: 60s
 
 Command hooks are the default. Use prompt hooks when the decision requires understanding intent (not just pattern
 matching). Use agent hooks when verification requires reading files or running commands.
@@ -156,12 +159,10 @@ All matching hooks run in parallel. Exit code 2 blocks the operation (for blocki
 
 ### Settings Scope Selection
 
-| Need                                  | Scope   | Location                      |
-| ------------------------------------- | ------- | ----------------------------- |
-| Organization policy (cannot override) | Managed | System paths                  |
-| Personal preferences across projects  | User    | `~/.claude/settings.json`     |
-| Team-shared project config            | Project | `.claude/settings.json`       |
-| Personal project-specific config      | Local   | `.claude/settings.local.json` |
+- **Organization policy (cannot override)** — Managed scope. Location: system paths
+- **Personal preferences across projects** — User scope. Location: `~/.claude/settings.json`
+- **Team-shared project config** — Project scope. Location: `.claude/settings.json`
+- **Personal project-specific config** — Local scope. Location: `.claude/settings.local.json`
 
 Precedence: managed > CLI args > local > project > user. Permission evaluation order: deny > ask > allow (first match
 wins).
@@ -170,12 +171,10 @@ wins).
 
 ### Skill Locations
 
-| Scope      | Path                               |
-| ---------- | ---------------------------------- |
-| Enterprise | Managed settings                   |
-| Personal   | `~/.claude/skills/<name>/SKILL.md` |
-| Project    | `.claude/skills/<name>/SKILL.md`   |
-| Plugin     | `<plugin>/skills/<name>/SKILL.md`  |
+- **Enterprise** — managed settings
+- **Personal** — `~/.claude/skills/<name>/SKILL.md`
+- **Project** — `.claude/skills/<name>/SKILL.md`
+- **Plugin** — `<plugin>/skills/<name>/SKILL.md`
 
 ### Plugin Layout
 
@@ -199,43 +198,37 @@ plugin-name/
 
 ### Hook Events (15)
 
-| Event                | When                       | Can Block |
-| -------------------- | -------------------------- | --------- |
-| `SessionStart`       | Session begins/resumes     | No        |
-| `UserPromptSubmit`   | Before prompt processing   | Yes       |
-| `PreToolUse`         | Before tool executes       | Yes       |
-| `PermissionRequest`  | Permission dialog shown    | Yes       |
-| `PostToolUse`        | After tool success         | No        |
-| `PostToolUseFailure` | After tool failure         | No        |
-| `Notification`       | Notification sent          | No        |
-| `SubagentStart`      | Subagent spawned           | No        |
-| `SubagentStop`       | Subagent finishes          | Yes       |
-| `Stop`               | Claude finishes responding | Yes       |
-| `TeammateIdle`       | Teammate going idle        | Yes       |
-| `TaskCompleted`      | Task marked complete       | Yes       |
-| `ConfigChange`       | Config file changes        | Yes       |
-| `PreCompact`         | Before compaction          | No        |
-| `SessionEnd`         | Session terminates         | No        |
+- `SessionStart` — session begins/resumes. Cannot block.
+- `UserPromptSubmit` — before prompt processing. Can block.
+- `PreToolUse` — before tool executes. Can block.
+- `PermissionRequest` — permission dialog shown. Can block.
+- `PostToolUse` — after tool success. Cannot block.
+- `PostToolUseFailure` — after tool failure. Cannot block.
+- `Notification` — notification sent. Cannot block.
+- `SubagentStart` — subagent spawned. Cannot block.
+- `SubagentStop` — subagent finishes. Can block.
+- `Stop` — Claude finishes responding. Can block.
+- `TeammateIdle` — teammate going idle. Can block.
+- `TaskCompleted` — task marked complete. Can block.
+- `ConfigChange` — config file changes. Can block.
+- `PreCompact` — before compaction. Cannot block.
+- `SessionEnd` — session terminates. Cannot block.
 
 ### Settings Scopes
 
-| Scope   | Location                      | Shared   |
-| ------- | ----------------------------- | -------- |
-| Managed | System path                   | Org-wide |
-| User    | `~/.claude/settings.json`     | No       |
-| Project | `.claude/settings.json`       | Git      |
-| Local   | `.claude/settings.local.json` | No       |
+- **Managed** — system path. Shared org-wide.
+- **User** — `~/.claude/settings.json`. Not shared.
+- **Project** — `.claude/settings.json`. Shared via Git.
+- **Local** — `.claude/settings.local.json`. Not shared.
 
 ### Memory Hierarchy
 
-| Type           | Location                               | Shared                 |
-| -------------- | -------------------------------------- | ---------------------- |
-| Managed policy | System paths                           | Org-wide               |
-| User memory    | `~/.claude/CLAUDE.md`                  | Personal, all projects |
-| Project memory | `./CLAUDE.md` or `.claude/CLAUDE.md`   | Team via VCS           |
-| Project rules  | `.claude/rules/*.md`                   | Team via VCS           |
-| Local memory   | `./CLAUDE.local.md`                    | Personal, this project |
-| Auto memory    | `~/.claude/projects/<project>/memory/` | Personal, per project  |
+- **Managed policy** — system paths. Shared org-wide.
+- **User memory** — `~/.claude/CLAUDE.md`. Personal, all projects.
+- **Project memory** — `./CLAUDE.md` or `.claude/CLAUDE.md`. Team via VCS.
+- **Project rules** — `.claude/rules/*.md`. Team via VCS.
+- **Local memory** — `./CLAUDE.local.md`. Personal, this project.
+- **Auto memory** — `~/.claude/projects/<project>/memory/`. Personal, per project.
 
 More specific memory takes precedence. CLAUDE.md in parent directories loads automatically; child directories load on
 demand when working in those paths.

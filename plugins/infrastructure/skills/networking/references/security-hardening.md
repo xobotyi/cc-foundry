@@ -51,12 +51,10 @@ individual public keys, a central CA signs short-lived certificates.
 
 **Key benefits over static keys:**
 
-| Aspect       | Static Keys                          | SSH Certificates               |
-| ------------ | ------------------------------------ | ------------------------------ |
-| Provisioning | Update authorized_keys on every host | One-time CA key distribution   |
-| Scalability  | O(users \* hosts)                    | O(1) -- CA key on each host    |
-| Revocation   | Manual removal from every server     | Natural expiry (short-lived)   |
-| Identity     | Bound to key file                    | Bound to identity (principals) |
+- Provisioning — Static Keys: update authorized_keys on every host; SSH Certificates: one-time CA key distribution
+- Scalability — Static Keys: O(users × hosts); SSH Certificates: O(1), CA key on each host
+- Revocation — Static Keys: manual removal from every server; SSH Certificates: natural expiry (short-lived)
+- Identity — Static Keys: bound to key file; SSH Certificates: bound to identity (principals)
 
 **Provisioners** control who can request certificates:
 
@@ -155,14 +153,23 @@ labels:
 
 **CrowdSec vs fail2ban:**
 
-| Aspect         | fail2ban                                | CrowdSec                                      |
-| -------------- | --------------------------------------- | --------------------------------------------- |
-| Detection      | Regex patterns on logs                  | YAML scenarios (leakspeed/capacity/blackhole) |
-| Intelligence   | Local only                              | Community-shared threat data                  |
-| Remediation    | iptables/nftables actions               | Pluggable Bouncers (firewall, proxy, CDN)     |
-| Configuration  | jail.conf + filter.d                    | acquis.yaml + Hub collections                 |
-| Scaling        | Single host                             | Multi-host with shared decisions              |
-| Resource usage | Low RAM, struggles with high log volume | Configurable cache_size for memory control    |
+**fail2ban:**
+
+- Detection: Regex patterns on logs
+- Intelligence: Local only
+- Remediation: iptables/nftables actions
+- Configuration: jail.conf + filter.d
+- Scaling: Single host
+- Resource usage: Low RAM, struggles with high log volume
+
+**CrowdSec:**
+
+- Detection: YAML scenarios (leakspeed/capacity/blackhole)
+- Intelligence: Community-shared threat data
+- Remediation: Pluggable Bouncers (firewall, proxy, CDN)
+- Configuration: acquis.yaml + Hub collections
+- Scaling: Multi-host with shared decisions
+- Resource usage: Configurable cache_size for memory control
 
 Both can run simultaneously. CrowdSec is the stronger choice for new deployments due to community intelligence and the
 separation of detection from remediation.
@@ -238,15 +245,13 @@ support SNMPv2c or SNMPv3.
 
 ### What to Monitor
 
-| Metric                            | Source                      | Why                                  |
-| --------------------------------- | --------------------------- | ------------------------------------ |
-| Interface traffic (bytes/packets) | SNMP / node_exporter        | Capacity planning, anomaly detection |
-| Error/discard counters            | SNMP                        | Failing cables, duplex mismatch      |
-| DNS query rate and latency        | Pi-hole/AdGuard metrics     | Detect DNS issues or abuse           |
-| Certificate expiry                | blackbox_exporter           | Prevent outages from expired certs   |
-| Firewall rule hit counts          | nftables counters           | Identify unused rules, detect scans  |
-| VPN peer status                   | WireGuard/Tailscale metrics | Detect tunnel failures               |
-| Uptime/reachability               | blackbox_exporter ICMP      | Service availability                 |
+- Interface traffic (bytes/packets) — SNMP / node_exporter: capacity planning, anomaly detection
+- Error/discard counters — SNMP: failing cables, duplex mismatch
+- DNS query rate and latency — Pi-hole/AdGuard metrics: detect DNS issues or abuse
+- Certificate expiry — blackbox_exporter: prevent outages from expired certs
+- Firewall rule hit counts — nftables counters: identify unused rules, detect scans
+- VPN peer status — WireGuard/Tailscale metrics: detect tunnel failures
+- Uptime/reachability — blackbox_exporter ICMP: service availability
 
 ### Service Health and Auto-Restart
 

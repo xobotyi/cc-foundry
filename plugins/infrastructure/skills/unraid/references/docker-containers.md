@@ -10,12 +10,10 @@
 
 ## Network Modes
 
-| Mode                    | Behavior                                              | When to Use                                    |
-| ----------------------- | ----------------------------------------------------- | ---------------------------------------------- |
-| Bridge (default)        | Internal Docker network, only mapped ports accessible | Most applications -- safest option             |
-| Host                    | Shares server's network stack, all ports available    | Applications requiring direct network access   |
-| None                    | No network access                                     | Isolated workloads                             |
-| Custom (macvlan/ipvlan) | Container gets its own LAN IP                         | Services needing to appear as separate devices |
+- **Bridge** (default) — Internal Docker network, only mapped ports accessible. Most applications; safest option
+- **Host** — Shares server's network stack, all ports available. Applications requiring direct network access
+- **None** — No network access. Isolated workloads
+- **Custom** (macvlan/ipvlan) — Container gets its own LAN IP. Services needing to appear as separate devices
 
 ### macvlan vs ipvlan Stability
 
@@ -153,11 +151,9 @@ Host: /mnt/user/data           ->  Container: /data        (working data)
 
 Common variables across containers:
 
-| Variable        | Purpose                                        |
-| --------------- | ---------------------------------------------- |
-| `PUID` / `PGID` | Run container processes as specific user/group |
-| `TZ`            | Timezone (e.g., `America/New_York`)            |
-| `UMASK`         | File permission mask                           |
+- `PUID` / `PGID` — Run container processes as specific user/group
+- `TZ` — Timezone (e.g., `America/New_York`)
+- `UMASK` — File permission mask
 
 Use environment variables for all configuration -- enhances portability and security.
 

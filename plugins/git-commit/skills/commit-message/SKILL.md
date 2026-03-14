@@ -195,15 +195,13 @@ git standards.
 
 ### Common Trailers
 
-| Trailer           | Purpose                   | Example                                      |
-| ----------------- | ------------------------- | -------------------------------------------- |
-| `Task:`           | Link to issue tracker     | `Task: https://tracker.example.com/PROJ-123` |
-| `Fixes:`          | Issue this commit fixes   | `Fixes: #456` or `Fixes: PROJ-456`           |
-| `Refs:`           | Related issues/commits    | `Refs: #123, #124`                           |
-| `Closes:`         | Auto-close issue on merge | `Closes: #789`                               |
-| `See:`            | Related documentation     | `See: docs/auth.md`                          |
-| `Reviewed-By:`    | Code reviewer             | `Reviewed-By: Alice <alice@example.com>`     |
-| `Co-Authored-By:` | Additional authors        | `Co-Authored-By: Bob <bob@example.com>`      |
+- `Task:` — link to issue tracker — `Task: https://tracker.example.com/PROJ-123`
+- `Fixes:` — issue this commit fixes — `Fixes: #456` or `Fixes: PROJ-456`
+- `Refs:` — related issues/commits — `Refs: #123, #124`
+- `Closes:` — auto-close issue on merge — `Closes: #789`
+- `See:` — related documentation — `See: docs/auth.md`
+- `Reviewed-By:` — code reviewer — `Reviewed-By: Alice <alice@example.com>`
+- `Co-Authored-By:` — additional authors — `Co-Authored-By: Bob <bob@example.com>`
 
 <trailer-conventions>
 - All trailers use Title-Case keys

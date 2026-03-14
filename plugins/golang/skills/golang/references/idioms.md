@@ -8,13 +8,11 @@ Naming conventions, declaration patterns, interface design, receivers, configura
 
 The distance rule: name length scales with scope distance.
 
-| Scope                | Style            | Examples                          |
-| -------------------- | ---------------- | --------------------------------- |
-| Loop index           | Single letter    | `i`, `j`, `k`                     |
-| Short function local | 1-3 chars        | `r` (reader), `b` (buffer), `ctx` |
-| Function parameter   | Short but clear  | `name`, `path`, `opts`            |
-| Package-level        | Descriptive      | `defaultTimeout`, `maxRetries`    |
-| Exported             | Self-documenting | `ErrNotFound`, `DefaultClient`    |
+- **Loop index** — single letter: `i`, `j`, `k`
+- **Short function local** — 1-3 chars: `r` (reader), `b` (buffer), `ctx`
+- **Function parameter** — short but clear: `name`, `path`, `opts`
+- **Package-level** — descriptive: `defaultTimeout`, `maxRetries`
+- **Exported** — self-documenting: `ErrNotFound`, `DefaultClient`
 
 **Receivers**: 1-2 letter abbreviation of the type. `c` for `Client`, `s` for `Server`. Never `self`, `this`, `me`. Be
 consistent — if one method uses `c`, all methods use `c`.

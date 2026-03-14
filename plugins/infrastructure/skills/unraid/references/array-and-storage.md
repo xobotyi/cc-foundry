@@ -15,11 +15,11 @@ slots. Ideal for all-SSD/NVMe builds.
 
 ## Write Modes
 
-| Mode                        | Speed (Typical)                        | Power Usage | Drives Spinning      | Best Use Case                                |
-| --------------------------- | -------------------------------------- | ----------- | -------------------- | -------------------------------------------- |
-| Read/Modify/Write (default) | 20-40 MB/s                             | Low         | Only parity + target | Most workloads, energy savings, small writes |
-| Turbo Write (Reconstruct)   | 40-120 MB/s                            | High        | All drives           | Large file transfers, array rebuilds         |
-| Cache Write (SSD/NVMe)      | 50-110 MB/s (SSD), 250-900 MB/s (NVMe) | Varies      | Cache drives only    | Apps, VMs, frequent writes                   |
+- **Read/Modify/Write** (default) — 20-40 MB/s, low power, only parity + target drives spinning. Most workloads, energy
+  savings, small writes
+- **Turbo Write** (Reconstruct) — 40-120 MB/s, high power, all drives spinning. Large file transfers, array rebuilds
+- **Cache Write** (SSD/NVMe) — 50-110 MB/s (SSD), 250-900 MB/s (NVMe), varies, cache drives only. Apps, VMs, frequent
+  writes
 
 ### Turbo Write
 
@@ -128,11 +128,10 @@ Typical result: array drives spun down 90%+ of the time, ~30-45W savings dependi
 
 ## Allocation Methods
 
-| Method               | Behavior                                                                      | Best For                                 |
-| -------------------- | ----------------------------------------------------------------------------- | ---------------------------------------- |
-| High-Water (default) | Progressively fills disks using switch points based on half the largest drive | Media servers, mixed drive sizes         |
-| Most-Free            | Always writes to disk with most free space                                    | High-throughput workflows, video editing |
-| Fill-Up              | Fills disks sequentially until minimum free space threshold                   | Static archives, identical drive sizes   |
+- **High-Water** (default) — Progressively fills disks using switch points based on half the largest drive. Media
+  servers, mixed drive sizes
+- **Most-Free** — Always writes to disk with most free space. High-throughput workflows, video editing
+- **Fill-Up** — Fills disks sequentially until minimum free space threshold. Static archives, identical drive sizes
 
 **Minimum Free Space**: set to 2x largest file size. Required for Fill-Up method. Split Level takes priority over free
 space -- may cause "out of space" errors even with available capacity.
@@ -141,12 +140,10 @@ space -- may cause "out of space" errors even with available capacity.
 
 Controls how directory trees span multiple disks:
 
-| Setting                   | Behavior                                | Use Case                       |
-| ------------------------- | --------------------------------------- | ------------------------------ |
-| Auto split any directory  | Creates folders on any disk as needed   | General data, downloads        |
-| Auto split top level only | First-level subfolders stay on one disk | Media libraries (Movies/Title) |
-| Auto split top N levels   | N levels managed automatically          | Complex nested projects        |
-| Manual (no auto split)    | Files only go where parent exists       | Archives, full manual control  |
+- **Auto split any directory** — Creates folders on any disk as needed. General data, downloads
+- **Auto split top level only** — First-level subfolders stay on one disk. Media libraries (Movies/Title)
+- **Auto split top N levels** — N levels managed automatically. Complex nested projects
+- **Manual (no auto split)** — Files only go where parent exists. Archives, full manual control
 
 ## Disk Management
 
@@ -168,22 +165,18 @@ Controls how directory trees span multiple disks:
 
 ### ZFS Pool Profiles
 
-| Profile | Redundancy   | Performance            | Space Efficiency | Recommended Drives    |
-| ------- | ------------ | ---------------------- | ---------------- | --------------------- |
-| Stripe  | None         | Fast but risky         | 100%             | Any number            |
-| Mirror  | 1:1          | Excellent random I/O   | 50%              | 2+ (add more mirrors) |
-| RAIDZ1  | 1 disk/vdev  | Fast sequential        | High             | 3-6 (max 8)           |
-| RAIDZ2  | 2 disks/vdev | Slightly slower writes | Moderate         | 6-12 (max 14)         |
-| RAIDZ3  | 3 disks/vdev | Most write overhead    | Lower            | 10-16 (max 20)        |
+- **Stripe** — No redundancy, fast but risky, 100% space efficiency. Any number of drives
+- **Mirror** — 1:1 redundancy, excellent random I/O, 50% space efficiency. 2+ drives (add more mirrors)
+- **RAIDZ1** — 1 disk/vdev redundancy, fast sequential, high space efficiency. 3-6 drives (max 8)
+- **RAIDZ2** — 2 disks/vdev redundancy, slightly slower writes, moderate space efficiency. 6-12 drives (max 14)
+- **RAIDZ3** — 3 disks/vdev redundancy, most write overhead, lower space efficiency. 10-16 drives (max 20)
 
 ### ZFS Integration Patterns
 
-| Use Case                        | Description                                                           |
-| ------------------------------- | --------------------------------------------------------------------- |
-| Fast SSD/NVMe pool for appdata  | Store appdata share for responsive containers. 2-drive mirror typical |
-| ZFS cache pool                  | Use ZFS features (snapshots, compression) for cache tier              |
-| Daily backup/replication target | Use ZFS send/receive for efficient incremental replication            |
-| Snapshot safety net             | Point-in-time recovery from accidental deletions or misconfigurations |
+- **Fast SSD/NVMe pool for appdata** — Store appdata share for responsive containers. 2-drive mirror typical
+- **ZFS cache pool** — Use ZFS features (snapshots, compression) for cache tier
+- **Daily backup/replication target** — Use ZFS send/receive for efficient incremental replication
+- **Snapshot safety net** — Point-in-time recovery from accidental deletions or misconfigurations
 
 ## Encryption
 

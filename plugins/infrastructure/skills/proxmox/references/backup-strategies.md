@@ -24,11 +24,9 @@ vzdump creates consistent backup archives of VMs and containers, including disk 
 
 ### Backup Compression
 
-| Algorithm | Speed  | Ratio  | CPU Usage |
-| --------- | ------ | ------ | --------- |
-| `lzo`     | Fast   | Low    | Low       |
-| `gzip`    | Medium | Medium | Medium    |
-| `zstd`    | Fast   | High   | Medium    |
+- **`lzo`** — fast speed, low ratio, low CPU
+- **`gzip`** — medium speed, medium ratio, medium CPU
+- **`zstd`** — fast speed, high ratio, medium CPU
 
 Use **zstd** as the default — it provides the best balance of compression ratio and speed. Specify with
 `--compress zstd`.
@@ -67,14 +65,12 @@ Configure retention per backup job or per storage:
 prune-backups: keep-daily=7,keep-weekly=4,keep-monthly=6,keep-yearly=1
 ```
 
-| Parameter      | Purpose                                |
-| -------------- | -------------------------------------- |
-| `keep-last`    | Keep the N most recent backups         |
-| `keep-hourly`  | Keep one backup per hour for N hours   |
-| `keep-daily`   | Keep one backup per day for N days     |
-| `keep-weekly`  | Keep one backup per week for N weeks   |
-| `keep-monthly` | Keep one backup per month for N months |
-| `keep-yearly`  | Keep one backup per year for N years   |
+- **`keep-last`** — keep the N most recent backups
+- **`keep-hourly`** — keep one backup per hour for N hours
+- **`keep-daily`** — keep one backup per day for N days
+- **`keep-weekly`** — keep one backup per week for N weeks
+- **`keep-monthly`** — keep one backup per month for N months
+- **`keep-yearly`** — keep one backup per year for N years
 
 **Retention rules are applied in order.** A backup kept by `keep-daily` is also counted toward `keep-weekly` if
 applicable. The pruning algorithm preserves the most diverse time distribution.

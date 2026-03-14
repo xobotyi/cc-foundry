@@ -5,11 +5,9 @@ BSDs). This reference covers when to target POSIX sh vs bash, and what construct
 
 ## When to Use What
 
-| Target   | Shebang               | Use Case                                           |
-| -------- | --------------------- | -------------------------------------------------- |
-| POSIX sh | `#!/bin/sh`           | System scripts, init scripts, maximum portability  |
-| Bash     | `#!/usr/bin/env bash` | User scripts, CI/CD, anywhere bash is guaranteed   |
-| Bash 4+  | `#!/usr/bin/env bash` | Associative arrays, `mapfile`, `${var,,}` case ops |
+- **POSIX sh** (`#!/bin/sh`) — System scripts, init scripts, maximum portability
+- **Bash** (`#!/usr/bin/env bash`) — User scripts, CI/CD, anywhere bash is guaranteed
+- **Bash 4+** (`#!/usr/bin/env bash`) — Associative arrays, `mapfile`, `${var,,}` case ops
 
 **macOS note:** macOS ships bash 3.2 permanently (GPL licensing). If targeting macOS, avoid bash 4+ features or require
 users to install modern bash via Homebrew.
@@ -32,21 +30,19 @@ users to install modern bash via Homebrew.
 
 ### Not Available in POSIX sh
 
-| Feature      | Bash Equivalent    | POSIX Workaround                                    |
-| ------------ | ------------------ | --------------------------------------------------- |
-| `[[ ]]`      | Extended test      | Use `[ ]` with proper quoting                       |
-| `(( ))`      | Arithmetic command | `[ "$a" -gt "$b" ]` or `$(( ))`                     |
-| Arrays       | `arr=(a b c)`      | Use positional parameters or IFS splitting          |
-| `local`      | Function locals    | Technically a widely-supported extension; not POSIX |
-| `${var,,}`   | Lowercase          | `echo "$var" \| tr '[:upper:]' '[:lower:]'`         |
-| `${var^^}`   | Uppercase          | `echo "$var" \| tr '[:lower:]' '[:upper:]'`         |
-| `${var/p/r}` | Substitution       | Use `sed` or parameter expansion tricks             |
-| `=~` regex   | Regex match        | Use `expr` or `case` with glob patterns             |
-| `<<<`        | Here-string        | Use `echo "$var" \| command` or here-doc            |
-| `<(cmd)`     | Process sub        | Use temp files or pipes                             |
-| `source`     | Source files       | Use `.` (dot command)                               |
-| `{1..10}`    | Brace expansion    | Use `seq` or arithmetic loop                        |
-| `$RANDOM`    | Random number      | Read from `/dev/urandom`                            |
+- **`[[ ]]`** (Extended test) — POSIX workaround: use `[ ]` with proper quoting
+- **`(( ))`** (Arithmetic command) — POSIX workaround: `[ "$a" -gt "$b" ]` or `$(( ))`
+- **Arrays** (`arr=(a b c)`) — POSIX workaround: use positional parameters or IFS splitting
+- **`local`** (Function locals) — Technically a widely-supported extension; not POSIX
+- **`${var,,}`** (Lowercase) — POSIX workaround: `echo "$var" | tr '[:upper:]' '[:lower:]'`
+- **`${var^^}`** (Uppercase) — POSIX workaround: `echo "$var" | tr '[:lower:]' '[:upper:]'`
+- **`${var/p/r}`** (Substitution) — POSIX workaround: use `sed` or parameter expansion tricks
+- **`=~` regex** (Regex match) — POSIX workaround: use `expr` or `case` with glob patterns
+- **`<<<`** (Here-string) — POSIX workaround: use `echo "$var" | command` or here-doc
+- **`<(cmd)`** (Process sub) — POSIX workaround: use temp files or pipes
+- **`source`** (Source files) — POSIX workaround: use `.` (dot command)
+- **`{1..10}`** (Brace expansion) — POSIX workaround: use `seq` or arithmetic loop
+- **`$RANDOM`** (Random number) — POSIX workaround: read from `/dev/urandom`
 
 ## Bash-Specific Features Worth Using
 
@@ -163,14 +159,11 @@ echo "${VAR:-fallback}"        # use fallback without modifying VAR
 
 ## GNU vs BSD Tool Differences
 
-| Operation        | GNU (Linux)               | BSD (macOS)                          |
-| ---------------- | ------------------------- | ------------------------------------ |
-| In-place sed     | `sed -i '' 's/a/b/' file` | `sed -i '' 's/a/b/' file`            |
-| In-place sed     | `sed -i 's/a/b/' file`    | Not compatible                       |
-| Extended regex   | `grep -P`                 | Not available; use `grep -E`         |
-| `date` format    | `date -d '2024-01-01'`    | `date -j -f '%Y-%m-%d' '2024-01-01'` |
-| `readlink -f`    | Canonical path            | Not available; use `realpath`        |
-| `stat` format    | `stat -c '%s' file`       | `stat -f '%z' file`                  |
-| xargs null-delim | `xargs -0 -r`             | `xargs -0` (no `-r` on macOS)        |
+- **In-place sed** — GNU: `sed -i 's/a/b/' file` / BSD: `sed -i '' 's/a/b/' file` (GNU form not compatible on macOS)
+- **Extended regex** — GNU: `grep -P` / BSD: not available; use `grep -E`
+- **`date` format** — GNU: `date -d '2024-01-01'` / BSD: `date -j -f '%Y-%m-%d' '2024-01-01'`
+- **`readlink -f`** — GNU: canonical path / BSD: not available; use `realpath`
+- **`stat` format** — GNU: `stat -c '%s' file` / BSD: `stat -f '%z' file`
+- **xargs null-delim** — GNU: `xargs -0 -r` / BSD: `xargs -0` (no `-r` on macOS)
 
 **Guideline:** When possible, avoid GNU-specific extensions. When they're needed, document the dependency.
