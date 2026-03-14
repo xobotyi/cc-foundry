@@ -46,17 +46,37 @@ Discovery must precede all structural decisions — including which plugin the s
     - Default: create a new notebook. Name and describe it so future agents can find it by description.
 
 2.  **Deep research #1 — the subject domain.** Research the subject itself: official documentation, specifications,
-    capabilities, APIs, and how it works. This is a documentation-driven pass.
+    capabilities, APIs, and how it works. This is a documentation-driven pass. **Bias toward recency** — include version
+    numbers and year in search queries (e.g., "Proxmox VE 9.1 2025", "Ansible-core 2.18 2026") to surface the latest
+    state of the technology.
 
 3.  **Deep research #2 — agentic application.** Research how people use the subject with autonomous agents: existing
     skills, blog posts, agentic workflows, and integration patterns. Prioritize quality sources — original findings,
     undocumented behavior, novel techniques. Skip tutorials that repackage official docs.
 
-4.  **Assess source quality.** After each research pass, review source summaries and remove low-quality entries.
-    NotebookLM sometimes pulls in low-signal sources during deep research.
+4.  **Assess source quality and recency.** After each research pass, review source summaries and remove entries that are
+    low-quality **or outdated**. NotebookLM sometimes pulls in low-signal sources during deep research.
+
+    <recency-rules>
+
+    Outdated information is worse than no information — it produces confidently wrong agent behavior.
+    - **Identify the subject's current stable version.** Every research pass should establish the latest stable release
+      as a baseline. Sources describing behavior from superseded versions are suspect.
+    - **Remove sources that describe removed or replaced features** — e.g., a guide for a deprecated API, a tutorial for
+      a configuration format that no longer exists, or a blog post about a workaround that is now built-in.
+    - **Flag version-specific claims.** When a source says "X is not supported" or "Y requires workaround Z", verify
+      whether this is still true in the current version. These negative claims age the worst — features get added, but
+      old "not supported" statements persist in search results indefinitely.
+    - **Prefer changelogs and "What's New" pages** over static documentation for understanding recent changes. These
+      pages are authoritative and time-stamped.
+    - **When in doubt, query the notebook** — ask "Is [claim] still accurate as of [current version]?" to
+      cross-reference across sources. If sources contradict each other, the more recent official source wins.
+
+    </recency-rules>
 
 5.  **Query and refine.** Query the notebook to build understanding of the domain. This reveals gaps and generates
-    better questions. Run a refined research pass to fill those gaps.
+    better questions. Run a refined research pass to fill those gaps. Specifically ask recency-oriented questions: "What
+    changed in the latest version?", "What was deprecated or removed?", "What new capabilities were added?"
 
 6.  **Target: ~50 quality sources** in the notebook (half the 100-source limit), leaving room for future research if
     needed.
