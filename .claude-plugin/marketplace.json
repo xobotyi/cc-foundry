@@ -28,7 +28,7 @@
     {
       "name": "ai-helpers",
       "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
-      "version": "1.5.1",
+      "version": "1.5.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -44,7 +44,7 @@
     {
       "name": "git-commit",
       "description": "Git commit workflow: atomic commits, validation, conventions",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -60,7 +60,7 @@
     {
       "name": "the-blueprint",
       "description": "Structured planning pipeline: design documents, technical designs, task decomposition, and task creation",
-      "version": "1.3.0",
+      "version": "1.3.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -92,7 +92,7 @@
     {
       "name": "the-crucible",
       "description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
-      "version": "1.3.0",
+      "version": "1.3.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -124,7 +124,7 @@
     {
       "name": "golang",
       "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-      "version": "1.2.4",
+      "version": "1.2.5",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -140,7 +140,7 @@
     {
       "name": "javascript",
       "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-      "version": "1.2.5",
+      "version": "1.2.6",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -156,7 +156,7 @@
     {
       "name": "frontend",
       "description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
-      "version": "1.2.4",
+      "version": "1.2.5",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -172,7 +172,7 @@
     {
       "name": "backend",
       "description": "Backend platform discipline: observability, API design, and service architecture practices",
-      "version": "1.1.3",
+      "version": "1.1.4",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -188,7 +188,7 @@
     {
       "name": "cli",
       "description": "CLI platform discipline: CLI application design, shell scripting conventions, and terminal UX",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -204,7 +204,7 @@
     {
       "name": "python",
       "description": "Python language discipline: conventions, modern idioms, type system, packaging, testing, and LSP-powered code intelligence",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -220,7 +220,7 @@
     {
       "name": "php",
       "description": "PHP language discipline: conventions, modern idioms, type system, OOP, testing, and LSP-powered code intelligence",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
@@ -236,7 +236,7 @@
     {
       "name": "infrastructure",
       "description": "Infrastructure management discipline: Ansible automation, container orchestration, Proxmox virtualization, Unraid NAS, and network architecture",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
