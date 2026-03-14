@@ -1,11 +1,11 @@
 ---
 name: proxmox
 description: >-
-  Proxmox VE administration: VM and LXC provisioning, storage backends, networking,
-  clustering, high availability, API automation, cloud-init templates, backups, and
-  PCIe passthrough. Invoke whenever task involves any interaction with Proxmox VE —
-  configuring hosts, managing guests, designing storage or networking, writing
-  automation scripts, planning clusters, troubleshooting, or reviewing PVE
+  Proxmox VE administration: VM/LXC/OCI container provisioning, storage backends,
+  networking/SDN, clustering, high availability, API automation, cloud-init templates,
+  backups/PBS, PCIe passthrough, and vGPU. Invoke whenever task involves any interaction
+  with Proxmox VE — configuring hosts, managing guests, designing storage or networking,
+  writing automation scripts, planning clusters, troubleshooting, or reviewing PVE
   configurations.
 ---
 
@@ -14,12 +14,11 @@ description: >-
 **Production infrastructure demands production discipline. Every Proxmox configuration must be secure by default,
 redundant where it matters, and automated where possible.**
 
----
-
 ## Route to Reference
 
-- **VM and LXC management** — [`${CLAUDE_SKILL_DIR}/references/vm-and-lxc.md`]: VM vs LXC comparison table,
-  configuration options, template workflows, linked vs full clone trade-offs
+- **VM, LXC, and OCI container management** — [`${CLAUDE_SKILL_DIR}/references/vm-and-lxc.md`]: VM vs LXC vs OCI
+  comparison, OCI container support (PVE 9.1 tech preview), Docker-on-Proxmox decision guidance, configuration options,
+  template workflows, linked vs full clone trade-offs
 - **Storage backends** — [`${CLAUDE_SKILL_DIR}/references/storage-backends.md`]: Backend capability matrix, ZFS tuning
   (ARC/L2ARC/SLOG/volblocksize), Ceph configuration, LVM-Thin monitoring, storage selection decision tree
 - **Networking** — [`${CLAUDE_SKILL_DIR}/references/networking.md`]: Bridge configuration, VLAN layout, bonding modes,
@@ -31,16 +30,18 @@ redundant where it matters, and automated where possible.**
 - **Backup strategies** — [`${CLAUDE_SKILL_DIR}/references/backup-strategies.md`]: vzdump modes, PBS architecture,
   encryption key management, garbage collection safety, verification jobs, retention policies, off-site sync patterns
 
----
-
 ## Guest Management
 
 <guest-management>
 
-### VM vs LXC Decision
+### VM vs LXC vs OCI Decision
 
 - **Default to LXC** for trusted Linux workloads — near-zero overhead, high density
 - **Use VMs** when the workload requires: non-Linux OS, full kernel isolation, PCIe passthrough, or live migration
+- **Use OCI containers** (PVE 9.1+, tech preview) for single-purpose microservices from Docker Hub/GHCR — lightweight
+  deployment without a Docker VM. Not suitable for multi-container stacks or workloads requiring Docker Compose
+- **Use a Docker VM** for full Docker/Compose/Kubernetes workflows, multi-container stacks, or advanced networking
+  (macvlan, overlay). Still the most flexible and compatible option for container-heavy workloads
 - **Use unprivileged containers** (default) — they map container UID 0 to a non-privileged host UID, preventing
   container escape attacks
 - Only use privileged containers when unprivileged mode is incompatible (specific device access, certain NFS mounts)
@@ -59,9 +60,18 @@ redundant where it matters, and automated where possible.**
 
 - Set **explicit memory limits** — containers without limits can exhaust host RAM
 - Enable **nesting** (`features: nesting=1`) only when required (Docker inside LXC)
-- For Docker workloads in LXC: unprivileged + `nesting=1` + `keyctl=1`
+- For Docker workloads in LXC: unprivileged + `nesting=1` + `keyctl=1` — but note this is **unsupported** and can break
+  on host updates (CVE-2025-52881 broke Docker-in-LXC setups; workaround: `lxc.apparmor.profile: unconfined`)
 - Use **bind mounts** to share host directories, not NFS/CIFS mounts inside the container
 - PVE 9.0 removed cgroup v1 entirely — containers requiring cgroup v1 must move to VMs
+
+### OCI Application Containers (PVE 9.1 — Tech Preview)
+
+- Pull OCI images from Docker Hub/GHCR/Quay and run as LXC containers — no Docker engine required
+- **Limitations:** no in-place updates, no Docker Compose, no orchestration, no shell in most containers
+- **Use for:** single-purpose lightweight services; **use a Docker VM** for multi-container stacks
+- See [`${CLAUDE_SKILL_DIR}/references/vm-and-lxc.md`] for full OCI details, Docker-on-Proxmox decision guide, and
+  Docker VM best practices
 
 ### Templates and Cloning
 
@@ -71,8 +81,6 @@ redundant where it matters, and automated where possible.**
 - Use **full clones** for production (independent, no template dependency)
 
 </guest-management>
-
----
 
 ## Storage
 
@@ -123,8 +131,6 @@ redundant where it matters, and automated where possible.**
 
 </storage>
 
----
-
 ## Networking
 
 <networking>
@@ -155,7 +161,7 @@ Corosync is latency-sensitive — network contention causes cluster instability 
 ### SDN
 
 Use SDN (VXLAN zones) for overlay networking across nodes without physical switch changes. Use EVPN for advanced
-multi-tenant setups with BGP routing.
+multi-tenant setups with BGP routing. SDN is fully supported and installed by default since PVE 8.1.
 
 **SDN gotchas:**
 
@@ -166,9 +172,14 @@ multi-tenant setups with BGP routing.
 - **OVS vs Linux bridge:** OVS is automatically VLAN-aware and may resolve 10GbE throughput bottlenecks seen with native
   Linux bridge
 
-</networking>
+**SDN-Firewall integration (PVE 8.3+):** SDN automatically generates IPSets for VNets and IPAM-managed guests — use
+these in firewall rules for simplified maintenance. The nftables firewall can filter forwarded traffic at host and VNet
+levels (e.g., restrict SNAT or inter-zone traffic).
 
----
+**Fabrics (PVE 9.0+):** Automated routing between cluster nodes using FRRouting with OpenFabric (IS-IS-based) or OSPF.
+Fabrics simplify underlay network configuration for Ceph full-mesh and EVPN/VXLAN deployments.
+
+</networking>
 
 ## Clustering and High Availability
 
@@ -216,13 +227,14 @@ If the cluster loses quorum, `pmxcfs` becomes read-only — no VM operations are
 
 ### Migration
 
-- **Live migration** (VMs only): requires shared/replicated storage, no PCIe passthrough devices, brief pause at cutover
+- **Live migration** (VMs only): requires shared/replicated storage, brief pause at cutover
+- **vGPU live migration** (PVE 8.4+): VMs using NVIDIA vGPU (mediated devices) can now be live-migrated between nodes
+  with compatible GPU hardware — previously required shutdown
+- VMs with full PCIe passthrough devices still cannot be live-migrated — use cluster-wide resource mappings for HA
 - **Offline migration** (VMs and containers): guest stops, data transfers, guest starts on target
 - Use a dedicated high-bandwidth network for migration traffic
 
 </clustering>
-
----
 
 ## API and Automation
 
@@ -267,61 +279,31 @@ If the cluster loses quorum, `pmxcfs` becomes read-only — no VM operations are
 
 </automation>
 
----
-
 ## Backups
 
 <backups>
 
 ### Backup Rules
 
-- **Use PBS for production** — deduplication, incremental backups, verification, and encryption. Directory/NFS backups
-  are acceptable only for lab environments.
-- Use **snapshot mode** for VMs (crash-consistent, no downtime)
-- Use **zstd compression** — best balance of ratio and speed
-- Run backups during **low-usage windows**, stagger across storage targets
+- **Use PBS for production** — deduplication, incremental backups, verification, encryption
+- Use **snapshot mode** for VMs (crash-consistent, no downtime); **zstd compression**
 - Follow the **3-2-1 rule**: 3 copies, 2 media types, 1 off-site
-
-### Retention
-
-Configure retention per backup job:
-
-```
-keep-daily=7,keep-weekly=4,keep-monthly=6,keep-yearly=1
-```
-
-Retention options process in order — each option covers only its time period. Use higher retention than minimally
-required; you cannot recreate pruned backups.
+- Retention: `keep-daily=7,keep-weekly=4,keep-monthly=6,keep-yearly=1`
 
 ### PBS Security
 
 - Restrict PVE backup user/token to create-only access (no delete) on PBS
-- Use **dedicated API tokens per host/cluster** scoped to specific namespaces
 - Separate PBS admin credentials from PVE access
-- Enable backup verification jobs — re-verify all backups monthly (bit rot detection). Encrypted chunks can only verify
-  CRC-32, not plaintext content
-- Encrypt off-site backups with client-side encryption
-- **Store encryption keys separately** from the backed-up system — losing the key means losing access. Use an RSA master
-  key for recovery. Store key copies in a password manager, USB drive, and QR-encoded paper backup
-- Never disable `gc-atime-safety-check` — risks deleting in-use chunks
-- The `protected` flag does not sync between PBS instances — re-protect snapshots manually on remote targets after sync
+- **Store encryption keys separately** from the backed-up system — password manager + offline backup
+- Never disable `gc-atime-safety-check`; use dedicated remote users per sync job
 
 ### Non-Negotiable
 
 - **Test restores regularly.** A backup that cannot be restored is worthless.
-- **Monitor backup jobs.** Configure notification matchers for `vzdump` errors. A silently failing backup is worse than
-  no backup.
-- **Document the restore procedure.** Where, what credentials, exact commands, expected recovery time.
-
-### Off-site Sync
-
-- Use **dedicated remote users** per sync job — shared users with `remove-vanished` enabled delete each other's
-  snapshots
-- Verify removable datastores are mounted at scheduled sync times
+- **Monitor backup jobs.** A silently failing backup is worse than no backup.
+- **Document the restore procedure.**
 
 </backups>
-
----
 
 ## PCIe Passthrough
 
@@ -330,25 +312,17 @@ required; you cannot recreate pruned backups.
 ### Requirements
 
 - CPU: VT-d (Intel) or AMD-Vi enabled in BIOS/UEFI
-- IOMMU enabled in kernel: `intel_iommu=on` or `amd_iommu=on` in boot parameters
-- Interrupt remapping supported (verify with `dmesg | grep remapping`)
-- Dedicated IOMMU group for the passthrough device
+- IOMMU enabled in kernel: `intel_iommu=on` or `amd_iommu=on`
 - VFIO modules loaded: `vfio`, `vfio_iommu_type1`, `vfio_pci`, `vfio_virqfd`
+- Dedicated IOMMU group for the passthrough device
 
 ### Configuration
 
-- Use **OVMF (UEFI) firmware + Q35 machine type** — provides virtual PCIe bus; if the GPU lacks a UEFI-capable ROM, use
-  SeaBIOS instead
-- Blacklist the host driver for the passthrough device (e.g., `nouveau`, `nvidia`, `radeon`) or bind via `vfio-pci` IDs
-  in `/etc/modprobe.d/`
-- Add device via `hostpci0: 0000:01:00,pcie=1` in VM configuration
-- Pass through **all device functions** — a GPU requires both video and audio functions; partial passthrough fails. GPUs
-  with USB-C controllers need that controller bound to `vfio-pci` too, or the host freezes
-- For GPU passthrough: add `x-vga=1` for primary GPU, configure `vga: none`
-- GPU output is **not visible** via NoVNC/SPICE — use a physical monitor, HDMI/DP dummy plug, or **Looking Glass**
-  (shared-memory low-latency display)
-- VMs with passthrough devices **cannot be live-migrated** — use cluster-wide resource mappings (`/cluster/mapping/pci`)
-  for HA with passthrough
+- Use **OVMF (UEFI) + Q35 machine type**; SeaBIOS if GPU lacks UEFI ROM
+- Blacklist host driver or bind via `vfio-pci` IDs in `/etc/modprobe.d/`
+- Pass through **all device functions** — GPU requires video + audio; USB-C controllers must also be bound to vfio-pci
+- For GPU: `x-vga=1` for primary, `vga: none`; output via physical monitor, dummy plug, or Looking Glass
+- VMs with full passthrough **cannot be live-migrated** — use resource mappings (`/cluster/mapping/pci`) for HA
 
 ### GPU-Specific Issues
 
@@ -356,7 +330,13 @@ required; you cannot recreate pruned backups.
 - **AMD reset bug** (Vega, Polaris, some Navi): GPU fails to reset after VM shutdown, preventing reuse without host
   reboot. Fix: install `vendor-reset` kernel module for vendor-specific reset quirks. RDNA2+ generally unaffected
 - **NVIDIA vGPU:** officially supported since vGPU Software 18 on PVE. Requires valid NVIDIA entitlement. Ampere+ GPUs
-  need SR-IOV enabled first via `pve-nvidia-vgpu-helper`
+  need SR-IOV enabled first via `pve-nvidia-vgpu-helper`. PVE 8.4+ supports **live migration of vGPU VMs**
+
+### Virtiofs Directory Passthrough (PVE 8.4+)
+
+Host-to-guest file sharing via **virtiofs** — bypasses network filesystems, provides near-native performance. Linux
+guests support virtiofs natively; Windows guests require a guest driver. Use for workloads requiring frequent host-guest
+file exchange without the overhead of NFS/SMB.
 
 ### LXC Device Passthrough
 
@@ -367,13 +347,10 @@ full PCIe passthrough, but supports specific device access (GPU rendering, USB d
 
 - `dmesg | grep -e DMAR -e IOMMU` — verify IOMMU is enabled
 - `pvesh get /nodes/{node}/hardware/pci --pci-class-blacklist ""` — list groups
-- If IOMMU group contains multiple devices (common on B550/X570), use `pcie_acs_override=downstream,multifunction` as a
-  workaround — not recommended for production but necessary on many consumer motherboards
+- Multi-device IOMMU groups (B550/X570): `pcie_acs_override=downstream,multifunction` as workaround (not for production)
 - IOMMU groups can change between kernel major versions — verify after updates
 
 </passthrough>
-
----
 
 ## Security
 
@@ -381,115 +358,61 @@ full PCIe passthrough, but supports specific device access (GPU rendering, USB d
 
 ### Certificates
 
-- PVE generates self-signed certificates by default — replace with ACME (Let's Encrypt) certificates for trusted HTTPS
-- Use **DNS-01 challenge** for nodes behind firewalls or for wildcard certs (via acme.sh-compatible DNS API plugins)
-- Use **HTTP-01 challenge** for internet-reachable nodes on port 80
-- Trusted certificates are required for reliable WebAuthn (FIDO2) operations
+- Replace self-signed certs with ACME (Let's Encrypt) — DNS-01 for nodes behind firewalls, HTTP-01 for
+  internet-reachable
+- Trusted certificates required for reliable WebAuthn (FIDO2)
 
 ### Firewall
 
-Proxmox VE includes a distributed firewall (iptables-based, nftables available since PVE 8.2 as tech preview)
-configurable at datacenter, host, and guest levels.
+Proxmox VE includes a distributed firewall (iptables-based, nftables opt-in since PVE 8.2) at datacenter, host, and
+guest levels. The nftables backend (PVE 8.3+) supports filtering **forwarded traffic** at host and VNet levels.
 
-- Enable the firewall **selectively at each level** — datacenter first, then host, then per-VM/container interface. It
-  is disabled by default at all levels.
-- Before enabling, create rules to allow management access from remote IPs (ports 8006, 22, 3128) — enabling without
-  rules locks you out. **Always keep an SSH session open** before applying firewall changes
-- Create an **IPSet named `management`** with trusted admin IPs — Proxmox auto-generates required management access
-  rules from this set
-- Use **security groups** for reusable rule sets (e.g., "webserver" group opening ports 80/443), applied to multiple VMs
-  for consistency
+- Enable **selectively** — datacenter first, then host, then per-interface. Disabled by default at all levels
+- Before enabling, create rules for management access (8006, 22, 3128) — **keep an SSH session open** as safety net
+- Create **IPSet `management`** with trusted admin IPs — auto-generates management access rules
+- Use **security groups** for reusable rule sets across VMs
 - Use **`ipfilter-net*` IPSets** per VM interface to prevent IP spoofing
-- Enable firewall **logging** for dropped/rejected packets — disabled by default
-- **nftables backend** (PVE 8.2+): enable via `nftables: 1` in host.fw; supports forwarded traffic rules at host and
-  VNet levels
 
 ### User Management and RBAC
 
-- Grant permissions to **groups**, not individual users — shorter, maintainable ACLs
-- Use **resource pools** to group related VMs/containers/storage; assign permissions at the pool level rather than
-  per-resource
-- Use **realms** for authentication: PAM (local), LDAP, Active Directory, OpenID Connect (Keycloak, Authentik)
-- Define **roles** with specific privileges (PVEVMAdmin, PVEAuditor, PVEDatastoreUser) — assign at the narrowest path
-  needed
-- Use **privilege-separated API tokens** — token permissions are the intersection of user permissions and token-specific
-  ACLs
-- Enforce **two-factor authentication** (TOTP, YubiKey, WebAuthn) at the realm level for all interactive accounts
+- Grant permissions to **groups**, not individuals
+- Use **resource pools** to group related resources; assign permissions at pool level
+- Use **realms** for auth: PAM, LDAP, AD, OpenID Connect (Keycloak, Authentik)
+- Use **privilege-separated API tokens** for automation
+- Enforce **2FA** (TOTP, YubiKey, WebAuthn) at realm level
 
 ### Hardening
 
-- Use the **Enterprise repository** for production — the no-subscription and test repositories are not as thoroughly
-  validated
-- Keep Proxmox VE updated — apply security patches promptly
+- Use **Enterprise repository** for production
 - Restrict management interface access (dedicated VLAN, firewall rules)
-- Disable root SSH login — use a non-root account with sudo
-- Use API tokens with privilege separation for automation
-- Do not run additional services (Docker, web servers) directly on the Proxmox host
-- Enable **non-free-firmware** repository for CPU microcode security updates (enabled by default on PVE 9.0 new
-  installs)
+- Disable root SSH; use non-root with sudo
+- Do not run Docker or other services directly on the PVE host
 
 </security>
-
----
 
 ## Monitoring
 
 <monitoring>
 
-### Metrics Export
-
-- Configure **external metric servers** (Datacenter > Metric Server) to export host, guest, and storage stats to
-  **InfluxDB** or **Graphite**
-- Use **Grafana** for dashboards — community dashboard ID 10048 provides per-host, per-VM, and per-storage visualization
-
-### Critical Alerts
-
-Configure notification matchers (PVE 8.1+ notification system) for:
-
-- **Backup failures:** `match-field exact:type=vzdump`, `match-severity error`
-- **Fencing/HA events:** `match-field exact:type=fencing`
-- **Replication failures:** `match-field exact:type=replication`
-- **ZFS errors:** enable ZED email notifications in `/etc/zfs/zed.d/zed.rc`
-- **Disk health:** `smartmontools` for S.M.A.R.T. monitoring
-- **Ceph health:** monitor for `HEALTH_WARN` and `HEALTH_ERR` states
-
-### Notification Targets
-
-Supported targets: Sendmail/Postfix, SMTP relay, Gotify push notifications, Webhooks (Discord, Slack, Mattermost).
-Configure at Datacenter > Notifications.
+- Export metrics to **InfluxDB/Graphite** (Datacenter > Metric Server); visualize with **Grafana** (dashboard 10048)
+- Configure notification matchers for: backup failures (`vzdump`), fencing/HA events, replication failures
+- Enable ZED for ZFS errors, `smartmontools` for disk health, Ceph health monitoring
+- Notification targets: Sendmail, SMTP, Gotify, Webhooks (PVE 8.3+ — any HTTP endpoint with custom headers/body)
 
 </monitoring>
 
----
-
 ## Anti-Patterns
 
-These anti-patterns are non-obvious traps that the positive rules above do not fully convey — common mistakes where the
-"right" approach is counterintuitive.
+Non-obvious traps where the "right" approach is counterintuitive:
 
-- **Running Docker directly on the PVE host** — conflicts with PVE networking/storage, complicates updates → run Docker
-  inside a VM or LXC container
-- **Swap on ZFS zvol** — blocks server during backups, high I/O load → partition a physical disk for swap
-- **Using `host` CPU type in mixed clusters** — live migration fails on different CPU generations → use `x86-64-v2-AES`
-  or lowest common model
-- **LACP bonds for Corosync with default rate** — 90s failover exceeds fencing timeout (~60s) → set
-  `bond-lacp-rate fast` on node and switch
-- **Load-balancing bond modes for Corosync** — asymmetric connectivity causes mass fencing → use `active-backup` or LACP
-  with fast rate
-- **Using no-subscription repo in production** — less validated packages, potential instability → use Enterprise
-  repository for production
-- **Updating all cluster nodes simultaneously** — watchdog fences nodes during CRM/LRM freeze → update one node at a
-  time, verify each
-- **Unbounded ZFS ARC on VM hosts** — ARC silently consumes RAM, VMs crash from OOM → cap ARC explicitly in
-  `/etc/modprobe.d/zfs.conf`
-- **VXLAN with default MTU 1500** — 50-byte encapsulation overhead causes fragmentation → set VNet MTU to 1450 (1370
-  with IPSEC)
-- **Storing PBS encryption key on backed-up system** — key lost when system fails, backups irrecoverable → store key in
-  password manager + offline backup
-- **Shared remote user for multiple PBS sync jobs** — jobs delete each other's snapshots with `remove-vanished` →
-  dedicated remote user per sync job
-
----
+- **Swap on ZFS zvol** → partition a physical disk for swap; zvol swap causes blocking I/O during backups
+- **LACP bonds for Corosync with default rate** → set `bond-lacp-rate fast` (default 90s failover > 60s fence timeout)
+- **Load-balancing bond modes for Corosync** → use `active-backup` or LACP with fast rate; load-balancing modes cause
+  asymmetric connectivity and mass fencing
+- **PBS encryption key on backed-up system** → store in password manager + offline backup; compromised host means
+  compromised backups
+- **Shared remote user for PBS sync jobs** → dedicated remote user per sync job; shared users bypass
+  `gc-atime-safety-check`
 
 ## Application
 
@@ -497,35 +420,27 @@ These anti-patterns are non-obvious traps that the positive rules above do not f
 
 ### When Configuring Proxmox
 
-- Apply these conventions without narrating each rule
-- If the environment has existing patterns, follow them — flag divergences once
+- Apply conventions without narrating each rule; follow existing environment patterns
 - Security practices are defaults, not optional add-ons
-- Test changes in a non-production environment when possible
-- Document non-obvious configuration choices in comments or a wiki
+- Test changes in non-production when possible
 
 ### When Reviewing Configuration
 
-- Verify storage backend matches workload requirements
-- Check network separation (Corosync, Ceph, guest, management)
-- Verify HA prerequisites: shared storage, fencing, quorum
-- Check backup coverage: all production guests backed up, retention configured, notifications enabled, restores tested
-- Verify security: firewall enabled, ACME certificates, RBAC configured, no root API usage, 2FA enforced
-- Verify monitoring: metric server configured, ZED enabled, notification matchers for backup/fencing/replication
-  failures
+- Check guest type matches workload (VM vs LXC vs OCI decision)
+- Verify storage backend matches workload characteristics (ZFS tuning, Ceph sizing, LVM-Thin monitoring)
+- Verify network separation: management, Corosync, Ceph, guest traffic on appropriate interfaces
+- Verify HA prerequisites: shared storage, fencing tested, quorum math correct, HA groups configured
+- Verify backup coverage: PBS for production, retention policy set, restores tested, encryption keys stored separately
+- Check security posture: API tokens with privsep, 2FA enforced, firewall enabled, management VLAN isolated
+- Check monitoring: metric export configured, notification matchers for backup/fencing/replication failures
 
 ### When Writing Automation
 
-- Use `pvesh` or the REST API — never screen-scrape the web GUI
-- Use API tokens with privilege separation
-- Handle API errors and task status polling (long operations return task IDs)
-- Use cloud-init templates for VM provisioning
-- Idempotent scripts: running twice produces the same result
-- For automation-heavy workloads with high API volume, increase `MAX_WORKERS` in `/etc/default/pvedaemon` and
-  `/etc/default/pveproxy`
+- Use `pvesh` or REST API — never screen-scrape the GUI
+- Use API tokens with privilege separation; handle task status polling
+- Use cloud-init templates; write idempotent scripts
 
 </application>
-
----
 
 ## Integration
 
@@ -537,7 +452,9 @@ This skill provides Proxmox VE discipline alongside sibling skills in the infras
 - **`ansible`** — configuration management for automating Proxmox host setup and post-provisioning
 - **`containers`** — Docker/Podman management inside PVE guests (VMs or LXC)
 
----
+**Proxmox Datacenter Manager (PDM 1.0):** Centralized management for multiple independent PVE/PBS environments —
+aggregated views, cross-cluster live migration, EVPN configuration between clusters, centralized update overview.
+Written in Rust. Requires PVE 8.4+ / PBS 3.4+. Relevant for multi-site or large-scale deployments.
 
 ## Critical Rules
 

@@ -136,6 +136,18 @@ lookup plugins. Secrets are never stored on disk -- they are fetched at playbook
   no_log: true
 ```
 
+### HashiCorp Vault Signed SSH Credentials
+
+AAP integrates with HashiCorp Vault's SSH secrets engine for dynamic, short-lived SSH certificates:
+
+1. AAP authenticates to Vault (AppRole, TLS, or Kubernetes auth)
+2. The credential plugin submits SSH keys to Vault for signing
+3. Vault signs via its SSH CA, applying role-based policies
+4. AAP uses the signed certificate for SSH access to target hosts
+
+This eliminates static, long-lived SSH keys -- certificates expire automatically, reducing credential leakage risk and
+simplifying rotation.
+
 ### When to use external managers vs Ansible Vault
 
 | Scenario                            | Recommendation                                                         |
@@ -200,6 +212,17 @@ Use community-vetted CIS roles (e.g., `ansible-lockdown` project):
 - Customization via `defaults/main.yml` or extra vars -- never edit tasks
 - Tags for precision: `level1-memberserver`, `level2-domaincontroller`
 - Idempotent: rerun at any time to detect and correct configuration drift
+- **Windows Server 2025 CIS** -- roles available for CIS Benchmark v1.0.0 compliance. Supports tailored GPO creation and
+  direct registry settings for controls without ADMX/ADML Group Policy templates.
+
+### Windows-Specific Security
+
+- **Windows Server 2012/2012 R2 removed** -- no longer tested or supported in AAP 2.5+ (Microsoft EOL October 2023)
+- **WinRM Debug** -- dedicated verbosity level (Level 5) in automation controller for Windows remote management
+  diagnostics
+- **pywinrm 0.4.3+** -- required in execution environments for Python 3.11 compatibility
+- **New Microsoft content (AAP 2.6)** -- SCCM, Active Directory Backup/Recovery, Windows Compliance modules, gMSA
+  modules, validated Windows Day 2 operations collection
 
 ### Compliance Scanning
 

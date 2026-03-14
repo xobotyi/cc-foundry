@@ -105,8 +105,9 @@ Primary GPU passthrough frequently requires vBIOS because the host BIOS has alre
 
 ## GPU Sharing (Unraid 7+)
 
-- **VirGL**: share Intel/AMD GPUs among Linux VMs. Set Graphics > Virtual, VM console video driver > VirtIO(3D). No
-  physical monitor output. Incompatible with Windows VMs and standard Nvidia plugins
+- **VirGL** (7.1+): share Intel/AMD GPUs among multiple Linux VMs for OpenGL acceleration. Set Graphics > Virtual, VM
+  console video driver > VirtIO(3D). No physical monitor output. Incompatible with Windows VMs and standard Nvidia
+  plugins
 - **QXL**: multi-screen support with configurable video memory. Set Graphics > Virtual, VM console video driver > QXL
   (best)
 - **SR-IOV**: efficient Intel iGPU passthrough across multiple VMs. Native support added in Unraid 7.0 VM Manager
@@ -173,9 +174,9 @@ Snapshots save VM state at a point in time using QCOW2 overlay files.
 - Delete old snapshots to reclaim storage
 - Snapshots are not a backup replacement
 
-## VM Templates (Unraid 7.1+)
+## User VM Templates (Unraid 7.1+)
 
-- Save custom VM configurations as reusable templates
+- Save custom VM configurations as reusable templates for repeatable setups
 - Create: Edit VM > Create/Modify template > enter name
 - Use: Add VM > select from User Templates section
 - Export/import templates between Unraid systems

@@ -1,6 +1,6 @@
 # Playbook Design Patterns
 
-## Play Structure
+## Play Execution Order
 
 A playbook is a list of plays. Each play targets hosts with a pattern and runs tasks in order. Execution order within a
 play using `roles:`:
@@ -9,74 +9,6 @@ play using `roles:`:
 2. Roles listed in `roles:` (dependencies first)
 3. `tasks` (and triggered handlers)
 4. `post_tasks` (and triggered handlers)
-
-## Naming
-
-Always name plays, tasks, and blocks. Names appear in output and make debugging possible. Unnamed tasks produce opaque
-logs.
-
-```yaml
-# Bad: unnamed task
-- ansible.builtin.yum:
-    name: httpd
-    state: present
-
-# Good: named task
-- name: Install Apache HTTP server
-  ansible.builtin.yum:
-    name: httpd
-    state: present
-```
-
-## State Explicitness
-
-Always specify `state:` even when the module default matches your intent. Different modules have different defaults.
-Explicit state makes playbooks self-documenting.
-
-```yaml
-# Bad: implicit state
-- name: Install nginx
-  ansible.builtin.apt:
-    name: nginx
-
-# Good: explicit state
-- name: Install nginx
-  ansible.builtin.apt:
-    name: nginx
-    state: present
-```
-
-## Fully Qualified Collection Names (FQCN)
-
-Always use FQCN to avoid module name collisions across collections:
-
-```yaml
-# Bad: short module name
-- copy:
-    src: foo.conf
-    dest: /etc/foo.conf
-
-# Good: FQCN
-- ansible.builtin.copy:
-    src: foo.conf
-    dest: /etc/foo.conf
-```
-
-## Idempotency
-
-Most modules check desired state before acting. Design all tasks to be idempotent:
-
-- Prefer declarative modules (`ansible.builtin.copy`, `ansible.builtin.template`, `ansible.builtin.service`) over
-  imperative ones (`ansible.builtin.command`, `ansible.builtin.shell`)
-- When using `command`/`shell`, add `creates:`, `removes:`, or `changed_when:` to make them idempotent
-- Test by running playbooks twice -- second run should report zero changes
-
-```yaml
-# Idempotent command with creates guard
-- name: Initialize database
-  ansible.builtin.command: /usr/bin/initdb --data-dir /var/lib/db
-  creates: /var/lib/db/initialized
-```
 
 ## Import vs Include (Static vs Dynamic)
 

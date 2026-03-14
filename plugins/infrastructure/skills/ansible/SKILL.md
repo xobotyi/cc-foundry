@@ -1,12 +1,11 @@
 ---
 name: ansible
 description: >-
-  Ansible automation: playbook design, role structure, inventory, vault, collections,
-  execution environments, testing with Molecule, variable precedence, error handling,
-  Jinja2 templating, performance tuning, security hardening, and content signing.
-  Invoke whenever task involves any interaction with Ansible — writing playbooks,
-  creating roles, managing inventory, reviewing automation code, or debugging
-  Ansible runs.
+  Ansible automation conventions, patterns, and toolchain: playbook design, roles,
+  inventory, vault, collections, execution environments, Event-Driven Ansible,
+  testing, and performance tuning. Invoke whenever task involves any interaction
+  with Ansible — writing playbooks, creating roles, managing inventory, reviewing
+  automation code, debugging runs, upgrading ansible-core, or working with AAP.
 ---
 
 # Ansible
@@ -17,10 +16,11 @@ Idempotency is the highest Ansible virtue. Every task must describe desired stat
 
 Extended examples, patterns, and detailed rationale for the rules below live in `${CLAUDE_SKILL_DIR}/references/`.
 
-- **playbook-patterns** — [`${CLAUDE_SKILL_DIR}/references/playbook-patterns.md`]: Execution order, static vs dynamic
-  reuse comparison, batched execution, standard directory layouts
-- **role-structure** — [`${CLAUDE_SKILL_DIR}/references/role-structure.md`]: Role directory tree, using roles three
-  ways, platform-specific task splitting, deduplication rules
+- **playbook-patterns** — [`${CLAUDE_SKILL_DIR}/references/playbook-patterns.md`]: Play execution order, static vs
+  dynamic reuse comparison table, batched execution with `serial`, verification flags, standard directory layouts
+- **role-structure** — [`${CLAUDE_SKILL_DIR}/references/role-structure.md`]: Extended directory tree, three ways to use
+  roles (play-level, import_role, include_role) with examples, platform-specific task splitting, argument_specs example,
+  dependency mechanics, deduplication rules
 - **inventory-management** — [`${CLAUDE_SKILL_DIR}/references/inventory-management.md`]: YAML/INI examples, group
   hierarchy, environment separation, AWS/Azure/GCP/NetBox/Terraform plugins, multi-cloud chaining, caching
 - **vault-and-security** — [`${CLAUDE_SKILL_DIR}/references/vault-and-security.md`]: File vs variable encryption,
@@ -35,23 +35,12 @@ Extended examples, patterns, and detailed rationale for the rules below live in 
   driver comparison, CI matrix testing, strategy plugins, SSH pipelining, fact caching, serial batching
 - **execution-environments-and-collections** —
   [`${CLAUDE_SKILL_DIR}/references/execution-environments-and-collections.md`]: EE vs local installs, version 3 schema,
-  FQCN migration, collection certification, Galaxy publishing
-
-## Anti-Patterns
-
-Recognize and avoid these common production failures:
-
-- **Procedural coding in YAML.** Ansible is a desired state engine, not a scripting language. Complex logic belongs in
-  modules or filter plugins, not in task chains.
-- **Monolithic roles.** A role should manage one service or microservice, not an entire stack. Keep provisioning
-  separate from configuration and app deployment.
-- **Treating roles as classes.** Roles are not programming constructs. Avoid deep inheritance hierarchies, tight
-  coupling, or hard dependencies on external variables.
-- **Monolithic inventories.** Split large inventories by function or region. A single static file with 5,000+ hosts
-  takes 15-30 seconds just to load.
-- **Manual-only reviews.** Integrate `ansible-lint` in CI and pre-commit. For enterprise environments, consider
-  policy-as-code tools (Steampunk Spotter, Checkov) to enforce security and compliance gates before automation reaches
-  production.
+  FQCN migration, collection certification, Galaxy publishing, automation mesh, AAP 2.5/2.6 platform architecture
+- **event-driven-ansible** — [`${CLAUDE_SKILL_DIR}/references/event-driven-ansible.md`]: Rulebook structure, event
+  sources, conditions, actions, Event Streams, decision environments, Kafka vs webhooks, performance tuning,
+  troubleshooting
+- **porting-guide** — [`${CLAUDE_SKILL_DIR}/references/porting-guide.md`]: ansible-core 2.17/2.18 breaking changes,
+  Python version requirements, removed modules, AAP 2.5/2.6 deprecations, upgrade strategy
 
 ## Playbook Design
 
@@ -68,6 +57,7 @@ Recognize and avoid these common production failures:
 - Prefer declarative modules (`ansible.builtin.template`, `ansible.builtin.service`, `ansible.builtin.user`) over
   imperative ones (`ansible.builtin.command`, `ansible.builtin.shell`)
 - When `command`/`shell` is unavoidable, add `creates:`, `removes:`, or `changed_when:` to make it idempotent
+- Move complex logic into custom modules or filter plugins — Ansible is a desired state engine, not a scripting language
 - Test idempotency: run twice, second run must report zero changes
 
 ### Static vs Dynamic Reuse
@@ -103,6 +93,10 @@ roles/
 `site.yml` imports tier playbooks. Each tier playbook maps host groups to roles.
 
 ## Roles
+
+A role manages one service or component — not an entire stack. Keep provisioning separate from configuration and
+application deployment. Roles are not programming constructs: avoid deep inheritance hierarchies, tight coupling, or
+hard dependencies on external variables.
 
 ### Structure
 
@@ -154,7 +148,8 @@ Group along three dimensions:
 
 ### Environment Separation
 
-Keep production and staging in separate inventory files or directories. Never mix environments in a single inventory --
+Split large inventories by function or region — a single static file with 5,000+ hosts takes 15-30 seconds to load. Keep
+production and staging in separate inventory files or directories. Never mix environments in a single inventory --
 developers using a mixed inventory need access to all vault passwords.
 
 ### Dynamic Inventory
@@ -351,7 +346,28 @@ When multiple hosts delegate to the same target, use `throttle: 1` or `run_once:
 - `async: N, poll: 0` -- fire-and-forget, check later with `async_status`
 - Do not use `poll: 0` with tasks requiring exclusive locks (package managers)
 
-## Execution Environments
+## Event-Driven Ansible (EDA)
+
+EDA is the "Automation Decisions" component of AAP -- a decision engine that listens to event sources and triggers
+automated responses via rulebooks. Rulebooks are the event-driven equivalent of playbooks: YAML files with sources,
+conditions, and actions.
+
+Key concepts:
+
+- **Rulebooks** define event sources, conditions (`when`), and actions (`run_job_template`, `run_workflow_template`,
+  `set_fact`, `debug`)
+- **Event Streams** (AAP 2.5+) route a single webhook endpoint to multiple rulebook activations with credential
+  integration -- use for production
+- **Decision environments** are container images for running rulebooks (analogous to execution environments for
+  playbooks)
+- Supported controller sources: `alertmanager`, `aws_sqs_queue`, `azure_service_bus`, `kafka`, `pg_listener`, `webhook`
+- Use **Kafka** for high-volume mission-critical streams; **webhooks** for simple integrations; **Event Streams** for
+  production webhook scenarios
+
+See [`${CLAUDE_SKILL_DIR}/references/event-driven-ansible.md`] for rulebook structure, event filters, scaling, and
+troubleshooting.
+
+## Execution Environments and AAP Platform
 
 Container images bundling Ansible Core, Runner, collections, and all dependencies. Replace traditional virtual
 environments for consistent automation execution.
@@ -360,9 +376,21 @@ environments for consistent automation execution.
   collections, Python packages, and system dependencies.
 - **ansible-navigator:** Interactive TUI for playbook development. Drill into task outputs, inspect variables, replay
   artifacts for collaborative debugging. Tightly integrated with EEs for dev-prod parity.
+- **Automation mesh:** Overlay network distributing workloads across execution nodes via peer-to-peer connections using
+  Receptor. Scale execution capacity independently from the control plane.
 
 Use EEs when: enterprise scale, complex dependencies, team consistency needed. Use local installs for: simple setups,
 ad-hoc tasks, beginners.
+
+### AAP 2.5/2.6 Awareness
+
+AAP 2.5 introduced a unified UI, Platform Gateway (single auth entry point), and containerized installer (Podman on
+RHEL). AAP 2.6 adds an automation dashboard (ROI tracking), self-service automation portal, and Ansible Lightspeed
+intelligent assistant.
+
+RPM-based installer is deprecated as of AAP 2.5 -- containerized and operator-based deployments are the future.
+
+See [`${CLAUDE_SKILL_DIR}/references/porting-guide.md`] for AAP platform changes and upgrade guidance.
 
 ## Collections
 
@@ -382,16 +410,17 @@ ad-hoc tasks, beginners.
 
 ### Collection Quality
 
-- Run `ansible-test sanity --docker default` to enforce coding standards
-- Run `ansible-lint --profile production` for certification-grade quality
-- Use `galaxy-importer` in CI to replicate automation hub import checks
-- Follow semantic versioning (minimum 1.0.0 for production)
-- Specify `requires_ansible` in `meta/runtime.yml`
-- For FQCN migration from standalone roles: use `plugin_routing` in `meta/runtime.yml` for backward-compatible redirects
+- `ansible-test sanity --docker default` for coding standards; `ansible-lint --profile production` for certification
+- `galaxy-importer` in CI to replicate automation hub import checks
+- Semantic versioning (minimum 1.0.0), `requires_ansible` in `meta/runtime.yml`
+- FQCN migration: use `plugin_routing` in `meta/runtime.yml` for backward-compatible redirects
 
 ## Testing
 
 ### Pipeline
+
+Integrate `ansible-lint` in CI and pre-commit hooks. For enterprise environments, add policy-as-code tools (Steampunk
+Spotter, Checkov) as gates before automation reaches production.
 
 1. **ansible-lint** -- static analysis in CI and pre-commit hooks
 2. **--syntax-check** -- parse without executing
@@ -402,14 +431,9 @@ ad-hoc tasks, beginners.
 
 ### Molecule
 
-Standard role testing framework. Provides provisioning (Docker/Podman/Vagrant/ cloud/delegated), role application,
-verification, and idempotency testing.
-
-Drivers: Docker (fast, local dev), Podman (rootless, enterprise), Vagrant (full VM, systemd), cloud (production-like),
-delegated (default in Molecule 6, uses Ansible itself for provisioning).
-
-Run `molecule test` for the full lifecycle. Use multiple scenarios for different conditions (default, HA cluster,
-upgrade, edge cases).
+Standard role testing framework. Drivers: Docker (fast, local dev), Podman (rootless, enterprise), Vagrant (full VM),
+delegated (default in Molecule 6). Run `molecule test` for the full lifecycle. Use multiple scenarios for different
+conditions (default, HA cluster, upgrade).
 
 ## Performance
 
@@ -424,34 +448,34 @@ upgrade, edge cases).
 - Use `serial` for staged batching in rolling deployments
 - Profile before optimizing: `callbacks_enabled = timer, profile_tasks`
 
-### Large Inventory Optimizations
+### Large Inventories
 
-- **Inventory caching:** Enable for dynamic inventories to avoid redundant API calls -- cuts loading from 30+ seconds to
-  under 1 second
-- **Constructed inventory plugin:** Build groups dynamically from host metadata instead of maintaining large static
-  group definitions
-- **Flat group hierarchies:** Deep nesting multiplies variable merge cost. Keep hosts in 3-4 groups instead of 6-7
-  nested groups.
-- **Split inventories:** By function or region, target with `-i` or `--limit`
-- **Memory management:** Avoid storing large data in `set_fact`; minimize `group_vars`/`host_vars` file count; disable
-  unused variable lookups
+Enable inventory caching for dynamic sources (30+ seconds to under 1 second). Use constructed inventory plugin over
+large static groups. Flatten group hierarchies (3-4 groups per host, not 6-7). Split inventories by function/region.
+
+## Porting and Compatibility
+
+ansible-core 2.17+ requires Python 3.7+ on managed hosts. RHEL 8 environments must stay on ansible-core 2.16 (system
+Python 3.6 bindings are incompatible). Key removals: `yum` module (redirected to `dnf`), `include` module (use
+`include_tasks`/`import_tasks`), `smart` connection option (select explicit plugin).
+
+ansible-core 2.18 removes old-style vars plugins (`get_host_vars`/`get_group_vars`) and deprecates plural
+`COLLECTIONS_PATHS`. Windows Server 2012/2012 R2 support is removed.
+
+See [`${CLAUDE_SKILL_DIR}/references/porting-guide.md`] for the full list of breaking changes, deprecations, and upgrade
+strategy.
 
 ## Application
 
 When **writing** Ansible automation: apply all conventions silently. If an existing codebase contradicts a convention,
 follow the codebase and flag the divergence.
 
-When **reviewing** Ansible code: cite the specific violation and show the fix inline.
-
-```
-Bad:  "According to Ansible best practices, you should use FQCN..."
-Good: "copy: -> ansible.builtin.copy:"
-```
+When **reviewing** Ansible code: cite the specific violation and show the fix inline. Example:
+`copy: -> ansible.builtin.copy:`
 
 ## Integration
 
-The **coding** skill governs workflow (discovery, planning, verification); this skill governs Ansible-specific
-conventions and patterns. Both are active simultaneously.
+The **coding** skill governs workflow; this skill governs Ansible-specific conventions. Both are active simultaneously.
 
 ## Non-Negotiable Defaults
 

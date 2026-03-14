@@ -183,3 +183,4 @@ Built-in scheduler for system maintenance tasks:
 - Mover schedule (default 3:40 AM daily)
 - SMART tests (short weekly, extended monthly)
 - Configure via Settings > Scheduler
+- **SMART-aware spindown** (7.2+): drives undergoing SMART self-tests no longer spin down mid-check

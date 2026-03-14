@@ -48,6 +48,12 @@ Disable unless explicitly required:
 - **OpenVPN** — Available as plugin or Docker container
 - **Unraid Connect** — Remote WebGUI access via encrypted proxy, requires port forward on router
 
+### OIDC/SSO Login (Unraid 7.2+)
+
+Unraid 7.2 supports logging into the WebGUI via Single Sign-On (SSO) with your Unraid.net account or any OIDC-compliant
+provider. This enables secure, scalable access for remote management and API integrations without sharing the root
+password.
+
 ### Tailscale Integration (Unraid 7+)
 
 - Install Tailscale plugin from Apps tab (or use built-in support in 7.0+)
@@ -136,6 +142,12 @@ docker run --network my-stack ...
 - Preserve custom networks across Docker restarts with a User Script at array start
 - **macvlan on br0 causes call traces** -- switch to ipvlan or disable bridging
 
+### Wi-Fi Support (Unraid 7.1+)
+
+Unraid 7.1 introduced native wireless networking support, including WPA3. Useful for mobile deployments, compact builds,
+or locations without Ethernet access. Configure via Settings > Network Settings. Prefer wired connections for production
+workloads -- Wi-Fi and Docker have known limitations.
+
 ### IPv6
 
 Unraid 7+ supports dynamic IPv4 and IPv6 address configuration. Enable via Settings > Network Settings.
@@ -222,8 +234,16 @@ NUT is the de facto standard for UPS monitoring on NAS systems. Install as plugi
 
 ### Official GraphQL API (Unraid 7.2+)
 
-Unraid 7.2 introduced an official GraphQL-based API as part of the core OS. Enables deeper integrations and
-community-driven developer tooling.
+Unraid 7.2 introduced an official GraphQL-based API as part of the core OS, fully open-source (github.com/unraid/api).
+
+- **Architecture**: GraphQL-based, designed for faster and more dynamic WebGUI updates and third-party integrations
+- **Current capabilities**: array status, Docker containers, network shares, system notifications, CPU usage stats for
+  the Dashboard
+- **Authentication**: supports OIDC (OpenID Connect) and SSO for secure remote or programmatic access
+- **First features built on API**: Notifications panel, Dashboard CPU stats
+- **Roadmap**: storage pool creation interfaces, streamlined container deployment -- the entire WebGUI will transition
+  to the API over time
+- The Unraid Connect plugin adds cloud communication features on top of the API; it remains optional
 
 ### Unraid Management Agent (Third-Party Plugin)
 
@@ -252,6 +272,28 @@ parsing for performance.
 - **MQTT + Home Assistant**: publish system events to MQTT broker for home automation triggers (e.g., shutdown on
   temperature threshold)
 - **Prometheus + Grafana**: monitoring dashboards with alerting rules
+
+## WebGUI (Unraid 7.x)
+
+### Integrated Tools (7.0+)
+
+- **Dynamix File Manager**: built-in file browser for copy, move, delete, rename operations
+- **GUI Search**: search for settings by name from the Menu bar
+
+### Responsive Design (7.2+)
+
+The WebGUI is fully responsive -- adapts to desktops, tablets, and smartphones. Key changes:
+
+- Dashboard distinguishes Intel Performance (P) and Efficiency (E) cores
+- RAM and network stats displayed in human-readable units
+- Notification management view via bell icon
+- Progress indicator for Docker/Plugin/VM popup windows
+- Lockout countdown timer on login page after incorrect attempts
+- Tools > Open Terminal page accessible via search
+
+**Upgrade note**: Theme Engine, Dark Theme, Dynamix Date Time, and Flash Remount plugins are automatically removed
+during 7.2 upgrade (incompatible with responsive CSS). Update all plugins -- especially Unraid Connect and Nvidia Driver
+-- before upgrading.
 
 ## Flash Drive Security
 

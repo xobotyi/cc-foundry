@@ -55,9 +55,13 @@ VLANs (802.1Q) segment network traffic at Layer 2 without additional physical ca
 - Place the **management interface on a dedicated VLAN** — never share the management network with guest traffic
 - Use a **trunk port** on the physical switch connected to the Proxmox host, allowing all required VLAN tags — frames
   with unrecognized VLAN IDs are silently dropped
-- Common VLAN layout: | VLAN | Purpose | |------|---------| | 1 (native) | Management / host access | | 10 |
-  Server/infrastructure | | 20 | User/client network | | 30 | IoT/untrusted devices | | 50 | Storage (Ceph, NFS, iSCSI)
-  | | 100 | DMZ / public-facing services |
+- Common VLAN layout:
+  - **VLAN 1 (native)** — Management / host access
+  - **VLAN 10** — Server/infrastructure
+  - **VLAN 20** — User/client network
+  - **VLAN 30** — IoT/untrusted devices
+  - **VLAN 50** — Storage (Ceph, NFS, iSCSI)
+  - **VLAN 100** — DMZ / public-facing services
 
 **Troubleshooting VLANs:**
 
@@ -126,16 +130,54 @@ bridge-like interface for guest assignment.
   ```
   Note: `default` must be set before interfaces are created (use a `zzz-` prefix sysctl file to ensure late loading)
 
-### PVE 9.0: Fabrics
+### SDN-Firewall Integration (PVE 8.3+)
 
-PVE 9.0 introduces **Fabrics** — automated routing between cluster nodes using FRRouting (FRR) with OpenFabric
-(IS-IS-based, optimized for spine-leaf topologies) or OSPF. Fabrics simplify underlay network configuration for Ceph
-full-mesh and EVPN/VXLAN zone deployments.
+The SDN stack is now tightly integrated with the Proxmox firewall:
+
+- **Automatic IPSets:** SDN auto-generates IPSets for each VNet (`vnet-all`, `vnet-gateway`, `vnet-no-gateway`) and for
+  IPAM-managed guests. Reference these in firewall rules for simplified maintenance.
+- **Forwarded traffic filtering (nftables):** The opt-in nftables firewall can filter forwarded traffic at both host and
+  VNet levels — use to restrict SNAT traffic or traffic flowing between Simple Zones.
+- **IPAM integration:** Guests managed by the IPAM plugin have their IPs automatically added to VNet IPSets.
+
+### EVPN Advanced Features
+
+- **Anycast IP/MAC:** EVPN VNets support anycast addresses — the bridge IP is the same on every node, so guests use a
+  single gateway address regardless of which node they run on
+- **VRF routing:** Routing between VNets in different zones works through Virtual Routing and Forwarding (VRF)
+  interfaces
+- **Inter-cluster EVPN:** Proxmox Datacenter Manager (PDM 1.0) provides initial support for managing EVPN configurations
+  across physically distributed clusters
+
+### Fabrics (PVE 9.0+)
+
+**Fabrics** automate routing between cluster nodes using FRRouting (FRR):
+
+- **OpenFabric** — IS-IS-based, optimized for spine-leaf topologies
+- **OSPF** — traditional link-state routing for flat or hierarchical networks
+
+Fabrics provide the underlay network for:
+
+- Ceph full-mesh connectivity between OSDs
+- EVPN/VXLAN zone deployments
+- Any scenario needing automatic, resilient inter-node routing
+
+Fabrics auto-configure routing protocols on physical interfaces, creating a self-healing network that adapts to topology
+changes (node additions, link failures).
+
+### DHCP/IPAM Integration
+
+SDN includes integrated DHCP management via **dnsmasq**, tied to the IPAM stack:
+
+- IP allocation happens automatically during guest creation when using the PVE IPAM plugin
+- MAC-to-IP mappings are created when the VM starts and cleaned up when destroyed
+- Requires a **gateway** configured on the subnet — without it, DHCP silently fails
 
 ### SDN Best Practices
 
 - Use **VXLAN zones** for overlay networking across nodes without switch changes
 - Use **EVPN** for advanced multi-tenant setups with BGP routing
+- Use **Fabrics** to automate underlay routing — eliminates manual FRR configuration
 - Apply SDN configuration changes via the GUI or `pvesh` — changes require explicit "Apply" to take effect cluster-wide
 - Use SDN for tenant isolation in multi-tenant environments
 - SDN is ideal when physical switch VLAN configuration is impractical or impossible

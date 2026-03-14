@@ -1,6 +1,6 @@
 # Role Structure and Reuse
 
-## Directory Structure
+## Extended Directory Structure
 
 ```
 roles/
@@ -25,15 +25,6 @@ roles/
 ```
 
 No directory is required. A role with only `files/` or only `tasks/` is valid.
-
-## defaults/ vs vars/
-
-| Directory   | Precedence | Override by                                    | Use for                                               |
-| ----------- | ---------- | ---------------------------------------------- | ----------------------------------------------------- |
-| `defaults/` | Very low   | Almost anything                                | User-configurable knobs (ports, paths, feature flags) |
-| `vars/`     | High       | Only `extra-vars`, role params, `include_vars` | Internal constants the role needs to function         |
-
-Rule: if users should change it, put it in `defaults/`. If the role breaks without it, put it in `vars/`.
 
 ## Using Roles
 
@@ -136,9 +127,3 @@ Ansible runs each role once per play by default. To run a role multiple times:
 
 - Pass different parameters (the `roles:` keyword compares parameters)
 - Set `allow_duplicates: true` in the role's `meta/main.yml`
-
-## Naming Conventions
-
-- Role names: lowercase, hyphens for separators (`nginx-proxy`, `ssl-certs`)
-- Prefix all role variables with the role name to avoid collisions: `nginx_port`, `nginx_worker_connections`
-- Prefix all role handlers with the role name: `nginx : Restart nginx`

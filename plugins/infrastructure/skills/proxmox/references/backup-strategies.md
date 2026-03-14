@@ -22,6 +22,12 @@ vzdump creates consistent backup archives of VMs and containers, including disk 
 - **Stop mode:** Stops the guest completely, backs up, restarts. Longest downtime but cleanest backup. Required for some
   LXC containers.
 
+**PVE 8.3+ container backup optimization:** When backing up containers to PBS, PVE can detect unchanged files since the
+last snapshot and skip them — significantly faster container backups for large, mostly-static filesystems.
+
+**PVE 8.4+ backup fleecing:** Refined mechanism that reduces I/O impact on running VMs during live backup operations —
+prevents the I/O stalls that could occur with large, write-heavy VMs during snapshot backups.
+
 ### Backup Compression
 
 - **`lzo`** — fast speed, low ratio, low CPU
@@ -90,6 +96,7 @@ PBS is a dedicated backup solution that provides enterprise features beyond what
 | Bandwidth efficiency   | Full transfer each time    | Changed data only              |
 | Garbage collection     | N/A                        | Automatic unused chunk cleanup |
 | Tape backup            | No                         | Yes (tape media pool support)  |
+| Third-party plugins    | No                         | Yes (PVE 8.4+ backup API)      |
 
 ### PBS Architecture
 
@@ -131,6 +138,13 @@ PBS provides architectural protection against ransomware that compromises the Pr
   admin rights
 - **Verification jobs:** PBS can verify backup integrity independently of PVE
 - **Immutable backups:** Configure datastore namespaces with delete restrictions
+
+### Third-Party Backup API (PVE 8.4+)
+
+PVE 8.4 introduces an official **backup plugin API** that allows external backup providers to integrate directly into
+the Proxmox UI and backup framework. Third-party solutions can register as backup plugins, enabling backup and restore
+operations through the same interface as native PBS — including scheduling, verification, and management features. This
+gives administrators flexibility to use non-Proxmox backup services with first-class integration.
 
 ### Connecting PVE to PBS
 
