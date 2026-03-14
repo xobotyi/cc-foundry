@@ -4,13 +4,14 @@ Structured planning pipeline that converts problem analysis into tracked work it
 
 ## Skills
 
-| Skill                | Purpose                                                                       |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `design-documents`   | Decision records: problem analysis, solution exploration, committed decisions |
-| `technical-design`   | Map chosen solution to codebase components, tools, sequencing                 |
-| `task-decomposition` | Break technical design into actionable task hierarchies                       |
-| `task-creation`      | Create individual tasks in issue trackers with proper categorization          |
-| `youtrack`           | YouTrack domain knowledge — data model, fields, queries, commands, linking    |
+| Skill                | Purpose                                                                        |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `design-documents`   | Decision records: problem analysis, solution exploration, committed decisions  |
+| `technical-design`   | Map chosen solution to codebase components, tools, sequencing                  |
+| `task-decomposition` | Break technical design into actionable task hierarchies                        |
+| `task-creation`      | Create individual tasks in issue trackers with proper categorization           |
+| `youtrack`           | YouTrack domain knowledge — data model, fields, queries, commands, linking     |
+| `diagramming`        | Technical diagram creation with visual design principles (Excalidraw, Mermaid) |
 
 ## Skill Flow
 
@@ -22,10 +23,12 @@ technical-design (solution → components, tools, sequencing)
 task-decomposition (technical design → task hierarchies with acceptance criteria)
     ↓
 task-creation (tasks → tracked work items)
+
+diagramming ← invoked alongside design-documents or technical-design when visual artifacts are needed
 ```
 
-Each skill prompts the user to proceed to the next stage on completion. User approval is required at every stage before
-advancing.
+Each pipeline skill prompts the user to proceed to the next stage on completion. User approval is required at every
+stage before advancing.
 
 ## Pipeline Usage
 
@@ -39,6 +42,11 @@ context.
 **YouTrack-specific work:** The `youtrack` skill provides domain knowledge for YouTrack's data model, custom fields,
 query language, commands, and linking. It complements `task-creation` (which is tracker-agnostic) with YouTrack-specific
 field handling and conventions. Invoke both when creating issues in YouTrack.
+
+**Diagrams:** The `diagramming` skill is a cross-cutting companion — not a pipeline stage. Invoke it alongside
+`design-documents` or `technical-design` when creating architecture diagrams, flowcharts, sequence diagrams, or any
+visual artifact. It covers format selection (Excalidraw vs Mermaid), visual design principles, and layout strategies
+that compensate for LLM spatial reasoning limitations.
 
 ## Conventions
 
