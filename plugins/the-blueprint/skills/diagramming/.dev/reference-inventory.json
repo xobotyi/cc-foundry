@@ -1,0 +1,17 @@
+{
+  "sources": {
+    "Excalidraw JSON Schema": "https://docs.excalidraw.com/docs/codebase/json-schema",
+    "Excalidraw Element Skeleton API": "https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/excalidraw-element-skeleton",
+    "Excalidraw Props Reference": "https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props",
+    "Excalidraw Elbow Arrows Design": "https://plus.excalidraw.com/blog/building-elbow-arrows-part-one",
+    "Mermaid Syntax Reference": "https://mermaid.js.org/intro/syntax-reference.html",
+    "Mermaid Flowchart Syntax": "https://mermaid.js.org/syntax/flowchart.html",
+    "Mermaid Sequence Diagram": "https://mermaid.js.org/syntax/sequenceDiagram.html",
+    "Mermaid Class Diagram": "https://mermaid.js.org/syntax/classDiagram.html",
+    "Mermaid State Diagram": "https://mermaid.js.org/syntax/stateDiagram.html",
+    "Mermaid Entity Relationship": "https://mermaid.js.org/syntax/entityRelationshipDiagram.html",
+    "Mermaid Theming": "https://mermaid.js.org/config/theming.html",
+    "Copilot Excalidraw Generator SKILL.md": "https://raw.githubusercontent.com/github/awesome-copilot/main/skills/excalidraw-diagram-generator/SKILL.md"
+  },
+  "lastFetched": "2026-03-14T10:25:39.059Z"
+}

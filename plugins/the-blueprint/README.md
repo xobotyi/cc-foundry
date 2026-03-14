@@ -80,6 +80,16 @@ mechanics, state machine constraints, and YouTrack's query/command syntax.
 **Use when:** Creating, searching, or updating issues in YouTrack. Use alongside task-creation for issue creation —
 task-creation handles description quality, youtrack handles field correctness.
 
+### diagramming
+
+Technical diagram creation with visual design principles. Covers format selection (Excalidraw for precise spatial
+control, Mermaid for portable markdown-embedded diagrams), Gestalt-based layout rules, semantic color palettes,
+complexity budgets, and layout templates that compensate for LLM spatial reasoning limitations.
+
+**Use when:** Creating, reviewing, or improving any visual diagram — architecture diagrams, flowcharts, sequence
+diagrams, ER diagrams, mind maps, or any visual representation of systems and processes. Works with both Excalidraw
+(`.excalidraw` JSON files) and Mermaid (inline markdown).
+
 ## Skill Relationships
 
 The skills form a linear pipeline with user approval gates at each transition:
@@ -92,6 +102,10 @@ Each skill prompts the user to proceed to the next stage on completion. Approval
 
 task-creation can also be invoked standalone for creating individual tasks without going through the full pipeline. When
 working with YouTrack specifically, the youtrack skill complements task-creation with tracker-specific domain knowledge.
+
+diagramming is a cross-cutting companion skill — not a pipeline stage. It can be invoked alongside design-documents or
+technical-design to create visual artifacts (architecture diagrams, flowcharts, data flow diagrams), or standalone for
+any diagramming task.
 
 ## Document Conventions
 
