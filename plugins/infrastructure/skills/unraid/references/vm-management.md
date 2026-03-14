@@ -25,26 +25,20 @@
 
 ### BIOS Types
 
-| Type        | Use Case                                             |
-| ----------- | ---------------------------------------------------- |
-| SeaBIOS     | Legacy operating systems                             |
-| OVMF (UEFI) | Windows 8+, modern Linux, GPU passthrough (required) |
+- **SeaBIOS** — Legacy operating systems
+- **OVMF (UEFI)** — Windows 8+, modern Linux, GPU passthrough (required)
 
 BIOS type can only be set at VM creation time.
 
 ### Machine Types
 
-| Type   | Use Case                                           |
-| ------ | -------------------------------------------------- |
-| i440fx | Default for Windows VMs                            |
-| Q35    | Default for Linux, recommended for GPU passthrough |
+- **i440fx** — Default for Windows VMs
+- **Q35** — Default for Linux, recommended for GPU passthrough
 
 ### vDisk Types
 
-| Type  | Characteristics                                |
-| ----- | ---------------------------------------------- |
-| RAW   | Best performance, no snapshot support          |
-| QCOW2 | Supports snapshots, slightly lower performance |
+- **RAW** — Best performance, no snapshot support
+- **QCOW2** — Supports snapshots, slightly lower performance
 
 ### Windows VM Configuration
 

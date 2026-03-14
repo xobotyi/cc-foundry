@@ -25,18 +25,16 @@ A window overlaid on the primary content. Users cannot interact with content out
 
 ### Requirements
 
-| Aspect           | Requirement                                                           |
-| ---------------- | --------------------------------------------------------------------- |
-| Role             | `role="dialog"` on container                                          |
-| Modal            | `aria-modal="true"`                                                   |
-| Label            | `aria-labelledby` pointing to visible title                           |
-| Description      | `aria-describedby` for simple dialog messages                         |
-| Focus on open    | Move to first focusable element (or dialog title for complex content) |
-| Focus trap       | Tab/Shift+Tab cycles within dialog only                               |
-| Escape           | Closes the dialog                                                     |
-| Focus on close   | Returns to the element that triggered the dialog                      |
-| Inert background | Prevent interaction with content behind the dialog                    |
-| Close button     | Include a visible close/cancel button                                 |
+- **Role** — `role="dialog"` on container
+- **Modal** — `aria-modal="true"`
+- **Label** — `aria-labelledby` pointing to visible title
+- **Description** — `aria-describedby` for simple dialog messages
+- **Focus on open** — move to first focusable element (or dialog title for complex content)
+- **Focus trap** — Tab/Shift+Tab cycles within dialog only
+- **Escape** — closes the dialog
+- **Focus on close** — returns to the element that triggered the dialog
+- **Inert background** — prevent interaction with content behind the dialog
+- **Close button** — include a visible close/cancel button
 
 ### Native `<dialog>`
 
@@ -82,17 +80,15 @@ A set of layered panels where one panel is visible at a time.
 
 ### Requirements
 
-| Aspect          | Requirement                                                      |
-| --------------- | ---------------------------------------------------------------- |
-| Container       | `role="tablist"` with `aria-label`                               |
-| Tabs            | `role="tab"` on each tab, inside/owned by tablist                |
-| Panels          | `role="tabpanel"` linked via `aria-controls`/`aria-labelledby`   |
-| Selected        | `aria-selected="true"` on active tab                             |
-| Arrow keys      | Left/Right (horizontal) or Up/Down (vertical) to switch tabs     |
-| Tab key         | Moves focus into the active panel, not to the next tab           |
-| Home/End        | Move to first/last tab                                           |
-| Roving tabindex | Active tab: `tabindex="0"`, others: `tabindex="-1"`              |
-| Orientation     | Add `aria-orientation="vertical"` if tabs are stacked vertically |
+- **Container** — `role="tablist"` with `aria-label`
+- **Tabs** — `role="tab"` on each tab, inside/owned by tablist
+- **Panels** — `role="tabpanel"` linked via `aria-controls`/`aria-labelledby`
+- **Selected** — `aria-selected="true"` on active tab
+- **Arrow keys** — Left/Right (horizontal) or Up/Down (vertical) to switch tabs
+- **Tab key** — moves focus into the active panel, not to the next tab
+- **Home/End** — move to first/last tab
+- **Roving tabindex** — active tab: `tabindex="0"`, others: `tabindex="-1"`
+- **Orientation** — add `aria-orientation="vertical"` if tabs are stacked vertically
 
 ## Accordion
 
@@ -119,14 +115,12 @@ Vertically stacked headings that expand/collapse associated content panels.
 
 ### Requirements
 
-| Aspect      | Requirement                                                   |
-| ----------- | ------------------------------------------------------------- |
-| Trigger     | `<button>` inside a heading element                           |
-| State       | `aria-expanded="true"/"false"` on the button                  |
-| Association | `aria-controls` pointing to the panel ID                      |
-| Panel role  | `role="region"` with `aria-labelledby` referencing the header |
-| Enter/Space | Toggle expanded/collapsed                                     |
-| Optional    | Arrow keys between accordion headers, Home/End for first/last |
+- **Trigger** — `<button>` inside a heading element
+- **State** — `aria-expanded="true"/"false"` on the button
+- **Association** — `aria-controls` pointing to the panel ID
+- **Panel role** — `role="region"` with `aria-labelledby` referencing the header
+- **Enter/Space** — toggle expanded/collapsed
+- **Optional** — arrow keys between accordion headers, Home/End for first/last
 
 ## Disclosure (Show/Hide)
 
@@ -169,18 +163,16 @@ Action menus (not navigation menus). Use for lists of commands/actions.
 
 ### Requirements
 
-| Aspect                 | Requirement                                            |
-| ---------------------- | ------------------------------------------------------ |
-| Trigger                | Button with `aria-haspopup="true"` and `aria-expanded` |
-| Menu                   | `role="menu"` on the container                         |
-| Items                  | `role="menuitem"` on each item                         |
-| Enter/Space on trigger | Opens menu, focuses first item                         |
-| Arrow Down on trigger  | Opens menu, focuses first item                         |
-| Arrow Up/Down          | Navigate menu items                                    |
-| Enter                  | Activate focused item and close                        |
-| Escape                 | Close menu, return focus to trigger                    |
-| Tab                    | Close menu, move focus to next element after trigger   |
-| Home/End               | First/last menu item                                   |
+- **Trigger** — button with `aria-haspopup="true"` and `aria-expanded`
+- **Menu** — `role="menu"` on the container
+- **Items** — `role="menuitem"` on each item
+- **Enter/Space on trigger** — opens menu, focuses first item
+- **Arrow Down on trigger** — opens menu, focuses first item
+- **Arrow Up/Down** — navigate menu items
+- **Enter** — activate focused item and close
+- **Escape** — close menu, return focus to trigger
+- **Tab** — close menu, move focus to next element after trigger
+- **Home/End** — first/last menu item
 
 **Do not use `role="menu"` for navigation menus.** Use `<nav>` with a list of links instead.
 
@@ -210,17 +202,15 @@ A text input with an associated popup list of suggestions.
 
 ### Requirements
 
-| Aspect        | Requirement                                                     |
-| ------------- | --------------------------------------------------------------- |
-| Input         | `role="combobox"`, `aria-expanded`, `aria-autocomplete`         |
-| List          | `role="listbox"` with `role="option"` children                  |
-| Association   | `aria-controls` on input pointing to listbox                    |
-| Active option | `aria-activedescendant` on input pointing to highlighted option |
-| Arrow Down    | Open list if closed; navigate down in list                      |
-| Arrow Up      | Navigate up in list                                             |
-| Enter         | Select highlighted option, close list                           |
-| Escape        | Close list, clear selection highlight                           |
-| Typing        | Filter options and update list                                  |
+- **Input** — `role="combobox"`, `aria-expanded`, `aria-autocomplete`
+- **List** — `role="listbox"` with `role="option"` children
+- **Association** — `aria-controls` on input pointing to listbox
+- **Active option** — `aria-activedescendant` on input pointing to highlighted option
+- **Arrow Down** — open list if closed; navigate down in list
+- **Arrow Up** — navigate up in list
+- **Enter** — select highlighted option, close list
+- **Escape** — close list, clear selection highlight
+- **Typing** — filter options and update list
 
 ## Tooltip
 

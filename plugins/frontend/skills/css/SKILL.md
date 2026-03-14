@@ -16,13 +16,13 @@ clever one-liners.
 
 ## References
 
-| Topic         | Reference                                           | Contents                                                                                 |
-| ------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Layout        | [`${CLAUDE_SKILL_DIR}/references/layout.md`]        | Flex shorthand values, grid details (subgrid, implicit rows, alignment), layout patterns |
-| Modern CSS    | [`${CLAUDE_SKILL_DIR}/references/modern-css.md`]    | Extended modern CSS patterns and examples                                                |
-| SCSS          | [`${CLAUDE_SKILL_DIR}/references/scss.md`]          | `@forward` patterns, module configuration, built-in modules, file organization           |
-| Responsive    | [`${CLAUDE_SKILL_DIR}/references/responsive.md`]    | Extended responsive design patterns and examples                                         |
-| Methodologies | [`${CLAUDE_SKILL_DIR}/references/methodologies.md`] | Methodology patterns and architecture details                                            |
+- **Layout** — [`${CLAUDE_SKILL_DIR}/references/layout.md`]: Flex shorthand values, grid details (subgrid, implicit
+  rows, alignment), layout patterns
+- **Modern CSS** — [`${CLAUDE_SKILL_DIR}/references/modern-css.md`]: Extended modern CSS patterns and examples
+- **SCSS** — [`${CLAUDE_SKILL_DIR}/references/scss.md`]: `@forward` patterns, module configuration, built-in modules,
+  file organization
+- **Responsive** — [`${CLAUDE_SKILL_DIR}/references/responsive.md`]: Extended responsive design patterns and examples
+- **Methodologies** — [`${CLAUDE_SKILL_DIR}/references/methodologies.md`]: Methodology patterns and architecture details
 
 ## Selectors and Specificity
 
@@ -114,11 +114,9 @@ Both work together — a grid item can be a flex container and vice versa.
 
 ### Container Query Units
 
-| Unit              | Meaning                             |
-| ----------------- | ----------------------------------- |
-| `cqw` / `cqh`     | 1% of container width / height      |
-| `cqi` / `cqb`     | 1% of container inline / block size |
-| `cqmin` / `cqmax` | Smaller / larger of `cqi` or `cqb`  |
+- `cqw` / `cqh` — 1% of container width / height
+- `cqi` / `cqb` — 1% of container inline / block size
+- `cqmin` / `cqmax` — smaller / larger of `cqi` or `cqb`
 
 Use `cqi` instead of `vw` for container-scoped fluid values: `font-size: clamp(1rem, 2.5cqi + 0.5rem, 2rem)`
 
@@ -128,12 +126,10 @@ Use `cqi` instead of `vw` for container-scoped fluid values: `font-size: clamp(1
 
 Design from the inside out — use the right tool for each level:
 
-| Level            | Tool                                        | When                           |
-| ---------------- | ------------------------------------------- | ------------------------------ |
-| Content-driven   | Flexbox wrapping, `min()`/`max()`/`clamp()` | Always — baseline              |
-| Container-driven | Container queries, `cqi`/`cqw` units        | Component adapts to parent     |
-| Viewport-driven  | Media queries, `vw`/`vh`/`dvh`              | Page-level layout changes      |
-| User preference  | `prefers-*` media queries                   | Color scheme, motion, contrast |
+- **Content-driven** — Flexbox wrapping, `min()`/`max()`/`clamp()`: always — baseline
+- **Container-driven** — Container queries, `cqi`/`cqw` units: component adapts to parent
+- **Viewport-driven** — Media queries, `vw`/`vh`/`dvh`: page-level layout changes
+- **User preference** — `prefers-*` media queries: color scheme, motion, contrast
 
 ### Core Rules
 
@@ -159,14 +155,12 @@ Design from the inside out — use the right tool for each level:
 Use logical properties for layout-sensitive values (margins, padding, borders, text alignment, positioning offsets).
 Physical properties are fine for visual effects not affected by writing direction (e.g., box-shadow offsets).
 
-| Physical           | Logical                       |
-| ------------------ | ----------------------------- |
-| `left` / `right`   | `inline-start` / `inline-end` |
-| `top` / `bottom`   | `block-start` / `block-end`   |
-| `width` / `height` | `inline-size` / `block-size`  |
-| `margin-left`      | `margin-inline-start`         |
-| `padding-top`      | `padding-block-start`         |
-| `text-align: left` | `text-align: start`           |
+- `left` / `right` → `inline-start` / `inline-end`
+- `top` / `bottom` → `block-start` / `block-end`
+- `width` / `height` → `inline-size` / `block-size`
+- `margin-left` → `margin-inline-start`
+- `padding-top` → `padding-block-start`
+- `text-align: left` → `text-align: start`
 
 Shorthands: `margin-block: 1rem 2rem` (block-start, block-end); `margin-inline: auto` (both inline directions).
 

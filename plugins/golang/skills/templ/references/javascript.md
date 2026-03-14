@@ -205,11 +205,9 @@ For TypeScript/NPM projects, use `esbuild` to bundle into a single JS file, then
 
 ## Method Summary
 
-| Method                   | Purpose                                      | Encoding                 |
-| ------------------------ | -------------------------------------------- | ------------------------ |
-| `templ.JSFuncCall`       | Call JS function with Go data                | JSON-encoded args        |
-| `templ.JSExpression`     | Raw JS expression (event, this)              | None — raw output        |
-| `templ.JSONString`       | Go data → JSON string for attributes         | JSON + HTML-encoded      |
-| `templ.JSONScript`       | Go data → `<script type="application/json">` | JSON                     |
-| `{{ value }}` in scripts | Inline interpolation                         | Context-dependent        |
-| `templ.JSUnsafeFuncCall` | Bypass function name sanitization            | None — **security risk** |
+- `templ.JSFuncCall` — call JS function with Go data; args are JSON-encoded
+- `templ.JSExpression` — raw JS expression (event, this); no encoding — raw output
+- `templ.JSONString` — Go data → JSON string for attributes; JSON + HTML-encoded
+- `templ.JSONScript` — Go data → `<script type="application/json">`; JSON-encoded
+- `{{ value }}` in scripts — inline interpolation; context-dependent encoding
+- `templ.JSUnsafeFuncCall` — bypass function name sanitization; no encoding — **security risk**

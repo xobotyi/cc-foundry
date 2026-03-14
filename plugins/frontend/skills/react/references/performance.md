@@ -241,12 +241,10 @@ const root = createRoot(document.getElementById('root'), {
 
 ## Anti-Patterns
 
-| Don't                                  | Do                                                                      |
-| -------------------------------------- | ----------------------------------------------------------------------- |
-| Wrap every component in `memo`         | Let React Compiler handle it; profile first                             |
-| `useMemo` for cheap computations       | Just compute inline                                                     |
-| `useCallback` on every function        | Only when needed as escape hatch                                        |
-| Fetch in `useEffect` without cleanup   | Use a data library or `use()` with Suspense                             |
-| `"use client"` on everything           | Default to Server Components; add `"use client"` only for interactivity |
-| Sequential awaits for independent data | `Promise.all` for parallel fetches                                      |
-| Barrel file imports                    | Direct imports to specific modules                                      |
+- **Wrap every component in `memo`** — Let React Compiler handle it; profile first
+- **`useMemo` for cheap computations** — Just compute inline
+- **`useCallback` on every function** — Only when needed as escape hatch
+- **Fetch in `useEffect` without cleanup** — Use a data library or `use()` with Suspense
+- **`"use client"` on everything** — Default to Server Components; add `"use client"` only for interactivity
+- **Sequential awaits for independent data** — `Promise.all` for parallel fetches
+- **Barrel file imports** — Direct imports to specific modules

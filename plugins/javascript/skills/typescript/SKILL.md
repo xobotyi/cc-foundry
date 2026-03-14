@@ -42,23 +42,19 @@ obvious. Never fight the type system — if you need `as` or `any`, the types ar
 
 ### `unknown` vs `any` Decision
 
-| Situation                                                  | Use                             |
-| ---------------------------------------------------------- | ------------------------------- |
-| Value from external source (API, JSON.parse, user input)   | `unknown`                       |
-| Function accepts anything, passes through without touching | `unknown`                       |
-| Migrating JS to TS incrementally                           | `any` (temporary, with comment) |
-| Test mock that intentionally bypasses type checking        | `any` (with comment)            |
+- **Value from external source (API, JSON.parse, user input)** → `unknown`
+- **Function accepts anything, passes through without touching** → `unknown`
+- **Migrating JS to TS incrementally** → `any` (temporary, with comment)
+- **Test mock that intentionally bypasses type checking** → `any` (with comment)
 
 ### The `{}` Type
 
 `{}` means "any non-nullish value" — almost never what you want.
 
-| Type                      | Allows                                            |
-| ------------------------- | ------------------------------------------------- |
-| `unknown`                 | Everything (null, undefined, primitives, objects) |
-| `object`                  | Non-primitive, non-null values                    |
-| `{}`                      | Any non-nullish value (primitives included)       |
-| `Record<string, unknown>` | Objects with string keys                          |
+- **`unknown`** → Everything (null, undefined, primitives, objects)
+- **`object`** → Non-primitive, non-null values
+- **`{}`** → Any non-nullish value (primitives included)
+- **`Record<string, unknown>`** → Objects with string keys
 
 Prefer `unknown` for opaque values, `Record<string, unknown>` for dict-like objects, `object` when you need "any
 non-primitive".
@@ -125,12 +121,10 @@ Conditional types (`T extends U ? X : Y`), mapped types (`{ [P in keyof T]: ... 
 
 ### Complexity Budget
 
-| Tier     | Tools                                   | Use When                      |
-| -------- | --------------------------------------- | ----------------------------- |
-| Simple   | `interface`, `type` alias, union        | Always — default choice       |
-| Moderate | `Partial`, `Pick`, `Omit`, `Record`     | Well-known transformations    |
-| Advanced | Conditional, mapped, template literal   | Library code, framework types |
-| Expert   | Recursive types, complex `infer` chains | Rarely — last resort          |
+- **Simple** (`interface`, `type` alias, union) → Always — default choice
+- **Moderate** (`Partial`, `Pick`, `Omit`, `Record`) → Well-known transformations
+- **Advanced** (Conditional, mapped, template literal) → Library code, framework types
+- **Expert** (Recursive types, complex `infer` chains) → Rarely — last resort
 
 Stay at the lowest tier that solves your problem. If you can't explain what a type does in one sentence, it's too
 complex — split it, simplify it, or use explicit interfaces.

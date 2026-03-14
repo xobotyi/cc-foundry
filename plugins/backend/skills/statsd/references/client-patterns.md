@@ -130,23 +130,19 @@ client.increment("requests", rate=0.1)
 
 ### Sample Rate Corrections by Type
 
-| Type         | Server Correction                     |
-| ------------ | ------------------------------------- |
-| Counter      | Value multiplied by `1/rate`          |
-| Gauge        | No correction (last value kept as-is) |
-| Set          | No correction                         |
-| Histogram    | Count corrected; other stats are not  |
-| Distribution | Value counted `1/rate` times          |
+- **Counter** — Value multiplied by `1/rate`
+- **Gauge** — No correction (last value kept as-is)
+- **Set** — No correction
+- **Histogram** — Count corrected; other stats are not
+- **Distribution** — Value counted `1/rate` times
 
 ### When to Sample
 
-| Scenario               | Recommendation                                           |
-| ---------------------- | -------------------------------------------------------- |
-| < 1000 metrics/sec     | `rate=1.0` (no sampling)                                 |
-| 1000-10000 metrics/sec | `rate=0.5` to `rate=0.1` for counters/timers             |
-| > 10000 metrics/sec    | `rate=0.1` or lower; also enable client-side aggregation |
-| Gauges                 | Always `rate=1.0`                                        |
-| Sets                   | Always `rate=1.0`                                        |
+- **< 1000 metrics/sec** — `rate=1.0` (no sampling)
+- **1000-10000 metrics/sec** — `rate=0.5` to `rate=0.1` for counters/timers
+- **> 10000 metrics/sec** — `rate=0.1` or lower; also enable client-side aggregation
+- **Gauges** — Always `rate=1.0`
+- **Sets** — Always `rate=1.0`
 
 **Do not sample gauges or sets.** The server cannot correct for sampling on these types — you'll get randomly missing
 data points.

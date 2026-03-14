@@ -86,16 +86,14 @@ a queue publish).
 
 ### Choosing the Right Signal
 
-| Question                                           | Signal        |
-| -------------------------------------------------- | ------------- |
-| "Is the system healthy right now?"                 | Metrics       |
-| "Why did this specific request fail?"              | Traces + Logs |
-| "What happened at 03:14 on node-7?"                | Logs          |
-| "Where is the bottleneck in checkout flow?"        | Traces        |
-| "Are error rates increasing over the last hour?"   | Metrics       |
-| "What was the full stack trace of that exception?" | Logs          |
-| "Which downstream service is slow?"                | Traces        |
-| "How much headroom does the database have?"        | Metrics       |
+- **"Is the system healthy right now?"** — Metrics
+- **"Why did this specific request fail?"** — Traces + Logs
+- **"What happened at 03:14 on node-7?"** — Logs
+- **"Where is the bottleneck in checkout flow?"** — Traces
+- **"Are error rates increasing over the last hour?"** — Metrics
+- **"What was the full stack trace of that exception?"** — Logs
+- **"Which downstream service is slow?"** — Traces
+- **"How much headroom does the database have?"** — Metrics
 
 ---
 
@@ -112,14 +110,12 @@ are acceptable only in local development. Structured logs are machine-parseable,
 
 Use levels consistently. Every team member must agree on what each level means.
 
-| Level              | Purpose                                  | Alerting                       |
-| ------------------ | ---------------------------------------- | ------------------------------ |
-| **FATAL/CRITICAL** | Process cannot continue; about to crash  | Page immediately               |
-| **ERROR**          | Operation failed; requires investigation | Alert / ticket                 |
-| **WARN**           | Unexpected condition; system compensated | Monitor trend                  |
-| **INFO**           | Significant business or lifecycle event  | Dashboard                      |
-| **DEBUG**          | Diagnostic detail for developers         | Never in production by default |
-| **TRACE**          | Extremely verbose step-by-step flow      | Never in production            |
+- **FATAL/CRITICAL** — Process cannot continue; about to crash. Alerting: Page immediately
+- **ERROR** — Operation failed; requires investigation. Alerting: Alert / ticket
+- **WARN** — Unexpected condition; system compensated. Alerting: Monitor trend
+- **INFO** — Significant business or lifecycle event. Alerting: Dashboard
+- **DEBUG** — Diagnostic detail for developers. Alerting: Never in production by default
+- **TRACE** — Extremely verbose step-by-step flow. Alerting: Never in production
 
 Rules:
 
@@ -134,28 +130,24 @@ Rules:
 
 Every log record should include these baseline fields:
 
-| Field       | Purpose                                      |
-| ----------- | -------------------------------------------- |
-| `timestamp` | ISO 8601, UTC                                |
-| `level`     | Severity (ERROR, WARN, INFO, ...)            |
-| `message`   | Human-readable summary of the event          |
-| `service`   | Service name emitting the log                |
-| `version`   | Service version / build / commit SHA         |
-| `trace_id`  | Distributed trace ID (if in request context) |
-| `span_id`   | Current span ID (if in request context)      |
+- `timestamp`: ISO 8601, UTC
+- `level`: Severity (ERROR, WARN, INFO, ...)
+- `message`: Human-readable summary of the event
+- `service`: Service name emitting the log
+- `version`: Service version / build / commit SHA
+- `trace_id`: Distributed trace ID (if in request context)
+- `span_id`: Current span ID (if in request context)
 
 Add contextual fields relevant to the event:
 
-| Field                                     | When                           |
-| ----------------------------------------- | ------------------------------ |
-| `user_id`                                 | User-initiated actions         |
-| `request_id`                              | Per-request correlation        |
-| `duration_ms`                             | Timed operations               |
-| `error.type`                              | Error class/name               |
-| `error.message`                           | Error description              |
-| `error.stack`                             | Stack trace (ERROR level only) |
-| `http.method`, `http.path`, `http.status` | HTTP request/response          |
-| `db.operation`, `db.duration_ms`          | Database calls                 |
+- `user_id`: User-initiated actions
+- `request_id`: Per-request correlation
+- `duration_ms`: Timed operations
+- `error.type`: Error class/name
+- `error.message`: Error description
+- `error.stack`: Stack trace (ERROR level only)
+- `http.method`, `http.path`, `http.status`: HTTP request/response
+- `db.operation`, `db.duration_ms`: Database calls
 
 ### Sensitive Data
 
@@ -203,12 +195,10 @@ be lost.
 
 ### Metric Types
 
-| Type          | Behavior                                    | Use For                                                 |
-| ------------- | ------------------------------------------- | ------------------------------------------------------- |
-| **Counter**   | Monotonically increasing; resets on restart | Totals: requests, errors, bytes sent                    |
-| **Gauge**     | Arbitrary value; goes up and down           | Snapshots: queue depth, memory usage, connections       |
-| **Histogram** | Client-side aggregation into buckets        | Distributions: request latency, payload size            |
-| **Summary**   | Client-side quantile calculation            | Pre-computed percentiles (less flexible than histogram) |
+- **Counter** — Monotonically increasing; resets on restart. Use for totals: requests, errors, bytes sent
+- **Gauge** — Arbitrary value; goes up and down. Use for snapshots: queue depth, memory usage, connections
+- **Histogram** — Client-side aggregation into buckets. Use for distributions: request latency, payload size
+- **Summary** — Client-side quantile calculation. Use for pre-computed percentiles (less flexible than histogram)
 
 Rules:
 
@@ -226,12 +216,10 @@ Rules:
 
 For every user-facing service, measure these four:
 
-| Signal         | What It Measures          | Example                                      |
-| -------------- | ------------------------- | -------------------------------------------- |
-| **Latency**    | Time to serve a request   | `http_request_duration_seconds` histogram    |
-| **Traffic**    | Demand on the system      | `http_requests_total` counter by method/path |
-| **Errors**     | Rate of failed requests   | `http_requests_total{status=~"5.."}`         |
-| **Saturation** | How "full" the service is | CPU usage, memory, queue depth, thread pool  |
+- **Latency** — Time to serve a request. Example: `http_request_duration_seconds` histogram
+- **Traffic** — Demand on the system. Example: `http_requests_total` counter by method/path
+- **Errors** — Rate of failed requests. Example: `http_requests_total{status=~"5.."}`
+- **Saturation** — How "full" the service is. Example: CPU usage, memory, queue depth, thread pool
 
 Distinguish **successful latency from error latency**. A fast 500 is not good latency. A slow error is worse than a fast
 error. Track both.
@@ -259,13 +247,12 @@ together.
 
 #### Service-Type Instrumentation
 
-| Service Type                                | Key Metrics                                                                        |
-| ------------------------------------------- | ---------------------------------------------------------------------------------- |
-| **Online-serving** (HTTP, gRPC)             | Request rate, error rate, latency (p50/p90/p99), in-flight requests                |
-| **Offline-processing** (workers, pipelines) | Items in/out per stage, processing duration, last-processed timestamp, queue depth |
-| **Batch jobs**                              | Last successful completion time, job duration, records processed, exit status      |
-| **Caches**                                  | Hit rate, miss rate, eviction count, latency to backend on miss                    |
-| **Thread/connection pools**                 | Pool size, active count, queue length, wait time                                   |
+- **Online-serving** (HTTP, gRPC) — Request rate, error rate, latency (p50/p90/p99), in-flight requests
+- **Offline-processing** (workers, pipelines) — Items in/out per stage, processing duration, last-processed timestamp,
+  queue depth
+- **Batch jobs** — Last successful completion time, job duration, records processed, exit status
+- **Caches** — Hit rate, miss rate, eviction count, latency to backend on miss
+- **Thread/connection pools** — Pool size, active count, queue length, wait time
 
 ### Metric Naming
 
@@ -328,26 +315,22 @@ dominate user experience when users hit multiple services per page load.
 
 ### Core Concepts
 
-| Concept             | Definition                                                                    |
-| ------------------- | ----------------------------------------------------------------------------- |
-| **Trace**           | End-to-end record of a single request across all services                     |
-| **Span**            | One unit of work within a trace (HTTP call, DB query, function)               |
-| **Root span**       | First span in a trace; has no parent                                          |
-| **Child span**      | Span nested under a parent; represents a sub-operation                        |
-| **Span context**    | Immutable bag of `trace_id` + `span_id` + flags, propagated across boundaries |
-| **Span attributes** | Key-value metadata on a span (http.method, db.statement)                      |
-| **Span events**     | Timestamped annotations within a span's lifetime                              |
-| **Span links**      | Causal references between spans in different traces                           |
+- **Trace** — End-to-end record of a single request across all services
+- **Span** — One unit of work within a trace (HTTP call, DB query, function)
+- **Root span** — First span in a trace; has no parent
+- **Child span** — Span nested under a parent; represents a sub-operation
+- **Span context** — Immutable bag of `trace_id` + `span_id` + flags, propagated across boundaries
+- **Span attributes** — Key-value metadata on a span (http.method, db.statement)
+- **Span events** — Timestamped annotations within a span's lifetime
+- **Span links** — Causal references between spans in different traces
 
 ### Span Kinds
 
-| Kind         | Direction                 | Example                             |
-| ------------ | ------------------------- | ----------------------------------- |
-| **Client**   | Outgoing synchronous call | HTTP request to another service     |
-| **Server**   | Incoming synchronous call | Handling an HTTP request            |
-| **Producer** | Creates async work        | Publishing to a message queue       |
-| **Consumer** | Processes async work      | Consuming from a message queue      |
-| **Internal** | No network boundary       | In-process function instrumentation |
+- **Client** — Outgoing synchronous call. Example: HTTP request to another service
+- **Server** — Incoming synchronous call. Example: Handling an HTTP request
+- **Producer** — Creates async work. Example: Publishing to a message queue
+- **Consumer** — Processes async work. Example: Consuming from a message queue
+- **Internal** — No network boundary. Example: In-process function instrumentation
 
 ### Context Propagation
 
@@ -369,39 +352,33 @@ Rules:
 
 Instrument at meaningful boundaries:
 
-| Boundary                        | Instrument?                            |
-| ------------------------------- | -------------------------------------- |
-| Incoming HTTP/gRPC requests     | Always — auto-instrument               |
-| Outgoing HTTP/gRPC calls        | Always — auto-instrument               |
-| Database queries                | Always — auto-instrument or manual     |
-| Cache operations                | Yes — hit/miss as attribute            |
-| Queue publish/consume           | Yes — link producer and consumer spans |
-| Significant business operations | Yes — manual spans for key logic       |
-| Tight loops / trivial functions | No — noise, performance cost           |
+- **Incoming HTTP/gRPC requests** — Always — auto-instrument
+- **Outgoing HTTP/gRPC calls** — Always — auto-instrument
+- **Database queries** — Always — auto-instrument or manual
+- **Cache operations** — Yes — hit/miss as attribute
+- **Queue publish/consume** — Yes — link producer and consumer spans
+- **Significant business operations** — Yes — manual spans for key logic
+- **Tight loops / trivial functions** — No — noise, performance cost
 
 ### Span Attributes
 
 Attach attributes that enable filtering and analysis:
 
-| Attribute                                        | When                        |
-| ------------------------------------------------ | --------------------------- |
-| `http.method`, `http.route`, `http.status_code`  | HTTP spans                  |
-| `db.system`, `db.operation`, `db.statement`      | Database spans              |
-| `messaging.system`, `messaging.operation`        | Queue spans                 |
-| `rpc.system`, `rpc.method`                       | RPC spans                   |
-| `error` (boolean), `error.type`, `error.message` | Error conditions            |
-| `service.name`, `service.version`                | All spans (set on resource) |
+- `http.method`, `http.route`, `http.status_code`: HTTP spans
+- `db.system`, `db.operation`, `db.statement`: Database spans
+- `messaging.system`, `messaging.operation`: Queue spans
+- `rpc.system`, `rpc.method`: RPC spans
+- `error` (boolean), `error.type`, `error.message`: Error conditions
+- `service.name`, `service.version`: All spans (set on resource)
 
 Use [semantic conventions](https://opentelemetry.io/docs/specs/semconv/) for attribute names rather than inventing
 custom ones. Consistent naming enables cross-service analysis.
 
 ### Span Status
 
-| Status  | Meaning                           | When                                     |
-| ------- | --------------------------------- | ---------------------------------------- |
-| `Unset` | Completed without error (default) | Most successful operations               |
-| `Error` | Operation failed                  | Server errors, exceptions                |
-| `Ok`    | Explicitly marked successful      | Only when you need to override ambiguity |
+- `Unset` — Completed without error (default). When: most successful operations
+- `Error` — Operation failed. When: server errors, exceptions
+- `Ok` — Explicitly marked successful. When: only when you need to override ambiguity
 
 Leave status as `Unset` for normal success. Set `Error` only for actual failures. Do not set `Error` for client errors
 like 404 on a server span — the server operated correctly.
@@ -437,12 +414,10 @@ points to a span → the span's logs reveal the root cause.
 
 ### Correlation Keys
 
-| Key                                | Purpose                                        | Where              |
-| ---------------------------------- | ---------------------------------------------- | ------------------ |
-| `trace_id`                         | Links logs and spans to the same trace         | Logs, span context |
-| `span_id`                          | Links a log to the exact span that produced it | Logs, span context |
-| `request_id`                       | Correlates all work for one inbound request    | Logs, HTTP headers |
-| `service.name` + `service.version` | Groups telemetry by source                     | All signals        |
+- `trace_id` — Links logs and spans to the same trace. Where: logs, span context
+- `span_id` — Links a log to the exact span that produced it. Where: logs, span context
+- `request_id` — Correlates all work for one inbound request. Where: logs, HTTP headers
+- `service.name` + `service.version` — Groups telemetry by source. Where: all signals
 
 Rules:
 
@@ -485,20 +460,29 @@ trace. This bidirectional linking is the backbone of incident investigation.
 
 ## Anti-Patterns
 
-| Anti-Pattern                                          | Problem                                                       | Fix                                                                   |
-| ----------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Logging everything at DEBUG in production             | Disk/cost explosion, noise buries signal                      | Default to INFO; enable DEBUG temporarily per-component               |
-| `catch (err) { log(err); throw err; }` at every layer | Same error logged N times across the call stack               | Log once at the top-level handler                                     |
-| Metrics with unbounded label cardinality              | Time series explosion; monitoring system degrades             | Use bounded labels; move high-cardinality data to logs                |
-| Encoding dimensions in metric names                   | Cannot aggregate; proliferates metrics                        | Use labels: `requests_total{method="GET"}`                            |
-| Averaging latency for alerting                        | Hides tail latency; misses degradation for minority of users  | Alert on p99 from histograms                                          |
-| Missing trace context propagation                     | Broken traces; spans from different services are disconnected | Propagate context on every cross-process call                         |
-| Sampling each service independently                   | Partial traces — some spans sampled, some dropped             | Decide at head, propagate sampling decision                           |
-| Logging PII / secrets                                 | Compliance violations, security risk                          | Audit log fields; log opaque IDs, never raw PII                       |
-| Alert on every metric wiggle                          | Alert fatigue; team ignores pages                             | Alert on symptoms (golden signals), not causes; require actionability |
-| Treating WARN as a soft ERROR                         | WARN becomes noise nobody reads                               | WARN = system compensated but situation is unusual; ERROR = broken    |
-| Storing pre-computed rates instead of counters        | Cannot re-aggregate over different windows                    | Store raw counters; derive rates at query time                        |
-| No baseline metrics for new services                  | Cannot tell if behavior is normal or degraded                 | Instrument golden signals from day one, before first deploy           |
+- **Logging everything at DEBUG in production** — Disk/cost explosion, noise buries signal. Fix: default to INFO; enable
+  DEBUG temporarily per-component
+- **`catch (err) { log(err); throw err; }` at every layer** — Same error logged N times across the call stack. Fix: log
+  once at the top-level handler
+- **Metrics with unbounded label cardinality** — Time series explosion; monitoring system degrades. Fix: use bounded
+  labels; move high-cardinality data to logs
+- **Encoding dimensions in metric names** — Cannot aggregate; proliferates metrics. Fix: use labels:
+  `requests_total{method="GET"}`
+- **Averaging latency for alerting** — Hides tail latency; misses degradation for minority of users. Fix: alert on p99
+  from histograms
+- **Missing trace context propagation** — Broken traces; spans from different services are disconnected. Fix: propagate
+  context on every cross-process call
+- **Sampling each service independently** — Partial traces — some spans sampled, some dropped. Fix: decide at head,
+  propagate sampling decision
+- **Logging PII / secrets** — Compliance violations, security risk. Fix: audit log fields; log opaque IDs, never raw PII
+- **Alert on every metric wiggle** — Alert fatigue; team ignores pages. Fix: alert on symptoms (golden signals), not
+  causes; require actionability
+- **Treating WARN as a soft ERROR** — WARN becomes noise nobody reads. Fix: WARN = system compensated but situation is
+  unusual; ERROR = broken
+- **Storing pre-computed rates instead of counters** — Cannot re-aggregate over different windows. Fix: store raw
+  counters; derive rates at query time
+- **No baseline metrics for new services** — Cannot tell if behavior is normal or degraded. Fix: instrument golden
+  signals from day one, before first deploy
 
 ---
 

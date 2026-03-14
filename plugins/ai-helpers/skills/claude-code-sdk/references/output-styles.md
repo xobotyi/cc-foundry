@@ -8,11 +8,9 @@ of the default prompt rather than appending to it.
 
 ## Built-in Styles
 
-| Style           | Description                                                                           |
-| --------------- | ------------------------------------------------------------------------------------- |
-| **Default**     | Efficient software engineering                                                        |
-| **Explanatory** | Educational "Insights" between tasks, explains implementation choices/patterns        |
-| **Learning**    | Collaborative mode; shares Insights + adds `TODO(human)` markers for you to implement |
+- **Default** — efficient software engineering
+- **Explanatory** — educational "Insights" between tasks, explains implementation choices/patterns
+- **Learning** — collaborative mode; shares Insights + adds `TODO(human)` markers for you to implement
 
 ## How Output Styles Work
 
@@ -35,10 +33,8 @@ Changes apply at local project level and are saved to `.claude/settings.local.js
 
 Custom styles are Markdown files with frontmatter, stored at:
 
-| Scope   | Path                       |
-| ------- | -------------------------- |
-| User    | `~/.claude/output-styles/` |
-| Project | `.claude/output-styles/`   |
+- User — `~/.claude/output-styles/`
+- Project — `.claude/output-styles/`
 
 ```markdown
 ---
@@ -59,11 +55,9 @@ tasks. [Your custom instructions here...]
 
 ## Frontmatter
 
-| Field                      | Purpose                                                | Default       |
-| -------------------------- | ------------------------------------------------------ | ------------- |
-| `name`                     | Display name                                           | From filename |
-| `description`              | Shown in `/output-style` UI                            | None          |
-| `keep-coding-instructions` | Keep coding-related parts of the default system prompt | `false`       |
+- `name` — display name. Default: from filename.
+- `description` — shown in `/output-style` UI. Default: none.
+- `keep-coding-instructions` — keep coding-related parts of the default system prompt. Default: `false`.
 
 ## Comparisons
 

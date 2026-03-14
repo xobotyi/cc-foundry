@@ -17,14 +17,18 @@ Target **WCAG 2.2 AA conformance** unless the project explicitly specifies other
 
 ## References
 
-| Topic              | Reference                                                                       | Contents                                                           |
-| ------------------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Semantic HTML      | [`semantic-html.md`](${CLAUDE_SKILL_DIR}/references/semantic-html.md)           | Landmarks, headings, images, tables, lists, language markup        |
-| ARIA               | [`aria.md`](${CLAUDE_SKILL_DIR}/references/aria.md)                             | Roles, states, properties, naming, live regions, common mistakes   |
-| Keyboard           | [`keyboard.md`](${CLAUDE_SKILL_DIR}/references/keyboard.md)                     | Focus order, visibility, roving tabindex, focus traps, restoration |
-| Forms              | [`forms.md`](${CLAUDE_SKILL_DIR}/references/forms.md)                           | Labels, grouping, required fields, validation, autocomplete        |
-| Component patterns | [`component-patterns.md`](${CLAUDE_SKILL_DIR}/references/component-patterns.md) | Dialog, tabs, accordion, disclosure, menu, combobox, tooltip       |
-| WCAG               | [`wcag.md`](${CLAUDE_SKILL_DIR}/references/wcag.md)                             | Full WCAG 2.2 AA criteria tables and compliance checklist          |
+- **Semantic HTML** — [`semantic-html.md`](${CLAUDE_SKILL_DIR}/references/semantic-html.md): Landmarks, headings,
+  images, tables, lists, language markup
+- **ARIA** — [`aria.md`](${CLAUDE_SKILL_DIR}/references/aria.md): Roles, states, properties, naming, live regions,
+  common mistakes
+- **Keyboard** — [`keyboard.md`](${CLAUDE_SKILL_DIR}/references/keyboard.md): Focus order, visibility, roving tabindex,
+  focus traps, restoration
+- **Forms** — [`forms.md`](${CLAUDE_SKILL_DIR}/references/forms.md): Labels, grouping, required fields, validation,
+  autocomplete
+- **Component patterns** — [`component-patterns.md`](${CLAUDE_SKILL_DIR}/references/component-patterns.md): Dialog,
+  tabs, accordion, disclosure, menu, combobox, tooltip
+- **WCAG** — [`wcag.md`](${CLAUDE_SKILL_DIR}/references/wcag.md): Full WCAG 2.2 AA criteria tables and compliance
+  checklist
 
 ---
 

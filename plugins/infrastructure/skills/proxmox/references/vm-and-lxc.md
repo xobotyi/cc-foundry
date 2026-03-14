@@ -10,13 +10,11 @@ containers** (OS-level virtualization). Each serves different use cases with dis
 VMs emulate a complete physical computer with dedicated virtual hardware. Each VM runs its own kernel, providing full
 isolation from the host and other guests.
 
-| Aspect    | Detail                                                             |
-| --------- | ------------------------------------------------------------------ |
-| Isolation | Full hardware-level isolation; separate kernel                     |
-| Overhead  | Higher — hypervisor layer, dedicated RAM allocation                |
-| Guest OS  | Any OS (Linux, Windows, FreeBSD, etc.)                             |
-| Migration | Live migration supported (except with PCIe passthrough)            |
-| Use cases | Untrusted workloads, non-Linux OS, GPU passthrough, full isolation |
+- **Isolation** — full hardware-level isolation; separate kernel
+- **Overhead** — higher; hypervisor layer, dedicated RAM allocation
+- **Guest OS** — any OS (Linux, Windows, FreeBSD, etc.)
+- **Migration** — live migration supported (except with PCIe passthrough)
+- **Use cases** — untrusted workloads, non-Linux OS, GPU passthrough, full isolation
 
 **Configuration best practices:**
 
@@ -35,13 +33,11 @@ isolation from the host and other guests.
 Containers share the host kernel and provide lightweight, near-native performance isolation using Linux namespaces and
 cgroups.
 
-| Aspect    | Detail                                                      |
-| --------- | ----------------------------------------------------------- |
-| Isolation | Namespace/cgroup isolation; shared kernel                   |
-| Overhead  | Minimal — no hypervisor layer, shared kernel                |
-| Guest OS  | Linux only (must be compatible with host kernel)            |
-| Migration | Offline migration only (restart required)                   |
-| Use cases | Linux services, high-density deployments, system containers |
+- **Isolation** — namespace/cgroup isolation; shared kernel
+- **Overhead** — minimal; no hypervisor layer, shared kernel
+- **Guest OS** — Linux only (must be compatible with host kernel)
+- **Migration** — offline migration only (restart required)
+- **Use cases** — Linux services, high-density deployments, system containers
 
 **Configuration best practices:**
 

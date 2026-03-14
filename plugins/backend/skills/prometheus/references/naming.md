@@ -41,15 +41,13 @@ myapp_orders_processed_total         # Application-specific metrics
 
 Always use base units. Let visualization tools handle conversion.
 
-| Family      | Base Unit   | Not This                                                  |
-| ----------- | ----------- | --------------------------------------------------------- |
-| Time        | seconds     | milliseconds, microseconds                                |
-| Data size   | bytes       | kilobytes, megabytes                                      |
-| Temperature | celsius     | fahrenheit                                                |
-| Length      | meters      | kilometers                                                |
-| Mass        | grams       | kilograms                                                 |
-| Percent     | ratio (0-1) | percentage (0-100)                                        |
-| Energy      | joules      | watts (export joules counter, compute power via `rate()`) |
+- `time`: seconds — not milliseconds, microseconds
+- `data size`: bytes — not kilobytes, megabytes
+- `temperature`: celsius — not fahrenheit
+- `length`: meters — not kilometers
+- `mass`: grams — not kilograms
+- `percent`: ratio (0-1) — not percentage (0-100)
+- `energy`: joules — not watts (export joules counter, compute power via `rate()`)
 
 ### Unit Suffix
 
@@ -63,13 +61,11 @@ disk_usage_ratio                     # ratio 0-1
 
 ### Type Suffix
 
-| Type              | Suffix               | Example                              |
-| ----------------- | -------------------- | ------------------------------------ |
-| Counter           | `_total`             | `http_requests_total`                |
-| Counter with unit | `_<unit>_total`      | `process_cpu_seconds_total`          |
-| Info metric       | `_info`              | `myapp_build_info`                   |
-| Timestamp         | `_timestamp_seconds` | `job_last_success_timestamp_seconds` |
-| Boolean-like      | (use gauge, 0 or 1)  | `myapp_healthy`                      |
+- `counter`: `_total` — e.g., `http_requests_total`
+- `counter with unit`: `_<unit>_total` — e.g., `process_cpu_seconds_total`
+- `info metric`: `_info` — e.g., `myapp_build_info`
+- `timestamp`: `_timestamp_seconds` — e.g., `job_last_success_timestamp_seconds`
+- `boolean-like`: use gauge, 0 or 1 — e.g., `myapp_healthy`
 
 ### Name Ordering for Sorting
 
@@ -120,12 +116,10 @@ api_http_requests_total{operation="delete"}
 
 ### Cardinality Guidelines
 
-| Cardinality | Guidance                        |
-| ----------- | ------------------------------- |
-| < 10        | Safe for most metrics           |
-| 10-100      | Acceptable, monitor growth      |
-| 100-1000    | Investigate alternatives        |
-| > 1000      | Move analysis out of Prometheus |
+- `< 10`: Safe for most metrics
+- `10-100`: Acceptable, monitor growth
+- `100-1000`: Investigate alternatives
+- `> 1000`: Move analysis out of Prometheus
 
 **Cardinality math:** Total time series = metric cardinality x number of targets. A metric with 100 label combinations
 across 1000 targets = 100,000 time series.

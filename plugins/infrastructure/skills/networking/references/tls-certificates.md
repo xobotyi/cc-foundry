@@ -15,11 +15,9 @@ certificate issuance.
 
 ### Challenge Types
 
-| Challenge   | How It Works                                                    | When to Use                                  |
-| ----------- | --------------------------------------------------------------- | -------------------------------------------- |
-| HTTP-01     | CA fetches `http://<domain>/.well-known/acme-challenge/<token>` | Public-facing servers with port 80 open      |
-| DNS-01      | Client creates `_acme-challenge.<domain>` TXT record            | Wildcard certs, internal servers, no port 80 |
-| TLS-ALPN-01 | CA connects to port 443 with special ALPN protocol              | When only port 443 is available              |
+- HTTP-01: CA fetches `http://<domain>/.well-known/acme-challenge/<token>` — public-facing servers with port 80 open
+- DNS-01: Client creates `_acme-challenge.<domain>` TXT record — wildcard certs, internal servers, no port 80
+- TLS-ALPN-01: CA connects to port 443 with special ALPN protocol — when only port 443 is available
 
 ### DNS Challenge for Internal Services
 
@@ -39,13 +37,11 @@ A wildcard certificate (`*.example.com`) covers all single-level subdomains:
 
 ### ACME Clients
 
-| Client  | Integration | Notes                                           |
-| ------- | ----------- | ----------------------------------------------- |
-| Caddy   | Built-in    | Zero-config HTTPS by default                    |
-| Traefik | Built-in    | Via `certificatesResolvers` config              |
-| certbot | Standalone  | Original LE client, many plugins                |
-| acme.sh | Standalone  | Shell-only, no dependencies, many DNS providers |
-| lego    | Standalone  | Go binary, CLI and library                      |
+- Caddy — Built-in: zero-config HTTPS by default
+- Traefik — Built-in: via `certificatesResolvers` config
+- certbot — Standalone: original LE client, many plugins
+- acme.sh — Standalone: shell-only, no dependencies, many DNS providers
+- lego — Standalone: Go binary, CLI and library
 
 ### acme.sh with DNS Provider
 

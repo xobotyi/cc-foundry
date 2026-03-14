@@ -5,23 +5,21 @@ provide deterministic control — certain actions always happen rather than rely
 
 ## Hook Lifecycle
 
-| Event                | When It Fires                             |
-| -------------------- | ----------------------------------------- |
-| `SessionStart`       | Session begins or resumes                 |
-| `UserPromptSubmit`   | User submits prompt, before processing    |
-| `PreToolUse`         | Before tool call executes (can block)     |
-| `PermissionRequest`  | Permission dialog appears                 |
-| `PostToolUse`        | After tool call succeeds                  |
-| `PostToolUseFailure` | After tool call fails                     |
-| `Notification`       | Claude Code sends a notification          |
-| `SubagentStart`      | Subagent spawned                          |
-| `SubagentStop`       | Subagent finishes                         |
-| `Stop`               | Claude finishes responding                |
-| `TeammateIdle`       | Agent team teammate about to go idle      |
-| `TaskCompleted`      | Task being marked as completed            |
-| `ConfigChange`       | Configuration file changes during session |
-| `PreCompact`         | Before context compaction                 |
-| `SessionEnd`         | Session terminates                        |
+- `SessionStart` — session begins or resumes
+- `UserPromptSubmit` — user submits prompt, before processing
+- `PreToolUse` — before tool call executes (can block)
+- `PermissionRequest` — permission dialog appears
+- `PostToolUse` — after tool call succeeds
+- `PostToolUseFailure` — after tool call fails
+- `Notification` — Claude Code sends a notification
+- `SubagentStart` — subagent spawned
+- `SubagentStop` — subagent finishes
+- `Stop` — Claude finishes responding
+- `TeammateIdle` — agent team teammate about to go idle
+- `TaskCompleted` — task being marked as completed
+- `ConfigChange` — configuration file changes during session
+- `PreCompact` — before context compaction
+- `SessionEnd` — session terminates
 
 All matching hooks run in parallel. Identical hook commands are deduplicated automatically.
 
@@ -29,14 +27,12 @@ All matching hooks run in parallel. Identical hook commands are deduplicated aut
 
 ### Hook Locations
 
-| Location                      | Scope                     | Shareable            |
-| ----------------------------- | ------------------------- | -------------------- |
-| `~/.claude/settings.json`     | All your projects         | No, local to machine |
-| `.claude/settings.json`       | Single project            | Yes, commit to repo  |
-| `.claude/settings.local.json` | Single project            | No, gitignored       |
-| Managed policy settings       | Organization-wide         | Admin-controlled     |
-| Plugin `hooks/hooks.json`     | When plugin enabled       | Yes, bundled         |
-| Skill/agent YAML frontmatter  | While component is active | Yes                  |
+- `~/.claude/settings.json` — all your projects. Not shareable (local to machine).
+- `.claude/settings.json` — single project. Shareable (commit to repo).
+- `.claude/settings.local.json` — single project. Not shareable (gitignored).
+- Managed policy settings — organization-wide. Admin-controlled.
+- Plugin `hooks/hooks.json` — when plugin enabled. Shareable (bundled).
+- Skill/agent YAML frontmatter — while component is active. Shareable.
 
 ### Basic Structure
 
@@ -65,16 +61,18 @@ Three levels of nesting: event → matcher group → hook handler(s).
 The `matcher` field is a regex string. Use `"*"`, `""`, or omit it entirely to match all occurrences. Each event type
 matches on a different field:
 
-| Event                                                                  | Matches On          | Example Values                                                                     |
-| ---------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------- |
-| `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | Tool name           | `Bash`, `Edit\|Write`, `mcp__.*`                                                   |
-| `SessionStart`                                                         | How session started | `startup`, `resume`, `clear`, `compact`                                            |
-| `SessionEnd`                                                           | Why session ended   | `clear`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other`     |
-| `Notification`                                                         | Notification type   | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`           |
-| `SubagentStart`, `SubagentStop`                                        | Agent type          | `Bash`, `Explore`, `Plan`, custom agent names                                      |
-| `PreCompact`                                                           | Trigger type        | `manual`, `auto`                                                                   |
-| `ConfigChange`                                                         | Config source       | `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills` |
-| `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted`            | No matcher support  | Always fires on every occurrence                                                   |
+- `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` — matches on tool name. Examples: `Bash`,
+  `Edit|Write`, `mcp__.*`
+- `SessionStart` — matches on how session started. Values: `startup`, `resume`, `clear`, `compact`
+- `SessionEnd` — matches on why session ended. Values: `clear`, `logout`, `prompt_input_exit`,
+  `bypass_permissions_disabled`, `other`
+- `Notification` — matches on notification type. Values: `permission_prompt`, `idle_prompt`, `auth_success`,
+  `elicitation_dialog`
+- `SubagentStart`, `SubagentStop` — matches on agent type. Examples: `Bash`, `Explore`, `Plan`, custom agent names
+- `PreCompact` — matches on trigger type. Values: `manual`, `auto`
+- `ConfigChange` — matches on config source. Values: `user_settings`, `project_settings`, `local_settings`,
+  `policy_settings`, `skills`
+- `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted` — no matcher support. Always fires on every occurrence.
 
 Matchers are case-sensitive. `Edit|Write` matches either tool; `Notebook.*` matches any tool starting with "Notebook".
 
@@ -91,26 +89,20 @@ Match patterns: `mcp__memory__.*` (all from memory server), `mcp__.*__write.*` (
 
 #### Common Fields
 
-| Field           | Required | Default   | Description                                           |
-| --------------- | -------- | --------- | ----------------------------------------------------- |
-| `type`          | Yes      | —         | `"command"`, `"prompt"`, or `"agent"`                 |
-| `timeout`       | No       | 600/30/60 | Seconds before cancel (command/prompt/agent defaults) |
-| `statusMessage` | No       | —         | Custom spinner message while hook runs                |
-| `once`          | No       | false     | Run only once per session then removed (skills only)  |
+- `type` (required) — `"command"`, `"prompt"`, or `"agent"`
+- `timeout` (optional, default 600/30/60) — seconds before cancel (command/prompt/agent defaults)
+- `statusMessage` (optional) — custom spinner message while hook runs
+- `once` (optional, default false) — run only once per session then removed (skills only)
 
 #### Command Hook Fields
 
-| Field     | Required | Description                                  |
-| --------- | -------- | -------------------------------------------- |
-| `command` | Yes      | Shell command to execute                     |
-| `async`   | No       | If true, runs in background without blocking |
+- `command` (required) — shell command to execute
+- `async` (optional) — if true, runs in background without blocking
 
 #### Prompt/Agent Hook Fields
 
-| Field    | Required | Description                                                      |
-| -------- | -------- | ---------------------------------------------------------------- |
-| `prompt` | Yes      | Prompt text; use `$ARGUMENTS` as placeholder for hook input JSON |
-| `model`  | No       | Model to use; defaults to a fast model                           |
+- `prompt` (required) — prompt text; use `$ARGUMENTS` as placeholder for hook input JSON
+- `model` (optional) — model to use; defaults to a fast model
 
 ### Reference Scripts by Path
 
@@ -189,55 +181,47 @@ settings level can disable those.
 
 All hooks receive JSON on stdin:
 
-| Field             | Description                                                                   |
-| ----------------- | ----------------------------------------------------------------------------- |
-| `session_id`      | Current session identifier                                                    |
-| `transcript_path` | Path to conversation JSON                                                     |
-| `cwd`             | Current working directory                                                     |
-| `permission_mode` | `"default"`, `"plan"`, `"acceptEdits"`, `"dontAsk"`, or `"bypassPermissions"` |
-| `hook_event_name` | Name of the event that fired                                                  |
+- `session_id` — current session identifier
+- `transcript_path` — path to conversation JSON
+- `cwd` — current working directory
+- `permission_mode` — `"default"`, `"plan"`, `"acceptEdits"`, `"dontAsk"`, or `"bypassPermissions"`
+- `hook_event_name` — name of the event that fired
 
 ### Exit Code Behavior
 
-| Exit Code | Meaning                                                     |
-| --------- | ----------------------------------------------------------- |
-| 0         | Success; Claude Code parses stdout for JSON output          |
-| 2         | Blocking error; stderr fed to Claude or shown to user       |
-| Other     | Non-blocking error; stderr shown in verbose mode (`Ctrl+O`) |
+- `0` — success; Claude Code parses stdout for JSON output
+- `2` — blocking error; stderr fed to Claude or shown to user
+- Other — non-blocking error; stderr shown in verbose mode (`Ctrl+O`)
 
 For `UserPromptSubmit` and `SessionStart`, stdout on exit 0 is added as Claude context. JSON output is only processed on
 exit 0. Choosing exit 2 ignores any JSON in stdout.
 
 #### Exit Code 2 Behavior Per Event
 
-| Event                | Can Block? | What Happens on Exit 2                                             |
-| -------------------- | ---------- | ------------------------------------------------------------------ |
-| `PreToolUse`         | Yes        | Blocks the tool call                                               |
-| `PermissionRequest`  | Yes        | Denies the permission                                              |
-| `UserPromptSubmit`   | Yes        | Blocks prompt and erases it from context                           |
-| `Stop`               | Yes        | Prevents Claude from stopping; continues the conversation          |
-| `SubagentStop`       | Yes        | Prevents the subagent from stopping                                |
-| `TeammateIdle`       | Yes        | Prevents teammate from going idle; teammate continues working      |
-| `TaskCompleted`      | Yes        | Prevents task from being marked completed                          |
-| `ConfigChange`       | Yes        | Blocks config change from taking effect (except `policy_settings`) |
-| `PostToolUse`        | No         | Shows stderr to Claude (tool already ran)                          |
-| `PostToolUseFailure` | No         | Shows stderr to Claude (tool already failed)                       |
-| `Notification`       | No         | Shows stderr to user only                                          |
-| `SubagentStart`      | No         | Shows stderr to user only                                          |
-| `SessionStart`       | No         | Shows stderr to user only                                          |
-| `SessionEnd`         | No         | Shows stderr to user only                                          |
-| `PreCompact`         | No         | Shows stderr to user only                                          |
+- `PreToolUse` — can block. Blocks the tool call.
+- `PermissionRequest` — can block. Denies the permission.
+- `UserPromptSubmit` — can block. Blocks prompt and erases it from context.
+- `Stop` — can block. Prevents Claude from stopping; continues the conversation.
+- `SubagentStop` — can block. Prevents the subagent from stopping.
+- `TeammateIdle` — can block. Prevents teammate from going idle; teammate continues working.
+- `TaskCompleted` — can block. Prevents task from being marked completed.
+- `ConfigChange` — can block. Blocks config change from taking effect (except `policy_settings`).
+- `PostToolUse` — cannot block. Shows stderr to Claude (tool already ran).
+- `PostToolUseFailure` — cannot block. Shows stderr to Claude (tool already failed).
+- `Notification` — cannot block. Shows stderr to user only.
+- `SubagentStart` — cannot block. Shows stderr to user only.
+- `SessionStart` — cannot block. Shows stderr to user only.
+- `SessionEnd` — cannot block. Shows stderr to user only.
+- `PreCompact` — cannot block. Shows stderr to user only.
 
 ### JSON Output Fields
 
 On exit 0, stdout can contain a JSON object with these universal fields:
 
-| Field            | Default | Description                                                                       |
-| ---------------- | ------- | --------------------------------------------------------------------------------- |
-| `continue`       | `true`  | If `false`, Claude stops entirely. Takes precedence over event-specific decisions |
-| `stopReason`     | none    | Shown to user when `continue` is `false`. Not shown to Claude                     |
-| `suppressOutput` | `false` | If `true`, hides stdout from verbose mode                                         |
-| `systemMessage`  | none    | Warning message shown to the user                                                 |
+- `continue` (default `true`) — if `false`, Claude stops entirely. Takes precedence over event-specific decisions.
+- `stopReason` (default none) — shown to user when `continue` is `false`. Not shown to Claude.
+- `suppressOutput` (default `false`) — if `true`, hides stdout from verbose mode.
+- `systemMessage` (default none) — warning message shown to the user.
 
 To stop Claude entirely regardless of event:
 
@@ -249,12 +233,11 @@ To stop Claude entirely regardless of event:
 
 Different events use different patterns for blocking or controlling behavior:
 
-| Events                                                                                          | Pattern              | Key Fields                                                        |
-| ----------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
-| `UserPromptSubmit`, `PostToolUse`, `PostToolUseFailure`, `Stop`, `SubagentStop`, `ConfigChange` | Top-level `decision` | `decision: "block"`, `reason`                                     |
-| `TeammateIdle`, `TaskCompleted`                                                                 | Exit code only       | Exit 2 blocks; stderr fed as feedback                             |
-| `PreToolUse`                                                                                    | `hookSpecificOutput` | `permissionDecision` (allow/deny/ask), `permissionDecisionReason` |
-| `PermissionRequest`                                                                             | `hookSpecificOutput` | `decision.behavior` (allow/deny)                                  |
+- `UserPromptSubmit`, `PostToolUse`, `PostToolUseFailure`, `Stop`, `SubagentStop`, `ConfigChange` — top-level
+  `decision`. Key fields: `decision: "block"`, `reason`
+- `TeammateIdle`, `TaskCompleted` — exit code only. Exit 2 blocks; stderr fed as feedback.
+- `PreToolUse` — `hookSpecificOutput`. Key fields: `permissionDecision` (allow/deny/ask), `permissionDecisionReason`
+- `PermissionRequest` — `hookSpecificOutput`. Key fields: `decision.behavior` (allow/deny)
 
 ---
 
@@ -269,11 +252,9 @@ injection; for static context, use `CLAUDE.md` instead.
 
 **Additional input fields:**
 
-| Field        | Description                                                              |
-| ------------ | ------------------------------------------------------------------------ |
-| `source`     | How the session started: `"startup"`, `"resume"`, `"clear"`, `"compact"` |
-| `model`      | Model identifier                                                         |
-| `agent_type` | Agent name (only when started with `claude --agent <name>`)              |
+- `source` — how the session started: `"startup"`, `"resume"`, `"clear"`, `"compact"`
+- `model` — model identifier
+- `agent_type` — agent name (only when started with `claude --agent <name>`)
 
 **Input example:**
 
@@ -333,17 +314,13 @@ input types.
 
 **Additional input fields:**
 
-| Field    | Description             |
-| -------- | ----------------------- |
-| `prompt` | Text the user submitted |
+- `prompt` — text the user submitted
 
 **Output:**
 
-| Field               | Description                                                        |
-| ------------------- | ------------------------------------------------------------------ |
-| `decision`          | `"block"` prevents processing and erases the prompt from context   |
-| `reason`            | Shown to user when `decision` is `"block"`. Not added to context   |
-| `additionalContext` | String added to Claude's context (more discrete than plain stdout) |
+- `decision` — `"block"` prevents processing and erases the prompt from context
+- `reason` — shown to user when `decision` is `"block"`. Not added to context.
+- `additionalContext` — string added to Claude's context (more discrete than plain stdout)
 
 Plain text stdout is also added as context (shown as hook output in transcript).
 
@@ -369,34 +346,28 @@ tool name.
 
 **Additional input fields:**
 
-| Field         | Description                          |
-| ------------- | ------------------------------------ |
-| `tool_name`   | Name of the tool being called        |
-| `tool_input`  | Tool-specific input parameters       |
-| `tool_use_id` | Unique identifier for this tool call |
+- `tool_name` — name of the tool being called
+- `tool_input` — tool-specific input parameters
+- `tool_use_id` — unique identifier for this tool call
 
 **Tool input schemas:**
 
-| Tool      | Key Fields                                                  |
-| --------- | ----------------------------------------------------------- |
-| Bash      | `command`, `description`, `timeout`, `run_in_background`    |
-| Write     | `file_path`, `content`                                      |
-| Edit      | `file_path`, `old_string`, `new_string`, `replace_all`      |
-| Read      | `file_path`, `offset`, `limit`                              |
-| Glob      | `pattern`, `path`                                           |
-| Grep      | `pattern`, `path`, `glob`, `output_mode`, `-i`, `multiline` |
-| WebFetch  | `url`, `prompt`                                             |
-| WebSearch | `query`, `allowed_domains`, `blocked_domains`               |
-| Task      | `prompt`, `description`, `subagent_type`, `model`           |
+- `Bash`: `command`, `description`, `timeout`, `run_in_background`
+- `Write`: `file_path`, `content`
+- `Edit`: `file_path`, `old_string`, `new_string`, `replace_all`
+- `Read`: `file_path`, `offset`, `limit`
+- `Glob`: `pattern`, `path`
+- `Grep`: `pattern`, `path`, `glob`, `output_mode`, `-i`, `multiline`
+- `WebFetch`: `url`, `prompt`
+- `WebSearch`: `query`, `allowed_domains`, `blocked_domains`
+- `Task`: `prompt`, `description`, `subagent_type`, `model`
 
 **Output** (uses `hookSpecificOutput` — not top-level `decision`):
 
-| Field                      | Description                                                                         |
-| -------------------------- | ----------------------------------------------------------------------------------- |
-| `permissionDecision`       | `"allow"` bypasses permissions, `"deny"` cancels the call, `"ask"` prompts the user |
-| `permissionDecisionReason` | For `allow`/`ask`: shown to user. For `deny`: shown to Claude                       |
-| `updatedInput`             | Modifies tool input before execution. Combine with `allow` or `ask`                 |
-| `additionalContext`        | String added to Claude's context before tool executes                               |
+- `permissionDecision` — `"allow"` bypasses permissions, `"deny"` cancels the call, `"ask"` prompts the user
+- `permissionDecisionReason` — for `allow`/`ask`: shown to user. For `deny`: shown to Claude.
+- `updatedInput` — modifies tool input before execution. Combine with `allow` or `ask`.
+- `additionalContext` — string added to Claude's context before tool executes
 
 ```json
 {
@@ -425,19 +396,15 @@ Runs when a permission dialog is about to be shown to the user. Does **not** fir
 
 **Additional input fields:** Same as `PreToolUse` (without `tool_use_id`), plus:
 
-| Field                    | Description                                                 |
-| ------------------------ | ----------------------------------------------------------- |
-| `permission_suggestions` | Array of "always allow" options the user would normally see |
+- `permission_suggestions` — array of "always allow" options the user would normally see
 
 **Output:**
 
-| Field                | Description                                                                         |
-| -------------------- | ----------------------------------------------------------------------------------- |
-| `behavior`           | `"allow"` grants permission, `"deny"` denies it                                     |
-| `updatedInput`       | For `allow`: modifies tool input before execution                                   |
-| `updatedPermissions` | For `allow`: applies permission rules (equivalent to user selecting "always allow") |
-| `message`            | For `deny`: tells Claude why permission was denied                                  |
-| `interrupt`          | For `deny`: if `true`, stops Claude                                                 |
+- `behavior` — `"allow"` grants permission, `"deny"` denies it
+- `updatedInput` — for `allow`: modifies tool input before execution
+- `updatedPermissions` — for `allow`: applies permission rules (equivalent to user selecting "always allow")
+- `message` — for `deny`: tells Claude why permission was denied
+- `interrupt` — for `deny`: if `true`, stops Claude
 
 ```json
 {
@@ -465,12 +432,10 @@ execution.
 
 **Output:**
 
-| Field                  | Description                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------ |
-| `decision`             | `"block"` prompts Claude with the reason. Omit to allow processing to continue |
-| `reason`               | Shown to Claude when `decision` is `"block"`                                   |
-| `additionalContext`    | Additional context for Claude                                                  |
-| `updatedMCPToolOutput` | MCP tools only: replaces the tool's output with this value                     |
+- `decision` — `"block"` prompts Claude with the reason. Omit to allow processing to continue.
+- `reason` — shown to Claude when `decision` is `"block"`
+- `additionalContext` — additional context for Claude
+- `updatedMCPToolOutput` — MCP tools only: replaces the tool's output with this value
 
 ```json
 {
@@ -494,13 +459,11 @@ corrective context to Claude.
 
 **Additional input fields:**
 
-| Field          | Description                                                        |
-| -------------- | ------------------------------------------------------------------ |
-| `tool_name`    | Name of the failed tool                                            |
-| `tool_input`   | Arguments sent to the tool                                         |
-| `tool_use_id`  | Unique identifier for this tool call                               |
-| `error`        | String describing what went wrong                                  |
-| `is_interrupt` | Optional boolean — whether failure was caused by user interruption |
+- `tool_name` — name of the failed tool
+- `tool_input` — arguments sent to the tool
+- `tool_use_id` — unique identifier for this tool call
+- `error` — string describing what went wrong
+- `is_interrupt` — optional boolean; whether failure was caused by user interruption
 
 **Output:** `additionalContext` in `hookSpecificOutput`.
 
@@ -523,11 +486,9 @@ Runs when Claude Code sends a notification. Cannot block notifications.
 
 **Additional input fields:**
 
-| Field               | Description                        |
-| ------------------- | ---------------------------------- |
-| `message`           | Notification text                  |
-| `title`             | Optional title                     |
-| `notification_type` | Which type fired (same as matcher) |
+- `message` — notification text
+- `title` — optional title
+- `notification_type` — which type fired (same as matcher)
 
 **Output:** `additionalContext` in `hookSpecificOutput` (adds to conversation context).
 
@@ -541,10 +502,8 @@ Runs when a subagent is spawned via the Task tool. Cannot block subagent creatio
 
 **Additional input fields:**
 
-| Field        | Description                         |
-| ------------ | ----------------------------------- |
-| `agent_id`   | Unique identifier for this subagent |
-| `agent_type` | Agent type name (used for matching) |
+- `agent_id` — unique identifier for this subagent
+- `agent_type` — agent type name (used for matching)
 
 **Output:** `additionalContext` in `hookSpecificOutput` (injected into subagent's context).
 
@@ -558,13 +517,11 @@ Runs when a subagent finishes responding.
 
 **Additional input fields:**
 
-| Field                    | Description                                                |
-| ------------------------ | ---------------------------------------------------------- |
-| `stop_hook_active`       | Whether already continuing from a stop hook                |
-| `agent_id`               | Unique subagent identifier                                 |
-| `agent_type`             | Agent type name (used for matching)                        |
-| `agent_transcript_path`  | Path to subagent's own transcript (in `subagents/` folder) |
-| `last_assistant_message` | Text content of subagent's final response                  |
+- `stop_hook_active` — whether already continuing from a stop hook
+- `agent_id` — unique subagent identifier
+- `agent_type` — agent type name (used for matching)
+- `agent_transcript_path` — path to subagent's own transcript (in `subagents/` folder)
+- `last_assistant_message` — text content of subagent's final response
 
 Note: `transcript_path` is the main session's transcript; `agent_transcript_path` is the subagent's.
 
@@ -580,10 +537,8 @@ Runs when the main Claude Code agent finishes responding. Does not fire on user 
 
 **Additional input fields:**
 
-| Field                    | Description                                     |
-| ------------------------ | ----------------------------------------------- |
-| `stop_hook_active`       | `true` when already continuing from a stop hook |
-| `last_assistant_message` | Text content of Claude's final response         |
+- `stop_hook_active` — `true` when already continuing from a stop hook
+- `last_assistant_message` — text content of Claude's final response
 
 **Output:**
 
@@ -616,10 +571,8 @@ teammate stops.
 
 **Additional input fields:**
 
-| Field           | Description                           |
-| --------------- | ------------------------------------- |
-| `teammate_name` | Name of the teammate about to go idle |
-| `team_name`     | Name of the team                      |
+- `teammate_name` — name of the teammate about to go idle
+- `team_name` — name of the team
 
 **Output:** Exit code only — no JSON decision control.
 
@@ -646,13 +599,11 @@ teammate finishes its turn with in-progress tasks.
 
 **Additional input fields:**
 
-| Field              | Description                                  |
-| ------------------ | -------------------------------------------- |
-| `task_id`          | Identifier of the task being completed       |
-| `task_subject`     | Title of the task                            |
-| `task_description` | Detailed description (may be absent)         |
-| `teammate_name`    | Teammate completing the task (may be absent) |
-| `team_name`        | Name of the team (may be absent)             |
+- `task_id` — identifier of the task being completed
+- `task_subject` — title of the task
+- `task_description` — detailed description (may be absent)
+- `teammate_name` — teammate completing the task (may be absent)
+- `team_name` — name of the team (may be absent)
 
 **Output:** Exit code only — no JSON decision control.
 
@@ -678,10 +629,8 @@ Runs when a configuration file changes during a session. Use for audit logging o
 
 **Additional input fields:**
 
-| Field       | Description                         |
-| ----------- | ----------------------------------- |
-| `source`    | Which configuration type changed    |
-| `file_path` | Path to the changed file (optional) |
+- `source` — which configuration type changed
+- `file_path` — path to the changed file (optional)
 
 **Output:**
 
@@ -705,10 +654,8 @@ Runs before a compaction operation.
 
 **Additional input fields:**
 
-| Field                 | Description                                                    |
-| --------------------- | -------------------------------------------------------------- |
-| `trigger`             | `"manual"` (from `/compact`) or `"auto"` (context window full) |
-| `custom_instructions` | User's instructions from `/compact`; empty for auto            |
+- `trigger` — `"manual"` (from `/compact`) or `"auto"` (context window full)
+- `custom_instructions` — user's instructions from `/compact`; empty for auto
 
 No decision control. Cannot block compaction.
 
@@ -722,9 +669,7 @@ Runs when a session ends. Cannot block session termination.
 
 **Additional input fields:**
 
-| Field    | Description           |
-| -------- | --------------------- |
-| `reason` | Why the session ended |
+- `reason` — why the session ended
 
 No decision control. Use for cleanup, logging session statistics, or saving state.
 

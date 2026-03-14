@@ -24,12 +24,10 @@ Before writing, clarify:
 
 Set `keep-coding-instructions` based on use case:
 
-| Use Case                              | Setting | Rationale                       |
-| ------------------------------------- | ------- | ------------------------------- |
-| Non-coding domain (research, content) | `false` | Remove irrelevant guidance      |
-| Coding with different tone            | `true`  | Keep skills, change personality |
-| Teaching/learning coding              | `true`  | Need coding knowledge           |
-| General assistant                     | `false` | Broader focus                   |
+- `false`: Non-coding domain (research, content) — remove irrelevant guidance
+- `true`: Coding with different tone — keep skills, change personality
+- `true`: Teaching/learning coding — need coding knowledge
+- `false`: General assistant — broader focus
 
 ### 3. Create the File
 

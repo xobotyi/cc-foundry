@@ -4,10 +4,8 @@ Error classes, `error.cause`, process-level error events, and error handling pat
 
 ## Error Categories
 
-| Category        | Description                                | Response                                |
-| --------------- | ------------------------------------------ | --------------------------------------- |
-| **Operational** | Bad input, network timeout, file not found | Handle gracefully, respond to caller    |
-| **Programmer**  | Null deref, assertion failure, type error  | Crash and restart — state is unreliable |
+- **Operational** — Bad input, network timeout, file not found → handle gracefully, respond to caller
+- **Programmer** — Null deref, assertion failure, type error → crash and restart; state is unreliable
 
 This distinction drives your error handling strategy. Operational errors are handled in-place. Programmer errors mean
 corrupted state — the safest response is to exit and let the process manager restart.

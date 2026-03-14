@@ -9,14 +9,14 @@ Both load into context at session start. More specific instructions take precede
 
 ## Memory Hierarchy
 
-| Memory Type            | Location                               | Purpose                                | Shared With                |
-| ---------------------- | -------------------------------------- | -------------------------------------- | -------------------------- |
-| Managed policy         | System paths (see below)               | Organization-wide instructions         | All users in organization  |
-| Project memory         | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Team-shared project instructions       | Team via source control    |
-| Project rules          | `./.claude/rules/*.md`                 | Modular topic-specific instructions    | Team via source control    |
-| User memory            | `~/.claude/CLAUDE.md`                  | Personal preferences for all projects  | Just you (all projects)    |
-| Project memory (local) | `./CLAUDE.local.md`                    | Personal project-specific preferences  | Just you (current project) |
-| Auto memory            | `~/.claude/projects/<project>/memory/` | Claude's automatic notes and learnings | Just you (per project)     |
+- **Managed policy** — system paths (see below). Organization-wide instructions. Shared with all users in organization.
+- **Project memory** — `./CLAUDE.md` or `./.claude/CLAUDE.md`. Team-shared project instructions. Shared via source
+  control.
+- **Project rules** — `./.claude/rules/*.md`. Modular topic-specific instructions. Shared via source control.
+- **User memory** — `~/.claude/CLAUDE.md`. Personal preferences for all projects. Just you (all projects).
+- **Project memory (local)** — `./CLAUDE.local.md`. Personal project-specific preferences. Just you (current project).
+- **Auto memory** — `~/.claude/projects/<project>/memory/`. Claude's automatic notes and learnings. Just you (per
+  project).
 
 **Managed policy paths:**
 
@@ -104,10 +104,8 @@ CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir ../shared-config
 
 ## Commands
 
-| Command   | Action                                                  |
-| --------- | ------------------------------------------------------- |
-| `/memory` | Open any memory file in system editor; see loaded files |
-| `/init`   | Bootstrap a CLAUDE.md for the current project           |
+- `/memory` — open any memory file in system editor; see loaded files
+- `/init` — bootstrap a CLAUDE.md for the current project
 
 ## Modular Rules with `.claude/rules/`
 
@@ -146,12 +144,10 @@ Rules without `paths` field apply to all files.
 
 ### Glob Patterns
 
-| Pattern                | Matches                                |
-| ---------------------- | -------------------------------------- |
-| `**/*.ts`              | All TypeScript files in any directory  |
-| `src/**/*`             | All files under `src/`                 |
-| `*.md`                 | Markdown files in project root         |
-| `src/components/*.tsx` | React components in specific directory |
+- `**/*.ts` — all TypeScript files in any directory
+- `src/**/*` — all files under `src/`
+- `*.md` — markdown files in project root
+- `src/components/*.tsx` — React components in specific directory
 
 Multiple patterns and brace expansion:
 

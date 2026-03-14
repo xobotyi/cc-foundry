@@ -20,10 +20,8 @@ keep-coding-instructions: false
 
 ## Storage Locations
 
-| Location      | Path                           | Scope                      |
-| ------------- | ------------------------------ | -------------------------- |
-| User-level    | `~/.claude/output-styles/*.md` | All projects for this user |
-| Project-level | `.claude/output-styles/*.md`   | Anyone in this repo        |
+- `~/.claude/output-styles/*.md` — user-level: all projects for this user
+- `.claude/output-styles/*.md` — project-level: anyone in this repo
 
 **Resolution:** Project-level styles with same name override user-level.
 

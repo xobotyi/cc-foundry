@@ -25,14 +25,17 @@ Skip only for trivial edits (typos, formatting).
 
 ## Route to Reference
 
-| Situation                                     | Reference                                        | Contents                                                                         |
-| --------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------- |
-| File format, frontmatter, storage, activation | [`${CLAUDE_SKILL_DIR}/references/spec.md`]       | Frontmatter field details, storage paths, activation methods, file naming rules  |
-| Creating a style from scratch                 | [`${CLAUDE_SKILL_DIR}/references/creation.md`]   | Full style templates by pattern, testing prompts, creation workflow steps        |
-| Evaluating style quality                      | [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] | Per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol |
-| Style not working, needs refinement           | [`${CLAUDE_SKILL_DIR}/references/iteration.md`]  | Detailed fix patterns with before/after, refinement techniques, version control  |
-| Real-world examples with analysis             | [`${CLAUDE_SKILL_DIR}/references/examples.md`]   | 5 complete styles with dimensional scoring and improvement notes                 |
-| Prompt engineering techniques                 | `prompt-engineering` skill                       | Instruction design fundamentals                                                  |
+- **File format, frontmatter, storage, activation** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] Frontmatter field
+  details, storage paths, activation methods, file naming rules
+- **Creating a style from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Full style templates by pattern,
+  testing prompts, creation workflow steps
+- **Evaluating style quality** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Per-dimension scoring rubrics (1-10),
+  weighted scoring formula, testing protocol
+- **Style not working, needs refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Detailed fix patterns with
+  before/after, refinement techniques, version control
+- **Real-world examples with analysis** — [`${CLAUDE_SKILL_DIR}/references/examples.md`] 5 complete styles with
+  dimensional scoring and improvement notes
+- **Prompt engineering techniques** — `prompt-engineering` skill Instruction design fundamentals
 
 ## What Output Styles Change
 
@@ -69,12 +72,10 @@ Output styles are the ONLY way to change the main agent's core personality.
 
 This field controls whether Claude retains its software engineering guidance.
 
-| Use Case                              | Setting | Rationale                              |
-| ------------------------------------- | ------- | -------------------------------------- |
-| Non-coding domain (research, content) | `false` | Remove irrelevant coding guidance      |
-| Coding with different tone            | `true`  | Keep coding skills, change personality |
-| Teaching/learning coding              | `true`  | Need coding knowledge for lessons      |
-| General assistant                     | `false` | Broader focus, no coding bias          |
+- `false`: Non-coding domain (research, content) — remove irrelevant coding guidance
+- `true`: Coding with different tone — keep coding skills, change personality
+- `true`: Teaching/learning coding — need coding knowledge for lessons
+- `false`: General assistant — broader focus, no coding bias
 
 Default is `false`. Set `true` when the style is a personality adjustment for coding work rather than a domain shift.
 
@@ -229,14 +230,12 @@ Full templates for each pattern: see `${CLAUDE_SKILL_DIR}/references/creation.md
 
 Six dimensions, three weighted 2x (high-leverage):
 
-| Dimension                  | Weight | What to Check                                                                               |
-| -------------------------- | ------ | ------------------------------------------------------------------------------------------- |
-| **Persona Clarity**        | 2x     | Can you describe the persona in one sentence? Would two readers imagine the same character? |
-| **Behavioral Specificity** | 2x     | Is every rule verifiable? Are there concrete do/don't examples?                             |
-| **Example Quality**        | 2x     | Do examples show contrast (good vs bad)? Do they cover key interaction types?               |
-| Output Format              | 1x     | Would Claude know exactly how to structure responses?                                       |
-| Consistency Safeguards     | 1x     | Are default behaviors explicitly forbidden with alternatives?                               |
-| Scope                      | 1x     | Is `keep-coding-instructions` set right? Does the style know what it's for?                 |
+- **Persona Clarity** (2x) — Can you describe the persona in one sentence? Would two readers imagine the same character?
+- **Behavioral Specificity** (2x) — Is every rule verifiable? Are there concrete do/don't examples?
+- **Example Quality** (2x) — Do examples show contrast (good vs bad)? Do they cover key interaction types?
+- Output Format (1x) — Would Claude know exactly how to structure responses?
+- Consistency Safeguards (1x) — Are default behaviors explicitly forbidden with alternatives?
+- Scope (1x) — Is `keep-coding-instructions` set right? Does the style know what it's for?
 
 **Must have (critical):** Persona defined, core behaviors listed, at least one tone example, output format specified.
 
@@ -257,16 +256,15 @@ Make ONE targeted change per iteration. Multiple changes make debugging impossib
 
 ### Diagnostic Table
 
-| Symptom                       | Likely Cause                   | Fix                                                     |
-| ----------------------------- | ------------------------------ | ------------------------------------------------------- |
-| Reverts to sycophantic tone   | Weak persona, no anti-patterns | Add explicit "Never use..." list with forbidden phrases |
-| Ignores format                | Format buried in text          | Move format to end, add example                         |
-| Inconsistent between turns    | No persistence language        | Add "maintain throughout" with scenario list            |
-| Works initially, drifts later | No reinforcement               | Add consistency section with override language          |
-| Too verbose                   | No length constraints          | Add explicit length limits                              |
-| Wrong tone in edge cases      | Missing example coverage       | Add example for the failing scenario                    |
-| Contradictory behavior        | Conflicting instructions       | Add priority hierarchy                                  |
-| Ignores some rules            | Too many instructions          | Consolidate overlapping rules, prioritize               |
+- **Reverts to sycophantic tone** — weak persona, no anti-patterns. Fix: add explicit "Never use..." list with forbidden
+  phrases
+- **Ignores format** — format buried in text. Fix: move format to end, add example
+- **Inconsistent between turns** — no persistence language. Fix: add "maintain throughout" with scenario list
+- **Works initially, drifts later** — no reinforcement. Fix: add consistency section with override language
+- **Too verbose** — no length constraints. Fix: add explicit length limits
+- **Wrong tone in edge cases** — missing example coverage. Fix: add example for the failing scenario
+- **Contradictory behavior** — conflicting instructions. Fix: add priority hierarchy
+- **Ignores some rules** — too many instructions. Fix: consolidate overlapping rules, prioritize
 
 ### Strengthening Techniques
 
@@ -288,11 +286,9 @@ Detailed fix patterns with before/after examples: see `${CLAUDE_SKILL_DIR}/refer
 
 ## Built-in Styles
 
-| Style           | Purpose                 | Key Behavior               |
-| --------------- | ----------------------- | -------------------------- |
-| **Default**     | Software engineering    | Concise, code-focused      |
-| **Explanatory** | Teaching while coding   | Adds "Insight" blocks      |
-| **Learning**    | Collaborative mentoring | Adds `TODO(human)` markers |
+- **Default** — software engineering. Concise, code-focused
+- **Explanatory** — teaching while coding. Adds "Insight" blocks
+- **Learning** — collaborative mentoring. Adds `TODO(human)` markers
 
 ## Quick Start
 

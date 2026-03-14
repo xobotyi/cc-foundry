@@ -18,25 +18,21 @@ Higher levels override lower levels. A flag always wins over an env var, which a
 
 ## Choosing the Right Mechanism
 
-| Configuration Type                     | Mechanism         | Example                                   |
-| -------------------------------------- | ----------------- | ----------------------------------------- |
-| Varies per invocation                  | Flags             | `--verbose`, `--dry-run`, `--format json` |
-| Stable per session, varies per machine | Env vars + flags  | `HTTP_PROXY`, `NO_COLOR`, `EDITOR`        |
-| Stable per project, shared in VCS      | Config file       | `myapp.toml`, `Makefile`, `package.json`  |
-| Stable per user, across projects       | User config (XDG) | `~/.config/myapp/config.toml`             |
-| Stable system-wide                     | System config     | `/etc/myapp/config.toml`                  |
+- **Varies per invocation** → Flags — `--verbose`, `--dry-run`, `--format json`
+- **Stable per session, varies per machine** → Env vars + flags — `HTTP_PROXY`, `NO_COLOR`, `EDITOR`
+- **Stable per project, shared in VCS** → Config file — `myapp.toml`, `Makefile`, `package.json`
+- **Stable per user, across projects** → User config (XDG) — `~/.config/myapp/config.toml`
+- **Stable system-wide** → System config — `/etc/myapp/config.toml`
 
 ## XDG Base Directory Specification
 
 Follow the [XDG Base Directory Spec][xdg] for user-level files:
 
-| Variable          | Default          | Purpose                       |
-| ----------------- | ---------------- | ----------------------------- |
-| `XDG_CONFIG_HOME` | `~/.config`      | User configuration            |
-| `XDG_DATA_HOME`   | `~/.local/share` | User data                     |
-| `XDG_STATE_HOME`  | `~/.local/state` | User state (logs, history)    |
-| `XDG_CACHE_HOME`  | `~/.cache`       | Non-essential cached data     |
-| `XDG_RUNTIME_DIR` | (system-set)     | Runtime files (sockets, PIDs) |
+- `XDG_CONFIG_HOME` (default `~/.config`) — User configuration
+- `XDG_DATA_HOME` (default `~/.local/share`) — User data
+- `XDG_STATE_HOME` (default `~/.local/state`) — User state (logs, history)
+- `XDG_CACHE_HOME` (default `~/.cache`) — Non-essential cached data
+- `XDG_RUNTIME_DIR` (system-set) — Runtime files (sockets, PIDs)
 
 [xdg]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
@@ -55,19 +51,17 @@ used by yarn, fish, neovim, tmux, and many modern tools.
 
 ### Well-Known Variables to Respect
 
-| Variable                                             | Purpose                                 |
-| ---------------------------------------------------- | --------------------------------------- |
-| `NO_COLOR`                                           | Disable color output                    |
-| `FORCE_COLOR`                                        | Force color output                      |
-| `DEBUG`                                              | Enable verbose/debug output             |
-| `EDITOR`                                             | User's preferred text editor            |
-| `PAGER`                                              | User's preferred pager (`less`, `more`) |
-| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` | Network proxies                         |
-| `SHELL`                                              | User's preferred interactive shell      |
-| `TERM`, `TERMINFO`, `TERMCAP`                        | Terminal capabilities                   |
-| `TMPDIR`                                             | Temporary file directory                |
-| `HOME`                                               | User's home directory                   |
-| `LINES`, `COLUMNS`                                   | Terminal dimensions                     |
+- `NO_COLOR` — Disable color output
+- `FORCE_COLOR` — Force color output
+- `DEBUG` — Enable verbose/debug output
+- `EDITOR` — User's preferred text editor
+- `PAGER` — User's preferred pager (`less`, `more`)
+- `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` — Network proxies
+- `SHELL` — User's preferred interactive shell
+- `TERM`, `TERMINFO`, `TERMCAP` — Terminal capabilities
+- `TMPDIR` — Temporary file directory
+- `HOME` — User's home directory
+- `LINES`, `COLUMNS` — Terminal dimensions
 
 ### .env Files
 
@@ -98,12 +92,10 @@ Accept secrets via:
 
 ### Common Formats
 
-| Format | Strengths                             | Use When                              |
-| ------ | ------------------------------------- | ------------------------------------- |
-| TOML   | Human-readable, typed, hierarchical   | General app config                    |
-| YAML   | Familiar to DevOps, supports comments | K8s/cloud ecosystem                   |
-| JSON   | Universal, no ambiguity               | API config, when comments unnecessary |
-| INI    | Simple, flat                          | Legacy, very simple config            |
+- **TOML** — Human-readable, typed, hierarchical. Use for general app config.
+- **YAML** — Familiar to DevOps, supports comments. Use for K8s/cloud ecosystem.
+- **JSON** — Universal, no ambiguity. Use for API config, when comments are unnecessary.
+- **INI** — Simple, flat. Use for legacy or very simple config.
 
 ### Config File Design
 

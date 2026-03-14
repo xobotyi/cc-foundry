@@ -15,10 +15,8 @@ This imports `theme.css` (default tokens), `preflight.css` (base reset), and `ut
 
 `@theme` defines design tokens that generate utility classes. It is **not** equivalent to `:root`.
 
-| Placement        | Generates utility classes | Use for                                 |
-| ---------------- | ------------------------- | --------------------------------------- |
-| `@theme { ... }` | Yes                       | Design tokens that need utility classes |
-| `:root { ... }`  | No                        | CSS vars that don't need utilities      |
+- **`@theme { ... }`** — Generates utility classes; use for design tokens that need utilities
+- **`:root { ... }`** — Does not generate utility classes; use for CSS vars that only need `var()` access
 
 Rules:
 
@@ -47,26 +45,24 @@ Use `@theme inline` when a token references another variable — prevents CSS va
 
 ## Namespaces → Utility Classes
 
-| Namespace                    | Generated utilities                                                |
-| ---------------------------- | ------------------------------------------------------------------ |
-| `--color-*`                  | `bg-*`, `text-*`, `border-*`, `ring-*`, `fill-*`, `stroke-*`, etc. |
-| `--font-*`                   | `font-*` (font-family)                                             |
-| `--text-*`                   | `text-*` (font-size)                                               |
-| `--font-weight-*`            | `font-*` (font-weight)                                             |
-| `--tracking-*`               | `tracking-*` (letter-spacing)                                      |
-| `--leading-*`                | `leading-*` (line-height)                                          |
-| `--breakpoint-*`             | Responsive variants: `sm:*`, `md:*`, etc.                          |
-| `--container-*`              | Container query variants: `@sm:*`, and `max-w-*`                   |
-| `--spacing-*` or `--spacing` | `px-*`, `py-*`, `m-*`, `w-*`, `h-*`, etc.                          |
-| `--radius-*`                 | `rounded-*`                                                        |
-| `--shadow-*`                 | `shadow-*`                                                         |
-| `--inset-shadow-*`           | `inset-shadow-*`                                                   |
-| `--drop-shadow-*`            | `drop-shadow-*`                                                    |
-| `--blur-*`                   | `blur-*`                                                           |
-| `--perspective-*`            | `perspective-*`                                                    |
-| `--aspect-*`                 | `aspect-*`                                                         |
-| `--ease-*`                   | `ease-*`                                                           |
-| `--animate-*`                | `animate-*`                                                        |
+- **`--color-*`** → `bg-*`, `text-*`, `border-*`, `ring-*`, `fill-*`, `stroke-*`, etc.
+- **`--font-*`** → `font-*` (font-family)
+- **`--text-*`** → `text-*` (font-size)
+- **`--font-weight-*`** → `font-*` (font-weight)
+- **`--tracking-*`** → `tracking-*` (letter-spacing)
+- **`--leading-*`** → `leading-*` (line-height)
+- **`--breakpoint-*`** → Responsive variants: `sm:*`, `md:*`, etc.
+- **`--container-*`** → Container query variants: `@sm:*`, and `max-w-*`
+- **`--spacing-*` or `--spacing`** → `px-*`, `py-*`, `m-*`, `w-*`, `h-*`, etc.
+- **`--radius-*`** → `rounded-*`
+- **`--shadow-*`** → `shadow-*`
+- **`--inset-shadow-*`** → `inset-shadow-*`
+- **`--drop-shadow-*`** → `drop-shadow-*`
+- **`--blur-*`** → `blur-*`
+- **`--perspective-*`** → `perspective-*`
+- **`--aspect-*`** → `aspect-*`
+- **`--ease-*`** → `ease-*`
+- **`--animate-*`** → `animate-*`
 
 Breakpoints generate **variants**, not utilities. Colors generate multiple utility families (`bg-*`, `text-*`,
 `border-*`, etc.) from a single namespace.
@@ -354,20 +350,18 @@ const val = getComputedStyle(document.documentElement).getPropertyValue("--shado
 
 ## V3 → V4 Migration Gotchas
 
-| V3                               | V4                                        |
-| -------------------------------- | ----------------------------------------- |
-| `tailwind.config.js` theme       | `@theme { ... }` in CSS                   |
-| `theme.extend.colors.brand`      | `--color-brand: oklch(...)` in `@theme`   |
-| `theme(colors.red.500)`          | `var(--color-red-500)`                    |
-| `bg-opacity-50`                  | `bg-black/50` (opacity modifier)          |
-| `bg-gradient-to-r`               | `bg-linear-to-r`                          |
-| `shadow-sm` (v3 small)           | `shadow-xs` (scale shifted)               |
-| `rounded` (v3 small)             | `rounded-sm` (scale shifted)              |
-| `!bg-red-500` (important prefix) | `bg-red-500!` (important suffix)          |
-| `ring` (3px blue)                | `ring-3` (v4 default is 1px currentColor) |
-| `outline-none`                   | `outline-hidden`                          |
-| `bg-[var(--brand)]`              | `bg-(--brand)` (v4 CSS var shorthand)     |
-| `safelist` in config             | `@source inline("class-name")`            |
+- **`tailwind.config.js` theme** → `@theme { ... }` in CSS
+- **`theme.extend.colors.brand`** → `--color-brand: oklch(...)` in `@theme`
+- **`theme(colors.red.500)`** → `var(--color-red-500)`
+- **`bg-opacity-50`** → `bg-black/50` (opacity modifier)
+- **`bg-gradient-to-r`** → `bg-linear-to-r`
+- **`shadow-sm`** (v3 small) → `shadow-xs` (scale shifted)
+- **`rounded`** (v3 small) → `rounded-sm` (scale shifted)
+- **`!bg-red-500`** (important prefix) → `bg-red-500!` (important suffix)
+- **`ring`** (3px blue) → `ring-3` (v4 default is 1px currentColor)
+- **`outline-none`** → `outline-hidden`
+- **`bg-[var(--brand)]`** → `bg-(--brand)` (v4 CSS var shorthand)
+- **`safelist` in config** → `@source inline("class-name")`
 
 **`@config` directive:** Use only for incremental v3→v4 migration. `corePlugins`, `safelist`, and `separator` from JS
 config are not supported in v4.

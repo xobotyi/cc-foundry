@@ -19,16 +19,22 @@ boundaries.
 Extended configuration examples, comparison tables, and detailed patterns for the rules below live in
 `${CLAUDE_SKILL_DIR}/references/`.
 
-| Topic                                                                | Reference                                                | Contents                                                                                                                |
-| -------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| VLAN design, trunk/access ports, inter-VLAN policy, Layer 2 security | [`${CLAUDE_SKILL_DIR}/references/vlan-segmentation.md`]  | Segment table, firewall rule matrix, hardware requirements, DHCP snooping, DAI, port security, L2 attack mitigation     |
-| nftables syntax, OPNsense/pfSense hardening, IPv6 firewall rules     | [`${CLAUDE_SKILL_DIR}/references/firewall-rules.md`]     | Chain types/hooks/priorities, connection tracking, NAT, rate limiting, sets/maps, ICMPv6 policy, dual-stack rules       |
-| Pi-hole, AdGuard Home, split-horizon, mDNS, Unbound, DoH/DoT         | [`${CLAUDE_SKILL_DIR}/references/dns-architecture.md`]   | Tool comparison table, deployment patterns, Avahi reflector config, recursive vs authoritative, encrypted DNS, IPv6 DNS |
-| Caddy, Traefik, Nginx Proxy Manager, Cloudflare tunnels              | [`${CLAUDE_SKILL_DIR}/references/reverse-proxy.md`]      | Caddyfile examples, Traefik Docker labels, decision matrix, snippet patterns, tunnel patterns, auth proxy integration   |
-| WireGuard, Tailscale, Headscale, site-to-site, HA with OSPF          | [`${CLAUDE_SKILL_DIR}/references/vpn-tunnels.md`]        | Config examples, topology comparison, subnet router, hybrid WG+TS, HA failover with BIRD/OSPF                           |
-| Let's Encrypt, ACME, wildcard certs, acme.sh                         | [`${CLAUDE_SKILL_DIR}/references/tls-certificates.md`]   | Challenge types table, ACME client comparison, certificate storage patterns, TLS config                                 |
-| SSH, fail2ban, CrowdSec, IDS/IPS, monitoring, hardening              | [`${CLAUDE_SKILL_DIR}/references/security-hardening.md`] | sshd_config, SSH CA, fail2ban vs CrowdSec, Suricata IDS, Prometheus stack, monitoring metrics, IPv6 hardening           |
-| Authelia, Authentik, forward auth, SSO patterns                      | [`${CLAUDE_SKILL_DIR}/references/auth-proxies.md`]       | Authelia vs Authentik comparison, ForwardAuth with Traefik/Caddy, SSO/MFA patterns, deployment guidance                 |
+- `vlan-segmentation.md` — VLAN design, trunk/access ports, inter-VLAN policy, Layer 2 security: segment table, firewall
+  rule matrix, hardware requirements, DHCP snooping, DAI, port security, L2 attack mitigation
+- `firewall-rules.md` — nftables syntax, OPNsense/pfSense hardening, IPv6 firewall rules: chain types/hooks/priorities,
+  connection tracking, NAT, rate limiting, sets/maps, ICMPv6 policy, dual-stack rules
+- `dns-architecture.md` — Pi-hole, AdGuard Home, split-horizon, mDNS, Unbound, DoH/DoT: tool comparison, deployment
+  patterns, Avahi reflector config, recursive vs authoritative, encrypted DNS, IPv6 DNS
+- `reverse-proxy.md` — Caddy, Traefik, Nginx Proxy Manager, Cloudflare tunnels: Caddyfile examples, Traefik Docker
+  labels, decision matrix, snippet patterns, tunnel patterns, auth proxy integration
+- `vpn-tunnels.md` — WireGuard, Tailscale, Headscale, site-to-site, HA with OSPF: config examples, topology comparison,
+  subnet router, hybrid WG+TS, HA failover with BIRD/OSPF
+- `tls-certificates.md` — Let's Encrypt, ACME, wildcard certs, acme.sh: challenge types, ACME client comparison,
+  certificate storage patterns, TLS config
+- `security-hardening.md` — SSH, fail2ban, CrowdSec, IDS/IPS, monitoring, hardening: sshd_config, SSH CA, fail2ban vs
+  CrowdSec, Suricata IDS, Prometheus stack, monitoring metrics, IPv6 hardening
+- `auth-proxies.md` — Authelia, Authentik, forward auth, SSO patterns: Authelia vs Authentik comparison, ForwardAuth
+  with Traefik/Caddy, SSO/MFA patterns, deployment guidance
 
 ## VLAN Segmentation
 
@@ -169,12 +175,11 @@ inspection.
 
 Collaborative security engine that replaces or augments fail2ban. Key differences from fail2ban:
 
-| Aspect        | fail2ban              | CrowdSec                               |
-| ------------- | --------------------- | -------------------------------------- |
-| Detection     | Regex on local logs   | YAML scenarios with leakspeed/capacity |
-| Intelligence  | Local only            | Community-shared threat data           |
-| Remediation   | iptables/nftables ban | Bouncers (firewall, Nginx, Traefik)    |
-| Configuration | jail.conf             | acquis.yaml + Hub collections          |
+**fail2ban:** Detection via regex on local logs; local-only intelligence; iptables/nftables ban remediation; configured
+via jail.conf.
+
+**CrowdSec:** Detection via YAML scenarios with leakspeed/capacity; community-shared threat data; Bouncers for
+remediation (firewall, Nginx, Traefik); configured via acquis.yaml + Hub collections.
 
 Install CrowdSec collections from the Hub for specific services (SSH, Nginx, Suricata). Configure whitelists immediately
 to prevent banning your own IPs.

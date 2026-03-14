@@ -82,13 +82,11 @@ StatsD server.
 
 ### Metric Type Mapping
 
-| StatsD Type        | Prometheus Type      |
-| ------------------ | -------------------- |
-| Counter (`c`)      | Counter              |
-| Gauge (`g`)        | Gauge                |
-| Timer (`ms`)       | Summary or Histogram |
-| Histogram (`h`)    | Summary or Histogram |
-| Distribution (`d`) | Summary or Histogram |
+- **Counter (`c`)** — Counter
+- **Gauge (`g`)** — Gauge
+- **Timer (`ms`)** — Summary or Histogram
+- **Histogram (`h`)** — Summary or Histogram
+- **Distribution (`d`)** — Summary or Histogram
 
 **Timer conversion:** StatsD timers report in milliseconds; Prometheus expects seconds. The exporter converts
 automatically.
@@ -122,12 +120,10 @@ of order.
 
 The exporter parses multiple tag formats:
 
-| Format    | Style        | Example                  |
-| --------- | ------------ | ------------------------ |
-| DogStatsD | `\|#key:val` | `metric:1\|c\|#env:prod` |
-| InfluxDB  | `,key=val`   | `metric,env=prod:1\|c`   |
-| Librato   | `#key=val`   | `metric#env=prod:1\|c`   |
-| SignalFX  | `[key=val]`  | `metric[env=prod]:1\|c`  |
+- **DogStatsD** — `\|#key:val` (e.g. `metric:1\|c\|#env:prod`)
+- **InfluxDB** — `,key=val` (e.g. `metric,env=prod:1\|c`)
+- **Librato** — `#key=val` (e.g. `metric#env=prod:1\|c`)
+- **SignalFX** — `[key=val]` (e.g. `metric[env=prod]:1\|c`)
 
 Do not mix tag formats on the same metric.
 
@@ -210,14 +206,12 @@ Enable `datadog_extensions = true` to parse:
 
 ## Backend Selection Guide
 
-| Need                                | Backend                    |
-| ----------------------------------- | -------------------------- |
-| Simple, self-hosted graphing        | Graphite                   |
-| Cloud monitoring + APM              | Datadog (DogStatsD)        |
-| Prometheus ecosystem integration    | statsd_exporter            |
-| Flexible multi-output pipeline      | Telegraf                   |
-| InfluxDB time-series storage        | Telegraf -> InfluxDB       |
-| Migrating from StatsD to Prometheus | statsd_exporter with relay |
+- **Simple, self-hosted graphing** — Graphite
+- **Cloud monitoring + APM** — Datadog (DogStatsD)
+- **Prometheus ecosystem integration** — statsd_exporter
+- **Flexible multi-output pipeline** — Telegraf
+- **InfluxDB time-series storage** — Telegraf -> InfluxDB
+- **Migrating from StatsD to Prometheus** — statsd_exporter with relay
 
 ## Migration Considerations
 

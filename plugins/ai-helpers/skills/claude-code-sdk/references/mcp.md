@@ -69,11 +69,9 @@ refreshes available tools, prompts, and resources — no reconnection needed.
 
 ## Installation Scopes
 
-| Scope   | Storage                         | Use Case                            |
-| ------- | ------------------------------- | ----------------------------------- |
-| local   | `~/.claude.json` (project path) | Personal, current project (default) |
-| project | `.mcp.json` in project root     | Team, via version control           |
-| user    | `~/.claude.json`                | Personal, all projects              |
+- `local` — `~/.claude.json` (project path). Personal, current project (default).
+- `project` — `.mcp.json` in project root. Team, via version control.
+- `user` — `~/.claude.json`. Personal, all projects.
 
 ```bash
 claude mcp add --transport http stripe --scope user https://mcp.stripe.com
@@ -150,11 +148,9 @@ Tokens stored securely and refreshed automatically. Use "Clear authentication" i
 For servers that don't support dynamic client registration (error: "Incompatible auth server: does not support dynamic
 client registration"), register an OAuth app through the server's developer portal first.
 
-| Flag              | Purpose                                                  |
-| ----------------- | -------------------------------------------------------- |
-| `--client-id`     | OAuth client ID from developer portal                    |
-| `--client-secret` | Prompts for secret with masked input                     |
-| `--callback-port` | Port for redirect URI (`http://localhost:PORT/callback`) |
+- `--client-id` — OAuth client ID from developer portal
+- `--client-secret` — prompts for secret with masked input
+- `--callback-port` — port for redirect URI (`http://localhost:PORT/callback`)
 
 **Via `claude mcp add`:**
 
@@ -283,12 +279,10 @@ Or inline in `plugin.json`:
 }
 ```
 
-| Feature               | Details                                                          |
-| --------------------- | ---------------------------------------------------------------- |
-| Automatic lifecycle   | Starts on plugin enable; requires Claude Code restart on changes |
-| Environment variables | `${CLAUDE_PLUGIN_ROOT}` resolves to plugin directory             |
-| User env access       | Same variables as manually configured servers                    |
-| Transport types       | Supports stdio, SSE, and HTTP                                    |
+- **Automatic lifecycle** — starts on plugin enable; requires Claude Code restart on changes
+- **Environment variables** — `${CLAUDE_PLUGIN_ROOT}` resolves to plugin directory
+- **User env access** — same variables as manually configured servers
+- **Transport types** — supports stdio, SSE, and HTTP
 
 Plugin servers appear in `/mcp` with indicators showing plugin origin. Managed through plugin installation, not `/mcp`
 commands.
@@ -327,12 +321,10 @@ instead of being preloaded. Requires Sonnet 4+ or Opus 4+ (Haiku not supported).
 
 **Configure via `ENABLE_TOOL_SEARCH`:**
 
-| Value      | Behavior                               |
-| ---------- | -------------------------------------- |
-| `auto`     | Activate at 10% threshold (default)    |
-| `auto:<N>` | Custom threshold (e.g., `auto:5` = 5%) |
-| `true`     | Always enabled                         |
-| `false`    | Disabled, all tools loaded upfront     |
+- `auto` — activate at 10% threshold (default)
+- `auto:<N>` — custom threshold (e.g., `auto:5` = 5%)
+- `true` — always enabled
+- `false` — disabled, all tools loaded upfront
 
 ```bash
 ENABLE_TOOL_SEARCH=auto:5 claude
@@ -353,12 +345,10 @@ when Claude should search for them. This is the primary signal Tool Search uses 
 
 ## Environment Variables
 
-| Variable                | Purpose                                       | Default  |
-| ----------------------- | --------------------------------------------- | -------- |
-| `MCP_TIMEOUT`           | Server startup timeout in ms                  | (system) |
-| `MAX_MCP_OUTPUT_TOKENS` | Maximum tokens for MCP tool output            | 25000    |
-| `ENABLE_TOOL_SEARCH`    | Tool search behavior (see above)              | `auto`   |
-| `MCP_CLIENT_SECRET`     | OAuth client secret for non-interactive setup | —        |
+- `MCP_TIMEOUT` — server startup timeout in ms. Default: (system)
+- `MAX_MCP_OUTPUT_TOKENS` — maximum tokens for MCP tool output. Default: 25000
+- `ENABLE_TOOL_SEARCH` — tool search behavior (see above). Default: `auto`
+- `MCP_CLIENT_SECRET` — OAuth client secret for non-interactive setup
 
 Output warning threshold is 10,000 tokens; increase limit:
 
@@ -377,11 +367,9 @@ Two options for organizational control over MCP servers:
 
 Deploy for complete control. Users cannot add, modify, or use any other servers.
 
-| Platform    | Path                                                       |
-| ----------- | ---------------------------------------------------------- |
-| macOS       | `/Library/Application Support/ClaudeCode/managed-mcp.json` |
-| Linux / WSL | `/etc/claude-code/managed-mcp.json`                        |
-| Windows     | `C:\Program Files\ClaudeCode\managed-mcp.json`             |
+- macOS — `/Library/Application Support/ClaudeCode/managed-mcp.json`
+- Linux / WSL — `/etc/claude-code/managed-mcp.json`
+- Windows — `C:\Program Files\ClaudeCode\managed-mcp.json`
 
 System-wide paths requiring administrator privileges.
 
@@ -406,11 +394,9 @@ constraints.
 
 **Restriction types (each entry must have exactly one):**
 
-| Type            | Matches                          | Example                                      |
-| --------------- | -------------------------------- | -------------------------------------------- |
-| `serverName`    | Configured server name           | `{"serverName": "github"}`                   |
-| `serverCommand` | Exact command array (stdio only) | `{"serverCommand": ["npx", "-y", "pkg"]}`    |
-| `serverUrl`     | URL pattern with `*` wildcards   | `{"serverUrl": "https://mcp.company.com/*"}` |
+- `serverName` — matches configured server name. Example: `{"serverName": "github"}`
+- `serverCommand` — matches exact command array (stdio only). Example: `{"serverCommand": ["npx", "-y", "pkg"]}`
+- `serverUrl` — matches URL pattern with `*` wildcards. Example: `{"serverUrl": "https://mcp.company.com/*"}`
 
 ```json
 {
@@ -434,19 +420,15 @@ constraints.
 
 **Allowlist behavior:**
 
-| Value       | Effect                                |
-| ----------- | ------------------------------------- |
-| `undefined` | No restrictions (default)             |
-| `[]`        | Complete lockdown, no servers allowed |
-| List        | Only matching servers allowed         |
+- `undefined` — no restrictions (default)
+- `[]` — complete lockdown, no servers allowed
+- List — only matching servers allowed
 
 **Denylist behavior:**
 
-| Value       | Effect                              |
-| ----------- | ----------------------------------- |
-| `undefined` | No servers blocked (default)        |
-| `[]`        | No servers blocked                  |
-| List        | Matching servers explicitly blocked |
+- `undefined` — no servers blocked (default)
+- `[]` — no servers blocked
+- List — matching servers explicitly blocked
 
 **Precedence rules:**
 

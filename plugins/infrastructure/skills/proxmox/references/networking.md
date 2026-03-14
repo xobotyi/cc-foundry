@@ -70,13 +70,11 @@ VLANs (802.1Q) segment network traffic at Layer 2 without additional physical ca
 
 Bonding combines multiple physical NICs for redundancy and/or throughput.
 
-| Mode                | Name                    | Use Case                                            |
-| ------------------- | ----------------------- | --------------------------------------------------- |
-| `balance-rr` (0)    | Round-robin             | Throughput (requires switch support)                |
-| `active-backup` (1) | Active-backup           | Redundancy without switch config                    |
-| `balance-xor` (2)   | XOR                     | Balanced with switch LAG                            |
-| `802.3ad` (4)       | LACP                    | Best throughput + redundancy (requires switch LACP) |
-| `balance-alb` (6)   | Adaptive load balancing | Throughput without switch config                    |
+- **`balance-rr` (0)** — round-robin; throughput (requires switch support)
+- **`active-backup` (1)** — active-backup; redundancy without switch config
+- **`balance-xor` (2)** — XOR; balanced with switch LAG
+- **`802.3ad` (4)** — LACP; best throughput + redundancy (requires switch LACP)
+- **`balance-alb` (6)** — adaptive load balancing; throughput without switch config
 
 **Best practices:**
 
@@ -100,13 +98,11 @@ switches.
 
 ### Zones
 
-| Zone Type | Layer | Transport           | Use Case                                    |
-| --------- | ----- | ------------------- | ------------------------------------------- |
-| Simple    | L2    | Linux bridge        | Single-node isolated networks               |
-| VLAN      | L2    | 802.1Q tags         | Multi-node with physical VLAN support       |
-| QinQ      | L2    | Double-tagged VLANs | Stacking VLANs over existing infrastructure |
-| VXLAN     | L2/L3 | UDP overlay         | Multi-node without physical VLAN changes    |
-| EVPN      | L2/L3 | BGP + VXLAN         | Advanced routing, multi-tenancy             |
+- **Simple** — L2, Linux bridge; single-node isolated networks
+- **VLAN** — L2, 802.1Q tags; multi-node with physical VLAN support
+- **QinQ** — L2, double-tagged VLANs; stacking VLANs over existing infrastructure
+- **VXLAN** — L2/L3, UDP overlay; multi-node without physical VLAN changes
+- **EVPN** — L2/L3, BGP + VXLAN; advanced routing, multi-tenancy
 
 ### VNets
 
@@ -148,14 +144,12 @@ full-mesh and EVPN/VXLAN zone deployments.
 
 Separate traffic types onto dedicated networks for performance and security:
 
-| Traffic Type          | Network               | Bandwidth                            |
-| --------------------- | --------------------- | ------------------------------------ |
-| Management / Corosync | Dedicated VLAN or NIC | 1GbE sufficient                      |
-| Ceph cluster          | Dedicated NIC(s)      | 10GbE minimum, 25GbE+ recommended    |
-| Ceph public           | Dedicated NIC(s)      | 10GbE minimum                        |
-| VM/CT guest traffic   | Shared bridge         | Depends on workload                  |
-| Migration             | Dedicated or shared   | 10GbE recommended for fast migration |
-| Backup                | Shared or dedicated   | Depends on backup window             |
+- **Management / Corosync** — dedicated VLAN or NIC; 1GbE sufficient
+- **Ceph cluster** — dedicated NIC(s); 10GbE minimum, 25GbE+ recommended
+- **Ceph public** — dedicated NIC(s); 10GbE minimum
+- **VM/CT guest traffic** — shared bridge; depends on workload
+- **Migration** — dedicated or shared; 10GbE recommended for fast migration
+- **Backup** — shared or dedicated; depends on backup window
 
 **Critical:** Never combine Corosync cluster traffic with high-bandwidth Ceph or migration traffic on a single 1GbE
 link. Corosync requires latency under 5ms — network contention causes cluster instability, false fencing, and potential

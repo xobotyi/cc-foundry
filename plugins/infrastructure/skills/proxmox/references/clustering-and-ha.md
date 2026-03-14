@@ -122,12 +122,10 @@ ha-group create mygroup -nodes "node1:2,node2:1,node3:1" -nofailback 0
 ha-manager add vm:100 -group mygroup -state started -max_restart 3 -max_relocate 2
 ```
 
-| Parameter      | Purpose                                                     |
-| -------------- | ----------------------------------------------------------- |
-| `state`        | `started`, `stopped`, `disabled`, `ignored`                 |
-| `max_restart`  | Maximum restart attempts on the same node before relocating |
-| `max_relocate` | Maximum relocations to other nodes before giving up         |
-| `group`        | HA group defining eligible nodes and priorities             |
+- **`state`** — `started`, `stopped`, `disabled`, `ignored`
+- **`max_restart`** — maximum restart attempts on the same node before relocating
+- **`max_relocate`** — maximum relocations to other nodes before giving up
+- **`group`** — HA group defining eligible nodes and priorities
 
 ### HA Requirements Checklist
 

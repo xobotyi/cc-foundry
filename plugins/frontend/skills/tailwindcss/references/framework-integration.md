@@ -54,17 +54,15 @@ No `tailwind.config.js` in v4. Configuration lives in CSS via `@theme`.
 
 Automatically injected when using `@import "tailwindcss"`. Key behaviors:
 
-| Element                     | Preflight behavior                                               |
-| --------------------------- | ---------------------------------------------------------------- |
-| All elements                | `margin: 0; padding: 0; box-sizing: border-box; border: 0 solid` |
-| `h1`–`h6`                   | Unstyled — same size/weight as body text                         |
-| `ol`, `ul`, `menu`          | No bullets or numbers                                            |
-| `img`, `svg`, `video`, etc. | `display: block; vertical-align: middle`                         |
-| `img`, `video`              | `max-width: 100%; height: auto`                                  |
-| `[hidden]`                  | `display: none !important` (except `hidden="until-found"`)       |
-| Buttons                     | `cursor: default` (v4; was `cursor: pointer` in v3)              |
-| Placeholder text            | Current text color at 50% opacity (v4; was `gray-400` in v3)     |
-| `<dialog>`                  | Margins reset to 0 (v4)                                          |
+- **All elements** — `margin: 0; padding: 0; box-sizing: border-box; border: 0 solid`
+- **`h1`–`h6`** — Unstyled — same size/weight as body text
+- **`ol`, `ul`, `menu`** — No bullets or numbers
+- **`img`, `svg`, `video`, etc.** — `display: block; vertical-align: middle`
+- **`img`, `video`** — `max-width: 100%; height: auto`
+- **`[hidden]`** — `display: none !important` (except `hidden="until-found"`)
+- **Buttons** — `cursor: default` (v4; was `cursor: pointer` in v3)
+- **Placeholder text** — Current text color at 50% opacity (v4; was `gray-400` in v3)
+- **`<dialog>`** — Margins reset to 0 (v4)
 
 **Extending preflight** — add to `@layer base`:
 
@@ -320,14 +318,12 @@ conflicting classes appear and CSS source order determines the winner (which may
 
 Controls how browser-native UI elements (date pickers, scrollbars, form controls) render.
 
-| Class               | CSS                        |
-| ------------------- | -------------------------- |
-| `scheme-light`      | `color-scheme: light`      |
-| `scheme-dark`       | `color-scheme: dark`       |
-| `scheme-light-dark` | `color-scheme: light dark` |
-| `scheme-only-light` | `color-scheme: only light` |
-| `scheme-only-dark`  | `color-scheme: only dark`  |
-| `scheme-normal`     | `color-scheme: normal`     |
+- **`scheme-light`** — `color-scheme: light`
+- **`scheme-dark`** — `color-scheme: dark`
+- **`scheme-light-dark`** — `color-scheme: light dark`
+- **`scheme-only-light`** — `color-scheme: only light`
+- **`scheme-only-dark`** — `color-scheme: only dark`
+- **`scheme-normal`** — `color-scheme: normal`
 
 Apply on `<html>` to match native UI to theme:
 
@@ -347,10 +343,8 @@ For explicit dark mode enforcement (no system preference):
 
 Controls behavior in Windows High Contrast / forced colors mode.
 
-| Class                      | CSS                                                     |
-| -------------------------- | ------------------------------------------------------- |
-| `forced-color-adjust-auto` | `forced-color-adjust: auto` — respects forced colors    |
-| `forced-color-adjust-none` | `forced-color-adjust: none` — opts out of forced colors |
+- **`forced-color-adjust-auto`** — `forced-color-adjust: auto` — respects forced colors
+- **`forced-color-adjust-none`** — `forced-color-adjust: none` — opts out of forced colors
 
 **When to use `forced-color-adjust-none`:** Color swatches, custom radio/checkbox UI, or any element where enforcing
 forced colors would destroy essential visual information (e.g., a color picker showing color options).

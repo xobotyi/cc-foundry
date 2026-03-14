@@ -15,15 +15,18 @@ visibility.
 
 ## References
 
-| Topic                | Reference                                                  | Contents                                                               |
-| -------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Spans                | [`${CLAUDE_SKILL_DIR}/references/spans.md`]                | Span anatomy, root spans, lifetime code patterns                       |
-| Span data            | [`${CLAUDE_SKILL_DIR}/references/span-data.md`]            | Events format, links format, SDK limits table                          |
-| Context propagation  | [`${CLAUDE_SKILL_DIR}/references/context-propagation.md`]  | W3C header format, propagator selection, baggage details, security     |
-| Instrumentation      | [`${CLAUDE_SKILL_DIR}/references/instrumentation.md`]      | Server/client/async code patterns, library rules, testing guidance     |
-| Sampling             | [`${CLAUDE_SKILL_DIR}/references/sampling.md`]             | Head/tail/combined strategies, decision guide, sampler types           |
-| Semantic conventions | [`${CLAUDE_SKILL_DIR}/references/semantic-conventions.md`] | HTTP/DB/messaging attribute lists, status mapping, general conventions |
-| SDK components       | [`${CLAUDE_SKILL_DIR}/references/sdk-components.md`]       | Resource config, env vars, Collector deployment, exporter types        |
+- **Spans** — [`${CLAUDE_SKILL_DIR}/references/spans.md`]: Span anatomy, root spans, lifetime code patterns
+- **Span data** — [`${CLAUDE_SKILL_DIR}/references/span-data.md`]: Events format, links format, SDK limits table
+- **Context propagation** — [`${CLAUDE_SKILL_DIR}/references/context-propagation.md`]: W3C header format, propagator
+  selection, baggage details, security
+- **Instrumentation** — [`${CLAUDE_SKILL_DIR}/references/instrumentation.md`]: Server/client/async code patterns,
+  library rules, testing guidance
+- **Sampling** — [`${CLAUDE_SKILL_DIR}/references/sampling.md`]: Head/tail/combined strategies, decision guide, sampler
+  types
+- **Semantic conventions** — [`${CLAUDE_SKILL_DIR}/references/semantic-conventions.md`]: HTTP/DB/messaging attribute
+  lists, status mapping, general conventions
+- **SDK components** — [`${CLAUDE_SKILL_DIR}/references/sdk-components.md`]: Resource config, env vars, Collector
+  deployment, exporter types
 
 ## Spans
 
@@ -52,13 +55,11 @@ names destroy it.
 
 SpanKind tells backends how to assemble the trace tree. Set it correctly.
 
-| Kind       | Direction | Use For                                |
-| ---------- | --------- | -------------------------------------- |
-| `SERVER`   | Incoming  | HTTP handler, gRPC server method       |
-| `CLIENT`   | Outgoing  | HTTP client call, DB query, gRPC call  |
-| `PRODUCER` | Outgoing  | Enqueue message, schedule job          |
-| `CONSUMER` | Incoming  | Dequeue message, process job           |
-| `INTERNAL` | Neither   | In-process business logic, computation |
+- `SERVER` (Incoming) — HTTP handler, gRPC server method
+- `CLIENT` (Outgoing) — HTTP client call, DB query, gRPC call
+- `PRODUCER` (Outgoing) — Enqueue message, schedule job
+- `CONSUMER` (Incoming) — Dequeue message, process job
+- `INTERNAL` (Neither) — In-process business logic, computation
 
 - A single span MUST NOT serve more than one purpose
 - Create a new span before injecting context for outgoing calls
@@ -67,11 +68,9 @@ SpanKind tells backends how to assemble the trace tree. Set it correctly.
 
 ### Span Status
 
-| Status  | Meaning               | When to Set                                        |
-| ------- | --------------------- | -------------------------------------------------- |
-| `Unset` | No error              | Default — do not change on success                 |
-| `Error` | Operation failed      | When an error occurs; include description          |
-| `Ok`    | Explicitly successful | Only to override a previous `Error`; rarely needed |
+- `Unset` — No error. Default — do not change on success.
+- `Error` — Operation failed. When an error occurs; include description.
+- `Ok` — Explicitly successful. Only to override a previous `Error`; rarely needed.
 
 - Leave status `Unset` on success — it already means "no error"
 - `Ok` is a "final call" — once set, subsequent `Error` attempts are ignored
@@ -204,12 +203,10 @@ Sampling controls which traces are recorded and exported — the primary mechani
 
 Decision at trace creation time, before any spans complete.
 
-| Sampler                    | Behavior                                   |
-| -------------------------- | ------------------------------------------ |
-| `AlwaysOn`                 | Record and sample everything               |
-| `AlwaysOff`                | Drop everything                            |
-| `TraceIdRatioBased(ratio)` | Sample based on trace ID hash              |
-| `ParentBased(root)`        | Delegate based on parent sampling decision |
+- `AlwaysOn` — Record and sample everything
+- `AlwaysOff` — Drop everything
+- `TraceIdRatioBased(ratio)` — Sample based on trace ID hash
+- `ParentBased(root)` — Delegate based on parent sampling decision
 
 **ParentBased** is the most common production configuration — respects parent decisions, applies custom root sampling.
 Default SDK sampler: `ParentBased(root=AlwaysOn)`.

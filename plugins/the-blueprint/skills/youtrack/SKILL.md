@@ -20,11 +20,12 @@ use this skill for YouTrack-specific field handling, linking, and categorization
 
 ## References
 
-| Topic                      | Reference                                          | Contents                                                            |
-| -------------------------- | -------------------------------------------------- | ------------------------------------------------------------------- |
-| Query language             | `${CLAUDE_SKILL_DIR}/references/query-language.md` | Full search syntax, operators, symbols, relative dates, BNF grammar |
-| Commands                   | `${CLAUDE_SKILL_DIR}/references/commands.md`       | Command syntax, field updates, link/tag commands, work items        |
-| Workflows & state machines | `${CLAUDE_SKILL_DIR}/references/workflows.md`      | State machine model, rule types, transition properties              |
+- **Query language** — `${CLAUDE_SKILL_DIR}/references/query-language.md` — Full search syntax, operators, symbols,
+  relative dates, BNF grammar
+- **Commands** — `${CLAUDE_SKILL_DIR}/references/commands.md` — Command syntax, field updates, link/tag commands, work
+  items
+- **Workflows & state machines** — `${CLAUDE_SKILL_DIR}/references/workflows.md` — State machine model, rule types,
+  transition properties
 
 ## Issue Data Model
 
@@ -120,12 +121,10 @@ issue B.
 
 ### Default Link Types
 
-| Inward     | Outward          | Direction   | Use                                              |
-| ---------- | ---------------- | ----------- | ------------------------------------------------ |
-| depends on | is required for  | Directed    | Issue must be resolved before dependent          |
-| subtask of | parent for       | Aggregation | Parent-child task hierarchy                      |
-| duplicates | is duplicated by | Aggregation | Same condition, resolving one resolves the other |
-| relates to | relates to       | Undirected  | Related but not dependent                        |
+- **depends on / is required for** (Directed) — issue must be resolved before dependent
+- **subtask of / parent for** (Aggregation) — parent-child task hierarchy
+- **duplicates / is duplicated by** (Aggregation) — same condition, resolving one resolves the other
+- **relates to / relates to** (Undirected) — related but not dependent
 
 Always use native links instead of mentioning issue IDs in descriptions. Native links are visible in dedicated UI,
 enable dependency tracking, and stay current when issues move.

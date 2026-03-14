@@ -8,13 +8,11 @@ Framework for assessing output style quality.
 
 Does the style define WHO Claude is clearly?
 
-| Score | Criteria                                           |
-| ----- | -------------------------------------------------- |
-| 1-2   | No persona defined, or vague ("be helpful")        |
-| 3-4   | Basic persona but lacks specificity                |
-| 5-6   | Clear persona with role and domain                 |
-| 7-8   | Detailed persona with expertise and perspective    |
-| 9-10  | Rich persona with motivations, constraints, values |
+- 1-2: No persona defined, or vague ("be helpful")
+- 3-4: Basic persona but lacks specificity
+- 5-6: Clear persona with role and domain
+- 7-8: Detailed persona with expertise and perspective
+- 9-10: Rich persona with motivations, constraints, values
 
 **Check:**
 
@@ -25,13 +23,11 @@ Does the style define WHO Claude is clearly?
 
 Are behaviors concrete and actionable?
 
-| Score | Criteria                                          |
-| ----- | ------------------------------------------------- |
-| 1-2   | Abstract instructions ("be professional")         |
-| 3-4   | Some concrete rules, most vague                   |
-| 5-6   | Mix of concrete and abstract                      |
-| 7-8   | Mostly concrete, actionable instructions          |
-| 9-10  | All behaviors are specific, testable, unambiguous |
+- 1-2: Abstract instructions ("be professional")
+- 3-4: Some concrete rules, most vague
+- 5-6: Mix of concrete and abstract
+- 7-8: Mostly concrete, actionable instructions
+- 9-10: All behaviors are specific, testable, unambiguous
 
 **Check:**
 
@@ -42,13 +38,11 @@ Are behaviors concrete and actionable?
 
 Do examples demonstrate expected behavior effectively?
 
-| Score | Criteria                                           |
-| ----- | -------------------------------------------------- |
-| 1-2   | No examples                                        |
-| 3-4   | Examples present but don't show tone clearly       |
-| 5-6   | Good examples but limited coverage                 |
-| 7-8   | Multiple examples covering key scenarios           |
-| 9-10  | Comprehensive examples with contrast (good vs bad) |
+- 1-2: No examples
+- 3-4: Examples present but don't show tone clearly
+- 5-6: Good examples but limited coverage
+- 7-8: Multiple examples covering key scenarios
+- 9-10: Comprehensive examples with contrast (good vs bad)
 
 **Check:**
 
@@ -59,13 +53,11 @@ Do examples demonstrate expected behavior effectively?
 
 Is response structure explicitly defined?
 
-| Score | Criteria                                    |
-| ----- | ------------------------------------------- |
-| 1-2   | No format guidance                          |
-| 3-4   | Vague format hints                          |
-| 5-6   | Some format specified                       |
-| 7-8   | Clear format with structure defined         |
-| 9-10  | Explicit format with templates and examples |
+- 1-2: No format guidance
+- 3-4: Vague format hints
+- 5-6: Some format specified
+- 7-8: Clear format with structure defined
+- 9-10: Explicit format with templates and examples
 
 **Check:**
 
@@ -76,13 +68,11 @@ Is response structure explicitly defined?
 
 Does the style prevent reversion to default behaviors?
 
-| Score | Criteria                                    |
-| ----- | ------------------------------------------- |
-| 1-2   | No safeguards, likely to revert             |
-| 3-4   | Minimal guidance on avoiding defaults       |
-| 5-6   | Some explicit "avoid" instructions          |
-| 7-8   | Clear anti-patterns with alternatives       |
-| 9-10  | Comprehensive safeguards with reinforcement |
+- 1-2: No safeguards, likely to revert
+- 3-4: Minimal guidance on avoiding defaults
+- 5-6: Some explicit "avoid" instructions
+- 7-8: Clear anti-patterns with alternatives
+- 9-10: Comprehensive safeguards with reinforcement
 
 **Check:**
 
@@ -93,13 +83,11 @@ Does the style prevent reversion to default behaviors?
 
 Is the style focused without being too narrow?
 
-| Score | Criteria                                            |
-| ----- | --------------------------------------------------- |
-| 1-2   | Too broad (tries to cover everything) or too narrow |
-| 3-4   | Scope unclear                                       |
-| 5-6   | Reasonable scope but some ambiguity                 |
-| 7-8   | Well-defined scope for intended use case            |
-| 9-10  | Perfect scope with clear boundaries                 |
+- 1-2: Too broad (tries to cover everything) or too narrow
+- 3-4: Scope unclear
+- 5-6: Reasonable scope but some ambiguity
+- 7-8: Well-defined scope for intended use case
+- 9-10: Perfect scope with clear boundaries
 
 **Check:**
 
@@ -145,12 +133,10 @@ Score = (Persona × 2 + Behaviors × 2 + Examples × 2 +
 **Why the weights?** Persona, behaviors, and examples are weighted 2× because they directly control Claude's compliance.
 Format, safeguards, and scope are supporting elements that reinforce the core three.
 
-| Total Score | Quality Level | Action               |
-| ----------- | ------------- | -------------------- |
-| 8-10        | Excellent     | Deploy               |
-| 6-7         | Good          | Minor refinements    |
-| 4-5         | Adequate      | Needs improvement    |
-| 1-3         | Poor          | Major rewrite needed |
+- 8-10: Excellent — deploy
+- 6-7: Good — minor refinements
+- 4-5: Adequate — needs improvement
+- 1-3: Poor — major rewrite needed
 
 ---
 
@@ -235,11 +221,9 @@ Prompt: "Please help me, I'm really stuck and frustrated!"
 
 Immediate issues requiring attention:
 
-| Red Flag                   | Risk                         |
-| -------------------------- | ---------------------------- |
-| No persona definition      | Inconsistent behavior        |
-| Only positive instructions | Will revert to defaults      |
-| No examples                | Ambiguous expectations       |
-| Contradictory rules        | Unpredictable responses      |
-| Over 1000 lines            | Instructions will be ignored |
-| No format guidance         | Inconsistent output          |
+- **No persona definition** — inconsistent behavior
+- **Only positive instructions** — will revert to defaults
+- **No examples** — ambiguous expectations
+- **Contradictory rules** — unpredictable responses
+- **Over 1000 lines** — instructions will be ignored
+- **No format guidance** — inconsistent output

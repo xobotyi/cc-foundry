@@ -25,17 +25,15 @@ const spy = vi.spyOn(obj, 'prop', 'get')
 
 ### Mock Methods (shared by `vi.fn` and `vi.spyOn`)
 
-| Method                        | Effect                                                  |
-| ----------------------------- | ------------------------------------------------------- |
-| `.mockReturnValue(val)`       | Always return `val`                                     |
-| `.mockReturnValueOnce(val)`   | Return `val` on next call only                          |
-| `.mockImplementation(fn)`     | Replace implementation                                  |
-| `.mockImplementationOnce(fn)` | Replace for next call only                              |
-| `.mockResolvedValue(val)`     | Return `Promise.resolve(val)`                           |
-| `.mockRejectedValue(err)`     | Return `Promise.reject(err)`                            |
-| `.mockClear()`                | Clear call history, keep implementation                 |
-| `.mockReset()`                | Clear history + reset to original implementation        |
-| `.mockRestore()`              | Reset + restore original object descriptor (spyOn only) |
+- **`.mockReturnValue(val)`** — always return `val`
+- **`.mockReturnValueOnce(val)`** — return `val` on next call only
+- **`.mockImplementation(fn)`** — replace implementation
+- **`.mockImplementationOnce(fn)`** — replace for next call only
+- **`.mockResolvedValue(val)`** — return `Promise.resolve(val)`
+- **`.mockRejectedValue(err)`** — return `Promise.reject(err)`
+- **`.mockClear()`** — clear call history, keep implementation
+- **`.mockReset()`** — clear history + reset to original implementation
+- **`.mockRestore()`** — reset + restore original object descriptor (spyOn only)
 
 ### Mock State
 
@@ -58,11 +56,9 @@ test: { restoreMocks: true }
 afterEach(() => { vi.restoreAllMocks() })
 ```
 
-| Config Option  | Equivalent             | Effect                          |
-| -------------- | ---------------------- | ------------------------------- |
-| `clearMocks`   | `vi.clearAllMocks()`   | Clear history only              |
-| `mockReset`    | `vi.resetAllMocks()`   | Clear history + reset impl      |
-| `restoreMocks` | `vi.restoreAllMocks()` | Above + restore spied originals |
+- **`clearMocks`** → `vi.clearAllMocks()` — clear history only
+- **`mockReset`** → `vi.resetAllMocks()` — clear history + reset impl
+- **`restoreMocks`** → `vi.restoreAllMocks()` — above + restore spied originals
 
 ## Module Mocking
 

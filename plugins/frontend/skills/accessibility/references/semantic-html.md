@@ -14,15 +14,13 @@ reader announcements for free. A `<div role="button">` requires you to manually 
 
 Use HTML sectioning elements to create landmark regions. Screen readers expose these as navigation shortcuts.
 
-| HTML Element                       | Implicit ARIA Role | Purpose                             |
-| ---------------------------------- | ------------------ | ----------------------------------- |
-| `<header>` (top-level)             | `banner`           | Site-wide header, logo, primary nav |
-| `<nav>`                            | `navigation`       | Navigation link groups              |
-| `<main>`                           | `main`             | Primary page content (one per page) |
-| `<aside>`                          | `complementary`    | Supporting content related to main  |
-| `<footer>` (top-level)             | `contentinfo`      | Site-wide footer, copyright, links  |
-| `<section>` (with accessible name) | `region`           | Generic labeled region              |
-| `<search>`                         | `search`           | Search functionality container      |
+- `<header>` (top-level) → `banner` — site-wide header, logo, primary nav
+- `<nav>` → `navigation` — navigation link groups
+- `<main>` → `main` — primary page content (one per page)
+- `<aside>` → `complementary` — supporting content related to main
+- `<footer>` (top-level) → `contentinfo` — site-wide footer, copyright, links
+- `<section>` (with accessible name) → `region` — generic labeled region
+- `<search>` → `search` — search functionality container
 
 **Rules:**
 
@@ -63,10 +61,8 @@ method.
 
 ### Buttons vs Links
 
-| Element    | Purpose                                          | Keyboard     |
-| ---------- | ------------------------------------------------ | ------------ |
-| `<button>` | Triggers an action (submit, toggle, open dialog) | Enter, Space |
-| `<a href>` | Navigates to a URL or anchor                     | Enter        |
+- `<button>` — triggers an action (submit, toggle, open dialog); activated by Enter, Space
+- `<a href>` — navigates to a URL or anchor; activated by Enter
 
 **Never use `<a href="#" onclick="...">` for actions.** Use `<button>`. **Never use `<button>` for navigation.** Use
 `<a href>`.
@@ -130,12 +126,10 @@ Data tables require proper markup for screen readers to associate cells with hea
 
 ### Images
 
-| Image Type               | `alt` Attribute                           |
-| ------------------------ | ----------------------------------------- |
-| Informative              | Describe the content and function         |
-| Decorative               | `alt=""` (empty string, not omitted)      |
-| Functional (link/button) | Describe the action, not the image        |
-| Complex (chart/graph)    | Brief `alt` + detailed description nearby |
+- **Informative** — describe the content and function
+- **Decorative** — `alt=""` (empty string, not omitted)
+- **Functional (link/button)** — describe the action, not the image
+- **Complex (chart/graph)** — brief `alt` + detailed description nearby
 
 ```html
 <!-- Informative -->

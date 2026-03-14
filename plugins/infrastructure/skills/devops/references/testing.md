@@ -116,11 +116,10 @@ parent skill.
 Runbooks exist on a spectrum from fully manual to fully automated. Target higher maturity levels for repetitive,
 high-frequency procedures.
 
-| Level               | Description                                                | When to use                                    |
-| ------------------- | ---------------------------------------------------------- | ---------------------------------------------- |
-| **Manual**          | Procedural documentation, human executes every step        | Novel or rare procedures, initial drafts       |
-| **Semi-automated**  | Executable scripts with human oversight at decision points | Procedures with judgment calls or approvals    |
-| **Fully automated** | Event-driven execution, no human intervention              | Rote responses to known alerts, scaling events |
+- **Manual** — procedural documentation, human executes every step: novel or rare procedures, initial drafts
+- **Semi-automated** — executable scripts with human oversight at decision points: procedures with judgment calls or
+  approvals
+- **Fully automated** — event-driven execution, no human intervention: rote responses to known alerts, scaling events
 
 **Automation patterns:**
 

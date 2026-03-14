@@ -2,12 +2,11 @@
 
 ## Storage Types
 
-| Type             | Managed By | Persists                | Host Access         | Use Case                        |
-| ---------------- | ---------- | ----------------------- | ------------------- | ------------------------------- |
-| Named volume     | Docker     | Yes                     | Via `docker volume` | Database data, persistent state |
-| Anonymous volume | Docker     | Until container removed | No                  | Temporary per-container data    |
-| Bind mount       | User       | N/A (is host FS)        | Direct              | Development, config injection   |
-| tmpfs            | Kernel     | No (RAM only)           | No                  | Secrets, scratch data, caches   |
+- **Named volume** — Managed by Docker, persists, accessible via `docker volume`: Database data, persistent state
+- **Anonymous volume** — Managed by Docker, persists until container removed, no direct host access: Temporary
+  per-container data
+- **Bind mount** — Managed by user, is host FS (direct access): Development, config injection
+- **tmpfs** — Managed by kernel, RAM only (never persisted), no host access: Secrets, scratch data, caches
 
 ## Named Volumes
 
@@ -181,13 +180,11 @@ Dangling anonymous volumes accumulate silently. Run `docker volume prune` period
 The storage driver manages the container's layered filesystem using copy-on-write. Writing to the container's writable
 layer is slower than writing to a volume — never store databases or logs in the container layer.
 
-| Driver             | Use Case                       | Notes                               |
-| ------------------ | ------------------------------ | ----------------------------------- |
-| `overlay2`         | Default for Docker on Linux    | Best performance, recommended       |
-| `fuse-overlayfs`   | Rootless Podman (legacy)       | Slower than native overlay          |
-| `overlay` (native) | Rootless Podman (kernel 5.12+) | Matches Docker overlay2 performance |
-| `btrfs` / `zfs`    | Specialized host filesystems   | Use when host FS requires it        |
-| `vfs`              | Fallback / nested builds       | No CoW — simple but least efficient |
+- **`overlay2`** — Default for Docker on Linux: Best performance, recommended
+- **`fuse-overlayfs`** — Rootless Podman (legacy): Slower than native overlay
+- **`overlay` (native)** — Rootless Podman (kernel 5.12+): Matches Docker overlay2 performance
+- **`btrfs` / `zfs`** — Specialized host filesystems: Use when host FS requires it
+- **`vfs`** — Fallback / nested builds: No CoW — simple but least efficient
 
 ### Performance best practices
 

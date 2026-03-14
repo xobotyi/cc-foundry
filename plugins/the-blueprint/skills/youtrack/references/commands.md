@@ -6,11 +6,9 @@ Format: `<attribute> <value>` — e.g., `Priority Critical`, `for me`.
 
 ## Simple Commands
 
-| Command   | Description                             |
-| --------- | --------------------------------------- |
-| `comment` | Add a comment (text entered separately) |
-| `delete`  | Delete selected issues                  |
-| `clone`   | Create a copy of selected issues        |
+- **`comment`** — add a comment (text entered separately)
+- **`delete`** — delete selected issues
+- **`clone`** — create a copy of selected issues
 
 ## Custom Field Commands
 
@@ -28,34 +26,28 @@ Set or change field values:
 
 **Multi-value fields:**
 
-| Command                  | Description                                |
-| ------------------------ | ------------------------------------------ |
-| `add <field> <value>`    | Add value without removing existing values |
-| `remove <field> <value>` | Remove single value from field             |
+- **`add <field> <value>`** — add value without removing existing values
+- **`remove <field> <value>`** — remove single value from field
 
 ## Assignee Commands
 
 The Assignee field has special aliases:
 
-| Command                     | Effect                                   |
-| --------------------------- | ---------------------------------------- |
-| `for <username>`            | Assign to user                           |
-| `for me` / `assigned to me` | Assign to current user                   |
-| `<username>`                | Assign to user (as single value)         |
-| `me` / `my`                 | Assign to current user (as single value) |
-| `Unassigned`                | Clear the assignee                       |
-| `add <username>`            | Assign (multi-assignee)                  |
-| `remove <username>`         | Unassign (multi-assignee)                |
+- **`for <username>`** — assign to user
+- **`for me` / `assigned to me`** — assign to current user
+- **`<username>`** — assign to user (as single value)
+- **`me` / `my`** — assign to current user (as single value)
+- **`Unassigned`** — clear the assignee
+- **`add <username>`** — assign (multi-assignee)
+- **`remove <username>`** — unassign (multi-assignee)
 
 ## Default Field Aliases
 
-| Alias                  | Field             |
-| ---------------------- | ----------------- |
-| `for`, `assigned to`   | Assignee          |
-| `in`                   | Subsystem         |
-| `affects`, `affecting` | Affected versions |
-| `fix for`, `fixed in`  | Fix versions      |
-| `fixed in build`       | Fixed in build    |
+- **`for`, `assigned to`** → Assignee
+- **`in`** → Subsystem
+- **`affects`, `affecting`** → Affected versions
+- **`fix for`, `fixed in`** → Fix versions
+- **`fixed in build`** → Fixed in build
 
 ## Link Commands
 
@@ -69,26 +61,22 @@ remove <link type> <issue ID>
 
 Default link type commands:
 
-| Command                 | Creates link     | Reciprocal link  |
-| ----------------------- | ---------------- | ---------------- |
-| `depends on <ID>`       | Depends on       | Is required for  |
-| `is required for <ID>`  | Is required for  | Depends on       |
-| `subtask of <ID>`       | Subtask of       | Parent for       |
-| `parent for <ID>`       | Parent for       | Subtask of       |
-| `duplicates <ID>`       | Duplicates       | Is duplicated by |
-| `is duplicated by <ID>` | Is duplicated by | Duplicates       |
-| `relates to <ID>`       | Relates to       | Relates to       |
+- **`depends on <ID>`** — creates "Depends on" / reciprocal "Is required for"
+- **`is required for <ID>`** — creates "Is required for" / reciprocal "Depends on"
+- **`subtask of <ID>`** — creates "Subtask of" / reciprocal "Parent for"
+- **`parent for <ID>`** — creates "Parent for" / reciprocal "Subtask of"
+- **`duplicates <ID>`** — creates "Duplicates" / reciprocal "Is duplicated by"
+- **`is duplicated by <ID>`** — creates "Is duplicated by" / reciprocal "Duplicates"
+- **`relates to <ID>`** — creates "Relates to" / reciprocal "Relates to"
 
 Custom link types use their outward/inward names as commands.
 
 ## Tag Commands
 
-| Command             | Effect                             |
-| ------------------- | ---------------------------------- |
-| `tag <name>`        | Add tag (creates if doesn't exist) |
-| `add tag <name>`    | Add tag (alternative syntax)       |
-| `untag <name>`      | Remove tag                         |
-| `remove tag <name>` | Remove tag (alternative syntax)    |
+- **`tag <name>`** — add tag (creates if doesn't exist)
+- **`add tag <name>`** — add tag (alternative syntax)
+- **`untag <name>`** — remove tag
+- **`remove tag <name>`** — remove tag (alternative syntax)
 
 ## Work Item Commands
 
@@ -98,42 +86,34 @@ Log time spent:
 work <type> <date> <duration> <description>
 ```
 
-| Parameter      | Required      | Format                           |
-| -------------- | ------------- | -------------------------------- |
-| work item type | Optional      | Work type name                   |
-| date           | Optional      | `YYYY-MM-DD` (defaults to today) |
-| duration       | **Mandatory** | Time period (e.g., `2h 30m`)     |
-| description    | Optional      | Text description                 |
+- **work item type** (optional) — work type name
+- **date** (optional) — `YYYY-MM-DD`, defaults to today
+- **duration** (mandatory) — time period (e.g., `2h 30m`)
+- **description** (optional) — text description
 
 Also: `add work <work item>`. The `remove` command is not supported for work items.
 
 ## Visibility Commands
 
-| Command                          | Effect                      |
-| -------------------------------- | --------------------------- |
-| `visible to <group/user>`        | Set issue visibility        |
-| `add visible to <group/user>`    | Add to visibility list      |
-| `remove visible to <group/user>` | Remove from visibility list |
+- **`visible to <group/user>`** — set issue visibility
+- **`add visible to <group/user>`** — add to visibility list
+- **`remove visible to <group/user>`** — remove from visibility list
 
 ## Board and Sprint Commands
 
-| Command                         | Effect                                           |
-| ------------------------------- | ------------------------------------------------ |
-| `Board <name> <sprint>`         | Assign to sprint on board                        |
-| `Board <name> {current sprint}` | Assign to current sprint                         |
-| `add Board <name> <sprint>`     | Add to sprint                                    |
-| `add Board <name>`              | Add to board (current sprint if sprints enabled) |
-| `remove Board <name> <sprint>`  | Remove from sprint                               |
-| `remove Board <name>`           | Remove from all sprints on board                 |
+- **`Board <name> <sprint>`** — assign to sprint on board
+- **`Board <name> {current sprint}`** — assign to current sprint
+- **`add Board <name> <sprint>`** — add to sprint
+- **`add Board <name>`** — add to board (current sprint if sprints enabled)
+- **`remove Board <name> <sprint>`** — remove from sprint
+- **`remove Board <name>`** — remove from all sprints on board
 
 ## Voter and Watcher Commands
 
-| Command             | Effect                                   |
-| ------------------- | ---------------------------------------- |
-| `vote` / `+1`       | Vote for issue                           |
-| `unvote`            | Remove vote                              |
-| `star <username>`   | Add Star tag for user (adds to watchers) |
-| `unstar <username>` | Remove Star tag for user                 |
+- **`vote` / `+1`** — vote for issue
+- **`unvote`** — remove vote
+- **`star <username>`** — add Star tag for user (adds to watchers)
+- **`unstar <username>`** — remove Star tag for user
 
 ## Move Command
 

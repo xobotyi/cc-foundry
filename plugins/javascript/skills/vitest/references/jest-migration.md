@@ -4,17 +4,15 @@ Key differences, API mapping, and common gotchas.
 
 ## Quick API Translation
 
-| Jest                          | Vitest                             | Notes                                  |
-| ----------------------------- | ---------------------------------- | -------------------------------------- |
-| `jest.fn()`                   | `vi.fn()`                          | Same API surface                       |
-| `jest.spyOn(obj, 'method')`   | `vi.spyOn(obj, 'method')`          | Same API                               |
-| `jest.mock('./mod')`          | `vi.mock('./mod')`                 | Factory return differs (see below)     |
-| `jest.requireActual('./mod')` | `await vi.importActual('./mod')`   | Always async                           |
-| `jest.useFakeTimers()`        | `vi.useFakeTimers()`               | Same `@sinonjs/fake-timers` internally |
-| `jest.setTimeout(n)`          | `vi.setConfig({ testTimeout: n })` | Different API                          |
-| `jest.clearAllMocks()`        | `vi.clearAllMocks()`               | Same behavior                          |
-| `jest.resetAllMocks()`        | `vi.resetAllMocks()`               | See `mockReset` difference below       |
-| `jest.restoreAllMocks()`      | `vi.restoreAllMocks()`             | Same concept                           |
+- **`jest.fn()`** → `vi.fn()` — same API surface
+- **`jest.spyOn(obj, 'method')`** → `vi.spyOn(obj, 'method')` — same API
+- **`jest.mock('./mod')`** → `vi.mock('./mod')` — factory return differs (see below)
+- **`jest.requireActual('./mod')`** → `await vi.importActual('./mod')` — always async
+- **`jest.useFakeTimers()`** → `vi.useFakeTimers()` — same `@sinonjs/fake-timers` internally
+- **`jest.setTimeout(n)`** → `vi.setConfig({ testTimeout: n })` — different API
+- **`jest.clearAllMocks()`** → `vi.clearAllMocks()` — same behavior
+- **`jest.resetAllMocks()`** → `vi.resetAllMocks()` — see `mockReset` difference below
+- **`jest.restoreAllMocks()`** → `vi.restoreAllMocks()` — same concept
 
 ### Type Changes
 

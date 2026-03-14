@@ -7,17 +7,15 @@ patching, environment variables, dictionary mutation, and scoped patches.
 
 All modifications are automatically undone after the test (or fixture) completes.
 
-| Method                                      | Purpose                               |
-| ------------------------------------------- | ------------------------------------- |
-| `monkeypatch.setattr(obj, name, value)`     | Replace attribute on object or module |
-| `monkeypatch.delattr(obj, name)`            | Remove attribute                      |
-| `monkeypatch.setitem(mapping, name, value)` | Set dictionary key                    |
-| `monkeypatch.delitem(mapping, name)`        | Remove dictionary key                 |
-| `monkeypatch.setenv(name, value)`           | Set environment variable              |
-| `monkeypatch.delenv(name)`                  | Remove environment variable           |
-| `monkeypatch.syspath_prepend(path)`         | Prepend to `sys.path`                 |
-| `monkeypatch.chdir(path)`                   | Change working directory              |
-| `monkeypatch.context()`                     | Context manager for scoped patches    |
+- **`monkeypatch.setattr(obj, name, value)`** — Replace attribute on object or module
+- **`monkeypatch.delattr(obj, name)`** — Remove attribute
+- **`monkeypatch.setitem(mapping, name, value)`** — Set dictionary key
+- **`monkeypatch.delitem(mapping, name)`** — Remove dictionary key
+- **`monkeypatch.setenv(name, value)`** — Set environment variable
+- **`monkeypatch.delenv(name)`** — Remove environment variable
+- **`monkeypatch.syspath_prepend(path)`** — Prepend to `sys.path`
+- **`monkeypatch.chdir(path)`** — Change working directory
+- **`monkeypatch.context()`** — Context manager for scoped patches
 
 The `raising` parameter (default `True`) controls whether `KeyError`/`AttributeError` is raised when the target doesn't
 exist. Pass `raising=False` to silently skip.

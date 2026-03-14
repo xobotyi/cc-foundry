@@ -23,14 +23,18 @@ This skill prevents all four.
 
 ## References
 
-| Topic             | Reference                                               | Contents                                                                                                                                           |
-| ----------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IaC principles    | [`${CLAUDE_SKILL_DIR}/references/iac-principles.md`]    | GitOps v1.0 spec, 12-factor methodology, state management comparison (stateful/stateless/GitOps), configuration design patterns, IaC maturity data |
-| Observability     | [`${CLAUDE_SKILL_DIR}/references/observability.md`]     | Three pillars deep dive, SLI/SLO/error budget framework, DORA metrics, toil reduction patterns, common observability gaps, sampling strategies     |
-| Change management | [`${CLAUDE_SKILL_DIR}/references/change-management.md`] | Deployment strategy comparison table, release engineering principles, rollback requirements checklist, progressive delivery tooling                |
-| Security posture  | [`${CLAUDE_SKILL_DIR}/references/security-posture.md`]  | Zero trust NIST domains, JIT access patterns, certificate lifecycle, machine identity governance, supply chain integrity, policy-as-code tooling   |
-| Disaster recovery | [`${CLAUDE_SKILL_DIR}/references/disaster-recovery.md`] | RTO/RPO sizing by business impact, service tiering table, recovery architecture trade-offs, chaos engineering approaches and tooling               |
-| Testing           | [`${CLAUDE_SKILL_DIR}/references/testing.md`]           | Testing pyramid layers with tool lists, IaC quality metrics, runbook format and automation maturity levels, incident response patterns             |
+- **IaC principles** — [`${CLAUDE_SKILL_DIR}/references/iac-principles.md`]: GitOps v1.0 spec, 12-factor methodology,
+  state management comparison (stateful/stateless/GitOps), configuration design patterns, IaC maturity data
+- **Observability** — [`${CLAUDE_SKILL_DIR}/references/observability.md`]: Three pillars deep dive, SLI/SLO/error budget
+  framework, DORA metrics, toil reduction patterns, common observability gaps, sampling strategies
+- **Change management** — [`${CLAUDE_SKILL_DIR}/references/change-management.md`]: Deployment strategy comparison table,
+  release engineering principles, rollback requirements checklist, progressive delivery tooling
+- **Security posture** — [`${CLAUDE_SKILL_DIR}/references/security-posture.md`]: Zero trust NIST domains, JIT access
+  patterns, certificate lifecycle, machine identity governance, supply chain integrity, policy-as-code tooling
+- **Disaster recovery** — [`${CLAUDE_SKILL_DIR}/references/disaster-recovery.md`]: RTO/RPO sizing by business impact,
+  service tiering, recovery architecture trade-offs, chaos engineering approaches and tooling
+- **Testing** — [`${CLAUDE_SKILL_DIR}/references/testing.md`]: Testing pyramid layers with tool lists, IaC quality
+  metrics, runbook format and automation maturity levels, incident response patterns
 
 ## Core Principles
 

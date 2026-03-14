@@ -246,16 +246,14 @@ function validate(data) { return schema.parse(data); }
 
 ### Choosing the Right Loop
 
-| Need                        | Use                             |
-| --------------------------- | ------------------------------- |
-| Transform data → new array  | `.map()`                        |
-| Filter items                | `.filter()`                     |
-| Accumulate to single value  | `.reduce()`                     |
-| Find first match            | `.find()` / `.findIndex()`      |
-| Check condition             | `.some()` / `.every()`          |
-| Side effects on each item   | `for...of`                      |
-| Async sequential processing | `for...of` with `await`         |
-| Object keys/values          | `Object.entries()` + `for...of` |
+- **Transform data → new array** → `.map()`
+- **Filter items** → `.filter()`
+- **Accumulate to single value** → `.reduce()`
+- **Find first match** → `.find()` / `.findIndex()`
+- **Check condition** → `.some()` / `.every()`
+- **Side effects on each item** → `for...of`
+- **Async sequential processing** → `for...of` with `await`
+- **Object keys/values** → `Object.entries()` + `for...of`
 
 ### Object Iteration
 

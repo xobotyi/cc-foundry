@@ -36,13 +36,11 @@ data, flushing every 5 seconds means only the last value per 10-second window su
 
 ## Aggregation Rules by Type
 
-| Type      | Aggregation             | At Flush                                            |
-| --------- | ----------------------- | --------------------------------------------------- |
-| Counter   | Sum all received values | Send count + rate, reset to 0                       |
-| Gauge     | Keep last value         | Send current value, retain for next flush           |
-| Timer     | Compute statistics      | Send min, max, mean, percentiles, count, sum; reset |
-| Set       | Track unique values     | Send cardinality (count of uniques); reset          |
-| Histogram | Same as timer           | Same as timer                                       |
+- **Counter** — Sum all received values → send count + rate, reset to 0
+- **Gauge** — Keep last value → send current value, retain for next flush
+- **Timer** — Compute statistics → send min, max, mean, percentiles, count, sum; reset
+- **Set** — Track unique values → send cardinality (count of uniques); reset
+- **Histogram** — Same as timer → same as timer
 
 ### Counters at Flush
 
@@ -169,13 +167,11 @@ unrepresentative).
 
 DogStatsD follows the same 10-second flush interval but aggregates differently depending on the metric type:
 
-| Type         | Aggregation Rule                                     |
-| ------------ | ---------------------------------------------------- |
-| COUNT        | Sum all values, send as RATE (count/interval)        |
-| GAUGE        | Send last value received                             |
-| HISTOGRAM    | Compute avg, count, median, max, p95; send each      |
-| SET          | Count unique values                                  |
-| DISTRIBUTION | Forward raw values to Datadog for global aggregation |
+- **COUNT** — Sum all values, send as RATE (count/interval)
+- **GAUGE** — Send last value received
+- **HISTOGRAM** — Compute avg, count, median, max, p95; send each
+- **SET** — Count unique values
+- **DISTRIBUTION** — Forward raw values to Datadog for global aggregation
 
 **Key difference from plain StatsD:** DogStatsD COUNTs are stored as RATE in Datadog. To see raw counts, apply
 `cumulative_sum()` or `integral()` functions in dashboards.

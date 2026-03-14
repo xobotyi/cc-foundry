@@ -25,14 +25,12 @@ without the I/O degradation of traditional LVM snapshots.
 
 Each storage can host specific content types:
 
-| Content    | Description                             | Storage Types                 |
-| ---------- | --------------------------------------- | ----------------------------- |
-| `images`   | VM disk images                          | All block/file storage        |
-| `rootdir`  | Container root filesystems              | Directory, NFS, ZFS, LVM-Thin |
-| `iso`      | ISO images for VM installation          | Directory, NFS, CIFS          |
-| `vztmpl`   | Container templates                     | Directory, NFS, CIFS          |
-| `backup`   | Backup files (vzdump)                   | Directory, NFS, CIFS, PBS     |
-| `snippets` | Snippet files (cloud-init, hookscripts) | Directory, NFS, CIFS          |
+- **`images`** — VM disk images; all block/file storage
+- **`rootdir`** — container root filesystems; Directory, NFS, ZFS, LVM-Thin
+- **`iso`** — ISO images for VM installation; Directory, NFS, CIFS
+- **`vztmpl`** — container templates; Directory, NFS, CIFS
+- **`backup`** — backup files (vzdump); Directory, NFS, CIFS, PBS
+- **`snippets`** — snippet files (cloud-init, hookscripts); Directory, NFS, CIFS
 
 ## ZFS
 
@@ -100,22 +98,18 @@ feasible.
 **Volblocksize (VMs on zvols)** — sets the logical block size for VM disks. Can only be set at zvol creation. Match to
 RAID configuration to minimize write amplification:
 
-| Configuration       | Optimal volblocksize |
-| ------------------- | -------------------- |
-| Mirror / RAID10     | 16k (PVE default)    |
-| RAIDZ-1 (3-5 disks) | 16k-32k              |
-| RAIDZ-1 (10+ disks) | 128k                 |
-| RAIDZ-2 (4 disks)   | 16k                  |
-| RAIDZ-2 (11+ disks) | 128k                 |
+- **Mirror / RAID10** — 16k (PVE default)
+- **RAIDZ-1 (3-5 disks)** — 16k-32k
+- **RAIDZ-1 (10+ disks)** — 128k
+- **RAIDZ-2 (4 disks)** — 16k
+- **RAIDZ-2 (11+ disks)** — 128k
 
 **Recordsize (containers on datasets)** — tune per workload:
 
-| Workload                                | Recommended recordsize |
-| --------------------------------------- | ---------------------- |
-| Postgres                                | 8k                     |
-| MariaDB/MySQL                           | 16k                    |
-| General purpose                         | 128k (default)         |
-| Large sequential files (backups, video) | 1M                     |
+- **Postgres** — 8k
+- **MariaDB/MySQL** — 16k
+- **General purpose** — 128k (default)
+- **Large sequential files (backups, video)** — 1M
 
 ### Other ZFS Settings
 

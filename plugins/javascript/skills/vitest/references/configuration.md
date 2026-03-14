@@ -160,11 +160,9 @@ export default defineConfig({
 
 ### Pool Types
 
-| Pool              | Mechanism             | When to Use                                        |
-| ----------------- | --------------------- | -------------------------------------------------- |
-| `forks` (default) | `child_process.fork`  | Best compatibility, default choice                 |
-| `threads`         | `worker_threads`      | Faster for large suites, some packages may break   |
-| `vmThreads`       | VM context in threads | Isolation + performance (cannot disable isolation) |
+- **`forks` (default)** — `child_process.fork`; best compatibility, default choice
+- **`threads`** — `worker_threads`; faster for large suites, some packages may break
+- **`vmThreads`** — VM context in threads; isolation + performance (cannot disable isolation)
 
 ```ts
 test: {

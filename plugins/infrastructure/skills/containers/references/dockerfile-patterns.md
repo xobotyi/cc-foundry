@@ -105,14 +105,12 @@ Order instructions from least-frequently-changed to most-frequently-changed.
 
 ## Base Image Selection
 
-| Use Case                   | Image                            | Size   | Notes                                    |
-| -------------------------- | -------------------------------- | ------ | ---------------------------------------- |
-| Go, Rust (static binaries) | `scratch` or `distroless/static` | ~2MB   | No shell, no package manager             |
-| General minimal            | `alpine:3.21`                    | ~6MB   | musl libc — test for glibc compatibility |
-| Debian-based apps          | `debian:bookworm-slim`           | ~75MB  | glibc, smaller than full debian          |
-| Python                     | `python:3.13-slim`               | ~150MB | Debian slim variant                      |
-| Node.js                    | `node:22-alpine`                 | ~55MB  | Alpine variant saves ~900MB over full    |
-| Distroless (Google)        | `gcr.io/distroless/*`            | varies | No shell — hardened for production       |
+- **Go, Rust (static binaries)** — `scratch` or `distroless/static` (~2MB): No shell, no package manager
+- **General minimal** — `alpine:3.21` (~6MB): musl libc — test for glibc compatibility
+- **Debian-based apps** — `debian:bookworm-slim` (~75MB): glibc, smaller than full debian
+- **Python** — `python:3.13-slim` (~150MB): Debian slim variant
+- **Node.js** — `node:22-alpine` (~55MB): Alpine variant saves ~900MB over full
+- **Distroless (Google)** — `gcr.io/distroless/*` (varies): No shell — hardened for production
 
 ### Image pinning
 
@@ -152,11 +150,9 @@ from the build context.
 
 ## ENTRYPOINT vs CMD
 
-| Pattern                                         | Use Case                             |
-| ----------------------------------------------- | ------------------------------------ |
-| `ENTRYPOINT ["app"]` + `CMD ["--default-flag"]` | App with overridable defaults        |
-| `CMD ["app", "--flag"]`                         | Simple service, fully overridable    |
-| `ENTRYPOINT ["entrypoint.sh"]` + `CMD ["app"]`  | Init script pattern (Postgres-style) |
+- **`ENTRYPOINT ["app"]` + `CMD ["--default-flag"]`** — App with overridable defaults
+- **`CMD ["app", "--flag"]`** — Simple service, fully overridable
+- **`ENTRYPOINT ["entrypoint.sh"]` + `CMD ["app"]`** — Init script pattern (Postgres-style)
 
 - Use exec form `["binary", "arg"]` — not shell form `binary arg`
 - Shell form wraps in `/bin/sh -c`, preventing signal forwarding to PID 1

@@ -63,12 +63,10 @@ services:
 
 Drop all capabilities, then add back only what's needed:
 
-| Capability          | Use Case                    |
-| ------------------- | --------------------------- |
-| `NET_BIND_SERVICE`  | Bind to ports < 1024        |
-| `CHOWN`             | Change file ownership       |
-| `SETUID` / `SETGID` | Switch users (init systems) |
-| `DAC_OVERRIDE`      | Bypass file permissions     |
+- **`NET_BIND_SERVICE`** — Bind to ports < 1024
+- **`CHOWN`** — Change file ownership
+- **`SETUID` / `SETGID`** — Switch users (init systems)
+- **`DAC_OVERRIDE`** — Bypass file permissions
 
 Most applications need zero capabilities.
 

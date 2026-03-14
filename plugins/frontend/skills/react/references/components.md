@@ -55,12 +55,10 @@ function TeaGathering() {
 
 ### Where Side Effects Belong
 
-| Side effect type                         | Where to put it                        |
-| ---------------------------------------- | -------------------------------------- |
-| User clicks, form submits                | Event handlers                         |
-| Sync with external system (DOM, network) | `useEffect` (last resort)              |
-| Data transformation                      | Compute during render                  |
-| Shared logic between handlers            | Extract a function, call from handlers |
+- **User clicks, form submits** — Event handlers
+- **Sync with external system (DOM, network)** — `useEffect` (last resort)
+- **Data transformation** — Compute during render
+- **Shared logic between handlers** — Extract a function, call from handlers
 
 **Event handlers don't need to be pure** — they run outside of rendering.
 

@@ -30,16 +30,14 @@ const button = screen.getByRole('button');
 
 Use queries in this order. Prefer the highest-priority query that works:
 
-| Priority | Query                  | When to use                                      |
-| -------- | ---------------------- | ------------------------------------------------ |
-| 1        | `getByRole`            | Almost always — buttons, inputs, headings, links |
-| 2        | `getByLabelText`       | Form inputs with associated labels               |
-| 3        | `getByPlaceholderText` | When label is absent (not ideal)                 |
-| 4        | `getByText`            | Non-interactive elements (paragraphs, spans)     |
-| 5        | `getByDisplayValue`    | Current value of filled-in inputs                |
-| 6        | `getByAltText`         | Images                                           |
-| 7        | `getByTitle`           | Rarely — title attribute                         |
-| 8        | `getByTestId`          | Last resort — when nothing else works            |
+- `1` `getByRole` — Almost always — buttons, inputs, headings, links
+- `2` `getByLabelText` — Form inputs with associated labels
+- `3` `getByPlaceholderText` — When label is absent (not ideal)
+- `4` `getByText` — Non-interactive elements (paragraphs, spans)
+- `5` `getByDisplayValue` — Current value of filled-in inputs
+- `6` `getByAltText` — Images
+- `7` `getByTitle` — Rarely — title attribute
+- `8` `getByTestId` — Last resort — when nothing else works
 
 ### getByRole Is Your Default
 
@@ -62,11 +60,9 @@ screen.getByRole('link', { name: /about/i });
 
 ## Query Variants
 
-| Variant   | No match               | Multiple matches | Use for                          |
-| --------- | ---------------------- | ---------------- | -------------------------------- |
-| `getBy`   | Throws                 | Throws           | Element exists right now         |
-| `queryBy` | Returns `null`         | Throws           | Asserting element does NOT exist |
-| `findBy`  | Throws (after timeout) | Throws           | Waiting for element to appear    |
+- `getBy` — no match: throws, multiple: throws. Use for: element exists right now
+- `queryBy` — no match: returns `null`, multiple: throws. Use for: asserting element does NOT exist
+- `findBy` — no match: throws (after timeout), multiple: throws. Use for: waiting for element to appear
 
 ### Rules
 
@@ -194,16 +190,14 @@ warnings, fix the root cause (a state update after the test finishes) instead of
 
 ## Anti-Patterns
 
-| Don't                                             | Do                                         |
-| ------------------------------------------------- | ------------------------------------------ |
-| `const { getByRole } = render(...)`               | `render(...); screen.getByRole(...)`       |
-| `fireEvent.change(input, ...)`                    | `await user.type(input, ...)`              |
-| `screen.queryByRole('alert')` to assert existence | `screen.getByRole('alert')`                |
-| `container.querySelector('.btn')`                 | `screen.getByRole('button')`               |
-| `getByTestId` as first choice                     | `getByRole`, `getByLabelText`, `getByText` |
-| `await waitFor(() => {})` (empty callback)        | `await waitFor(() => expect(...))`         |
-| Side-effects inside `waitFor`                     | Fire events outside, assert inside         |
-| Multiple assertions in one `waitFor`              | One assertion per `waitFor`                |
-| Wrapping everything in `act`                      | Let `render`/`fireEvent` handle it         |
-| `role="button"` on `<button>`                     | Native elements have implicit roles        |
-| Manual `afterEach(cleanup)`                       | Automatic — don't call `cleanup`           |
+- **`const { getByRole } = render(...)`** — use `render(...); screen.getByRole(...)`
+- **`fireEvent.change(input, ...)`** — use `await user.type(input, ...)`
+- **`screen.queryByRole('alert')` to assert existence** — use `screen.getByRole('alert')`
+- **`container.querySelector('.btn')`** — use `screen.getByRole('button')`
+- **`getByTestId` as first choice** — use `getByRole`, `getByLabelText`, `getByText`
+- **`await waitFor(() => {})` (empty callback)** — use `await waitFor(() => expect(...))`
+- **Side-effects inside `waitFor`** — fire events outside, assert inside
+- **Multiple assertions in one `waitFor`** — one assertion per `waitFor`
+- **Wrapping everything in `act`** — let `render`/`fireEvent` handle it
+- **`role="button"` on `<button>`** — native elements have implicit roles
+- **Manual `afterEach(cleanup)`** — automatic — don't call `cleanup`

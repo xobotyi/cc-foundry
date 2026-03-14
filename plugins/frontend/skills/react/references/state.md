@@ -28,10 +28,8 @@ Local state (useState)
 
 These are fundamentally different:
 
-| Category         | Examples                                 | Tool                                |
-| ---------------- | ---------------------------------------- | ----------------------------------- |
-| **UI state**     | Modal open, form input, selected tab     | `useState`, `useReducer`, Context   |
-| **Server cache** | User data, search results, API responses | react-query, SWR, framework loaders |
+- **UI state** (modal open, form input, selected tab) — `useState`, `useReducer`, Context
+- **Server cache** (user data, search results, API responses) — react-query, SWR, framework loaders
 
 Server cache has inherently different problems — caching, deduplication, race conditions, background refetching. Don't
 reinvent these with raw `useState`.
@@ -76,12 +74,10 @@ previous state in non-trivial ways.
 
 ### When to Choose useReducer over useState
 
-| Signal                                          | Tool         |
-| ----------------------------------------------- | ------------ |
-| Single value, simple updates                    | `useState`   |
-| Multiple related values, complex transitions    | `useReducer` |
-| Many event handlers doing similar state updates | `useReducer` |
-| Need to test state logic in isolation           | `useReducer` |
+- **Single value, simple updates** — `useState`
+- **Multiple related values, complex transitions** — `useReducer`
+- **Many event handlers doing similar state updates** — `useReducer`
+- **Need to test state logic in isolation** — `useReducer`
 
 ### Reducer Pattern
 
@@ -285,13 +281,11 @@ This is cleaner than using an Effect to reset state on prop change.
 
 ## Anti-Patterns
 
-| Don't                                    | Do                                         |
-| ---------------------------------------- | ------------------------------------------ |
-| Store computed values in state           | Compute during render                      |
-| Sync state with Effect                   | Derive values, or compute in event handler |
-| Put all state in a global store          | Keep state local, lift only when needed    |
-| One giant context for everything         | Multiple focused contexts                  |
-| `useState` + `useEffect` for server data | Data-fetching library                      |
-| Reset state in Effect on prop change     | Use `key` prop                             |
-| Manual pending/error state for mutations | `useActionState`                           |
-| Delayed UI during mutations              | `useOptimistic` for instant feedback       |
+- **Store computed values in state** — Compute during render
+- **Sync state with Effect** — Derive values, or compute in event handler
+- **Put all state in a global store** — Keep state local, lift only when needed
+- **One giant context for everything** — Multiple focused contexts
+- **`useState` + `useEffect` for server data** — Data-fetching library
+- **Reset state in Effect on prop change** — Use `key` prop
+- **Manual pending/error state for mutations** — `useActionState`
+- **Delayed UI during mutations** — `useOptimistic` for instant feedback

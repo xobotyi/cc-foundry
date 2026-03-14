@@ -38,23 +38,21 @@ GNU extends POSIX with `--long-name` options:
 The GNU Coding Standards define a [table of common long options][gnu-options] for consistency across programs. Key
 entries:
 
-| Short | Long         | Purpose                         |
-| ----- | ------------ | ------------------------------- |
-| `-a`  | `--all`      | All items                       |
-| `-d`  | `--debug`    | Debug output                    |
-| `-f`  | `--force`    | Force operation                 |
-| `-h`  | `--help`     | Display help                    |
-| `-n`  | `--dry-run`  | Simulate without executing      |
-| `-o`  | `--output`   | Output file                     |
-| `-p`  | `--port`     | Port number                     |
-| `-q`  | `--quiet`    | Suppress non-essential output   |
-| `-u`  | `--user`     | User                            |
-| `-v`  | `--verbose`  | Verbose output                  |
-|       | `--version`  | Version information             |
-|       | `--json`     | JSON output                     |
-|       | `--no-color` | Disable color                   |
-|       | `--no-input` | Non-interactive mode            |
-|       | `--plain`    | Machine-readable tabular output |
+- `-a` / `--all` — All items
+- `-d` / `--debug` — Debug output
+- `-f` / `--force` — Force operation
+- `-h` / `--help` — Display help
+- `-n` / `--dry-run` — Simulate without executing
+- `-o` / `--output` — Output file
+- `-p` / `--port` — Port number
+- `-q` / `--quiet` — Suppress non-essential output
+- `-u` / `--user` — User
+- `-v` / `--verbose` — Verbose output
+- `--version` — Version information
+- `--json` — JSON output
+- `--no-color` — Disable color
+- `--no-input` — Non-interactive mode
+- `--plain` — Machine-readable tabular output
 
 [gnu-options]: https://www.gnu.org/prep/standards/html_node/Option-Table.html
 

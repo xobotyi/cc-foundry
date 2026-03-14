@@ -44,12 +44,10 @@ methods.
 
 From Google SRE: if you can only measure four metrics, measure these.
 
-| Signal         | What it measures          | Example                                           |
-| -------------- | ------------------------- | ------------------------------------------------- |
-| **Latency**    | Time to service a request | HTTP response time, DNS resolution time           |
-| **Traffic**    | Demand on the system      | Requests/sec, network I/O, concurrent connections |
-| **Errors**     | Rate of failed requests   | HTTP 5xx rate, failed health checks, timeout rate |
-| **Saturation** | How "full" the system is  | CPU %, memory %, disk %, queue depth              |
+- **Latency** — time to service a request: HTTP response time, DNS resolution time
+- **Traffic** — demand on the system: requests/sec, network I/O, concurrent connections
+- **Errors** — rate of failed requests: HTTP 5xx rate, failed health checks, timeout rate
+- **Saturation** — how "full" the system is: CPU %, memory %, disk %, queue depth
 
 **Latency:** Distinguish between successful and failed request latency. A fast error is still an error. A slow error is
 worse than a fast error. Track error latency separately.

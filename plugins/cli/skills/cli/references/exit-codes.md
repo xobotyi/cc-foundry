@@ -5,11 +5,9 @@ with full tables and edge cases.
 
 ## Standard Exit Codes
 
-| Code | Meaning       | Usage                                     |
-| ---- | ------------- | ----------------------------------------- |
-| `0`  | Success       | Operation completed successfully          |
-| `1`  | General error | Catch-all for unspecified failures        |
-| `2`  | Usage error   | Invalid arguments, missing required flags |
+- `0` — Success: operation completed successfully
+- `1` — General error: catch-all for unspecified failures
+- `2` — Usage error: invalid arguments, missing required flags
 
 These three codes cover the vast majority of CLI tools. Only define additional codes when the caller (script, CI) needs
 to distinguish specific failure modes.
@@ -18,28 +16,24 @@ to distinguish specific failure modes.
 
 Some tools define richer exit code ranges. The most common convention (used by `grep`, `diff`, `curl`, and many others):
 
-| Range   | Meaning                          |
-| ------- | -------------------------------- |
-| `0`     | Success                          |
-| `1`     | General/operational error        |
-| `2`     | Command-line usage error         |
-| `3-125` | Application-specific errors      |
-| `126`   | Command found but not executable |
-| `127`   | Command not found                |
-| `128+N` | Terminated by signal N           |
+- `0` — Success
+- `1` — General/operational error
+- `2` — Command-line usage error
+- `3-125` — Application-specific errors
+- `126` — Command found but not executable
+- `127` — Command not found
+- `128+N` — Terminated by signal N
 
 ## Signal Exit Codes
 
 When a process is killed by a signal, the conventional exit code is `128 + signal_number`:
 
-| Signal  | Number | Exit Code | Meaning            |
-| ------- | ------ | --------- | ------------------ |
-| SIGHUP  | 1      | 129       | Hangup             |
-| SIGINT  | 2      | 130       | Interrupt (Ctrl-C) |
-| SIGQUIT | 3      | 131       | Quit (Ctrl-\)      |
-| SIGABRT | 6      | 134       | Abort              |
-| SIGKILL | 9      | 137       | Kill (unblockable) |
-| SIGTERM | 15     | 143       | Termination        |
+- `SIGHUP` (1) → exit 129 — Hangup
+- `SIGINT` (2) → exit 130 — Interrupt (Ctrl-C)
+- `SIGQUIT` (3) → exit 131 — Quit (Ctrl-\)
+- `SIGABRT` (6) → exit 134 — Abort
+- `SIGKILL` (9) → exit 137 — Kill (unblockable)
+- `SIGTERM` (15) → exit 143 — Termination
 
 The shell sets `$?` to 128+N when a child is killed by signal N. If your program catches a signal and exits cleanly, use
 the conventional exit code to preserve the signal information for calling scripts.

@@ -69,16 +69,14 @@ The event loop is shared across all clients. Blocking it blocks everyone.
 
 ### What Blocks
 
-| Operation                  | Impact               | Fix                                   |
-| -------------------------- | -------------------- | ------------------------------------- |
-| `fs.readFileSync()`        | Blocks on disk I/O   | `await fs.readFile()`                 |
-| `child_process.execSync()` | Blocks on subprocess | `child_process.exec()`                |
-| `crypto.pbkdf2Sync()`      | CPU-bound            | `crypto.pbkdf2()` (async)             |
-| `zlib.inflateSync()`       | CPU-bound            | `zlib.inflate()` (async)              |
-| `JSON.parse(hugeString)`   | O(n) CPU             | Limit input size, stream parse        |
-| `JSON.stringify(hugeObj)`  | O(n) CPU             | Limit depth, stream serialize         |
-| Vulnerable regex           | O(2^n) CPU           | Use safe-regex, RE2, or `indexOf`     |
-| Tight `while` loop         | CPU-bound            | Break into chunks with `setImmediate` |
+- `fs.readFileSync()` — blocks on disk I/O → `await fs.readFile()`
+- `child_process.execSync()` — blocks on subprocess → `child_process.exec()`
+- `crypto.pbkdf2Sync()` — CPU-bound → `crypto.pbkdf2()` (async)
+- `zlib.inflateSync()` — CPU-bound → `zlib.inflate()` (async)
+- `JSON.parse(hugeString)` — O(n) CPU → limit input size, stream parse
+- `JSON.stringify(hugeObj)` — O(n) CPU → limit depth, stream serialize
+- Vulnerable regex — O(2^n) CPU → use safe-regex, RE2, or `indexOf`
+- Tight `while` loop — CPU-bound → break into chunks with `setImmediate`
 
 ### Partitioning CPU Work
 

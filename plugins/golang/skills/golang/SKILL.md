@@ -13,14 +13,18 @@ Simplicity is the highest Go virtue. Resist abstraction until the cost of not ab
 
 Extended examples, code patterns, and detailed rationale for the rules below live in `${CLAUDE_SKILL_DIR}/references/`.
 
-| Topic                                                                 | Reference                                         | Contents                                                                                      |
-| --------------------------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Naming, declarations, interfaces, receivers, configuration, embedding | [`${CLAUDE_SKILL_DIR}/references/idioms.md`]      | Extended code examples for each idiom, Go/bad vs good comparisons, decision criteria tables   |
-| Variable shadowing, defer traps, slice mutation, strings, copy safety | [`${CLAUDE_SKILL_DIR}/references/gotchas.md`]     | Annotated code showing each pitfall with fix patterns, global state examples                  |
-| Error creation, wrapping, Is/As, structured errors (golib/e)          | [`${CLAUDE_SKILL_DIR}/references/errors.md`]      | Error type decision tree, golib/e API (sentinels, fields, logging), wrapping context examples |
-| Goroutines, channels, context, sync, errgroup, data races             | [`${CLAUDE_SKILL_DIR}/references/concurrency.md`] | Worker lifecycle patterns, pipeline/fan-out/fan-in code, data race scenarios with fixes       |
-| Table tests, subtests, assertions, test doubles, benchmarks           | [`${CLAUDE_SKILL_DIR}/references/testing.md`]     | Full table-test template, testify usage, parallel subtests, httptest/iotest utilities         |
-| Project layout, packages, imports, file organization                  | [`${CLAUDE_SKILL_DIR}/references/structure.md`]   | Package naming examples, import grouping, backward-incompatible change staged workflow        |
+- **[`${CLAUDE_SKILL_DIR}/references/idioms.md`]** — Naming, declarations, interfaces, receivers, configuration,
+  embedding: extended code examples for each idiom, Go/bad vs good comparisons, decision criteria tables
+- **[`${CLAUDE_SKILL_DIR}/references/gotchas.md`]** — Variable shadowing, defer traps, slice mutation, strings, copy
+  safety: annotated code showing each pitfall with fix patterns, global state examples
+- **[`${CLAUDE_SKILL_DIR}/references/errors.md`]** — Error creation, wrapping, Is/As, structured errors (golib/e): error
+  type decision tree, golib/e API (sentinels, fields, logging), wrapping context examples
+- **[`${CLAUDE_SKILL_DIR}/references/concurrency.md`]** — Goroutines, channels, context, sync, errgroup, data races:
+  worker lifecycle patterns, pipeline/fan-out/fan-in code, data race scenarios with fixes
+- **[`${CLAUDE_SKILL_DIR}/references/testing.md`]** — Table tests, subtests, assertions, test doubles, benchmarks: full
+  table-test template, testify usage, parallel subtests, httptest/iotest utilities
+- **[`${CLAUDE_SKILL_DIR}/references/structure.md`]** — Project layout, packages, imports, file organization: package
+  naming examples, import grouping, backward-incompatible change staged workflow
 
 ## Naming
 
@@ -28,13 +32,11 @@ Extended examples, code patterns, and detailed rationale for the rules below liv
 
 Name length scales with scope distance.
 
-| Scope                | Style            | Examples                          |
-| -------------------- | ---------------- | --------------------------------- |
-| Loop index           | Single letter    | `i`, `j`, `k`                     |
-| Short function local | 1-3 chars        | `r` (reader), `b` (buffer), `ctx` |
-| Function parameter   | Short but clear  | `name`, `path`, `opts`            |
-| Package-level        | Descriptive      | `defaultTimeout`, `maxRetries`    |
-| Exported             | Self-documenting | `ErrNotFound`, `DefaultClient`    |
+- **Loop index** — single letter: `i`, `j`, `k`
+- **Short function local** — 1-3 chars: `r` (reader), `b` (buffer), `ctx`
+- **Function parameter** — short but clear: `name`, `path`, `opts`
+- **Package-level** — descriptive: `defaultTimeout`, `maxRetries`
+- **Exported** — self-documenting: `ErrNotFound`, `DefaultClient`
 
 ### Receivers
 
@@ -172,12 +174,10 @@ repeats the type.
 
 ### Error Creation
 
-| Caller needs to match? | Message | Use                                          |
-| ---------------------- | ------- | -------------------------------------------- |
-| No                     | Static  | `errors.New("not found")`                    |
-| No                     | Dynamic | `fmt.Errorf("file %q missing", name)`        |
-| Yes                    | Static  | Exported `var ErrNotFound = errors.New(...)` |
-| Yes                    | Dynamic | Custom error type with `Error()` method      |
+- **No match needed, static message** — `errors.New("not found")`
+- **No match needed, dynamic message** — `fmt.Errorf("file %q missing", name)`
+- **Caller must match, static message** — exported `var ErrNotFound = errors.New(...)`
+- **Caller must match, dynamic message** — custom error type with `Error()` method
 
 ### Sentinel Errors
 
@@ -317,11 +317,9 @@ When `context.Context` is unavailable (infrastructure code predating context), u
 
 ### Channels vs Mutexes
 
-| Relationship                               | Mechanism    | Why                         |
-| ------------------------------------------ | ------------ | --------------------------- |
-| Parallel goroutines accessing shared state | `sync.Mutex` | Synchronization             |
-| Concurrent goroutines coordinating work    | Channels     | Communication/orchestration |
-| Transferring ownership of a resource       | Channels     | Signaling completion        |
+- **Parallel goroutines accessing shared state** — `sync.Mutex` (synchronization)
+- **Concurrent goroutines coordinating work** — channels (communication/orchestration)
+- **Transferring ownership of a resource** — channels (signaling completion)
 
 Mutexes protect shared state. Channels coordinate independent actors.
 
@@ -632,16 +630,15 @@ Glob.** LSP understands Go's type system, scope rules, and module boundaries —
 
 ### Tool Routing
 
-| Task                                          | LSP Operation        | Why LSP over text search                            |
-| --------------------------------------------- | -------------------- | --------------------------------------------------- |
-| Find where a function/type/method is defined  | `goToDefinition`     | Resolves imports, aliases, embedded types           |
-| Find all usages of a symbol                   | `findReferences`     | Scope-aware, no false positives from string matches |
-| Get type signature, docs, or return types     | `hover`              | Instant type info without reading source files      |
-| List all symbols in a file                    | `documentSymbol`     | Structured output vs grepping for `func`/`type`     |
-| Find a symbol by name across the project      | `workspaceSymbol`    | Searches all packages                               |
-| Find concrete types implementing an interface | `goToImplementation` | Knows the type system and implicit interfaces       |
-| Find what calls a function                    | `incomingCalls`      | Precise call graph across module boundaries         |
-| Find what a function calls                    | `outgoingCalls`      | Structured dependency map                           |
+- **Find where a function/type/method is defined** — `goToDefinition` (resolves imports, aliases, embedded types)
+- **Find all usages of a symbol** — `findReferences` (scope-aware, no false positives from string matches)
+- **Get type signature, docs, or return types** — `hover` (instant type info without reading source files)
+- **List all symbols in a file** — `documentSymbol` (structured output vs grepping for `func`/`type`)
+- **Find a symbol by name across the project** — `workspaceSymbol` (searches all packages)
+- **Find concrete types implementing an interface** — `goToImplementation` (knows the type system and implicit
+  interfaces)
+- **Find what calls a function** — `incomingCalls` (precise call graph across module boundaries)
+- **Find what a function calls** — `outgoingCalls` (structured dependency map)
 
 **Grep/Glob remain appropriate for:** text in comments, string literals, log messages, TODO markers, config values,
 build tags, file name patterns — anything that isn't a Go identifier.

@@ -52,17 +52,15 @@ Re-run the failing prompt. If fixed, test other scenarios for regression.
 
 ## Diagnostic Table
 
-| Symptom                       | Likely Cause                   | Fix                                |
-| ----------------------------- | ------------------------------ | ---------------------------------- |
-| Reverts to sycophantic tone   | Weak persona, no anti-patterns | Add explicit "Never use..." list   |
-| Ignores format                | Format buried in text          | Move format to end, add example    |
-| Inconsistent between turns    | No multi-turn guidance         | Add conversation continuity rules  |
-| Works initially, drifts later | Style reminders not reinforced | Add "maintain throughout" language |
-| Too verbose                   | No length constraints          | Add explicit length limits         |
-| Too terse                     | Over-aggressive brevity rules  | Relax constraints, add minimum     |
-| Wrong tone in edge cases      | Examples don't cover scenario  | Add example for failing case       |
-| Contradictory behavior        | Conflicting instructions       | Resolve conflict, prioritize rules |
-| Ignores some rules            | Too many instructions          | Simplify, consolidate, prioritize  |
+- **Reverts to sycophantic tone** — weak persona, no anti-patterns. Fix: add explicit "Never use..." list
+- **Ignores format** — format buried in text. Fix: move format to end, add example
+- **Inconsistent between turns** — no multi-turn guidance. Fix: add conversation continuity rules
+- **Works initially, drifts later** — style reminders not reinforced. Fix: add "maintain throughout" language
+- **Too verbose** — no length constraints. Fix: add explicit length limits
+- **Too terse** — over-aggressive brevity rules. Fix: relax constraints, add minimum
+- **Wrong tone in edge cases** — examples don't cover scenario. Fix: add example for failing case
+- **Contradictory behavior** — conflicting instructions. Fix: resolve conflict, prioritize rules
+- **Ignores some rules** — too many instructions. Fix: simplify, consolidate, prioritize
 
 ---
 

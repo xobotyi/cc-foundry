@@ -9,14 +9,12 @@ work within a single session; for cross-session coordination between multiple ag
 
 ## Built-in Subagents
 
-| Agent             | Model   | Tools     | Purpose                                                   |
-| ----------------- | ------- | --------- | --------------------------------------------------------- |
-| Explore           | Haiku   | Read-only | File discovery, code search, codebase exploration         |
-| Plan              | Inherit | Read-only | Research during plan mode                                 |
-| general-purpose   | Inherit | All       | Complex multi-step tasks requiring exploration and action |
-| Bash              | Inherit | Bash      | Terminal commands in separate context                     |
-| statusline-setup  | Sonnet  | —         | Configures status line via `/statusline`                  |
-| Claude Code Guide | Haiku   | —         | Questions about Claude Code features                      |
+- **Explore** — Model: Haiku. Tools: Read-only. Purpose: File discovery, code search, codebase exploration.
+- **Plan** — Model: Inherit. Tools: Read-only. Purpose: Research during plan mode.
+- **general-purpose** — Model: Inherit. Tools: All. Purpose: Complex multi-step tasks requiring exploration and action.
+- **Bash** — Model: Inherit. Tools: Bash. Purpose: Terminal commands in separate context.
+- **statusline-setup** — Model: Sonnet. Tools: —. Purpose: Configures status line via `/statusline`.
+- **Claude Code Guide** — Model: Haiku. Tools: —. Purpose: Questions about Claude Code features.
 
 Explore supports thoroughness levels: `quick`, `medium`, `very thorough`.
 
@@ -50,12 +48,10 @@ immediately.
 
 ## Locations (Priority Order)
 
-| Location                   | Scope                   | Priority    |
-| -------------------------- | ----------------------- | ----------- |
-| `--agents` CLI flag        | Current session only    | 1 (highest) |
-| `.claude/agents/`          | Current project         | 2           |
-| `~/.claude/agents/`        | All your projects       | 3           |
-| Plugin `agents/` directory | Where plugin is enabled | 4 (lowest)  |
+- `--agents` CLI flag — Scope: Current session only. Priority: 1 (highest).
+- `.claude/agents/` — Scope: Current project. Priority: 2.
+- `~/.claude/agents/` — Scope: All your projects. Priority: 3.
+- Plugin `agents/` directory — Scope: Where plugin is enabled. Priority: 4 (lowest).
 
 When multiple subagents share a name, higher-priority location wins.
 
@@ -73,31 +69,27 @@ Recommended way to create and manage subagents.
 
 ## Frontmatter Reference
 
-| Field             | Required | Description                                                           |
-| ----------------- | -------- | --------------------------------------------------------------------- |
-| `name`            | Yes      | Unique identifier (lowercase, hyphens)                                |
-| `description`     | Yes      | When Claude should delegate to this subagent                          |
-| `tools`           | No       | Allowlist of tools. Inherits all if omitted                           |
-| `disallowedTools` | No       | Denylist removed from inherited/specified tools                       |
-| `model`           | No       | `sonnet`, `opus`, `haiku`, or `inherit` (default)                     |
-| `permissionMode`  | No       | `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan`      |
-| `maxTurns`        | No       | Maximum agentic turns before subagent stops                           |
-| `skills`          | No       | Skills to inject at startup (full content, not just available)        |
-| `mcpServers`      | No       | MCP servers: name referencing configured server, or inline definition |
-| `hooks`           | No       | Lifecycle hooks scoped to this subagent                               |
-| `memory`          | No       | Persistent memory scope: `user`, `project`, or `local`                |
-| `background`      | No       | `true` to always run as background task. Default: `false`             |
-| `isolation`       | No       | `worktree` for git worktree isolation; auto-cleaned if no changes     |
+- `name` — Unique identifier (lowercase, hyphens). Required: Yes.
+- `description` — When Claude should delegate to this subagent. Required: Yes.
+- `tools` — Allowlist of tools. Inherits all if omitted. Required: No.
+- `disallowedTools` — Denylist removed from inherited/specified tools. Required: No.
+- `model` — `sonnet`, `opus`, `haiku`, or `inherit` (default). Required: No.
+- `permissionMode` — `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan`. Required: No.
+- `maxTurns` — Maximum agentic turns before subagent stops. Required: No.
+- `skills` — Skills to inject at startup (full content, not just available). Required: No.
+- `mcpServers` — MCP servers: name referencing configured server, or inline definition. Required: No.
+- `hooks` — Lifecycle hooks scoped to this subagent. Required: No.
+- `memory` — Persistent memory scope: `user`, `project`, or `local`. Required: No.
+- `background` — `true` to always run as background task. Default: `false`. Required: No.
+- `isolation` — `worktree` for git worktree isolation; auto-cleaned if no changes. Required: No.
 
 ## Permission Modes
 
-| Mode                | Behavior                                                |
-| ------------------- | ------------------------------------------------------- |
-| `default`           | Standard permission prompts                             |
-| `acceptEdits`       | Auto-accept file edits                                  |
-| `dontAsk`           | Auto-deny prompts (explicitly allowed tools still work) |
-| `bypassPermissions` | Skip all permission checks                              |
-| `plan`              | Read-only exploration                                   |
+- `default` — Standard permission prompts
+- `acceptEdits` — Auto-accept file edits
+- `dontAsk` — Auto-deny prompts (explicitly allowed tools still work)
+- `bypassPermissions` — Skip all permission checks
+- `plan` — Read-only exploration
 
 Parent `bypassPermissions` takes precedence and cannot be overridden by subagent config.
 
@@ -193,11 +185,10 @@ you discover. This builds institutional knowledge across conversations.
 
 ### Memory Scopes
 
-| Scope     | Location                                   | Use when                                         |
-| --------- | ------------------------------------------ | ------------------------------------------------ |
-| `user`    | `~/.claude/agent-memory/<agent-name>/`     | Learnings apply across all projects              |
-| `project` | `.claude/agent-memory/<agent-name>/`       | Knowledge is project-specific, shareable via VCS |
-| `local`   | `.claude/agent-memory-local/<agent-name>/` | Project-specific, not checked into VCS           |
+- `user` — Location: `~/.claude/agent-memory/<agent-name>/`. Use when: Learnings apply across all projects.
+- `project` — Location: `.claude/agent-memory/<agent-name>/`. Use when: Knowledge is project-specific, shareable via
+  VCS.
+- `local` — Location: `.claude/agent-memory-local/<agent-name>/`. Use when: Project-specific, not checked into VCS.
 
 `user` is the recommended default.
 
@@ -248,10 +239,8 @@ All hook events are supported. `Stop` hooks in frontmatter auto-convert to `Suba
 
 ### In settings.json (subagent lifecycle events)
 
-| Event           | Matcher input   | When it fires                    |
-| --------------- | --------------- | -------------------------------- |
-| `SubagentStart` | Agent type name | When a subagent begins execution |
-| `SubagentStop`  | Agent type name | When a subagent completes        |
+- `SubagentStart` — matcher: agent type name. Fires when a subagent begins execution.
+- `SubagentStop` — matcher: agent type name. Fires when a subagent completes.
 
 Both support matchers to target specific agent types by name:
 

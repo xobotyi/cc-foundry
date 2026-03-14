@@ -17,13 +17,11 @@ flow from parent to child. References contain extended examples, rationale, and 
 
 ## References
 
-| Topic       | Reference                                       | Contents                                                   |
-| ----------- | ----------------------------------------------- | ---------------------------------------------------------- |
-| Components  | `${CLAUDE_SKILL_DIR}/references/components.md`  | Composition, refs, metadata, custom elements               |
-| Hooks       | `${CLAUDE_SKILL_DIR}/references/hooks.md`       | Hook rules, custom hooks, `useSyncExternalStore`           |
-| State       | `${CLAUDE_SKILL_DIR}/references/state.md`       | Placement, reducers, context, actions                      |
-| Performance | `${CLAUDE_SKILL_DIR}/references/performance.md` | Compiler, memoization, server components, streaming        |
-| Testing     | `${CLAUDE_SKILL_DIR}/references/testing.md`     | Query priority/variants, userEvent catalog, async patterns |
+- **Components** — `${CLAUDE_SKILL_DIR}/references/components.md` Composition, refs, metadata, custom elements
+- **Hooks** — `${CLAUDE_SKILL_DIR}/references/hooks.md` Hook rules, custom hooks, `useSyncExternalStore`
+- **State** — `${CLAUDE_SKILL_DIR}/references/state.md` Placement, reducers, context, actions
+- **Performance** — `${CLAUDE_SKILL_DIR}/references/performance.md` Compiler, memoization, server components, streaming
+- **Testing** — `${CLAUDE_SKILL_DIR}/references/testing.md` Query priority/variants, userEvent catalog, async patterns
 
 ## Component Design
 
@@ -47,12 +45,10 @@ variables declared before rendering.
   invisible outside that render.
 - **Event handlers don't need to be pure** — they run outside of rendering.
 
-| Side effect type                         | Where it belongs                       |
-| ---------------------------------------- | -------------------------------------- |
-| User clicks, form submits                | Event handlers                         |
-| Sync with external system (DOM, network) | `useEffect` (last resort)              |
-| Data transformation                      | Compute during render                  |
-| Shared logic between handlers            | Extract a function, call from handlers |
+- **User clicks, form submits** — Event handlers
+- **Sync with external system (DOM, network)** — `useEffect` (last resort)
+- **Data transformation** — Compute during render
+- **Shared logic between handlers** — Extract a function, call from handlers
 
 ### Component Structure
 
@@ -162,15 +158,13 @@ data, handling user events, or state derivation.
 
 **You don't need an Effect for:**
 
-| Situation                     | Do this instead                             |
-| ----------------------------- | ------------------------------------------- |
-| Transform data for rendering  | Compute during render                       |
-| Handle user events            | Call in event handler                       |
-| Reset state on prop change    | Use `key={userId}` on the component         |
-| Adjust state on prop change   | Compute: `items.find(...)` during render    |
-| Notify parent of state change | Call `onChange` in the event handler        |
-| Share logic between handlers  | Extract a function, call from both handlers |
-| Chain state updates           | Calculate all state in one event handler    |
+- **Transform data for rendering** — Compute during render
+- **Handle user events** — Call in event handler
+- **Reset state on prop change** — Use `key={userId}` on the component
+- **Adjust state on prop change** — Compute: `items.find(...)` during render
+- **Notify parent of state change** — Call `onChange` in the event handler
+- **Share logic between handlers** — Extract a function, call from both handlers
+- **Chain state updates** — Calculate all state in one event handler
 
 **You DO need an Effect for:**
 
@@ -219,10 +213,8 @@ Local state → Lift state up → Composition → Context → External library
 
 ### Server Cache vs UI State
 
-| Category     | Examples                                 | Tool                                |
-| ------------ | ---------------------------------------- | ----------------------------------- |
-| UI state     | Modal open, form input, selected tab     | `useState`, `useReducer`, Context   |
-| Server cache | User data, search results, API responses | react-query, SWR, framework loaders |
+- **UI state** (modal open, form input, selected tab) — `useState`, `useReducer`, Context
+- **Server cache** (user data, search results, API responses) — react-query, SWR, framework loaders
 
 Never reinvent caching, deduplication, and race condition handling with raw `useState`.
 
@@ -240,12 +232,10 @@ Never reinvent caching, deduplication, and race condition handling with raw `use
 Use when state updates are complex — many event handlers modifying the same state, or when next state depends on
 previous state in non-trivial ways.
 
-| Signal                                          | Tool         |
-| ----------------------------------------------- | ------------ |
-| Single value, simple updates                    | `useState`   |
-| Multiple related values, complex transitions    | `useReducer` |
-| Many event handlers doing similar state updates | `useReducer` |
-| Need to test state logic in isolation           | `useReducer` |
+- **Single value, simple updates** — `useState`
+- **Multiple related values, complex transitions** — `useReducer`
+- **Many event handlers doing similar state updates** — `useReducer`
+- **Need to test state logic in isolation** — `useReducer`
 
 **Reducer rules:**
 

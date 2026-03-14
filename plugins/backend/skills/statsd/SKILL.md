@@ -16,14 +16,18 @@ corrupt your data silently.
 
 ## References
 
-| Topic           | Reference                                             | Contents                                                                      |
-| --------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Metric types    | [`${CLAUDE_SKILL_DIR}/references/metric-types.md`]    | Wire format details, type comparison, sampling correction                     |
-| Naming          | [`${CLAUDE_SKILL_DIR}/references/naming.md`]          | Graphite namespace mapping, character rules, naming examples                  |
-| DogStatsD       | [`${CLAUDE_SKILL_DIR}/references/dogstatsd.md`]       | Events format, service checks, protocol versions, distributions vs histograms |
-| Aggregation     | [`${CLAUDE_SKILL_DIR}/references/aggregation.md`]     | Flush mechanics, Graphite downsampling, DogStatsD aggregation, timestamps     |
-| Client patterns | [`${CLAUDE_SKILL_DIR}/references/client-patterns.md`] | High-throughput tuning, error handling, K8s deployment, UDS configuration     |
-| Backends        | [`${CLAUDE_SKILL_DIR}/references/backends.md`]        | statsd_exporter config, Telegraf setup, migration guides                      |
+- **Metric types** — [`${CLAUDE_SKILL_DIR}/references/metric-types.md`]: Wire format details, type comparison, sampling
+  correction
+- **Naming** — [`${CLAUDE_SKILL_DIR}/references/naming.md`]: Graphite namespace mapping, character rules, naming
+  examples
+- **DogStatsD** — [`${CLAUDE_SKILL_DIR}/references/dogstatsd.md`]: Events format, service checks, protocol versions,
+  distributions vs histograms
+- **Aggregation** — [`${CLAUDE_SKILL_DIR}/references/aggregation.md`]: Flush mechanics, Graphite downsampling, DogStatsD
+  aggregation, timestamps
+- **Client patterns** — [`${CLAUDE_SKILL_DIR}/references/client-patterns.md`]: High-throughput tuning, error handling,
+  K8s deployment, UDS configuration
+- **Backends** — [`${CLAUDE_SKILL_DIR}/references/backends.md`]: statsd_exporter config, Telegraf setup, migration
+  guides
 
 ## Metric Types
 
@@ -125,23 +129,19 @@ Format: `metric.name:1|c|#key1:value1,key2:value2` — comma-separated, no space
 
 Set these as global/constant tags on the client — attach to every metric automatically:
 
-| Tag       | Purpose                | Example               |
-| --------- | ---------------------- | --------------------- |
-| `env`     | Deployment environment | `env:production`      |
-| `service` | Service name           | `service:payment-api` |
-| `version` | Deployed version       | `version:2.1.0`       |
+- **`env`** — Deployment environment (`env:production`)
+- **`service`** — Service name (`service:payment-api`)
+- **`version`** — Deployed version (`version:2.1.0`)
 
 ### Tag Cardinality
 
 Rule of thumb: if a tag can have >1000 distinct values, do not use it. Use logs or traces for high-cardinality data.
 
-| Tag                   | Cardinality | Acceptable? |
-| --------------------- | ----------- | ----------- |
-| `env:production`      | ~3-5        | Yes         |
-| `method:GET`          | ~7          | Yes         |
-| `status_code:200`     | ~20-50      | Yes         |
-| `endpoint:/api/users` | ~50-200     | Caution     |
-| `user_id:12345`       | Unbounded   | No          |
+- **`env:production`** — ~3-5 values: Yes
+- **`method:GET`** — ~7 values: Yes
+- **`status_code:200`** — ~20-50 values: Yes
+- **`endpoint:/api/users`** — ~50-200 values: Caution
+- **`user_id:12345`** — Unbounded: No
 
 ## Aggregation and Flush
 
@@ -174,11 +174,9 @@ Most modern DogStatsD clients buffer by default. Call `flush()` before shutdown.
 Client randomly decides whether to send each metric based on sample rate. Datagram includes `|@<rate>` so server
 corrects the count.
 
-| Volume             | Recommendation                                      |
-| ------------------ | --------------------------------------------------- |
-| < 1000 metrics/sec | `rate=1.0` (no sampling)                            |
-| 1000-10000/sec     | `rate=0.5` to `0.1` for counters/timers             |
-| > 10000/sec        | `rate=0.1` or lower; enable client-side aggregation |
+- **< 1000 metrics/sec** — `rate=1.0` (no sampling)
+- **1000-10000/sec** — `rate=0.5` to `0.1` for counters/timers
+- **> 10000/sec** — `rate=0.1` or lower; enable client-side aggregation
 
 **Never sample gauges or sets** — server cannot correct for these types.
 
@@ -187,13 +185,11 @@ deployment patterns.
 
 ## Backends
 
-| Need                             | Backend                    |
-| -------------------------------- | -------------------------- |
-| Simple, self-hosted graphing     | Graphite                   |
-| Cloud monitoring + APM           | Datadog (DogStatsD)        |
-| Prometheus ecosystem integration | statsd_exporter            |
-| Flexible multi-output pipeline   | Telegraf                   |
-| Migrating StatsD to Prometheus   | statsd_exporter with relay |
+- **Simple, self-hosted graphing** — Graphite
+- **Cloud monitoring + APM** — Datadog (DogStatsD)
+- **Prometheus ecosystem integration** — statsd_exporter
+- **Flexible multi-output pipeline** — Telegraf
+- **Migrating StatsD to Prometheus** — statsd_exporter with relay
 
 See `${CLAUDE_SKILL_DIR}/references/backends.md` for statsd_exporter configuration, Telegraf setup, and migration
 guides.

@@ -4,10 +4,8 @@ Providers, configuration, including/excluding files, and ignoring code.
 
 ## Providers
 
-| Provider       | Package                     | Mechanism                   | Recommendation                          |
-| -------------- | --------------------------- | --------------------------- | --------------------------------------- |
-| `v8` (default) | `@vitest/coverage-v8`       | V8 engine's native coverage | Recommended — fast, accurate since v3.2 |
-| `istanbul`     | `@vitest/coverage-istanbul` | Babel instrumentation       | Use when not on V8 (Firefox, Bun)       |
+- **`v8` (default)** — `@vitest/coverage-v8`; V8 engine's native coverage; recommended — fast, accurate since v3.2
+- **`istanbul`** — `@vitest/coverage-istanbul`; Babel instrumentation; use when not on V8 (Firefox, Bun)
 
 Install the provider package:
 

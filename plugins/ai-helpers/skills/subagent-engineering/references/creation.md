@@ -107,24 +107,20 @@ description: "Code review. Keywords: review, quality, lint, security"
 
 **Principle:** Grant minimum necessary permissions.
 
-| Agent Type                      | Recommended Tools                         |
-| ------------------------------- | ----------------------------------------- |
-| Read-only (reviewers, analysts) | `Read, Grep, Glob`                        |
-| Research (with web)             | `Read, Grep, Glob, WebFetch, WebSearch`   |
-| Code writers                    | `Read, Write, Edit, Bash, Glob, Grep`     |
-| Documentation                   | `Read, Write, Edit, Glob, Grep, WebFetch` |
+- `Read-only (reviewers, analysts)`: `Read, Grep, Glob`
+- `Research (with web)`: `Read, Grep, Glob, WebFetch, WebSearch`
+- `Code writers`: `Read, Write, Edit, Bash, Glob, Grep`
+- `Documentation`: `Read, Write, Edit, Glob, Grep, WebFetch`
 
 **If omitted:** Inherits ALL tools from main conversation (including MCP). Be intentional — don't leave it blank unless
 you want full access.
 
 ### Step 4: Choose the Model
 
-| Model     | When to Use                                                |
-| --------- | ---------------------------------------------------------- |
-| `haiku`   | Quick searches, docs, simple analysis                      |
-| `sonnet`  | Everyday coding, debugging, refactoring                    |
-| `opus`    | Architecture decisions, security audits, complex reasoning |
-| `inherit` | Match parent (default)                                     |
+- `haiku`: Quick searches, docs, simple analysis
+- `sonnet`: Everyday coding, debugging, refactoring
+- `opus`: Architecture decisions, security audits, complex reasoning
+- `inherit`: Match parent (default)
 
 **Cost consideration:** Haiku is significantly cheaper. Use it for high-volume, straightforward tasks.
 

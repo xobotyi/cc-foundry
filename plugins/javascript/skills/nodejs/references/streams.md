@@ -15,12 +15,10 @@ Don't use streams when data is already fully in memory — the overhead isn't wo
 
 ## Stream Types
 
-| Type        | Purpose                    | Example                                         |
-| ----------- | -------------------------- | ----------------------------------------------- |
-| `Readable`  | Source of data             | `fs.createReadStream()`, `http.IncomingMessage` |
-| `Writable`  | Destination for data       | `fs.createWriteStream()`, `http.ServerResponse` |
-| `Duplex`    | Both readable and writable | `net.Socket`, `zlib` streams                    |
-| `Transform` | Duplex that modifies data  | `zlib.createGzip()`, custom parsers             |
+- **`Readable`** — source of data (e.g. `fs.createReadStream()`, `http.IncomingMessage`)
+- **`Writable`** — destination for data (e.g. `fs.createWriteStream()`, `http.ServerResponse`)
+- **`Duplex`** — both readable and writable (e.g. `net.Socket`, `zlib` streams)
+- **`Transform`** — duplex that modifies data (e.g. `zlib.createGzip()`, custom parsers)
 
 ## pipeline() — The Only Way to Compose Streams
 

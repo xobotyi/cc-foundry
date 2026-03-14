@@ -74,12 +74,10 @@ pvesh set /nodes/pve1/qemu/100/resize -disk scsi0 -size +10G
 
 **pvesh verbs map to HTTP methods:**
 
-| pvesh    | HTTP   | Purpose                             |
-| -------- | ------ | ----------------------------------- |
-| `get`    | GET    | Read/list resources                 |
-| `create` | POST   | Create resources or trigger actions |
-| `set`    | PUT    | Update resources                    |
-| `delete` | DELETE | Remove resources                    |
+- **`get`** → GET — read/list resources
+- **`create`** → POST — create resources or trigger actions
+- **`set`** → PUT — update resources
+- **`delete`** → DELETE — remove resources
 
 **Output formats:**
 

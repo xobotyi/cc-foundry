@@ -129,13 +129,11 @@ websocket: {
 
 ### WebSocket Config
 
-| Option              | Default | Description                     |
-| ------------------- | ------- | ------------------------------- |
-| `maxPayloadLength`  | 16 MB   | Max message size                |
-| `idleTimeout`       | 120s    | Idle disconnect time            |
-| `backpressureLimit` | 1 MB    | Queue limit before backpressure |
-| `perMessageDeflate` | false   | Per-message compression         |
-| `publishToSelf`     | false   | Receive own published messages  |
+- **`maxPayloadLength`** (default: 16 MB) — Max message size
+- **`idleTimeout`** (default: 120s) — Idle disconnect time
+- **`backpressureLimit`** (default: 1 MB) — Queue limit before backpressure
+- **`perMessageDeflate`** (default: false) — Per-message compression
+- **`publishToSelf`** (default: false) — Receive own published messages
 
 ### Pub/Sub
 

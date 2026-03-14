@@ -35,13 +35,11 @@ Attributes are key-value pairs that annotate a span with metadata about the oper
 
 ### Common Attribute Patterns
 
-| Domain      | Key Attributes                                                                                  |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| HTTP server | `http.request.method`, `url.path`, `url.scheme`, `http.route`, `http.response.status_code`      |
-| HTTP client | `http.request.method`, `url.full`, `server.address`, `server.port`, `http.response.status_code` |
-| Database    | `db.system`, `db.namespace`, `db.operation.name`, `db.query.text`                               |
-| Messaging   | `messaging.system`, `messaging.operation.type`, `messaging.destination.name`                    |
-| General     | `error.type`, `server.address`, `server.port`, `network.protocol.version`                       |
+- **HTTP server** — `http.request.method`, `url.path`, `url.scheme`, `http.route`, `http.response.status_code`
+- **HTTP client** — `http.request.method`, `url.full`, `server.address`, `server.port`, `http.response.status_code`
+- **Database** — `db.system`, `db.namespace`, `db.operation.name`, `db.query.text`
+- **Messaging** — `messaging.system`, `messaging.operation.type`, `messaging.destination.name`
+- **General** — `error.type`, `server.address`, `server.port`, `network.protocol.version`
 
 ## Events
 
@@ -113,12 +111,10 @@ a parent-child hierarchy.
 
 The SDK enforces limits to prevent unbounded memory growth:
 
-| Limit                    | Default | Configuration                 |
-| ------------------------ | ------- | ----------------------------- |
-| Attribute count per span | 128     | `AttributeCountLimit`         |
-| Event count per span     | 128     | `EventCountLimit`             |
-| Link count per span      | 128     | `LinkCountLimit`              |
-| Attributes per event     | 128     | `AttributePerEventCountLimit` |
-| Attributes per link      | 128     | `AttributePerLinkCountLimit`  |
+- **Attribute count per span** — default 128, configure via `AttributeCountLimit`
+- **Event count per span** — default 128, configure via `EventCountLimit`
+- **Link count per span** — default 128, configure via `LinkCountLimit`
+- **Attributes per event** — default 128, configure via `AttributePerEventCountLimit`
+- **Attributes per link** — default 128, configure via `AttributePerLinkCountLimit`
 
 Excess items are silently dropped. The SDK logs a warning once per span when limits are hit.

@@ -156,17 +156,15 @@ Bun aims for 100% Node.js API compatibility. If a Node.js package doesn't work i
 
 ### Mostly Compatible (minor gaps)
 
-| Module                | Notes                                                                 |
-| --------------------- | --------------------------------------------------------------------- |
-| `node:async_hooks`    | `AsyncLocalStorage` works. `executionAsyncId` is a stub.              |
-| `node:child_process`  | Missing `proc.gid`/`proc.uid`. No socket handle IPC.                  |
-| `node:crypto`         | Missing `secureHeapUsed`, `setEngine`, `setFips`                      |
-| `node:http2`          | Client & server work. Missing `allowHTTP1`, `pushStream`.             |
-| `node:https`          | APIs work, `Agent` not always used.                                   |
-| `node:tls`            | Missing `tls.createSecurePair`                                        |
-| `node:vm`             | Core works. Missing `vm.measureMemory`.                               |
-| `node:worker_threads` | Missing some `Worker` options (`stdin`, `stdout`).                    |
-| `process`             | `process.binding` partially. `process.title` is no-op on macOS/Linux. |
+- **`node:async_hooks`** — `AsyncLocalStorage` works. `executionAsyncId` is a stub.
+- **`node:child_process`** — Missing `proc.gid`/`proc.uid`. No socket handle IPC.
+- **`node:crypto`** — Missing `secureHeapUsed`, `setEngine`, `setFips`
+- **`node:http2`** — Client & server work. Missing `allowHTTP1`, `pushStream`.
+- **`node:https`** — APIs work, `Agent` not always used.
+- **`node:tls`** — Missing `tls.createSecurePair`
+- **`node:vm`** — Core works. Missing `vm.measureMemory`.
+- **`node:worker_threads`** — Missing some `Worker` options (`stdin`, `stdout`).
+- **`process`** — `process.binding` partially. `process.title` is no-op on macOS/Linux.
 
 ### Not Implemented
 
@@ -187,19 +185,17 @@ All standard Web APIs are available globally: `fetch`, `Request`, `Response`, `H
 
 ### When to Use Node.js APIs vs Bun APIs
 
-| Task             | Prefer                       | Reason                         |
-| ---------------- | ---------------------------- | ------------------------------ |
-| HTTP server      | `Bun.serve()`                | Faster, declarative routing    |
-| File read/write  | `Bun.file()` / `Bun.write()` | Optimized syscalls             |
-| Shell commands   | `Bun.$`                      | Cross-platform, injection-safe |
-| Process spawn    | `Bun.spawn()`                | Better API, faster             |
-| SQLite           | `bun:sqlite`                 | Native, 3-6x faster            |
-| Testing          | `bun:test`                   | Built-in, Jest-compatible      |
-| Password hashing | `Bun.password`               | Built-in argon2id/bcrypt       |
-| Directory ops    | `node:fs`                    | No Bun API yet                 |
-| TCP/UDP sockets  | `Bun.listen` / `Bun.connect` | Native, faster                 |
-| Streams          | Web Streams API              | Standard, Bun-optimized        |
-| Crypto (general) | `node:crypto` / Web Crypto   | Both work                      |
+- **HTTP server** — `Bun.serve()`: Faster, declarative routing
+- **File read/write** — `Bun.file()` / `Bun.write()`: Optimized syscalls
+- **Shell commands** — `Bun.$`: Cross-platform, injection-safe
+- **Process spawn** — `Bun.spawn()`: Better API, faster
+- **SQLite** — `bun:sqlite`: Native, 3-6x faster
+- **Testing** — `bun:test`: Built-in, Jest-compatible
+- **Password hashing** — `Bun.password`: Built-in argon2id/bcrypt
+- **Directory ops** — `node:fs`: No Bun API yet
+- **TCP/UDP sockets** — `Bun.listen` / `Bun.connect`: Native, faster
+- **Streams** — Web Streams API: Standard, Bun-optimized
+- **Crypto (general)** — `node:crypto` / Web Crypto: Both work
 
 Rule: if `Bun.*` or `bun:*` has it, use it. Fall back to `node:*` only when there's no Bun-native alternative or when
 portability to Node.js is required.

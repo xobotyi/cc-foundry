@@ -66,14 +66,12 @@ TypeScript's standard library includes essential type operators:
 
 ### Object Transformation
 
-| Type              | Purpose                                   |
-| ----------------- | ----------------------------------------- |
-| `Partial<T>`      | All properties optional                   |
-| `Required<T>`     | All properties required                   |
-| `Readonly<T>`     | All properties readonly                   |
-| `Pick<T, Keys>`   | Subset of properties                      |
-| `Omit<T, Keys>`   | All except specified properties           |
-| `Record<Keys, T>` | Object with specified keys and value type |
+- **`Partial<T>`** → All properties optional
+- **`Required<T>`** → All properties required
+- **`Readonly<T>`** → All properties readonly
+- **`Pick<T, Keys>`** → Subset of properties
+- **`Omit<T, Keys>`** → All except specified properties
+- **`Record<Keys, T>`** → Object with specified keys and value type
 
 ```ts
 interface User {
@@ -94,11 +92,9 @@ type UserWithoutAge = Omit<User, "age">;
 
 ### Union Manipulation
 
-| Type                        | Purpose                       |
-| --------------------------- | ----------------------------- |
-| `Exclude<Union, Excluded>`  | Remove members from union     |
-| `Extract<Union, Extracted>` | Keep only matching members    |
-| `NonNullable<T>`            | Remove `null` and `undefined` |
+- **`Exclude<Union, Excluded>`** → Remove members from union
+- **`Extract<Union, Extracted>`** → Keep only matching members
+- **`NonNullable<T>`** → Remove `null` and `undefined`
 
 ```ts
 type T = Exclude<"a" | "b" | "c", "a">; // "b" | "c"
@@ -107,12 +103,10 @@ type U = NonNullable<string | null>;      // string
 
 ### Function Types
 
-| Type            | Purpose                          |
-| --------------- | -------------------------------- |
-| `ReturnType<T>` | Extract return type              |
-| `Parameters<T>` | Extract parameter types as tuple |
-| `Awaited<T>`    | Unwrap Promise types recursively |
-| `NoInfer<T>`    | Block inference at this position |
+- **`ReturnType<T>`** → Extract return type
+- **`Parameters<T>`** → Extract parameter types as tuple
+- **`Awaited<T>`** → Unwrap Promise types recursively
+- **`NoInfer<T>`** → Block inference at this position
 
 ```ts
 function fetchUser(id: string): Promise<User> { ... }
@@ -246,12 +240,10 @@ use explicit interfaces instead.
 
 ### Complexity Tiers
 
-| Tier     | Tools                                   | Use When                      |
-| -------- | --------------------------------------- | ----------------------------- |
-| Simple   | `interface`, `type` alias, union        | Always — default choice       |
-| Moderate | `Partial`, `Pick`, `Omit`, `Record`     | Well-known transformations    |
-| Advanced | Conditional, mapped, template literal   | Library code, framework types |
-| Expert   | Recursive types, complex `infer` chains | Rarely — last resort          |
+- **Simple** (`interface`, `type` alias, union) → Always — default choice
+- **Moderate** (`Partial`, `Pick`, `Omit`, `Record`) → Well-known transformations
+- **Advanced** (Conditional, mapped, template literal) → Library code, framework types
+- **Expert** (Recursive types, complex `infer` chains) → Rarely — last resort
 
 Stay at the lowest tier that solves your problem.
 

@@ -271,16 +271,14 @@ cache_timeout = 3600
 
 Key behavioral parameters set per-host or per-group:
 
-| Parameter                      | Purpose                                    |
-| ------------------------------ | ------------------------------------------ |
-| `ansible_host`                 | IP/hostname to connect to                  |
-| `ansible_port`                 | SSH port (default 22)                      |
-| `ansible_user`                 | SSH username                               |
-| `ansible_ssh_private_key_file` | SSH key path                               |
-| `ansible_connection`           | Connection type (`ssh`, `local`, `docker`) |
-| `ansible_python_interpreter`   | Python path on target                      |
-| `ansible_become`               | Enable privilege escalation                |
-| `ansible_become_method`        | Escalation method (`sudo`, `su`, `doas`)   |
+- **`ansible_host`** — IP/hostname to connect to
+- **`ansible_port`** — SSH port (default 22)
+- **`ansible_user`** — SSH username
+- **`ansible_ssh_private_key_file`** — SSH key path
+- **`ansible_connection`** — Connection type (`ssh`, `local`, `docker`)
+- **`ansible_python_interpreter`** — Python path on target
+- **`ansible_become`** — Enable privilege escalation
+- **`ansible_become_method`** — Escalation method (`sudo`, `su`, `doas`)
 
 Never store `ansible_password` or `ansible_become_password` in plain text -- use Vault.
 

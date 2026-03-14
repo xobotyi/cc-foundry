@@ -125,11 +125,9 @@ Prefer `context.Context` over raw stop/done channels in new code.
 
 Choose based on goroutine relationship:
 
-| Relationship | Mechanism | Why |
-|-------------|-----------|-----|
-| Parallel goroutines accessing shared state | `sync.Mutex` | Synchronization |
-| Concurrent goroutines coordinating work | Channels | Communication / orchestration |
-| Transferring ownership of a resource | Channels | Signaling completion |
+- **Parallel goroutines accessing shared state** — `sync.Mutex` (synchronization)
+- **Concurrent goroutines coordinating work** — channels (communication / orchestration)
+- **Transferring ownership of a resource** — channels (signaling completion)
 
 **Parallel** = doing the same thing simultaneously (e.g., workers processing a queue).
 **Concurrent** = doing different steps of a pipeline (e.g., producer → consumer).

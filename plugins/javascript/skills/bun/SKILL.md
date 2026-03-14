@@ -16,13 +16,16 @@ is an explicit requirement.
 
 ## References
 
-| Topic                    | Reference                                               | Contents                                                              |
-| ------------------------ | ------------------------------------------------------- | --------------------------------------------------------------------- |
-| HTTP server              | [`${CLAUDE_SKILL_DIR}/references/server.md`]            | Route types, file response patterns, WebSocket pub/sub, server config |
-| File I/O and processes   | [`${CLAUDE_SKILL_DIR}/references/io-and-processes.md`]  | File I/O details, shell API, child processes, workers                 |
-| Testing                  | [`${CLAUDE_SKILL_DIR}/references/testing.md`]           | Test modifiers, parametrized tests, mocking, snapshots, CLI flags     |
-| SQLite, bundler, plugins | [`${CLAUDE_SKILL_DIR}/references/ecosystem.md`]         | SQLite API, bundler options, plugins, macros                          |
-| Configuration            | [`${CLAUDE_SKILL_DIR}/references/config-and-compat.md`] | bunfig.toml sections, Node.js compatibility, env vars                 |
+- **HTTP server** — [`${CLAUDE_SKILL_DIR}/references/server.md`]: Route types, file response patterns, WebSocket
+  pub/sub, server config
+- **File I/O and processes** — [`${CLAUDE_SKILL_DIR}/references/io-and-processes.md`]: File I/O details, shell API,
+  child processes, workers
+- **Testing** — [`${CLAUDE_SKILL_DIR}/references/testing.md`]: Test modifiers, parametrized tests, mocking, snapshots,
+  CLI flags
+- **SQLite, bundler, plugins** — [`${CLAUDE_SKILL_DIR}/references/ecosystem.md`]: SQLite API, bundler options, plugins,
+  macros
+- **Configuration** — [`${CLAUDE_SKILL_DIR}/references/config-and-compat.md`]: bunfig.toml sections, Node.js
+  compatibility, env vars
 
 ## Prefer Bun-Native APIs
 

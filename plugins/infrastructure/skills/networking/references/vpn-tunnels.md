@@ -91,15 +91,13 @@ handles the control plane; data flows peer-to-peer.
 
 ### Key Features
 
-| Feature        | Description                                                                         |
-| -------------- | ----------------------------------------------------------------------------------- |
-| MagicDNS       | Automatic DNS names for all devices (`hostname.tailnet-name.ts.net`)                |
-| ACLs           | Policy engine for access control, defined in JSON/HuJSON                            |
-| Exit nodes     | Route all traffic through a specific device (one-click toggle)                      |
-| Subnet routers | Advertise local subnets to the tailnet without installing Tailscale on every device |
-| Taildrop       | Peer-to-peer file transfer between tailnet devices                                  |
-| SSH            | Tailscale SSH eliminates SSH key management                                         |
-| Funnel         | Expose services to the public internet via Tailscale's infrastructure               |
+- MagicDNS: automatic DNS names for all devices (`hostname.tailnet-name.ts.net`)
+- ACLs: policy engine for access control, defined in JSON/HuJSON
+- Exit nodes: route all traffic through a specific device (one-click toggle)
+- Subnet routers: advertise local subnets to the tailnet without installing Tailscale on every device
+- Taildrop: peer-to-peer file transfer between tailnet devices
+- SSH: Tailscale SSH eliminates SSH key management
+- Funnel: expose services to the public internet via Tailscale's infrastructure
 
 ### Subnet Router Pattern
 
@@ -131,17 +129,29 @@ the infrastructure. Tailscale clients connect to your Headscale instance instead
 
 ## WireGuard vs Tailscale Decision
 
-| Factor              | WireGuard                    | Tailscale                    |
-| ------------------- | ---------------------------- | ---------------------------- |
-| Topology            | Hub-and-spoke                | Full mesh                    |
-| NAT traversal       | Manual port forwarding       | Automatic                    |
-| Key management      | Manual                       | Automatic                    |
-| Config complexity   | High (per-peer config files) | Zero-config (SSO login)      |
-| External dependency | None                         | Coordination server          |
-| RAM overhead        | ~5 MB (kernel module)        | ~30-50 MB (userspace daemon) |
-| DNS                 | Manual setup                 | MagicDNS (automatic)         |
-| ACLs                | iptables / nftables          | Built-in policy engine       |
-| Cost                | Free (GPLv2)                 | Free up to 100 devices       |
+**WireGuard:**
+
+- Topology: Hub-and-spoke
+- NAT traversal: Manual port forwarding
+- Key management: Manual
+- Config complexity: High (per-peer config files)
+- External dependency: None
+- RAM overhead: ~5 MB (kernel module)
+- DNS: Manual setup
+- ACLs: iptables / nftables
+- Cost: Free (GPLv2)
+
+**Tailscale:**
+
+- Topology: Full mesh
+- NAT traversal: Automatic
+- Key management: Automatic
+- Config complexity: Zero-config (SSO login)
+- External dependency: Coordination server
+- RAM overhead: ~30-50 MB (userspace daemon)
+- DNS: MagicDNS (automatic)
+- ACLs: Built-in policy engine
+- Cost: Free up to 100 devices
 
 ### Topology Resilience
 

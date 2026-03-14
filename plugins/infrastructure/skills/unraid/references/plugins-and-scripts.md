@@ -43,21 +43,26 @@ Container configurations are saved as XML template files:
 
 ## Essential Plugins
 
-| Plugin                      | Purpose                                                    | Why Essential                                                           |
-| --------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Community Applications      | App store interface                                        | Gateway to all other plugins and containers                             |
-| CA Appdata Backup/Restore   | Automated backup of container configs and appdata          | Protects against docker.img corruption and data loss                    |
-| Fix Common Problems         | Configuration error and security risk alerts               | Catches missing root password, insecure shares, failed logins           |
-| Unassigned Devices          | Mount drives outside array/pools                           | Required for scratch backup drives, external USB, preclear              |
-| Unassigned Devices Preclear | Prepare new drives before adding to array                  | Stress-tests drives and zeroes data before production use               |
-| Dynamix System Temp         | Hardware temperature monitoring (CPU, motherboard)         | Real-time thermal awareness in WebGUI                                   |
-| Dynamix Cache Dirs          | Prevents unnecessary drive spinups from directory listings | Critical for power-saving spindown strategies                           |
-| Dynamix Password Validator  | Real-time password strength feedback                       | Enforces strong root password (Unraid has no built-in complexity rules) |
-| Tips and Tweaks             | System-level performance optimizations and tuning          | First-install plugin for new builds                                     |
-| File Integrity              | File hash checking for bitrot detection                    | Data verification and silent corruption monitoring                      |
-| Mover Tuning                | Advanced mover schedule, threshold, and age-based control  | Prevents premature cache-to-array moves, enables spindown optimization  |
-| NUT (Network UPS Tools)     | UPS monitoring and graceful shutdown                       | Prevents data corruption and forced parity checks from power loss       |
-| User Scripts                | Custom shell script automation via WebGUI                  | Primary automation engine for all scheduled tasks                       |
+- **Community Applications** — App store interface. Gateway to all other plugins and containers
+- **CA Appdata Backup/Restore** — Automated backup of container configs and appdata. Protects against docker.img
+  corruption and data loss
+- **Fix Common Problems** — Configuration error and security risk alerts. Catches missing root password, insecure
+  shares, failed logins
+- **Unassigned Devices** — Mount drives outside array/pools. Required for scratch backup drives, external USB, preclear
+- **Unassigned Devices Preclear** — Prepare new drives before adding to array. Stress-tests drives and zeroes data
+  before production use
+- **Dynamix System Temp** — Hardware temperature monitoring (CPU, motherboard). Real-time thermal awareness in WebGUI
+- **Dynamix Cache Dirs** — Prevents unnecessary drive spinups from directory listings. Critical for power-saving
+  spindown strategies
+- **Dynamix Password Validator** — Real-time password strength feedback. Enforces strong root password (Unraid has no
+  built-in complexity rules)
+- **Tips and Tweaks** — System-level performance optimizations and tuning. First-install plugin for new builds
+- **File Integrity** — File hash checking for bitrot detection. Data verification and silent corruption monitoring
+- **Mover Tuning** — Advanced mover schedule, threshold, and age-based control. Prevents premature cache-to-array moves,
+  enables spindown optimization
+- **NUT (Network UPS Tools)** — UPS monitoring and graceful shutdown. Prevents data corruption and forced parity checks
+  from power loss
+- **User Scripts** — Custom shell script automation via WebGUI. Primary automation engine for all scheduled tasks
 
 ## User Scripts Plugin
 
@@ -69,13 +74,11 @@ Settings > User Scripts (install from Apps tab first).
 
 ### Script Scheduling
 
-| Schedule Type                          | Description                             |
-| -------------------------------------- | --------------------------------------- |
-| At Startup of Array                    | Runs when array starts                  |
-| At Stopping of Array                   | Runs when array stops                   |
-| At First Array Start Only              | Runs once after boot                    |
-| Custom (cron)                          | Cron expression for flexible scheduling |
-| Scheduled: Hourly/Daily/Weekly/Monthly | Preset intervals                        |
+- **At Startup of Array** — Runs when array starts
+- **At Stopping of Array** — Runs when array stops
+- **At First Array Start Only** — Runs once after boot
+- **Custom (cron)** — Cron expression for flexible scheduling
+- **Scheduled: Hourly/Daily/Weekly/Monthly** — Preset intervals
 
 Cron expression example: `0 3 * * 1` = 3:00 AM every Monday.
 
@@ -163,13 +166,11 @@ Use healthchecks.io (free hosted or self-hosted) to monitor automated scripts:
 
 Configure in Settings > Notifications:
 
-| Agent         | Setup                                                        |
-| ------------- | ------------------------------------------------------------ |
-| Email         | Built-in, configure SMTP settings                            |
-| Browser       | WebGUI notifications, auto-closing timer configurable        |
-| Telegram      | Create bot via BotFather, add token in Notification Settings |
-| Pushover      | Install app, add API key in Notification Settings            |
-| Slack/Discord | Available via third-party notification plugins               |
+- **Email** — Built-in, configure SMTP settings
+- **Browser** — WebGUI notifications, auto-closing timer configurable
+- **Telegram** — Create bot via BotFather, add token in Notification Settings
+- **Pushover** — Install app, add API key in Notification Settings
+- **Slack/Discord** — Available via third-party notification plugins
 
 Alert categories: disk errors, parity issues, temperature warnings, update availability, backup completion/failure,
 container health.

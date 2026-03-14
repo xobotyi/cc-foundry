@@ -17,17 +17,25 @@ Idempotency is the highest Ansible virtue. Every task must describe desired stat
 
 Extended examples, patterns, and detailed rationale for the rules below live in `${CLAUDE_SKILL_DIR}/references/`.
 
-| Topic                                                                         | Reference                                                                    | Contents                                                                                                                             |
-| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Play structure, import vs include, project layout, verification               | [`${CLAUDE_SKILL_DIR}/references/playbook-patterns.md`]                      | Execution order, static vs dynamic reuse comparison, batched execution, standard directory layouts                                   |
-| Directory structure, defaults vs vars, argument validation, dependencies      | [`${CLAUDE_SKILL_DIR}/references/role-structure.md`]                         | Role directory tree, using roles three ways, platform-specific task splitting, deduplication rules                                   |
-| Formats, grouping, dynamic inventory, cloud plugins, constructed inventory    | [`${CLAUDE_SKILL_DIR}/references/inventory-management.md`]                   | YAML/INI examples, group hierarchy, environment separation, AWS/Azure/GCP/NetBox/Terraform plugins, multi-cloud chaining, caching    |
-| Vault encryption, vars/vault pattern, content signing, CIS benchmarks         | [`${CLAUDE_SKILL_DIR}/references/vault-and-security.md`]                     | File vs variable encryption, password sources, ansible-sign, GPG verification, hardening roles, compliance scanning, security smells |
-| Precedence order, scoping, Jinja2 filters/tests, template files               | [`${CLAUDE_SKILL_DIR}/references/variables-and-templating.md`]               | Full 22-level precedence list, magic variables, YAML quoting gotcha, registered variables                                            |
-| Blocks, rescue/always, error control keywords, retry logic                    | [`${CLAUDE_SKILL_DIR}/references/error-handling.md`]                         | Block execution flow, rescue variables, failed_when/changed_when, any_errors_fatal                                                   |
-| Handler mechanics, listen topics, delegation, async tasks                     | [`${CLAUDE_SKILL_DIR}/references/handlers-and-delegation.md`]                | Handler execution order, flushing, delegate_to, delegate_facts, fire-and-forget async                                                |
-| Molecule drivers/scenarios, ansible-lint profiles, Mitogen, callback plugins  | [`${CLAUDE_SKILL_DIR}/references/testing-and-performance.md`]                | Molecule lifecycle, driver comparison, CI matrix testing, strategy plugins, SSH pipelining, fact caching, serial batching            |
-| EE definition files, ansible-builder, ansible-navigator, collection structure | [`${CLAUDE_SKILL_DIR}/references/execution-environments-and-collections.md`] | EE vs local installs, version 3 schema, FQCN migration, collection certification, Galaxy publishing                                  |
+- **playbook-patterns** — [`${CLAUDE_SKILL_DIR}/references/playbook-patterns.md`]: Execution order, static vs dynamic
+  reuse comparison, batched execution, standard directory layouts
+- **role-structure** — [`${CLAUDE_SKILL_DIR}/references/role-structure.md`]: Role directory tree, using roles three
+  ways, platform-specific task splitting, deduplication rules
+- **inventory-management** — [`${CLAUDE_SKILL_DIR}/references/inventory-management.md`]: YAML/INI examples, group
+  hierarchy, environment separation, AWS/Azure/GCP/NetBox/Terraform plugins, multi-cloud chaining, caching
+- **vault-and-security** — [`${CLAUDE_SKILL_DIR}/references/vault-and-security.md`]: File vs variable encryption,
+  password sources, ansible-sign, GPG verification, hardening roles, compliance scanning, security smells
+- **variables-and-templating** — [`${CLAUDE_SKILL_DIR}/references/variables-and-templating.md`]: Full 22-level
+  precedence list, magic variables, YAML quoting gotcha, registered variables
+- **error-handling** — [`${CLAUDE_SKILL_DIR}/references/error-handling.md`]: Block execution flow, rescue variables,
+  failed_when/changed_when, any_errors_fatal
+- **handlers-and-delegation** — [`${CLAUDE_SKILL_DIR}/references/handlers-and-delegation.md`]: Handler execution order,
+  flushing, delegate_to, delegate_facts, fire-and-forget async
+- **testing-and-performance** — [`${CLAUDE_SKILL_DIR}/references/testing-and-performance.md`]: Molecule lifecycle,
+  driver comparison, CI matrix testing, strategy plugins, SSH pipelining, fact caching, serial batching
+- **execution-environments-and-collections** —
+  [`${CLAUDE_SKILL_DIR}/references/execution-environments-and-collections.md`]: EE vs local installs, version 3 schema,
+  FQCN migration, collection certification, Galaxy publishing
 
 ## Anti-Patterns
 
@@ -173,14 +181,12 @@ constructed inventory for cross-cloud targeting. Successor to Smart Inventories 
 
 Role `defaults/` is lowest. Extra vars (`-e`) always win. Most common layers:
 
-| Want to...                     | Put variables in...      |
-| ------------------------------ | ------------------------ |
-| Set overridable defaults       | Role `defaults/main.yml` |
-| Set environment-wide values    | `group_vars/all.yml`     |
-| Set group-specific values      | `group_vars/<group>.yml` |
-| Set host-specific values       | `host_vars/<host>.yml`   |
-| Force a value in a role        | Role `vars/main.yml`     |
-| Override everything at runtime | `--extra-vars`           |
+- **Overridable defaults** → Role `defaults/main.yml`
+- **Environment-wide values** → `group_vars/all.yml`
+- **Group-specific values** → `group_vars/<group>.yml`
+- **Host-specific values** → `host_vars/<host>.yml`
+- **Force a value in a role** → Role `vars/main.yml`
+- **Override everything at runtime** → `--extra-vars`
 
 Define each variable in ONE place.
 

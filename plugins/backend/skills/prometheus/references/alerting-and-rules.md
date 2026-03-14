@@ -136,10 +136,8 @@ level:metric:operations
 
 ### Recording Rule Anti-Patterns
 
-| Don't                         | Why                                                     |
-| ----------------------------- | ------------------------------------------------------- |
-| Record everything             | Costs storage, most rules are unused                    |
-| Skip intermediate levels      | Harder to debug, can't reuse steps                      |
-| Use `by` instead of `without` | Silently drops new labels added later                   |
-| Average ratios                | Statistically invalid — aggregate components separately |
-| Inconsistent naming           | Level/metric/operation structure exists for a reason    |
+- **Record everything** — Costs storage, most rules are unused
+- **Skip intermediate levels** — Harder to debug, can't reuse steps
+- **Use `by` instead of `without`** — Silently drops new labels added later
+- **Average ratios** — Statistically invalid — aggregate components separately
+- **Inconsistent naming** — Level/metric/operation structure exists for a reason

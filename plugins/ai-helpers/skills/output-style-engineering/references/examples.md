@@ -84,13 +84,11 @@ Don't hesitate to ask if you need anything else!"
 
 **Analysis:**
 
-| Dimension              | Score | Notes                                                 |
-| ---------------------- | ----- | ----------------------------------------------------- |
-| Persona Clarity        | 7/10  | Professional peer, clear but not deeply characterized |
-| Behavioral Specificity | 9/10  | Concrete forbidden phrases, clear patterns            |
-| Example Quality        | 8/10  | Good contrast examples                                |
-| Format Clarity         | 7/10  | Basic pattern, could be more detailed                 |
-| Safeguards             | 9/10  | Strong anti-sycophancy rules                          |
+- Persona Clarity: 7/10 — professional peer, clear but not deeply characterized
+- Behavioral Specificity: 9/10 — concrete forbidden phrases, clear patterns
+- Example Quality: 8/10 — good contrast examples
+- Format Clarity: 7/10 — basic pattern, could be more detailed
+- Safeguards: 9/10 — strong anti-sycophancy rules
 
 **Key strength:** Explicit forbidden phrases list.
 
@@ -193,13 +191,11 @@ about policy implementation.
 
 **Analysis:**
 
-| Dimension              | Score | Notes                                    |
-| ---------------------- | ----- | ---------------------------------------- |
-| Persona Clarity        | 8/10  | Clear academic researcher role           |
-| Behavioral Specificity | 9/10  | Detailed framework, concrete sections    |
-| Example Quality        | 9/10  | Full worked example                      |
-| Format Clarity         | 10/10 | Explicit template                        |
-| Safeguards             | 7/10  | Good principles, could add anti-patterns |
+- Persona Clarity: 8/10 — clear academic researcher role
+- Behavioral Specificity: 9/10 — detailed framework, concrete sections
+- Example Quality: 9/10 — full worked example
+- Format Clarity: 10/10 — explicit template
+- Safeguards: 7/10 — good principles, could add anti-patterns
 
 **Key strength:** Detailed output format with template.
 
@@ -301,13 +297,11 @@ works? That understanding is what matters."
 
 **Analysis:**
 
-| Dimension              | Score | Notes                                           |
-| ---------------------- | ----- | ----------------------------------------------- |
-| Persona Clarity        | 9/10  | Clear teaching philosophy                       |
-| Behavioral Specificity | 9/10  | Explicit question types, escalation pattern     |
-| Example Quality        | 10/10 | Multiple scenarios including frustration        |
-| Format Clarity         | 8/10  | Good pattern, output template could be stronger |
-| Safeguards             | 9/10  | Clear constraints on when to reveal             |
+- Persona Clarity: 9/10 — clear teaching philosophy
+- Behavioral Specificity: 9/10 — explicit question types, escalation pattern
+- Example Quality: 10/10 — multiple scenarios including frustration
+- Format Clarity: 8/10 — good pattern, output template could be stronger
+- Safeguards: 9/10 — clear constraints on when to reveal
 
 **Key strength:** Escalation pattern handling frustration.
 
@@ -405,13 +399,11 @@ own words."
 
 **Analysis:**
 
-| Dimension              | Score | Notes                                   |
-| ---------------------- | ----- | --------------------------------------- |
-| Persona Clarity        | 8/10  | Patient tutor, voice-first context      |
-| Behavioral Specificity | 10/10 | Detailed question formats, pacing rules |
-| Example Quality        | 9/10  | Good interaction flow                   |
-| Format Clarity         | 9/10  | Clear session structure                 |
-| Safeguards             | 9/10  | Strong "never code" constraint          |
+- Persona Clarity: 8/10 — patient tutor, voice-first context
+- Behavioral Specificity: 10/10 — detailed question formats, pacing rules
+- Example Quality: 9/10 — good interaction flow
+- Format Clarity: 9/10 — clear session structure
+- Safeguards: 9/10 — strong "never code" constraint
 
 **Key strength:** Detailed interaction protocol for unique use case.
 
@@ -489,13 +481,11 @@ When reviewing content:
 
 **Analysis:**
 
-| Dimension              | Score | Notes                                  |
-| ---------------------- | ----- | -------------------------------------- |
-| Persona Clarity        | 8/10  | Clear strategist role                  |
-| Behavioral Specificity | 7/10  | Good framework, could be more specific |
-| Example Quality        | 6/10  | Missing full example                   |
-| Format Clarity         | 8/10  | Clear output template                  |
-| Safeguards             | 6/10  | Could add anti-patterns                |
+- Persona Clarity: 8/10 — clear strategist role
+- Behavioral Specificity: 7/10 — good framework, could be more specific
+- Example Quality: 6/10 — missing full example
+- Format Clarity: 8/10 — clear output template
+- Safeguards: 6/10 — could add anti-patterns
 
 **Key strength:** Clear analysis framework.
 

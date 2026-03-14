@@ -43,18 +43,16 @@ independently.
 
 #### `--value()` resolution modes
 
-| Syntax                          | Matches                                     | Example class                                |
-| ------------------------------- | ------------------------------------------- | -------------------------------------------- |
-| `--value(--ns-*)`               | Theme key in `--ns-*` namespace             | `tab-github` (if `--tab-size-github` exists) |
-| `--value(integer)`              | Bare integer                                | `tab-4`, `tab-76`                            |
-| `--value(number)`               | Bare decimal number                         | `opacity-75`                                 |
-| `--value(percentage)`           | Bare percentage                             | `opacity-50%`                                |
-| `--value(ratio)`                | Fraction (triggers ratio+modifier handling) | `aspect-3/4`                                 |
-| `--value([integer])`            | Arbitrary integer                           | `tab-[8]`                                    |
-| `--value([length])`             | Arbitrary length                            | `w-[117px]`                                  |
-| `--value([color])`              | Arbitrary color                             | `bg-[#abc]`                                  |
-| `--value([*])`                  | Any arbitrary value                         |                                              |
-| `--value("inherit", "initial")` | Literal keyword                             | `tab-inherit`                                |
+- **`--value(--ns-*)`** — Theme key in `--ns-*` namespace; e.g. `tab-github` (if `--tab-size-github` exists)
+- **`--value(integer)`** — Bare integer; e.g. `tab-4`, `tab-76`
+- **`--value(number)`** — Bare decimal number; e.g. `opacity-75`
+- **`--value(percentage)`** — Bare percentage; e.g. `opacity-50%`
+- **`--value(ratio)`** — Fraction (triggers ratio+modifier handling); e.g. `aspect-3/4`
+- **`--value([integer])`** — Arbitrary integer; e.g. `tab-[8]`
+- **`--value([length])`** — Arbitrary length; e.g. `w-[117px]`
+- **`--value([color])`** — Arbitrary color; e.g. `bg-[#abc]`
+- **`--value([*])`** — Any arbitrary value
+- **`--value("inherit", "initial")`** — Literal keyword; e.g. `tab-inherit`
 
 Bare value types: `number`, `integer`, `ratio`, `percentage`. Arbitrary value types: `absolute-size`, `angle`,
 `bg-size`, `color`, `family-name`, `generic-name`, `image`, `integer`, `length`, `line-width`, `number`, `percentage`,

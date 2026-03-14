@@ -30,25 +30,23 @@ version-specific: `https://schema.phpunit.de/11.5/phpunit.xsd`.
 
 ## Key `<phpunit>` Attributes
 
-| Attribute                                 | Default   | Purpose                                                 |
-| ----------------------------------------- | --------- | ------------------------------------------------------- |
-| `bootstrap`                               | —         | Autoloader script path                                  |
-| `colors`                                  | `false`   | Colored output                                          |
-| `cacheDirectory`                          | —         | Cache dir for test results and coverage analysis        |
-| `cacheResult`                             | `true`    | Cache test results for defect/duration ordering         |
-| `executionOrder`                          | `default` | Test order: `default`, `random`, `depends,random`, etc. |
-| `stopOnDefect`                            | `false`   | Stop on first error/failure/warning/risky               |
-| `stopOnFailure`                           | `false`   | Stop on first failure                                   |
-| `failOnWarning`                           | `false`   | Treat warnings as CI failures                           |
-| `failOnRisky`                             | `false`   | Treat risky tests as CI failures                        |
-| `failOnDeprecation`                       | `false`   | Treat deprecations as CI failures                       |
-| `failOnNotice`                            | `false`   | Treat notices as CI failures                            |
-| `beStrictAboutTestsThatDoNotTestAnything` | `true`    | Mark assertionless tests risky                          |
-| `beStrictAboutOutputDuringTests`          | `false`   | Mark tests with output risky                            |
-| `beStrictAboutCoverageMetadata`           | `false`   | Mark tests without coverage attrs risky                 |
-| `processIsolation`                        | `false`   | Run each test in separate PHP process                   |
-| `backupGlobals`                           | `false`   | Backup/restore global variables per test                |
-| `backupStaticProperties`                  | `false`   | Backup/restore static properties per test               |
+- **`bootstrap`** (default: —) — Autoloader script path
+- **`colors`** (default: `false`) — Colored output
+- **`cacheDirectory`** (default: —) — Cache dir for test results and coverage analysis
+- **`cacheResult`** (default: `true`) — Cache test results for defect/duration ordering
+- **`executionOrder`** (default: `default`) — Test order: `default`, `random`, `depends,random`, etc.
+- **`stopOnDefect`** (default: `false`) — Stop on first error/failure/warning/risky
+- **`stopOnFailure`** (default: `false`) — Stop on first failure
+- **`failOnWarning`** (default: `false`) — Treat warnings as CI failures
+- **`failOnRisky`** (default: `false`) — Treat risky tests as CI failures
+- **`failOnDeprecation`** (default: `false`) — Treat deprecations as CI failures
+- **`failOnNotice`** (default: `false`) — Treat notices as CI failures
+- **`beStrictAboutTestsThatDoNotTestAnything`** (default: `true`) — Mark assertionless tests risky
+- **`beStrictAboutOutputDuringTests`** (default: `false`) — Mark tests with output risky
+- **`beStrictAboutCoverageMetadata`** (default: `false`) — Mark tests without coverage attrs risky
+- **`processIsolation`** (default: `false`) — Run each test in separate PHP process
+- **`backupGlobals`** (default: `false`) — Backup/restore global variables per test
+- **`backupStaticProperties`** (default: `false`) — Backup/restore static properties per test
 
 ## `<testsuites>` Element
 

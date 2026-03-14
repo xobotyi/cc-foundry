@@ -52,29 +52,23 @@ Structure: Action name → Prerequisites (optional) → Actions.
 
 Properties:
 
-| Property       | Description                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| `fieldName`    | The custom field managed by the state machine                     |
-| `states`       | Map of field values to their transition definitions               |
-| `requirements` | Fields required for the rule to work (auto-checked on attachment) |
+- **`fieldName`** — the custom field managed by the state machine
+- **`states`** — map of field values to their transition definitions
+- **`requirements`** — fields required for the rule to work (auto-checked on attachment)
 
 Each state defines:
 
-| Property      | Description                                                        |
-| ------------- | ------------------------------------------------------------------ |
-| `initial`     | Boolean — exactly one state must be `true` (set on issue creation) |
-| `onEnter`     | Action executed when the state is entered                          |
-| `onExit`      | Action executed when leaving the state                             |
-| `transitions` | Named paths to target states                                       |
+- **`initial`** — boolean; exactly one state must be `true` (set on issue creation)
+- **`onEnter`** — action executed when the state is entered
+- **`onExit`** — action executed when leaving the state
+- **`transitions`** — named paths to target states
 
 Each transition defines:
 
-| Property      | Description                                               |
-| ------------- | --------------------------------------------------------- |
-| `targetState` | The state value to set                                    |
-| `guard`       | Condition that must be true for the transition to execute |
-| `action`      | Action to perform during the transition                   |
-| `after`       | Time delay before executing the action (in milliseconds)  |
+- **`targetState`** — the state value to set
+- **`guard`** — condition that must be true for the transition to execute
+- **`action`** — action to perform during the transition
+- **`after`** — time delay before executing the action (in milliseconds)
 
 #### Example: Basic State Machine
 
@@ -96,12 +90,10 @@ Fixed
 
 Extends the basic model with type-specific transition sets:
 
-| Property              | Description                                                                    |
-| --------------------- | ------------------------------------------------------------------------------ |
-| `stateFieldName`      | The field managed by the state machine (alias for `fieldName`)                 |
-| `typeFieldName`       | The field that determines which machine applies (e.g., `Type`)                 |
-| `defaultMachine`      | Default transitions (alias for `states`) — applies when no alternative matches |
-| `alternativeMachines` | Map of type values to their dedicated state machines                           |
+- **`stateFieldName`** — the field managed by the state machine (alias for `fieldName`)
+- **`typeFieldName`** — the field that determines which machine applies (e.g., `Type`)
+- **`defaultMachine`** — default transitions (alias for `states`); applies when no alternative matches
+- **`alternativeMachines`** — map of type values to their dedicated state machines
 
 The type field acts as a switch: issues with a type defined in `alternativeMachines` use that machine; all others use
 `defaultMachine`.

@@ -14,10 +14,8 @@ Enables async test functions and fixtures.
 asyncio_mode = "auto"  # auto-detect async tests (recommended)
 ```
 
-| Mode     | Behavior                                                               |
-| -------- | ---------------------------------------------------------------------- |
-| `auto`   | Async tests and fixtures detected automatically — no decorator needed  |
-| `strict` | Requires explicit `@pytest.mark.asyncio` on every async test (default) |
+- **`auto`** — Async tests and fixtures detected automatically — no decorator needed
+- **`strict`** — Requires explicit `@pytest.mark.asyncio` on every async test (default)
 
 With `auto` mode, any `async def test_*` function is treated as an async test without needing `@pytest.mark.asyncio`.
 
@@ -28,10 +26,8 @@ With `auto` mode, any `async def test_*` function is treated as an async test wi
 asyncio_default_fixture_loop_scope = "session"
 ```
 
-| Scope      | Behavior                                                            |
-| ---------- | ------------------------------------------------------------------- |
-| `function` | Fresh event loop per test (more isolated, default)                  |
-| `session`  | One event loop for the entire test run (faster, shared connections) |
+- **`function`** — Fresh event loop per test (more isolated, default)
+- **`session`** — One event loop for the entire test run (faster, shared connections)
 
 ### Async Fixtures
 
@@ -73,16 +69,14 @@ def test_sends_email(mocker):
 
 ### Method Reference
 
-| Method                                                  | Purpose                                             |
-| ------------------------------------------------------- | --------------------------------------------------- |
-| `mocker.patch("target")`                                | Replace target with `MagicMock`                     |
-| `mocker.patch.object(obj, "attr")`                      | Patch attribute on a specific object                |
-| `mocker.patch.dict(dict_obj, values)`                   | Temporarily modify dict entries                     |
-| `mocker.spy(obj, "method")`                             | Wrap method — track calls while preserving behavior |
-| `mocker.stub(name="stub")`                              | Create a standalone stub (no spec)                  |
-| `mocker.MagicMock(spec=Type)`                           | Create spec-constrained mock                        |
-| `mocker.AsyncMock(spec=Type)`                           | Create async-compatible mock                        |
-| `mocker.patch("target", new_callable=mocker.AsyncMock)` | Patch with async mock                               |
+- **`mocker.patch("target")`** — Replace target with `MagicMock`
+- **`mocker.patch.object(obj, "attr")`** — Patch attribute on a specific object
+- **`mocker.patch.dict(dict_obj, values)`** — Temporarily modify dict entries
+- **`mocker.spy(obj, "method")`** — Wrap method — track calls while preserving behavior
+- **`mocker.stub(name="stub")`** — Create a standalone stub (no spec)
+- **`mocker.MagicMock(spec=Type)`** — Create spec-constrained mock
+- **`mocker.AsyncMock(spec=Type)`** — Create async-compatible mock
+- **`mocker.patch("target", new_callable=mocker.AsyncMock)`** — Patch with async mock
 
 ### Spy Pattern
 
@@ -158,13 +152,11 @@ pytest -n auto --dist loadgroup
 
 ### Distribution Modes
 
-| Mode        | Behavior                                                  |
-| ----------- | --------------------------------------------------------- |
-| `load`      | Distribute tests to workers as they become free (default) |
-| `loadfile`  | Group tests by file — each worker runs whole files        |
-| `loadgroup` | Group by `@pytest.mark.xdist_group("name")`               |
-| `loadscope` | Group by test module/class scope                          |
-| `no`        | Disable distribution (useful for debugging)               |
+- **`load`** — Distribute tests to workers as they become free (default)
+- **`loadfile`** — Group tests by file — each worker runs whole files
+- **`loadgroup`** — Group by `@pytest.mark.xdist_group("name")`
+- **`loadscope`** — Group by test module/class scope
+- **`no`** — Disable distribution (useful for debugging)
 
 ### Configuration
 

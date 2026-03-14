@@ -59,14 +59,12 @@ Same as above but returns a mock with expectation support.
 
 Chain after `->method('methodName')`:
 
-| Method                             | Behavior                                         |
-| ---------------------------------- | ------------------------------------------------ |
-| `willReturn($v1, $v2, ...)`        | Returns values in sequence; last value repeats   |
-| `willReturnArgument(int $index)`   | Returns the nth argument unchanged               |
-| `willReturnSelf()`                 | Returns the stub/mock itself (fluent interfaces) |
-| `willReturnCallback(callable $cb)` | Delegates to callback                            |
-| `willReturnMap(array $map)`        | Maps `[arg1, arg2, ..., returnValue]` arrays     |
-| `willThrowException(Throwable $e)` | Throws exception                                 |
+- **`willReturn($v1, $v2, ...)`** — Returns values in sequence; last value repeats
+- **`willReturnArgument(int $index)`** — Returns the nth argument unchanged
+- **`willReturnSelf()`** — Returns the stub/mock itself (fluent interfaces)
+- **`willReturnCallback(callable $cb)`** — Delegates to callback
+- **`willReturnMap(array $map)`** — Maps `[arg1, arg2, ..., returnValue]` arrays
+- **`willThrowException(Throwable $e)`** — Throws exception
 
 ### Consecutive returns
 
@@ -79,14 +77,12 @@ $stub->method('fetch')->willReturn('first', 'second', 'third');
 
 Use with `$mock->expects($matcher)`:
 
-| Matcher                  | Matches when       |
-| ------------------------ | ------------------ |
-| `$this->any()`           | Zero or more calls |
-| `$this->never()`         | Never called       |
-| `$this->once()`          | Exactly one call   |
-| `$this->atLeastOnce()`   | One or more calls  |
-| `$this->exactly(int $n)` | Exactly n calls    |
-| `$this->atMost(int $n)`  | At most n calls    |
+- **`$this->any()`** — Zero or more calls
+- **`$this->never()`** — Never called
+- **`$this->once()`** — Exactly one call
+- **`$this->atLeastOnce()`** — One or more calls
+- **`$this->exactly(int $n)`** — Exactly n calls
+- **`$this->atMost(int $n)`** — At most n calls
 
 ## Argument Constraints
 

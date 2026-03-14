@@ -7,37 +7,31 @@ significant overhead. Shell builtins execute in-process and are both faster and 
 
 ### String Operations
 
-| Operation              | Syntax                 | Example                              |
-| ---------------------- | ---------------------- | ------------------------------------ |
-| Length                 | `${#var}`              | `name="hello"; echo ${#name}` -> `5` |
-| Substring              | `${var:offset:length}` | `${name:1:3}` -> `ell`               |
-| Remove shortest prefix | `${var#pattern}`       | `${path#*/}` -> `b/c.txt`            |
-| Remove longest prefix  | `${var##pattern}`      | `${path##*/}` -> `c.txt`             |
-| Remove shortest suffix | `${var%pattern}`       | `${path%/*}` -> `a/b`                |
-| Remove longest suffix  | `${var%%pattern}`      | `${path%%/*}` -> `a`                 |
-| First substitution     | `${var/pat/rep}`       | `${name/l/L}` -> `heLlo`             |
-| All substitutions      | `${var//pat/rep}`      | `${name//l/L}` -> `heLLo`            |
-| Prefix substitution    | `${var/#pat/rep}`      | `${name/#he/HE}` -> `HEllo`          |
-| Suffix substitution    | `${var/%lo/LO}`        | `${name/%lo/LO}` -> `helLO`          |
+- **Length** — `${#var}`: `name="hello"; echo ${#name}` -> `5`
+- **Substring** — `${var:offset:length}`: `${name:1:3}` -> `ell`
+- **Remove shortest prefix** — `${var#pattern}`: `${path#*/}` -> `b/c.txt`
+- **Remove longest prefix** — `${var##pattern}`: `${path##*/}` -> `c.txt`
+- **Remove shortest suffix** — `${var%pattern}`: `${path%/*}` -> `a/b`
+- **Remove longest suffix** — `${var%%pattern}`: `${path%%/*}` -> `a`
+- **First substitution** — `${var/pat/rep}`: `${name/l/L}` -> `heLlo`
+- **All substitutions** — `${var//pat/rep}`: `${name//l/L}` -> `heLLo`
+- **Prefix substitution** — `${var/#pat/rep}`: `${name/#he/HE}` -> `HEllo`
+- **Suffix substitution** — `${var/%lo/LO}`: `${name/%lo/LO}` -> `helLO`
 
 ### Case Modification (bash 4+)
 
-| Operation            | Syntax     | Example                |
-| -------------------- | ---------- | ---------------------- |
-| First char uppercase | `${var^}`  | `${name^}` -> `Hello`  |
-| All uppercase        | `${var^^}` | `${name^^}` -> `HELLO` |
-| First char lowercase | `${var,}`  | `${VAR,}` -> `hELLO`   |
-| All lowercase        | `${var,,}` | `${VAR,,}` -> `hello`  |
+- **First char uppercase** — `${var^}`: `${name^}` -> `Hello`
+- **All uppercase** — `${var^^}`: `${name^^}` -> `HELLO`
+- **First char lowercase** — `${var,}`: `${VAR,}` -> `hELLO`
+- **All lowercase** — `${var,,}`: `${VAR,,}` -> `hello`
 
 ### Default Values
 
-| Syntax         | Meaning                                     |
-| -------------- | ------------------------------------------- |
-| `${var:-word}` | Use `word` if `var` is unset or empty       |
-| `${var-word}`  | Use `word` if `var` is unset                |
-| `${var:=word}` | Assign `word` if `var` is unset or empty    |
-| `${var:+word}` | Use `word` if `var` is set and non-empty    |
-| `${var:?msg}`  | Error with `msg` if `var` is unset or empty |
+- **`${var:-word}`** — Use `word` if `var` is unset or empty
+- **`${var-word}`** — Use `word` if `var` is unset
+- **`${var:=word}`** — Assign `word` if `var` is unset or empty
+- **`${var:+word}`** — Use `word` if `var` is set and non-empty
+- **`${var:?msg}`** — Error with `msg` if `var` is unset or empty
 
 ### Indirection (bash)
 

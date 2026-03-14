@@ -16,25 +16,25 @@ unless the project explicitly requires it.
 
 ## References
 
-| Topic                                                            | Reference                                         | Contents                                                                                        |
-| ---------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Type annotation patterns, generics, overloads, TypeVar, variance | [`${CLAUDE_SKILL_DIR}/references/typing.md`]      | Full annotation examples, generic class patterns, Protocol implementation, TypeVar usage        |
-| Project layout, pyproject.toml, uv, dependency management        | [`${CLAUDE_SKILL_DIR}/references/packaging.md`]   | pyproject.toml templates, uv workflows, src layout, dependency groups, build backends           |
-| Module system, imports, namespace packages, `__init__.py`        | [`${CLAUDE_SKILL_DIR}/references/modules.md`]     | Import resolution order, circular import fixes, lazy imports, namespace packages                |
-| asyncio, TaskGroup, cancellation, timeouts, threading interop    | [`${CLAUDE_SKILL_DIR}/references/concurrency.md`] | TaskGroup error handling, timeout scopes, cancellation semantics, to_thread, eager task factory |
+- **[`${CLAUDE_SKILL_DIR}/references/typing.md`]** — Type annotation patterns, generics, overloads, TypeVar, variance:
+  full annotation examples, generic class patterns, Protocol implementation, TypeVar usage
+- **[`${CLAUDE_SKILL_DIR}/references/packaging.md`]** — Project layout, pyproject.toml, uv, dependency management:
+  pyproject.toml templates, uv workflows, src layout, dependency groups, build backends
+- **[`${CLAUDE_SKILL_DIR}/references/modules.md`]** — Module system, imports, namespace packages, `__init__.py`: import
+  resolution order, circular import fixes, lazy imports, namespace packages
+- **[`${CLAUDE_SKILL_DIR}/references/concurrency.md`]** — asyncio, TaskGroup, cancellation, timeouts, threading interop:
+  TaskGroup error handling, timeout scopes, cancellation semantics, to_thread, eager task factory
 
 ## Naming
 
-| Entity                        | Style                              | Examples                         |
-| ----------------------------- | ---------------------------------- | -------------------------------- |
-| Variables, functions, methods | snake_case                         | `user_name`, `fetch_data`        |
-| Classes, type aliases         | PascalCase                         | `UserService`, `HttpClient`      |
-| Constants                     | UPPER_SNAKE_CASE                   | `MAX_RETRIES`, `API_BASE_URL`    |
-| Modules, packages             | snake_case, short                  | `user_store`, `auth`             |
-| Private attributes/methods    | `_` prefix                         | `_internal_cache`, `_validate()` |
-| Name-mangled attributes       | `__` prefix                        | `__secret` (rarely needed)       |
-| Type variables                | PascalCase, short                  | `T`, `KT`, `VT`, `ResponseT`     |
-| Protocols                     | PascalCase, `-able`/`-ible` suffix | `Renderable`, `Serializable`     |
+- **Variables, functions, methods** — snake_case: `user_name`, `fetch_data`
+- **Classes, type aliases** — PascalCase: `UserService`, `HttpClient`
+- **Constants** — UPPER_SNAKE_CASE: `MAX_RETRIES`, `API_BASE_URL`
+- **Modules, packages** — snake_case, short: `user_store`, `auth`
+- **Private attributes/methods** — `_` prefix: `_internal_cache`, `_validate()`
+- **Name-mangled attributes** — `__` prefix: `__secret` (rarely needed)
+- **Type variables** — PascalCase, short: `T`, `KT`, `VT`, `ResponseT`
+- **Protocols** — PascalCase, `-able`/`-ible` suffix: `Renderable`, `Serializable`
 
 - **Descriptive names.** `user_count` not `n`. Short names (`i`, `x`) only in tiny scopes (comprehensions, simple
   lambdas).
@@ -439,16 +439,14 @@ text search does not.
 
 ### Tool Routing
 
-| Task                                            | LSP Operation        | Why LSP over text search                            |
-| ----------------------------------------------- | -------------------- | --------------------------------------------------- |
-| Find where a function/class/variable is defined | `goToDefinition`     | Resolves imports, re-exports, aliases               |
-| Find all usages of a symbol                     | `findReferences`     | Scope-aware, no false positives from string matches |
-| Get type signature, docs, or return types       | `hover`              | Instant type info without reading source files      |
-| List all symbols in a file                      | `documentSymbol`     | Structured output vs grepping for `def`/`class`     |
-| Find a symbol by name across the project        | `workspaceSymbol`    | Searches all packages, respects `__all__`           |
-| Find implementations of a Protocol or ABC       | `goToImplementation` | Knows the type system and structural subtyping      |
-| Find what calls a function                      | `incomingCalls`      | Precise call graph across module boundaries         |
-| Find what a function calls                      | `outgoingCalls`      | Structured dependency map                           |
+- **`goToDefinition`** — find where a function/class/variable is defined: resolves imports, re-exports, aliases
+- **`findReferences`** — find all usages of a symbol: scope-aware, no false positives from string matches
+- **`hover`** — get type signature, docs, or return types: instant type info without reading source files
+- **`documentSymbol`** — list all symbols in a file: structured output vs grepping for `def`/`class`
+- **`workspaceSymbol`** — find a symbol by name across the project: searches all packages, respects `__all__`
+- **`goToImplementation`** — find implementations of a Protocol or ABC: knows the type system and structural subtyping
+- **`incomingCalls`** — find what calls a function: precise call graph across module boundaries
+- **`outgoingCalls`** — find what a function calls: structured dependency map
 
 **Grep/Glob remain appropriate for:** text in comments, string literals, log messages, TODO markers, config values, env
 vars, file name patterns, URLs, error message text — anything that isn't a Python identifier.

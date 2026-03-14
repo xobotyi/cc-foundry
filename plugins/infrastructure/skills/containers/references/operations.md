@@ -9,13 +9,11 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8080/healthz || exit 1
 ```
 
-| Parameter          | Default | Purpose                                         |
-| ------------------ | ------- | ----------------------------------------------- |
-| `--interval`       | 30s     | Time between checks                             |
-| `--timeout`        | 30s     | Max time for a single check                     |
-| `--start-period`   | 0s      | Grace period for startup (failures don't count) |
-| `--retries`        | 3       | Consecutive failures before `unhealthy`         |
-| `--start-interval` | 5s      | Interval during start period (Docker 25+)       |
+- **`--interval`** (default: 30s) — Time between checks
+- **`--timeout`** (default: 30s) — Max time for a single check
+- **`--start-period`** (default: 0s) — Grace period for startup (failures don't count)
+- **`--retries`** (default: 3) — Consecutive failures before `unhealthy`
+- **`--start-interval`** (default: 5s) — Interval during start period (Docker 25+)
 
 ### Health check patterns by service type
 
@@ -101,14 +99,12 @@ containers.
 
 ### Driver selection
 
-| Driver      | Rotation     | `docker logs` | Use Case                     |
-| ----------- | ------------ | ------------- | ---------------------------- |
-| `json-file` | Manual       | Yes           | Default — configure rotation |
-| `local`     | Built-in     | Yes           | Recommended for production   |
-| `journald`  | Via journald | Yes           | Systemd integration          |
-| `syslog`    | Via syslog   | No            | Central syslog server        |
-| `fluentd`   | Via fluentd  | No            | Log aggregation pipeline     |
-| `none`      | N/A          | No            | Disable logging entirely     |
+- **`json-file`** — Manual rotation, supports `docker logs`: Default — configure rotation
+- **`local`** — Built-in rotation, supports `docker logs`: Recommended for production
+- **`journald`** — Via journald, supports `docker logs`: Systemd integration
+- **`syslog`** — Via syslog, no `docker logs`: Central syslog server
+- **`fluentd`** — Via fluentd, no `docker logs`: Log aggregation pipeline
+- **`none`** — No rotation, no `docker logs`: Disable logging entirely
 
 ### Configure log rotation (critical for production)
 
@@ -209,11 +205,9 @@ For production monitoring:
 
 Implement multiple health endpoints for fine-grained monitoring:
 
-| Endpoint   | Purpose                        | Check                         |
-| ---------- | ------------------------------ | ----------------------------- |
-| `/livez`   | Liveness — process is alive    | Always 200 if event loop runs |
-| `/readyz`  | Readiness — can handle traffic | DB + cache connectivity       |
-| `/healthz` | Combined (simple apps)         | Basic connectivity check      |
+- **`/livez`** — Liveness (process is alive): Always 200 if event loop runs
+- **`/readyz`** — Readiness (can handle traffic): DB + cache connectivity
+- **`/healthz`** — Combined (simple apps): Basic connectivity check
 
 Configure Compose health checks against the readiness endpoint:
 
@@ -350,13 +344,11 @@ Most Docker CLI commands work identically with Podman:
 alias docker=podman  # Common alias for Podman users
 ```
 
-| Docker           | Podman           | Notes                           |
-| ---------------- | ---------------- | ------------------------------- |
-| `docker compose` | `podman compose` | Podman compose is a wrapper     |
-| `docker build`   | `podman build`   | Uses Buildah under the hood     |
-| `docker run`     | `podman run`     | Rootless by default in Podman   |
-| `docker volume`  | `podman volume`  | Same interface                  |
-| `docker network` | `podman network` | Rootless uses pasta/slirp4netns |
+- **`docker compose`** → `podman compose`: Podman compose is a wrapper
+- **`docker build`** → `podman build`: Uses Buildah under the hood
+- **`docker run`** → `podman run`: Rootless by default in Podman
+- **`docker volume`** → `podman volume`: Same interface
+- **`docker network`** → `podman network`: Rootless uses pasta/slirp4netns
 
 ### Key Podman differences
 

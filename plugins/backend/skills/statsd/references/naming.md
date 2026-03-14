@@ -60,13 +60,11 @@ paths.
 
 StatsD automatically namespaces metrics under `stats.<type>`:
 
-| Metric Type   | Graphite Path (legacy)    | Graphite Path (modern)        |
-| ------------- | ------------------------- | ----------------------------- |
-| Counter rate  | `stats.<name>`            | `stats.counters.<name>.rate`  |
-| Counter count | `stats_counts.<name>`     | `stats.counters.<name>.count` |
-| Timer         | `stats.timers.<name>.*`   | `stats.timers.<name>.*`       |
-| Gauge         | `stats.gauges.<name>`     | `stats.gauges.<name>`         |
-| Set           | `stats.sets.<name>.count` | `stats.sets.<name>.count`     |
+- **Counter rate** — legacy: `stats.<name>` / modern: `stats.counters.<name>.rate`
+- **Counter count** — legacy: `stats_counts.<name>` / modern: `stats.counters.<name>.count`
+- **Timer** — legacy: `stats.timers.<name>.*` / modern: `stats.timers.<name>.*`
+- **Gauge** — legacy: `stats.gauges.<name>` / modern: `stats.gauges.<name>`
+- **Set** — legacy: `stats.sets.<name>.count` / modern: `stats.sets.<name>.count`
 
 The modern namespace (enabled with `legacyNamespace: false`) is cleaner and groups counters under `stats.counters.*`
 instead of splitting them.
@@ -103,15 +101,13 @@ for plain StatsD + Graphite setups.
 Tags with unbounded values create unbounded metric series, which consumes backend resources (disk, memory, query time,
 billing).
 
-| Tag                    | Cardinality | Acceptable? |
-| ---------------------- | ----------- | ----------- |
-| `env:production`       | ~3-5        | Yes         |
-| `method:GET`           | ~7          | Yes         |
-| `status_code:200`      | ~20-50      | Yes         |
-| `endpoint:/api/users`  | ~50-200     | Caution     |
-| `user_id:12345`        | Unbounded   | No          |
-| `request_id:abc-123`   | Unbounded   | No          |
-| `timestamp:1234567890` | Unbounded   | No          |
+- **`env:production`** — ~3-5 values: Yes
+- **`method:GET`** — ~7 values: Yes
+- **`status_code:200`** — ~20-50 values: Yes
+- **`endpoint:/api/users`** — ~50-200 values: Caution
+- **`user_id:12345`** — Unbounded: No
+- **`request_id:abc-123`** — Unbounded: No
+- **`timestamp:1234567890`** — Unbounded: No
 
 **Rule of thumb:** If a tag can have more than ~1000 distinct values, do not use it. Use logs or traces for
 high-cardinality data.

@@ -14,14 +14,18 @@ signals carry intent. Get the boundaries right and everything else follows.
 
 ## References
 
-| Topic         | Reference                                           | Contents                                                                               |
-| ------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Arguments     | [`${CLAUDE_SKILL_DIR}/references/arguments.md`]     | Full POSIX guidelines, GNU long option table, subcommand patterns, flag design         |
-| Output        | [`${CLAUDE_SKILL_DIR}/references/output.md`]        | Stream separation details, color codes, ANSI escapes, NO_COLOR spec, pager setup       |
-| Exit codes    | [`${CLAUDE_SKILL_DIR}/references/exit-codes.md`]    | Standard/extended code tables, signal exit codes, partial success patterns             |
-| Interaction   | [`${CLAUDE_SKILL_DIR}/references/interaction.md`]   | TTY detection, prompting patterns, confirmation levels, progress display, error format |
-| Configuration | [`${CLAUDE_SKILL_DIR}/references/configuration.md`] | Full hierarchy, XDG spec, env var catalog, config file formats, secret handling        |
-| Signals       | [`${CLAUDE_SKILL_DIR}/references/signals.md`]       | Full signal table, SIGPIPE handling, crash-only design, child process signals          |
+- **Arguments** [`${CLAUDE_SKILL_DIR}/references/arguments.md`] — Full POSIX guidelines, GNU long option table,
+  subcommand patterns, flag design
+- **Output** [`${CLAUDE_SKILL_DIR}/references/output.md`] — Stream separation details, color codes, ANSI escapes,
+  NO_COLOR spec, pager setup
+- **Exit codes** [`${CLAUDE_SKILL_DIR}/references/exit-codes.md`] — Standard/extended code tables, signal exit codes,
+  partial success patterns
+- **Interaction** [`${CLAUDE_SKILL_DIR}/references/interaction.md`] — TTY detection, prompting patterns, confirmation
+  levels, progress display, error format
+- **Configuration** [`${CLAUDE_SKILL_DIR}/references/configuration.md`] — Full hierarchy, XDG spec, env var catalog,
+  config file formats, secret handling
+- **Signals** [`${CLAUDE_SKILL_DIR}/references/signals.md`] — Full signal table, SIGPIPE handling, crash-only design,
+  child process signals
 
 ## Output Streams
 

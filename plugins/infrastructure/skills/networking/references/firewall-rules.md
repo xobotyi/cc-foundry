@@ -18,11 +18,9 @@ protocol-specific (e.g., ICMPv6 neighbor discovery).
 
 ### Chain Types and Hooks
 
-| Type     | Purpose                       | Supported Hooks                                 |
-| -------- | ----------------------------- | ----------------------------------------------- |
-| `filter` | Packet filtering              | prerouting, input, forward, output, postrouting |
-| `nat`    | Address translation           | prerouting, input, output, postrouting          |
-| `route`  | Rerouting (mangle equivalent) | output only                                     |
+- `filter` — Packet filtering: prerouting, input, forward, output, postrouting
+- `nat` — Address translation: prerouting, input, output, postrouting
+- `route` — Rerouting (mangle equivalent): output only
 
 Hooks determine where in the packet path the chain fires:
 
@@ -35,14 +33,12 @@ Hooks determine where in the packet path the chain fires:
 
 Chain priority determines evaluation order. Lower numbers run first.
 
-| Priority | Constant         | Use                     |
-| -------- | ---------------- | ----------------------- |
-| -400     | conntrack defrag | Defragmentation         |
-| -300     | raw              | Pre-conntrack filtering |
-| -200     | conntrack        | Connection tracking     |
-| -100     | dstnat           | DNAT (port forwarding)  |
-| 0        | filter           | Standard filtering      |
-| 100      | srcnat           | SNAT/masquerade         |
+- `-400` (`conntrack defrag`) — Defragmentation
+- `-300` (`raw`) — Pre-conntrack filtering
+- `-200` (`conntrack`) — Connection tracking
+- `-100` (`dstnat`) — DNAT (port forwarding)
+- `0` (`filter`) — Standard filtering
+- `100` (`srcnat`) — SNAT/masquerade
 
 ### Verdict Statements
 
@@ -173,16 +169,14 @@ table inet filter {
 
 ICMPv6 is not optional -- blocking it breaks IPv6 networking entirely.
 
-| ICMPv6 Type                  | Action          | Reason                                          |
-| ---------------------------- | --------------- | ----------------------------------------------- |
-| Destination Unreachable (1)  | Allow transit   | Communication maintenance                       |
-| Packet Too Big (2)           | Allow transit   | PMTU discovery -- blocking breaks large packets |
-| Time Exceeded (3)            | Allow transit   | Traceroute, path diagnostics                    |
-| Echo Request/Reply (128/129) | Allow (policy)  | Connectivity testing                            |
-| Router Solicitation (133)    | Link-local only | Router discovery -- never route                 |
-| Router Advertisement (134)   | Link-local only | Prefix advertisement -- never route             |
-| Neighbor Solicitation (135)  | Link-local only | ARP equivalent for IPv6                         |
-| Neighbor Advertisement (136) | Link-local only | ARP reply equivalent                            |
+- Destination Unreachable (1) — Allow transit: communication maintenance
+- Packet Too Big (2) — Allow transit: PMTU discovery, blocking breaks large packets
+- Time Exceeded (3) — Allow transit: traceroute, path diagnostics
+- Echo Request/Reply (128/129) — Allow (policy): connectivity testing
+- Router Solicitation (133) — Link-local only: router discovery, never route
+- Router Advertisement (134) — Link-local only: prefix advertisement, never route
+- Neighbor Solicitation (135) — Link-local only: ARP equivalent for IPv6
+- Neighbor Advertisement (136) — Link-local only: ARP reply equivalent
 
 Use port-based ACLs to prevent Router Advertisement messages from entering the network from end-user ports (RA Guard).
 

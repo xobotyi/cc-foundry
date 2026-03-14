@@ -137,13 +137,11 @@ Use `disallowedTools` when you want most tools but need to exclude a few.
 
 Which Claude model the subagent uses.
 
-| Value     | Behavior                            |
-| --------- | ----------------------------------- |
-| `sonnet`  | Use Claude Sonnet                   |
-| `opus`    | Use Claude Opus                     |
-| `haiku`   | Use Claude Haiku (fast, cheap)      |
-| `inherit` | Use same model as main conversation |
-| (omitted) | Defaults to `inherit`               |
+- `sonnet`: Use Claude Sonnet
+- `opus`: Use Claude Opus
+- `haiku`: Use Claude Haiku (fast, cheap)
+- `inherit`: Use same model as main conversation
+- (omitted): Defaults to `inherit`
 
 ```yaml
 # Fast exploration
@@ -166,13 +164,11 @@ model: inherit
 
 How the subagent handles permission prompts.
 
-| Mode                | Behavior                                     |
-| ------------------- | -------------------------------------------- |
-| `default`           | Standard permission checking                 |
-| `acceptEdits`       | Auto-accept file edits                       |
-| `dontAsk`           | Auto-deny prompts (allowed tools still work) |
-| `bypassPermissions` | Skip all permission checks                   |
-| `plan`              | Plan mode (read-only exploration)            |
+- `default`: Standard permission checking
+- `acceptEdits`: Auto-accept file edits
+- `dontAsk`: Auto-deny prompts (allowed tools still work)
+- `bypassPermissions`: Skip all permission checks
+- `plan`: Plan mode (read-only exploration)
 
 ```yaml
 # Read-only exploration
@@ -272,12 +268,10 @@ Include specific examples of how to fix issues.
 
 ## Storage Locations
 
-| Location            | Scope                | Priority    |
-| ------------------- | -------------------- | ----------- |
-| `--agents` CLI flag | Session only         | 1 (highest) |
-| `.claude/agents/`   | Current project      | 2           |
-| `~/.claude/agents/` | All projects         | 3           |
-| Plugin `agents/`    | Where plugin enabled | 4 (lowest)  |
+- `--agents` CLI flag — Session only (priority 1, highest)
+- `.claude/agents/` — Current project (priority 2)
+- `~/.claude/agents/` — All projects (priority 3)
+- Plugin `agents/` — Where plugin enabled (priority 4, lowest)
 
 When multiple agents share the same name, higher priority wins.
 

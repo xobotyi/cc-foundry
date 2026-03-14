@@ -15,14 +15,18 @@ via `templ generate`. Outside `templ` blocks = ordinary Go. Inside = templ synta
 
 Extended examples and detailed patterns for the rules below:
 
-| Topic                                                     | Reference                                      | Contents                                                                                    |
-| --------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Template syntax, expressions, control flow, raw Go blocks | `${CLAUDE_SKILL_DIR}/references/syntax.md`     | File structure, expression types, error propagation, auto-escaping, control flow examples   |
-| Component definition, composition, children, fragments    | `${CLAUDE_SKILL_DIR}/references/components.md` | Component interface, `@` composition, children context API, render-once, fragment rendering |
-| Boolean, conditional, spread attributes, key expressions  | `${CLAUDE_SKILL_DIR}/references/attributes.md` | Attribute types with code examples, spread value table, URL/JS/JSON attribute patterns      |
-| View models, layouts, context, html/template interop      | `${CLAUDE_SKILL_DIR}/references/patterns.md`   | Props struct pattern, nested layouts, context helpers with middleware, Go template interop  |
-| Script/style tags, inline events, data passing to JS      | `${CLAUDE_SKILL_DIR}/references/javascript.md` | JSFuncCall/JSExpression/JSONString/JSONScript API, IIFE pattern, method summary table       |
-| Class patterns, CSS components, style attributes          | `${CLAUDE_SKILL_DIR}/references/styling.md`    | Class toggling approaches (KV, maps, raw Go), CSS component scoping, style sanitization     |
+- `${CLAUDE_SKILL_DIR}/references/syntax.md` — Template syntax, expressions, control flow, raw Go blocks: file
+  structure, expression types, error propagation, auto-escaping, control flow examples
+- `${CLAUDE_SKILL_DIR}/references/components.md` — Component definition, composition, children, fragments: component
+  interface, `@` composition, children context API, render-once, fragment rendering
+- `${CLAUDE_SKILL_DIR}/references/attributes.md` — Boolean, conditional, spread attributes, key expressions: attribute
+  types with code examples, spread value behavior, URL/JS/JSON attribute patterns
+- `${CLAUDE_SKILL_DIR}/references/patterns.md` — View models, layouts, context, html/template interop: props struct
+  pattern, nested layouts, context helpers with middleware, Go template interop
+- `${CLAUDE_SKILL_DIR}/references/javascript.md` — Script/style tags, inline events, data passing to JS:
+  JSFuncCall/JSExpression/JSONString/JSONScript API, IIFE pattern, method summary
+- `${CLAUDE_SKILL_DIR}/references/styling.md` — Class patterns, CSS components, style attributes: class toggling
+  approaches (KV, maps, raw Go), CSS component scoping, style sanitization
 
 ## Syntax
 
@@ -188,12 +192,12 @@ defined via key expressions are treated as plain strings without special sanitiz
 
 Append a dynamic map with `{ attrs... }` where `attrs` is `templ.Attributes` (`map[string]any`).
 
-| Value Type                     | Rendering                              |
-| ------------------------------ | -------------------------------------- |
-| `string`                       | `name="value"`                         |
-| `bool`                         | `name` (if true) or omitted (if false) |
-| `templ.KeyValue[string, bool]` | `name="value"` if bool is true         |
-| `templ.KeyValue[bool, bool]`   | `name` if both bools are true          |
+Value rendering by type:
+
+- `string` → `name="value"`
+- `bool` → `name` (if true) or omitted (if false)
+- `templ.KeyValue[string, bool]` → `name="value"` if bool is true
+- `templ.KeyValue[bool, bool]` → `name` if both bools are true
 
 Spread attributes can be conditional using `if` inside element open tags.
 
@@ -233,15 +237,13 @@ Function names in `templ.JSFuncCall` are sanitized — invalid names become `__t
 
 Multiple approaches for conditional classes, ordered by simplicity:
 
-| Pattern               | Syntax                                                       | Best For                   |
-| --------------------- | ------------------------------------------------------------ | -------------------------- |
-| Static string         | `class="button primary"`                                     | Unchanging classes         |
-| Dynamic expression    | `class={ className }`                                        | Single dynamic class       |
-| Multiple values       | `class={ "button", className }`                              | Combining static + dynamic |
-| `templ.KV`            | `class={ "btn", templ.KV("active", isActive) }`              | Conditional single class   |
-| `map[string]bool`     | `class={ map[string]bool{"tab": true, "active": isActive} }` | Multiple conditional       |
-| Raw Go `{{ }}`        | Compute class string in `{{ }}`, use in `class={ computed }` | Complex logic              |
-| Conditional attribute | `if cond { class="full-set" }` in open tag                   | Replacing full value       |
+- Static string — `class="button primary"`: unchanging classes
+- Dynamic expression — `class={ className }`: single dynamic class
+- Multiple values — `class={ "button", className }`: combining static + dynamic
+- `templ.KV` — `class={ "btn", templ.KV("active", isActive) }`: conditional single class
+- `map[string]bool` — `class={ map[string]bool{"tab": true, "active": isActive} }`: multiple conditional
+- Raw Go `{{ }}` — compute class string in `{{ }}`, use in `class={ computed }`: complex logic
+- Conditional attribute — `if cond { class="full-set" }` in open tag: replacing full value
 
 CSS component functions (from `css` blocks) can be used in class expressions:
 `class={ "button", templ.KV(primaryButton(), isPrimary) }`.
@@ -250,15 +252,15 @@ CSS component functions (from `css` blocks) can be used in class expressions:
 
 Dynamic styles accept multiple values combined in output: `style={ style1, style2 }`.
 
-| Type                                  | Example                                 |
-| ------------------------------------- | --------------------------------------- |
-| `string`                              | `"background-color: red"`               |
-| `templ.SafeCSS`                       | Bypasses sanitization                   |
-| `map[string]string`                   | `map[string]string{"color": "red"}`     |
-| `map[string]templ.SafeCSSProperty`    | Map with unsanitized values             |
-| `templ.KeyValue[string, bool]`        | Conditional: include CSS string if true |
-| `templ.KeyValue[templ.SafeCSS, bool]` | Conditional unsanitized CSS             |
-| Functions returning any above         | Single function may return `(T, error)` |
+Supported value types:
+
+- `string` — e.g. `"background-color: red"`
+- `templ.SafeCSS` — bypasses sanitization
+- `map[string]string` — e.g. `map[string]string{"color": "red"}`
+- `map[string]templ.SafeCSSProperty` — map with unsanitized values
+- `templ.KeyValue[string, bool]` — conditional: include CSS string if true
+- `templ.KeyValue[templ.SafeCSS, bool]` — conditional unsanitized CSS
+- Functions returning any above — single function may return `(T, error)`
 
 Use `templ.KV("border-color: red", hasError)` for conditional style toggling.
 
@@ -302,11 +304,9 @@ Standard `<script>` tags for client-side JavaScript. Use `templ.OnceHandle` to r
 
 Three approaches, ordered by preference:
 
-| Approach             | API                                      | Best For                           |
-| -------------------- | ---------------------------------------- | ---------------------------------- |
-| Data attributes      | `data-config={ templ.JSONString(data) }` | Component-scoped data              |
-| Script elements      | `@templ.JSONScript("id", data)`          | Page-level configuration           |
-| Inline interpolation | `{{ value }}` in `<script>`              | Least preferred — mixing data/code |
+1. Data attributes — `data-config={ templ.JSONString(data) }`: component-scoped data
+2. Script elements — `@templ.JSONScript("id", data)`: page-level configuration
+3. Inline interpolation — `{{ value }}` in `<script>`: least preferred — mixing data/code
 
 ### `templ.JSFuncCall`
 
