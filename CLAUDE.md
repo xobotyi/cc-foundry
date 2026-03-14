@@ -33,16 +33,45 @@ Each plugin has its own `CLAUDE.md` with plugin-specific context.
 ## Creating a New Skill
 
 <workflow>
-Follow this procedure to add a skill to an existing plugin. Do not explore or research
-the repo structure — this procedure contains everything needed.
 
-1.  **Read the target plugin's CLAUDE.md** — understand existing skills, scope boundaries, and conventions. Read one
-    existing SKILL.md in the same plugin to match the tone and structure.
+### Phase 1: Research
 
-2.  **Invoke `skill-engineering`** — load the skill before writing anything. It contains the description formula,
-    content architecture rules, and archetype templates.
+Discovery must precede all structural decisions — including which plugin the skill belongs to.
 
-3.  **Scaffold the directory:**
+1.  **Find or create a NotebookLM notebook.**
+    - Search existing notebooks by description — if one directly matches the domain and purpose, reuse it.
+    - If a partially relevant notebook exists but is 60%+ full, query it for domain knowledge but create a new notebook
+      for this skill's research. The iterative research loop requires source headroom — if you can't add ~50 sources,
+      create a new one.
+    - Default: create a new notebook. Name and describe it so future agents can find it by description.
+
+2.  **Deep research #1 — the subject domain.** Research the subject itself: official documentation, specifications,
+    capabilities, APIs, and how it works. This is a documentation-driven pass.
+
+3.  **Deep research #2 — agentic application.** Research how people use the subject with autonomous agents: existing
+    skills, blog posts, agentic workflows, and integration patterns. Prioritize quality sources — original findings,
+    undocumented behavior, novel techniques. Skip tutorials that repackage official docs.
+
+4.  **Assess source quality.** After each research pass, review source summaries and remove low-quality entries.
+    NotebookLM sometimes pulls in low-signal sources during deep research.
+
+5.  **Query and refine.** Query the notebook to build understanding of the domain. This reveals gaps and generates
+    better questions. Run a refined research pass to fill those gaps.
+
+6.  **Target: ~50 quality sources** in the notebook (half the 100-source limit), leaving room for future research if
+    needed.
+
+### Phase 2: Scaffold
+
+7.  **Decide plugin placement** — informed by Phase 1 research, determine which plugin the skill belongs to (existing or
+    new).
+
+8.  **Read the target plugin's CLAUDE.md** — understand scope boundaries and conventions. If the plugin has existing
+    skills that relate to the new skill's domain, read their SKILL.md files to understand inter-skill relationships and
+    alignment (e.g., how typescript references javascript). This is for positioning the skill in the existing
+    infrastructure, not for matching tone.
+
+9.  **Scaffold the directory:**
 
     ```
     plugins/<plugin>/skills/<skill-name>/
@@ -52,7 +81,9 @@ the repo structure — this procedure contains everything needed.
         └── reference-inventory.json  # Optional: external doc sources
     ```
 
-4.  **Populate references** (if the skill needs external documentation): a. Create `.dev/reference-inventory.json`:
+10. **Build the reference inventory** — select only the highest-value fetchable sources from the research notebook. The
+    inventory must contain sources that can be pulled into an agent's context via the CLI toolchain. Not all research
+    sources become inventory entries — only those with direct value for skill authoring.
 
     ```json
     {
@@ -62,18 +93,7 @@ the repo structure — this procedure contains everything needed.
     }
     ```
 
-    b. Fetch docs from repo root:
-
-    ```bash
-    cd .dev && yarn cli docs-fetch <path-to-inventory.json>
-    ```
-
-    URLs ending in `.md`/`.mdx` fetch as raw markdown. Others convert from HTML. c. Distill fetched content into
-    `references/*.md` files.
-
-    Full CLI docs: [.dev/CLAUDE.md](.dev/CLAUDE.md)
-
-          <reference-inventory-guidance>
+    <reference-inventory-guidance>
 
     **Building a quality inventory:**
 
@@ -91,7 +111,7 @@ the repo structure — this procedure contains everything needed.
       field lists.
     - **Skip tutorials** — they paraphrase official docs, go stale, and add noise. Official docs and canonical style
       guides are sufficient.
-    - **Include blog posts only when they contain original findings** — reverse- engineered internals, undocumented
+    - **Include blog posts only when they contain original findings** — reverse-engineered internals, undocumented
       behavior, activation patterns, or novel techniques not covered by official docs. Posts that merely repackage
       official documentation as a walkthrough are tutorials in disguise — skip them.
     - **Use Perplexity or web search** to discover sources you might not know about, but be selective — most results for
@@ -100,16 +120,37 @@ the repo structure — this procedure contains everything needed.
     - **10–15 sources per skill is typical.** More is fine if each source covers a distinct topic. Fewer is fine for
       narrow skills. </reference-inventory-guidance>
 
-5.  **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content. SKILL.md must be behaviorally
-    self-sufficient. References provide depth, not breadth. Writing the skill last ensures it's informed by the
-    distilled reference material.
+11. **Fetch and distill** — fetch docs, then distill into `references/*.md` files:
 
-6.  **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable), plugin README.md (skill
+    ```bash
+    cd .dev && yarn cli docs-fetch <path-to-inventory.json>
+    ```
+
+    URLs ending in `.md`/`.mdx` fetch as raw markdown. Others convert from HTML. Full CLI docs:
+    [.dev/CLAUDE.md](.dev/CLAUDE.md)
+
+### Phase 3: Write
+
+12. **Query NotebookLM** — ask skill-creation-relevant questions to enrich context beyond what the fetched references
+    provide. The notebook serves as a live knowledge base during writing.
+
+13. **Invoke `skill-engineering` and `prompt-engineering`** — load both skills before writing. skill-engineering
+    provides the description formula, content architecture rules, and archetype templates. prompt-engineering provides
+    instruction design techniques.
+
+14. **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content. SKILL.md must be behaviorally
+    self-sufficient. References provide depth, not breadth. Writing the skill last ensures it's informed by the research
+    and distilled reference material.
+
+### Phase 4: Ship
+
+15. **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable), plugin README.md (skill
     listing), root CLAUDE.md structure diagram (only if new plugin).
 
-7.  **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and root
+16. **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and root
     `.claude-plugin/marketplace.json`.
-    </workflow>
+
+</workflow>
 
 ## Conventions
 
