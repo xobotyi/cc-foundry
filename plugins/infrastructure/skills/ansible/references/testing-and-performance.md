@@ -19,7 +19,17 @@ Key rules it enforces:
 - Proper YAML formatting
 - No `command`/`shell` when a module exists
 
-Integrate into CI/CD pipelines and pre-commit hooks.
+Integrate into CI/CD pipelines and pre-commit hooks. With accelerating ansible-core release cycles (2.17, 2.18+),
+automated linting is essential to catch deprecated modules and behavioral changes before they break production.
+
+For enterprise environments, supplement ansible-lint with policy-as-code tools:
+
+- **Steampunk Spotter** -- enterprise policy enforcement with custom rule authoring and remediation guidance
+- **Checkov** -- security and compliance scanning for IaC including Ansible playbooks
+
+The industry trend is shifting from "linting to find issues" to "policy gates that prevent risky automation from
+reaching production." AI-generated Ansible content especially requires automated validation gates due to its
+non-deterministic nature.
 
 ### ansible-lint Profiles
 

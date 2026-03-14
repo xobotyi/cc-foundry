@@ -143,8 +143,22 @@ ha-manager add vm:100 -group mygroup -state started -max_restart 3 -max_relocate
 - Requires shared storage or replicated local storage
 - RAM contents transferred over the network while VM continues running
 - Brief pause at cutover (typically milliseconds to seconds)
-- Not possible with PCIe passthrough devices
+- **Full PCIe passthrough:** not possible — use cluster-wide resource mappings (`/cluster/mapping/pci`) for HA with
+  passthrough devices
+- **vGPU (mediated devices) live migration (PVE 8.4+):** VMs using NVIDIA vGPU can now be live-migrated between nodes
+  with compatible GPU hardware and drivers. Previously required shutdown. Use `pve-nvidia-vgpu-helper` to simplify
+  driver setup
 - Use dedicated migration network for large-memory VMs
+
+### Virtiofs Directory Passthrough (PVE 8.4+)
+
+PVE 8.4 introduces **virtiofs** for efficient host-to-guest file sharing:
+
+- Bypasses network filesystems (NFS/SMB) — VM accesses host directories directly with minimal overhead
+- Linux guests support virtiofs natively; Windows guests require a VirtIO guest driver
+- Configured via VM hardware settings — add a virtiofs mount point referencing a host directory
+- Use for development workflows, build artifacts, shared configuration, or any scenario with frequent host-guest file
+  exchange
 
 ### Offline Migration
 

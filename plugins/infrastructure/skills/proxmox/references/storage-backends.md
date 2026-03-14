@@ -139,7 +139,8 @@ LVM for VM/container storage.
 ## Ceph (RBD and CephFS)
 
 Ceph provides distributed, self-healing storage with no single point of failure. Proxmox VE integrates Ceph natively —
-it can manage the full Ceph lifecycle. PVE 9.0 defaults to Ceph Squid (v19.2).
+it can manage the full Ceph lifecycle. Ceph Squid 19.2.1 is fully supported and stable since PVE 8.4 (was tech preview
+in 8.3). PVE 9.0+ defaults to Ceph Squid.
 
 ### Strengths
 

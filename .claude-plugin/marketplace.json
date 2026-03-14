@@ -236,7 +236,7 @@
     {
       "name": "infrastructure",
       "description": "Infrastructure management discipline: Ansible automation, container orchestration, Proxmox virtualization, Unraid NAS, and network architecture",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"

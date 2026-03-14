@@ -81,6 +81,8 @@ Use "Yes (Hidden)" for shares that authorized users need but should not be disco
 - Configure per-share in Shares tab > share settings > NFS section
 - Export settings: Yes, Yes (Hidden), or No
 - Used primarily by Linux clients and some media devices
+- **Exclusive NFS shares** (7.2+): shares that exist only on a single pool (bypassing the SHFS fuse layer) can now be
+  exported via NFS for improved performance
 
 ## User Access Control
 

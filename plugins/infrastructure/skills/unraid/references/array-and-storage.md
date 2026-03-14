@@ -94,13 +94,13 @@ A single high-endurance enterprise NVMe (e.g., Intel P4510) consolidates multipl
 
 ### Cache Pool Performance Comparison
 
-| Feature         | Cache Pool (BTRFS)                     | Cache Pool (ZFS)                       | Main Array                   |
-| --------------- | -------------------------------------- | -------------------------------------- | ---------------------------- |
-| Read speed      | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | HDD: 70-250 MB/s (per disk)  |
-| Write speed     | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | 20-120 MB/s (mode-dependent) |
-| Data protection | RAID 1                                 | RAID 1                                 | Parity-based                 |
-| Expansion       | Mix drive sizes, dynamic add/remove    | Limited (cannot remove from RAIDZ)     | Add drives freely            |
-| Best for        | Apps, VMs, frequent writes             | Apps, VMs, enterprise workloads        | Bulk storage, media          |
+| Feature         | Cache Pool (BTRFS)                     | Cache Pool (ZFS)                                    | Main Array                   |
+| --------------- | -------------------------------------- | --------------------------------------------------- | ---------------------------- |
+| Read speed      | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s              | HDD: 70-250 MB/s (per disk)  |
+| Write speed     | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s | SSD: 400-550 MB/s, NVMe: 250-7000 MB/s              | 20-120 MB/s (mode-dependent) |
+| Data protection | RAID 1                                 | RAID 1                                              | Parity-based                 |
+| Expansion       | Mix drive sizes, dynamic add/remove    | RAIDZ: one drive at a time (7.2+), no drive removal | Add drives freely            |
+| Best for        | Apps, VMs, frequent writes             | Apps, VMs, enterprise workloads                     | Bulk storage, media          |
 
 ### Mover Configuration
 
@@ -170,6 +170,58 @@ Controls how directory trees span multiple disks:
 - **RAIDZ1** — 1 disk/vdev redundancy, fast sequential, high space efficiency. 3-6 drives (max 8)
 - **RAIDZ2** — 2 disks/vdev redundancy, slightly slower writes, moderate space efficiency. 6-12 drives (max 14)
 - **RAIDZ3** — 3 disks/vdev redundancy, most write overhead, lower space efficiency. 10-16 drives (max 20)
+
+### RAIDZ Expansion (Unraid 7.2+)
+
+Expand single-vdev RAIDZ1/2/3 pools by adding one drive at a time -- no need to create new vdevs or rebuild.
+
+**Process:**
+
+1. Stop the array
+2. On Main > Pool Devices, check if "Upgrade Pool" button exists -- click it if so (one-way, prevents mounting on
+   pre-7.1 Unraid)
+3. Add a slot to the pool
+4. Assign the new drive (must be >= smallest drive in the pool)
+5. Start the array -- expansion begins automatically
+
+**Constraints:**
+
+- Expansion is slow: adding a 14TB drive to a pool with 8TB of data takes 26-36 hours
+- The array remains fully usable during expansion -- do not stop the array mid-expansion
+- **Existing data is not restriped** across the new drive. Old files remain on their original disks until rewritten. New
+  data stripes across all drives. To restripe existing data: rewrite files (copy/paste or convert directories to ZFS
+  datasets)
+- New capacity does not appear until expansion completes -- check progress via Pool Status on the first drive in the
+  pool
+
+### Foreign ZFS Pool Import (Unraid 7.1+)
+
+Import ZFS pools created on TrueNAS, Proxmox, QNAP, or Ubuntu:
+
+1. Stop the array
+2. Click Add Pool, choose a name
+3. Set Number of Data Slots to total drives in the original pool (including support vdevs: log, cache, special, dedup)
+4. Assign every physical drive to the correct slots -- Unraid auto-detects each drive's role on start
+5. Set File System to **Auto**
+6. Start the array. Run a **scrub** after import to verify data integrity
+
+**Limitations:**
+
+- Missing special or dedup vdevs: pool will not import or will be unusable
+- Missing log (SLOG) vdev: pool imports but sync write performance drops
+- Missing cache (L2ARC) vdev: pool imports, read cache lost, no data loss
+- Spare vdevs: not supported (as of 7.1.2)
+- Upgrading an imported pool to newer ZFS features prevents mounting on earlier Unraid versions
+
+### External Filesystem Support (Unraid 7.2+)
+
+Unraid 7.2 natively supports **Ext2/3/4, NTFS, and exFAT** alongside XFS, BTRFS, and ZFS:
+
+- Add filled data drives in these formats to the array or single-device pools -- data is retained
+- Filled drives can only be added **before** starting the array with a parity drive. Once parity exists, new drives are
+  zeroed
+- Drives can be formatted directly into Ext4 or NTFS from the WebGUI
+- Use case: importing legacy drives (content creator archives, drives from other NAS platforms)
 
 ### ZFS Integration Patterns
 

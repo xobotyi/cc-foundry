@@ -6,7 +6,9 @@
 - Default location: `system` share on cache pool for performance
 - Container configurations saved as XML templates on the flash drive at `/boot/config/plugins/dockerMan/templates-user/`
 - Application data stored in `appdata` share, one subfolder per container
-- Unraid does not natively support Docker Compose
+- **Docker on ZFS volumes**: use overlay2 storage driver (Settings > Docker). The legacy native driver causes stability
+  issues. Switching requires deleting Docker directory contents for re-download. Alternative: use Docker data-root=xfs
+  vDisk if downgrade compatibility is needed
 
 ## Network Modes
 
@@ -79,16 +81,32 @@ Route container traffic through a dedicated VPN container (e.g., Gluetun):
 
 ## Docker Compose on Unraid
 
-Unraid's native Docker management uses XML templates, not Compose. Docker Compose is an advanced, community-supported
-workflow.
+Unraid's native Docker management uses XML templates, not Compose. Docker Compose is community-supported via the
+**Docker Compose Manager plugin**. Native Compose support is a planned feature (TBD timeline) -- top user-requested
+feature in the 2026 Unraid Customer Survey.
 
-### Options for Running Compose
+### Docker Compose Manager Plugin
 
-- **Docker-Compose Manager plugin**: install from Community Applications. Provides WebGUI interface for managing Compose
-  stacks and editing YAML files
-- **CLI**: run standard `docker-compose` commands via Unraid terminal or SSH
-- **unDOCK-compose**: tool to convert existing Unraid Docker XML templates into Docker Compose YAML files. Useful for
-  migration
+Install from Community Applications. Provides a WebGUI for managing Compose stacks.
+
+**Setup:**
+
+1. Install from Apps tab
+2. Enable "Show Compose in Header Menu" in Settings > Compose for easy access
+3. Click "Add New Stack", provide a label
+4. In Advanced settings, set the stack directory to your `appdata` share (ensures configs persist outside the plugin's
+   temp files)
+
+**Workflow:**
+
+1. Select the stack's cogwheel > "Edit Stack"
+2. Click "Compose File" and paste `docker-compose.yml` content
+3. Click "Env File" to add environment variables
+4. Set custom icons (via URL, e.g., selfh.st/icons .webp URLs) and WebUI links
+5. Click "Compose Up" to pull images and start containers
+
+**Updating:** Use the "Update Stack" button on the Docker tab. Do not select "Compose Down" first -- it is unnecessary.
+The native "update ready" label is always shown for Compose containers -- ignore it and update via Compose Manager.
 
 ### What Compose Enables
 
@@ -105,6 +123,8 @@ workflow.
   Applications
 - Unraid's user-friendly template system is designed to avoid CLI complexity -- Compose is explicitly outside standard
   Unraid documentation and support
+- **CLI alternative**: run standard `docker compose` commands via Unraid terminal or SSH
+- **Migration**: unDOCK-compose converts existing Unraid Docker XML templates into Docker Compose YAML files
 
 ## Reverse Proxy Integration
 

@@ -187,3 +187,86 @@ When migrating roles into collections:
 - Dependencies must reference other certified collections
 - At least one standard tag in `galaxy.yml`
 - External Python deps listed in `requirements.txt` with open ranges (`>=`)
+
+## Automation Mesh
+
+Automation mesh is an overlay network that distributes automation workloads across execution nodes using peer-to-peer
+connections via Receptor. It replaces the older isolated nodes model from Ansible Tower with a more flexible, resilient
+architecture.
+
+### Architecture
+
+- **Control nodes** -- run the automation controller, manage job scheduling and RBAC
+- **Execution nodes** -- where ansible-playbook actually runs inside execution environments
+- **Hop nodes** -- relay traffic between control and execution nodes across network boundaries
+
+Mesh creates peer-to-peer connections using existing network connectivity, increasing resilience against latency and
+disruptions. Execution capacity scales independently from the control plane.
+
+### Scaling Execution Capacity
+
+Add standalone execution nodes to the mesh without re-running the main installation:
+
+1. Download the mesh configuration bundle from the automation controller
+2. Install `ansible-core` on the new execution node
+3. Run the bundle playbook to register the node with the mesh
+
+On OpenShift, add/remove nodes dynamically through the UI's Instances resource without running the installer.
+
+### Node Types and Capacity
+
+- More CPU cores and RAM per node = more concurrent jobs
+- Container groups bypass the normal capacity algorithm -- set forks at the job template level
+- Use `--limit` and instance groups to control which nodes handle which workloads
+
+## AAP Platform Architecture (2.5/2.6)
+
+### Components
+
+- **Platform Gateway** -- single entry point for authentication, authorization, and the unified UI. Replaces separate
+  logins for controller, hub, and EDA.
+- **Automation Controller** (formerly Ansible Tower) -- job scheduling, execution history, RBAC, inventory/credential
+  management
+- **Event-Driven Ansible Controller** -- real-time event processing and rulebook-based automation decisions
+- **Automation Hub** -- certified and supported Ansible Content Collections from Red Hat and partners
+- **Private Automation Hub** -- internal collection repository for air-gapped or restricted environments
+- **Automation Mesh** -- networking layer connecting controllers, gateways, and execution nodes
+- **PostgreSQL** -- persistent storage for all platform data
+
+### Deployment Models (AAP 2.5+)
+
+Three supported deployment models:
+
+- **RPM** (deprecated) -- traditional packages on RHEL. Will be removed in a future release.
+- **Containerized** (GA in 2.5) -- components run in Podman containers on RHEL. Growth topology (single VM,
+  non-production) or Enterprise topology (multi-VM, redundant).
+- **Operator** -- Kubernetes-native on OpenShift. Growth (Single Node OpenShift) or Enterprise (multi-node cluster).
+
+### Enterprise Topology
+
+For high availability, the enterprise topology provides:
+
+- 2x Platform Gateways behind a load balancer
+- 2x Automation Controllers
+- 2x Automation Hubs (HA Hub)
+- 2x EDA Controllers (API + worker node separation)
+- External PostgreSQL database
+- HAProxy or equivalent load balancer
+
+### Horizontal Scaling
+
+**EDA scaling** (AAP 2.5+): Multi-node EDA with separate API nodes (user requests) and worker nodes (rulebook
+activations). Scale each independently.
+
+**Mesh scaling**: Add execution nodes to increase job capacity. On OpenShift, dynamically manage through the Instances
+UI.
+
+**Hub HA**: Multiple hub nodes behind a load balancer for content distribution resilience.
+
+### AAP 2.6 Additions
+
+- **Automation Dashboard** -- on-premise ROI tracking and reporting utility
+- **Ansible Lightspeed Intelligent Assistant** -- AI chat in the platform UI
+- **Self-Service Automation Portal** -- point-and-click interface for non-technical users
+- **Refreshed UI** -- cleaner, more responsive, enhanced accessibility
+- **AI-assisted inventory generation** (developer preview) -- describe topology, get validated inventory
