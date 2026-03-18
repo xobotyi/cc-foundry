@@ -1,32 +1,50 @@
 # the-workflow
 
-Workflow mechanics: crossing context boundaries without losing critical state.
+Agentic workflow mechanics: the foundational skills that make working with Claude Code effective across sessions,
+projects, and teams.
 
 ## The Problem
 
-When work must cross a context boundary — session restart, teammate delegation, or async resumption — the handoff is
-either a wall of text that overloads the receiver, or a paragraph that loses decisions, constraints, and resource
-identifiers. Either way, the receiving agent wastes tokens re-deriving information that was already known.
+Two workflow problems compound across every project that uses agentic coding:
 
-The root cause: no structured mechanism exists to separate state that must survive a boundary crossing (decisions,
-constraints, resource IDs, verification state) from state that should be dropped (intermediate exploration, failed
-paths, raw tool outputs).
+**Persistent context degrades.** CLAUDE.md files grow until Claude ignores half the instructions. Rules get buried in
+noise, drift from reality, or sit at the wrong abstraction level. The file exists, but compliance drops — and nobody
+knows why Claude keeps getting things wrong.
+
+**Context transfer loses state.** When work crosses a context boundary — session restart, teammate delegation, async
+resumption — the handoff is either a wall of text that overloads the receiver, or a paragraph that loses decisions,
+constraints, and resource identifiers. The receiving agent wastes tokens re-deriving information that was already known.
 
 ## The Solution
 
-the-workflow provides structured handoff — a triage-based approach that produces a prompt-quality transfer document. The
-handoff skill guides the agent through categorizing its context into "preserve" (high-value state) and "drop" (noise),
-then generates a structured markdown document targeting 500-2000 tokens.
+the-workflow provides skills for the two sides of agentic workflow quality:
+
+### claude-md
+
+CLAUDE.md instruction quality — writing, diagnosing, and improving project instructions. Applies prompt engineering
+principles to the specific artifact that shapes every Claude Code session.
+
+Covers:
+
+- **What belongs where** — routing content to CLAUDE.md vs skills vs hooks vs settings vs memory
+- **Writing effective instructions** — concrete over abstract, observable over aspirational, brevity = compliance
+- **Multi-layer hierarchy** — global, project, subdirectory; what goes at each level
+- **Diagnosing failures** — why Claude ignores rules (buried, vague, stale, contradictory, wrong artifact)
+- **Systematic improvement** — deletion test, contradiction scan, specificity upgrade, attention restructuring
+
+### handoff
+
+Structured context transfer across session boundaries. Produces a prompt-quality transfer document by triaging the
+agent's conversation context into "preserve" (decisions, constraints, resource IDs, verification state) and "drop"
+(exploration paths, failed approaches, raw tool output).
 
 Two modes handle different receivers:
 
-- **Self-handoff** — for continuing your own work after a session restart. Focuses on task state, decisions, and
-  remaining work.
-- **Teammate handoff** — for delegating to another agent. Adds codebase orientation, skill recommendations, and
-  convention pointers.
+- **Self-handoff** — for session restarts. Focuses on task state and decisions.
+- **Teammate handoff** — for delegation. Adds codebase orientation and skill recommendations.
 
-The skill is designed for late-session use when context is nearly full — it reads only from the conversation window,
-makes no tool calls during triage, and keeps its own footprint minimal.
+Designed for late-session use when context is nearly full — reads only from the conversation window and targets 500-2000
+token output.
 
 ## Installation
 
@@ -34,30 +52,6 @@ makes no tool calls during triage, and keeps its own footprint minimal.
 /plugin marketplace add xobotyi/cc-foundry
 /plugin install the-workflow
 ```
-
-## Skills
-
-### handoff
-
-Produces a structured transfer document by triaging the agent's conversation context. Invoke with `/handoff` or ask the
-agent to prepare a handoff.
-
-**Output includes:**
-
-- Decisions made and their rationale
-- Discovered constraints
-- External resource identifiers (URLs, issue IDs, branch names)
-- Remaining work in priority order
-- Verification state
-- Open questions
-
-**Self-check:** After generating the document, the skill verifies that critical sections (Decisions, Remaining Work) are
-populated and that no raw tool output leaked through.
-
-## Future Direction
-
-the-workflow is scoped broadly to workflow mechanics. Future skills may cover coordination patterns, checkpointing, or
-structured work intake — but only when genuine needs emerge.
 
 ## License
 
