@@ -17,7 +17,7 @@ cc-foundry/
 │   ├── the-crucible/     # Quality validation and multi-agent code review
 │   ├── the-statusline/   # Session metrics status line
 │   ├── infrastructure/   # Infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
-│   ├── the-workflow/     # Workflow mechanics (handoff across context boundaries)
+│   ├── the-workflow/     # Agentic workflow mechanics (CLAUDE.md quality, context handoff)
 │   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
 │   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
 │   ├── cli/              # CLI platform discipline (CLI design, shell scripting)
@@ -36,26 +36,53 @@ Each plugin has its own `CLAUDE.md` with plugin-specific context.
 
 ### Phase 1: Research
 
-Discovery must precede all structural decisions — including which plugin the skill belongs to.
+Discovery must precede all structural decisions — including which plugin the skill belongs to. Two tools serve different
+roles: **Perplexity** discovers and verifies (live web search, fast answers, reasoning); **NotebookLM** synthesizes and
+persists (grounded answers from curated sources, persistent knowledge base). Use both — Perplexity for breadth and
+recency, NotebookLM for depth and grounded synthesis.
 
-1.  **Find or create a NotebookLM notebook.**
+<research-tools>
+
+**Perplexity** — discovery, fact-checking, recency verification. Use `perplexity_search` to find official doc pages,
+changelogs, and source URLs. Use `perplexity_ask` for quick factual answers about current versions, feature status, and
+best practices. Use `perplexity_reason` to evaluate tradeoffs or compare approaches. Use `perplexity_research` for
+comprehensive landscape surveys when the domain is unfamiliar. Always include version numbers and years in queries.
+
+**NotebookLM** — synthesis and persistent knowledge base. Sources added to a notebook become a queryable corpus for
+grounded, citation-backed answers. NotebookLM cannot discover new sources — you bring them from Perplexity, web search,
+or manual curation. Its strength is cross-source synthesis, contradiction detection, and structured summarization over a
+fixed set of documents.
+
+</research-tools>
+
+1.  **Establish the current state with Perplexity.** Before committing to deep research, use Perplexity to answer:
+    - What is the current stable version of the subject technology?
+    - What changed in recent releases? What was deprecated or removed?
+    - What are the primary official documentation sources?
+    - Are there existing Claude Code skills, agentic workflows, or MCP integrations for this subject?
+
+    This grounds the entire research phase in current facts and prevents wasting time on outdated sources.
+
+2.  **Find or create a NotebookLM notebook.**
     - Search existing notebooks by description — if one directly matches the domain and purpose, reuse it.
     - If a partially relevant notebook exists but is 60%+ full, query it for domain knowledge but create a new notebook
       for this skill's research. The iterative research loop requires source headroom — if you can't add ~50 sources,
       create a new one.
-    - Default: create a new notebook. Name and describe it so future agents can find it by description.
+    - Default: create a new notebook. Name with a machine-parseable convention (e.g., `proxmox-ve-9-skill-research`) and
+      describe it so future agents can find it by description search.
 
-2.  **Deep research #1 — the subject domain.** Research the subject itself: official documentation, specifications,
-    capabilities, APIs, and how it works. This is a documentation-driven pass. **Bias toward recency** — include version
-    numbers and year in search queries (e.g., "Proxmox VE 9.1 2025", "Ansible-core 2.18 2026") to surface the latest
-    state of the technology.
+3.  **Deep research #1 — the subject domain.** Research the subject itself: official documentation, specifications,
+    capabilities, APIs, and how it works. This is a documentation-driven pass. Use Perplexity to discover source URLs,
+    then add them to the NotebookLM notebook. **Bias toward recency** — include version numbers and year in queries
+    (e.g., "Proxmox VE 9.1 2025", "Ansible-core 2.18 2026") to surface the latest state of the technology.
 
-3.  **Deep research #2 — agentic application.** Research how people use the subject with autonomous agents: existing
+4.  **Deep research #2 — agentic application.** Research how people use the subject with autonomous agents: existing
     skills, blog posts, agentic workflows, and integration patterns. Prioritize quality sources — original findings,
     undocumented behavior, novel techniques. Skip tutorials that repackage official docs.
 
-4.  **Assess source quality and recency.** After each research pass, review source summaries and remove entries that are
-    low-quality **or outdated**. NotebookLM sometimes pulls in low-signal sources during deep research.
+5.  **Assess source quality and recency.** After each research pass, review source summaries and remove entries that are
+    low-quality **or outdated**. NotebookLM sometimes pulls in low-signal sources during deep research. Use Perplexity
+    to verify claims that seem outdated — `perplexity_ask` with version-specific questions is effective for this.
 
     <recency-rules>
 
@@ -69,29 +96,32 @@ Discovery must precede all structural decisions — including which plugin the s
       old "not supported" statements persist in search results indefinitely.
     - **Prefer changelogs and "What's New" pages** over static documentation for understanding recent changes. These
       pages are authoritative and time-stamped.
-    - **When in doubt, query the notebook** — ask "Is [claim] still accurate as of [current version]?" to
-      cross-reference across sources. If sources contradict each other, the more recent official source wins.
+    - **Cross-reference across tools** — ask NotebookLM "Is [claim] still accurate as of [current version]?" to check
+      against your curated sources. Use Perplexity to verify against the live web. When sources contradict each other,
+      the more recent official source wins.
 
     </recency-rules>
 
-5.  **Query and refine.** Query the notebook to build understanding of the domain. This reveals gaps and generates
-    better questions. Run a refined research pass to fill those gaps. Specifically ask recency-oriented questions: "What
-    changed in the latest version?", "What was deprecated or removed?", "What new capabilities were added?"
+6.  **Query and refine.** Query the NotebookLM notebook to build understanding of the domain. This reveals gaps and
+    generates better questions. Use Perplexity to fill gaps that require live web data (recent releases, community
+    sentiment, emerging patterns), then add high-value discovered sources back to the notebook. Specifically ask
+    recency-oriented questions: "What changed in the latest version?", "What was deprecated or removed?", "What new
+    capabilities were added?"
 
-6.  **Target: ~50 quality sources** in the notebook (half the 100-source limit), leaving room for future research if
+7.  **Target: ~50 quality sources** in the notebook (half the 100-source limit), leaving room for future research if
     needed.
 
 ### Phase 2: Scaffold
 
-7.  **Decide plugin placement** — informed by Phase 1 research, determine which plugin the skill belongs to (existing or
+8.  **Decide plugin placement** — informed by Phase 1 research, determine which plugin the skill belongs to (existing or
     new).
 
-8.  **Read the target plugin's CLAUDE.md** — understand scope boundaries and conventions. If the plugin has existing
+9.  **Read the target plugin's CLAUDE.md** — understand scope boundaries and conventions. If the plugin has existing
     skills that relate to the new skill's domain, read their SKILL.md files to understand inter-skill relationships and
     alignment (e.g., how typescript references javascript). This is for positioning the skill in the existing
     infrastructure, not for matching tone.
 
-9.  **Scaffold the directory:**
+10. **Scaffold the directory:**
 
     ```
     plugins/<plugin>/skills/<skill-name>/
@@ -101,7 +131,7 @@ Discovery must precede all structural decisions — including which plugin the s
         └── reference-inventory.json  # Optional: external doc sources
     ```
 
-10. **Build the reference inventory** — select only the highest-value fetchable sources from the research notebook. The
+11. **Build the reference inventory** — select only the highest-value fetchable sources from the research notebook. The
     inventory must contain sources that can be pulled into an agent's context via the CLI toolchain. Not all research
     sources become inventory entries — only those with direct value for skill authoring.
 
@@ -140,7 +170,7 @@ Discovery must precede all structural decisions — including which plugin the s
     - **10–15 sources per skill is typical.** More is fine if each source covers a distinct topic. Fewer is fine for
       narrow skills. </reference-inventory-guidance>
 
-11. **Fetch and distill** — fetch docs, then distill into `references/*.md` files:
+12. **Fetch and distill** — fetch docs, then distill into `references/*.md` files:
 
     ```bash
     cd .dev && yarn cli docs-fetch <path-to-inventory.json>
@@ -151,23 +181,23 @@ Discovery must precede all structural decisions — including which plugin the s
 
 ### Phase 3: Write
 
-12. **Query NotebookLM** — ask skill-creation-relevant questions to enrich context beyond what the fetched references
+13. **Query NotebookLM** — ask skill-creation-relevant questions to enrich context beyond what the fetched references
     provide. The notebook serves as a live knowledge base during writing.
 
-13. **Invoke `skill-engineering` and `prompt-engineering`** — load both skills before writing. skill-engineering
+14. **Invoke `skill-engineering` and `prompt-engineering`** — load both skills before writing. skill-engineering
     provides the description formula, content architecture rules, and archetype templates. prompt-engineering provides
     instruction design techniques.
 
-14. **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content. SKILL.md must be behaviorally
+15. **Write SKILL.md** — frontmatter (`name`, `description`) + behavioral content. SKILL.md must be behaviorally
     self-sufficient. References provide depth, not breadth. Writing the skill last ensures it's informed by the research
     and distilled reference material.
 
 ### Phase 4: Ship
 
-15. **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable), plugin README.md (skill
+16. **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable), plugin README.md (skill
     listing), root CLAUDE.md structure diagram (only if new plugin).
 
-16. **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and root
+17. **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and root
     `.claude-plugin/marketplace.json`.
 
 </workflow>
