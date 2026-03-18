@@ -51,14 +51,7 @@ It does not cover:
 
 ## Conventions
 
-**Skill structure:** SKILL.md is the complete behavioral specification — an agent reading only SKILL.md must be able to
-do the job correctly. References provide depth (extended examples, catalogs, detailed rubrics), never core behavioral
-rules. Target under 500 lines; behavioral rules count as core and justify exceeding the limit.
-
-**Description formula:** `[What it does] + [When to invoke — broad domain claim with trigger examples]`
-
-**Prerequisite pattern:** Skills reference `prompt-engineering` via `<prerequisite>` blocks because all AI artifacts are
-fundamentally prompts.
-
-**Reference inventory:** Skills with external documentation dependencies maintain `.dev/reference-inventory.json` for
-doc fetching via CLI tools.
+- Skills reference `prompt-engineering` via `<prerequisite>` blocks because all AI artifacts are fundamentally prompts
+- Skills with external documentation dependencies maintain `.dev/reference-inventory.json` for doc fetching via CLI
+  tools
+- For skill structure rules, description formulas, and content architecture — invoke `skill-engineering`

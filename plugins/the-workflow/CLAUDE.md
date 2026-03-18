@@ -25,10 +25,6 @@ prompt-quality document that a receiving agent (or the same agent in a new sessi
 set. Two modes serve different receivers: self-handoff (session restart) and teammate handoff (delegation). Designed for
 low token budgets — reads only from conversation context and targets 500-2000 token output.
 
-## Design Rationale
-
-Design document: `design-docs/01-handoff-skill.md`
-
 ## Conventions
 
 - The handoff skill must remain self-contained: no references, no external dependencies
