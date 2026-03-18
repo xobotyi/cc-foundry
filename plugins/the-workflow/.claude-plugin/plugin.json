@@ -1,7 +1,7 @@
 {
   "name": "the-workflow",
-  "version": "1.0.0",
-  "description": "Workflow mechanics: structured handoff across context boundaries",
+  "version": "1.1.0",
+  "description": "Agentic workflow mechanics: CLAUDE.md instruction quality and structured context handoff",
   "author": {
     "name": "xobotyi",
     "email": "xog3@yandex.ru",

@@ -1,37 +1,36 @@
 # the-workflow Plugin
 
-Workflow mechanics for crossing context boundaries — session restarts, teammate delegation, and async resumption.
+Agentic workflow mechanics — the skills that make working with Claude Code effective across sessions, projects, and
+teams. Covers persistent project context (CLAUDE.md), structured handoff across context boundaries, and workflow
+patterns that apply regardless of what domain you're working in.
 
 ## Skills
 
-| Skill     | Purpose                                                         |
-| --------- | --------------------------------------------------------------- |
-| `handoff` | Triage conversation context into a structured transfer document |
+| Skill       | Purpose                                                            |
+| ----------- | ------------------------------------------------------------------ |
+| `handoff`   | Triage conversation context into a structured transfer document    |
+| `claude-md` | CLAUDE.md instruction quality — writing, diagnosing, and improving |
 
 ## How It Works
 
-The handoff skill guides the agent through a structured triage of its own context, producing a prompt-quality document
-that a receiving agent (or the same agent in a new session) can use as a cold-start instruction set.
+The plugin addresses two sides of agentic workflow quality:
 
-Two modes serve different receivers:
+**Persistent context** — the `claude-md` skill applies prompt engineering principles to CLAUDE.md files. It teaches what
+belongs in CLAUDE.md vs skills/hooks/settings, how to write instructions Claude actually follows, how to diagnose
+instruction failures (buried, vague, stale, contradictory), and a systematic improvement workflow. The goal is not
+completeness — it's compliance.
 
-- **Self-handoff** — for session restarts. Assumes shared project knowledge, focuses on task state and decisions.
-- **Teammate handoff** — for delegation. Adds codebase orientation and skill recommendations for a receiver with less
-  project context.
-
-The skill is designed for low token budgets — it reads only from the conversation context (no file reads, no memory
-queries) and targets 500-2000 token output.
+**Context transfer** — the `handoff` skill guides the agent through a structured triage of its own context, producing a
+prompt-quality document that a receiving agent (or the same agent in a new session) can use as a cold-start instruction
+set. Two modes serve different receivers: self-handoff (session restart) and teammate handoff (delegation). Designed for
+low token budgets — reads only from conversation context and targets 500-2000 token output.
 
 ## Design Rationale
-
-The plugin deliberately launches with a single skill, breaking the 2-3 skill minimum convention. The convention exists
-to prevent plugin fragmentation, but forcing artificial companion skills would dilute quality. Future workflow skills
-(coordination, checkpointing, intake) will join when genuine needs emerge.
 
 Design document: `design-docs/01-handoff-skill.md`
 
 ## Conventions
 
 - The handoff skill must remain self-contained: no references, no external dependencies
-- SKILL.md must stay under 200 lines to minimize token cost when context is nearly full
-- The skill produces a standalone document — it must make sense without access to the originating conversation
+- Handoff SKILL.md must stay under 200 lines to minimize token cost when context is nearly full
+- The handoff skill produces a standalone document — it must make sense without access to the originating conversation
