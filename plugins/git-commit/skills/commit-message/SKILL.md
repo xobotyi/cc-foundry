@@ -4,6 +4,7 @@ description: >-
   Git commit message conventions: structure, formatting, scoping, body content, breaking changes,
   trailers. Invoke whenever task involves any interaction with commit messages — writing,
   reviewing, validating, or understanding message format.
+user-invocable: false
 ---
 
 # Commit Message Format
