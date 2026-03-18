@@ -97,12 +97,12 @@ agent directory changes.
 
 ### the-workflow
 
-Work crossing a context boundary — session restart, teammate delegation, async resumption — loses critical state. The
-handoff is either a wall of text that overloads the receiver, or a paragraph that drops decisions and constraints. The
-`handoff` skill guides the agent through a structured triage of its context, producing a 500-2000 token transfer
-document that preserves decisions, constraints, resource identifiers, and remaining work while dropping intermediate
-exploration and raw tool output. Two modes: self-handoff (session restart) and teammate handoff (delegation with
-codebase orientation).
+Agentic workflow mechanics — the foundational skills that make working with Claude Code effective across sessions and
+teams. The `claude-md` skill applies prompt engineering principles to CLAUDE.md files: what belongs where, writing
+instructions Claude actually follows, diagnosing why rules get ignored (buried, vague, stale, contradictory), and
+systematic improvement. The `handoff` skill produces structured transfer documents when work crosses context boundaries
+— session restarts, teammate delegation, async resumption — preserving decisions, constraints, and remaining work in
+500-2000 tokens while dropping noise.
 
 ```
 /plugin install the-workflow

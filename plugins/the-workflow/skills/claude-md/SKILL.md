@@ -75,13 +75,40 @@ Instructions must describe behaviors Claude can actually perform, not qualities 
 
 ### Brevity = Compliance
 
-Every token in CLAUDE.md competes for attention. Research shows unnecessary requirements reduce task success even when
-the model can follow them. Shorter CLAUDE.md files produce higher instruction adherence.
+Every token in CLAUDE.md competes for attention. The IFScale benchmark (2025) demonstrated a clear negative correlation
+between instruction density and compliance — even frontier models drop to 68% accuracy under high instruction load.
+Shorter CLAUDE.md files produce higher instruction adherence.
 
 - State each rule once, in the section where it's contextually relevant
 - Prefer bullet lists over prose paragraphs — they're faster to scan and harder to miss
 - If a section exceeds 15-20 bullet points, it's likely mixing concerns — split by topic or move depth to a skill
 - Delete rules that pass the deletion test (removing them doesn't change behavior)
+
+### Prose vs Bullet Lists
+
+Explanatory prose and terse directives serve different purposes. Using the wrong style in the wrong place degrades
+compliance.
+
+**Prose (1-3 paragraphs) for project identity only.** A brief "what is this project and why does it exist" section at
+the top orients Claude for edge cases where rules don't cover the situation. This is the one place where explaining
+_why_ earns its tokens — understanding project intent helps the model make correct judgment calls.
+
+**Bullet lists for all operational rules.** Conventions, constraints, commands, verification workflows — everything
+Claude must _do_ goes in bullet lists. Research consistently shows:
+
+- Bullet lists increase signal density — critical rules can't hide inside paragraphs
+- Prose introduces rhetorical padding that competes for attention without changing behavior
+- Adding "because..." rationale to individual rules is actively harmful — it doubles the token cost of each rule while
+  the model rarely needs the justification to follow it
+- When the model encounters conflicting prose-wrapped rules, it produces mediocre compromises instead of following
+  either rule strictly
+
+**The split:** Top 10-15% of the file can be explanatory prose (project context). The remaining 85-90% should be
+structured bullet lists organized by topic.
+
+**Exception:** If a rule is genuinely counterintuitive and Claude would resist following it without understanding why, a
+one-sentence rationale after the rule is acceptable. This is rare — most rules don't need justification, they need
+clarity.
 
 ### Placement Matters
 
