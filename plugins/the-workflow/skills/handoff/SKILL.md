@@ -5,6 +5,7 @@ description: >-
   and remaining work into a prompt-quality transfer document. Invoke whenever task
   involves handing off work — session restart, teammate delegation, async resumption,
   or any context boundary crossing.
+disable-model-invocation: true
 ---
 
 # Handoff
