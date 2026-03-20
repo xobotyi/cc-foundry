@@ -13,6 +13,25 @@ subagent execution, and dynamic context injection.
 > support supporting files and additional features. If a skill and command share the same name, the skill takes
 > precedence.
 
+## Bundled Skills
+
+Bundled skills ship with Claude Code and are available in every session. Unlike built-in commands (which execute fixed
+logic directly), bundled skills are prompt-based: they give Claude a detailed playbook and let it orchestrate the work
+using its tools. This means bundled skills can spawn parallel agents, read files, and adapt to your codebase.
+
+- `/batch <instruction>` — orchestrate large-scale changes across a codebase in parallel. Researches the codebase,
+  decomposes work into 5-30 independent units, presents a plan. Once approved, spawns one background agent per unit in
+  an isolated git worktree. Each agent implements its unit, runs tests, and opens a PR. Requires a git repository.
+- `/claude-api` — load Claude API reference material for your project's language (Python, TypeScript, Java, Go, Ruby,
+  C#, PHP, cURL) and Agent SDK reference for Python and TypeScript. Auto-activates when code imports `anthropic`,
+  `@anthropic-ai/sdk`, or `claude_agent_sdk`.
+- `/debug [description]` — troubleshoot current session by reading the session debug log. Optionally describe the issue
+  to focus analysis.
+- `/loop [interval] <prompt>` — run a prompt repeatedly on an interval while the session stays open. Useful for polling
+  deployments, babysitting PRs, or periodically re-running another skill.
+- `/simplify [focus]` — review recently changed files for code reuse, quality, and efficiency issues. Spawns three
+  review agents in parallel, aggregates findings, and applies fixes. Pass text to focus on specific concerns.
+
 ## Skill Structure
 
 ```
@@ -71,6 +90,7 @@ disable-model-invocation: true
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: claude-opus-4-6
+effort: high
 context: fork
 agent: Explore
 hooks:
@@ -91,6 +111,8 @@ hooks:
 - `user-invocable` — `false` = hide from `/` menu. Claude can still auto-invoke. Default: `true`. Required: No.
 - `allowed-tools` — Tools Claude can use without per-use approval when skill is active. Required: No.
 - `model` — Model to use when skill is active. Required: No.
+- `effort` — Effort level when skill is active. Overrides session effort level. Options: `low`, `medium`, `high`, `max`
+  (Opus 4.6 only). Default: inherits from session. Required: No.
 - `context` — `fork` = run in isolated subagent context. Required: No.
 - `agent` — Subagent type when `context: fork` (`Explore`, `Plan`, `general-purpose`, or custom). Required: No.
 - `hooks` — Hooks scoped to skill lifecycle. Cleaned up when skill finishes. Required: No.
@@ -128,6 +150,9 @@ of 16,000 characters. Run `/context` to check for warnings about excluded skills
 - `$ARGUMENTS[N]` — Specific argument by 0-based index
 - `$N` — Shorthand for `$ARGUMENTS[N]` (e.g., `$0`, `$1`)
 - `${CLAUDE_SESSION_ID}` — Current session ID (useful for logging, session-specific files)
+- `${CLAUDE_SKILL_DIR}` — Directory containing the skill's `SKILL.md` file. For plugin skills, this is the skill's
+  subdirectory within the plugin, not the plugin root. Use in bash injection commands to reference bundled scripts/files
+  regardless of current working directory.
 
 If `$ARGUMENTS` is not present in the skill content, arguments are appended as `ARGUMENTS: <value>` — Claude still sees
 the input.
@@ -236,8 +261,9 @@ Reference from SKILL.md using `${CLAUDE_SKILL_DIR}` so Claude sees absolute path
 - For usage examples, see `${CLAUDE_SKILL_DIR}/examples.md`
 ```
 
-Skills can also bundle and run scripts in any language (Python, Bash, etc.) to generate visual output, run analysis, or
-extend what's possible in a single prompt.
+Skills can also bundle and run scripts in any language (Python, Bash, etc.) to generate visual output (interactive
+HTML), run analysis, or extend what's possible in a single prompt. The bundled script does the heavy lifting while
+Claude handles orchestration.
 
 ## Share Skills
 

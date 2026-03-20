@@ -1,96 +1,133 @@
-# Settings Reference
-
-Configure Claude Code behavior through hierarchical settings files and environment variables.
+# Claude Code Settings
 
 ## Configuration Scopes
 
-- **Managed** — system-level `managed-settings.json`. Affects all users on machine. Shared (deployed by IT).
-- **User** — `~/.claude/settings.json`. Affects you, all projects. Not shared.
-- **Project** — `.claude/settings.json`. Affects all project collaborators. Shared (committed).
-- **Local** — `.claude/settings.local.json`. Affects you, this project only. Not shared (gitignored).
+| Scope       | Location                                                          | Affects              | Shared?              |
+| ----------- | ----------------------------------------------------------------- | -------------------- | -------------------- |
+| **Managed** | Server-managed, plist/registry, or system `managed-settings.json` | All users on machine | Yes (deployed by IT) |
+| **User**    | `~/.claude/` directory                                            | You, all projects    | No                   |
+| **Project** | `.claude/` in repository                                          | All collaborators    | Yes (in git)         |
+| **Local**   | `.claude/settings.local.json`                                     | You, this repo only  | No (gitignored)      |
 
-**Precedence (highest to lowest):**
+### Precedence (highest to lowest)
 
-1. Managed — cannot be overridden
-2. Command line arguments
-3. Local
-4. Project
-5. User
+1. **Managed** -- cannot be overridden
+2. **Command line arguments**
+3. **Local** (`.claude/settings.local.json`)
+4. **Project** (`.claude/settings.json`)
+5. **User** (`~/.claude/settings.json`)
 
-### Managed Settings Locations
+Array settings merge across scopes (concatenated and deduplicated).
 
-- macOS — `/Library/Application Support/ClaudeCode/`
-- Linux/WSL — `/etc/claude-code/`
-- Windows — `C:\Program Files\ClaudeCode\`
+### Feature Locations
 
-### Scope Locations Summary
+| Feature     | User                      | Project                            | Local                          |
+| ----------- | ------------------------- | ---------------------------------- | ------------------------------ |
+| Settings    | `~/.claude/settings.json` | `.claude/settings.json`            | `.claude/settings.local.json`  |
+| Subagents   | `~/.claude/agents/`       | `.claude/agents/`                  | --                             |
+| MCP servers | `~/.claude.json`          | `.mcp.json`                        | `~/.claude.json` (per-project) |
+| Plugins     | `~/.claude/settings.json` | `.claude/settings.json`            | `.claude/settings.local.json`  |
+| CLAUDE.md   | `~/.claude/CLAUDE.md`     | `CLAUDE.md` or `.claude/CLAUDE.md` | --                             |
 
-- **Settings** — User: `~/.claude/settings.json`. Project: `.claude/settings.json`. Local:
-  `.claude/settings.local.json`.
-- **Subagents** — User: `~/.claude/agents/`. Project: `.claude/agents/`. Local: —.
-- **MCP** — User: `~/.claude.json`. Project: `.mcp.json`. Local: `~/.claude.json` (per-project).
-- **Plugins** — User: `~/.claude/settings.json`. Project: `.claude/settings.json`. Local: `.claude/settings.local.json`.
-- **CLAUDE.md** — User: `~/.claude/CLAUDE.md`. Project: `CLAUDE.md` or `.claude/CLAUDE.md`. Local: `CLAUDE.local.md`.
+## Settings Files
 
----
+- **User**: `~/.claude/settings.json`
+- **Project shared**: `.claude/settings.json` (committed to git)
+- **Project local**: `.claude/settings.local.json` (gitignored)
+- **Managed**: multiple delivery mechanisms:
+  - Server-managed (via Claude.ai admin console)
+  - MDM/OS-level: macOS `com.anthropic.claudecode` preferences, Windows `HKLM\SOFTWARE\Policies\ClaudeCode`
+  - File-based: `managed-settings.json` in system directories (macOS: `/Library/Application Support/ClaudeCode/`, Linux:
+    `/etc/claude-code/`, Windows: `C:\Program Files\ClaudeCode\`)
+- **Other config**: `~/.claude.json` (preferences, OAuth, MCP servers, per-project state)
 
-## Settings File Structure
+JSON schema: `https://json.schemastore.org/claude-code-settings.json`
 
-```json
-{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "permissions": {
-    "allow": ["Bash(npm run lint)", "Bash(npm run test *)"],
-    "deny": ["Bash(curl *)", "Read(./.env)", "Read(./secrets/**)"]
-  },
-  "env": {
-    "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
-  },
-  "hooks": { },
-  "model": "claude-sonnet-4-6",
-  "outputStyle": "Explanatory"
-}
-```
+## Available Settings
 
-Add `"$schema": "https://json.schemastore.org/claude-code-settings.json"` for IDE autocomplete and validation.
+| Key                               | Description                                                          | Example                                                          |
+| --------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `apiKeyHelper`                    | Script to generate auth value (sent as X-Api-Key and Bearer headers) | `/bin/generate_temp_api_key.sh`                                  |
+| `autoMemoryDirectory`             | Custom auto memory storage path (not from project settings)          | `"~/my-memory-dir"`                                              |
+| `cleanupPeriodDays`               | Session cleanup period (default: 30). 0 = delete all, no persistence | `20`                                                             |
+| `companyAnnouncements`            | Startup announcements (cycled randomly)                              | `["Welcome to Acme Corp!"]`                                      |
+| `env`                             | Environment variables for every session                              | `{"FOO": "bar"}`                                                 |
+| `attribution`                     | Git commit/PR attribution customization                              | `{"commit": "Generated with AI", "pr": ""}`                      |
+| `includeGitInstructions`          | Include built-in git workflow instructions (default: true)           | `false`                                                          |
+| `permissions`                     | Permission rules (allow/ask/deny)                                    | See permission settings                                          |
+| `hooks`                           | Lifecycle event hooks                                                | See hooks docs                                                   |
+| `disableAllHooks`                 | Disable all hooks and status line                                    | `true`                                                           |
+| `allowManagedHooksOnly`           | (Managed only) Block user/project/plugin hooks                       | `true`                                                           |
+| `allowedHttpHookUrls`             | URL allowlist for HTTP hooks (supports `*` wildcard)                 | `["https://hooks.example.com/*"]`                                |
+| `httpHookAllowedEnvVars`          | Env var allowlist for HTTP hook headers                              | `["MY_TOKEN", "HOOK_SECRET"]`                                    |
+| `allowManagedPermissionRulesOnly` | (Managed only) Only managed permission rules apply                   | `true`                                                           |
+| `allowManagedMcpServersOnly`      | (Managed only) Only managed MCP allowlist applies                    | `true`                                                           |
+| `model`                           | Override default model                                               | `"claude-sonnet-4-6"`                                            |
+| `availableModels`                 | Restrict selectable models                                           | `["sonnet", "haiku"]`                                            |
+| `modelOverrides`                  | Map Anthropic model IDs to provider-specific IDs                     | `{"claude-opus-4-6": "arn:aws:bedrock:..."}`                     |
+| `effortLevel`                     | Persist effort level (`low`, `medium`, `high`)                       | `"medium"`                                                       |
+| `statusLine`                      | Custom status line configuration                                     | `{"type": "command", "command": "~/.claude/statusline.sh"}`      |
+| `fileSuggestion`                  | Custom `@` file autocomplete command                                 | `{"type": "command", "command": "~/.claude/file-suggestion.sh"}` |
+| `respectGitignore`                | `@` picker respects .gitignore (default: true)                       | `false`                                                          |
+| `outputStyle`                     | Output style name                                                    | `"Explanatory"`                                                  |
+| `agent`                           | Run main thread as named subagent                                    | `"code-reviewer"`                                                |
+| `forceLoginMethod`                | Restrict login to `claudeai` or `console`                            | `"claudeai"`                                                     |
+| `forceLoginOrgUUID`               | Auto-select org during login                                         | `"xxxxxxxx-xxxx-..."`                                            |
+| `enableAllProjectMcpServers`      | Auto-approve all project `.mcp.json` servers                         | `true`                                                           |
+| `enabledMcpjsonServers`           | Specific `.mcp.json` servers to approve                              | `["memory", "github"]`                                           |
+| `disabledMcpjsonServers`          | Specific `.mcp.json` servers to reject                               | `["filesystem"]`                                                 |
+| `channelsEnabled`                 | (Managed only) Allow channels                                        | `true`                                                           |
+| `allowedMcpServers`               | MCP server allowlist (managed settings)                              | `[{ "serverName": "github" }]`                                   |
+| `deniedMcpServers`                | MCP server denylist (managed settings)                               | `[{ "serverName": "filesystem" }]`                               |
+| `strictKnownMarketplaces`         | Marketplace allowlist (managed settings)                             | `[{ "source": "github", "repo": "acme/plugins" }]`               |
+| `blockedMarketplaces`             | Marketplace blocklist (managed settings)                             | `[{ "source": "github", "repo": "untrusted/plugins" }]`          |
+| `pluginTrustMessage`              | (Managed only) Custom plugin trust warning message                   | `"Approved by IT"`                                               |
+| `awsAuthRefresh`                  | AWS credential refresh script                                        | `aws sso login --profile myprofile`                              |
+| `awsCredentialExport`             | AWS credential export script                                         | `/bin/generate_aws_grant.sh`                                     |
+| `alwaysThinkingEnabled`           | Enable extended thinking by default                                  | `true`                                                           |
+| `plansDirectory`                  | Plan file storage path (default: `~/.claude/plans`)                  | `"./plans"`                                                      |
+| `spinnerVerbs`                    | Custom spinner action verbs                                          | `{"mode": "append", "verbs": ["Pondering"]}`                     |
+| `language`                        | Preferred response language                                          | `"japanese"`                                                     |
+| `voiceEnabled`                    | Enable push-to-talk voice dictation                                  | `true`                                                           |
+| `autoUpdatesChannel`              | Release channel: `"stable"` or `"latest"` (default)                  | `"stable"`                                                       |
+| `spinnerTipsEnabled`              | Show spinner tips (default: true)                                    | `false`                                                          |
+| `prefersReducedMotion`            | Reduce UI animations for accessibility                               | `true`                                                           |
+| `fastModePerSessionOptIn`         | Require per-session fast mode opt-in                                 | `true`                                                           |
+| `teammateMode`                    | Agent team display: `auto`, `in-process`, `tmux`                     | `"in-process"`                                                   |
+| `feedbackSurveyRate`              | Survey probability 0-1 (0 = suppress)                                | `0.05`                                                           |
+| `otelHeadersHelper`               | Script for dynamic OpenTelemetry headers                             | `/bin/generate_otel_headers.sh`                                  |
 
----
+### Global Config (in `~/.claude.json`, not `settings.json`)
+
+- `showTurnDuration` -- show turn duration messages (default: true)
+- `terminalProgressBarEnabled` -- terminal progress bar (default: true)
+
+### Worktree Settings
+
+- `worktree.symlinkDirectories` -- directories to symlink into worktrees (e.g., `["node_modules", ".cache"]`)
+- `worktree.sparsePaths` -- directories to sparse-checkout (e.g., `["packages/my-app", "shared/utils"]`)
 
 ## Permission Settings
 
-- `allow` — array of permission rules to allow
-- `ask` — array of permission rules to confirm
-- `deny` — array of permission rules to block
-- `additionalDirectories` — extra working directories Claude can access
-- `defaultMode` — default permission mode (`acceptEdits`, etc.)
-- `disableBypassPermissionsMode` — `"disable"` to block `--dangerously-skip-permissions`
+| Key                            | Description                               |
+| ------------------------------ | ----------------------------------------- |
+| `allow`                        | Rules to allow tool use                   |
+| `ask`                          | Rules to ask for confirmation             |
+| `deny`                         | Rules to deny tool use                    |
+| `additionalDirectories`        | Extra working directories                 |
+| `defaultMode`                  | Default permission mode                   |
+| `disableBypassPermissionsMode` | Set to `"disable"` to prevent bypass mode |
 
 ### Permission Rule Syntax
 
-**Evaluation order:** deny → ask → allow (first match wins)
+Format: `Tool` or `Tool(specifier)`. Evaluated: deny first, then ask, then allow.
 
-**Match all uses:**
-
-```
-Bash        # All bash commands
-WebFetch    # All web requests
-Read        # All file reads
-```
-
-**Match specific uses:**
-
-```
-Bash(npm run build)           # Exact command
-Bash(npm run *)               # Wildcard prefix
-Bash(* --version)             # Wildcard anywhere
-Read(./.env)                  # Specific file
-Read(./secrets/**)            # Directory pattern
-WebFetch(domain:example.com)  # Domain filter
-```
-
-**Space before `*` matters:** `Bash(ls *)` matches `ls -la` but not `lsof`.
-
----
+| Rule                           | Effect                                   |
+| ------------------------------ | ---------------------------------------- |
+| `Bash`                         | Matches all Bash commands                |
+| `Bash(npm run *)`              | Matches commands starting with `npm run` |
+| `Read(./.env)`                 | Matches reading .env file                |
+| `WebFetch(domain:example.com)` | Matches fetch to example.com             |
 
 ## Sandbox Settings
 
@@ -99,7 +136,13 @@ WebFetch(domain:example.com)  # Domain filter
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
-    "excludedCommands": ["git", "docker"],
+    "excludedCommands": ["docker"],
+    "filesystem": {
+      "allowWrite": ["/tmp/build", "~/.kube"],
+      "denyWrite": ["/etc"],
+      "denyRead": ["~/.aws/credentials"],
+      "allowRead": ["."]
+    },
     "network": {
       "allowedDomains": ["github.com", "*.npmjs.org"],
       "allowUnixSockets": ["/var/run/docker.sock"],
@@ -109,56 +152,12 @@ WebFetch(domain:example.com)  # Domain filter
 }
 ```
 
-- `enabled` — enable bash sandboxing (default: false)
-- `autoAllowBashIfSandboxed` — auto-approve bash when sandboxed (default: true)
-- `excludedCommands` — commands that bypass sandbox
-- `allowUnsandboxedCommands` — allow `dangerouslyDisableSandbox` param (default: true)
-- `network.allowedDomains` — domains for outbound traffic (wildcards OK)
-- `network.allowUnixSockets` — Unix socket paths accessible in sandbox
-- `network.allowAllUnixSockets` — allow all Unix socket connections (default: false)
-- `network.allowLocalBinding` — allow binding to localhost (macOS only)
-- `network.httpProxyPort` — custom HTTP proxy port (bring your own proxy)
-- `network.socksProxyPort` — custom SOCKS5 proxy port
-- `enableWeakerNestedSandbox` — weaker sandbox for Docker (Linux/WSL2, reduces security)
+Path prefixes: `/` = absolute, `~/` = home, `./` = project root (in project settings) or `~/.claude` (in user settings).
 
-Use `Read`/`Edit`/`WebFetch` deny rules for filesystem and network restrictions — not sandbox settings.
+Key settings: `allowUnsandboxedCommands` (default: true), `allowManagedReadPathsOnly` (managed only),
+`enableWeakerNestedSandbox` (Linux/WSL2), `enableWeakerNetworkIsolation` (macOS).
 
----
-
-## Common Settings
-
-- `model` — override default model
-- `availableModels` — restrict selectable models (managed only)
-- `outputStyle` — output style name
-- `hooks` — hook configuration (see hooks reference)
-- `disableAllHooks` — disable all hooks and status line
-- `allowManagedHooksOnly` — only allow managed/SDK hooks (managed only)
-- `allowManagedPermissionRulesOnly` — only managed permission rules apply (managed only)
-- `statusLine` — custom status line command `{"type": "command", "command": "..."}`
-- `env` — environment variables for all sessions
-- `cleanupPeriodDays` — delete sessions older than N days (default: 30)
-- `language` — Claude's response language
-- `plansDirectory` — where plan files are stored (default: `~/.claude/plans`)
-- `showTurnDuration` — show turn duration messages
-- `spinnerVerbs` — customize spinner verbs (`mode`, `verbs`)
-- `spinnerTipsEnabled` — show tips in spinner (default: true)
-- `spinnerTipsOverride` — custom spinner tips (`tips` array, `excludeDefault` flag)
-- `respectGitignore` — file picker respects `.gitignore` (default: true)
-- `autoUpdatesChannel` — `"stable"` or `"latest"` (default)
-- `apiKeyHelper` — script to generate auth value for API requests
-- `companyAnnouncements` — startup announcements array (random rotation)
-- `forceLoginMethod` — `"claudeai"` or `"console"` to restrict login method
-- `forceLoginOrgUUID` — auto-select org during login (requires `forceLoginMethod`)
-- `alwaysThinkingEnabled` — enable extended thinking by default
-- `terminalProgressBarEnabled` — terminal progress bar (default: true)
-- `prefersReducedMotion` — reduce UI animations for accessibility
-- `teammateMode` — agent team display: `auto`, `in-process`, `tmux`
-- `otelHeadersHelper` — script for dynamic OpenTelemetry headers
-- `awsAuthRefresh` — script that modifies `.aws` directory for credential refresh
-- `awsCredentialExport` — script that outputs JSON with AWS credentials
-- `fileSuggestion` — custom `@` autocomplete command (see below)
-
-### Attribution Settings
+## Attribution Settings
 
 ```json
 {
@@ -169,250 +168,64 @@ Use `Read`/`Edit`/`WebFetch` deny rules for filesystem and network restrictions 
 }
 ```
 
-Empty string hides attribution. `attribution` takes precedence over deprecated `includeCoAuthoredBy`.
+Empty string hides attribution. Takes precedence over deprecated `includeCoAuthoredBy`.
 
----
+## File Suggestion Settings
+
+Custom `@` autocomplete command. Receives JSON with `query` field on stdin, outputs newline-separated file paths (max
+15):
+
+```json
+{ "fileSuggestion": { "type": "command", "command": "~/.claude/file-suggestion.sh" } }
+```
 
 ## Plugin Settings
 
+### `enabledPlugins`
+
+Format: `"plugin-name@marketplace-name": true/false`
+
+### `extraKnownMarketplaces`
+
+Pre-register marketplaces for team members:
+
 ```json
 {
-  "enabledPlugins": {
-    "formatter@acme-tools": true,
-    "analyzer@security-plugins": false
-  },
   "extraKnownMarketplaces": {
     "acme-tools": {
-      "source": {
-        "source": "github",
-        "repo": "acme-corp/claude-plugins"
-      }
+      "source": { "source": "github", "repo": "acme-corp/claude-plugins" }
     }
   }
 }
 ```
 
-**`enabledPlugins`** — format: `"plugin-name@marketplace-name": true/false`. Applies at user, project, and local scope.
+Marketplace source types: `github`, `git`, `url`, `npm`, `file`, `directory`, `hostPattern`, `settings` (inline
+plugins).
 
-**`extraKnownMarketplaces`** — defines additional marketplaces for the repository. When present in project settings,
-team members are prompted to install the marketplace on folder trust.
+### `strictKnownMarketplaces` (Managed Only)
 
-### Managed Marketplace Restrictions
+Allowlist of permitted marketplace sources. Uses exact matching (except `hostPattern` which uses regex).
 
-In `managed-settings.json` only:
+- `undefined` -- no restrictions
+- `[]` -- complete lockdown
+- List -- only matching sources allowed
 
-```json
-{
-  "strictKnownMarketplaces": [
-    { "source": "github", "repo": "acme-corp/approved-plugins" },
-    { "source": "npm", "package": "@acme/plugins" }
-  ]
-}
-```
+Deployed to managed settings file locations. Cannot be overridden.
 
-- `undefined`: No restrictions
-- `[]`: Block all marketplace additions
-- List: Only allow exact matches (including optional `ref` and `path` fields)
-
-**Source types:** `github`, `git`, `url`, `npm`, `file`, `directory`, `hostPattern`
-
-`hostPattern` uses regex matching against the host; all others use exact matching.
-
-| Aspect                | `strictKnownMarketplaces`        | `extraKnownMarketplaces`           |
-| --------------------- | -------------------------------- | ---------------------------------- |
-| **Purpose**           | Policy enforcement               | Team convenience                   |
-| **Settings file**     | `managed-settings.json` only     | Any settings file                  |
-| **Behavior**          | Blocks non-allowlisted additions | Auto-installs missing marketplaces |
-| **Can be overridden** | No (highest precedence)          | Yes                                |
-
----
-
-## MCP Server Settings
-
-- `enableAllProjectMcpServers` — auto-approve all `.mcp.json` servers
-- `enabledMcpjsonServers` — list of approved servers
-- `disabledMcpjsonServers` — list of rejected servers
-- `allowedMcpServers` — allowlist (managed only)
-- `deniedMcpServers` — denylist (managed only, takes precedence)
-
----
-
-## Environment Variables
-
-### API and Authentication
-
-- `ANTHROPIC_API_KEY` — API key (`X-Api-Key` header)
-- `ANTHROPIC_AUTH_TOKEN` — custom `Authorization: Bearer` value
-- `ANTHROPIC_CUSTOM_HEADERS` — additional request headers (newline-separated)
-- `ANTHROPIC_MODEL` — model setting name
-- `ANTHROPIC_DEFAULT_HAIKU_MODEL` — override default Haiku model ID
-- `ANTHROPIC_DEFAULT_SONNET_MODEL` — override default Sonnet model ID
-- `ANTHROPIC_DEFAULT_OPUS_MODEL` — override default Opus model ID
-- `CLAUDE_CODE_USE_BEDROCK` — use Amazon Bedrock
-- `CLAUDE_CODE_USE_VERTEX` — use Google Vertex AI
-- `CLAUDE_CODE_USE_FOUNDRY` — use Microsoft Foundry
-- `ANTHROPIC_FOUNDRY_API_KEY` — API key for Microsoft Foundry
-- `ANTHROPIC_FOUNDRY_BASE_URL` — full Foundry base URL
-- `ANTHROPIC_FOUNDRY_RESOURCE` — Foundry resource name
-- `AWS_BEARER_TOKEN_BEDROCK` — Bedrock API key
-- `CLAUDE_CODE_SKIP_BEDROCK_AUTH` — skip AWS auth (e.g. when using an LLM gateway)
-- `CLAUDE_CODE_SKIP_VERTEX_AUTH` — skip Google auth
-- `CLAUDE_CODE_SKIP_FOUNDRY_AUTH` — skip Azure auth
-- `CLAUDE_CODE_API_KEY_HELPER_TTL_MS` — credential refresh interval for `apiKeyHelper`
-- `CLAUDE_CODE_CLIENT_CERT` — client certificate path for mTLS
-- `CLAUDE_CODE_CLIENT_KEY` — client private key path for mTLS
-- `CLAUDE_CODE_CLIENT_KEY_PASSPHRASE` — passphrase for encrypted client key
-
-### Behavior Control
-
-- `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` — context % threshold for auto-compaction (1-100)
-- `CLAUDE_CODE_MAX_OUTPUT_TOKENS` — max output tokens (default: 32000, max: 64000)
-- `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS` — token limit for file reads
-- `MAX_THINKING_TOKENS` — extended thinking budget (0 to disable)
-- `CLAUDE_CODE_EFFORT_LEVEL` — effort level: `low`, `medium`, `high` (Opus 4.6+)
-- `BASH_DEFAULT_TIMEOUT_MS` — default bash timeout
-- `BASH_MAX_TIMEOUT_MS` — max bash timeout model can set
-- `BASH_MAX_OUTPUT_LENGTH` — max chars before middle-truncation
-- `CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR` — return to project dir after each Bash command
-- `CLAUDE_CODE_SHELL` — override shell detection
-- `CLAUDE_CODE_SHELL_PREFIX` — prefix to wrap all bash commands (for auditing)
-- `CLAUDE_ENV_FILE` — script sourced before each bash command
-- `MAX_MCP_OUTPUT_TOKENS` — max tokens in MCP tool responses (default: 25000)
-- `MCP_TIMEOUT` — timeout for MCP server startup (ms)
-- `MCP_TOOL_TIMEOUT` — timeout for MCP tool execution (ms)
-
-### Feature Toggles
-
-- `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` — disable background task functionality
-- `CLAUDE_CODE_ENABLE_TASKS` — task tracking (`false` to use TODO list)
-- `CLAUDE_CODE_DISABLE_AUTO_MEMORY` — `1` to disable auto memory
-- `CLAUDE_CODE_SIMPLE` — `1` for minimal system prompt + basic tools only
-- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` — `1` to enable agent teams (experimental)
-- `DISABLE_AUTOUPDATER` — disable auto-updates
-- `FORCE_AUTOUPDATE_PLUGINS` — force plugin updates even if updater is disabled
-- `DISABLE_TELEMETRY` — opt out of Statsig telemetry
-- `DISABLE_ERROR_REPORTING` — opt out of Sentry reporting
-- `DISABLE_PROMPT_CACHING` — disable prompt caching (all models)
-- `DISABLE_PROMPT_CACHING_HAIKU` — disable prompt caching for Haiku only
-- `DISABLE_PROMPT_CACHING_SONNET` — disable prompt caching for Sonnet only
-- `DISABLE_PROMPT_CACHING_OPUS` — disable prompt caching for Opus only
-- `DISABLE_BUG_COMMAND` — disable the `/bug` command
-- `DISABLE_COST_WARNINGS` — disable cost warning messages
-- `DISABLE_NON_ESSENTIAL_MODEL_CALLS` — disable model calls for non-critical paths
-- `ENABLE_TOOL_SEARCH` — MCP tool search: `auto`, `auto:N`, `true`, `false`
-- `CLAUDE_CODE_ENABLE_TELEMETRY` — `1` to enable OpenTelemetry collection
-- `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` — equivalent to disabling autoupdater, bug command, error reporting,
-  telemetry
-- `SLASH_COMMAND_TOOL_CHAR_BUDGET` — character budget for skill metadata in Skill tool
-
-### Paths and Environment
-
-- `CLAUDE_CONFIG_DIR` — custom config directory
-- `CLAUDE_CODE_TMPDIR` — custom temp directory
-- `HTTP_PROXY` — HTTP proxy server
-- `HTTPS_PROXY` — HTTPS proxy server
-- `NO_PROXY` — domains/IPs that bypass proxy
-- `CLAUDE_CODE_PROXY_RESOLVES_HOSTS` — let proxy perform DNS resolution
-- `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD` — `1` to load CLAUDE.md from `--add-dir` directories
-- `CLAUDE_CODE_TASK_LIST_ID` — share task list across sessions (set same ID)
-- `CLAUDE_CODE_TEAM_NAME` — agent team name (set automatically on teammates)
-- `CLAUDE_CODE_EXIT_AFTER_STOP_DELAY` — auto-exit delay after idle (ms, for SDK mode)
-- `CLAUDE_CODE_HIDE_ACCOUNT_INFO` — `1` to hide email/org from UI (streaming/recording)
-- `USE_BUILTIN_RIPGREP` — `0` to use system `rg` instead of bundled one
-
----
-
-## Tools Available to Claude
-
-- `AskUserQuestion` — multiple-choice questions. Permission: no.
-- `Bash` — shell commands. Permission: yes.
-- `TaskOutput` — retrieve output from a background task. Permission: no.
-- `Edit` — targeted file edits. Permission: yes.
-- `ExitPlanMode` — prompt user to exit plan mode and start coding. Permission: yes.
-- `Write` — create/overwrite files. Permission: yes.
-- `Read` — read file contents. Permission: no.
-- `Glob` — find files by pattern. Permission: no.
-- `Grep` — search file contents. Permission: no.
-- `KillShell` — kill a running background bash shell. Permission: no.
-- `MCPSearch` — search/load MCP tools when tool search enabled. Permission: no.
-- `WebFetch` — fetch URL content. Permission: yes.
-- `WebSearch` — web search with domain filtering. Permission: yes.
-- `Task` — run subagent for complex tasks. Permission: no.
-- `TaskCreate` — create a new task in the task list. Permission: no.
-- `TaskGet` — retrieve full details for a specific task. Permission: no.
-- `TaskList` — list all tasks with status. Permission: no.
-- `TaskUpdate` — update task status, dependencies, or details. Permission: no.
-- `Skill` — execute a skill. Permission: yes.
-- `LSP` — code intelligence via language servers. Permission: no.
-- `NotebookEdit` — modify Jupyter cells. Permission: yes.
-
-### Bash Tool Behavior
-
-- **Working directory persists** between commands
-- **Environment variables do NOT persist** — each command runs in fresh shell
-
-**Options to persist environment variables:**
-
-- **Activate before starting Claude Code** — `conda activate myenv && claude`
-- **Set `CLAUDE_ENV_FILE`** — export path to a setup script; Claude sources it before each command
-- **SessionStart hook** — write to `$CLAUDE_ENV_FILE` in hook; ideal for team configs
-
-```json
-{
-  "hooks": {
-    "SessionStart": [{
-      "matcher": "startup",
-      "hooks": [{"type": "command", "command": "echo 'export MY_VAR=value' >> \"$CLAUDE_ENV_FILE\""}]
-    }]
-  }
-}
-```
-
----
-
-## File Suggestion
-
-Custom `@` autocomplete:
-
-```json
-{
-  "fileSuggestion": {
-    "type": "command",
-    "command": "~/.claude/file-suggestion.sh"
-  }
-}
-```
-
-Script receives JSON on stdin (`{"query": "src/comp"}`), outputs newline-separated file paths (max 15).
-
----
-
-## Troubleshooting
-
-### Settings Not Applied
-
-- Check scope precedence (managed overrides all)
-- Restart Claude Code after editing settings files
-- Run `/config` to verify effective settings
-
-### Permissions Not Working
-
-- Deny rules take precedence over allow
-- Check wildcard syntax (`Bash(npm run *)` not `Bash(npm run:*)`)
-- Argument-constraining patterns are fragile — don't rely on for security
-
-### Sensitive Files Still Accessible
-
-Use `permissions.deny`:
+## Excluding Sensitive Files
 
 ```json
 {
   "permissions": {
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./secrets/**)"
-    ]
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"]
   }
 }
 ```
+
+## System Prompt
+
+Not published. Use CLAUDE.md files or `--append-system-prompt` for custom instructions.
+
+## Verify Settings
+
+Run `/status` to see active settings sources and their origins.
