@@ -17,21 +17,25 @@ debugging any Claude Code extension mechanism.
 - **Skills** — [`${CLAUDE_SKILL_DIR}/references/skills.md`] Frontmatter fields, invocation control matrix, string
   substitutions, dynamic context injection, subagent execution, nested discovery, sharing
 - **Subagents** — [`${CLAUDE_SKILL_DIR}/references/subagents.md`] Built-in agents table, frontmatter fields, permission
-  modes, tool control, preloading skills, persistent memory, worktree isolation, CLI-defined agents, teams
-- **Plugins** — [`${CLAUDE_SKILL_DIR}/references/plugins.md`] Plugin manifest schema, component paths, marketplace
-  schema, source types, strict mode, version resolution, LSP server table, caching, validation
-- **Hooks** — [`${CLAUDE_SKILL_DIR}/references/hooks.md`] All 15 event details (input fields, output schemas, exit code
-  behavior), matcher patterns, hook types (command/prompt/agent), async hooks, security
+  modes, tool control, preloading skills, persistent memory, worktree isolation, CLI-defined agents, @-mention
+  invocation, --agent session mode, MCP scoping, effort/background fields, teams
+- **Plugins** — [`${CLAUDE_SKILL_DIR}/references/plugins.md`] Plugin manifest schema, component paths,
+  CLAUDE_PLUGIN_DATA persistent directory, marketplace schema, official marketplace, LSP server configs, caching,
+  validation, CLI commands
+- **Hooks** — [`${CLAUDE_SKILL_DIR}/references/hooks.md`] All 22 event details (input fields, output schemas, exit code
+  behavior), matcher patterns, hook types (command/http/prompt/agent), async hooks, decision control patterns, security
 - **MCP** — [`${CLAUDE_SKILL_DIR}/references/mcp.md`] Server installation (HTTP/SSE/stdio), scopes, OAuth
   authentication, environment variable expansion, managed MCP config, tool search, plugin-provided servers
-- **Memory** — [`${CLAUDE_SKILL_DIR}/references/memory.md`] CLAUDE.md hierarchy and loading, auto memory structure,
-  import syntax, modular rules with path scoping, organization-level management
-- **Model config** — [`${CLAUDE_SKILL_DIR}/references/model-config.md`] Model aliases, setting methods, effort levels,
-  extended context (1M), opusplan mode, third-party provider pinning, prompt caching env vars
+- **Memory** — [`${CLAUDE_SKILL_DIR}/references/memory.md`] CLAUDE.md hierarchy and loading, @import syntax, auto memory
+  (storage, /memory command, settings), path-specific rules with globs, claudeMdExcludes, organization-level management
+- **Model config** — [`${CLAUDE_SKILL_DIR}/references/model-config.md`] Model aliases (including opus[1m]/sonnet[1m]),
+  effort levels (low/medium/high/max), extended context (1M), opusplan mode, availableModels/modelOverrides, custom
+  model option, third-party provider pinning, prompt caching env vars
 - **Output styles** — [`${CLAUDE_SKILL_DIR}/references/output-styles.md`] Built-in styles, frontmatter fields,
   keep-coding-instructions flag, comparison with CLAUDE.md/agents/skills
 - **Settings** — [`${CLAUDE_SKILL_DIR}/references/settings.md`] Scope hierarchy, permission rule syntax, sandbox config,
-  common settings table, environment variables (API, behavior, feature toggles, paths), tools list
+  worktree settings, attribution settings, common settings table (50+ keys), hook configuration controls, file
+  suggestion settings, environment variables
 - **Status line** — [`${CLAUDE_SKILL_DIR}/references/statusline.md`] Configuration, JSON input schema with all fields,
   ANSI colors, clickable links, caching, plugin delivery
 - **Best practices** — [`${CLAUDE_SKILL_DIR}/references/best-practices.md`] Context management, verification patterns,
@@ -43,35 +47,42 @@ provide field-level schemas and implementation details.
 ## Concepts
 
 <concepts>
-**Skill** — Prompt template in `SKILL.md` that extends Claude's capabilities.
-Loaded on-demand when description matches user request. Can include
-`references/` for detailed content. Invoked with `/skill-name` or automatically.
+**Skill** — Prompt template in `SKILL.md` that extends Claude's capabilities. Loaded on-demand when description matches
+user request. Can include `references/` for detailed content. Invoked with `/skill-name` or automatically. Frontmatter
+controls invocation, tool access, model, effort level, execution context (`fork` for subagent), and scoped hooks.
 
-**Plugin** — Distributable package containing skills, hooks, MCP servers, LSP servers, output styles, and default
-settings. Has optional `.claude-plugin/plugin.json` manifest. Installed from marketplace or local path. Skills
-namespaced as `/plugin:skill`.
+**Plugin** — Distributable package containing skills, agents, hooks, MCP servers, LSP servers, output styles, and
+default settings. Has optional `.claude-plugin/plugin.json` manifest. Installed from marketplace or local path. Skills
+namespaced as `/plugin:skill`. Two path variables: `${CLAUDE_PLUGIN_ROOT}` (install dir, changes on update) and
+`${CLAUDE_PLUGIN_DATA}` (persistent data dir, survives updates).
 
-**Hook** — Deterministic automation triggered at 15 lifecycle events (tool use, session start/end, permission request,
-subagent lifecycle, teammate/task events). Three types: command (shell), prompt (LLM decision), agent (multi-turn
-verification). Configured in settings, plugin, or frontmatter.
+**Hook** — Deterministic automation triggered at 22 lifecycle events (tool use, session start/end, permission request,
+subagent lifecycle, teammate/task events, compaction, worktree, elicitation, instructions loading). Four types: command
+(shell), http (POST to URL), prompt (LLM decision), agent (multi-turn verification). Configured in settings, plugin, or
+skill/agent frontmatter.
 
 **MCP Server** — External tool/resource provider via Model Context Protocol. Connects Claude to databases, APIs,
-services. Supports stdio, HTTP, SSE transports and OAuth authentication. Configured per-project, per-user, or via
-plugin.
+services. Supports stdio, HTTP, SSE transports and OAuth authentication. Configured per-project, per-user, via plugin,
+or scoped to a specific subagent via inline definition.
 
 **Output Style** — Persona/behavior modifier via system prompt changes. Affects how Claude responds without changing
-capabilities. Built-in: Default, Explanatory, Learning.
+capabilities. Built-in: Default, Explanatory, Learning. Custom styles exclude coding instructions unless
+`keep-coding-instructions: true`.
 
 **CLAUDE.md** — Project memory file providing persistent context about codebase, conventions, instructions. Hierarchy:
-managed > user > project. Loaded automatically at session start. Auto memory (`MEMORY.md`) stores Claude's own learnings
-per project.
+managed > user > project. Loaded automatically at session start. Supports `@path` imports (max depth 5). Modular rules
+in `.claude/rules/*.md` with optional `paths:` frontmatter for file-scoped loading. Auto memory (`MEMORY.md`) stores
+Claude's own learnings per project (first 200 lines loaded each session).
 
-**Subagent** — Isolated context for delegated tasks. Built-in types: Explore (read-only), Plan (architecture),
-general-purpose. Custom agents in `.claude/agents/`. Supports persistent memory, worktree isolation. Agent teams
-coordinate multiple subagents across sessions.
+**Subagent** — Isolated context for delegated tasks. Built-in types: Explore (haiku, read-only), Plan (inherited model,
+read-only), general-purpose (inherited model, all tools). Custom agents in `.claude/agents/`. Supports persistent
+memory, worktree isolation, effort override, background execution, scoped MCP servers, and tool restrictions via `tools`
+or `disallowedTools`. Invocable via delegation, @-mention, or `--agent` flag (session-wide). Subagents cannot spawn
+other subagents. Agent teams coordinate multiple agents across separate sessions.
 
-**Settings** — Configuration hierarchy controlling permissions, model, hooks, behavior. Scopes: managed > user >
-project > local.
+**Settings** — Configuration hierarchy controlling permissions, model, hooks, behavior, sandbox, plugins, and more.
+Scopes: managed > CLI args > local > project > user. Managed settings support server-managed, MDM/plist/registry, and
+file-based delivery.
 
 </concepts>
 
@@ -135,27 +146,36 @@ excluded skills.
 
 ### Subagent Selection
 
-- **Read-only codebase exploration** — built-in `Explore` agent
-- **Plan mode research** — built-in `Plan` agent
+- **Read-only codebase exploration** — built-in `Explore` agent (haiku)
+- **Plan mode research** — built-in `Plan` agent (inherited model)
 - **Complex multi-step task with tools** — built-in `general-purpose` agent
 - **Specialized role with custom system prompt** — custom agent in `.claude/agents/`
 - **Skill that runs in isolation** — skill with `context: fork` + `agent` field
+- **Session-wide agent mode** — `claude --agent <name>` or `agent` setting in `.claude/settings.json`
 
 Skills with `context: fork` write the task in the skill and pick an agent type. Custom subagents get their own system
 prompt and load skills as reference content. Use custom subagents when the agent needs a persistent identity, tool
 restrictions, or persistent memory across sessions.
 
+Invocation methods: automatic delegation (Claude decides), @-mention (guarantees specific agent), `--agent` flag
+(session-wide). Restrict which agents can be spawned with `Agent(type1, type2)` in `tools` or deny with `Agent(name)` in
+`permissions.deny`.
+
 ### Hook Type Selection
 
-- **`command`** — deterministic check (lint, validate, format). Timeout: 600s
-- **`prompt`** — LLM judgment on hook input data alone. Timeout: 30s
-- **`agent`** — LLM judgment that needs file inspection or commands. Timeout: 60s
+- **`command`** — deterministic check (lint, validate, format). Timeout: 600s. Supports `async: true` for background.
+- **`http`** — POST event JSON to a URL. Non-2xx = non-blocking error. Block via 2xx + JSON decision body. Supports
+  header env var interpolation with `allowedEnvVars`.
+- **`prompt`** — LLM judgment on hook input data alone. Timeout: 30s. Returns `{ok, reason}` JSON.
+- **`agent`** — LLM judgment that needs file inspection or commands. Timeout: 60s. Same response schema as prompt.
 
-Command hooks are the default. Use prompt hooks when the decision requires understanding intent (not just pattern
-matching). Use agent hooks when verification requires reading files or running commands.
+Command hooks are the default. Use http hooks for external service integration. Use prompt hooks when the decision
+requires understanding intent (not just pattern matching). Use agent hooks when verification requires reading files or
+running commands. Not all events support all types — prompt/agent hooks are limited to 8 events (PreToolUse,
+PostToolUse, PostToolUseFailure, PermissionRequest, UserPromptSubmit, Stop, SubagentStop, TaskCompleted).
 
-All matching hooks run in parallel. Exit code 2 blocks the operation (for blocking events). Always check
-`stop_hook_active` in Stop hooks to prevent infinite loops.
+All matching hooks run in parallel (identical handlers deduplicated). Exit code 2 blocks the operation (for blocking
+events).
 
 ### Settings Scope Selection
 
@@ -196,23 +216,30 @@ plugin-name/
 └── README.md
 ```
 
-### Hook Events (15)
+### Hook Events (22)
 
-- `SessionStart` — session begins/resumes. Cannot block.
+- `SessionStart` — session begins/resumes. Cannot block. Command only.
+- `InstructionsLoaded` — CLAUDE.md or rules file loaded into context. Cannot block. Command only.
 - `UserPromptSubmit` — before prompt processing. Can block.
-- `PreToolUse` — before tool executes. Can block.
-- `PermissionRequest` — permission dialog shown. Can block.
-- `PostToolUse` — after tool success. Cannot block.
+- `PreToolUse` — before tool executes. Can block. Supports `updatedInput`.
+- `PermissionRequest` — permission dialog shown. Can block. Supports `updatedPermissions`.
+- `PostToolUse` — after tool success. Cannot block (but `decision: "block"` feeds reason to Claude).
 - `PostToolUseFailure` — after tool failure. Cannot block.
-- `Notification` — notification sent. Cannot block.
-- `SubagentStart` — subagent spawned. Cannot block.
+- `Notification` — notification sent. Cannot block. Command only.
+- `SubagentStart` — subagent spawned. Cannot block. Command only.
 - `SubagentStop` — subagent finishes. Can block.
 - `Stop` — Claude finishes responding. Can block.
+- `StopFailure` — turn ended due to API error. Cannot block. Output ignored. Command only.
 - `TeammateIdle` — teammate going idle. Can block.
 - `TaskCompleted` — task marked complete. Can block.
-- `ConfigChange` — config file changes. Can block.
-- `PreCompact` — before compaction. Cannot block.
-- `SessionEnd` — session terminates. Cannot block.
+- `ConfigChange` — config file changes. Can block (except `policy_settings`).
+- `WorktreeCreate` — worktree being created. Replaces default git behavior. Must print path. Command only.
+- `WorktreeRemove` — worktree being removed. Cannot block. Command only.
+- `PreCompact` — before compaction. Cannot block. Command only.
+- `PostCompact` — after compaction completes. Cannot block. Command only.
+- `Elicitation` — MCP server requests user input. Can block. Command only.
+- `ElicitationResult` — after user responds to MCP elicitation. Can block. Command only.
+- `SessionEnd` — session terminates. Cannot block. Command only. Timeout: 1.5s default.
 
 ### Settings Scopes
 
@@ -223,15 +250,17 @@ plugin-name/
 
 ### Memory Hierarchy
 
-- **Managed policy** — system paths. Shared org-wide.
-- **User memory** — `~/.claude/CLAUDE.md`. Personal, all projects.
-- **Project memory** — `./CLAUDE.md` or `.claude/CLAUDE.md`. Team via VCS.
-- **Project rules** — `.claude/rules/*.md`. Team via VCS.
-- **Local memory** — `./CLAUDE.local.md`. Personal, this project.
-- **Auto memory** — `~/.claude/projects/<project>/memory/`. Personal, per project.
+- **Managed policy** — system paths. Shared org-wide. Cannot be excluded.
+- **User instructions** — `~/.claude/CLAUDE.md`. Personal, all projects.
+- **User rules** — `~/.claude/rules/*.md`. Personal, all projects.
+- **Project instructions** — `./CLAUDE.md` or `.claude/CLAUDE.md`. Team via VCS.
+- **Project rules** — `.claude/rules/*.md`. Team via VCS. Supports `paths:` frontmatter for file-scoped loading.
+- **Auto memory** — `~/.claude/projects/<project>/memory/`. Personal, per project. First 200 lines of `MEMORY.md` loaded
+  each session.
 
 More specific memory takes precedence. CLAUDE.md in parent directories loads automatically; child directories load on
-demand when working in those paths.
+demand when working in those paths. Use `@path` in CLAUDE.md to import files (max depth 5). Use `claudeMdExcludes` in
+settings to skip irrelevant CLAUDE.md files in monorepos.
 
 ## Cross-Skill Dependencies
 
