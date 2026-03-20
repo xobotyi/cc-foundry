@@ -6,6 +6,7 @@ Structured planning pipeline that converts problem analysis into tracked work it
 
 | Skill                | Purpose                                                                        |
 | -------------------- | ------------------------------------------------------------------------------ |
+| `discovery`          | Adversarial requirements elicitation — stress-test ideas before design         |
 | `design-documents`   | Decision records: problem analysis, solution exploration, committed decisions  |
 | `technical-design`   | Map chosen solution to codebase components, tools, sequencing                  |
 | `task-decomposition` | Break technical design into actionable task hierarchies                        |
@@ -16,7 +17,9 @@ Structured planning pipeline that converts problem analysis into tracked work it
 ## Skill Flow
 
 ```
-design-documents (problem → analysis → decision)
+discovery (idea → shared understanding via adversarial questioning)
+    ↓
+design-documents (understanding → analysis → decision)
     ↓
 technical-design (solution → components, tools, sequencing)
     ↓
@@ -32,9 +35,9 @@ stage before advancing.
 
 ## Pipeline Usage
 
-**From problem to tasks:** Start with `design-documents` and follow the prompts through each stage. The pipeline
-produces three deliverables: the design document (what was decided and why), the technical design (how at the component
-level), and the decomposition document with links to tracked tasks.
+**From idea to tasks:** Start with `discovery` to stress-test the idea, then follow the prompts through each stage. The
+pipeline produces three deliverables: the design document (what was decided and why), the technical design (how at the
+component level), and the decomposition document with links to tracked tasks.
 
 **Standalone task creation:** Invoke `task-creation` directly when creating individual tasks outside the pipeline
 context.

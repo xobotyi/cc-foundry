@@ -37,6 +37,19 @@ implementation without drifting from intent.
 
 ## Skills
 
+### discovery
+
+Adversarial requirements elicitation that stress-tests ideas before committing to design. The agent acts as a critic —
+challenging assumptions, finding gaps, and pressuring vague reasoning until the user's thinking holds up. Explores
+available context (codebase, docs, existing systems) first, presents findings, then systematically questions across
+problem, goals, scope, constraints, risks, and prior art dimensions.
+
+The primary output isn't a document — it's the primed conversation context. The agent's enriched understanding carries
+into whatever comes next. A brief verification summary crystallizes the shared understanding for the user to confirm.
+
+**Use when:** Starting a new initiative, exploring a product idea, stress-testing a plan, or beginning the blueprint
+pipeline. Also useful as a standalone content-priming tool before any complex task.
+
 ### design-documents
 
 Decision records that explore problems and commit to solutions before implementation. Produces design documents with
@@ -95,10 +108,12 @@ diagrams, ER diagrams, mind maps, or any visual representation of systems and pr
 The skills form a linear pipeline with user approval gates at each transition:
 
 ```
-design-documents → technical-design → task-decomposition → task-creation
+discovery → design-documents → technical-design → task-decomposition → task-creation
 ```
 
-Each skill prompts the user to proceed to the next stage on completion. Approval is required before advancing.
+Each skill prompts the user to proceed to the next stage on completion. Approval is required before advancing. Discovery
+is optional — start there to stress-test an idea, or skip directly to design-documents when the problem is already
+well-understood.
 
 task-creation can also be invoked standalone for creating individual tasks without going through the full pipeline. When
 working with YouTrack specifically, the youtrack skill complements task-creation with tracker-specific domain knowledge.
