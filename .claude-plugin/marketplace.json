@@ -59,8 +59,8 @@
     },
     {
       "name": "the-blueprint",
-      "description": "Structured planning pipeline: design documents, technical designs, task decomposition, task creation, and technical diagramming",
-      "version": "1.4.0",
+      "description": "Structured planning pipeline: discovery, design documents, technical designs, task decomposition, task creation, and technical diagramming",
+      "version": "1.5.0",
       "author": {
         "name": "xobotyi",
         "email": "xog3@yandex.ru"
