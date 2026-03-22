@@ -80,6 +80,18 @@ This plugin bundles a `gopls` LSP server configuration. Once installed, Claude C
 | `incomingCalls`      | Find what calls a function            |
 | `outgoingCalls`      | Find what a function calls            |
 
+### zog
+
+Covers the Zog schema validation library — a Zod-inspired declarative schema builder for Go. The skill provides
+the complete API reference inline: all schema types (String, Int, Float, Bool, Time, Struct, Slice, Ptr, Boxed), generic
+methods (Required, Default, Catch, Transform, Test), Parse vs Validate semantics, error handling (ZogIssueList,
+formatting strategies), HTTP/JSON/env integration packages (zhttp, zjson, zenv), custom tests, transforms,
+preprocessing, i18n, and global configuration. Includes common patterns for HTTP handlers, struct validation methods,
+and environment config parsing.
+
+**Use when:** writing schemas, parsing HTTP/JSON/env input, validating structs, handling Zog errors, or integrating Zog
+into Go services.
+
 ## Related Plugins
 
 - **the-coder** — Language-agnostic coding discipline (discovery, planning, verification)
