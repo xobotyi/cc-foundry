@@ -158,6 +158,18 @@ function colorByUrgency(percent, text) {
  */
 
 /**
+ * @typedef {object} RateLimitWindow
+ * @property {number} used_percentage - Usage percentage (0-100)
+ * @property {number} resets_at - Reset time (Unix epoch seconds)
+ */
+
+/**
+ * @typedef {object} RateLimitsData
+ * @property {RateLimitWindow} [five_hour] - 5-hour rate limit (Pro/Max only)
+ * @property {RateLimitWindow} [seven_day] - 7-day rate limit
+ */
+
+/**
  * @typedef {object} SessionData
  * @property {string} session_id - Unique session identifier
  * @property {string} transcript_path - Path to session transcript
@@ -171,6 +183,7 @@ function colorByUrgency(percent, text) {
  * @property {boolean} exceeds_200k_tokens - Whether last response exceeded 200k tokens (fixed threshold)
  * @property {VimData} [vim] - Present only when vim mode is enabled
  * @property {AgentData} [agent] - Present only when running with --agent flag or agent settings
+ * @property {RateLimitsData} [rate_limits] - Present only for Claude.ai subscribers after first API response
  */
 
 
@@ -407,6 +420,23 @@ function formatCacheEfficiency(data) {
 }
 
 /**
+ * Formats 5-hour rate limit usage. Returns null when data is unavailable.
+ * @param {SessionData} data
+ * @returns {string|null}
+ */
+function formatRateLimit(data) {
+    const fiveHour = data.rate_limits?.five_hour;
+    if (!fiveHour) {
+        return null;
+    }
+
+    const used = fiveHour.used_percentage ?? 0;
+    // Invert: colorByUrgency expects "remaining", rate limit gives "used"
+    const val = colorByUrgency(100 - used, `${Math.round(used)}%`);
+    return `5h limit ${val}`;
+}
+
+/**
  * Formats first row of status line: style, model, cost, api time
  * @param {SessionData} data
  * @returns {string}
@@ -429,8 +459,9 @@ function formatRow2(data) {
     const row = [
         formatContextRemaining(data),
         formatTokenRatio(data),
-        formatCacheEfficiency(data)
-    ];
+        formatCacheEfficiency(data),
+        formatRateLimit(data)
+    ].filter(Boolean);
     return row.join(" | ");
 }
 
