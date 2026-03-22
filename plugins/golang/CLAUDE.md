@@ -9,6 +9,7 @@ code intelligence via `gopls`.
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `golang` | Go language conventions, idioms, error handling, concurrency patterns, project structure, testing, toolchain (go mod, golangci-lint), and LSP navigation rules |
 | `templ`  | templ (a-h/templ) type-safe HTML templating: syntax, components, attributes, styling, CSS/JS integration, and testing                                          |
+| `zog`    | Zog schema validation library: schema definition, parsing, validation, error handling, HTTP/JSON/env integration, custom tests, and transforms                  |
 
 ## LSP Integration
 
@@ -24,9 +25,10 @@ search tools remain appropriate for non-semantic searches (comments, string lite
 ## Skill Dependencies
 
 The `golang` skill provides language-specific conventions. The `templ` skill extends those conventions to `.templ` files
-and references `golang` error handling and naming rules.
+and references `golang` error handling and naming rules. The `zog` skill is standalone — it covers the Zog validation
+library API and patterns, deferring to `golang` for general Go conventions.
 
-Both skills assume the `the-coder` plugin for language-agnostic coding discipline (discovery, planning, verification).
+All skills assume the `the-coder` plugin for language-agnostic coding discipline (discovery, planning, verification).
 
 ## Plugin Scope
 
