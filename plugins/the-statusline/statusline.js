@@ -431,9 +431,22 @@ function formatRateLimit(data) {
     }
 
     const used = fiveHour.used_percentage ?? 0;
+    const remaining = 100 - used;
+
+    // Format reset time as local HH:MM
+    let resetLabel = "";
+    if (fiveHour.resets_at) {
+        const resetDate = new Date(fiveHour.resets_at * 1000);
+        const h = resetDate.getHours();
+        const m = String(resetDate.getMinutes()).padStart(2, "0");
+        const suffix = h >= 12 ? "pm" : "am";
+        const h12 = h % 12 || 12;
+        resetLabel = ` til ${h12}:${m}${suffix}`;
+    }
+
     // Invert: colorByUrgency expects "remaining", rate limit gives "used"
-    const val = colorByUrgency(100 - used, `${Math.round(used)}%`);
-    return `5h limit ${val}`;
+    const val = colorByUrgency(remaining, `${Math.round(remaining)}%${resetLabel}`);
+    return val;
 }
 
 /**
