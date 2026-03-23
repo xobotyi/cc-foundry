@@ -73,7 +73,7 @@ const MaxRetries = 12
 
 ### Unexported Globals
 
-Prefix with `_`: `_defaultPort`, `_maxRetries`. Exception: error values use `err` prefix: `errNotFound`.
+Plain lowercase: `defaultPort`, `maxRetries`. Error values use `err` prefix: `errNotFound`.
 
 ### Avoid Repetition
 
@@ -145,11 +145,11 @@ s := "hello"
 n := computeSize()
 
 // Top-level — use var, omit type if obvious
-var _defaultPort = 8080
-var _errNotFound = errors.New("not found")
+var defaultPort = 8080
+var errNotFound = errors.New("not found")
 
 // Type differs from expression — specify type
-var _e error = myError{}
+var e error = myError{}
 ```
 
 ### Slices
