@@ -71,7 +71,7 @@ don't define it. `const MaxRetries = 12` (good) vs `const Twelve = 12` (bad).
 
 ### Unexported Globals
 
-Prefix with `_`: `_defaultPort`, `_maxRetries`. Exception: error values use `err` prefix: `errNotFound`.
+Plain lowercase: `defaultPort`, `maxRetries`. Error values use `err` prefix: `errNotFound`.
 
 ### Avoid Repetition
 
@@ -118,8 +118,8 @@ Already reference types. Never use pointers to them: `func process(m map[string]
 
 - `var` for zero values: `var s string`, `var mu sync.Mutex`
 - `:=` for initializations: `s := "hello"`, `n := computeSize()`
-- Top-level: use `var`, omit type if obvious: `var _defaultPort = 8080`
-- Specify type when it differs from expression: `var _e error = myError{}`
+- Top-level: use `var`, omit type if obvious: `var defaultPort = 8080`
+- Specify type when it differs from expression: `var e error = myError{}`
 
 ### Slices
 
