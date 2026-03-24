@@ -70,10 +70,12 @@ This is an active discovery step — use available tools, don't rely on inferenc
 
    **Acceptance criteria** — How to know it's done. See the dedicated section below.
 
-   **References** — Links to design documents, technical designs, relevant code paths, mockups, or similar
-   implementations. Only external resources belong here — never references to other tasks in the same tracker.
-   Inter-task relationships (blocks, depends-on, parent-child, relates-to) are handled exclusively through native
-   tracker links in Step 4.
+   **References** (optional) — Links to resources that already exist: design documents, technical designs, external
+   specs, documentation URLs, mockups. Every item must be a real, verifiable resource — a file that exists on disk or a
+   URL that resolves. Never include code paths, file paths to source code, or references to files that will be created
+   during implementation. Code-level details belong in implementation, not task descriptions. Never reference other
+   tasks in the same tracker — inter-task relationships are handled exclusively through native tracker links in Step 4.
+   Omit this section entirely when there are no existing resources to link.
 
    Every task needs a description. Extract intent, structure it, and link to the conversation if someone needs the raw
    thread — never copy-paste chat messages directly.
@@ -227,7 +229,7 @@ structure.
 - [ ] [Verifiable conditions]
 
 ## References
-- [Links to design docs, code paths, mockups — never other tasks]
+- [Links to existing design docs, specs, documentation URLs, mockups — never code paths or other tasks]
 ```
 
 ### Pattern 3: Investigation Task
@@ -345,7 +347,7 @@ quote the problematic section, and show the fix inline. Common review findings:
 - Missing or untestable acceptance criteria
 - Description contains implementation prescriptions (code, class names, function signatures)
 - Inter-task relationships written in description text instead of native tracker links
-- References section lists other tasks instead of external resources (design docs, code)
+- References section contains code paths, non-existent files, or other tasks instead of verifiable external resources
 - Fields set with values not matching the project's configuration
 
 ## After Completion
@@ -372,7 +374,7 @@ Before creating a task in the tracker:
 - [ ] Work items are concrete but don't prescribe implementation
 - [ ] Acceptance criteria are testable with clear pass/fail outcomes
 - [ ] Negative cases and error conditions are covered where relevant
-- [ ] References link to external resources (design docs, code) — no task-to-task refs
+- [ ] References (if present) link only to verifiable existing resources — no code paths, no future files
 - [ ] Inter-task relationships use native tracker links, not description text
 - [ ] All tracker fields match the project's configuration
 - [ ] User approved the draft before creation
