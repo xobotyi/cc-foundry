@@ -336,3 +336,12 @@ Before deploying:
 - [ ] Critical rules placed at end
 - [ ] `keep-coding-instructions` set appropriately
 - [ ] Tested with varied prompts (simple, complex, edge cases, emotional)
+
+## Related Skills
+
+- `prompt-engineering` — load first for instruction design techniques (output styles are system prompts)
+- `skill-engineering` — skills extend capabilities; output styles change personality — different mechanisms,
+  complementary
+- `subagent-engineering` — subagents have their own system prompts; output styles modify the main agent's
+- `claude-code-sdk` — consult for output style frontmatter fields, activation methods, and `keep-coding-instructions`
+  details

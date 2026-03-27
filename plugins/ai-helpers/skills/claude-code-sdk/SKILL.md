@@ -262,14 +262,12 @@ More specific memory takes precedence. CLAUDE.md in parent directories loads aut
 demand when working in those paths. Use `@path` in CLAUDE.md to import files (max depth 5). Use `claudeMdExcludes` in
 settings to skip irrelevant CLAUDE.md files in monorepos.
 
-## Cross-Skill Dependencies
+## Related Skills
 
-When building Claude Code extensions, invoke specialized skills for component design:
+This skill provides the SDK reference (what exists, how it works). The engineering skills provide design guidance (how
+to build it well):
 
-- **Skills** — invoke `ai-helpers:skill-engineering` for SKILL.md design
-- **Subagents** — invoke `ai-helpers:subagent-engineering` for agent design
-- **Output styles** — invoke `ai-helpers:output-style-engineering` for style design
-- **All artifacts** — invoke `ai-helpers:prompt-engineering` for instruction design
-
-This skill provides the SDK reference (what exists, how it works); those skills provide engineering guidance (how to
-design it well).
+- `prompt-engineering` — instruction design techniques for any AI artifact
+- `skill-engineering` — SKILL.md design, description formulas, content architecture
+- `subagent-engineering` — agent prompt design, tool scoping, team coordination
+- `output-style-engineering` — persona definition, tone examples, behavioral rules

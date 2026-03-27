@@ -35,7 +35,7 @@ Skip only for trivial edits (typos, formatting).
 - **Diagnosing failures** — [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] Diagnostic steps, error message
   catalog, debug mode
 - **Architecture and examples** — [`${CLAUDE_SKILL_DIR}/references/patterns.md`] Full agent examples,
-  pipeline/parallel/master-clone patterns, multi-agent coordination
+  pipeline/parallel/master-clone patterns, multi-agent coordination, agent team lifecycle and patterns
 
 Read the relevant reference for extended depth. The rules below are sufficient for correct work without loading
 references.
@@ -261,6 +261,45 @@ You are a [role] specializing in [domain].
 - **general-purpose** (Inherits): Complex multi-step tasks
 - **Bash** (Inherits): Command execution in separate context
 - **claude-code-guide** (Haiku): Questions about Claude Code features
+
+## Agent Teams
+
+When work exceeds a single subagent's context window, needs sustained parallelism, or requires cross-session
+coordination — use agent teams instead of standalone subagents.
+
+**Teams vs standalone subagents:**
+
+- **Standalone subagent** — self-contained task, returns summary to caller, caller's context absorbs output
+- **Agent team** — multiple teammates with shared task list, coordinate via `SendMessage` summaries, each teammate has
+  its own context window
+
+**Core mechanics:**
+
+1. `TeamCreate` — creates a named team
+2. `TaskCreate` — adds tasks to the team's shared task list (with optional `blockedBy` dependencies)
+3. Spawn agents with `team_name` parameter — they join as teammates, claim tasks, coordinate via `SendMessage`
+4. Teammates go idle when no unclaimed tasks remain; `TeammateIdle` hooks can inject follow-up work
+
+**Design rules:**
+
+- **Never use standalone subagents for user-requested parallel work.** Standalone subagents inject full output into the
+  caller's context via `TaskOutput`. Teammates communicate via short `SendMessage` summaries and share task lists.
+- **Tasks must be self-contained.** Each task description must include enough context for any teammate to pick it up —
+  teammates don't share conversation history.
+- **Use `blockedBy` for sequencing.** When task B depends on task A's output, set the dependency explicitly rather than
+  relying on execution order.
+- **Keep SendMessage summaries concise.** Teammates receive messages as injected context — verbose messages degrade
+  reasoning quality.
+
+**When to use teams:**
+
+- User explicitly requests parallel agents / teammates / workers
+- Work decomposes into 3+ independent tasks that benefit from parallel execution
+- Total work would exceed a single subagent's context budget
+- Tasks need coordination checkpoints (one agent's output feeds another's input)
+
+Architecture patterns, team coordination examples, and pipeline designs: see
+`${CLAUDE_SKILL_DIR}/references/patterns.md`.
 
 ## Evaluation Criteria
 

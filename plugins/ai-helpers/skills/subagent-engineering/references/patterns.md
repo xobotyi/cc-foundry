@@ -472,6 +472,129 @@ Specialist agents for known task types
 Generalist (Task) for everything else
 ```
 
+## Agent Teams
+
+Agent teams coordinate multiple agents across separate sessions with a shared task list. Unlike standalone subagents
+(which return full output to the caller's context), teammates communicate via short `SendMessage` summaries.
+
+### When Teams Beat Standalone Subagents
+
+- **Context budget** — Standalone subagents inject full output via `TaskOutput`. Three verbose subagents can exhaust the
+  caller's context. Teammates return only what they choose to `SendMessage`.
+- **Sustained parallelism** — Standalone subagents block the caller (foreground) or run independently (background) with
+  no coordination primitive. Teammates share a task list and can hand off work.
+- **Cross-task dependencies** — `blockedBy` lets you express "task B waits for task A" declaratively. Standalone
+  subagents require the caller to orchestrate sequencing manually.
+
+### Team Lifecycle
+
+```
+1. TeamCreate("my-team")
+2. TaskCreate(subject, description, team_name="my-team")
+   TaskCreate(subject, description, team_name="my-team", blockedBy=["task-1"])
+3. Agent(prompt, team_name="my-team")  — spawns teammate
+   Agent(prompt, team_name="my-team")  — spawns another
+4. Teammates claim tasks, work, SendMessage summaries
+5. TeammateIdle fires when no unclaimed tasks remain
+6. TaskCompleted hooks can validate before marking done
+```
+
+### Task Design for Teams
+
+Each task must be **self-contained** — teammates don't share conversation history. The task description is all context a
+teammate gets (plus its own agent prompt and any CLAUDE.md/skills).
+
+**Good task description:**
+
+```
+Refactor the authentication middleware in src/middleware/auth.ts.
+Replace the session-based auth with JWT validation.
+The JWT secret is in process.env.JWT_SECRET.
+Existing tests are in src/middleware/__tests__/auth.test.ts — update them.
+```
+
+**Bad task description:**
+
+```
+Fix the auth thing we discussed.
+```
+
+**Task decomposition rules:**
+
+- Each task should be completable by a single agent in a single session
+- Include file paths, function names, and concrete acceptance criteria
+- If task B depends on task A's output, use `blockedBy` and describe what task B should find when it starts
+- Avoid tasks that require reading another teammate's conversation — the output won't be available
+
+### Coordination via SendMessage
+
+Teammates use `SendMessage` to communicate findings, request help, or report blockers. Messages are injected into the
+recipient's context.
+
+**Rules:**
+
+- Keep messages under ~500 tokens — they consume recipient context
+- Lead with the actionable information: "Found 3 broken imports in auth module: [list]"
+- Don't use SendMessage for status updates that nobody acts on
+- The main agent (team creator) receives messages too — useful for progress summaries
+
+### Team Hooks
+
+Two hook events support team coordination:
+
+- **`TeammateIdle`** — fires when a teammate has no unclaimed tasks. Exit 2 + stderr gives the teammate new
+  instructions. `{"continue": false, "stopReason": "..."}` stops the teammate. Use this to inject follow-up tasks
+  discovered during execution.
+- **`TaskCompleted`** — fires when a task is marked complete. Exit 2 blocks completion and feeds stderr as feedback
+  (e.g., "tests not passing, task not done"). Use this as a quality gate.
+
+### Team Patterns
+
+**Independent parallel work:**
+
+```
+Team: "refactor-team"
+├── Task: "Refactor auth middleware" (no dependencies)
+├── Task: "Refactor logging middleware" (no dependencies)
+└── Task: "Refactor rate-limit middleware" (no dependencies)
+
+3 teammates, each claims one task, work in parallel.
+```
+
+**Pipeline with dependencies:**
+
+```
+Team: "feature-team"
+├── Task 1: "Design API schema for /users endpoint"
+├── Task 2: "Implement API handlers" (blockedBy: [1])
+└── Task 3: "Write integration tests" (blockedBy: [2])
+
+1-2 teammates; task 2 waits for task 1's completion.
+```
+
+**Research fan-out with synthesis:**
+
+```
+Team: "research-team"
+├── Task 1: "Analyze authentication patterns in codebase"
+├── Task 2: "Analyze authorization patterns in codebase"
+├── Task 3: "Analyze session management patterns"
+└── Task 4: "Synthesize findings into security report" (blockedBy: [1, 2, 3])
+
+3 teammates for research, task 4 picks up after all complete.
+```
+
+### Team Anti-Patterns
+
+- **Too many teammates** — Each teammate consumes API quota. 2-4 is typical; beyond 6 rarely helps.
+- **Tasks too small** — Overhead of spawning a teammate exceeds the work. If a task takes <30 seconds, batch it with
+  related work.
+- **Tasks too large** — If a task exceeds a teammate's context window, it fails silently or produces partial results.
+  Decompose further.
+- **Missing dependencies** — Two teammates modifying the same files without `blockedBy` causes merge conflicts in
+  worktree isolation or overwrites without it.
+- **Verbose SendMessage** — Injecting 2000-token messages into every teammate's context degrades everyone's reasoning.
+
 ## Anti-Patterns to Avoid
 
 ### God Agent
