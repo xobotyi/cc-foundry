@@ -1,7 +1,7 @@
 {
   "name": "ai-helpers",
   "version": "1.5.2",
-  "description": "AI workflow helpers: prompt engineering, context management, memory patterns",
+  "description": "AI artifact engineering: prompts, skills, subagents, and output styles",
   "author": {
     "name": "xobotyi",
     "email": "xog3@yandex.ru",
