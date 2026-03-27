@@ -380,3 +380,10 @@ Before deploying:
 - [ ] Every instruction earns its place (deletion test: removing it changes output)
 - [ ] Under 500 lines (exceeding is acceptable when all content is behavioral)
 - [ ] Name matches directory (lowercase, hyphens)
+
+## Related Skills
+
+- `prompt-engineering` — load first for instruction design techniques (skills are prompts)
+- `subagent-engineering` — skills and subagents complement each other; skills run inline, subagents run in isolation
+- `output-style-engineering` — output styles replace the system prompt; skills extend it
+- `claude-code-sdk` — consult for SKILL.md frontmatter fields, plugin layout, and invocation control details

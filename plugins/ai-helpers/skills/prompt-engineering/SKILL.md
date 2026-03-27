@@ -430,32 +430,15 @@ Attack taxonomy, defense implementation details, full checklist: see [`${CLAUDE_
 ## Writing Prompts as an Agent
 
 When you (the AI) are authoring a prompt for another model to execute — skills, system prompts, subagent instructions,
-hook prompts — the process differs from human prompt authoring. You lack the "this could be better" intuition;
-substitute explicit structure and self-evaluation.
+hook prompts — treat prompts as programs to be optimized, not strings to be written. Define the signature (inputs,
+outputs, success criteria) before writing text. Decompose into components, scaffold with XML, then draft.
 
-**Workflow:**
+**Key failure modes to guard against:** blob-prompts (unstructured paragraphs), confident sub-optimality (first draft
+looks good but underperforms — score against quality dimensions before delivering), instruction inflation (adding rules
+without removing redundant ones), persona defaulting ("You are an expert X" when domain priming is more reliable).
 
-1. **Define the signature** — what the prompt receives, produces, and what success looks like, before writing any text
-2. **Decompose** — separate role, task, constraints, format, context, and examples into distinct components
-3. **Scaffold with XML tags** — never deliver a single-paragraph prompt
-4. **Draft content** — fill the scaffold; start with the constraint envelope, not the task description; use imperative
-   voice throughout
-5. **Self-evaluate** — check clarity, specificity, robustness, completeness, and structure before delivering
-6. **Correct targeted** — fix specific sections, not wholesale rewrites; cap refinement at 2-3 cycles
-
-**Avoid these failure modes:**
-
-- **Blob-prompts** — unstructured paragraphs mixing instructions with context. Always decompose before drafting.
-- **Confident sub-optimality** — the first draft looks coherent but underperforms. Score against quality dimensions
-  before delivering.
-- **Instruction inflation** — adding rules to fix failures without removing rules that became redundant. Apply deletion
-  test after every correction.
-- **Persona defaulting** — reflexive "You are an expert X" when domain priming ("This is an X task") is more reliable.
-- **Overfitting to examples** — instructions that reproduce specific examples but fail on novel inputs. Mentally
-  simulate an unseen input.
-
-Extended workflow, optimization patterns (candidate-scoring, failure- analysis, bootstrapped demos), and
-artifact-specific guidance: see [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
+Full workflow, optimization patterns, and artifact-specific guidance: see
+[`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
 
 ---
 
@@ -481,3 +464,10 @@ Before finalizing a prompt:
 - [ ] Domain priming over persona assignment
 - [ ] No blanket CoT — let the model decide reasoning depth per request
 - [ ] Few-shot examples calibrate format/style, not teach known patterns
+
+## Related Skills
+
+- `skill-engineering` — applies prompt techniques to SKILL.md design, description formulas, and content architecture
+- `subagent-engineering` — applies prompt techniques to subagent system prompts, tool scoping, and delegation triggers
+- `output-style-engineering` — applies prompt techniques to persona definition, tone examples, and behavioral rules
+- `claude-code-sdk` — reference for Claude Code extensibility APIs when building any AI artifact
