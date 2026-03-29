@@ -1,0 +1,26 @@
+{
+  "sources": {
+    "GitHub Docs — Pull Requests Overview": "https://docs.github.com/en/pull-requests",
+    "GitHub Docs — Creating a PR Template": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository",
+    "GitHub Docs — Syncing a Fork": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork",
+    "GitHub Docs — Setting Guidelines for Repository Contributors": "https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors",
+    "Google Engineering Practices — How to Do a Code Review": "https://google.github.io/eng-practices/review/reviewer/",
+    "Google Engineering Practices — The Standard of Code Review": "https://google.github.io/eng-practices/review/reviewer/standard.html",
+    "Software Engineering at Google — Code Review Chapter": "https://abseil.io/resources/swe-book/html/ch09.html",
+    "Pragmatic Engineer — Pull Request Best Practices": "https://blog.pragmaticengineer.com/pull-request-or-diff-best-practices/",
+    "Graphite — Best Practices for PR Titles and Descriptions": "https://graphite.com/guides/best-practices-pr-titles-descriptions",
+    "Why Agentic-PRs Get Rejected (arxiv 2602.04226)": "https://arxiv.org/abs/2602.04226",
+    "GitHub Community Discussion — Tackling Low-Quality Contributions": "https://github.com/orgs/community/discussions/185387",
+    "CodeRabbit — AI Code Review Quality Report": "https://www.helpnetsecurity.com/2025/12/23/coderabbit-ai-assisted-pull-requests-report/",
+    "FINOS — CLAs and DCOs Explained": "https://osr.finos.org/docs/bok/artifacts/clas-and-dcos",
+    "Creative Commons — Pull Request Guidelines": "https://opensource.creativecommons.org/contributing-code/pr-guidelines/",
+    "GitHub Standard Fork & Pull Request Workflow (Gist)": "https://gist.github.com/Chaser324/ce0505fbed06b947d962",
+    "GitHub Docs — Creating a PR from a Fork": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork",
+    "Google Engineering Practices — Writing Good CL Descriptions": "https://google.github.io/eng-practices/review/developer/cl-descriptions.html",
+    "Google Engineering Practices — Small CLs": "https://google.github.io/eng-practices/review/developer/small-cls.html",
+    "Conventional Commits Specification": "https://www.conventionalcommits.org/en/v1.0.0/",
+    "opensource.guide — How to Contribute to Open Source": "https://opensource.guide/how-to-contribute/",
+    "CodeRabbit — AI Is Burning Out OSS Maintainers": "https://www.coderabbit.ai/blog/ai-is-burning-out-the-people-who-keep-open-source-alive"
+  },
+  "lastFetched": "2026-03-29T12:59:52.605Z"
+}
