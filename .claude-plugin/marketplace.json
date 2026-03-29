@@ -1,269 +1,293 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "foundry",
-  "owner": {
-    "name": "xobotyi",
-    "email": "xog3@yandex.ru"
-  },
-  "metadata": {
-    "description": "Shared Claude Code configurations, skills, agents, and commands"
-  },
-  "plugins": [
-    {
-      "name": "skill-enforcer",
-      "description": "Enforces skill invocation and reference reading via SEF checkpoints",
-      "version": "1.4.2",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/skill-enforcer",
-      "category": "productivity",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/skill-enforcer",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["skills", "enforcement", "hooks", "lifecycle"],
-      "tags": ["automation", "workflow", "discipline"]
-    },
-    {
-      "name": "ai-helpers",
-      "description": "AI artifact engineering: prompts, skills, subagents, and output styles",
-      "version": "1.5.2",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/ai-helpers",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/ai-helpers",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["prompts", "skills", "agents", "output-styles"],
-      "tags": ["ai", "engineering", "meta"]
-    },
-    {
-      "name": "git-commit",
-      "description": "Git commit workflow: atomic commits, validation, conventions",
-      "version": "1.0.5",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/git-commit",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/git-commit",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["git", "commit", "conventions", "workflow", "validation", "atomic-commits"],
-      "tags": ["git", "workflow", "automation"]
-    },
-    {
-      "name": "the-blueprint",
-      "description": "Structured planning pipeline: discovery, design documents, technical designs, task decomposition, task creation, and technical diagramming",
-      "version": "1.5.1",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/the-blueprint",
-      "category": "productivity",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-blueprint",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["design-docs", "technical-design", "task-decomposition", "task-creation", "planning"],
-      "tags": ["planning", "management", "workflow"]
-    },
-    {
-      "name": "the-statusline",
-      "description": "Status line with context window, cost, and model info",
-      "version": "1.1.1",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/the-statusline",
-      "category": "productivity",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-statusline",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["statusline", "status", "ui", "context-window", "cost"],
-      "tags": ["ui", "monitoring", "automation"]
-    },
-    {
-      "name": "the-crucible",
-      "description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
-      "version": "1.3.1",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/the-crucible",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-crucible",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["code-quality", "validation", "code-review", "multi-agent", "evaluation"],
-      "tags": ["quality", "review", "automation"]
-    },
-    {
-      "name": "the-coder",
-      "description": "Software engineering discipline: output styles, coding fundamentals, and universal development practices",
-      "version": "1.0.2",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/the-coder",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-coder",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["coding", "software-engineering", "output-styles", "development"],
-      "tags": ["coding", "engineering", "discipline"]
-    },
-    {
-      "name": "golang",
-      "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-      "version": "1.3.1",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/golang",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/golang",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["go", "golang", "conventions", "idioms"],
-      "tags": ["language", "go", "coding"]
-    },
-    {
-      "name": "javascript",
-      "description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-      "version": "1.2.6",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/javascript",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/javascript",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["javascript", "typescript", "conventions", "patterns"],
-      "tags": ["language", "javascript", "typescript", "coding"]
-    },
-    {
-      "name": "frontend",
-      "description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
-      "version": "1.2.5",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/frontend",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/frontend",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["frontend", "css", "accessibility", "browser", "web"],
-      "tags": ["platform", "frontend", "web"]
-    },
-    {
-      "name": "backend",
-      "description": "Backend platform discipline: observability, API design, and service architecture practices",
-      "version": "1.1.4",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/backend",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/backend",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["backend", "observability", "logging", "api", "services"],
-      "tags": ["platform", "backend", "services"]
-    },
-    {
-      "name": "cli",
-      "description": "CLI platform discipline: CLI application design, shell scripting conventions, and terminal UX",
-      "version": "1.1.2",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/cli",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/cli",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["cli", "command-line", "terminal", "shell-scripting", "bash", "ux"],
-      "tags": ["platform", "cli", "terminal"]
-    },
-    {
-      "name": "python",
-      "description": "Python language discipline: conventions, modern idioms, type system, packaging, testing, and LSP-powered code intelligence",
-      "version": "1.2.3",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/python",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/python",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["python", "conventions", "typing", "packaging"],
-      "tags": ["language", "python", "coding"]
-    },
-    {
-      "name": "php",
-      "description": "PHP language discipline: conventions, modern idioms, type system, OOP, testing, and LSP-powered code intelligence",
-      "version": "1.0.2",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/php",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/php",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["php", "conventions", "typing", "oop", "phpunit"],
-      "tags": ["language", "php", "coding"]
-    },
-    {
-      "name": "infrastructure",
-      "description": "Infrastructure management discipline: Ansible automation, container orchestration, Proxmox virtualization, Unraid NAS, and network architecture",
-      "version": "1.1.0",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/infrastructure",
-      "category": "development",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/infrastructure",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["ansible", "docker", "proxmox", "unraid", "networking", "infrastructure", "devops"],
-      "tags": ["platform", "infrastructure", "devops"]
-    },
-    {
-      "name": "the-workflow",
-      "description": "Agentic workflow mechanics: CLAUDE.md instruction quality and structured context handoff",
-      "version": "1.2.0",
-      "author": {
-        "name": "xobotyi",
-        "email": "xog3@yandex.ru"
-      },
-      "source": "./plugins/the-workflow",
-      "category": "productivity",
-      "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-workflow",
-      "repository": "https://github.com/xobotyi/cc-foundry",
-      "license": "MIT",
-      "keywords": ["workflow", "handoff", "context-boundaries", "delegation", "claude-md", "instructions"],
-      "tags": ["workflow", "productivity", "automation"]
-    }
-  ]
+	"$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+	"name": "foundry",
+	"owner": {
+		"name": "xobotyi",
+		"email": "xog3@yandex.ru"
+	},
+	"metadata": {
+		"description": "Shared Claude Code configurations, skills, agents, and commands"
+	},
+	"plugins": [
+		{
+			"name": "skill-enforcer",
+			"description": "Enforces skill invocation and reference reading via SEF checkpoints",
+			"version": "1.4.2",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/skill-enforcer",
+			"category": "productivity",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/skill-enforcer",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["skills", "enforcement", "hooks", "lifecycle"],
+			"tags": ["automation", "workflow", "discipline"]
+		},
+		{
+			"name": "ai-helpers",
+			"description": "AI artifact engineering: prompts, skills, subagents, and output styles",
+			"version": "1.5.2",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/ai-helpers",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/ai-helpers",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["prompts", "skills", "agents", "output-styles"],
+			"tags": ["ai", "engineering", "meta"]
+		},
+		{
+			"name": "git-commit",
+			"description": "Git commit workflow: atomic commits, validation, conventions",
+			"version": "1.0.5",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/git-commit",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/git-commit",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["git", "commit", "conventions", "workflow", "validation", "atomic-commits"],
+			"tags": ["git", "workflow", "automation"]
+		},
+		{
+			"name": "the-blueprint",
+			"description": "Structured planning pipeline: discovery, design documents, technical designs, task decomposition, task creation, and technical diagramming",
+			"version": "1.5.1",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/the-blueprint",
+			"category": "productivity",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-blueprint",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["design-docs", "technical-design", "task-decomposition", "task-creation", "planning"],
+			"tags": ["planning", "management", "workflow"]
+		},
+		{
+			"name": "the-statusline",
+			"description": "Status line with context window, cost, and model info",
+			"version": "1.1.1",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/the-statusline",
+			"category": "productivity",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-statusline",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["statusline", "status", "ui", "context-window", "cost"],
+			"tags": ["ui", "monitoring", "automation"]
+		},
+		{
+			"name": "the-crucible",
+			"description": "Code quality validation pipeline: task completion checks and multi-agent code evaluation",
+			"version": "1.3.1",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/the-crucible",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-crucible",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["code-quality", "validation", "code-review", "multi-agent", "evaluation"],
+			"tags": ["quality", "review", "automation"]
+		},
+		{
+			"name": "the-coder",
+			"description": "Software engineering discipline: output styles, coding fundamentals, and universal development practices",
+			"version": "1.0.2",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/the-coder",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-coder",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["coding", "software-engineering", "output-styles", "development"],
+			"tags": ["coding", "engineering", "discipline"]
+		},
+		{
+			"name": "golang",
+			"description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
+			"version": "1.3.1",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/golang",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/golang",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["go", "golang", "conventions", "idioms"],
+			"tags": ["language", "go", "coding"]
+		},
+		{
+			"name": "javascript",
+			"description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
+			"version": "1.2.6",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/javascript",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/javascript",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["javascript", "typescript", "conventions", "patterns"],
+			"tags": ["language", "javascript", "typescript", "coding"]
+		},
+		{
+			"name": "frontend",
+			"description": "Frontend platform discipline: CSS, accessibility, and browser-specific practices",
+			"version": "1.2.5",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/frontend",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/frontend",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["frontend", "css", "accessibility", "browser", "web"],
+			"tags": ["platform", "frontend", "web"]
+		},
+		{
+			"name": "backend",
+			"description": "Backend platform discipline: observability, API design, and service architecture practices",
+			"version": "1.1.4",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/backend",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/backend",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["backend", "observability", "logging", "api", "services"],
+			"tags": ["platform", "backend", "services"]
+		},
+		{
+			"name": "cli",
+			"description": "CLI platform discipline: CLI application design, shell scripting conventions, and terminal UX",
+			"version": "1.1.2",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/cli",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/cli",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["cli", "command-line", "terminal", "shell-scripting", "bash", "ux"],
+			"tags": ["platform", "cli", "terminal"]
+		},
+		{
+			"name": "python",
+			"description": "Python language discipline: conventions, modern idioms, type system, packaging, testing, and LSP-powered code intelligence",
+			"version": "1.2.3",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/python",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/python",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["python", "conventions", "typing", "packaging"],
+			"tags": ["language", "python", "coding"]
+		},
+		{
+			"name": "php",
+			"description": "PHP language discipline: conventions, modern idioms, type system, OOP, testing, and LSP-powered code intelligence",
+			"version": "1.0.2",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/php",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/php",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["php", "conventions", "typing", "oop", "phpunit"],
+			"tags": ["language", "php", "coding"]
+		},
+		{
+			"name": "infrastructure",
+			"description": "Infrastructure management discipline: Ansible automation, container orchestration, Proxmox virtualization, Unraid NAS, and network architecture",
+			"version": "1.1.0",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/infrastructure",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/infrastructure",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["ansible", "docker", "proxmox", "unraid", "networking", "infrastructure", "devops"],
+			"tags": ["platform", "infrastructure", "devops"]
+		},
+		{
+			"name": "open-source",
+			"description": "Open-source contribution discipline: issue writing, pull request creation, and contribution etiquette",
+			"version": "1.0.0",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/open-source",
+			"category": "development",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/open-source",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": [
+				"open-source",
+				"issues",
+				"pull-requests",
+				"contribution",
+				"github",
+				"bug-reports",
+				"feature-requests"
+			],
+			"tags": ["workflow", "contribution", "discipline"]
+		},
+		{
+			"name": "the-workflow",
+			"description": "Agentic workflow mechanics: CLAUDE.md instruction quality and structured context handoff",
+			"version": "1.2.0",
+			"author": {
+				"name": "xobotyi",
+				"email": "xog3@yandex.ru"
+			},
+			"source": "./plugins/the-workflow",
+			"category": "productivity",
+			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-workflow",
+			"repository": "https://github.com/xobotyi/cc-foundry",
+			"license": "MIT",
+			"keywords": ["workflow", "handoff", "context-boundaries", "delegation", "claude-md", "instructions"],
+			"tags": ["workflow", "productivity", "automation"]
+		}
+	]
 }

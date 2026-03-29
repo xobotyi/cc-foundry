@@ -1,0 +1,18 @@
+{
+  "sources": {
+    "GitHub Docs: Creating an issue": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue",
+    "GitHub Docs: Configuring issue templates for your repository": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository",
+    "GitHub Docs: Syntax for issue forms": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms",
+    "GitHub Docs: Syntax for GitHub's form schema": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema",
+    "GitHub Docs: Setting guidelines for repository contributors": "https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors",
+    "Mozilla Bug Writing Guidelines": "https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html",
+    "Chromium Bug Reporting Guidelines": "https://www.chromium.org/for-testers/bug-reporting-guidelines/",
+    "web.dev: How to file a good browser bug": "https://web.dev/articles/how-to-file-a-good-bug",
+    "Daniel Stenberg: Death by a thousand slops": "https://daniel.haxx.se/blog/2025/07/14/death-by-a-thousand-slops/",
+    "GitHub Community: Exploring Solutions to Tackle Low-Quality Contributions": "https://github.com/orgs/community/discussions/185387",
+    "OpenSSF: AI-SLOP best practices for OSS maintainers": "https://github.com/ossf/wg-vulnerability-disclosures/issues/178",
+    "Developer Engagement with Feature Requests in Open Source (arXiv)": "https://arxiv.org/html/2507.13553v1",
+    "opensource.guide: How to Contribute to Open Source": "https://opensource.guide/how-to-contribute/"
+  },
+  "lastFetched": "2026-03-29T12:59:46.564Z"
+}

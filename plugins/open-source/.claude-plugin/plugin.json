@@ -1,0 +1,22 @@
+{
+  "name": "open-source",
+  "version": "1.0.0",
+  "description": "Open-source contribution discipline: issue writing, pull request creation, and contribution etiquette",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru",
+    "url": "https://github.com/xobotyi"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/open-source",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": [
+    "open-source",
+    "issues",
+    "pull-requests",
+    "contribution",
+    "github",
+    "bug-reports",
+    "feature-requests"
+  ]
+}

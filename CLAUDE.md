@@ -21,6 +21,7 @@ cc-foundry/
 │   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
 │   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
 │   ├── cli/              # CLI platform discipline (CLI design, shell scripting)
+│   ├── open-source/      # Open-source contribution discipline (issues, pull requests)
 │   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)
 │   ├── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
 │   ├── php/              # PHP language discipline (conventions, types, OOP, PHPUnit, Intelephense LSP)
