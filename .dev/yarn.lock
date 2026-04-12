@@ -11,14 +11,14 @@ __metadata:
   dependencies:
     "@mozilla/readability": "npm:^0.6.0"
     "@types/fs-extra": "npm:^11.0.4"
-    "@types/node": "npm:^25.1.0"
+    "@types/node": "npm:^25.6.0"
     "@types/turndown": "npm:^5.0.6"
-    citty: "npm:^0.2.0"
+    citty: "npm:^0.2.2"
     consola: "npm:^3.4.2"
-    fs-extra: "npm:^11.3.3"
+    fs-extra: "npm:^11.3.4"
     linkedom: "npm:^0.18.12"
-    turndown: "npm:^7.2.2"
-    typescript: "npm:^5.9.3"
+    turndown: "npm:^7.2.4"
+    typescript: "npm:^6.0.2"
   bin:
     foundry-tools: ./src/index.ts
   languageName: unknown
@@ -57,12 +57,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^25.1.0":
+"@types/node@npm:*":
   version: 25.1.0
   resolution: "@types/node@npm:25.1.0"
   dependencies:
     undici-types: "npm:~7.16.0"
   checksum: 10c0/5f393a127dc9565e2e152514a271455d580c7095afc51302e73ffe8aac3526b64ebacc3c10dd40c93cef81a95436ef2c6a8b522930df567a3f6b189c0eef649a
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^25.6.0":
+  version: 25.6.0
+  resolution: "@types/node@npm:25.6.0"
+  dependencies:
+    undici-types: "npm:~7.19.0"
+  checksum: 10c0/d2d2015630ff098a201407f55f5077a20270ae4f465c739b40865cd9933b91b9c5d2b85568eadaf3db0801b91e267333ca7eb39f007428b173d1cdab4b339ac5
   languageName: node
   linkType: hard
 
@@ -80,10 +89,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"citty@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "citty@npm:0.2.0"
-  checksum: 10c0/da72051262ec0e0390dc9800e16bae72a5c85d61982e4f74e3c502d08a3099428964405eb1b4cdc07a7fd5658f78db97c0111c503cde592a41e75a299ac45fb5
+"citty@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "citty@npm:0.2.2"
+  checksum: 10c0/c896c9dcd187d2a16685706d11428dcdec9eb59aa13fe50aff7b12e1d3521f1bf434d6a5316fe75a341f8ba5ce1d2beceb84f7f261d018985a73d3f6f2a793e3
   languageName: node
   linkType: hard
 
@@ -173,14 +182,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^11.3.3":
-  version: 11.3.3
-  resolution: "fs-extra@npm:11.3.3"
+"fs-extra@npm:^11.3.4":
+  version: 11.3.4
+  resolution: "fs-extra@npm:11.3.4"
   dependencies:
     graceful-fs: "npm:^4.2.0"
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
-  checksum: 10c0/984924ff4104e3e9f351b658a864bf3b354b2c90429f57aec0acd12d92c4e6b762cbacacdffb4e745b280adce882e1f980c485d9f02c453f769ab4e7fc646ce3
+  checksum: 10c0/e08276f767a62496ae97d711aaa692c6a478177f24a85979b6a2881c9db9c68b8c2ad5da0bcf92c0b2a474cea6e935ec245656441527958fd8372cb647087df0
   languageName: node
   linkType: hard
 
@@ -250,32 +259,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turndown@npm:^7.2.2":
-  version: 7.2.2
-  resolution: "turndown@npm:7.2.2"
+"turndown@npm:^7.2.4":
+  version: 7.2.4
+  resolution: "turndown@npm:7.2.4"
   dependencies:
     "@mixmark-io/domino": "npm:^2.2.0"
-  checksum: 10c0/ee09f7bd67c468505aad6c3a26b11269ca49ffce07eaa9c212926d068f242b11b4e955b31a58289f26674ff29f91209b29454907551dcaec7da712e524cc78c2
+  checksum: 10c0/8e66e24bc9d9cdcf720f0ee2655a61d9b9e60ebe2763e97a7a8c3f689e9154717bbea7ed48cc5e355651f34182da698c6bc5fef3028e5600c1cadb7e117376d5
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.9.3":
-  version: 5.9.3
-  resolution: "typescript@npm:5.9.3"
+"typescript@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "typescript@npm:6.0.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/6bd7552ce39f97e711db5aa048f6f9995b53f1c52f7d8667c1abdc1700c68a76a308f579cd309ce6b53646deb4e9a1be7c813a93baaf0a28ccd536a30270e1c5
+  checksum: 10c0/4b860b0bf87cc0fee0f66d8ef2640b5a8a8a8c74d1129adb82e389e5f97124383823c47946bef8a73ede371461143a3aa8544399d2133c7b2e4f07e81860af7f
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.9.3#optional!builtin<compat/typescript>":
-  version: 5.9.3
-  resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
+"typescript@patch:typescript@npm%3A^6.0.2#optional!builtin<compat/typescript>":
+  version: 6.0.2
+  resolution: "typescript@patch:typescript@npm%3A6.0.2#optional!builtin<compat/typescript>::version=6.0.2&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/ad09fdf7a756814dce65bc60c1657b40d44451346858eea230e10f2e95a289d9183b6e32e5c11e95acc0ccc214b4f36289dcad4bf1886b0adb84d711d336a430
+  checksum: 10c0/49f0b84fc6ca55653e77752b8a61beabc09ee3dae5d965c31596225aa6ef213c5727b1d2e895b900416dc603854ba0872ac4a812c2a4ed6793a601f9c675de02
   languageName: node
   linkType: hard
 
@@ -290,6 +299,13 @@ __metadata:
   version: 7.16.0
   resolution: "undici-types@npm:7.16.0"
   checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.19.0":
+  version: 7.19.2
+  resolution: "undici-types@npm:7.19.2"
+  checksum: 10c0/7159f10546f9f6c47d36776bb1bbf8671e87c1e587a6fee84ae1f111ae8de4f914efa8ca0dfcd224f4f4a9dfc3f6028f627ccb5ddaccf82d7fd54671b89fac3e
   languageName: node
   linkType: hard
 
