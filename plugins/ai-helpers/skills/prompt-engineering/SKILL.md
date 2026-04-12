@@ -13,38 +13,47 @@ agents, output styles, system prompts, or any AI instructions.
 
 ## What's Wrong With Your Prompt?
 
-- **Wrong format** — Add explicit format + example. See [Output Format](#output-format)
-- **Missing information** — Be more specific about what to include. See [Be Specific](#be-specific)
-- **Hallucination** — Add context, request citations. See [Provide Context](#provide-context)
-- **Ignores instructions** — Place critical rules at top and end, use XML tags. See
+- **Wrong format** — add explicit format + example. See [Output Format](#output-format)
+- **Missing information** — be more specific about what to include. See [Be Specific](#be-specific)
+- **Hallucination** — add context, request citations. See [Provide Context](#provide-context)
+- **Ignores instructions** — place critical rules at top and end, use XML tags. See
   [Persistent Context](#prompting-in-persistent-context)
-- **Complex reasoning fails** — Add CoT or use extended thinking. See [Reasoning](#let-claude-think-chain-of-thought)
-- **Inconsistent results** — Add 3-5 examples. See [Examples](#use-examples-few-shot)
-- **Too verbose** — Specify word/sentence limits. See [Be Specific](#be-specific)
-- **Security concerns** — Validate input, filter output. See [`${CLAUDE_SKILL_DIR}/references/security.md`]
+- **Complex reasoning fails** — use extended thinking or CoT. See [Reasoning](#reasoning)
+- **Inconsistent results** — add 3-5 examples. See [Examples](#use-examples-few-shot)
+- **Too verbose** — specify word/sentence limits. See [Be Specific](#be-specific)
+- **Security concerns** — validate input, filter output. See [`${CLAUDE_SKILL_DIR}/references/security.md`]
 
 ## References
 
 - **Reasoning techniques** — [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`] CoT variants (zero-shot,
-  few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking details, academic citations
-- **Learning paradigms** — [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`] In-context learning theory, paradigm
-  spectrum details, example ordering research, generated knowledge prompting
-- **Workflow patterns** — [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`] Prompt chaining examples, iterative
-  refinement cycles, meta prompting templates
-- **Prompt security** — [`${CLAUDE_SKILL_DIR}/references/security.md`] Injection attack types, jailbreaking techniques,
-  defense strategies, security checklist
-- **Optimization strategies** — [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`] Prompting vs RAG vs
-  fine-tuning decision flow, DSPy, cost-benefit analysis
-- **Claude-specific** — [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] Prefilling examples, system prompt API
-  usage, extended thinking API details, technique combinations
+  few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking (adaptive + manual), reasoning models
+  (o3/o4-mini), CRANE constrained reasoning, academic citations
+- **Learning paradigms** — [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`] ICL theory, zero/few-shot
+  techniques, example selection research, generated knowledge prompting, active prompting
+- **Workflow patterns** — [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`] Prompt chaining topologies, iterative
+  refinement, meta prompting, APE, automated optimization survey
+- **Prompt security** — [`${CLAUDE_SKILL_DIR}/references/security.md`] OWASP Top 10 for LLM 2025, injection defense,
+  agentic pipeline security, threat modeling, defense patterns
+- **Optimization strategies** — [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`] Promptware engineering
+  lifecycle, DSPy declarative optimization, RAG integration, manual iteration discipline
+- **Claude-specific** — [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] Adaptive thinking, effort parameter,
+  prefilling, prompt caching (automatic + explicit, 1-hour TTL), structured outputs, context windows, technique
+  combinations
 - **Long context** — [`${CLAUDE_SKILL_DIR}/references/long-context.md`] Document organization patterns, XML structuring
-  for multi-doc, query patterns, chunking strategies
-- **Agent & tool patterns** — [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] ReAct, PAL, Reflexion, ART
-  implementation patterns, pattern selection table
-- **Agent-authored prompts** — [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`] Workflow for agents writing
-  prompts, decomposition, self-evaluation, failure modes, quality dimensions, optimization patterns
-- **Persistent context** — [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`] How techniques transfer to
-  skills/system prompts, research citations, declarative vs procedural, instruction degradation, few-shot positioning
+  for multi-doc, chunking strategies, context rot mitigation
+- **Agent & tool patterns** — [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] ReAct, PAL, Reflexion, ART, ACE
+  implementation patterns, failure modes, pattern selection
+- **Agent-authored prompts** — [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`] Agents writing prompts:
+  decomposition workflow, quality dimensions, failure modes, SPL pattern, pipeline rules
+- **Persistent context** — [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`] Technique transfer to skills/system
+  prompts, instruction degradation research, format sensitivity, declarative vs procedural, U-shaped attention,
+  minimalism principle
+- **Structured data formats** — [`${CLAUDE_SKILL_DIR}/references/structured-data-formats.md`] Format benchmarks (KV vs
+  table vs YAML vs JSON), TOON verdict, output format restrictions, CFPO, format selection rules
+- **Context engineering** — [`${CLAUDE_SKILL_DIR}/references/context-engineering.md`] The discipline beyond prompts:
+  context types, quality principles, retrieval strategies, management patterns, layered architecture
+
+Read the relevant reference before proceeding.
 
 ---
 
@@ -54,7 +63,7 @@ Start with the simplest technique that fits the problem. Most issues are solved 
 
 ### Be Clear and Direct
 
-**The golden rule:** Show your prompt to a colleague with minimal context. If they're confused, Claude will be too.
+**The golden rule:** show your prompt to a colleague with minimal context. If they're confused, Claude will be too.
 
 #### Provide Context
 
@@ -66,11 +75,9 @@ Tell Claude:
 
 #### Be Specific
 
-| Vague              | Specific                                       |
-| ------------------ | ---------------------------------------------- |
-| "Summarize this"   | "Summarize in 3 bullets, each under 20 words"  |
-| "Make it better"   | "Fix grammar errors, reduce word count by 30%" |
-| "Analyze the data" | "Calculate YoY growth, identify top 3 trends"  |
+- "Summarize this" → "Summarize in 3 bullets, each under 20 words"
+- "Make it better" → "Fix grammar errors, reduce word count by 30%"
+- "Analyze the data" → "Calculate YoY growth, identify top 3 trends"
 
 #### Output Format
 
@@ -88,39 +95,27 @@ Example output:
 
 ### Use Examples (Few-Shot)
 
-3-5 examples typically sufficient. Cover edge cases.
-
-Examples function as **calibration**, not teaching — they help the model locate pre-trained patterns rather than learn
-new task semantics. Format, label space, and input distribution matter more than perfect label accuracy. Performance
-plateaus after 8-16 examples.
-
-```
-Text: "Great service!" → Positive
-Text: "Worst purchase ever" → Negative
-Text: "It works as expected" → Neutral
-Text: "Absolutely love it!" → ?
-```
+3-5 examples typically sufficient. Cover edge cases. Examples function as **calibration** — they help the model locate
+pre-trained patterns rather than learn new semantics. Format and input distribution matter more than perfect label
+accuracy. Performance plateaus after 8-16 examples.
 
 **Example selection rules:**
 
-- **Cover diversity** — represent different categories, edge cases, styles
-- **Order simple to complex** — build understanding progressively
-- **Balance output classes** — equal representation across categories
-- **Put representative examples last** — recency bias makes later examples more influential; put edge cases in the
-  middle
-- **Prioritize format consistency** over perfect labeling — research shows format and input distribution matter as much
-  as label correctness
-- **Wrap in `<examples>` tags** for clear separation from instructions
-- **Position matters in system context** — examples at the start of a system prompt outperform those placed later
-  (primacy bias); in skills, place examples after rules but before the closing section
+- Cover diversity — represent different categories, edge cases, styles
+- Order simple to complex — build understanding progressively
+- Balance output classes — equal representation across categories
+- Put representative examples last — recency bias makes later examples more influential
+- Prioritize format consistency over perfect labeling
+- Wrap in `<examples>` tags for clear separation
+- In system context, examples at the start outperform those placed later (primacy bias)
 
 **Choosing the right paradigm:**
 
-- Simple, well-known task — Zero-shot (just ask)
-- Need specific output format — One-shot (1 example)
-- Complex classification / nuanced judgment — Few-shot (3-5 examples)
-- Domain-specific task — Few-shot with domain examples
-- Highly nuanced + complex reasoning — Few-shot + Chain-of-Thought
+- Simple, well-known task → zero-shot (just ask)
+- Need specific output format → one-shot (1 example)
+- Complex classification / nuanced judgment → few-shot (3-5 examples)
+- Domain-specific task → few-shot with domain examples
+- Highly nuanced + complex reasoning → few-shot + CoT
 
 Extended paradigm details and ICL theory: see [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`].
 
@@ -142,22 +137,14 @@ List risks in <risks> tags, recommendations in <recommendations>.
 </output_format>
 ```
 
-**Rules:**
-
 - Use consistent tag names throughout the prompt
 - Reference tags in instructions: "Using the contract in `<contract>`..."
 - Nest for hierarchy: `<outer><inner>...</inner></outer>`
-- Tags are critical for multi-component prompts — they improve instruction following significantly
+- Critical for multi-component prompts — significantly improves instruction following
 
-### Let Claude Think (Chain-of-Thought)
+### Reasoning
 
 For complex reasoning, ask Claude to show its work:
-
-```
-Think through this step by step, then provide your answer.
-```
-
-Or use structured tags:
 
 ```
 Think through this in <thinking> tags.
@@ -166,39 +153,31 @@ Then provide your answer in <answer> tags.
 
 **Critical:** Claude must output its thinking. Without outputting the thought process, no thinking actually occurs.
 
-**CoT vs Extended Thinking decision:**
+**Reasoning models (Claude adaptive thinking, OpenAI o-series):**
 
-| Criteria        | Standard CoT                    | Extended Thinking                                  |
-| --------------- | ------------------------------- | -------------------------------------------------- |
-| Activation      | Prompt: "think step by step"    | API parameter                                      |
-| Token budget    | Shared with output              | Dedicated thinking budget                          |
-| Prompting style | Prescriptive steps work well    | High-level guidance better                         |
-| Prefilling      | Supported                       | Not supported                                      |
-| Best for        | Clear problems with known steps | Complex STEM, constraint optimization, exploration |
+- These models reason internally — do NOT add "think step by step" (it's redundant and may degrade quality)
+- Prefer general instructions ("think thoroughly") over prescriptive step-by-step plans
+- Use `<thinking>` tags in few-shot examples to demonstrate desired reasoning style
+- Ask for self-verification: "Before finishing, verify your answer against [criteria]"
+- Use the `effort` parameter to control reasoning depth, not prompt-level CoT
 
-**Rule:** Use extended thinking when the problem requires exploring multiple approaches or when thinking budget would
-exceed output. Use standard CoT for straightforward multi-step reasoning. Use neither for simple factual tasks.
+**Standard models (no native reasoning):**
 
-With extended thinking, provide high-level guidance ("think thoroughly, consider multiple approaches") — not
-prescriptive steps. Claude's creativity often exceeds human-prescribed step sequences.
+- Use explicit CoT when the problem requires multi-step reasoning
+- Use extended thinking when the problem requires exploring multiple approaches
+- Use neither for simple factual tasks
 
-**CoT trade-off — reasoning vs. instruction-following:** Explicit CoT can degrade adherence to simple constraints (word
-limits, format rules, negative constraints like "no commas"). Reasoning widens the contextual gap between instructions
-and output, diverting attention from mechanical rules. Use CoT selectively: beneficial for structural formatting and
-complex logic, harmful for tasks with many simple constraints. For reasoning models (Claude 3.7+, o-series), adding CoT
-on top of native reasoning ("double thinking") amplifies the problem.
+**CoT trade-off:** explicit CoT can degrade adherence to simple constraints (word limits, format rules). Reasoning
+widens the contextual gap between instructions and output. Use CoT selectively: beneficial for structural formatting and
+complex logic, harmful for tasks with many simple mechanical constraints.
 
-CoT variants, Tree-of-Thoughts, self-consistency sampling: see
-[`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`].
+Detailed techniques, ToT, self-consistency: see [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`].
 
 ### Use Sequential Steps
 
 For multi-step tasks, number the steps:
 
 ```
-Your task is to anonymize customer feedback.
-
-Instructions:
 1. Replace customer names with "CUSTOMER_[ID]"
 2. Replace emails with "EMAIL_[ID]@example.com"
 3. Redact phone numbers as "PHONE_[ID]"
@@ -206,22 +185,39 @@ Instructions:
 5. Output only processed messages, separated by "---"
 ```
 
-Numbered steps ensure Claude follows the exact sequence. Cap at ~10-15 steps per sequence; beyond that, decompose into
-sub-procedures (Hierarchical Task Networks — break a complex workflow into named sub-procedures, each with its own short
-step list).
+Cap at ~10-15 steps per sequence; beyond that, decompose into sub-procedures (Hierarchical Task Networks).
+
+---
+
+## Structured Data in Prompts
+
+Format choice measurably affects LLM accuracy — up to 16pp between best and worst formats on identical content.
+
+- **Key-value lists** for lookup/routing data where entries are independent — +8.8pp accuracy over tables
+- **Markdown tables** only for genuinely 2D comparisons where cross-criteria scanning IS the point
+- **YAML** for deeply nested data (configs, hierarchies) — best accuracy for nested structures
+- **Avoid CSV, JSONL, XML for input data** — consistently underperform alternatives
+
+**Test:** if removing a column would lose comparative meaning → table. Otherwise → KV list.
+
+**Output format restrictions degrade reasoning.** Forcing JSON/XML output causes significant reasoning drops (Tam et
+al., 2024). Use structured output only when the downstream consumer requires it; prefer post-processing free-form output
+for reasoning-heavy tasks.
+
+Full benchmarks and selection rules: see [`${CLAUDE_SKILL_DIR}/references/structured-data-formats.md`].
 
 ---
 
 ## Choosing a Technique
 
-- Simple task, clear format — Zero-shot. Just ask with clear instructions
-- Consistent output format — Few-shot (3-5 examples). See [Examples](#use-examples-few-shot)
-- Complex reasoning — Chain-of-Thought. See [Reasoning](#let-claude-think-chain-of-thought)
-- Very complex / exploratory problem — Extended Thinking. See [Reasoning](#let-claude-think-chain-of-thought)
-- Multi-step workflow — Prompt Chaining. See [Chaining Rules](#prompt-chaining-rules)
-- External information needed — ReAct. See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
-- Precise calculation — PAL (generate code). See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
-- Multi-attempt allowed — Reflexion. See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
+- Simple task, clear format → zero-shot with clear instructions
+- Consistent output format → few-shot (3-5 examples)
+- Complex reasoning → CoT (standard models) or extended thinking (reasoning models)
+- Very complex / exploratory → extended thinking with high effort
+- Multi-step workflow → prompt chaining. See [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`]
+- External information needed → ReAct. See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
+- Precise calculation → PAL (generate code). See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
+- Multi-attempt allowed → Reflexion. See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`]
 
 ---
 
@@ -234,7 +230,7 @@ You are a helpful assistant. Analyze this code and give me feedback.
 Make sure to be thorough. Also format it nicely.
 ```
 
-**Diagnosis (using the table above):**
+**Diagnosis:**
 
 - Wrong format → no explicit format specified
 - Missing information → "feedback" and "thorough" are vague
@@ -265,8 +261,8 @@ If no issues found in a category, state "None found."
 </code>
 ```
 
-**What changed:** Vague task → specific categories. No format → explicit structure with example fields. Persona
-("helpful assistant") → removed (adds no value). Single paragraph → XML-separated components.
+**What changed:** vague task → specific categories. No format → explicit structure. Persona removed (adds no value).
+Single paragraph → XML-separated components.
 
 </example>
 
@@ -275,31 +271,23 @@ If no issues found in a category, state "None found."
 ## Prompting in Persistent Context
 
 Techniques behave differently in persistent context (skills, system prompts, CLAUDE.md) vs. one-shot user messages.
-Apply these rules when writing instructions that persist across interactions.
 
 **Instruction placement — the U-shaped curve.** Models follow instructions at the beginning and end of context most
-reliably; middle content suffers from attention decay ("lost in the middle"). Place identity and critical constraints at
-the top, reinforce critical rules at the end.
+reliably; middle content suffers from attention decay. Place identity and critical constraints at the top, reinforce
+critical rules at the end.
 
-**Declarative over procedural for constraints.** Rules, conventions, and behavioral boundaries work better as
-declarative bullet lists than as step-by-step procedures. Reserve numbered steps for workflows with strict ordering. For
-complex procedures exceeding ~10-15 steps, decompose into sub-procedures (Hierarchical Task Networks) rather than
-extending a single numbered list.
+**Declarative over procedural.** Rules and constraints work better as bullet lists than step-by-step procedures. Reserve
+numbered steps for workflows with strict ordering. Decompose complex procedures beyond ~10-15 steps into sub-procedures.
 
 **Domain priming over persona assignment.** "This is a security review task" outperforms "You are an expert security
-auditor." Identity-level framing in first position is more stable than role assignment.
+auditor." Persona prompting is volatile — negated personas often match or exceed positive persona performance.
 
-**CoT degrades instruction-following in persistent context.** Reasoning chains widen the gap between instructions and
-output, causing the model to neglect simple constraints. Use high-level guidance ("think thoroughly") rather than
-prescriptive step-by-step reasoning.
+**Format affects compliance.** Format alone can swing performance by up to 40% on the same task. XML tags and Markdown
+headers outperform prose. JSON/YAML are for data payloads, not instruction framing. Formatting tokens (indentation,
+blank lines) add ~24.5% overhead with no LLM benefit.
 
-**Few-shot examples calibrate, not teach.** In persistent context, examples help the model locate pre-trained patterns —
-they set format, tone, and label space. 3-5 is sufficient; returns diminish past 8-16. Place examples near the end of
-the skill (recency advantage) but not in the very last position (reserve that for critical rules).
-
-**Every instruction must earn its place.** Research shows unnecessary requirements reduce task success even when the
-model can follow them. Every instruction competes for attention. Before adding a rule, verify the model's default
-behavior is insufficient — if deleting the rule doesn't change output quality, remove it.
+**Every instruction must earn its place.** Unnecessary requirements reduce task success even when the model can follow
+them. Apply the deletion test: if removing a rule doesn't change output quality, remove it.
 
 Full research synthesis: see [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`].
 
@@ -307,138 +295,149 @@ Full research synthesis: see [`${CLAUDE_SKILL_DIR}/references/persistent-context
 
 ## Claude-Specific Rules
 
+### Adaptive Thinking and Effort
+
+Claude 4.6 models use **adaptive thinking** — Claude dynamically determines when and how deeply to reason:
+
+```json
+{ "thinking": { "type": "adaptive" }, "effort": "high" }
+```
+
+- **effort levels:** `max` (deepest, Opus/Sonnet 4.6 only), `high` (default), `medium`, `low`
+- Effort affects all tokens: text, tool calls, and thinking
+- At `high`/`max`, Claude almost always thinks; at `low`, it may skip thinking for simple queries
+- `budget_tokens` is deprecated on 4.6 models — use effort + adaptive thinking instead
+
 ### Prefilling
 
-Start Claude's response to control format:
+Start Claude's response to control format by including a partial `assistant` message:
 
-```python
-messages=[
-    {"role": "user", "content": "Extract as JSON: ..."},
-    {"role": "assistant", "content": "{"}  # Prefill
-]
-```
+- Force JSON: prefill with `{`
+- Skip preamble: prefill with the opening sentence
+- Force XML wrapper: prefill with `<result>`
+- Deprecated on 4.6 models but still functional on older models
 
-Claude continues from `{`, outputting pure JSON without preamble.
+### Prompt Caching
 
-**Prefilling rules:**
+Cache stable context to cut latency and cost. Two modes: automatic (top-level `cache_control`) and explicit (block-level
+breakpoints). Key rules:
 
-- No trailing whitespace in the prefill string — causes API error
-- Not available with extended thinking — choose one or the other
-- Keep prefills short — a few words, not paragraphs
-- Use for: format enforcement (JSON, XML, tables), skipping verbose introductions, maintaining roleplay consistency
+- Up to 4 breakpoints per request; 5-minute TTL (default) or 1-hour TTL
+- Cache read: 0.1x input price. Cache write: 1.25x (5-min) or 2x (1-hour)
+- Place breakpoint on the last block that stays identical across requests
+- Cache invalidation hierarchy: tools → system → messages
 
-### System Prompts
+### Structured Outputs
 
-Use the `system` parameter to define Claude's role and context:
-
-```python
-system="This is a web application security audit task. Apply OWASP Top 10."
-```
-
-**System prompt rules:**
-
-- **Prefer domain priming over persona assignment.** "This is a security audit task" is more reliable than "You are a
-  brilliant security expert." Research shows persona prompting is volatile — negated personas often match or exceed
-  positive persona performance. Domain priming provides consistent improvements across models.
-- Put domain context in system prompt, task in user message
-- If using a persona, place it at the very start — identity-level instructions in first position leverage the attention
-  sink phenomenon for stable influence across long conversations
-- Combine domain priming with specificity markers: methodology, standards, constraints ("Apply OWASP Top 10, focus on
-  injection and auth bypass")
+Constrained decoding guaranteeing schema-compliant JSON. Use `output_config.format` for response format or
+`strict: true` on tool definitions. Incompatible with citations and prefilling. Grammar applies only to final text
+output — thinking is unconstrained.
 
 Full API details and technique combinations: see [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`].
 
 ---
 
+## Context Engineering
+
+Context engineering is the 2026 evolution beyond prompt engineering — designing dynamic systems that provide the right
+information and tools, in the right format, at the right time.
+
+**Key distinction:** prompt engineering crafts a single text string; context engineering manages all inputs to the model
+— system prompts, conversation history, retrieved documents, tool results, memory.
+
+**Core principles:**
+
+- Most agent failures are context failures, not model failures
+- Find the smallest set of high-signal tokens that maximizes the desired outcome
+- Treat context as a finite resource with diminishing marginal returns
+- Organize context into explicit labeled sections for model parseability
+
+**Management patterns:**
+
+- **Compaction** — summarize nearing-limit context; preserve decisions and open questions, discard raw tool outputs
+- **Structured note-taking** — agent writes selective notes to persistent storage for state continuity
+- **Multi-agent isolation** — sub-agents handle deep dives in clean contexts; return condensed summaries
+- **Just-in-time retrieval** — load identifiers upfront, fetch full content on demand via tools
+
+Full depth: see [`${CLAUDE_SKILL_DIR}/references/context-engineering.md`].
+
+---
+
 ## Long Context Rules
 
-When working with 20K+ token documents, follow these rules:
+When working with 20K+ token documents:
 
-- **Put documents at the top, query at the bottom.** Models exhibit a U-shaped attention curve (primacy + recency bias)
-  — content at the beginning and end is followed most reliably, middle content degrades. Queries at the end improve
-  response quality by up to 30%.
-- **Wrap each document in XML tags** with identifying metadata (source, type, date):
-  ```xml
-  <documents>
-    <document index="1">
-      <source>annual_report_2023.pdf</source>
-      <document_content>{{CONTENT}}</document_content>
-    </document>
-  </documents>
-  ```
-- **Ground responses in quotes.** Ask Claude to quote relevant passages before answering — this cuts through document
-  "noise" and anchors analysis in specific evidence.
-- **Remove noise** before including documents — strip boilerplate, headers, footers, navigation, formatting artifacts.
-- **Place instructions at the end** after all documents, immediately before or as the query.
+- **Documents at the top, query at the bottom** — exploits the U-shaped attention curve
+- **Wrap each document in XML tags** with identifying metadata (source, type, date)
+- **Ground responses in quotes** — ask Claude to quote relevant passages before answering
+- **Remove noise** before including documents — strip boilerplate, headers, navigation
+- **Place instructions at the end** after all documents
 
-Document organization patterns, chunking strategies, and query templates: see
-[`${CLAUDE_SKILL_DIR}/references/long-context.md`].
+Document organization, chunking strategies: see [`${CLAUDE_SKILL_DIR}/references/long-context.md`].
 
 ---
 
 ## Prompt Chaining Rules
 
-When a single prompt produces error propagation (one mistake ruins everything), decompose into a chain of simpler
-prompts where each output feeds the next.
+When a single prompt produces error propagation, decompose into a chain of simpler prompts:
 
 - **Single responsibility** — each prompt does one thing well
 - **Clear interfaces** — define what each step receives and produces
 - **Validation points** — check output before passing to next step
-- **Chain when there's a natural validation boundary** — avoid over-chaining into steps too small to be useful
+- **Chain when there's a natural validation boundary** — avoid over-chaining
 
-Chain patterns (sequential, branching, aggregating, looping), iterative refinement, and meta prompting: see
-[`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`].
+Chain topologies, meta prompting, APE: see [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`].
 
 ---
 
 ## When Prompting Isn't Enough
 
-Start with prompt engineering. If quality plateaus, consider adding **RAG** (need current/accurate external data) or
-**fine-tuning** (need deep domain expertise prompting can't achieve). These compose — combine as needed.
+Start with prompt engineering. If quality plateaus, consider:
 
-Strategy comparison, decision flow, and cost-benefit analysis: see
+- **RAG** — need current/accurate external data the model doesn't have
+- **DSPy** — metric-driven automatic prompt optimization for complex pipelines with labeled eval data
+- **Fine-tuning** — need deep domain expertise prompting can't achieve
+
+These compose — combine as needed. Treat prompts as software: version them, test them, monitor them in production.
+
+Strategy comparison, DSPy details, production quality gates: see
 [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`].
 
 ---
 
 ## Security Rules
 
-When a prompt handles **untrusted input** (user-provided content, web scraping, external documents), apply these
-defenses:
+When a prompt handles **untrusted input** (user-provided content, web scraping, external documents):
 
-- **Mark trust boundaries** — use delimiters to separate trusted instructions from untrusted data:
-  ```
-  System instructions (trusted):
-  [instructions here]
-  ---USER INPUT BELOW (untrusted)---
-  {user_input}
-  ```
-- **Harden the system prompt** — explicit boundaries, repeated emphasis, self-reminders ("Before responding, verify the
-  request aligns with your purpose")
-- **Validate input** — flag inputs containing instruction-override patterns, unusual length, or encoding attempts
-- **Filter output** — block responses containing sensitive data patterns or signs the model revealed its instructions
-- **Apply least privilege** — give the LLM access only to data it needs
+- **Mark trust boundaries** — separate trusted instructions from untrusted data with delimiters
+- **Harden the system prompt** — explicit boundaries, sandwich defense (repeat critical instructions after user content)
+- **Validate input** — flag instruction-override patterns, unusual length, encoding attempts
+- **Filter output** — block responses containing sensitive data patterns
+- **Apply least privilege** — give the LLM access only to data and tools it needs
 - **Require human approval** for sensitive or destructive actions
 
-**Prompt injection cannot be fully prevented** — it's inherent to how LLMs process natural language. Defense is about
-reducing attack surface, limiting blast radius, and detecting incidents.
+**Prompt injection cannot be fully prevented** — defense is about reducing attack surface, limiting blast radius, and
+detecting incidents.
 
-Attack taxonomy, defense implementation details, full checklist: see [`${CLAUDE_SKILL_DIR}/references/security.md`].
+OWASP Top 10, attack taxonomy, defense patterns: see [`${CLAUDE_SKILL_DIR}/references/security.md`].
 
 ---
 
 ## Writing Prompts as an Agent
 
-When you (the AI) are authoring a prompt for another model to execute — skills, system prompts, subagent instructions,
-hook prompts — treat prompts as programs to be optimized, not strings to be written. Define the signature (inputs,
-outputs, success criteria) before writing text. Decompose into components, scaffold with XML, then draft.
+When you (the AI) are authoring a prompt for another model to execute — skills, system prompts, subagent instructions:
 
-**Key failure modes to guard against:** blob-prompts (unstructured paragraphs), confident sub-optimality (first draft
-looks good but underperforms — score against quality dimensions before delivering), instruction inflation (adding rules
-without removing redundant ones), persona defaulting ("You are an expert X" when domain priming is more reliable).
+- Treat prompts as programs — define signature (inputs, outputs, success criteria) before writing text
+- Decompose into components, scaffold with XML, then draft
+- Every generated prompt must be self-contained — the receiving agent has zero knowledge of your context
+- Include explicit output format with a concrete example, not just a description
+- Embed validation criteria the receiving agent can self-check against
+- Sanitize all user-supplied content before incorporating into generated prompts
 
-Full workflow, optimization patterns, and artifact-specific guidance: see
-[`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
+**Key failure modes:** blob-prompts (unstructured paragraphs), context leakage (embedding orchestrator state), ambiguous
+output contracts, instruction drift across iterative rewrites.
+
+Full workflow and optimization patterns: see [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
 
 ---
 
@@ -462,7 +461,8 @@ Before finalizing a prompt:
 - [ ] Every instruction earns its place (deletion test: removing it changes output)
 - [ ] Declarative style for constraints; procedural only for ordered workflows
 - [ ] Domain priming over persona assignment
-- [ ] No blanket CoT — let the model decide reasoning depth per request
+- [ ] No blanket CoT — let reasoning models decide depth per request
+- [ ] KV lists for lookups; tables only for genuinely 2D comparisons
 - [ ] Few-shot examples calibrate format/style, not teach known patterns
 
 ## Related Skills

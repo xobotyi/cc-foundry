@@ -1,267 +1,214 @@
 # Learning Paradigms
 
-How models learn from examples within prompts — the spectrum from zero examples to many.
+In-context learning (ICL) and related techniques — how models learn from demonstrations without weight updates.
 
-## Contents
+---
 
-- [The Paradigm Spectrum](#the-paradigm-spectrum)
-- [Zero-Shot Prompting](#zero-shot-prompting)
-- [One-Shot Prompting](#one-shot-prompting)
-- [Few-Shot Prompting](#few-shot-prompting)
-- [In-Context Learning (ICL)](#in-context-learning-icl)
-- [Generated Knowledge Prompting](#generated-knowledge-prompting)
-- [Practical Guidelines](#practical-guidelines)
-- [References](#references)
+## Theoretical Foundation
 
-## The Paradigm Spectrum
+**What prompting actually does (Kim et al., arXiv:2512.12688):**
 
-```
-Zero-shot → One-shot → Few-shot → Many-shot
-   ↓           ↓          ↓           ↓
-No examples  1 example  3-5 examples  Many examples
-```
+- A fixed Transformer backbone can approximate a broad class of target behaviors via prompts alone
+- Attention performs selective routing from prompt memory (the demonstrations)
+- FFN performs local arithmetic conditioned on retrieved fragments
+- Depth-wise stacking composes local updates into multi-step computation
+- Prompt = externally injected program; backbone = executor
 
-All operate through **in-context learning (ICL)** — the model adapts to the task from the prompt alone, without
-parameter updates.
+**Mechanism:** The prompt switches model behavior without changing weights. This is not retrieval — it is computation
+redirection. Increasing prompt length/precision expands the function space reachable without fine-tuning.
+
+**Practical implication:** ICL works because the model is not "following instructions" in a shallow sense — it is
+executing a compressed program. Demonstrations are code, not hints.
 
 ---
 
 ## Zero-Shot Prompting
 
-Task description only. No examples. Relies entirely on pre-trained knowledge.
+Model performs a task with no examples, relying entirely on pre-trained knowledge and instruction tuning.
 
-```
-Classify the sentiment of this review as positive, negative,
-or neutral: "The product arrived damaged but customer service
-was helpful."
-```
+**When it works:**
 
-### When It Works
+- Tasks the model has seen extensively during training (classification, translation, summarization)
+- Simple, well-defined operations with unambiguous output format
 
-- Task is common (sentiment, translation, summarization)
-- Instructions are unambiguous
-- Output format is standard
-- Model is large enough to have learned the pattern
+**When it fails:**
 
-### When It Fails
+- Novel task formats the model hasn't seen
+- Multi-step reasoning requiring intermediate steps
+- Tasks requiring specific domain knowledge not in training data
 
-- Novel or domain-specific tasks
-- Precise output format required
-- Task requires nuanced judgment
-- Smaller models with less pre-training
+**Enabling factors (Wei et al., 2022):**
 
-### Strengthening Zero-Shot
+- Instruction tuning on datasets described via instructions dramatically improves zero-shot capability
+- RLHF (Christiano et al., 2017) further aligns zero-shot behavior to human preferences
+- Scale: zero-shot capability emerges with model size (Kaplan et al., 2020)
 
-**Instruction clarity:** Be explicit about format, constraints, scope.
-
-**Domain priming:** "This is a legal risk assessment task. Apply contract law principles." (More reliable than persona
-assignment — see SKILL.md "System Prompts" section.)
-
-**Output anchoring:** "Respond with exactly one word: positive, negative, or neutral."
-
----
-
-## One-Shot Prompting
-
-Single example demonstrates the pattern.
-
-```
-Review: "Excellent quality, fast shipping" → Positive
-Review: "Product broke after one week" → ?
-```
-
-### When to Use
-
-- Format demonstration needed
-- Task is clear but output style matters
-- Zero-shot produces wrong format
-- Adding more examples has diminishing returns
-
-### Limitations
-
-- Single example may not cover edge cases
-- Model might overfit to the specific example
-- Doesn't establish robust pattern for complex tasks
+**Escalation rule:** When zero-shot fails, move to few-shot before reaching for fine-tuning.
 
 ---
 
 ## Few-Shot Prompting
 
-Multiple examples (typically 3-5) establish the pattern.
+Provide k input-output demonstrations in the prompt to condition the model's behavior. First appeared at sufficient
+model scale (Kaplan et al., 2020; Touvron et al., 2023). Demonstrated systematically by Brown et al. (2020) with GPT-3.
 
-```
-Text: "I love this!" → Positive
-Text: "Terrible experience" → Negative
-Text: "It's okay I guess" → Neutral
-Text: "Best purchase ever!" → ?
-```
+### What demonstrations actually teach (Min et al., 2022)
 
-### Why Few-Shot Works
+- **Label space:** Which output categories are valid — more important than correct labels per example
+- **Input distribution:** What kinds of inputs are relevant to the task
+- **Output format:** The structure and style of acceptable answers
+- **Correct label mapping:** Least important — random labels still outperform no labels
 
-The model recognizes the input→output mapping pattern and applies it to new inputs. This is **in-context learning** —
-temporary task adaptation without weight updates.
+**Key finding:** Format consistency matters more than label accuracy. A well-formatted few-shot prompt with random
+labels outperforms a zero-shot prompt.
 
-**Key research insight (Min et al., 2022):** Format and distribution matter as much as — sometimes more than — label
-correctness:
+### Shot count guidance
 
-- Label space (the set of possible outputs) matters
-- Input distribution (what examples look like) matters
-- Consistent format helps even with random labels
-- True labels are less important than having any labels
+- `k` — number of demonstrations to provide
+- 1-shot — sufficient for simple format learning
+- 3–5 shot — standard for most tasks
+- 10+ shot — complex tasks, multi-class classification
+- Diminishing returns after ~10 for most tasks; cost scales with context length
 
-This means: prioritize format consistency and representative examples over perfect labeling for every edge case.
+### Example selection
 
-### Example Selection Strategies
+- **Label balance:** Include examples from all output classes proportionally (Min et al., 2022 — true label distribution
+  beats uniform)
+- **Input diversity:** Vary surface form, not just class
+- **Difficulty gradient:** Start simple, increase complexity (ordering effect — later examples have stronger priming)
+- **Relevance:** Examples semantically similar to the test input outperform random selection
 
-**Diversity:** Cover different categories, edge cases, styles.
+### Format effects
 
-**Similarity:** Select examples semantically close to expected inputs (use embeddings for matching).
+- Consistent delimiters between input and output across all examples
+- Same output format in every demonstration — model extrapolates the pattern
+- Include a final prompt ending mid-example to force completion in the established format
 
-**Difficulty progression:** Simple → moderate → complex ordering helps model build understanding.
+### Hard limits
 
-**Balance:** Equal representation across output classes.
-
-### Example Ordering
-
-Order affects performance:
-
-- Recency bias: later examples weighted more
-- Primacy effect: first examples set expectations
-
-**Best practice:** Put most representative examples last, edge cases in the middle.
-
-### Optimal Example Count
-
-- 3-5 examples: typical sweet spot
-- More isn't always better (context window cost)
-- Diminishing returns after 5-7 for most tasks
-- Complex tasks may need more
-
----
-
-## In-Context Learning (ICL)
-
-The mechanism underlying all shot paradigms. Model adapts to task from prompt examples without updating parameters.
-
-### How ICL Works
-
-Two leading theories:
-
-**Bayesian Inference View:** Model infers a latent "task concept" from examples. More examples → higher confidence in
-task understanding.
-
-**Implicit Gradient Descent:** Transformer attention simulates learning — behaves "as if" it's updating weights based on
-examples, though parameters stay fixed.
-
-### ICL vs Traditional Learning
-
-| Aspect         | Traditional ML   | In-Context Learning        |
-| -------------- | ---------------- | -------------------------- |
-| Training data  | Separate phase   | In the prompt              |
-| Parameters     | Updated          | Fixed                      |
-| Generalization | From training    | From pre-training + prompt |
-| Cost           | Training compute | Inference tokens           |
-
-### Factors Affecting ICL
-
-**Model scale:** Larger models exhibit stronger ICL.
-
-**Pre-training data:** ICL works because similar patterns were seen during training.
-
-**Prompt format:** Must match patterns the model learned.
-
-**Example quality:** Relevant, clear, correctly labeled examples.
-
-### Context Engineering
-
-Beyond static prompts — dynamically assembling optimal context at runtime:
-
-1. **Retrieval:** Pull relevant examples from a database
-2. **Filtering:** Remove low-quality or irrelevant content
-3. **Ordering:** Arrange for optimal comprehension
-4. **Formatting:** Structure for model's learned patterns
-
-This shifts from "write a good prompt" to "build a system that constructs good prompts."
+- Few-shot cannot fix multi-step arithmetic or symbolic reasoning — the model tries to pattern-match the answer, not
+  execute the steps
+- Chain-of-thought (see reasoning-techniques.md) is the correct escalation path for reasoning failures
+- Fine-tuning is the correct escalation path when the task is fundamentally out-of-distribution
 
 ---
 
 ## Generated Knowledge Prompting
 
-When you lack examples but need grounding, generate relevant knowledge first, then answer using that knowledge.
+**Source:** Liu et al. (2022), arXiv:2110.08387
 
-### The Pattern
+Two-phase technique: generate relevant knowledge first, then use it in the prediction prompt.
+
+**Why:** LLMs make factual errors on commonsense reasoning tasks because the relevant world knowledge is not activated
+by the task prompt alone. Explicit generation forces retrieval before commitment.
+
+**Protocol:**
+
+1. Generate multiple knowledge statements about the question domain (without asking for the answer)
+2. For each knowledge statement, construct a separate prediction prompt that includes the statement
+3. Select the answer with highest confidence across predictions (or use voting)
+
+**Prompt structure for phase 1:**
 
 ```
-Step 1: "Generate 3 facts relevant to: [question]"
-→ Model produces relevant background knowledge
-
-Step 2: "Using these facts, answer: [question]"
-→ Model answers grounded in generated knowledge
+Generate some knowledge about [topic]:
 ```
 
-### Example
+Run this multiple times or with `k` continuations to get diverse knowledge.
+
+**Prompt structure for phase 2:**
 
 ```
-Question: Part of golf is trying to get a higher point total than
-others. Yes or No?
+[Knowledge statement]
 
-Step 1 (knowledge):
-- Golf scoring counts strokes (fewer is better)
-- The player with the lowest score wins
-- Points are not accumulated; strokes are minimized
-
-Step 2 (answer):
-Using these facts, the answer is No — golf rewards lowest score,
-not highest.
+Question: [original question]
+Answer:
 ```
 
-### When to Use
+**When to use:**
 
-**Ideal for:**
+- Commonsense reasoning tasks (sport rules, physical world properties, social norms)
+- Factual QA where the answer depends on implicit background knowledge
+- Tasks where the model gives confident wrong answers — a sign knowledge is missing from activation
 
-- Commonsense reasoning questions
-- When RAG isn't available
-- Tasks requiring world knowledge activation
+**When not to use:**
 
-**Limitation:** Generated knowledge may be incorrect (model hallucination). Works best when model has reliable domain
-knowledge.
-
-See [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] for more on knowledge generation techniques.
+- Tasks requiring external, verifiable facts (generated "knowledge" may be hallucinated)
+- Simple classification where knowledge injection adds noise
 
 ---
 
-## Practical Guidelines
+## Active Prompting
 
-### Choosing a Paradigm
+**Source:** Diao et al. (2023), arXiv:2302.12246
 
-- Simple, well-known task — Zero-shot
-- Need specific format — One-shot
-- Complex classification — Few-shot (3-5)
-- Domain-specific task — Few-shot with domain examples
-- Highly nuanced judgment — Few-shot + CoT
+Addresses the weakness of fixed exemplar sets in CoT prompting — exemplars chosen by researchers may not be the hardest
+or most informative for the model.
 
-### Common Mistakes
+**Protocol:**
 
-**Too many examples:** Wastes context, diminishing returns.
+1. Query the LLM on a set of training questions with or without initial CoT examples, generating k answers per question
+2. Compute uncertainty per question using disagreement across k answers (high disagreement = high uncertainty)
+3. Select the most uncertain questions for human annotation with CoT reasoning
+4. Use the newly annotated exemplars for inference
 
-**Unrepresentative examples:** Model learns wrong pattern.
+**Why disagreement works as an uncertainty signal:** If the model produces consistent answers across k samples, it has
+strong priors — human annotation adds little. If answers vary widely, the model is confused — this is where exemplar
+quality matters most.
 
-**Inconsistent format:** Confuses the mapping.
+**Parameters:**
 
-**Wrong difficulty curve:** Complex examples first overwhelms.
+- `k` — number of samples per question (higher k = better uncertainty estimate, higher cost)
+- selection budget — number of questions to send for human annotation
+- annotation format — must include explicit CoT reasoning, not just the answer
 
-### Quality Checklist
+**When to use:**
 
-- [ ] Examples are correctly labeled
-- [ ] Format is consistent across all examples
-- [ ] Edge cases are represented
-- [ ] Examples are relevant to actual use case
-- [ ] Output format is clear from examples
+- You have a labeled training set and annotation budget
+- Off-the-shelf CoT exemplars perform inconsistently across question types
+- You want the best few-shot set for a specific task, not a general one
 
 ---
 
-## References
+## Directional Stimulus Prompting
 
-- Few-shot emergence: Brown et al., 2020 — [arXiv:2005.14165](https://arxiv.org/abs/2005.14165)
-- Format > labels finding: Min et al., 2022 — [arXiv:2202.12837](https://arxiv.org/abs/2202.12837)
-- Instruction tuning: Wei et al., 2022 — [arXiv:2109.01652](https://arxiv.org/abs/2109.01652)
+**Source:** Li et al. (2023), arXiv:2302.11520
+
+A hybrid approach: train a small, tuneable policy LM to generate hints/stimuli that guide a large, frozen black-box LLM.
+
+**Architecture:**
+
+- Policy LM — small, fine-tuned with RL to generate optimal hints for a given input
+- Executor LLM — large, frozen, receives the original input plus the policy-generated hint
+- The hint is a directional stimulus: a keyword, constraint, or partial answer that steers generation
+
+**Why a separate policy LM:**
+
+- The large LLM cannot be fine-tuned (cost, access)
+- Prompt engineering by hand does not scale to task-specific optimization
+- RL over the policy LM optimizes hint quality directly against task reward
+
+**Typical use case:** Summarization — the policy LM generates keywords that should appear in the summary; the executor
+LLM produces the summary conditioned on those keywords.
+
+**Practical applicability:** Requires RL training infrastructure and task-specific reward. Not applicable to one-off
+prompting — relevant when building a production pipeline around a fixed API model.
+
+---
+
+## Paradigm Selection Guide
+
+- **Zero-shot** — default starting point; use when task is standard and model is instruction-tuned
+- **Few-shot** — when zero-shot output format or quality is wrong; add 3–5 representative examples
+- **Generated knowledge** — when model gives confidently wrong factual/commonsense answers
+- **Active prompting** — when you have annotation budget and fixed exemplars underperform across question types
+- **Directional stimulus** — when you have RL infrastructure and a frozen production model to steer
+
+**Escalation path:**
+
+```
+zero-shot → few-shot → generated knowledge / active prompting → CoT (see reasoning-techniques) → fine-tuning
+```
+
+Do not skip steps. Each escalation adds cost and complexity; validate that the simpler approach actually fails before
+escalating.
