@@ -1,300 +1,279 @@
 # Agent & Tool Patterns
 
-Techniques for LLM agents that reason and act in the world.
+Five patterns for building agents that reason, act, reflect, and adapt. Each targets a different failure mode in purely
+generative LLM output.
 
-## Contents
+---
 
-- [ReAct (Reasoning + Acting)](#react-reasoning--acting)
-- [PAL (Program-Aided Language Models)](#pal-program-aided-language-models)
-- [Reflexion](#reflexion)
-- [ART (Automatic Reasoning and Tool-use)](#art-automatic-reasoning-and-tool-use)
-- [Generated Knowledge Prompting](#generated-knowledge-prompting)
-- [Pattern Selection](#pattern-selection)
-- [References](#references)
+## ReAct — Reasoning + Acting
 
-## ReAct (Reasoning + Acting)
+**Paper:** Yao et al., 2022 — arXiv:2210.03629
 
-Interleave reasoning traces with actions. The model thinks about what to do, does it, observes the result, then thinks
-again.
+ReAct interleaves verbal reasoning traces with discrete tool actions. The model alternates between `Thought` (internal
+reasoning), `Action` (tool call), and `Observation` (tool result) steps, forming a trajectory. This loop continues until
+the model produces a final answer.
 
-### The Pattern
+**Core loop:**
 
 ```
-Thought: I need to find X to answer this question
-Action: Search[X]
-Observation: [result from search]
-Thought: Now I know X, but I also need Y
-Action: Search[Y]
-Observation: [result from search]
-Thought: With X and Y, the answer is...
-Action: Finish[answer]
+Thought: I need to find the population of Tokyo.
+Action: Search["Tokyo population 2024"]
+Observation: Tokyo metropolitan area population is approximately 37.4 million.
+Thought: I now have the answer.
+Answer: 37.4 million
 ```
 
-### Why It Works
+**Why it outperforms CoT alone:**
 
-- **Reasoning grounds actions:** Thoughts explain why an action is taken
-- **Actions ground reasoning:** Observations provide facts for next thought
-- **Traceable:** Full audit trail of decision process
-- **Recoverable:** Can adjust strategy based on observations
+- CoT has no access to external state — hallucinations compound silently
+- Pure acting (no reasoning) fails to decompose multi-step goals
+- ReAct's reasoning targets _what to retrieve next_, grounding each step
 
-### ReAct vs Pure Reasoning
+**Why it outperforms pure acting:**
 
-| Aspect        | CoT Only                  | ReAct                            |
-| ------------- | ------------------------- | -------------------------------- |
-| External info | None                      | Retrieved as needed              |
-| Hallucination | Higher (relies on memory) | Lower (grounded in observations) |
-| Flexibility   | Fixed knowledge           | Dynamic knowledge gathering      |
-| Complexity    | Simpler                   | Requires tool integration        |
+- Reasoning steps allow the model to detect retrieval failures and reformulate queries
+- Thought traces improve human interpretability and auditability
 
-### Implementation
+**Known failure modes:**
+
+- Non-informative search results derail the reasoning chain and are hard to recover from
+- Structural constraint (Thought/Action/Observation) reduces flexibility vs free-form CoT
+- Performs worse than CoT alone on HotPotQA; better on Fever — task-dependent
+
+**Prompt construction:**
+
+- Provide few-shot trajectories showing complete Thought/Action/Observation sequences
+- For reasoning-heavy tasks: dense thought steps throughout the trajectory
+- For decision-making tasks (navigation, shopping): sparse thoughts, more actions
+- Exemplars come from the task's training set, formatted as ReAct trajectories
+
+**Best combined with:** CoT + self-consistency for maximum performance on knowledge-intensive tasks
+
+**Use when:** task requires fetching external information to answer correctly; multi-hop question answering; fact
+verification; any tool-using agent where interpretability matters
+
+---
+
+## PAL — Program-Aided Language Models
+
+**Paper:** Gao et al., 2022 — arXiv:2211.10435
+
+PAL delegates solution computation to a programmatic runtime rather than performing arithmetic or logic in text. The LLM
+generates a program (typically Python) as the intermediate reasoning step; a Python interpreter executes it and returns
+the result.
+
+**Core loop:**
 
 ```
-You have access to these tools:
-- Search[query]: Search for information
-- Lookup[term]: Look up a term in current context
-- Finish[answer]: Return final answer
-
-For each step, output:
-Thought: [your reasoning]
-Action: [tool call]
-
-Wait for Observation before next Thought.
+Problem: [natural language problem]
+→ LLM generates Python code
+→ exec(code)
+→ return result
 ```
 
-### When to Use ReAct
+**Key distinction from CoT:** CoT generates free-form text reasoning that the LLM also "evaluates". PAL offloads
+evaluation to a deterministic runtime, eliminating arithmetic errors in the reasoning chain.
 
-**Ideal for:**
+**Prompt construction:**
 
-- Knowledge-intensive QA (need current/accurate facts)
-- Multi-hop reasoning (answer depends on multiple lookups)
-- Tasks requiring external tool use
-- Decision-making with environmental feedback
+- Few-shot exemplars: each shows a natural language problem followed by the corresponding Python solution
+- Exemplars should cover the reasoning patterns expected at test time (date arithmetic, unit conversion, counting)
+- No special markers needed — the model learns the code generation format from examples
+
+**Example exemplar structure:**
+
+```python
+# Q: What date is 3 weeks after March 5, 1998?
+from datetime import datetime, timedelta
+start = datetime(1998, 3, 5)
+result = start + timedelta(weeks=3)
+print(result.strftime('%m/%d/%Y'))
+```
+
+**Strengths:**
+
+- Eliminates multi-step arithmetic errors (LLMs are unreliable accumulators)
+- Python handles date math, unit conversion, combinatorics without hallucination
+- Verifiable: code can be inspected, tested, re-run
 
 **Limitations:**
 
-- Depends on retrieval quality
-- Can get stuck in loops
-- More expensive (multiple tool calls)
+- Only applicable when the solution can be expressed as executable code
+- Requires a sandboxed runtime; security boundary is critical
+- Fails on problems requiring open-ended natural language output as the answer
+
+**Use when:** mathematical reasoning; symbolic computation; date/time arithmetic; any problem where the answer is
+deterministic and expressible as a program
 
 ---
 
-## PAL (Program-Aided Language Models)
+## Reflexion — Self-Reflection Loops
 
-Offload computation to a code interpreter. Model generates code instead of computing directly.
+**Paper:** Shinn et al., 2023 — arXiv:2303.11366
 
-### The Pattern
+Reflexion adds a self-improvement loop on top of ReAct. Rather than fine-tuning weights, it stores verbal
+self-reflections in an episodic memory buffer and feeds them as context in subsequent episodes.
 
-```
-Question: Roger has 5 tennis balls. He buys 2 cans of 3 balls each.
-How many does he have now?
+**Three-model architecture:**
 
-# Let me write code to solve this
-start_balls = 5
-cans_bought = 2
-balls_per_can = 3
-new_balls = cans_bought * balls_per_can
-total = start_balls + new_balls
-print(total)  # Execute this
-```
+- **Actor** — generates actions; uses CoT or ReAct; reads short-term (current trajectory) and long-term (reflection)
+  memory
+- **Evaluator** — scores the Actor's trajectory; outputs a reward signal (scalar or binary); can be an LLM or a
+  rule-based heuristic
+- **Self-Reflection model** — takes (reward signal + trajectory + persistent memory) → produces verbal feedback
 
-Output: `11`
+**Episode loop:**
 
-### Why It Works
+1. Actor generates trajectory (Thought/Action/Observation steps)
+2. Evaluator scores the trajectory
+3. Self-Reflection model generates a verbal critique stored in long-term memory
+4. Next episode: Actor reads prior reflections as context, attempts the task again
 
-- **Precise computation:** Code doesn't make arithmetic errors
-- **Complex logic:** Loops, conditions, data structures available
-- **Verifiable:** Code can be inspected and tested
-- **Scalable:** Works for any computation complexity
+**Memory management:**
 
-### When to Use PAL
+- Short-term memory: current episode trajectory (sliding window)
+- Long-term memory: accumulated self-reflections across episodes
+- For complex tasks, the sliding window is the bottleneck — consider vector stores or SQL databases for large reflection
+  sets
 
-**Ideal for:**
+**Reported results:**
 
-- Math word problems
-- Date/time calculations
-- Data transformation
-- Any task requiring precise computation
-
-**Avoid when:**
-
-- Task is purely linguistic
-- No code interpreter available
-- Simple enough for direct answer
-
-### Implementation Pattern
-
-```
-Solve this problem by writing Python code.
-Think through the problem, then write code that computes the answer.
-The code will be executed and the output returned.
-
-Problem: [problem here]
-```
-
----
-
-## Reflexion
-
-Self-reflection for learning from errors across attempts.
-
-### The Pattern
-
-```
-Attempt 1:
-  Action: [try solution]
-  Result: [failed - reason X]
-  Reflection: "I failed because X. Next time I should Y."
-
-Attempt 2:
-  [Uses reflection to avoid previous mistake]
-  Action: [improved solution]
-  Result: [success or new failure]
-  Reflection: [updates understanding]
-```
-
-### Components
-
-**Actor:** Generates actions based on state + reflections **Evaluator:** Scores the result (pass/fail, reward signal)
-**Self-Reflection:** Converts failure into verbal feedback for next attempt
-
-### Why It Works
-
-- **Episodic memory:** Past reflections inform future attempts
-- **Verbal feedback:** More nuanced than scalar rewards
-- **No retraining:** Improvement through prompt context alone
-
-### When to Use Reflexion
-
-**Ideal for:**
-
-- Sequential decision-making (games, navigation)
-- Programming tasks (iterative debugging)
-- Reasoning with multiple attempts allowed
-- Tasks where trial-and-error is acceptable
+- AlfWorld (sequential decision-making): 130/134 tasks completed vs ReAct baseline
+- HotPotQA (reasoning): Reflexion + CoT outperforms CoT alone and CoT + episodic memory
+- HumanEval / MBPP / LeetCode Hard: state-of-the-art on Python and Rust code generation
 
 **Limitations:**
 
-- Requires multiple attempts (cost)
-- Self-evaluation may be unreliable
-- Memory window limits history
+- Requires accurate self-evaluation — if the Evaluator is wrong, reflections mislead rather than guide
+- Does not converge if the task exceeds the model's capability ceiling
+- Code generation: test-driven evaluation struggles with non-deterministic outputs and hardware-dependent functions
 
-### Implementation Pattern
-
-```
-You have {max_attempts} attempts to solve this.
-
-After each attempt, if it fails:
-1. Analyze why it failed
-2. Write a reflection: what you learned and what to try differently
-3. Use your reflections to improve the next attempt
-
-Previous reflections:
-{reflections_from_past_attempts}
-
-Current attempt:
-```
+**Use when:** task allows multiple attempts with feedback (code, decision-making, reasoning); trial-and-error learning
+without fine-tuning is required; nuanced verbal feedback is more useful than scalar rewards; interpretability of failure
+modes matters
 
 ---
 
-## ART (Automatic Reasoning and Tool-use)
+## ART — Automatic Reasoning and Tool-use
 
-Automatically select reasoning chains and tools from a library based on the task.
+**Paper:** Paranjape et al., 2023 — arXiv:2303.09014
 
-### The Pattern
+ART automates the construction of ReAct-style prompts. Instead of hand-crafting task-specific demonstrations, ART
+retrieves relevant multi-step reasoning + tool-use examples from a curated **task library**, injects them at inference
+time, and pauses generation when a tool call is detected.
 
-1. Match new task to similar tasks in library
-2. Retrieve relevant reasoning templates + tool usage patterns
-3. Apply templates to new task
-4. Pause for tool execution when needed
-5. Integrate tool output and continue
+**Mechanism:**
 
-### Key Insight
+1. Given a new task, select closest demonstrations from the task library (multi-step reasoning + tool calls)
+2. At inference time: generate until a tool call is detected → pause → execute tool → inject result → resume
+3. Humans can add new tools or fix reasoning steps by updating the task library and tool library — no model retraining
 
-Don't hand-craft demonstrations for every task. Maintain a library of task-specific reasoning patterns and retrieve
-relevant ones at runtime.
+**What makes it different from ReAct:**
 
-### When to Use ART
+- ReAct requires hand-crafted per-task demonstrations; ART retrieves them automatically in zero-shot fashion
+- ART separates the tool library (callable functions) from the task library (reasoning demonstrations)
+- Extensible: new tools and reasoning patterns can be added without touching the model
 
-**Ideal for:**
+**Task library design:**
 
-- Many task types with known patterns
-- Generalizing tool use to new tasks
-- Reducing per-task prompt engineering
+- Entries: (task description, multi-step reasoning trajectory with tool calls)
+- Retrieval: semantic similarity between new task and library entries
+- Quality of retrieved demonstrations directly determines reasoning quality
 
----
+**Tool library design:**
 
-## Generated Knowledge Prompting
+- Entries: (tool name, description, invocation schema)
+- Tools are paused-and-resumed at generation time — the model does not need to know tool internals
+- Human corrections to the tool library take effect immediately
 
-Generate relevant knowledge before answering.
+**Benchmarks:** Substantially improves over few-shot and automatic CoT on BigBench and MMLU unseen tasks; exceeds
+hand-crafted CoT when human feedback is incorporated.
 
-### The Pattern
-
-```
-Step 1: "Generate 3 facts relevant to this question: [question]"
-→ [generated facts]
-
-Step 2: "Using these facts, answer: [question]"
-→ [grounded answer]
-```
-
-### Why It Works
-
-- Activates relevant pre-trained knowledge
-- Provides explicit context for reasoning
-- Reduces hallucination by grounding in generated facts
-
-### Example
-
-```
-Question: "Part of golf is trying to get a higher point total than
-others. Yes or No?"
-
-Step 1 - Generate knowledge:
-"The objective of golf is to hit a ball into holes using the fewest
-strokes. The player with the lowest score wins."
-
-Step 2 - Answer with knowledge:
-Using the fact that golf rewards lowest score, the answer is No.
-```
-
-### When to Use
-
-**Ideal for:**
-
-- Commonsense reasoning
-- Questions requiring world knowledge
-- When RAG isn't available but grounding helps
-
-**Limitation:**
-
-- Generated knowledge may be wrong (model hallucination)
-- Two-step adds latency
+**Use when:** you have a diverse task space where hand-crafting per-task demonstrations is impractical; you want
+zero-shot generalization over a tool-equipped reasoning system; extensibility (adding tools without retraining) is a
+requirement
 
 ---
 
-## Pattern Selection
+## ACE — Agentic Context Engineering
 
-- Need external information — ReAct
-- Precise calculation — PAL
-- Multi-attempt allowed — Reflexion
-- Many similar task types — ART
-- Commonsense gaps — Generated Knowledge
-- Simple reasoning — Standard CoT
+**Paper:** Zhang et al., 2025 — arXiv:2510.04618 (ICLR 2026)
 
-## Combining Patterns
+ACE treats contexts (system prompts, agent memory) as **evolving playbooks** rather than static inputs. It addresses two
+failure modes in prior self-improving systems:
 
-Patterns compose:
+- **Brevity bias** — reflection systems produce concise summaries that drop domain-specific insights
+- **Context collapse** — iterative rewriting degrades accumulated knowledge over time
 
-- **ReAct + Reflexion:** Reflect on failed action sequences
-- **CoT + PAL:** Reason through problem, then code the computation
-- **ReAct + Self-Consistency:** Multiple ReAct traces, majority answer
+**Core insight:** rather than rewriting the context on each update, ACE performs structured, incremental updates that
+_accumulate and organize_ strategies without replacing prior knowledge.
+
+**Three-stage pipeline:**
+
+- **Generation** — agent executes a task and collects execution traces / feedback
+- **Reflection** — analyzes traces to extract strategy-level insights (not episode summaries)
+- **Curation** — merges new insights into the existing context using structured incremental updates; deduplicates and
+  organizes without erasing
+
+**Two operating modes:**
+
+- **Offline** — optimizes static artifacts (system prompts, tool descriptions) before deployment using historical
+  trajectories
+- **Online** — updates agent memory in real time during deployment using natural execution feedback (no labeled
+  supervision required)
+
+**Key design choices that prevent collapse:**
+
+- Incremental appends with structured organization (not full rewrites)
+- Curation step explicitly deduplicates and categorizes before merging
+- Compatible with long-context models — scales context size rather than compressing it
+
+**Reported results:**
+
+- +10.6% on agent benchmarks vs strong baselines
+- +8.6% on finance domain-specific reasoning
+- Matches top-ranked production agent on AppWorld leaderboard using a smaller open-source model
+- Reduces adaptation latency and rollout cost vs fine-tuning approaches
+
+**Use when:** agent needs to improve from its own execution history without labeled data; system prompts need continuous
+refinement based on production feedback; long-running agents where context collapse is a risk; you want self-improvement
+without model fine-tuning
 
 ---
 
-## References
+## Pattern Selection Guide
 
-- ReAct: Yao et al., 2022 — [arXiv:2210.03629](https://arxiv.org/abs/2210.03629)
-- PAL: Gao et al., 2022 — [arXiv:2211.10435](https://arxiv.org/abs/2211.10435)
-- Reflexion: Shinn et al., 2023 — [arXiv:2303.11366](https://arxiv.org/abs/2303.11366)
-- ART: Paranjape et al., 2023 — [arXiv:2303.09014](https://arxiv.org/abs/2303.09014)
-- Generated Knowledge: Liu et al., 2022 — [arXiv:2110.08387](https://arxiv.org/abs/2110.08387)
+**Problem → pattern mapping:**
+
+- Need external information to answer → **ReAct**
+- Answer is a computation (math, dates, logic) → **PAL**
+- Task allows retry with feedback, needs trial-and-error learning → **Reflexion**
+- Diverse task space, need automatic demonstration selection → **ART**
+- Agent/prompt needs to improve from its own execution history → **ACE**
+
+**Combinations that work:**
+
+- ReAct + CoT + self-consistency — best for knowledge-intensive single-shot tasks
+- ReAct + Reflexion — multi-episode improvement on decision-making and coding
+- ART + Reflexion — automatic demonstrations with self-improvement loop
+- ACE offline → ACE online — bootstrap system prompt offline, then adapt in production
+
+**When NOT to use each:**
+
+- ReAct: task is purely internal reasoning with no external state to query
+- PAL: answer cannot be expressed as executable code; open-ended generation required
+- Reflexion: task has no retry semantics; evaluator accuracy is too low to trust self-reflection
+- ART: task space is narrow and static (hand-crafted demos are fine); latency of library retrieval is prohibitive
+- ACE: single-run tasks with no historical signal; context window is a hard constraint with no headroom
+
+---
+
+## Citations
+
+- Yao, S. et al. (2022). ReAct: Synergizing Reasoning and Acting in Language Models. arXiv:2210.03629
+- Gao, L. et al. (2022). PAL: Program-aided Language Models. arXiv:2211.10435
+- Shinn, N. et al. (2023). Reflexion: Language Agents with Verbal Reinforcement Learning. arXiv:2303.11366
+- Paranjape, B. et al. (2023). ART: Automatic multi-step reasoning and tool-use for large language models.
+  arXiv:2303.09014
+- Zhang, Q. et al. (2025). Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models.
+  arXiv:2510.04618. ICLR 2026.

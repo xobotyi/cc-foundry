@@ -1,272 +1,201 @@
 # Workflow Patterns
 
-Techniques for structuring multi-step prompting workflows.
-
-## Contents
-
-- [Prompt Chaining](#prompt-chaining)
-- [Iterative Prompting](#iterative-prompting)
-- [Meta Prompting](#meta-prompting)
-- [Combining Patterns](#combining-patterns)
-
-## Prompt Chaining
-
-Decompose complex tasks into a sequence of simpler prompts, where each prompt's output feeds the next.
-
-### Why Chain Prompts
-
-**Single complex prompt problems:**
-
-- Error propagation — one mistake ruins everything
-- Hard to debug — unclear where things went wrong
-- Inconsistent quality — too many requirements at once
-
-**Chaining benefits:**
-
-- Validate at each step
-- Clear failure points
-- Modular, reusable components
-- Better quality control
-
-### Chain Architecture
-
-```
-[Input] → Prompt 1 → [Output 1]
-                         ↓
-         Prompt 2 ← [Input 2]
-              ↓
-         [Output 2] → Prompt 3 → [Final Output]
-```
-
-### Example: Document Analysis
-
-**Monolithic (problematic):**
-
-```
-Read this document. Extract key facts, identify the main argument,
-assess the quality of evidence, note any logical fallacies, and
-write a 200-word critical summary.
-```
-
-**Chained (better):**
-
-```
-Chain 1: "Extract the 5 most important facts from this document."
-     → [facts]
-
-Chain 2: "Based on these facts, what is the author's main argument?"
-     → [argument]
-
-Chain 3: "Evaluate the evidence quality: strong, moderate, or weak.
-          List supporting and contradicting points."
-     → [evaluation]
-
-Chain 4: "Using this analysis, write a 200-word critical summary."
-     → [final summary]
-```
-
-### Design Principles
-
-**Single responsibility:** Each prompt does one thing well.
-
-**Clear interfaces:** Define what each step receives and produces.
-
-**Validation points:** Check output before passing to next step.
-
-**Graceful degradation:** Handle failures at each step.
-
-### Chain Patterns
-
-**Sequential:** A → B → C (most common)
-
-**Branching:** A → (B₁ | B₂) based on A's output
-
-**Aggregating:** (A₁, A₂, A₃) → B (combine multiple outputs)
-
-**Looping:** A → B → validate → (pass | retry A)
+Covers multi-step prompt architectures: chaining, refinement cycles, meta prompting, and automated prompt optimization.
+For single-prompt structure and in-prompt reasoning (CoT, ToT), see `reasoning-techniques.md`.
 
 ---
 
-## Iterative Prompting
+## Prompt Chaining
 
-Refine outputs through cycles of generation, evaluation, and adjustment.
+Break complex tasks into sequential sub-prompts where each output feeds the next as input. Enables reliability and
+debuggability improvements impossible in a single monolithic prompt.
 
-### The Iteration Cycle
+**Why chain instead of single-prompt:**
 
-```
-1. Initial Prompt → First Output
-         ↓
-2. Evaluate Output (accuracy, relevance, format)
-         ↓
-3. Identify Gaps
-         ↓
-4. Refine Prompt → Better Output
-         ↓
-   Repeat until convergence
-```
+- Easier to isolate and fix failures in individual stages
+- Each stage can use a different model, temperature, or context
+- Intermediate outputs are auditable and can be human-reviewed
+- Enables branching and conditional logic between stages
 
-### Evaluation Dimensions
+### Chain Topologies
 
-- **Accuracy:** Is the information correct?
-- **Completeness:** Is anything missing?
-- **Relevance:** Is everything on-topic?
-- **Format:** Does it match requirements?
-- **Tone:** Appropriate style and voice?
+**Sequential** — linear pipeline, each step depends on prior output
 
-### Refinement Strategies
+- Use when: task has distinct transformation phases (extract → filter → format)
+- Example: extract relevant quotes → generate answer from quotes (Anthropic's document QA pattern)
+- Risk: error propagation — a bad output in step N corrupts all downstream steps
 
-**Add specificity:**
+**Branching** — output of one step routes to one of several downstream prompts
 
-```
-v1: "Summarize this article"
-v2: "Summarize this article in 3 bullet points"
-v3: "Summarize this article in 3 bullet points, each under 20 words,
-     focusing on business implications"
-```
+- Use when: task type or content determines which sub-task to execute
+- Example: classify document type → route to domain-specific extraction prompt
+- Implementation: classify in step 1, use conditional logic in code to select prompt for step 2
 
-**Add constraints:**
+**Aggregating (fan-in)** — multiple parallel prompts whose outputs merge into a single prompt
 
-```
-v1: "Write a product description"
-v2: "Write a product description. Do not use superlatives.
-     Focus on specifications, not marketing claims."
-```
+- Use when: different perspectives or sub-tasks must be synthesized
+- Example: run three domain-expert prompts in parallel → merge-and-reconcile prompt
+- Risk: aggregator prompt must handle inconsistent or conflicting inputs gracefully
 
-**Add examples:**
+**Looping** — output feeds back as input to the same or earlier prompt until termination condition met
 
-```
-v1: "Format the output as JSON"
-v2: "Format the output as JSON like this: {\"name\": \"...\", ...}"
-```
+- Use when: refinement converges iteratively (e.g., code that must pass tests, plan that must satisfy constraints)
+- Termination: check output against acceptance criteria in code; do not rely on model to self-terminate
+- Risk: infinite loops — always impose a hard iteration cap (3–5 is typical)
 
-### Avoiding Prompt Drift
+### Implementation Rules
 
-Drift occurs when refinements stray from the original goal.
+- Pass full context explicitly at each step — models have no memory of prior prompts in a chain
+- Strip or summarize intermediate outputs before passing downstream; avoid bloating later-stage context
+- Validate output schema at each handoff before passing to next step
+- Keep each prompt in a chain focused on one transformation; multi-tasking within a chain step defeats the purpose
 
-**Track intent:** Document what you're trying to achieve.
+---
 
-**Compare to baseline:** Does each change serve the original purpose?
+## Iterative Refinement Cycles
 
-**Version control:** Keep history of prompt versions and rationale.
+A specialized loop pattern where each cycle evaluates the prior output and produces an improved version.
 
-### Convergence Criteria
+**Basic cycle structure:**
 
-Know when to stop:
+1. **Generate** — produce initial output from task prompt
+2. **Critique** — separate prompt evaluates output against explicit criteria
+3. **Revise** — generation prompt receives original task + critique + prior output, produces improved version
+4. Repeat until critique passes or iteration cap hit
 
-- Output meets quality threshold (e.g., >90% accuracy)
-- Iterations reach diminishing returns
-- Human validation passes
-- Automated tests pass
+**Critique prompt requirements:**
+
+- State evaluation criteria explicitly as a checklist or rubric — vague criteria produce vague critiques
+- Output structured feedback (pass/fail per criterion + explanation) so the revision step can act on specifics
+- Optionally output a binary "done" signal to terminate the loop
+
+**Refinement patterns:**
+
+- Self-critique: same model critiques its own output — cheap but prone to blind spots
+- Cross-critique: different model or different temperature/persona critiques — catches more failure modes
+- Rubric-anchored: critique compares output to a canonical example or scoring rubric
+- Human-in-the-loop: critique step surfaces to user for approval before proceeding
+
+**When refinement adds value:** ambiguous tasks where correctness can't be checked programmatically (writing quality,
+reasoning validity, design decisions)
+
+**When it doesn't:** tasks with deterministic correct answers — verify programmatically instead of using an LLM judge
 
 ---
 
 ## Meta Prompting
 
-Create reusable templates for categories of problems, not individual instances.
+Zhang et al. (2024, arXiv:2311.11482) — focuses on structure and syntax of tasks rather than content specifics.
 
-### Concept
+**Core idea:** provide abstract structural templates (the _form_ of a solution) rather than content-specific examples
+(the _substance_ of a solution).
 
-Instead of: "Solve 2x + 3 = 7" Template: "For any linear equation ax + b = c, follow these steps..."
+**Key characteristics:**
 
-The model receives a **methodology**, not just a task.
+- Structure-oriented: defines the shape of the expected response, not its content
+- Abstract examples: illustrates problem/solution structure without domain-specific details
+- Zero-shot aligned: minimizes influence of specific examples, closer to zero-shot than few-shot
 
-### Template Structure
+**Advantages over few-shot prompting:**
 
-```markdown
-You are solving [problem category].
+- Token efficiency — structural templates are shorter than content-rich examples
+- Fair comparison — removes domain-example bias when evaluating model capabilities
+- Generalization — same template applies across problem instances in a domain
 
-## Methodology
-1. First, [identify key components]
-2. Then, [apply technique]
-3. Next, [verify step]
-4. Finally, [format output]
+**Best fit:**
 
-## Constraints
-- [Rule 1]
-- [Rule 2]
+- Complex reasoning and math where solution structure is uniform across instances
+- Coding challenges where the pattern (read input → transform → output) is consistent
+- Theoretical queries where the argument form matters more than any specific example
 
-## Output Format
-[Exact structure]
+**Limitation:** assumes the model has innate task knowledge. Performance degrades on genuinely novel tasks where a
+structural scaffold provides no additional leverage — use content-rich few-shot in those cases.
 
-## Problem
-[Specific instance goes here]
-```
-
-### Example: Code Review Template
-
-```markdown
-You are reviewing code for quality issues.
-
-## Review Methodology
-1. Read the code to understand its purpose
-2. Check for: bugs, security issues, performance problems
-3. Assess: readability, maintainability, test coverage
-4. Prioritize findings: critical > major > minor > suggestion
-
-## Output Format
-### Summary
-[One paragraph overview]
-
-### Critical Issues
-- [Issue]: [Location] — [Why it matters]
-
-### Recommendations
-1. [Highest priority fix]
-2. [Next priority]
-
-## Code to Review
-[Code goes here]
-```
-
-### Benefits
-
-**Consistency:** Same methodology across all instances.
-
-**Reusability:** One template, many problems.
-
-**Quality:** Refined methodology over time.
-
-**Scalability:** Non-experts can use expert methodology.
-
-### Types of Meta Prompts
-
-**User-provided:** Human creates the template (most control).
-
-**Recursive (RMP):** Model generates its own template, then solves (two-pass: design methodology, then apply it).
-
-**Conductor:** One model creates templates for specialist models (multi-agent orchestration).
+**Vs. few-shot:** few-shot is content-driven (here are worked examples); meta prompting is structure-driven (here is the
+form answers must take). Use meta prompting when examples are expensive to write or when you want to test model
+capability without example contamination.
 
 ---
 
-## Combining Patterns
+## Automatic Prompt Engineer (APE)
 
-Patterns compose for complex workflows:
+Zhou et al. (2022, arXiv:2211.01910) — frame instruction generation as black-box optimization: use an LLM to generate
+candidate instructions, evaluate them, select the best.
 
-```
-Meta Prompt (methodology)
-    ↓
-Prompt Chain (step 1 → step 2 → step 3)
-    ↓
-Iterative Refinement (polish final output)
-```
+**Two-phase process:**
 
-### Example: Report Generation
+1. **Generate** — give the LLM input/output demonstrations; ask it to produce candidate instruction phrasings
+2. **Select** — execute each candidate instruction on a target model; score outputs; keep highest-scoring instruction
 
-1. **Meta:** Template for business reports
-2. **Chain:**
-   - Gather data points
-   - Analyze trends
-   - Generate insights
-   - Draft sections
-   - Assemble report
-3. **Iterate:** Refine clarity, check facts, adjust tone
+**Key finding:** APE-discovered zero-shot CoT prompt ("Let's work this out in a step by step way to be sure we have the
+right answer.") outperforms human-engineered "Let's think step by step" on MultiArith and GSM8K.
 
-### Anti-Patterns
+**Practical application:**
 
-**Over-chaining:** Breaking things too small creates overhead.
+- Use APE when you have labeled evaluation examples but are unsure which instruction phrasing works best
+- Requires: a scoring function (automated metric or LLM judge), a generation model, a target model
+- Generation and target model can be the same — the generate/evaluate loop still adds value
 
-**Premature templates:** Creating meta prompts before understanding the problem space.
+**Related approaches** (from Zhou et al. survey and subsequent work):
 
-**Iteration without criteria:** Endless refinement with no stopping point.
+- OPRO (arXiv:2309.03409) — uses LLMs to optimize prompts iteratively, including discovered phrases like "Take a deep
+  breath" that improve math performance
+- Prompt-OIRL (arXiv:2309.06553) — offline inverse RL for query-dependent prompt generation
+- AutoPrompt (arXiv:2010.15980) — gradient-guided search for automatic prompt creation across diverse tasks
 
-**Rigid chains:** No error handling or branching for edge cases.
+---
+
+## Automated Prompt Optimization (Survey Perspective)
+
+Based on: arXiv:2502.11560 — "A Survey of Automatic Prompt Engineering: An Optimization Perspective" (Li et al., 2025)
+
+**Unified framing:** APE is a maximization problem over a prompt space. Methods differ by what they optimize and how.
+
+**Optimization variables:**
+
+- **Instructions** — the natural-language directive text (what APE and OPRO optimize)
+- **Soft prompts** — continuous embedding vectors prepended to input (Prefix Tuning, Prompt Tuning)
+- **Exemplars** — which few-shot examples to include and in what order
+
+**Optimization methods by mechanism:**
+
+- FM-based: LLM generates, evaluates, and refines candidate prompts using its own capabilities
+- Evolutionary: mutation and selection of prompt populations (no gradient required)
+- Gradient-based: requires differentiable access to model (soft prompts only — not applicable to black-box APIs)
+- Reinforcement learning: reward signal from task metric guides prompt policy
+
+**Prompt space types:**
+
+- Discrete: natural-language instructions — interpretable, transferable, no model access required
+- Continuous: embedding vectors — higher expressiveness, requires model internals, not human-readable
+- Hybrid: discrete structure with continuous components
+
+**Practitioner guidance:**
+
+- Black-box API (GPT-4, Claude): only discrete optimization is available — use FM-based or evolutionary methods
+- Open-weight model with gradient access: soft prompt tuning is viable for narrow, high-volume tasks
+- Labeled eval set is prerequisite for all automated approaches — without it, optimization has no signal
+- Score variance is a problem: evaluation noise causes optimization to chase noise; use large eval sets or aggregate
+  across multiple runs
+
+---
+
+## Choosing a Pattern
+
+**Sequential chaining:** Use for: multi-phase transformations with distinct stages Avoid when: stages aren't separable
+or intermediate outputs can't be validated
+
+**Branching:** Use for: task-type routing, conditional processing Avoid when: classification boundary is ambiguous and
+misrouting is costly
+
+**Aggregating (fan-in):** Use for: multi-perspective synthesis, ensemble reasoning Avoid when: aggregator can't handle
+conflicting inputs
+
+**Looping/refinement:** Use for: quality-sensitive outputs, code that must pass tests Avoid when: acceptance criteria
+can't be expressed programmatically
+
+**Meta prompting:** Use for: uniform-structure tasks, token budget constraints, capability testing Avoid when: task is
+novel or requires content-rich examples
+
+**APE/automated optimization:** Use for: high-volume prompts where even small improvements compound; when you have
+labeled eval data Avoid when: no eval set exists; one-off prompts where optimization cost exceeds benefit

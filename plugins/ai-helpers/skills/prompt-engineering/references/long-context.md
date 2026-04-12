@@ -1,262 +1,231 @@
 # Long Context Prompting
 
-Strategies for working with Claude's 200K token context window effectively.
-
-## Contents
-
-- [Core Principles](#core-principles)
-- [Document Organization Patterns](#document-organization-patterns)
-- [Query Patterns](#query-patterns)
-- [Performance Optimization](#performance-optimization)
-- [Common Pitfalls](#common-pitfalls)
-- [Checklist for Long Context Prompts](#checklist-for-long-context-prompts)
-
-## Core Principles
-
-### 1. Document Placement Matters
-
-**Put longform data at the top** — above your query, instructions, and examples.
-
-```
-[Documents/data here - 20K+ tokens]
+High-volume context prompting (documents, codebases, transcripts) requires deliberate curation and structure. The
+challenge is not fitting content into the window — it is keeping the model's attention focused on the right tokens.
 
 ---
 
-[Instructions]
+## Core Principle: Context as a Finite Attention Budget
 
-[Query]
-```
+LLMs use transformer attention: every token attends to every other token (O(n²) relationships). As context grows,
+pairwise attention is stretched thin across more tokens. This is not a cliff — it is a gradient of degrading precision
+called **context rot**: recall and long-range reasoning degrade steadily as token count rises.
 
-Queries at the end can improve response quality by up to 30%, especially with complex multi-document inputs.
-
-### 2. Structure with XML
-
-Wrap documents in clear tags with metadata:
-
-```xml
-<documents>
-  <document index="1">
-    <source>annual_report_2023.pdf</source>
-    <document_content>
-      {{ANNUAL_REPORT}}
-    </document_content>
-  </document>
-  <document index="2">
-    <source>competitor_analysis_q2.xlsx</source>
-    <document_content>
-      {{COMPETITOR_ANALYSIS}}
-    </document_content>
-  </document>
-</documents>
-
-Analyze the annual report and competitor analysis.
-Identify strategic advantages and recommend Q3 focus areas.
-```
-
-### 3. Ground Responses in Quotes
-
-For long document tasks, ask Claude to quote relevant parts first:
-
-```xml
-<documents>
-  <document index="1">
-    <source>patient_symptoms.txt</source>
-    <document_content>{{SYMPTOMS}}</document_content>
-  </document>
-  <document index="2">
-    <source>patient_records.txt</source>
-    <document_content>{{RECORDS}}</document_content>
-  </document>
-</documents>
-
-Find quotes from the patient records relevant to diagnosing
-the reported symptoms. Place these in <quotes> tags.
-Then, based on these quotes, list diagnostic information
-in <info> tags.
-```
-
-Quote grounding helps Claude cut through document "noise" and anchor its analysis in specific evidence.
+Consequence: treat context as a scarce resource with diminishing marginal returns. The goal is the **smallest set of
+high-signal tokens** that maximizes the likelihood of the desired output — not the largest set of potentially relevant
+tokens.
 
 ---
 
 ## Document Organization Patterns
 
-### Multiple Documents
+### KV Label Pattern
+
+Assign a short, unique identifier to each document before it enters context. Reference it in the task instruction.
+
+```xml
+<document id="policy-v3">
+  [content]
+</document>
+
+<document id="policy-v4">
+  [content]
+</document>
+
+Task: Compare the liability clauses in policy-v3 and policy-v4.
+```
+
+- Identifier enables precise citation in model output
+- Prevents the model conflating overlapping documents
+- Works at any scale (2–50+ documents)
+
+### Ordered Relevance Pattern
+
+Place the most task-relevant documents first, least relevant last. Models attend more precisely to early context; the
+primacy effect is well-documented at long context lengths.
+
+- If relevance is unknown, use recency as a proxy (newer = more relevant)
+- For symmetric relevance, interleave related documents rather than grouping by source
+
+### Metadata Header Pattern
+
+Prefix each document with structured metadata before the content:
+
+```xml
+<document id="report-q4" source="finance" date="2025-12-31" pages="42">
+  [content]
+</document>
+```
+
+- Date metadata enables the model to reason about recency without reading full content
+- Source metadata helps when documents have overlapping terminology with different meanings
+- Page count signals depth; the model can adjust extraction strategy accordingly
+
+---
+
+## XML Structuring for Multi-Document Context
+
+XML tags outperform markdown for large multi-document prompts because:
+
+- Nesting is unambiguous (no heading level ambiguity)
+- Tags survive line wrapping and copy-paste damage
+- Models trained on Claude's constitution recognize XML as semantic structure
+
+### Standard Multi-Document Template
 
 ```xml
 <documents>
-  <document index="1">
-    <source>filename.pdf</source>
-    <type>report</type>
-    <date>2024-01</date>
-    <document_content>...</document_content>
+  <document id="1" title="Q3 Earnings Report" type="financial">
+    <summary>Optional 2-3 sentence abstract for very long docs</summary>
+    <content>
+      [full document text]
+    </content>
   </document>
-  <!-- more documents -->
+
+  <document id="2" title="Analyst Note" type="commentary">
+    <content>
+      [full document text]
+    </content>
+  </document>
 </documents>
+
+<task>
+  [instructions referencing document IDs]
+</task>
 ```
 
-Use metadata attributes that help Claude understand relationships:
+### Inline Citation Prompt
 
-- `source` — filename or URL
-- `type` — report, email, code, transcript
-- `date` — temporal ordering
-- `author` — attribution
+Append to the task section when citations are required:
 
-### Hierarchical Content
-
-```xml
-<codebase>
-  <module name="auth">
-    <file path="auth/login.py">...</file>
-    <file path="auth/session.py">...</file>
-  </module>
-  <module name="api">
-    <file path="api/routes.py">...</file>
-  </module>
-</codebase>
 ```
-
-### Conversation History
-
-```xml
-<conversation>
-  <message role="customer" timestamp="10:30">
-    I can't log in to my account.
-  </message>
-  <message role="agent" timestamp="10:32">
-    I'll help you with that. What error do you see?
-  </message>
-  <!-- ... -->
-</conversation>
-
-Summarize the key issues raised in this support conversation.
+When citing evidence, use the format [doc-id, paragraph N]. Do not summarize without a citation.
 ```
 
 ---
 
 ## Query Patterns
 
-### Analysis with Citations
+**Extraction queries** — ask for specific facts, not summaries. Specific targets reduce hallucination risk because the
+model searches rather than paraphrases.
+
+- Weak: "Summarize the contract."
+- Strong: "List every termination clause in the contract that applies within the first 90 days."
+
+**Comparative queries** — name both documents explicitly in the question.
+
+- Weak: "How do the policies differ?"
+- Strong: "List every claim condition present in policy-v4 but absent in policy-v3."
+
+**Grounded queries** — instruct the model to quote before analyzing.
 
 ```
-Based on the documents above:
-1. What are the three main risks identified?
-2. For each risk, quote the relevant passage that supports it.
-3. Recommend mitigation strategies.
+For each finding, first quote the relevant passage verbatim, then explain its significance.
 ```
 
-### Comparison Tasks
+**Negative-space queries** — useful for gap analysis.
 
 ```
-Compare Document 1 and Document 2:
-- Where do they agree?
-- Where do they contradict?
-- What does each cover that the other doesn't?
-
-Support each point with specific quotes.
-```
-
-### Synthesis
-
-```
-Synthesize the information across all documents to answer:
-[specific question]
-
-Cite which document supports each part of your answer.
+List topics covered in document-A that are not addressed in document-B.
 ```
 
 ---
 
-## Performance Optimization
+## Chunking Strategies
 
-### Reduce Noise
+When a single document exceeds ~50k tokens, chunking is required. Two primary approaches:
 
-Before including documents:
+### Map-Reduce
 
-- Remove boilerplate (headers, footers, navigation)
-- Strip formatting artifacts
-- Summarize or truncate irrelevant sections
+1. Split document into chunks (by section, page count, or token budget)
+2. Run extraction query independently on each chunk → collect partial results
+3. Run synthesis query on the aggregated partial results
 
-### Chunking Strategy
+SPL research (arXiv:2602.21257) demonstrates this reduces attention cost from O(N²) to O(N²/k) for k chunks, enabling
+parallel execution on cloud or sequential execution locally with identical logic.
 
-If total content exceeds context window:
+Best for: extraction, classification, QA over uniform content (transcripts, legal documents, code files of similar
+structure).
 
-1. Identify most relevant sections
-2. Include full text for critical parts
-3. Summarize less critical sections
-4. Mention what was omitted
+### Sliding Window with Overlap
 
-### Progressive Detail
+1. Define window size (e.g., 8k tokens) and overlap (e.g., 1k tokens)
+2. Each window includes the tail of the previous chunk
+3. Run query on each window; deduplicate results by content similarity
+
+Best for: continuous narrative content where chunk boundaries would split logical units (novels, meeting transcripts
+with speaker turns, log files with correlated events).
+
+### Logical Chunking via CTE Syntax (SPL pattern)
+
+For structured pipelines, use named intermediate results:
 
 ```
-First, skim all documents and identify the 3 most relevant
-sections for answering: [question]
-
-Then, analyze those sections in detail.
+Step 1: Extract all action items from transcript → store as action_items
+Step 2: Extract all decisions from transcript → store as decisions
+Step 3: Cross-reference action_items against decisions → identify conflicts
 ```
+
+This mirrors SQL's Common Table Expression pattern — each named step has a clear output, and later steps reference
+earlier outputs by name. Avoids re-reading the full document for each sub-query.
 
 ---
 
-## Common Pitfalls
+## Context Rot Mitigation
 
-### Buried Query
+**Compaction** — when a long conversation approaches the window limit, summarize and restart. Preserve:
 
-**Bad:**
+- Decisions made
+- Open questions / unresolved bugs
+- Structural constraints (schema, API contracts)
+- The 5 most recently accessed files/documents
 
-```
-What are the key findings?
+Discard: raw tool outputs, redundant retrieval results, superseded working notes.
 
-[50K tokens of documents]
-```
+**Tool-result clearing** — once a tool call's output has been processed, strip it from history. The agent has already
+incorporated the result; the raw output adds tokens without adding signal.
 
-**Good:**
+**Structured note-taking** — agent maintains a `NOTES.md` or equivalent that is small and selective. Notes get pulled
+into context at the start of each new turn. The note file replaces, not supplements, the raw history.
 
-```
-[50K tokens of documents]
-
-What are the key findings?
-```
-
-### Missing Structure
-
-**Bad:**
-
-```
-Here's some data:
-[raw dump of multiple files concatenated]
-```
-
-**Good:**
-
-```xml
-<documents>
-  <document index="1" source="file1.txt">...</document>
-  <document index="2" source="file2.txt">...</document>
-</documents>
-```
-
-### Vague Grounding Request
-
-**Bad:**
-
-```
-Use the documents to answer.
-```
-
-**Good:**
-
-```
-Quote the specific passages that support your answer.
-Use the format: [Document X]: "quote"
-```
+**Just-in-time retrieval** — instead of loading all potentially relevant documents up front, load lightweight
+identifiers (file paths, IDs, URLs) and retrieve content on demand via tools. This mirrors human cognition: we maintain
+references, not full copies, in working memory.
 
 ---
 
-## Checklist for Long Context Prompts
+## Sub-Agent Architecture for Context Isolation
 
-- [ ] Documents placed at top, query at bottom
-- [ ] Each document wrapped with identifying tags
-- [ ] Metadata (source, type, date) included where helpful
-- [ ] Query requests specific citations/quotes
-- [ ] Irrelevant content removed or summarized
-- [ ] Clear instructions on how to handle multiple documents
+When a task requires exploring more content than fits in one focused context:
+
+- Parent agent holds high-level plan + synthesized results only
+- Sub-agents handle deep-dive tasks in isolated clean contexts
+- Sub-agents return condensed summaries (1,000–2,000 tokens) not raw results
+
+This achieves separation of concerns: detailed search context stays within sub-agents; the lead agent stays focused on
+coordination and synthesis. See `references/agent-patterns.md` for implementation patterns.
+
+---
+
+## Positioning Rules
+
+- **Instructions** → top of system prompt and/or end of user turn (primacy + recency)
+- **Documents** → middle of context, between system prompt and final instructions
+- **Examples** → immediately before the task, after documents, to prime output format
+- **Task** → always last in the user turn; never bury it under documents
+
+Rationale: models exhibit stronger recall for content at the beginning and end of context (primacy- recency effect).
+Critical instructions placed only in the middle of a long document block are at highest risk of being under-attended.
+
+---
+
+## Token Efficiency Checklist
+
+- [ ] Every document in context is directly needed for this specific task
+- [ ] Documents have `id` attributes for precise citation
+- [ ] Most relevant documents appear first
+- [ ] Redundant or superseded documents are removed
+- [ ] Tool results from previous turns are cleared after processing
+- [ ] The task instruction explicitly names which documents to use
+- [ ] Chunking is used if any single document exceeds ~50k tokens
+- [ ] Notes/memory file is selective, not a full transcript
