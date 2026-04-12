@@ -28,21 +28,30 @@ Skip only for trivial edits (typos, formatting).
 
 ## Route to Reference
 
-- **SKILL.md format, frontmatter rules, directory layout** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] Frontmatter
-  fields, name rules, string substitutions, progressive disclosure mechanics, discovery/precedence, instruction budget
+- **SKILL.md format, frontmatter rules, directory layout** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] All frontmatter
+  fields (open standard + Claude Code extensions), name rules, string substitutions, progressive disclosure mechanics
+  (1%/8K budget, 250-char cap), discovery/precedence, instruction budget, SDK behavior differences
 - **Creating a skill from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Step-by-step creation workflow,
-  scope sizing guidance, evaluation-driven development process, archetype deep dives with extended structural patterns
+  scope sizing, description writing formula with examples, evaluation-driven development, archetype deep dives with
+  structural patterns, pre-delivery checklist
 - **Evaluating skill quality (review, audit)** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Scoring rubric (5
-  dimensions), evaluation-driven development, testing protocol, common issues by score range
-- **Skill not triggering, wrong output, refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Activation fixes,
-  output fixes, restructuring, splitting guidance
+  dimensions × 20pts), activation rate benchmarks, trigger keyword density, testing protocol, common issues by score
+  range
+- **Skill not triggering, wrong output, refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Activation
+  reliability research (20%→100%), commitment mechanisms, description optimization tiers, output fixes, restructuring
+  and splitting guidance
 - **Multi-file skills, scripts, subagents, hooks** — [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] Fork
-  pattern, workflow skills, composable skills, verifiable intermediate outputs, permission scoping
+  pattern, workflow skills, composable skills, dynamic context injection, permission scoping, plugin packaging, Agent
+  SDK integration, agent teams, skill-scoped hooks, model/effort overrides
 - **Debugging activation failures, script errors** — [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] Diagnostic
-  steps for structure, activation reliability, output, script, reference issues
-- **Writing persuasive instructions, reasoning** — [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] CoT trade-off
-  research and decision rules, instruction strengthening escalation patterns, format control techniques, security
-  blocks, debugging instruction failures
+  steps for structure, activation, output, script, reference, token budget, and plugin cache issues. YAML multiline bug
+  documentation.
+- **Writing persuasive instructions, reasoning** — [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] Instruction
+  budget research, prompt interference detection (Arbiter), CoT trade-offs in persistent context, instruction
+  strengthening escalation, format control, debugging instruction failures
+- **Skill security — authoring and vetting** — [`${CLAUDE_SKILL_DIR}/references/security.md`] Vulnerability taxonomy
+  (26.1% of skills affected), consent gap, enterprise vetting checklist, secure authoring rules, red flags quick
+  reference
 
 Read the relevant reference before proceeding.
 
@@ -55,7 +64,7 @@ missed activations.
 [What it does] + [When to invoke — broad domain claim with trigger examples]
 ```
 
-- **What it does** — Functional description of the skill's purpose. State what the skill covers concretely, not a slogan
+- **What it does** — functional description of the skill's purpose. State what the skill covers concretely, not a slogan
   or tagline.
 - **When to invoke** — "Invoke whenever task involves any interaction with X." Claims the domain broadly, then lists
   specific triggers as examples under the broad claim.
@@ -69,72 +78,54 @@ description: >-
   refactoring, debugging, or understanding Go projects.
 ```
 
-**Good — what it does + when with trigger keywords:**
-
-```yaml
-description: >-
-  Design and iterate Claude Code skills: SKILL.md structure,
-  description formulas, content architecture, and quality evaluation.
-  Invoke whenever task involves any interaction with Claude Code
-  skills — creating, reviewing, evaluating, debugging, or improving
-  skills.
-```
-
 **Bad — vague, no trigger surface:**
 
 ```yaml
 description: Helps with documents
 ```
 
-**Bad — slogan instead of functional description:**
-
-```yaml
-description: >-
-  Speed and simplicity over compatibility layers: Bun runtime
-  conventions, APIs, and toolchain.
-```
-
-**Bad — narrow verb list instead of domain claim:**
-
-```yaml
-description: >-
-  Skills for Claude Code. Invoke when creating, editing, debugging,
-  or asking questions about skills.
-```
-
 ### Principles
 
-- **Lead with function, not slogans.** The first sentence must describe what the skill covers. "Node.js runtime
-  conventions, APIs, and ecosystem patterns" — not "Async-first, event-driven". Slogans waste description tokens on zero
-  activation value.
+- **Lead with function, not slogans.** The first sentence must describe what the skill covers concretely. Slogans waste
+  description tokens on zero activation value.
 - **Claim broadly, then list specifics.** "Invoke whenever task involves any interaction with X — creating, editing,
   debugging" beats "Invoke when creating, editing, or debugging X."
 - **Aggressive triggering, graceful de-escalation.** Better to trigger and de-escalate inside the skill than to miss
-  activations. Native skill activation is unreliable — measured at 20-50% without enforcement hooks. Well-written
-  descriptions improve odds but don't guarantee activation. Design skills to be useful when loaded, not to depend on
-  perfect auto-activation.
+  activations. Native activation is unreliable (20-50% without enforcement hooks). Design skills to be useful when
+  loaded, not to depend on perfect auto-activation.
 - **Skill dependencies belong in SKILL.md body, not descriptions.** Prerequisites like "load prompt-engineering first"
   are handled by the skill body — putting them in descriptions wastes trigger space.
-- **Philosophy belongs in SKILL.md body.** If a skill has a guiding principle ("simplicity over cleverness"), put it as
-  the opening statement in SKILL.md where it shapes behavior — not in the description where it wastes trigger space.
+- **Philosophy belongs in SKILL.md body.** Guiding principles shape behavior inside the skill — not in the description
+  where they have zero activation value.
+
+### Activation Reliability
+
+Native skill activation is unreliable. Measured rates across 250+ sandboxed evaluations:
+
+- No hook / simple instruction hook: ~20-50% activation
+- LLM pre-eval hook (API pre-screening): ~80% (can fail on multi-skill prompts)
+- Forced-eval hook (explicit YES/NO per skill): ~84-100% (most consistent, zero false positives)
+- Manual `/skill-name` invocation: 100%
+
+The forced-eval hook works via a **commitment mechanism**: Claude must evaluate each skill, state YES/NO with reason,
+then follow through. Simple passive suggestions are ignored. Description optimization alone cannot break the ~50%
+systemic ceiling — hooks are the path to consistent activation.
+
+Description optimization tiers, hook implementation details: see [`${CLAUDE_SKILL_DIR}/references/iteration.md`].
 
 ## Content Architecture
 
 SKILL.md must be **behaviorally self-sufficient**. An agent reading only SKILL.md — without loading any references —
 must be able to do the job correctly. References provide depth, not breadth.
 
-This applies to all skill types, not just coding disciplines.
-
 ### What Goes Where
 
 - **Behavioral rules** → SKILL.md body — agent must follow these during work; can't afford a missed reference read
-- **Catalog/lookup content** → references/ — agent reads on-demand for specific lookups (API tables, comparison charts)
-- **Situational content** → references/ — only needed in specific phases (migration guides, deployment patterns)
-- **Voluminous structural content** → references/ — too large to inline, inherently lookup-oriented (schemas, 50+ entry
-  tables)
+- **Catalog/lookup content** → references/ — agent reads on-demand for specific lookups
+- **Situational content** → references/ — only needed in specific phases
+- **Voluminous structural content** → references/ — too large to inline, inherently lookup-oriented
 
-Behavioral rules are directives an agent must follow to do the work correctly. If an agent skipping a reference would
-produce wrong output, that content is behavioral and belongs in SKILL.md.
+If an agent skipping a reference would produce wrong output, that content is behavioral and belongs in SKILL.md.
 
 ### Working-Resolution / High-Resolution
 
@@ -145,40 +136,70 @@ When a reference contains both rules and depth, use a two-resolution split:
 
 The agent works correctly at working resolution. References let it zoom in.
 
-**Example:** A quality assessment skill puts a 6-row checklist with criteria and weights in SKILL.md. The reference
-provides detailed 0-20 scoring rubrics for each criterion with examples at each level.
-
-**Example:** A Node.js skill puts 17 module system rules in SKILL.md. The reference provides ESM/CJS comparison tables,
-file extension edge cases, and interop patterns.
-
 ### Structured Data Formats
 
-Format choice measurably affects LLM comprehension — up to 16pp between formats on identical content. Choose format by
-data type:
+Format choice affects LLM accuracy by up to 16pp on identical content. Apply these rules when creating or reviewing any
+skill content:
 
-- **Key-value lists** for lookup/routing data where each entry is independent: route tables, tool references, scoring
-  rubrics, configuration mappings
-- **Markdown tables** for genuinely 2D comparison data where cross-criteria scanning IS the point: decision matrices,
-  feature comparisons, naming convention tables
+**Use KV lists** for independent-entry data — route tables, tool references, scoring rubrics, configuration mappings,
+hook events, permission modes, model aliases. Each entry stands alone; no cross-row scanning is needed.
 
-KV lists outperform tables for lookup tasks (+8.8pp accuracy) because explicit key-value pairing eliminates
-column-header-to-cell inference. Tables outperform KV for comparison tasks because grid structure enables cross-row
-scanning.
+**Use markdown tables** only for genuinely 2D comparisons where cross-criteria scanning IS the point — decision
+matrices, feature comparisons across two or more alternatives.
 
-**Default to KV lists. Use tables only when removing a column would lose comparative meaning.**
+**Use numbered lists** only for sequential steps where order matters — "1. Read input → 2. Validate → 3. Output."
+
+**Use bullet lists** for rules, directives, and conventions with no ordering — if items can be reordered without
+changing meaning, use bullets.
+
+**The table test:** if removing a column would lose comparative meaning → table. Otherwise → KV list.
+
+**Audit format choices** when creating or reviewing a skill. Converting misused tables to KV lists is a mechanical
+improvement with measurable accuracy gain (+8.8pp on lookup tasks).
+
+<example name="table-to-kv-conversion">
+
+**Before (wrong — independent entries in a table):**
+
+```markdown
+| Hook Event    | When It Fires          |
+|---------------|------------------------|
+| PreToolUse    | Before each tool call  |
+| PostToolUse   | After each tool call   |
+| UserPromptSubmit | On user message     |
+```
+
+**After (correct — KV list for independent entries):**
+
+```markdown
+- **PreToolUse** — fires before each tool call
+- **PostToolUse** — fires after each tool call
+- **UserPromptSubmit** — fires on user message submission
+```
+
+</example>
+
+<example name="legitimate-table">
+
+**Correct — genuine 2D comparison (removing either column loses meaning):**
+
+```markdown
+| Frontmatter                      | User invoke | Claude invoke |
+| :------------------------------- | :---------- | :------------ |
+| (default)                        | Yes         | Yes           |
+| `disable-model-invocation: true` | Yes         | No            |
+| `user-invocable: false`          | No          | Yes           |
+```
+
+</example>
+
+Full format benchmarks and selection rules: see [`${CLAUDE_SKILL_DIR}/references/spec.md`] and the `prompt-engineering`
+skill's structured-data-formats reference.
 
 ### Route-to-Reference Lists
 
 When a skill has references, include a route list describing what depth each reference provides. Use
-`$\{CLAUDE_SKILL_DIR\}` for all reference paths — it resolves to the skill's absolute directory at load time, so the
-agent sees unambiguous paths it can pass directly to the Read tool.
-
-```markdown
-- **Modules** — `$\{CLAUDE_SKILL_DIR\}/references/modules.md`
-  ESM/CJS comparison tables, file extension rules, interop patterns
-- **Streams** — `$\{CLAUDE_SKILL_DIR\}/references/streams.md`
-  Stream types table, pipeline patterns, backpressure handling
-```
+`$\{CLAUDE_SKILL_DIR\}` for all reference paths — it resolves to the skill's absolute directory at load time.
 
 Each entry names the topic, provides the path, and describes the contents — enabling informed read decisions. Without
 content descriptions, agents either over-read (wasting context) or skip (missing depth).
@@ -191,34 +212,24 @@ Skills are prompts. Apply prompt engineering fundamentals.
 
 Match instruction specificity to task fragility:
 
-- **High freedom** (text guidance) — multiple approaches are valid, decisions depend on context. "Analyze the code
-  structure and suggest improvements."
-- **Medium freedom** (pseudocode/templates) — a preferred pattern exists but some variation is acceptable. Provide a
-  template with customizable parameters.
-- **Low freedom** (exact scripts) — operations are fragile, consistency is critical, a specific sequence must be
-  followed. "Run exactly this script. Do not modify the command."
-
-Think of it as a bridge vs. an open field: narrow bridge with cliffs needs exact guardrails (low freedom); open field
-needs general direction (high freedom).
+- **High freedom** — multiple approaches are valid, decisions depend on context
+- **Medium freedom** — a preferred pattern exists but some variation is acceptable
+- **Low freedom** — operations are fragile, consistency is critical, exact sequence required
 
 ### Declarative vs Procedural
 
-Choose instruction style based on what the content demands:
-
-- **Declarative** (bullet-list rules, constraints, conventions) — for behavioral boundaries, coding conventions, safety
-  guardrails, formatting rules. Models utilize factual constraints more reliably across varied inputs. Use for the
-  majority of skill content.
-- **Procedural** (numbered steps, workflows) — for tasks with strict ordering requirements, multi-step agent workflows,
-  simple sequential processes. Cap at ~10-15 steps per sequence; decompose beyond that into sub-procedures (Hierarchical
-  Task Networks).
+- **Declarative** (bullet-list rules, constraints) — for behavioral boundaries, conventions, safety guardrails. Models
+  utilize factual constraints more reliably across varied inputs. Use for the majority of skill content.
+- **Procedural** (numbered steps) — for tasks with strict ordering. Cap at ~10-15 steps; decompose beyond that into
+  sub-procedures (Hierarchical Task Networks).
 
 **Default to declarative.** Research shows declarative knowledge provides greater performance benefits than procedural
-in the majority of tasks. Reserve numbered steps for workflows where order genuinely matters.
+in the majority of tasks.
 
 ### Instruction Placement
 
-Models follow a **U-shaped attention curve**: instructions at the beginning and end of a document are followed most
-reliably; middle content suffers from attention decay.
+Models follow a **U-shaped attention curve**: instructions at the beginning and end are followed most reliably; middle
+content suffers from attention decay.
 
 - **Top 20% (primacy zone):** Identity, philosophy, critical constraints
 - **Middle:** Detailed rules by topic, route list, examples
@@ -233,63 +244,35 @@ Research shows unnecessary requirements reduce task success even when the model 
 competes for attention. Before adding a rule, verify the model's default behavior is insufficient — if deleting the rule
 doesn't change output quality, remove it.
 
-This does not mean minimize everything — skills exist to add rules the model doesn't know. It means: don't add rules for
-things the model already does well. When auditing a skill, apply the deletion test: "if I remove this rule, does output
-quality measurably change?"
-
-### Numbered Lists vs Bullet Lists
-
-- **Numbered lists** — ONLY for sequential steps where order matters: "1. Read input → 2. Validate → 3. Output"
-- **Bullet lists** — for rules, directives, and conventions where there is no ordering: "- Use ESM. - Use `node:`
-  prefix..."
-
-If the items can be reordered without changing meaning, use bullets.
-
 ### State Rules as Positive Directives
 
-Place rules in the body section where they're contextually relevant. State them as positive directives: "Use
-`pipeline()` for stream composition" — not "Don't use `.pipe()`" in a separate anti-pattern table. Separate anti-pattern
-tables duplicate body content and waste tokens.
+State rules as positive directives in the body section where they're contextually relevant: "Use `pipeline()` for stream
+composition" — not "Don't use `.pipe()`" in a separate anti-pattern table. Keep an anti-pattern table only when the
+"don't" side is genuinely non-obvious from the positive rule.
 
-Keep an anti-pattern table only when the "don't" side is genuinely non-obvious from the positive rule (e.g., common
-migration pitfalls in a version upgrade skill where users carry muscle memory from the old version).
+Instruction strengthening patterns, interference detection, CoT trade-offs: see
+[`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`].
 
 ## Skill Archetypes
 
 ### Workflow Skill
 
-Sequential phases with clear inputs/outputs and checkpoints. The SKILL.md contains the complete workflow; references
-provide detailed rubrics, templates, or extended checklists. Example: a CLAUDE.md auditor with discover → assess →
-report → update phases.
+Sequential phases with clear inputs/outputs and checkpoints. SKILL.md contains the complete workflow; references provide
+detailed rubrics, templates, or extended checklists. Use `disable-model-invocation: true` for skills with side effects.
 
 ### Knowledge Skill
 
 Complete specification for a tool, format, or API. Everything inline — the agent needs the full spec to do the work.
-References are rare; when present, they hold example collections. Example: a hookify rule-writing skill containing the
-entire rule syntax (~300 lines, no references).
+References are rare; when present, they hold example collections. Knowledge skills often exceed 500 lines — acceptable
+when all content is behavioral.
 
 ### Coding Discipline Skill
 
-Conventions and rules for a language, framework, or platform. Structure:
+Conventions and rules for a language, framework, or platform. Key patterns: philosophy bookends, declarative rules as
+bullet lists (8-17 rules typical), Application section (writing mode vs reviewing mode), Integration section
+(relationship to other skills, precedence rules).
 
-```markdown
-# [Technology]
-
-[Philosophy statement — one line]
-
-## References (route list with content descriptions)
-## [Topic sections with declarative rules as bullet lists]
-## Application (writing mode vs reviewing mode)
-## Integration (relationship to other skills)
-[Closing maxim]
-```
-
-Key patterns:
-
-- **Philosophy bookends** — opening statement frames the skill's values; closing maxim reinforces
-- **Declarative rules as bullet lists** per topic (8-17 rules is typical)
-- **Application section** — "when writing: apply silently; when reviewing: cite violation, show fix inline"
-- **Integration section** — names related skills and their boundaries
+Extended structural patterns for all archetypes: see [`${CLAUDE_SKILL_DIR}/references/creation.md`].
 
 ## Quick Templates
 
@@ -338,27 +321,48 @@ description: >-
 
 [Working-resolution rules — complete behavioral spec]
 
-[Pointers to references for extended examples, lookup tables, edge cases]
+[Pointers to references for extended examples, lookup tables]
 ```
+
+## Security
+
+Skills execute with system-prompt authority — Claude treats SKILL.md as trusted instructions. Research shows 26.1% of
+skills in the wild contain vulnerabilities (14 patterns across prompt injection, data exfiltration, privilege
+escalation, and supply chain categories).
+
+**When authoring skills:**
+
+- Never embed secrets in SKILL.md, references, or scripts
+- Set `allowed-tools` to the minimum required — don't claim `Bash` if `Read` suffices
+- Sanitize user-supplied content before interpolating into generated prompts or commands
+- Pin all dependencies with exact version constraints
+- Prefer instruction-only skills over script-bundled when possible (scripts are 2.12× more likely to contain
+  vulnerabilities)
+
+**When vetting third-party skills:** read all content including scripts, verify behavior in sandbox, check for
+adversarial instructions and exfiltration patterns.
+
+Full vulnerability taxonomy and enterprise vetting checklist: see [`${CLAUDE_SKILL_DIR}/references/security.md`].
 
 ## Critical Rules
 
 - **Deletion test before adding.** Every rule competes for attention. Before adding a rule to a skill, verify the
   model's default behavior is insufficient. If removing the rule doesn't change output quality, it shouldn't exist.
 
-- **References must not duplicate SKILL.md.** If a reference restates rules already in SKILL.md body, it wastes tokens
-  and creates maintenance burden. References provide genuinely different depth: detailed rubrics, extended examples,
-  full catalogs, comparison tables, edge case coverage.
+- **References must not duplicate SKILL.md.** References provide genuinely different depth: detailed rubrics, extended
+  examples, full catalogs, comparison tables, edge case coverage. Not restated rules.
 
 - **Description is activation, not documentation.** Every token in the description must increase activation probability.
-  Slogans, philosophy, cross-skill dependencies, and filler verbs ("understanding", "assisting") have zero activation
-  value.
+  Slogans, philosophy, cross-skill dependencies, and filler verbs have zero activation value.
 
 - **Declarative by default.** Use numbered steps only for workflows with strict ordering. Bullet-list rules for
-  everything else. If the items can be reordered without changing meaning, use bullets.
+  everything else.
 
 - **One skill, one purpose.** If scope creeps, split. Broad skills produce mediocre results because instructions compete
   for attention.
+
+- **Check for interference.** New rules can conflict with existing harness directives or other loaded skills. Test in
+  fresh context; the executing model smooths over contradictions silently (Observer's Paradox).
 
 ## Quick Checks
 
@@ -378,6 +382,7 @@ Before deploying:
 - [ ] At least one input/output example (few-shot) for generative skills
 - [ ] Critical rules in top 20% and/or bottom 20% (not only in middle)
 - [ ] Every instruction earns its place (deletion test: removing it changes output)
+- [ ] No secrets in SKILL.md, references, or scripts
 - [ ] Under 500 lines (exceeding is acceptable when all content is behavioral)
 - [ ] Name matches directory (lowercase, hyphens)
 
