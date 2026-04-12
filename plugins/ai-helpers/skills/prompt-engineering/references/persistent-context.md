@@ -8,6 +8,7 @@ persistent loaded context — vs. one-shot user messages where most prompt engin
 - [Why Persistent Context Is Different](#why-persistent-context-is-different)
 - [Technique Transfer Rules](#technique-transfer-rules)
 - [Instruction Degradation](#instruction-degradation)
+- [Format and Template Sensitivity](#format-and-template-sensitivity)
 - [Declarative vs Procedural Instructions](#declarative-vs-procedural-instructions)
 - [Instruction Placement Strategy](#instruction-placement-strategy)
 - [The Minimalism Principle](#the-minimalism-principle)
@@ -154,10 +155,67 @@ Adding tokens to context degrades instruction-following even when those tokens a
 degradation is from length itself, not from distracting content. This means every line in a skill has a cost — even if
 the model reads it correctly, its presence reduces attention available for other instructions.
 
+**Formatting tokens are not free.** Human-readable whitespace (indentation, blank lines, decorative separators) that
+aids human comprehension consumes real tokens with no corresponding LLM comprehension benefit. Research across 10 LLMs
+and 4 programming languages shows code formatting elements (indentation, newlines) add an average of 24.5% input tokens
+with negligible performance impact — stripping them loses nothing for the model while cutting cost. In persistent
+context where token budget directly affects attention quality, over-formatted prompts pay a measurable degradation
+penalty.
+
 ### Working Memory Overload
 
 Adding too many constraints overwhelms the model's "working memory," causing incidental errors where relevant clauses
 are omitted or applied inconsistently. More guardrails does not monotonically improve compliance.
+
+---
+
+## Format and Template Sensitivity
+
+Prompt format (the structural template wrapping content) is a distinct variable from prompt content. Research shows
+format alone can swing model performance by up to 40% on the same task with the same underlying instructions.
+
+### Format Performance by Task Type
+
+- **Natural language reasoning** — plain prose and Markdown perform similarly; JSON/YAML add marginal parsing overhead
+  with no reasoning benefit
+- **Code generation** — format sensitivity is highest; GPT-3.5-class models show up to 40% variance across plain text,
+  Markdown, JSON, and YAML templates on the same task
+- **Translation** — moderate sensitivity; structured formats (JSON, YAML) impose syntax overhead that can compete with
+  content attention
+- **Instruction-heavy prompts** — Markdown headers and XML tags outperform unstructured prose by creating explicit
+  section boundaries the model can anchor to
+
+### Model-Scale Interaction
+
+Format sensitivity is strongly inversely correlated with model scale:
+
+- Smaller/older models (GPT-3.5-class, 7B-13B range) — high sensitivity; format choice can dominate content quality
+- Larger models (GPT-4-class, 70B+) — substantially more robust; format matters less than content
+- **Implication for skills:** Skills targeting Claude Haiku or other smaller models need more careful format selection
+  than those targeting Sonnet/Opus. Don't assume robustness.
+
+### Recommended Format Hierarchy for Persistent Context
+
+Order of preference for system prompts and skills, highest to lowest reliability:
+
+- XML tags (structured sections, explicit boundaries) — best for complex multi-section skills
+- Markdown headers + bullet lists — best for mid-complexity skills; good attention anchors
+- Plain prose — only for short, single-purpose prompts where structure adds overhead
+- JSON/YAML — avoid in instruction context; fine for data payloads, not for instruction framing
+
+### What This Means for Skill Authoring
+
+- **Don't over-format.** Decorative structure (nested sub-bullets, elaborate dividers, heavy indentation) adds tokens
+  without adding semantic anchors. Human readability and LLM parseability diverge.
+- **Whitespace is not neutral.** Blank lines between every bullet, deep indentation, and spacer lines all consume
+  tokens. In a 200-line skill loaded into a 50K-token context, formatting bloat compounds instruction degradation.
+- **Test format changes as you would content changes.** Reformatting a skill (e.g., converting a table to a KV list, or
+  adding XML tags) can measurably change compliance rates. Treat format as a tunable parameter.
+- **Consistency beats elegance.** A consistent, slightly verbose format the model reliably parses outperforms a clean
+  format that introduces ambiguity.
+
+**Key papers:** "Does Prompt Formatting Have Any Impact on LLM Performance?" (Rungta et al., arXiv:2411.10541); "The
+Hidden Cost of Readability: How Code Formatting Silently Consumes Your LLM Budget" (Pan et al., arXiv:2508.13666)
 
 ---
 
@@ -262,5 +320,11 @@ This does not mean "minimize everything" — skills exist precisely to add rules
 add rules for things the model already does well. Audit existing skills by asking: "if I delete this rule, does output
 quality measurably change?"
 
+**Formatting as a minimalism concern:** Decorative whitespace, redundant blank lines, and indentation-heavy structure
+are invisible instruction budget leaks. A skill with 30% formatting overhead is effectively 30% longer than it needs to
+be — pushing content further into the middle-zone attention penalty. Prefer compact, well-anchored structure over
+visually polished but token-heavy layout.
+
 **Key papers:** "Impact of AGENTS.md on AI Coding Agent Efficiency" (multiple authors); "Do Context Files Help Coding
-Agents?" (multiple authors)
+Agents?" (multiple authors); "Does Prompt Formatting Have Any Impact on LLM Performance?" (Rungta et al.,
+arXiv:2411.10541); "The Hidden Cost of Readability" (Pan et al., arXiv:2508.13666)
