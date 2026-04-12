@@ -8,11 +8,104 @@ application.
 
 ## Contents
 
+- [Instruction Budget and Applicability](#instruction-budget-and-applicability)
+- [Prompt Interference and Conflict Detection](#prompt-interference-and-conflict-detection)
 - [CoT Trade-Offs in Persistent Context](#cot-trade-offs-in-persistent-context)
 - [Instruction Strengthening Patterns](#instruction-strengthening-patterns)
 - [Format Control Techniques](#format-control-techniques)
-- [Security Considerations for Skills](#security-considerations-for-skills)
 - [Debugging Instruction Failures](#debugging-instruction-failures)
+
+---
+
+## Instruction Budget and Applicability
+
+Skills inject additional instructions into an already-loaded context. Understanding the budget helps you decide what
+belongs in a skill versus what should be left to the harness.
+
+### The Budget Problem
+
+Claude Code's system prompt contains approximately 50 individual instructions before any plugin, skill, or user message
+is loaded. Research on frontier models indicates:
+
+- Thinking models: ~150-200 instructions followed with reasonable consistency
+- Non-thinking models: significantly lower ceiling with exponential decay (not linear)
+- **Uniform degradation**: as instruction count grows, compliance drops across all rules equally — the model does not
+  simply ignore "later" instructions, it degrades on all of them
+
+This means skills that add 20+ instructions are burning budget that affects harness rules too, not just their own.
+
+### Applicability Rule
+
+CLAUDE.md research shows: the more instructions in context that are irrelevant to the current task, the worse the model
+performs. Skills trigger contextually, but their full content is loaded when triggered.
+
+- Include only instructions that apply to **every** invocation of the skill
+- Move task-specific depth to `references/` and instruct the skill to read them on demand (progressive disclosure)
+- Avoid code style guidelines in skills — linters enforce those better and for free
+
+### Pointers Over Content
+
+Don't embed file content or code snippets that will become stale. Embed `file:line` references instead. The same
+principle applies to skill cross-references: point to the authoritative skill (`prompt-engineering`) rather than copying
+its content.
+
+---
+
+## Prompt Interference and Conflict Detection
+
+Skills add behavioral rules to an existing rule set. The Arbiter framework (NLM-sourced research) analyzed the system
+prompts of Claude Code (1,490 lines), Codex CLI (298 lines), and Gemini CLI (245 lines) to identify structural
+interference patterns. The findings apply directly to skill authoring.
+
+### Interference Patterns Found in Production Agents
+
+**Monolithic growth bugs** — As a system prompt grows via concatenation of plugins and skills, subsystem boundaries
+become ambiguous. Example from Claude Code: the TodoWrite mandate ("use VERY frequently") directly contradicts the
+commit workflow prohibition ("NEVER use TodoWrite"). Each rule is correct in isolation; together they conflict.
+
+**Scope overlaps** — The same constraint restated in 2-3 locations with subtle wording differences. Claude Code
+contained 13 such overlaps. The model resolves these through judgment, not by flagging them as contradictions.
+
+**Priority ambiguities** — Parallel execution guidance coexisting with sequential ordering constraints. The model picks
+one interpretation silently.
+
+**Universal tensions** — Autonomy vs. restraint conflicts and precedence hierarchy ambiguity appeared in all three
+studied agents. These are not implementation bugs — they are structural properties of rule accumulation.
+
+### The Observer's Paradox
+
+The executing model "smooths over" contradictions — it resolves them using judgment, which prevents it from recognizing
+them as contradictions. The model that follows your skill is the worst validator of whether your skill conflicts with
+other rules.
+
+**Implication**: test skill instructions with a different model than the executing one, or with a model in a fresh
+context without the harness system prompt.
+
+### Conflict-Check Protocol Before Shipping a Skill
+
+When adding behavioral rules to a skill, verify:
+
+1. **New rule vs. harness rules** — does it conflict with Claude Code's built-in directives?
+2. **New rule vs. plugin rules** — does it conflict with other installed skills (especially CLAUDE.md and other loaded
+   skills)?
+3. **Duplicate constraint check** — is this constraint already stated elsewhere with different wording? If yes, either
+   remove one or consolidate them.
+4. **Priority check** — if two rules conflict in a specific scenario, is the resolution order explicit?
+
+### XML Tags as Scope Boundaries
+
+Explicit section boundaries reduce interference because the model uses tag names to scope rules. A constraint inside
+`<constraints>` is less likely to bleed into adjacent behavior than the same constraint in unmarked prose.
+
+Prefer:
+
+```markdown
+<constraints>
+NEVER include preamble before the JSON output.
+</constraints>
+```
+
+Over: "Don't include preamble before the JSON output." buried in a paragraph.
 
 ---
 
@@ -37,11 +130,11 @@ between instructions and output grows with each reasoning step. Research finding
 
 ### Decision Rules for Skill Authors
 
-- **Many mechanical constraints** (format, word limits): Avoid CoT entirely
-- **Complex multi-step workflow**: Use numbered steps (procedural)
-- **Varied request types** (coding discipline): No blanket CoT; let model decide
-- **Specific reasoning sub-task**: Scoped CoT with constraint re-statement after
-- **Targets reasoning models** (Claude 3.7+): High-level guidance only ("think thoroughly")
+- **Many mechanical constraints** (format, word limits): avoid CoT entirely
+- **Complex multi-step workflow**: use numbered steps (procedural)
+- **Varied request types** (coding discipline): no blanket CoT; let model decide
+- **Specific reasoning sub-task**: scoped CoT with constraint re-statement after
+- **Targets reasoning models** (Claude 3.7+): high-level guidance only ("think thoroughly")
 
 ### Constraint Re-Statement Pattern
 
@@ -131,48 +224,9 @@ Do NOT add commentary after the structured output.
 
 ---
 
-## Security Considerations for Skills
-
-Skills may process untrusted user input. When a skill handles external data, apply these patterns:
-
-### Input Validation Block
-
-```markdown
-## Input Requirements
-
-Before processing, verify:
-- File exists and is readable
-- File size is under 10MB
-- Content does not contain executable code
-- File extension matches expected type
-```
-
-### Scope Boundary Block
-
-```markdown
-## Boundaries
-
-This skill operates ONLY on:
-- Files in the current project directory
-- Files with extensions: .py, .js, .ts
-
-Do NOT:
-- Access files outside project directory
-- Execute downloaded code
-- Make network requests to unknown hosts
-```
-
-Most skills don't need security blocks. Add them when the skill handles:
-
-- User-provided file paths or URLs
-- Content from external sources (web scraping, API responses)
-- Operations that could affect files outside the project
-
----
-
 ## Debugging Instruction Failures
 
-When a skill produces wrong output, diagnose with this table before adding more instructions (which may make the problem
+When a skill produces wrong output, diagnose with this list before adding more instructions (which may make the problem
 worse):
 
 - **Wrong format** — no format specification or example. Fix: add explicit format + example output
@@ -182,6 +236,8 @@ worse):
 - **Partial completion** — steps not numbered or unclear. Fix: use numbered sequential steps
 - **Correct but verbose** — no negative constraints. Fix: add "Do NOT include..." directives
 - **Works sometimes** — critical rule in attention dead zone. Fix: dual-place: top principle + bottom checklist
+- **Conflicts with harness** — a different rule wins silently. Fix: run conflict-check protocol; test with fresh context
+  or different model
 
 ### The Fix Hierarchy
 

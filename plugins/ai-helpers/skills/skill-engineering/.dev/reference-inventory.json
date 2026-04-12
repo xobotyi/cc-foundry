@@ -1,18 +1,22 @@
 {
   "sources": {
     "Claude Code: Skills Documentation": "https://code.claude.com/docs/en/skills.md",
+    "Claude Code: Agent SDK Skills": "https://code.claude.com/docs/en/agent-sdk/skills.md",
     "Agent Skills Open Standard: Specification": "https://agentskills.io/specification",
     "Claude API: Agent Skills Overview": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
     "Claude API: Skill Authoring Best Practices": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
-    "Claude API: Skills in the Agent SDK": "https://platform.claude.com/docs/en/agent-sdk/skills.md",
     "Claude API: Skills for Enterprise": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/enterprise.md",
     "Anthropic Engineering: Claude Code Best Practices": "https://www.anthropic.com/engineering/claude-code-best-practices",
-    "Anthropic Engineering: Effective Context Engineering": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
     "Claude Help: How to Create Custom Skills": "https://support.claude.com/en/articles/12512198-how-to-create-custom-skills",
     "Lee Han Chung: Agent Skills First Principles Deep Dive": "https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/",
     "Mikhail Shilkov: Skill Tool Wire Format": "https://mikhail.io/2025/10/claude-code-skills/",
     "Scott Spence: Skills Activation Reliability": "https://scottspence.com/posts/how-to-make-claude-code-skills-activate-reliably",
-    "HumanLayer: Instruction-Following Mechanics": "https://www.humanlayer.dev/blog/writing-a-good-claude-md"
+    "HumanLayer: Instruction-Following Mechanics": "https://www.humanlayer.dev/blog/writing-a-good-claude-md",
+    "mgechev: Skills Best Practices": "https://raw.githubusercontent.com/mgechev/skills-best-practices/main/README.md",
+    "Paper: Agent Skills in the Wild (Security)": "https://arxiv.org/abs/2507.04815",
+    "Paper: Arbiter (System Prompt Interference)": "https://arxiv.org/abs/2503.15498",
+    "Paper: Configuring Agentic AI Coding Tools": "https://arxiv.org/abs/2505.09498",
+    "Paper: Strategic Architecture for Agent Skills": "https://arxiv.org/abs/2506.17982"
   },
-  "lastFetched": "2026-03-05T12:10:05.174Z"
+  "lastFetched": "2026-04-12T17:02:43.223Z"
 }
