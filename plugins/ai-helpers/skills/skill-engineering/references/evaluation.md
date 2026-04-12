@@ -17,16 +17,57 @@ in SKILL.md.
 
 ## Description Quality
 
-The description is the **highest-leverage field**. Poor descriptions cause activation failures or false triggers.
+The description is the **highest-leverage field**. It is the only signal Claude uses to decide whether to invoke a skill
+— no algorithmic routing, no intent classification, pure LLM reasoning against the description text. Poor descriptions
+cause activation failures or false triggers.
+
+### Trigger Keyword Density
+
+Keyword density directly correlates with activation rate. Claude matches descriptions against user intent using language
+understanding. A description with zero trigger verbs (e.g., "Helps with coding tasks") gives Claude nothing to match
+against. A description with 4-6 domain-specific trigger verbs gives Claude multiple match opportunities.
+
+**Baseline activation rates by description quality (Scott Spence, 200+ test runs, Haiku 4.5):**
+
+- No hook, poor description: ~20% (coin flip)
+- No hook, optimized description: 20-50% (systemic ceiling, not just a description problem)
+- Forced-eval hook, any description: ~84%
+- Manual invocation: 100%
+
+**What "optimized description" means:** domain claim + action verbs + clear scope. Example:
+
+```
+# Low keyword density — activation unreliable
+description: Helps with Go code
+
+# High keyword density — best achievable without a hook
+description: >-
+  Go language conventions, idioms, and toolchain.
+  Invoke whenever task involves any interaction with Go —
+  writing, reviewing, debugging, or understanding Go code.
+```
 
 ### Evaluation Criteria
 
-| Aspect           | Good                                                   | Bad                              |
-| ---------------- | ------------------------------------------------------ | -------------------------------- |
-| Functional lead  | "Go language conventions, idioms, and toolchain"       | "Helps with coding"              |
-| Domain claim     | "Invoke whenever task involves any interaction with X" | "Use when creating or editing X" |
-| Trigger keywords | "— creating, evaluating, debugging, or understanding"  | (no trigger keywords)            |
-| Point of view    | "Design and iterate..."                                | "I can help you..."              |
+**Functional lead:**
+
+- Good: "Go language conventions, idioms, and toolchain"
+- Bad: "Helps with coding"
+
+**Domain claim:**
+
+- Good: "Invoke whenever task involves any interaction with X"
+- Bad: "Use when creating or editing X"
+
+**Trigger keywords:**
+
+- Good: "— creating, evaluating, debugging, or understanding"
+- Bad: (no trigger keywords listed)
+
+**Point of view:**
+
+- Good: "Design and iterate..."
+- Bad: "I can help you..."
 
 ### Red Flags
 
@@ -46,15 +87,40 @@ Could a colleague follow these instructions without asking clarifying questions?
 
 ### Evaluation Criteria
 
-| Aspect         | Good                                   | Bad                                 |
-| -------------- | -------------------------------------- | ----------------------------------- |
-| Voice          | Imperative: "Extract the data"         | Passive: "Data should be extracted" |
-| Steps          | Numbered, sequential                   | Prose paragraphs                    |
-| Specificity    | "Format as JSON with keys: name, date" | "Format appropriately"              |
-| Completeness   | Covers happy path + edge cases         | Only happy path                     |
-| Structure      | XML tags, clear sections               | Wall of text                        |
-| Format spec    | Explicit output example                | "Return results"                    |
-| Critical rules | At end of document                     | Buried in middle                    |
+**Voice:**
+
+- Good: Imperative: "Extract the data"
+- Bad: Passive: "Data should be extracted"
+
+**Steps:**
+
+- Good: Numbered, sequential
+- Bad: Prose paragraphs
+
+**Specificity:**
+
+- Good: "Format as JSON with keys: name, date"
+- Bad: "Format appropriately"
+
+**Completeness:**
+
+- Good: Covers happy path + edge cases
+- Bad: Only happy path
+
+**Structure:**
+
+- Good: XML tags, clear sections
+- Bad: Wall of text
+
+**Format spec:**
+
+- Good: Explicit output example
+- Bad: "Return results"
+
+**Critical rules:**
+
+- Good: At end of document (recency zone)
+- Bad: Buried in middle
 
 ### Red Flags
 
@@ -70,12 +136,25 @@ Could a colleague follow these instructions without asking clarifying questions?
 
 ### Evaluation Criteria
 
-| Aspect          | Good                        | Bad                    |
-| --------------- | --------------------------- | ---------------------- |
-| SKILL.md size   | < 500 lines                 | > 1000 lines           |
-| Reference depth | One level from SKILL.md     | Nested references      |
-| Content split   | Detailed docs in references | Everything in SKILL.md |
-| File references | Clear pointers with context | "See other files"      |
+**SKILL.md size:**
+
+- Good: < 500 lines
+- Bad: > 1000 lines
+
+**Reference depth:**
+
+- Good: One level from SKILL.md
+- Bad: Nested references
+
+**Content split:**
+
+- Good: Detailed docs in references
+- Bad: Everything in SKILL.md
+
+**File references:**
+
+- Good: Clear pointers with context
+- Bad: "See other files"
 
 ### Structure Check
 
@@ -123,12 +202,25 @@ Signs:
 
 ### Evaluation Criteria
 
-| Aspect    | Good                            | Bad                        |
-| --------- | ------------------------------- | -------------------------- |
-| Coverage  | Simple, complex, and edge cases | Only happy path            |
-| Format    | Clear input → output pairs      | Prose descriptions         |
-| Realism   | Uses realistic data             | Trivial "foo/bar" examples |
-| Diversity | Different scenarios represented | Same pattern repeated      |
+**Coverage:**
+
+- Good: Simple, complex, and edge cases
+- Bad: Only happy path
+
+**Format:**
+
+- Good: Clear input → output pairs
+- Bad: Prose descriptions
+
+**Realism:**
+
+- Good: Uses realistic data
+- Bad: Trivial "foo/bar" examples
+
+**Diversity:**
+
+- Good: Different scenarios represented
+- Bad: Same pattern repeated
 
 ### Minimum Examples
 
@@ -173,6 +265,16 @@ Run these prompts and verify behavior:
 
 Document expected behavior for each.
 
+**Activation rate benchmarks (Haiku 4.5, 200+ test runs):**
+
+- Simple instruction hook: ~20% — effectively no better than no hook at all
+- LLM-eval hook: ~80% — faster and cheaper, but can fail spectacularly on multi-skill prompts
+- Forced-eval hook: ~84% — most consistent; forces Claude to state YES/NO per skill before acting
+- Manual `/skill-name`: 100% — always reliable
+
+If auto-activation is below 50% after description optimization, the description is not the primary problem — the
+activation ceiling is systemic. Use a forced-eval hook or accept manual invocation.
+
 ### Output Quality Testing
 
 For each test case:
@@ -194,10 +296,10 @@ After any change:
 
 ### Description (20 points)
 
-- 20: Specific capabilities + clear triggers + right length
+- 20: Specific capabilities + clear triggers + right length; trigger keyword density ≥ 4 domain-specific verbs
 - 15: Mostly complete, minor improvements possible
-- 10: Vague on either capabilities or triggers
-- 5: Very vague, missing key information
+- 10: Vague on either capabilities or triggers; low keyword density
+- 5: Very vague, missing key information; no trigger verbs
 - 0: Missing or actively misleading
 
 ### Instructions (20 points)
@@ -255,7 +357,7 @@ After any change:
 
 ### 70-89 (Minor Issues)
 
-- Description could be more specific
+- Description could be more specific; trigger keyword density < 4 verbs
 - Missing one edge case example
 - Instructions slightly verbose
 - One or two behavioral rules only in references
@@ -264,7 +366,7 @@ After any change:
 
 ### 50-69 (Moderate Issues)
 
-- Vague description causing activation problems
+- Vague description causing activation problems; zero trigger keywords
 - Instructions missing key scenarios
 - No examples for edge cases
 - Wrong scope (too broad or too narrow)

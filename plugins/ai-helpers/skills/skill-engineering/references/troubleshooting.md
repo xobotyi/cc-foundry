@@ -9,6 +9,8 @@ Diagnostic guide for skill failures.
 - **Wrong output format** → [Output Issues](#output-issues)
 - **Scripts failing** → [Script Issues](#script-issues)
 - **References not loading** → [Reference Issues](#reference-issues)
+- **Skill excluded from context** → [Token Budget Issues](#token-budget-issues)
+- **Skill loads twice or conflicts** → [Plugin Cache Conflicts](#plugin-cache-conflicts)
 
 ## Structure Issues
 
@@ -54,26 +56,68 @@ Diagnostic guide for skill failures.
    - No leading/trailing hyphens
    - No "anthropic" or "claude" in name
 
+### YAML Multiline Description Bug
+
+The skill indexer does **not** correctly parse YAML multiline block scalars (`>-`, `|`, `|-`, `>`) in the `description`
+field. When these are used, the description may be silently truncated, malformed, or omitted entirely from the
+`<available_skills>` list. Claude will never see the skill, and it will not auto-trigger.
+
+**Symptom:** Skill exists, name is valid, but it never appears in the Skill tool's available skills list.
+
+**Affected patterns:**
+
+```yaml
+# BROKEN — multiline block scalar
+description: >-
+  Go language conventions and idioms.
+  Invoke whenever task involves Go code.
+
+# BROKEN — literal block
+description: |
+  Go language conventions and idioms.
+  Invoke whenever task involves Go code.
+```
+
+**Fix — use a plain string or quoted single-line:**
+
+```yaml
+# Safe — plain string (no quotes needed for short descriptions)
+description: Go language conventions and idioms. Invoke whenever task involves Go code.
+
+# Safe — double-quoted for longer descriptions
+description: "Go language conventions, idioms, and toolchain. Invoke whenever task involves any interaction with Go — writing, reviewing, debugging, or understanding Go code."
+```
+
+If your description must be long, keep it on one line. The budget for `<available_skills>` is 1% of the context window
+(fallback: 8,000 characters) — each entry is capped at 250 characters regardless of total budget.
+
 ## Activation Issues
 
 ### Native Activation Is Unreliable
 
-Skill auto-activation is inherently unreliable. Independent testing measured 20-50% activation rates without enforcement
-hooks. This is a systemic limitation, not just a description quality issue.
+Skill auto-activation is inherently unreliable. Independent testing measured 20% activation rates with a simple
+instruction hook — no better than no hook at all. This is a systemic limitation, not just a description quality issue.
 
 **Why it happens:** Claude sees skill descriptions in the Skill tool definition and must decide to invoke the tool
 before proceeding. In practice, Claude often skips this step and proceeds directly with implementation, especially for
-multi-skill prompts.
+multi-skill prompts. The selection mechanism is pure LLM reasoning — no algorithmic routing or keyword matching at the
+code level.
+
+**Measured rates (Scott Spence, 200+ test runs, Haiku 4.5):**
+
+- No hook / simple instruction hook: ~20%
+- LLM-eval hook: ~80% (cheaper, faster, but can fail completely on multi-skill prompts)
+- Forced-eval hook: ~84% (most consistent; forces YES/NO evaluation per skill before acting)
+- Manual `/skill-name` invocation: 100%
 
 **Mitigation strategies:**
 
-- **Improve descriptions** — necessary but not sufficient (see below)
-- **Enforcement hooks** — `UserPromptSubmit` hooks that force Claude to evaluate each skill before proceeding.
-  Forced-eval hooks (where Claude must explicitly state YES/NO for each skill) achieve ~84% activation. The commitment
-  mechanism — evaluate → commit → activate — is what makes this work.
-- **Manual invocation** — `/skill-name` is always reliable
+- **Improve descriptions** — necessary but not sufficient; optimized descriptions don't break the ~50% systemic ceiling
+- **Forced-eval hook** — `UserPromptSubmit` hook that makes Claude explicitly state YES/NO for each skill before
+  proceeding; the commitment mechanism is what drives the improvement
+- **Manual invocation** — `/skill-name` is always reliable and appropriate for user-triggered-only workflows
 
-**Key finding:** simple instruction hooks ("if the prompt matches, use the skill") perform no better than no hook at all
+**Key finding:** Simple instruction hooks ("if the prompt matches, use the skill") perform no better than no hook
 (~20%). The hook must create a structured evaluation and commitment step to be effective.
 
 ### Skill Not Auto-Triggering
@@ -81,13 +125,11 @@ multi-skill prompts.
 **Check description quality:**
 
 ```yaml
-# Bad
+# Bad — no trigger keywords
 description: Helps with code
 
-# Good
-description: >-
-  Review Python code for bugs and security issues.
-  Use when asked to review, audit, or check Python code.
+# Good — domain claim + trigger verbs
+description: "Go language conventions, idioms, and toolchain. Invoke whenever task involves any interaction with Go — writing, reviewing, debugging, or understanding Go code."
 ```
 
 **Check for blocking flag:**
@@ -99,16 +141,14 @@ disable-model-invocation: true
 ```
 
 **Test with explicit invocation:** Try `/skill-name` directly. If that works, the description needs better trigger terms
-— but keep in mind that even good descriptions achieve imperfect auto-activation.
+— but keep in mind that even good descriptions hit a ~50% ceiling without a hook.
 
 ### Skill Triggers Too Often
 
 **Add exclusions:**
 
 ```yaml
-description: >-
-  Analyze CSV files for patterns.
-  NOT for text documents, images, or database queries.
+description: "Analyze CSV files for patterns. NOT for text documents, images, or database queries."
 ```
 
 **Use domain-specific terms:**
@@ -154,7 +194,7 @@ Return results as:
 Do not proceed to next step if current step fails.
 ```
 
-**Move critical instructions to end:** Instructions at context end are followed more reliably.
+**Move critical instructions to end:** Instructions at context end are followed more reliably (recency bias).
 
 ## Script Issues
 
@@ -182,8 +222,8 @@ Do not proceed to next step if current step fails.
 
 5. **Check path in SKILL.md:**
    ```markdown
-   # Relative to skill directory
-   python scripts/validate.py
+   # Use ${CLAUDE_SKILL_DIR} — resolves to absolute path at load time
+   python ${CLAUDE_SKILL_DIR}/scripts/validate.py
    ```
 
 ## Reference Issues
@@ -217,27 +257,68 @@ Bad: SKILL.md → references/main.md → references/detail.md
 Read `${CLAUDE_SKILL_DIR}/references/guide.md` completely before proceeding.
 ```
 
-## Context Budget Issues
+## Token Budget Issues
 
-**Symptoms:**
+The `<available_skills>` list embedded in the Skill tool description has a character budget of **1% of the context
+window (fallback: 8,000 characters)**. Each entry is capped at 250 characters. When the total exceeds this limit, Claude
+Code truncates the list — skills that appear late are silently excluded. Claude cannot see excluded skills and will
+never invoke them.
 
-- Warning about excluded skills in Claude Code output
-- Descriptions truncated in skill metadata
-- Multiple skills loaded but instructions ignored
+### Symptoms
 
-**Diagnosis:**
+- Skill exists and has a valid description, but never auto-triggers
+- Claude says it doesn't know about a skill you've installed
+- Running `/context` shows "excluded skills" or skills marked as over budget
 
-1. Count active skills — each adds ~30-50 metadata tokens at startup
-2. Check SKILL.md line count — target under 500 lines
-3. Check if multiple large skills are co-loaded
+### Diagnosis
 
-**Fixes:**
+1. Run `/context` in Claude Code — look for excluded skills listed in the output
+2. Count loaded skills: each adds ~30-300 characters to the budget depending on description length
+3. Long descriptions from multiple skills can exhaust the budget quickly
 
-- Shorten descriptions to under 200 characters
-- Move catalog/lookup content from SKILL.md to references
-- Set `disable-model-invocation: true` on rarely-used skills (removes description from context entirely — free
-  activation budget for others)
-- Split overloaded skills into focused ones
+### Fixes
+
+- **Shorten descriptions** — target under 200 characters per skill; this is the highest-leverage fix
+- **Move catalog/lookup content** from SKILL.md to references — reduces SKILL.md token weight
+- **Set `disable-model-invocation: true`** on rarely-used skills — removes the description from the budget entirely;
+  skill is only invocable via `/skill-name` but frees budget for others
+- **Split overloaded skills** into focused, narrower skills with shorter descriptions
+
+## Plugin Cache Conflicts
+
+Skills loaded from plugins are discovered from multiple cache locations. If the same plugin is installed in more than
+one cache location, the skill may be registered twice — causing double-loading, unexpected behavior, or one version
+shadowing another.
+
+### Symptoms
+
+- Skill tool shows duplicate entries for the same skill name
+- Running a skill loads unexpected or outdated content
+- Plugin update doesn't take effect even after reinstall
+
+### Diagnosis
+
+Check the three plugin cache locations Claude Code scans:
+
+```bash
+# User-level cache
+ls ~/.claude/plugins/cache/
+
+# Project-level cache
+ls .claude/plugins/cache/
+
+# Global Claude Code cache (platform-dependent)
+ls ~/Library/Application\ Support/claude-code/plugins/cache/  # macOS
+```
+
+Look for the same plugin directory appearing in more than one location.
+
+### Fixes
+
+- **Remove duplicate cache entries** — keep only the most recently installed version
+- **Reinstall cleanly** — uninstall the plugin with `/plugin uninstall <name>` before reinstalling
+- **Check plugin.json version** — if two copies have the same version string, Claude Code may not detect the conflict;
+  bump the version before reinstalling
 
 ## Getting Help
 
@@ -247,3 +328,4 @@ When asking for help, provide:
 - Expected vs actual behavior
 - Exact prompt that failed
 - Any error messages
+- Output of `/context` if token budget is suspected
