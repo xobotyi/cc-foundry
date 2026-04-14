@@ -1,9 +1,6 @@
 ---
 name: subagent-engineering
-description: >-
-  Claude Code subagent lifecycle: creation, configuration, evaluation, and troubleshooting. Invoke
-  whenever task involves any interaction with Claude Code subagents — designing, debugging,
-  iterating, or deciding when to delegate work to isolated agent contexts.
+description: "Claude Code subagent lifecycle: creation, configuration, evaluation, and troubleshooting. Invoke whenever task involves any interaction with Claude Code subagents — designing, debugging, iterating, or deciding when to delegate work to isolated agent contexts."
 ---
 
 # Subagent Engineering

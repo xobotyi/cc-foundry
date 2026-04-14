@@ -1,9 +1,6 @@
 ---
 name: prompt-engineering
-description: >-
-  Prompt design techniques for LLMs: structure, examples, reasoning patterns, and optimization.
-  Invoke whenever task involves any interaction with AI instructions — crafting, debugging,
-  improving, or evaluating prompts for skills, agents, output styles, or system configurations.
+description: "Prompt design techniques for LLMs: structure, examples, reasoning patterns, and optimization. Invoke whenever task involves any interaction with AI instructions — crafting, debugging, improving, or evaluating prompts for skills, agents, output styles, or system configurations."
 ---
 
 # Prompt Engineering

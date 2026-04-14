@@ -1,9 +1,6 @@
 ---
 name: skill-engineering
-description: >-
-  Design and iterate Claude Code skills: SKILL.md structure, description formulas, content
-  architecture, and quality evaluation. Invoke whenever task involves any interaction with
-  Claude Code skills — creating, reviewing, evaluating, debugging, or improving skills.
+description: "Design and iterate Claude Code skills: SKILL.md structure, description formulas, content architecture, and quality evaluation. Invoke whenever task involves any interaction with Claude Code skills — creating, reviewing, evaluating, debugging, or improving skills."
 ---
 
 # Skill Engineering

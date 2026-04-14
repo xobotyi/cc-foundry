@@ -1,10 +1,6 @@
 ---
 name: claude-code-sdk
-description: >-
-  Claude Code extensibility and configuration reference: plugins, hooks, skills, subagents, agent
-  teams, channels, MCP servers, output styles, memory, settings, model configuration, and Agent
-  SDK. Invoke whenever Claude Code itself is the subject — questions, configuration, building
-  extensions, debugging, or understanding internals.
+description: "Claude Code extensibility and configuration reference: plugins, hooks, skills, subagents, agent teams, channels, MCP servers, output styles, memory, settings, model configuration, and Agent SDK. Invoke whenever Claude Code itself is the subject — questions, configuration, building extensions, debugging, or understanding internals."
 ---
 
 # Claude Code SDK
