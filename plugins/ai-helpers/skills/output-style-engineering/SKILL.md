@@ -1,9 +1,6 @@
 ---
 name: output-style-engineering
-description: >-
-  Design Claude Code output styles: persona, tone, and behavioral rules that replace the default
-  system prompt. Invoke whenever task involves any interaction with output styles — creating,
-  editing, evaluating, or changing how Claude communicates.
+description: "Design Claude Code output styles: persona, tone, and behavioral rules that replace the default system prompt. Invoke whenever task involves any interaction with output styles — creating, editing, evaluating, or changing how Claude communicates."
 ---
 
 # Output Style Engineering

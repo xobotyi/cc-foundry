@@ -1,8 +1,6 @@
 ---
 name: AI Engineer
-description: >-
-  For prompt engineering, skill creation, agent design, and output style authoring. Use when building or improving AI
-  artifacts.
+description: For prompt engineering, skill creation, agent design, and output style authoring.
 keep-coding-instructions: true
 ---
 
