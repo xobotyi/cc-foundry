@@ -1,345 +1,244 @@
 # Creating Output Styles
 
-## Table of Contents
+## Why Output Styles Exist
 
-- [Creation Workflow](#creation-workflow)
-- [Writing Effective Instructions](#writing-effective-instructions)
-- [Common Style Patterns](#common-style-patterns)
-- [Testing Your Style](#testing-your-style)
+Output styles **replace** Claude Code's system prompt — they don't augment it. This is the defining characteristic and
+the reason they exist as a separate mechanism.
 
----
+You cannot remove default behaviors by adding instructions on top of them. Users have repeatedly proven this:
 
-## Creation Workflow
+- **CLAUDE.md** adds project context but cannot override the coding personality
+- **`--append-system-prompt`** appends without substituting — default behaviors remain
+- **Hooks** lose influence after several conversation rounds
+- Users report "Claude's ingrained celebratory defaults seemingly overrode the style guidance" when using CLAUDE.md
+  alone
 
-### 1. Define the Purpose
+Output styles are the only file-based mechanism that replaces the core personality. Everything else augments it.
 
-Before writing, clarify:
-
-- **Who is Claude in this style?** (persona)
-- **What domain/context?** (coding, research, content, education)
-- **What communication pattern?** (direct, educational, collaborative)
-- **What should change vs stay the same?**
-
-### 2. Decide on Coding Instructions
-
-Set `keep-coding-instructions` based on use case:
-
-- `false`: Non-coding domain (research, content) — remove irrelevant guidance
-- `true`: Coding with different tone — keep skills, change personality
-- `true`: Teaching/learning coding — need coding knowledge
-- `false`: General assistant — broader focus
-
-### 3. Create the File
-
-```bash
-# User-level (available everywhere)
-mkdir -p ~/.claude/output-styles
-
-# Project-level (shared with team)
-mkdir -p .claude/output-styles
-```
-
-Create `style-name.md` with frontmatter and content.
-
-### 4. Write the Style Content
-
-Follow this structure:
+## File Format
 
 ```markdown
 ---
-name: Style Display Name
-description: Brief description for the menu
+name: My Style Name
+description: One sentence shown in the /config picker
 keep-coding-instructions: false
 ---
 
-# [Style Name]
+# Role and Identity
 
-[1-2 sentence overview of who Claude is in this style]
+[Who Claude is in this style]
 
-## Core Principle
+## Tone and Communication
 
-[The single most important behavior rule]
-
-## Persona
-
-[Detailed description of Claude's role/identity]
-
-## Communication Style
-
-[How Claude should communicate: tone, language, approach]
-
-## Response Format
-
-[How to structure outputs]
-
-## Behaviors
-
-### Do
-- [Explicit positive instructions]
-
-### Avoid
-- [Explicit negative instructions]
-
-## Examples
-
-[Input/output pairs showing expected tone and behavior]
-```
-
-### 5. Test with Varied Prompts
-
-Activate and test:
-
-```
-/output-style style-name
-```
-
-Test scenarios:
-
-- Simple requests
-- Complex multi-step tasks
-- Edge cases
-- Tasks that might trigger default behaviors
-
----
-
-## Writing Effective Instructions
-
-### Define Persona Clearly
-
-**Vague:**
-
-```markdown
-Be helpful and professional.
-```
-
-**Clear:**
-
-```markdown
-You are a senior technical architect with 15 years of experience.
-You communicate directly, value precision over politeness, and
-always provide rationale for recommendations.
-```
-
-### Use Imperative Voice
-
-**Weak:**
-
-```markdown
-You should try to be direct in your responses.
-```
-
-**Strong:**
-
-```markdown
-State conclusions first. Provide rationale second. Never hedge.
-```
-
-### Specify Concrete Behaviors
-
-**Abstract:**
-
-```markdown
-Communicate professionally.
-```
-
-**Concrete:**
-
-```markdown
-## Communication Rules
-
-- Acknowledge valid points with "Correct" or "Valid point"
-- State disagreements as "I see it differently because..."
-- Never use "I'd be happy to" or "Great question"
-- Open with the answer, not pleasantries
-```
-
-### Include Tone Examples
-
-Examples are the most reliable way to communicate expected behavior:
-
-```markdown
-## Tone Examples
-
-**User:** "Can you help me with this code?"
-
-**Default Claude (avoid):**
-"Of course! I'd be happy to help you with your code.
-Let me take a look at what you've got..."
-
-**This Style (use):**
-"Looking at the code now. Three issues:
-1. [specific issue]
-2. [specific issue]
-3. [specific issue]"
-```
-
-### Place Critical Rules at End
-
-Instructions near the end of the prompt are followed more reliably:
-
-```markdown
-[... other instructions ...]
-
-## Critical Rules
-
-These rules override all other guidance:
-
-- Never apologize for limitations
-- Never use emoji unless user does first
-- Always surface concerns before proceeding
-```
-
----
-
-## Common Style Patterns
-
-### Direct Professional
-
-Removes sycophancy, focuses on substance:
-
-```markdown
----
-name: Direct Professional
-description: Clear communication without excessive deference
----
-
-# Direct Professional Communication
-
-Communicate with professional directness.
-
-## Core Behaviors
-
-- State facts without hedging ("This approach has issues" not
-  "I think there might be some potential concerns")
-- Acknowledge valid points neutrally: "Correct" or "Valid point"
-- Disagree directly: "That's incorrect because..."
-- Never use: "Great question!", "I'd be happy to...", "Certainly!"
+[How Claude speaks, what it avoids, phrasing patterns]
 
 ## Response Structure
 
-1. Answer or conclusion first
-2. Supporting rationale
-3. Caveats or alternatives (if relevant)
+[Format rules, section ordering, length guidelines]
 
-## Example
+## Specific Behaviors
 
-User: "Is this a good approach?"
-
-Response: "No. Two problems: [problem 1] and [problem 2].
-Better approach: [alternative]."
+[Edge cases, what to do and not do]
 ```
+
+### Frontmatter Fields
+
+- **`name`** — display name; defaults to filename (without `.md`) if omitted
+- **`description`** — shown in `/config` picker; make it scannable
+- **`keep-coding-instructions`** — `true` preserves the default coding system prompt alongside your style instructions;
+  `false` (default) replaces it entirely
+
+### File Locations
+
+- **User-level** (all projects) — `~/.claude/output-styles/`
+- **Project-level** (current project) — `.claude/output-styles/`
+- **Plugin-shipped** — `output-styles/` directory inside the plugin
+
+## Creation Methods
+
+### `/output-style:new` (recommended start)
+
+Run in Claude Code:
+
+```
+/output-style:new [name] [verbose description of desired behavior]
+```
+
+Claude generates a Markdown file in `~/.claude/output-styles/`. Treat this as a first draft — review and tighten before
+using.
+
+### Manual file creation
+
+Create a `.md` file directly in one of the storage locations above. Full control from the start, but requires
+understanding the file format and writing effective style instructions.
+
+### SDK programmatic creation
+
+For Agent SDK integrations, write the style file to `~/.claude/output-styles/` or `.claude/output-styles/`
+programmatically, then reference it via `settingSources` in SDK options. Details in
+[`${CLAUDE_SKILL_DIR}/references/spec.md`] under Agent SDK Integration.
+
+## Creation Workflow
+
+### Step 1: Clarify purpose
+
+Answer before writing a single line:
+
+- What is the user _not_ getting from the default style?
+- What role does this style play? (teacher, critic, domain specialist, persona)
+- Does the user need coding instructions preserved?
+- Is this a coding use case or a non-coding domain (business analysis, content strategy, research)?
+
+### Step 2: Choose a pattern
+
+Select the pattern that matches the use case. Each pattern has different structural requirements — see Style Patterns
+below.
+
+### Step 3: Draft
+
+Use `/output-style:new` for a starting point or write manually. Either way, apply the pattern's structural requirements.
+
+### Step 4: Activate and test
+
+```
+/output-style [name]
+```
+
+Or set directly in `.claude/settings.local.json`:
+
+```json
+{ "outputStyle": "MyStyleName" }
+```
+
+The style is applied once at session start — it cannot change mid-session. Start a new session to pick up changes.
+
+### Step 5: Iterate
+
+Test with representative prompts covering normal use and edge cases. Adjust instructions where behavior diverges from
+intent. Keep the file under ~300 lines; move detailed rules into referenced behaviors. Make one change per iteration —
+multiple changes make debugging impossible.
+
+## Style Patterns
+
+### Direct Professional
+
+**Purpose:** Strip sycophancy and filler, focus on precision.
+
+**`keep-coding-instructions`:** `true` — this is a tone overlay, not a domain switch.
+
+**Key instructions:**
+
+- Never use openers like "Great question!", "Certainly!", "I'd be happy to..."
+- State conclusions before reasoning
+- No trailing summaries of work just done
+- Professional tone without warmth padding
+- No hedging phrases ("it's worth noting that...", "might potentially")
+
+**Reversion risk:** High. Default personality traits are deeply embedded — Claude acknowledges the instructions but
+reverts to celebratory defaults mid-session. Mitigate with multiple consistency anchors distributed throughout the
+style, not just one section at the end. Include explicit anti-reversion language: "If you notice yourself softening
+tone, correct immediately."
 
 ### Domain Specialist
 
-Replaces coding expertise with domain knowledge:
+**Purpose:** Claude acts as a named expert role, replacing the software engineering identity with domain knowledge.
 
-```markdown
----
-name: Research Analyst
-description: Systematic research analysis without coding assumptions
-keep-coding-instructions: false
----
+**`keep-coding-instructions`:** `false` — the style replaces coding expertise with domain expertise.
 
-# Research Analyst
+**Key instructions:**
 
-You are a systematic research analyst who processes information
-with academic rigor.
+- Define the expert identity and knowledge scope
+- Specify what the role _does not_ do (scope boundaries)
+- Set the vocabulary register (jargon level, abbreviations allowed)
+- Define how the role handles requests outside its domain
+- Script the boundary response: "That's outside my [role]. Here's the direction: [guidance]."
 
-## Approach
+**Non-coding use cases** — the most common reason users create domain specialist styles:
 
-- Always cite sources with exact quotes
-- Distinguish facts from interpretations
-- Note confidence levels for conclusions
-- Identify gaps in available information
+- **Business analysis** — upload CSV churn data, get consultant-level insights on MRR, churn rate, LTV, CAC without
+  software engineering assumptions
+- **Content strategy** — YouTube analytics, brand voice consistency, audience engagement patterns
+- **Research** — academic paper processing, citation management, literature review
+- **Design** — SVG modification, design system maintenance, visual hierarchy feedback
+- **DevOps** — YAML configurations, structured data generation, infrastructure documentation
 
-## Output Format
+For all non-coding domain specialists, set `keep-coding-instructions: false` to strip the software engineering
+assumptions that would otherwise contaminate domain-specific advice.
 
-For analysis requests, use:
+### Interaction Mode
 
-### Summary
-[Key findings in 2-3 sentences]
+**Purpose:** Change how Claude and user _collaborate_, not just how Claude speaks.
 
-### Evidence
-[Quoted sources with citations]
+**`keep-coding-instructions`:** Based on whether the mode involves coding.
 
-### Analysis
-[Your interpretation, clearly labeled]
+**Examples:**
 
-### Limitations
-[What's missing or uncertain]
-```
+- **Pair programmer** — Claude assigns tasks to the user with `TODO(human)`, gives guidance but doesn't implement
+- **Socratic tutor** — guides via questions rather than answers, waits for user response before continuing
+- **Code reviewer** — evaluates submitted code rather than writing it, structures feedback by severity
 
-### Interactive Mode
+**Required structure for interaction modes:**
 
-Changes engagement pattern:
+- **Turn structure** — who acts, who responds, in what order
+- **Wait signals** — how Claude signals it's waiting for user input
+- **Skip handling** — what Claude does if user skips a step or asks to bypass the exercise
+- **Scope of action** — what Claude handles vs. what the user handles
 
-```markdown
----
-name: Socratic Mentor
-description: Teaching through guided questions rather than direct answers
-keep-coding-instructions: true
----
+### Learning / Educational
 
-# Socratic Mentor
+**Purpose:** Teach concepts through engagement, not passive explanation.
 
-Guide understanding through questions rather than providing answers.
+**`keep-coding-instructions`:** `true` if teaching coding concepts, `false` for non-coding education.
 
-## Teaching Method
+The built-in `learning` style uses `TODO(human)` markers for hands-on coding. Custom learning styles can go further:
 
-- Never give direct solutions
-- Ask questions that lead to insight
-- Provide hints when stuck (not answers)
-- Celebrate understanding, not completion
+- **Voice-first / dictation design** — all questions answerable by speaking (letter choices, true/false, verbal
+  explanation). The strongest design constraint: if the user can't answer by talking, the question is poorly designed.
+- **Question types** — multiple choice, true/false, scenario-based, verbal explanation
+- **Adaptive pacing** — one question at a time, progress checks every 5 questions, confusion handling
+- **Feedback format** — correct/incorrect with explanation, next step. No superlative feedback words (perfect, amazing,
+  excellent).
 
-## Interaction Pattern
+Learning styles produce longer output tokens by design — this is intentional, not a problem to optimize away.
 
-When user asks for help:
-1. Ask what they've tried
-2. Ask what they think the issue might be
-3. Guide with questions toward the solution
-4. Only reveal answer if explicitly requested
+## Token Impact
 
-## Example
+- **`keep-coding-instructions: false`** — reduces input tokens by removing the default coding prompt from the system
+  message
+- **`keep-coding-instructions: true`** — adds both the default coding prompt AND your style instructions, increasing
+  input token count
+- **Prompt caching** — after the first request in a session, the system prompt (including the output style) is cached,
+  reducing latency and cost for subsequent requests. Since the style is fixed per session, the cache hit rate is high.
+- **Explanatory / verbose styles** — produce longer output tokens by design. Learning and educational styles are the
+  highest token consumers. Factor this into cost estimates.
 
-User: "How do I fix this null pointer error?"
+## Comparison: Output Styles vs. Related Features
 
-Response: "Let's figure this out together.
+- **`CLAUDE.md`** — added as a user message after the system prompt; project/user context, not persona
+- **`--append-system-prompt`** — appends to the system prompt; preserves default coding behavior
+- **Output styles** — replace the system prompt; fullest control over role and behavior
+- **Subagents** — separate invocations with their own tools/model; output styles affect the main loop only
+- **Skills** — invoked on-demand for specific workflows; output styles are always-on once selected
 
-1. Where exactly does the error occur?
-2. What value did you expect at that point?
-3. Where does that value get set?
+Detailed comparison table with persistence and scope dimensions: see [`${CLAUDE_SKILL_DIR}/references/spec.md`] under
+Comparison.
 
-Walk me through the code path."
-```
+## Common Failure Modes
 
----
+**Style reverts mid-session** — Default personality traits are deeply embedded. A single consistency reminder at the end
+is insufficient for long sessions. Fix: distribute anti-reversion language throughout the style — at least two anchors
+in different sections. Include explicit scenario lists ("even if the topic changes, even if multiple turns have
+passed"). Users who moved style instructions from CLAUDE.md to an output style specifically because of this problem
+report that replacement is more effective than augmentation, but still requires reinforcement.
 
-## Testing Your Style
+**Coding capability lost** — `keep-coding-instructions: false` (the default) removes all coding guidance. Users who
+create a tone-only style (e.g., "be more direct") accidentally lose coding capability. Fix: set
+`keep-coding-instructions: true` for any style that should augment coding behavior rather than replace it.
 
-### Manual Testing Checklist
+**Instructions too vague** — "Be professional" is underspecified — two readers would imagine different behaviors. Fix:
+list concrete behaviors ("never use emoji", "always give verdict before rationale", "no hedging phrases") rather than
+adjectives. Every instruction should be verifiable: you can check whether a response complies or not.
 
-After activation, test these scenarios:
-
-- [ ] Simple task: Does tone match expectations?
-- [ ] Complex task: Do behaviors hold under pressure?
-- [ ] Edge case: Does style handle unusual requests?
-- [ ] Default trigger: Any accidental reversion to default tone?
-- [ ] Multi-turn: Does style persist across conversation?
-
-### Common Testing Prompts
-
-```
-"Hello, can you help me?"
-"Is this approach good?"
-"I'm not sure what to do here"
-"Explain [complex topic]"
-"This isn't working, why?"
-```
-
-Watch for:
-
-- Sycophantic openers ("Great question!")
-- Hedging language ("might", "perhaps", "could be")
-- Unnecessary apologies
-- Format violations
-- Tone drift
+**Style ignored in tool output** — Style controls Claude's prose, not the output of bash commands, file reads, or MCP
+tool results. Don't expect the style to reformat tool results — it governs how Claude frames and presents information,
+not the raw output of tools.
