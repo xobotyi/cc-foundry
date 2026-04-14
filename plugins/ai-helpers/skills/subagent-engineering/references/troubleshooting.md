@@ -1,425 +1,409 @@
 # Troubleshooting Subagents
 
-Diagnose and fix common subagent problems.
+Reference for the `subagent-engineering` skill. Covers diagnostic steps, error catalog, debug mode, and common failure
+patterns for Claude Code subagents — including agent teams, background agents, worktree isolation, and the Agent SDK.
 
 ---
 
-## Table of Contents
+## Quick Symptom Index
 
-- [Quick Diagnosis](#quick-diagnosis)
-- [Detailed Troubleshooting](#detailed-troubleshooting)
-- [Error Messages](#error-messages)
-- [Debug Mode](#debug-mode)
-- [Getting Help](#getting-help)
+- **Agent not found** → [Agent Discovery Failures](#agent-discovery-failures)
+- **Wrong agent activates** → [Trigger Accuracy](#trigger-accuracy)
+- **Agent never activates** → [Trigger Accuracy](#trigger-accuracy)
+- **Permission / tool error** → [Tool Permissions](#tool-permissions)
+- **Output wrong format** → [Output Format](#output-format)
+- **Agent returns early** → [Task Incompletion](#task-incompletion)
+- **Teammate not receiving messages** → [Agent Teams](#agent-teams)
+- **Task coordination failure** → [Agent Teams](#agent-teams)
+- **Background agent status unknown** → [Background Agents](#background-agents)
+- **Worktree branch conflict** → [Worktree Isolation](#worktree-isolation)
+- **SDK `settingSources` missing** → [Agent SDK](#agent-sdk)
+- **Hook not firing** → [Hooks Configuration](#hooks-configuration)
+- **Context exhaustion** → [Context Issues](#context-issues)
+- **Slow / expensive** → [Performance](#performance)
 
 ---
 
-## Quick Diagnosis
+## Agent Discovery Failures
 
-- **Agent never triggers** — Name typo or vague description. Fix: check spec, broaden description
-- **Agent triggers too often** — Description too broad. Fix: narrow scope, add boundaries
-- **Wrong output format** — No format spec in prompt. Fix: add explicit format + example
-- **Stops mid-task** — Unclear workflow, no checklist. Fix: add numbered steps, completion criteria
-- **Scope creep** — Too many tools, no constraints. Fix: restrict tools, add boundaries
-- **Permission errors** — Wrong tools granted. Fix: check `tools` field, add needed tools
-- **Hook not firing** — Wrong event/matcher. Fix: check hooks configuration
-- **Agent not loaded** — Manual file not reloaded. Fix: restart session or use `/agents`
+The agent exists but `@agent-name` returns "agent not found" or similar.
 
-## Detailed Troubleshooting
+Checklist:
 
-### Agent Not Found / Never Triggers
+- **File location** — agent file must be in `.claude/agents/` (project-scoped) or `~/.claude/agents/` (global). No other
+  directories are scanned.
+- **File extension** — must be `.md`. Files named `.txt`, `.yaml`, or without extension are ignored.
+- **File name format** — must be lowercase-hyphenated: `code-reviewer.md`, not `CodeReviewer.md` or `code_reviewer.md`.
+  The `@` reference uses the filename without extension.
+- **Frontmatter syntax** — YAML frontmatter must be valid. A single syntax error (missing quote, bad indentation) causes
+  the entire file to be skipped silently.
+- **Required fields** — `name` and `description` are required. An agent without `description` will not appear in
+  delegation decisions.
 
-**Symptoms:**
+Verification steps:
 
-- Claude says it doesn't know about the agent
-- Have to explicitly invoke by name every time
-- Agent doesn't appear in `/agents` list
+1. Run `ls .claude/agents/` and confirm the file exists with the correct name and extension.
+2. Open the file and validate frontmatter with a YAML linter or by checking indentation manually.
+3. Confirm `name:` matches the filename stem exactly.
 
-**Diagnostic steps:**
-
-1. **Check file location:**
-
-```bash
-# Project-level
-ls -la .claude/agents/
-
-# User-level
-ls -la ~/.claude/agents/
-```
-
-2. **Check file extension:** Must be `.md` (not `.txt`, `.yaml`, etc.)
-
-3. **Check frontmatter syntax:**
-
-```markdown
 ---
-name: my-agent        # Required
-description: "..."    # Required
+
+## Trigger Accuracy
+
+### Over-triggering (agent activates for wrong requests)
+
+Cause: description is too vague or uses generic language that matches many request types.
+
+Fix:
+
+- Narrow the description to specific nouns and verbs: "Reviews Go code for error handling patterns" not "Reviews code".
+- Add a "when NOT to use" line in the description.
+- Test with 5 out-of-scope requests; if any activate the agent, tighten further.
+
+### Under-triggering (agent never activates for correct requests)
+
+Cause: description is too specific, uses jargon the user won't use, or lacks delegation language.
+
+Fix:
+
+- Broaden with synonyms: "security audit, vulnerability scan, CVE check".
+- Add explicit trigger phrases: "Invoke when the user asks to review, audit, or check security".
+- Confirm the description contains "invoke when" or equivalent delegation signal.
+
+### Broken (agent never activates regardless of input)
+
+Cause: description has no delegation language, or frontmatter `name` field is missing.
+
+Fix:
+
+- Add an explicit "Invoke when:" line.
+- Confirm `name:` field is present in frontmatter.
+- Confirm the file is in the correct directory (see [Agent Discovery](#agent-discovery-failures)).
+
 ---
-```
 
-Common YAML errors:
+## Tool Permissions
 
-- Missing `---` delimiters
-- Incorrect indentation
-- Unquoted special characters
+### Tool not available to agent
 
-4. **Check name format:**
+Cause: tool not listed in `tools` frontmatter field, or field is missing entirely.
 
-```yaml
-# Valid
-name: code-reviewer
-name: my-agent-v2
+Fix:
 
-# Invalid
-name: Code_Reviewer    # uppercase, underscore
-name: my agent         # space
-name: <agent>          # special chars
-```
+- Add the tool to `tools:` list. Tool names are case-sensitive: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`,
+  `WebSearch`, `WebFetch`, `Task`, `TodoWrite`, `TodoRead`, `Bash`.
+- If `tools:` is absent, the agent inherits the parent's tool set — check whether the parent session has the tool.
 
-5. **Reload the agent:**
+### Tool blocked despite being in `tools` list
 
-- Restart Claude Code session, OR
-- Run `/agents` to force reload
+Cause: `disallowedTools` in `settings.json` conflicts with the agent's `tools` list. `disallowedTools` takes precedence.
 
-### Agent Triggers Incorrectly
+Fix:
 
-**Over-triggering (false positives):**
+- Check `settings.json` for `disallowedTools` entries that overlap with the agent's required tools.
+- Either remove the tool from `disallowedTools` or accept the restriction and redesign the agent's approach.
 
-The agent activates for unrelated tasks.
+### Permission denied on Bash command
 
-**Fix:** Narrow the description:
+Cause: the command is blocked by a hook or by `settings.json` permissions policy.
 
-```yaml
-# Before
-description: "Helps with code"
+Fix:
 
-# After
-description: "Security audit for authentication modules only.
-  Use when reviewing auth code or after security-related changes."
-```
+- Check hooks in `settings.json` for `PreToolUse:Bash` matchers that might block the command.
+- Verify the agent is using the narrowest command possible (prefer `Grep` over `bash grep`).
 
-**Under-triggering (false negatives):**
+---
 
-The agent doesn't activate for matching tasks.
-
-**Fix:** Broaden the description and add trigger phrases:
-
-```yaml
-# Before
-description: "Reviews Python PEP8 compliance"
-
-# After
-description: "Code review specialist for style, quality, and best practices.
-  Use proactively after writing or modifying code in any language."
-```
-
-### Tools Not Working
-
-**Symptoms:**
-
-- "Tool not available" errors
-- Agent can't perform expected actions
-- Unexpected permission prompts
-
-**Diagnostic steps:**
-
-1. **Check `tools` field:**
-
-```yaml
-# Explicit tools list
-tools: Read, Grep, Glob
-
-# Or omit to inherit all
-# (no tools field = inherit from parent)
-```
-
-2. **Check tool names are exact:**
-
-```yaml
-# Correct
-tools: Read, Write, Edit, Bash, Glob, Grep
-
-# Wrong
-tools: read, write  # lowercase
-tools: ReadFile     # wrong name
-```
-
-3. **Check `disallowedTools` conflict:**
-
-```yaml
-# Conflicting configuration
-tools: Read, Write
-disallowedTools: Write  # Write is both allowed and disallowed
-```
-
-4. **Check permission mode:**
-
-```yaml
-# May block tools
-permissionMode: dontAsk  # auto-denies permission prompts
-```
-
-### Output Format Problems
-
-**Symptoms:**
-
-- Inconsistent formatting
-- Missing expected sections
-- Wrong structure
-
-**Fix 1: Add explicit format specification:**
-
-```markdown
 ## Output Format
 
-Your response MUST follow this exact structure:
+### Agent produces wrong structure
 
-### Summary
-[1-2 sentence overview]
+Cause: system prompt lacks explicit format specification.
 
-### Findings
-- **Critical:** [issue] at [location]
-- **Warning:** [issue] at [location]
+Fix (apply in order until resolved):
 
-### Recommendations
-1. [First action]
-2. [Second action]
-```
+1. Add a dedicated `## Output Format` section to the system prompt specifying exact structure, sections, and length.
+2. Add a concrete example of expected output — agents follow examples more reliably than abstract descriptions.
+3. Add a prefill-style opening line: "Start your response with: `## Summary`" to anchor the format.
 
-**Fix 2: Add an example:**
+### Output varies between runs
 
-```markdown
-## Example Output
+Cause: format instructions are ambiguous or placed too late in the system prompt.
 
-### Summary
-Found 2 security issues in the auth module.
+Fix:
 
-### Findings
-- **Critical:** SQL injection in login() at auth.py:42
-- **Warning:** Missing rate limiting at auth.py:15
+- Move format instructions to near the top of the system prompt, before workflow steps.
+- Replace "should include" with "must include" — weaker language produces more variation.
 
-### Recommendations
-1. Use parameterized queries for all database calls
-2. Add rate limiting to prevent brute force attacks
-```
+---
 
-**Fix 3: Use prefill-like guidance:**
+## Task Incompletion
 
-```markdown
-Begin your response with "## Summary" and follow the format exactly.
-```
+Agent returns before finishing all steps.
 
-### Task Incomplete
+Cause: no sequential workflow, no explicit completion criteria, or no verification checklist.
 
-**Symptoms:**
+Fix:
 
-- Agent stops before finishing
-- Missing steps in workflow
-- Partial analysis
+- Add numbered steps marked "complete IN ORDER before returning".
+- Add a completion checklist at the end of the system prompt:
+  ```
+  Before returning, verify:
+  - [ ] Step 1 completed
+  - [ ] Step 2 completed
+  - [ ] Output written to correct location
+  ```
+- Add an explicit final instruction: "Do not return until all checklist items are checked."
 
-**Fix 1: Add numbered steps:**
+---
 
-```markdown
-Execute these steps IN ORDER:
+## Agent Teams
 
-1. List all files matching the pattern
-2. Read each file completely
-3. Analyze using the checklist below
-4. Compile findings
-5. Return formatted report
+### Teammate not receiving messages
 
-Do not skip any steps.
-```
+Cause: `SendMessage` tool not included in the sender's `tools` list, or message sent with wrong recipient name.
 
-**Fix 2: Add completion checklist:**
+Diagnosis:
 
-```markdown
-Before returning your response, verify:
-- [ ] All matching files examined
-- [ ] Each checklist item addressed
-- [ ] Findings organized by priority
-- [ ] Specific recommendations provided
+- Confirm `SendMessage` is in the sending agent's `tools` list.
+- Confirm `to:` uses the teammate's name exactly as defined in `TeamCreate` — not a UUID, not a display name variant.
+- Remember: plain text output is NOT visible to teammates. `SendMessage` is the only inter-agent communication channel.
 
-If any item is incomplete, continue working.
-```
+Fix:
 
-**Fix 3: Set explicit completion criteria:**
+- Add `SendMessage` to `tools` in the sender's frontmatter.
+- Verify recipient name spelling matches the team member name exactly.
+- If broadcasting, use `to: "*"` sparingly — it scales linearly with team size.
 
-```markdown
-Your task is COMPLETE when:
-- All changed files have been reviewed
-- Security checklist is fully addressed
-- Output follows the specified format
+### Task coordination failures
 
-Do not return until all criteria are met.
-```
+Symptoms: two agents work the same task, tasks run in wrong order, blocker tasks not respected.
 
-### Hooks Not Firing
+Cause: missing `blockedBy` dependencies, or agents claimed the same task before `owner` was set.
 
-**Symptoms:**
+Fix:
 
-- Hook commands don't execute
-- No stdout from hook scripts
-- Expected validation not happening
+- Use `addBlockedBy` when creating dependent tasks to enforce order.
+- Agents must call `TaskUpdate` with `owner` immediately when claiming a task — before starting work.
+- Check `TaskList` before claiming to confirm no other agent already owns the task.
+- Task descriptions must be fully self-contained — teammates have no shared conversation history, so all context (file
+  paths, function names, acceptance criteria) must be in the description itself.
 
-**Diagnostic steps:**
+### TeammateIdle not firing
 
-1. **Check hook configuration in frontmatter:**
+Cause: hook `event` field set incorrectly, or hook exit code is 0 (exit 2 is required to inject instructions).
 
-```yaml
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: "./scripts/validate.sh"
-```
+Fix:
 
-2. **Check matcher pattern:**
+- Confirm hook event is `TeammateIdle` (not `AgentIdle` or similar).
+- Exit with code `2` to inject new instructions; exit `0` means "continue normally".
 
-```yaml
-# Exact match
-matcher: "Bash"
+### TaskCompleted hook not blocking completion
 
-# Regex match
-matcher: "Edit|Write"
-```
+Cause: hook exits with 0 instead of 2.
 
-3. **Check script is executable:**
+Fix:
 
-```bash
-chmod +x ./scripts/validate.sh
-```
+- Exit with `2` to block the task completion as a quality gate and return feedback.
+- The hook receives task details as JSON on stdin — validate against acceptance criteria before deciding exit code.
 
-4. **Check script path:** Paths are relative to working directory.
+---
 
-5. **Check hook event:**
-   - `PreToolUse`: Before tool execution
-   - `PostToolUse`: After tool execution
-   - `Stop`: When agent finishes
+## Background Agents
 
-6. **Test script manually:**
+### Checking background agent status
 
-```bash
-./scripts/validate.sh
-echo $?  # Check exit code
-```
+Background agents run asynchronously. To check status:
 
-### Context/Memory Issues
+- In Claude Code UI: check the Agents panel for the running agent's status indicator.
+- Via SDK: poll the agent run object — status transitions through `running` → `completed` / `failed`.
+- Look for `TaskCompleted` or `TeammateIdle` hook events if the agent is part of a team.
 
-**Symptoms:**
+### Agent appears stuck
 
-- Agent forgets earlier context
-- Repeated searches for same information
-- "I don't have access to..." for info it should have
+Cause: agent is waiting on a tool call that is blocked by a hook, or context is exhausted.
 
-**Causes and fixes:**
+Fix:
 
-- **Auto-compaction:** Context may have been summarized.
-  - Set `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` lower
-  - Use more concise prompts
+- Check hook logs for `PreToolUse` events that may be blocking.
+- Check if the agent has hit the context limit — look for truncation warnings in output.
+- If context is exhausted, the agent cannot recover; cancel and restart with a more context-efficient prompt.
 
-- **Subagent isolation:** Subagents have own context, don't inherit conversation.
-  - Pass necessary context in the prompt/task description
-  - Use `skills` field to preload required knowledge
+### Timeout handling
 
-- **Fresh start:** Each subagent invocation starts fresh (unless resumed).
-  - Use resume feature: `resume: agent-id`
-  - Or pass context explicitly
+Background agents do not have a built-in timeout by default. For long-running agents:
 
-### Performance Issues
+- Set an explicit deadline in the task description: "Complete within 10 tool calls or return partial results."
+- Use `TeammateIdle` hook to detect when an agent has been idle longer than expected and inject a stop instruction.
+- Design agents to emit progress via `SendMessage` so the team lead can detect stalls.
 
-**Symptoms:**
+---
 
-- Agent is very slow
-- Excessive tool calls
-- Reading too many files
+## Worktree Isolation
 
-**Fix 1: Add efficiency instructions:**
+### Worktree cleanup failure
 
-```markdown
-## Efficiency
+Cause: `ExitWorktree` not called, or agent crashed before cleanup.
 
-- Use Grep to locate relevant code BEFORE reading entire files
-- Stop searching once you have sufficient information
-- Prefer targeted searches over broad scans
-- Maximum 10 files per analysis unless explicitly needed
-```
+Fix:
 
-**Fix 2: Restrict model:**
+- Always wrap worktree work in try/finally equivalent: emit cleanup instructions at the end of the system prompt.
+- If a stale worktree exists: `git worktree remove --force <path>` from the main repo root.
+- List existing worktrees with `git worktree list` to identify orphans.
 
-```yaml
-# For simple tasks
-model: haiku  # Faster, cheaper
-```
+### Branch conflicts in worktree
 
-**Fix 3: Narrow tool scope:**
+Cause: two agents checked out the same branch in separate worktrees, or agent created a branch that already exists.
 
-```yaml
-# Remove unnecessary tools
-tools: Read, Grep  # Not Bash if not needed
-```
+Fix:
 
-## Error Messages
+- Each agent must use a unique branch name — include a timestamp or agent ID in the branch name.
+- Before `EnterWorktree`, check `git branch --list <name>` to confirm the branch does not already exist.
+- If the branch exists and has unrelated changes, delete it (`git branch -D <name>`) only after confirming it is safe.
 
-### "Agent not found"
+### Worktree changes not visible to main session
 
-```
-Agent 'xxx' not found
-```
+Cause: worktree writes to its own working tree; the main session's working tree is separate.
 
-- Check file exists in correct location
-- Check name matches filename (minus .md)
-- Restart session to reload
+Fix:
 
-### "Tool not available"
+- This is expected behavior. Merge or cherry-pick from the worktree branch into main after the agent completes.
+- Do not expect the main session to see worktree file changes directly.
 
-```
-Tool 'Write' is not available to this agent
-```
+---
 
-- Add tool to `tools` field
-- Remove from `disallowedTools` if present
-- Check parent permissions
+## Agent SDK
 
-### "Permission denied"
+### `settingSources` missing (most common SDK failure)
 
-```
-Permission denied for operation
-```
+Cause: the `ClaudeCodeOptions` object was constructed without the `settingSources` field, or it was set to an empty
+array.
 
-- Check `permissionMode` setting
-- Verify user has granted permission
-- Consider `acceptEdits` or `bypassPermissions` if appropriate
+Symptom: agent runs with no settings applied — no tools, no hooks, no model restrictions — or throws a validation error
+on startup.
 
-### "Maximum turns exceeded"
+Fix:
 
-```
-Agent reached maximum turns without completing
-```
+- Always include `settingSources` in options:
+  ```typescript
+  const options: ClaudeCodeOptions = {
+    settingSources: ["user", "project"],
+    // ...
+  };
+  ```
+- Valid values: `"user"` (loads `~/.claude/settings.json`), `"project"` (loads `.claude/settings.json`), `"enterprise"`.
+- If `settingSources` is intentionally empty (fully isolated agent), confirm this is deliberate — it disables all
+  configured tools and hooks.
 
-- Task may be too complex for single agent
-- Add clearer completion criteria
-- Split into multiple agents
+### `allowedTools` not including required tools
+
+Cause: `allowedTools` in SDK options does not list a tool the agent's system prompt expects to use.
+
+Symptom: agent attempts a tool call and receives a permission error; task fails mid-workflow.
+
+Fix:
+
+- Enumerate all tools the agent needs in `allowedTools`:
+  ```typescript
+  allowedTools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+  ```
+- Tool names are case-sensitive and must match exactly.
+- Cross-reference the agent's system prompt workflow steps against `allowedTools` before running.
+- If using `disallowedTools` alongside `allowedTools`, `disallowedTools` takes precedence — check for conflicts.
+
+### SDK agent exits without completing task
+
+Cause: unhandled exception in the agent loop, or the agent returned `stop_reason: end_turn` before finishing.
+
+Fix:
+
+- Check the `ClaudeCodeResult` object for `stop_reason` and `error` fields.
+- If `stop_reason` is `max_tokens`, increase `maxTokens` in options or reduce prompt verbosity.
+- Wrap the SDK call in try/catch and log the full error object — SDK errors are often swallowed silently.
+
+---
+
+## Hooks Configuration
+
+### Hook not firing
+
+Diagnosis checklist:
+
+- `event` field matches exactly: `PreToolUse`, `PostToolUse`, `Stop`, `TeammateIdle`, `TaskCompleted`.
+- `matcher` pattern (if used) matches the tool name or agent name — test the regex independently.
+- Hook script is executable: `chmod +x .claude/hooks/script.sh`.
+- Hook script path is absolute or correctly relative to the project root.
+
+### Hook fires but has no effect
+
+Cause: hook exits with code 0 (no-op). Exit codes:
+
+- **0** — continue normally
+- **2** — inject content into context (for `PreToolUse` / `TeammateIdle`) or block (for `TaskCompleted`)
+
+Fix:
+
+- Confirm the script exits with the correct code for the intended effect.
+- Add `set -e` to shell scripts to catch silent failures.
+
+---
+
+## Context Issues
+
+### Context exhaustion mid-task
+
+Cause: agent reads too many files, produces verbose output, or runs in a long session.
+
+Fix:
+
+- Add efficiency instructions: "Read each file at most once. Do not re-read files you have already processed."
+- Restrict `tools` to prevent exploratory use (e.g., remove `Glob` if not needed).
+- Switch to a smaller model (`haiku`) for token-intensive but cognitively simple tasks.
+
+### Subagent isolated from parent context
+
+This is expected behavior — subagents do not inherit the parent's conversation history. They receive only their system
+prompt and the invocation message.
+
+Fix:
+
+- Include all necessary context in the agent's system prompt or in the invocation message.
+- For dynamic context, pass it explicitly in the task description (agent teams) or in the `prompt` parameter (SDK).
+
+---
+
+## Performance
+
+### Agent is slow
+
+Primary levers, in order of impact:
+
+- **Model** — switch from `opus` or `sonnet` to `haiku` for simple tasks
+- **Tool calls** — each tool call adds latency; reduce unnecessary reads and searches
+- **Output length** — verbose output takes longer to generate; add length constraints to the system prompt
+
+### Agent is expensive
+
+- Profile which tool calls are repeated unnecessarily
+- Add "read each file at most once" instruction
+- Restrict `tools` to the minimum set needed — fewer available tools means fewer exploratory calls
+- Use `haiku` for subtasks that do not require reasoning
+
+---
 
 ## Debug Mode
 
-Enable verbose logging:
+To get verbose agent execution output:
 
 ```bash
-CLAUDE_CODE_DEBUG=1 claude
+claude --debug @agent-name "test request"
 ```
 
-Or trace LLM traffic (advanced):
+Debug output includes:
 
-- Set up proxy to inspect requests
-- Check actual prompts being sent
+- Tool calls attempted and their results
+- Hook events fired and exit codes
+- Token usage per turn
+- Stop reason for each completion
 
-## Getting Help
-
-If still stuck:
-
-- Check `/agents` output for agent status
-- Review Claude Code docs: https://docs.anthropic.com/en/docs/claude-code/sub-agents
-- Report issues: https://github.com/anthropics/claude-code/issues
+Use debug output to pinpoint exactly which step fails in a multi-step workflow.
