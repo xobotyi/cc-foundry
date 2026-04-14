@@ -4,19 +4,20 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
 
 ## Skills
 
-| Skill                      | Purpose                                 |
-| -------------------------- | --------------------------------------- |
-| `prompt-engineering`       | Prompt design techniques for LLMs       |
-| `skill-engineering`        | Design and iterate Claude Code skills   |
-| `subagent-engineering`     | Build and debug Claude Code subagents   |
-| `output-style-engineering` | Create Claude Code output styles        |
-| `claude-code-sdk`          | Reference for Claude Code extensibility |
+- **`prompt-engineering`** — prompt design techniques for LLMs: structure, examples, reasoning patterns, optimization
+- **`skill-engineering`** — design and iterate Claude Code skills: SKILL.md structure, description formulas, content
+  architecture, quality evaluation
+- **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
+  evaluation, troubleshooting
+- **`output-style-engineering`** — design output styles that replace the system prompt: persona, tone, behavioral rules,
+  non-coding domains, evaluation framework
+- **`claude-code-sdk`** — Claude Code extensibility reference: plugins, hooks, skills, subagents, agent teams, MCP,
+  output styles, settings, Agent SDK
 
 ## Output Styles
 
-| Style         | Purpose                                    |
-| ------------- | ------------------------------------------ |
-| `ai-engineer` | Collaborative persona for AI artifact work |
+- **`ai-engineer`** — collaborative AI engineering persona: direct communication, no sycophancy, adversarial
+  self-checks, iterative refinement
 
 ## Skill Dependencies
 
