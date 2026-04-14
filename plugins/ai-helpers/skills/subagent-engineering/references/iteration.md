@@ -1,403 +1,292 @@
 # Iterating on Subagents
 
-Guide to improving existing subagents based on observed behavior.
-
----
-
-## Table of Contents
-
-- [Improvement Workflow](#improvement-workflow)
-- [Common Issues and Fixes](#common-issues-and-fixes)
-- [Prompt Refinement Techniques](#prompt-refinement-techniques)
-- [Version Control for Agents](#version-control-for-agents)
-- [A/B Testing Agents](#ab-testing-agents)
-- [Incremental Improvement](#incremental-improvement)
-- [When to Redesign vs. Iterate](#when-to-redesign-vs-iterate)
-- [Feedback Loop](#feedback-loop)
+Guide to improving existing subagents based on observed behavior — from targeted prompt fixes to full redesigns.
 
 ---
 
 ## Improvement Workflow
 
 ```
-1. Identify Issue → What's not working?
-2. Diagnose Cause → Why is it happening?
-3. Plan Fix → What change will help?
-4. Implement → Make the change
-5. Test → Verify improvement
-6. Monitor → Watch for regressions
+1. Identify → What behavior is wrong?
+2. Diagnose → Root cause (description? prompt? tools? scope?)
+3. Hypothesize → One change that should fix it
+4. Apply → Change only that variable
+5. Verify → Run same task, compare output
+6. Commit or revert
 ```
 
-## Common Issues and Fixes
+Change one thing per iteration. Changing multiple variables makes it impossible to know what helped.
 
-### Issue: Agent Doesn't Trigger
+---
 
-**Symptoms:**
+## Description Optimization
 
-- Claude ignores the agent even for matching tasks
-- Have to explicitly say "use the X agent"
+The `description` field controls when Claude delegates. It is the highest-leverage field to tune — wrong descriptions
+cause all trigger problems.
 
-**Diagnosis:**
+**Trigger accuracy formula:**
 
-- Description too narrow?
-- Name has typo?
-- Agent not loaded (manual file creation)?
+- Trigger conditions: _what kind of task / context should invoke this agent_
+- Scope exclusions: _what this agent does NOT handle_
+- Proactivity signal: include `"Use proactively"` or `"Use when"` to encourage automatic delegation
 
-**Fixes:**
+**Under-triggering (agent ignored):**
 
 ```yaml
-# Before: too specific
+# Too narrow — only fires on exact PEP8 mention
 description: "Reviews Python code for PEP8 compliance"
 
-# After: broader trigger
-description: "Code review specialist for quality, style, and best practices.
-  Use proactively after writing or modifying code."
+# Fixed — broader trigger, explicit proactivity
+description: >
+  Code review specialist for quality, style, and best practices.
+  Use proactively after writing or modifying any code.
 ```
 
-Add "use proactively" to encourage automatic delegation:
+**Over-triggering (delegates for unrelated tasks):**
 
 ```yaml
-description: "Debugger. Use proactively when encountering errors."
-```
-
-### Issue: Agent Over-Triggers
-
-**Symptoms:**
-
-- Delegates to agent for unrelated tasks
-- Takes over when main conversation would be better
-
-**Diagnosis:**
-
-- Description too vague?
-- Overlaps with other agents?
-
-**Fixes:**
-
-```yaml
-# Before: too broad
+# Too vague — fires for anything code-related
 description: "Helps with code"
 
-# After: specific scope
-description: "Security vulnerability scanner for authentication and
-  authorization code. Use when reviewing auth modules or after
-  security-related changes."
+# Fixed — scoped with explicit exclusion
+description: >
+  Security vulnerability scanner for authentication and authorization code.
+  Use when reviewing auth modules or after security-related changes.
+  NOT for general code review.
 ```
 
-Add explicit boundaries:
+**Conflicting agents (wrong agent chosen):**
 
-```markdown
----
-name: security-reviewer
-description: "Security review for auth code only. NOT for general code review."
----
-```
-
-### Issue: Wrong Output Format
-
-**Symptoms:**
-
-- Output doesn't match expected structure
-- Inconsistent formatting across runs
-
-**Diagnosis:**
-
-- Format not specified clearly?
-- No examples in prompt?
-
-**Fixes:**
-
-Add explicit format specification:
-
-```markdown
-## Output Format
-Provide your findings as:
-
-### Critical Issues
-- [Issue]: [Location] - [Fix]
-
-### Warnings
-- [Issue]: [Location] - [Fix]
-
-### Suggestions
-- [Suggestion]: [Location]
-```
-
-Add an example:
-
-```markdown
-## Example Output
-
-### Critical Issues
-- SQL Injection: auth.py:42 - Use parameterized queries
-
-### Warnings
-- Missing validation: user.py:15 - Add input sanitization
-
-### Suggestions
-- Consider adding rate limiting to login endpoint
-```
-
-### Issue: Incomplete Task Execution
-
-**Symptoms:**
-
-- Stops before finishing
-- Misses important steps
-- Partial analysis
-
-**Diagnosis:**
-
-- Workflow not explicit enough?
-- Missing checklist?
-- Scope too large?
-
-**Fixes:**
-
-Add numbered steps:
-
-```markdown
-When invoked, follow these steps IN ORDER:
-1. Run git diff to identify changed files
-2. Read each changed file completely
-3. Analyze for issues using the checklist below
-4. Compile findings by priority
-5. Return formatted report
-```
-
-Add completion checklist:
-
-```markdown
-Before returning, verify:
-- [ ] All changed files reviewed
-- [ ] Each checklist item addressed
-- [ ] Findings organized by priority
-- [ ] Specific fixes provided
-```
-
-### Issue: Scope Creep
-
-**Symptoms:**
-
-- Agent does more than asked
-- Modifies files when should only read
-- Makes decisions it shouldn't
-
-**Diagnosis:**
-
-- Tools too permissive?
-- Prompt doesn't set boundaries?
-
-**Fixes:**
-
-Restrict tools:
+When multiple agents overlap in scope, Claude picks unpredictably. Add exclusions to each:
 
 ```yaml
-# Before: full access
-tools: Read, Write, Edit, Bash, Glob, Grep
+# In security-reviewer.md
+description: "Security review. NOT general quality review."
 
-# After: read-only
-tools: Read, Glob, Grep
+# In code-reviewer.md
+description: "General code quality review. NOT security audits — use security-reviewer for those."
 ```
 
-Add explicit constraints:
-
-```markdown
-## Constraints
-- DO NOT modify any files
-- DO NOT make implementation decisions
-- ONLY report findings, do not fix them
-- ASK for clarification if requirements are unclear
-```
-
-### Issue: Poor Context Efficiency
-
-**Symptoms:**
-
-- Reads too many files
-- Returns verbose output
-- Slow execution
-
-**Diagnosis:**
-
-- No efficiency guidance?
-- Returns raw data instead of synthesis?
-
-**Fixes:**
-
-Add efficiency instructions:
-
-```markdown
-## Efficiency Guidelines
-- Use Grep to locate relevant code before reading entire files
-- Stop searching once you have enough information
-- Synthesize findings into actionable summary
-- Do NOT return raw search results
-```
-
-Specify return format:
-
-```markdown
-## Return to Parent
-Return a concise summary (max 500 words) containing:
-- Key findings (bullet points)
-- Recommended actions
-- Files examined (list only, not contents)
-```
+---
 
 ## Prompt Refinement Techniques
 
-### Adding Examples
+### Strengthen: Add What's Missing
 
-Examples clarify expectations:
+Add explicit instructions for observed gaps without restructuring:
+
+**Missing output format** — add a concrete template:
 
 ```markdown
-## Examples
+## Output Format
 
-### Input
-"Review the authentication module"
+### Critical Issues
 
-### Expected Behavior
-1. Locate auth-related files
-2. Check for common vulnerabilities
-3. Return prioritized findings
+- [Issue]: [Location] — [Fix]
 
-### Example Output
-**Critical:** Password stored in plaintext (auth/user.py:23)
-**Warning:** No rate limiting on login endpoint
-**Suggestion:** Consider adding 2FA support
+### Warnings
+
+- [Issue]: [Location] — [Fix]
+
+### Suggestions
+
+- [Suggestion]: [Location]
 ```
 
-### Using Checklists
-
-Checklists ensure consistency:
+**Incomplete execution** — add ordered steps and a completion gate:
 
 ```markdown
-## Review Checklist
+When invoked, follow these steps IN ORDER:
 
-### Security
-- [ ] No hardcoded credentials
-- [ ] Input validation present
-- [ ] SQL injection protected
-- [ ] XSS prevented
+1. Run `git diff` to identify changed files
+2. Read each changed file
+3. Apply the review checklist
+4. Compile findings by severity
+5. Return formatted report
 
-### Quality
-- [ ] Clear naming
-- [ ] No code duplication
-- [ ] Error handling present
-- [ ] Tests exist
+Before returning, verify:
+
+- [ ] All changed files reviewed
+- [ ] Each checklist item addressed
+- [ ] Specific fixes provided for Critical items
 ```
 
-### Conditional Instructions
+**Scope creep** — add explicit constraint block and restrict tools:
 
-Handle different scenarios:
-
-```markdown
-## Workflow
-
-IF reviewing new code:
-1. Focus on design and patterns
-2. Check for test coverage
-3. Verify documentation
-
-IF reviewing bug fix:
-1. Verify the fix addresses root cause
-2. Check for regression risks
-3. Ensure tests cover the fix
-
-IF reviewing refactor:
-1. Verify behavior unchanged
-2. Check for improvements
-3. Validate test coverage maintained
+```yaml
+tools: Read, Glob, Grep
 ```
 
-## Version Control for Agents
+```markdown
+## Constraints
 
-Keep track of changes:
+- DO NOT modify any files
+- DO NOT make implementation decisions
+- ONLY report findings — fixes are the caller's responsibility
+```
+
+**Context bloat** — add synthesis instruction and cap return length:
 
 ```markdown
+## Efficiency
+
+- Use Grep to locate relevant code before reading entire files
+- Stop once you have enough evidence for each checklist item
+- Synthesize findings into actionable summary
+
+## Return
+
+Concise summary (max 400 words):
+
+- Key findings (bullet list)
+- Recommended actions
+- Files examined (names only, not contents)
+```
+
+### Restructure: Reorder for LLM Attention
+
+Models weight earlier content more heavily. If an instruction is consistently ignored, move it earlier in the system
+prompt — before examples, after the role declaration.
+
+**Restructuring checklist:**
+
+- Role and primary purpose → top
+- Critical constraints → immediately after role
+- Workflow steps → middle
+- Output format → before examples
+- Examples → last
+
+### Split: Decompose an Overloaded Agent
+
+When an agent reliably fails on a subset of tasks or produces inconsistent quality, the root cause is often scope
+overload. Split into two focused agents:
+
+```
+# Before: one agent doing too much
+security-and-quality-reviewer.md
+
+# After: two focused agents
+security-reviewer.md   — auth/security scope, read-only tools
+quality-reviewer.md    — style/patterns scope, broader tools
+```
+
+Each agent's description now has clear, non-overlapping triggers. Claude can pick the right one.
+
+---
+
+## A/B Testing
+
+Test a change before committing it by running both versions on identical tasks.
+
+**Setup:**
+
+```markdown
+---
+name: code-reviewer-v2
+description: "Code reviewer (experimental). Compare against code-reviewer before adopting."
+---
+```
+
+**Process:**
+
+1. Identify a representative task (one where current agent underperforms)
+2. Run `code-reviewer` — record output
+3. Run `code-reviewer-v2` — record output
+4. Compare on: trigger accuracy, output completeness, format, conciseness
+5. If v2 wins on all dimensions → rename to `code-reviewer`, delete v2
+6. If mixed results → iterate on v2 before deciding
+
+**Keep variants in git** rather than in file copies. Use branches or commits to track what changed and why. File copies
+accumulate and become confusing.
+
+---
+
+## Version Control for Agent Definitions
+
+Agent definitions are code — treat them as such. Useful patterns:
+
+**Inline changelog (lightweight):**
+
+```yaml
 ---
 name: code-reviewer
 description: "..."
 # version: 2.1
 # changelog:
-#   2.1 - Added security checklist
-#   2.0 - Restructured output format
-#   1.0 - Initial version
+#   2.1 - Added security checklist, narrowed description scope
+#   2.0 - Restructured: role → constraints → workflow → format
+#   1.0 - Initial
 ---
 ```
 
-Or maintain separate files:
+**Branch-per-experiment (preferred for significant changes):**
 
+```bash
+git checkout -b agents/code-reviewer-v3
+# edit .claude/agents/code-reviewer.md
+# test
+git commit -m "agents: restructure code-reviewer prompt order"
 ```
-.claude/agents/
-├── code-reviewer.md          # Current version
-├── code-reviewer-v1.md       # Previous version (backup)
-└── code-reviewer-experimental.md  # Testing new approach
-```
 
-## A/B Testing Agents
+This lets you compare diffs, revert cleanly, and review changes with collaborators.
 
-Test changes before committing:
-
-1. Create variant with different name:
-
-```markdown
 ---
-name: code-reviewer-v2
-description: "Code reviewer (experimental v2). Use for testing new format."
+
+## Fix vs. Rebuild Criteria
+
+**Fix (iterate)** when:
+
+- Core concept is valid, execution is off
+- One or two specific symptoms to address
+- Description or output format is the likely cause
+- The agent works for 70%+ of cases
+
+**Rebuild** when:
+
+- Fundamental scope is wrong (agent tries to do too much)
+- Requirements changed enough that the system prompt fights the new goal
+- Multiple unrelated symptoms — suggests architectural mismatch
+- Accumulated patches have made the prompt contradictory
+
+**Split** when:
+
+- Agent handles two distinct task types inconsistently
+- Different tool restrictions would be ideal for each type
+- Description can't accurately scope both use cases simultaneously
+
+When rebuilding, start from spec, not from the existing prompt. Carry over only tested patterns (output format,
+checklists) — not the overall structure.
+
 ---
+
+## Fan-out Iteration Pattern
+
+When applying a prompt change across many similar agents (e.g., migrating a template), tune on 2–3 instances before
+deploying to all:
+
+```bash
+# Step 1: Apply change to 2-3 representative agents
+# Step 2: Run same evaluation tasks on each
+# Step 3: If consistent improvement → apply to all remaining agents
+# Step 4: If mixed → diagnose and adjust prompt before continuing
 ```
 
-2. Run same tasks with both versions
-3. Compare results
-4. Keep winner, archive loser
+This is the same principle as large-scale code migration: prototype → verify → scale. Avoid "artisanal" per-agent tuning
+when the same pattern applies broadly.
 
-## Incremental Improvement
+---
 
-Don't change everything at once:
+## Parallel Session Bias Avoidance
 
-```
-Week 1: Fix trigger accuracy
-Week 2: Improve output format
-Week 3: Add efficiency guidelines
-Week 4: Refine checklists
-```
+When evaluating whether an agent change is an improvement, avoid reviewing it in the same session where you wrote it.
+The writing context biases judgment toward "this looks right."
 
-Test after each change to isolate impact.
-
-## When to Redesign vs. Iterate
-
-**Iterate when:**
-
-- Core concept is sound
-- Issues are specific and fixable
-- Changes are incremental
-
-**Redesign when:**
-
-- Fundamental approach is wrong
-- Multiple major issues
-- Requirements have changed significantly
-- Agent tries to do too much (split it)
-
-## Feedback Loop
-
-Establish continuous improvement:
+**Pattern:**
 
 ```
-Use agent → Observe issues → Document → Fix → Test → Repeat
+Session A (Author): Writes the new agent prompt, commits
+Session B (Reviewer): Opens fresh session, runs agent against test tasks, evaluates output cold
 ```
 
-Keep a log of issues and fixes:
-
-```markdown
-## Agent: code-reviewer
-
-### Issue Log
-| Date | Issue | Fix | Result |
-|------|-------|-----|--------|
-| 2024-01-15 | Over-triggers | Narrowed description | Fixed |
-| 2024-01-20 | Missing security checks | Added checklist | Fixed |
-| 2024-01-25 | Verbose output | Added synthesis step | Improved |
-```
+This mirrors the writer/reviewer pattern for code review — the reviewer's fresh context catches gaps the author's
+context conceals.

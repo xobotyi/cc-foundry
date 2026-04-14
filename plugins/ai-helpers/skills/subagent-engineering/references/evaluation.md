@@ -1,310 +1,250 @@
 # Evaluating Subagents
 
-Framework for assessing subagent quality and effectiveness.
+Reference for the `subagent-engineering` skill. Covers the five-dimension scoring rubric, testing protocol, and
+benchmarking practices for Claude Code subagents.
 
 ---
 
-## Table of Contents
+## Scoring Rubric
 
-- [Evaluation Dimensions](#evaluation-dimensions)
-- [Evaluation Checklist](#evaluation-checklist)
-- [Testing Protocol](#testing-protocol)
-- [Comparative Evaluation](#comparative-evaluation)
-- [Quality Scoring](#quality-scoring)
-- [Continuous Monitoring](#continuous-monitoring)
+Evaluate on five dimensions. Each dimension has a weight; final score is the weighted sum (max 5.0).
+
+### Dimension Weights
+
+- **Task completion** — 30%
+- **Trigger accuracy** — 25%
+- **Output quality** — 25%
+- **Context efficiency** — 10%
+- **Tool usage** — 10%
+
+Task completion carries the highest weight: an agent that doesn't finish its job fails regardless of other qualities.
 
 ---
 
-## Evaluation Dimensions
+### 1. Task completion (30%)
 
-### 1. Trigger Accuracy
+Does the agent reliably complete the work it is invoked to do?
 
-Does Claude delegate to this agent at the right times?
+Score guide:
 
-**Test scenarios:**
+- **5** — Always completes; handles edge cases gracefully
+- **4** — Completes in normal cases; minor gaps at edges
+- **3** — Completes most cases; notable gaps
+- **2** — Frequent incompletion; returns early
+- **1** — Rarely or never completes
 
-- Direct invocation: "Use the [agent] to [task]"
-- Implicit match: Describe a task that should trigger delegation
-- Non-match: Describe similar but different tasks (should NOT trigger)
+Common causes of low scores:
 
-**Scoring:**
+- No numbered sequential steps → agent loses track of order
+- Missing explicit completion criteria → agent returns too early
+- No completion checklist → skips verification steps
 
-- **Delegates correctly when should** — Good: no action needed
-- **Delegates when shouldn't** — Over-triggering: narrow description
-- **Doesn't delegate when should** — Under-triggering: broaden description
-- **Never delegates** — Broken: check name/description format
+---
 
-**Common issues:**
+### 2. Trigger accuracy (25%)
 
-- Description too vague → over-triggers on unrelated tasks
-- Description too specific → under-triggers on valid tasks
-- Typo in name → never found
+Does the agent activate for the right requests, and only those requests?
 
-### 2. Task Completion
+Score guide:
 
-Does the agent accomplish its intended purpose?
+- **5** — Activates precisely for intended scope; never for out-of-scope
+- **4** — Occasional edge-case misfires; core scope correct
+- **3** — Over- or under-triggering in ~20% of cases
+- **2** — Significant misfiring; scope poorly defined
+- **1** — Broken — never delegates or always delegates wrong
 
-**Evaluate:**
+Failure modes:
 
-- Does it follow the specified workflow?
-- Does it produce the expected output format?
-- Does it handle edge cases?
-- Does it stay within scope?
+- **Over-triggering** — description too vague; matches unintended requests
+- **Under-triggering** — description too specific; misses legitimate requests
+- **Broken** — description has no delegation language; agent never activates
 
-**Test matrix:** | Input Type | Expected Behavior | |------------|-------------------| | Happy path | Complete
-successfully | | Edge case | Handle gracefully | | Invalid input | Fail clearly with explanation | | Out of scope |
-Recognize and decline |
+---
 
-### 3. Output Quality
+### 3. Output quality (25%)
 
-Is the agent's output useful and actionable?
+Is the agent's output correct, well-structured, and usable without post-processing?
 
-**Criteria:**
+Score guide:
 
-- **Clarity:** Is the output easy to understand?
-- **Completeness:** Does it include all necessary information?
-- **Actionability:** Can the user/parent agent act on it?
-- **Format compliance:** Does it match specified structure?
+- **5** — Output matches expected format exactly; correct and complete
+- **4** — Minor formatting deviations; content correct
+- **3** — Output requires light editing; some gaps
+- **2** — Structural problems; partial correctness
+- **1** — Output unusable
 
-**Red flags:**
+Levers:
 
-- Raw data dumps without synthesis
-- Missing key information
-- Inconsistent formatting
-- Scope creep (doing more than asked)
+- Add explicit format specification (structure, sections, length)
+- Provide a concrete output example in the system prompt
+- Use prefill-style opening lines to anchor the response format
 
-### 4. Context Efficiency
+---
 
-Does the agent use context wisely?
+### 4. Context efficiency (10%)
 
-**Measure:**
+Does the agent avoid wasting tokens — its own and the caller's?
 
-- How much context does it consume?
-- Does it return concise summaries?
-- Does it avoid unnecessary tool calls?
+Score guide:
 
-**Good patterns:**
+- **5** — Reads only necessary files; minimal tool calls; compact output
+- **4** — Occasional redundant reads; output slightly verbose
+- **3** — Repeated reads; unnecessary exploration
+- **2** — Excessive reads; output bloated
+- **1** — Runaway tool calls; context exhaustion risk
 
-- Returns synthesized findings, not raw search results
-- Uses parallel tool calls when possible
-- Stops when task is complete
+Levers:
 
-**Bad patterns:**
+- Add efficiency instructions: "read each file at most once"
+- Restrict model to `haiku` for simple tasks
+- Narrow `tools` list to prevent exploratory tool use
 
-- Reads entire codebase for simple lookup
-- Returns verbose output to parent
-- Continues working after task is done
+---
 
-### 5. Tool Usage
+### 5. Tool usage (10%)
 
-Does the agent use tools appropriately?
+Does the agent use the right tools correctly?
 
-**Check:**
+Score guide:
 
-- Uses only granted tools
-- Doesn't attempt dangerous operations
-- Makes efficient use of tools
-- Handles tool errors gracefully
+- **5** — Uses only permitted tools; correct tool for each operation
+- **4** — Minor mismatches (e.g., Bash where Grep fits)
+- **3** — Some unnecessary tool use or incorrect choices
+- **2** — Frequent wrong-tool usage
+- **1** — Attempts disallowed tools; breaks on permissions
 
-**Scoring:**
+Common issues:
 
-- **Uses minimal necessary tools** — Good
-- **Makes redundant tool calls** — Inefficient
-- **Attempts blocked tools** — Over-scoped
-- **Ignores available useful tools** — Under-utilizing
+- Tool name typos (exact match required: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`)
+- `disallowedTools` conflicts with `tools` list
+- Agent tries tools not in its `tools` field
 
-## Evaluation Checklist
+---
 
-Run through this checklist for each subagent:
+## Quality Thresholds
 
-### Description Quality
+Map the weighted score to an action:
 
-- [ ] Clearly states what the agent does
-- [ ] Clearly states when to use it
-- [ ] No execution instructions in description
-- [ ] Under 1024 characters
+- **4.5–5.0** — Excellent. Monitor in production; no changes needed.
+- **3.5–4.4** — Good. Minor prompt tuning; address lowest-scoring dimension.
+- **2.5–3.4** — Fair. Significant rework; re-examine system prompt structure.
+- **< 2.5** — Poor. Consider redesign or splitting into multiple agents.
 
-### Trigger Behavior
-
-- [ ] Delegates on direct invocation
-- [ ] Delegates on implicit matching tasks
-- [ ] Does NOT delegate on unrelated tasks
-- [ ] Delegation speed is acceptable
-
-### Task Execution
-
-- [ ] Follows specified workflow
-- [ ] Produces correct output format
-- [ ] Handles happy path correctly
-- [ ] Handles edge cases gracefully
-- [ ] Recognizes out-of-scope requests
-
-### Output Quality
-
-- [ ] Clear and understandable
-- [ ] Contains necessary information
-- [ ] Actionable by recipient
-- [ ] Consistent format across runs
-
-### Resource Usage
-
-- [ ] Reasonable context consumption
-- [ ] Efficient tool usage
-- [ ] Concise return to parent
+---
 
 ## Testing Protocol
 
-### Level 1: Smoke Test
+Five levels of testing, applied in order. Do not skip levels — later tests are only meaningful if earlier ones pass.
 
-Quick validation that agent works at all:
+### Level 1: Smoke test
 
-```
-Use the [agent-name] subagent to [simple representative task]
-```
+Verify the agent can be invoked at all.
 
-**Pass criteria:** Agent is invoked, produces output, returns to parent.
+- Does `@agent-name` resolve without "agent not found"?
+- Does the agent respond to a minimal valid request?
+- Does it complete without crashing?
 
-### Level 2: Functional Test
+Pass criteria: agent invokes and returns any output.
 
-Test core functionality:
+### Level 2: Functional test
 
-```
-# Happy path
-Use the [agent] to [typical use case]
+Verify the agent completes its primary workflow.
 
-# Verify workflow steps are followed
-# Verify output format is correct
-```
+- Run 3–5 representative requests covering the core use case
+- Check output against expected structure and content
+- Confirm no premature returns
 
-**Pass criteria:** Workflow executed correctly, output matches spec.
+Pass criteria: ≥ 80% of functional cases complete correctly.
 
-### Level 3: Edge Case Test
+### Level 3: Edge case test
 
-Test boundary conditions:
+Verify the agent handles boundary inputs gracefully.
 
-```
-# Empty/minimal input
-Use the [agent] with [minimal input]
+- Empty inputs, missing files, ambiguous requests
+- Inputs near the boundary of the agent's scope
+- Large inputs that stress context limits
 
-# Large input
-Use the [agent] on [large codebase/dataset]
+Pass criteria: agent degrades gracefully (clear error or partial output), does not crash.
 
-# Ambiguous input
-Use the [agent] for [ambiguous request]
-```
+### Level 4: Negative test
 
-**Pass criteria:** Handles gracefully without crashing or hallucinating.
+Verify the agent recognizes and rejects out-of-scope requests.
 
-### Level 4: Negative Test
+- Send requests that should NOT trigger the agent
+- Confirm the agent declines or redirects rather than attempting
+- Test the boundary between this agent's scope and adjacent agents
 
-Test what should NOT happen:
+Pass criteria: agent correctly declines or defers ≥ 90% of out-of-scope requests.
 
-```
-# Out of scope request
-Use the [agent] for [unrelated task]
+### Level 5: Integration test
 
-# Should reject or clarify, not attempt
-```
+Verify the agent coordinates correctly in multi-agent workflows.
 
-**Pass criteria:** Agent recognizes scope boundary, doesn't attempt.
+- Run as part of a pipeline or agent team
+- Confirm `SendMessage` summaries are concise (< 500 tokens)
+- Confirm `blockedBy` dependencies resolve correctly
+- Verify output format is consumable by downstream agents
 
-### Level 5: Integration Test
+Pass criteria: no coordination failures; downstream agents receive usable input.
 
-Test in realistic workflow:
+---
 
-```
-# Chain with other agents
-Use [agent-1] to [task], then use [agent-2] to [follow-up]
+## Benchmarking
 
-# Parallel execution
-Research [topic-a] and [topic-b] in parallel using subagents
-```
+Use a fixed test suite to detect regressions across versions.
 
-**Pass criteria:** Works correctly in multi-agent context.
+### Building a test suite
 
-## Comparative Evaluation
+Create 10–20 test cases covering:
 
-When you have multiple versions or similar agents:
+- Core use cases (≥ 50% of suite)
+- Edge cases (≥ 20%)
+- Negative / out-of-scope cases (≥ 20%)
+- Integration scenarios if the agent participates in pipelines
 
-### A/B Testing
+Store test cases as markdown files with:
 
-Run same task with both versions:
+- **Input** — the request
+- **Expected output** — structure, key content, or exact text
+- **Expected behavior** — completes / declines / delegates
 
-```
-# Version A
-Use the code-reviewer to review the authentication module
+### A/B testing between versions
 
-# Version B (different prompt)
-Use the code-reviewer-v2 to review the authentication module
-```
+When iterating on a prompt:
 
-Compare:
+1. Run the full test suite on version A; record dimension scores
+2. Apply the change to get version B
+3. Run the same suite on version B
+4. Compare per-dimension deltas — a gain in one dimension should not cause regression in another
 
-- Trigger accuracy
-- Output quality
-- Context usage
-- Completion time
+Accept the change only if the weighted score improves or holds, with no dimension dropping more than 0.5 points.
 
-### Benchmarking
+### Regression detection
 
-Create a standard test suite:
+Run the test suite after any system prompt change, tool list change, or model change. Flag any case that was passing and
+now fails — this is a regression, not just a score change.
 
-```markdown
-## Test Suite: Code Reviewer
-
-### Test 1: Simple function
-Input: [single function with obvious issue]
-Expected: Identifies issue, suggests fix
-
-### Test 2: Security vulnerability
-Input: [code with SQL injection]
-Expected: Flags as critical, explains risk
-
-### Test 3: Clean code
-Input: [well-written code]
-Expected: Minimal feedback, no false positives
-```
-
-Run periodically to catch regressions.
-
-## Quality Scoring
-
-Rate each dimension 1-5:
-
-- **Trigger Accuracy**: weight 25%
-- **Task Completion**: weight 30%
-- **Output Quality**: weight 25%
-- **Context Efficiency**: weight 10%
-- **Tool Usage**: weight 10%
-
-**Overall = weighted average**
-
-**Why these weights?**
-
-- Task Completion (30%) is highest — an agent that doesn't complete its task fails regardless of other qualities
-- Trigger Accuracy and Output Quality (25% each) — wrong triggers waste time; poor output requires rework
-- Context Efficiency and Tool Usage (10% each) — important for cost and speed, but secondary to correctness
-
-- **4.5+**: Excellent — monitor only
-- **3.5–4.4**: Good — minor improvements
-- **2.5–3.4**: Fair — significant revision needed
-- **<2.5**: Poor — redesign from scratch
+---
 
 ## Continuous Monitoring
 
-### Session Review
+Beyond structured testing, monitor agents in active use.
 
-After using an agent, note:
+**Session reviews:**
 
-- Did it trigger correctly?
-- Was output useful?
-- Any unexpected behavior?
+- After each session where an agent was invoked, note any unexpected behavior
+- Check for trigger misfires (wrong agent activated or failed to activate)
+- Check for incomplete outputs or tool permission errors
 
-### Periodic Audit
+**Monthly audits:**
 
-Monthly review:
+- Run the full test suite
+- Re-score all five dimensions
+- Update the test suite with new cases discovered during use
 
-- Run test suite
-- Check for regressions
-- Update for new requirements
-- Archive unused agents
+**When to re-evaluate:**
+
+- After any change to the agent's system prompt
+- After adding or removing tools
+- After changing the model
+- After upstream context changes (new CLAUDE.md rules, new hook behavior)
