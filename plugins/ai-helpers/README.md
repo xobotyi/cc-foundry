@@ -59,19 +59,20 @@ quality.
 
 ### subagent-engineering
 
-Build Claude Code subagents with clear scope and reliable behavior. Covers agent prompt design, tool restrictions,
-termination conditions, and when to use subagents vs. other approaches.
+Claude Code subagent lifecycle: creation, configuration, evaluation, and troubleshooting. Covers agent teams, worktree
+isolation, background execution, Agent SDK integration, subagent-scoped hooks, and persistent memory.
 
-**Use when:** Creating custom agents, debugging agent behavior, or deciding if a subagent is the right solution for a
-task.
+**Use when:** Creating custom agents, designing agent teams, debugging agent behavior, or deciding if a subagent is the
+right solution for a task.
 
 ### output-style-engineering
 
-Create output styles that consistently shape Claude's responses. Covers persona definition, instruction layering, tone
-examples, and avoiding conflicts with base behavior.
+Design output styles that replace Claude's system prompt. Covers the replace-not-augment principle, persona definition,
+non-coding domain patterns (business analysis, content strategy, research), evaluation framework with dimensional
+scoring, and iteration diagnostics.
 
-**Use when:** Building personas, customizing tone, creating domain-specific response patterns, or debugging style
-inconsistencies.
+**Use when:** Building personas, customizing tone, creating domain-specific response patterns, evaluating style quality,
+or debugging style drift and reversion.
 
 ### claude-code-sdk
 
@@ -85,8 +86,9 @@ consulting API documentation.
 
 ### ai-engineer
 
-Collaborative persona for AI artifact work. Direct communication without sycophancy, conclusions first, challenge ideas
-freely. Optimized for iterative refinement with peer-level interaction.
+Collaborative AI engineering persona. Direct communication without sycophancy, conclusions first, challenge ideas
+freely. Adversarial self-checks on recommendations, frustration-aware responses. Optimized for iterative refinement with
+peer-level interaction.
 
 **Activate:** `/output-style ai-engineer`
 
