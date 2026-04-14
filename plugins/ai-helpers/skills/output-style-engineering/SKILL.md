@@ -26,16 +26,21 @@ Skip only for trivial edits (typos, formatting).
 ## Route to Reference
 
 - **File format, frontmatter, storage, activation** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] Frontmatter field
-  details, storage paths, activation methods, file naming rules
-- **Creating a style from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Full style templates by pattern,
-  testing prompts, creation workflow steps
-- **Evaluating style quality** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Per-dimension scoring rubrics (1-10),
-  weighted scoring formula, testing protocol
-- **Style not working, needs refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Detailed fix patterns with
-  before/after, refinement techniques, version control
+  details, replace-vs-preserve semantics, storage paths, activation methods, scope priority, session timing and
+  reminders, token impact, built-in styles catalog, feature comparison table, Agent SDK system prompt approaches (4
+  methods)
+- **Creating a style from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Replace-not-augment principle,
+  creation methods (/output-style:new, manual, SDK), creation workflow, style pattern templates (direct professional,
+  domain specialist with non-coding use cases, interaction mode, learning/educational with voice-first design), token
+  impact, common failure modes
+- **Evaluating style quality** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Scope appropriateness pre-check,
+  per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol (4 core + 3 persistence + 1 domain),
+  deployment readiness go/no-go, red flags
+- **Style not working, needs refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Mechanism mismatch
+  diagnosis, diagnostic symptom→fix mapping with community evidence, refinement techniques (repetition, contrast,
+  consolidation), escalation patterns, rewrite vs iterate criteria
 - **Real-world examples with analysis** — [`${CLAUDE_SKILL_DIR}/references/examples.md`] 5 complete styles with
-  dimensional scoring and improvement notes
-- **Prompt engineering techniques** — `prompt-engineering` skill Instruction design fundamentals
+  dimensional scoring and improvement notes — includes non-coding examples (SaaS analyst, content strategist)
 
 ## What Output Styles Change
 
@@ -46,38 +51,35 @@ Output styles **replace** the default system prompt — they don't augment it.
 - System prompt personality and domain assumptions
 - Task prioritization and interaction patterns
 - Response formatting and tone
-- Efficiency instructions (concise output)
 - Coding instructions (unless `keep-coding-instructions: true`)
 
-**Preserved:**
+**Preserved (regardless of style):**
 
 - All tools (Read, Write, Bash, Grep, etc.)
 - CLAUDE.md project context system
-- Sub-agent and custom agent delegation
+- Subagent delegation and skills
 - MCP integrations
+- Environment context (working directory, git status)
 
 **Key distinction from other features:**
 
-| Feature                  | Purpose                        | System Prompt Impact        |
-| ------------------------ | ------------------------------ | --------------------------- |
-| **Output Style**         | Replace main agent personality | Replaces entirely           |
-| CLAUDE.md                | Add project context            | Added as user message after |
-| `--append-system-prompt` | Add instructions               | Appends to system prompt    |
-| Custom Agents            | Specialized sub-tasks          | Separate agent context      |
-| Skills                   | On-demand task workflows       | Loads when triggered        |
+- **Output style** — replaces the default system prompt; file on disk
+- **CLAUDE.md** — added as user message after the system prompt; does not modify it
+- **`--append-system-prompt`** — appends to system prompt without removing anything
+- **Custom `systemPrompt` (SDK)** — full replacement in code; use for specialized agents
 
-Output styles are the ONLY way to change the main agent's core personality.
+Output styles are the ONLY file-based way to change the main agent's core personality.
 
 ## `keep-coding-instructions`
 
-This field controls whether Claude retains its software engineering guidance.
+Controls whether Claude retains its software engineering guidance.
 
-- `false`: Non-coding domain (research, content) — remove irrelevant coding guidance
-- `true`: Coding with different tone — keep coding skills, change personality
-- `true`: Teaching/learning coding — need coding knowledge for lessons
-- `false`: General assistant — broader focus, no coding bias
+- `false` (default) — removes coding workflow instructions. Use for non-coding domains (research, content, UX design)
+- `true` — preserves safety, code quality, and test verification guidance. Use when the style is a personality overlay
+  for coding work (different tone, domain-specific conventions)
 
-Default is `false`. Set `true` when the style is a personality adjustment for coding work rather than a domain shift.
+**Rule:** if the style is for someone who writes code, set `true`. If the style replaces coding with another domain, set
+`false`.
 
 ## File Structure
 
@@ -89,9 +91,10 @@ Default is `false`. Set `true` when the style is a personality adjustment for co
 ```
 
 Filename becomes the style identifier (without `.md`). Activate with `/output-style style-name` or via settings.
-Project-level styles with the same name override user-level.
+Project-level styles shadow user-level styles with the same name.
 
-Full format details, frontmatter fields, activation methods: see `${CLAUDE_SKILL_DIR}/references/spec.md`.
+Full format details, frontmatter fields, activation methods, Agent SDK integration: see
+[`${CLAUDE_SKILL_DIR}/references/spec.md`].
 
 ## Writing Style Instructions
 
@@ -104,12 +107,8 @@ every response.
 
 **Vague (fails):** "Be helpful and professional."
 
-**Clear (works):**
-
-```markdown
-You are a senior technical architect who communicates directly and
-values precision over politeness.
-```
+**Clear (works):** "You are a senior technical architect who communicates directly and values precision over
+politeness."
 
 The test: could two people reading this persona imagine the same character? If not, add specificity.
 
@@ -126,8 +125,7 @@ Abstract instructions ("communicate clearly") get ignored. Concrete behaviors ar
 - Open with the answer, not pleasantries
 ```
 
-Each rule should be verifiable: you can check whether a response complies or not. If you can't verify it, make it more
-specific.
+Each rule should be verifiable: you can check whether a response complies or not.
 
 ### 3. Include Tone Examples
 
@@ -145,27 +143,14 @@ Let me take a look at what you've got..."
 
 This Style (use):
 "Looking at the code now. Three issues:
-1. [specific issue]
-2. [specific issue]
-3. [specific issue]"
+1. [specific issue]..."
 ```
 
-Include at least one contrast example. Cover the interaction types most likely to trigger default behavior (greetings,
-requests for help, disagreements).
+Include at least one contrast example. Cover interaction types most likely to trigger default behavior.
 
 ### 4. Specify Output Format
 
-Without format guidance, response structure varies unpredictably. Provide templates for common response types:
-
-```markdown
-## Response Format
-
-When providing solutions:
-1. State the problem as you understand it
-2. List constraints and assumptions
-3. Provide recommendation with rationale
-4. Note alternatives considered
-```
+Without format guidance, response structure varies unpredictably. Provide templates for common response types.
 
 ### 5. Add Consistency Safeguards
 
@@ -174,8 +159,8 @@ Styles drift mid-conversation. Explicit persistence language prevents reversion:
 ```markdown
 ## Consistency
 
-Maintain this style throughout the entire conversation. Do not
-revert to default patterns even if:
+Maintain this style throughout the entire conversation. Do not revert
+to default patterns even if:
 - The topic changes
 - The user asks follow-up questions
 - Multiple turns have passed
@@ -187,62 +172,41 @@ If uncertain, default to MORE adherence to this style, not less.
 ### Place Critical Rules at End
 
 Instructions near the end of the prompt are followed more reliably. Place the rules you absolutely cannot afford to have
-ignored last:
-
-```markdown
-## Critical Rules
-
-These rules override all other guidance:
-- Never apologize for limitations
-- Never use emoji unless user does first
-- Always surface concerns before proceeding
-```
+ignored last.
 
 ### Establish Priority Hierarchy
 
-When a style has rules that could conflict (e.g., "be concise" vs. "explain your reasoning"), add an explicit priority
-order:
-
-```markdown
-## Priority Hierarchy
-
-When rules conflict, follow this order:
-1. Safety and accuracy
-2. Style persona
-3. Format requirements
-4. Length constraints
-```
+When a style has rules that could conflict, add an explicit priority order.
 
 ## Common Style Patterns
 
-**Direct Professional:** Remove sycophancy, focus on substance over pleasantries. Set `keep-coding-instructions: true`.
+- **Direct Professional** — remove sycophancy, focus on substance. Set `keep-coding-instructions: true`.
+- **Domain Specialist** — replace coding expertise with domain knowledge. Set `keep-coding-instructions: false`.
+- **Interaction Mode** — change engagement style (voice-first, quiz, pair programming). Set `keep-coding-instructions`
+  based on whether the mode involves coding.
+- **Learning/Educational** — collaborative mentoring with guided exercises. Set `keep-coding-instructions: true`.
 
-**Domain Specialist:** Replace coding expertise with domain-specific knowledge (content strategy, research analysis, UX
-design). Set `keep-coding-instructions: false`.
-
-**Interaction Mode:** Change how Claude engages (voice-first, educational quiz, pair programming mentor). Set
-`keep-coding-instructions` based on whether the mode involves coding.
-
-Full templates for each pattern: see `${CLAUDE_SKILL_DIR}/references/creation.md`. Scored examples: see
-`${CLAUDE_SKILL_DIR}/references/examples.md`.
+Full templates for each pattern: see [`${CLAUDE_SKILL_DIR}/references/creation.md`]. Scored examples: see
+[`${CLAUDE_SKILL_DIR}/references/examples.md`].
 
 ## Evaluating Style Quality
 
+**First: verify scope appropriateness.** Before scoring dimensions, confirm the style needs to be an output style — not
+CLAUDE.md, not `--append-system-prompt`, not a skill. If the style body could work identically as CLAUDE.md content, it
+should not be a style.
+
 Six dimensions, three weighted 2x (high-leverage):
 
-- **Persona Clarity** (2x) — Can you describe the persona in one sentence? Would two readers imagine the same character?
-- **Behavioral Specificity** (2x) — Is every rule verifiable? Are there concrete do/don't examples?
-- **Example Quality** (2x) — Do examples show contrast (good vs bad)? Do they cover key interaction types?
-- Output Format (1x) — Would Claude know exactly how to structure responses?
-- Consistency Safeguards (1x) — Are default behaviors explicitly forbidden with alternatives?
-- Scope (1x) — Is `keep-coding-instructions` set right? Does the style know what it's for?
+- **Persona Clarity (2x)** — can you describe the persona in one sentence? Would two readers imagine the same character?
+- **Behavioral Specificity (2x)** — is every rule verifiable? Are there concrete do/don't examples?
+- **Example Quality (2x)** — do examples show contrast (default vs this style)? Do they cover key interaction types?
+- **Output Format (1x)** — would Claude know exactly how to structure responses?
+- **Consistency Safeguards (1x)** — are default behaviors explicitly forbidden with alternatives?
+- **Scope (1x)** — is `keep-coding-instructions` set right? Does the style know what it's for?
 
-**Must have (critical):** Persona defined, core behaviors listed, at least one tone example, output format specified.
+**Must have:** persona defined, core behaviors listed, at least one contrast example, output format specified.
 
-**Should have:** Multiple contrast examples, explicit "avoid" list, format templates, `keep-coding-instructions`
-considered.
-
-Detailed per-dimension scoring rubrics and testing protocol: see `${CLAUDE_SKILL_DIR}/references/evaluation.md`.
+Detailed per-dimension scoring rubrics and testing protocol: see [`${CLAUDE_SKILL_DIR}/references/evaluation.md`].
 
 ## Iterating on Styles
 
@@ -254,41 +218,29 @@ Observe → Diagnose → Hypothesize → Modify (ONE change) → Test → Repeat
 
 Make ONE targeted change per iteration. Multiple changes make debugging impossible.
 
-### Diagnostic Table
+### First: Check for Mechanism Mismatch
 
-- **Reverts to sycophantic tone** — weak persona, no anti-patterns. Fix: add explicit "Never use..." list with forbidden
-  phrases
-- **Ignores format** — format buried in text. Fix: move format to end, add example
-- **Inconsistent between turns** — no persistence language. Fix: add "maintain throughout" with scenario list
-- **Works initially, drifts later** — no reinforcement. Fix: add consistency section with override language
-- **Too verbose** — no length constraints. Fix: add explicit length limits
-- **Wrong tone in edge cases** — missing example coverage. Fix: add example for the failing scenario
-- **Contradictory behavior** — conflicting instructions. Fix: add priority hierarchy
-- **Ignores some rules** — too many instructions. Fix: consolidate overlapping rules, prioritize
+Before iterating on the style, verify the right mechanism is in use. If instructions are in CLAUDE.md or a hook instead
+of an output style, they lose influence over multiple turns — iteration cannot fix a mechanism mismatch.
 
-### Strengthening Techniques
+### Common Issues and Fixes
 
-- **Repetition** — Reinforce critical rules across persona, behaviors, examples, and critical rules sections.
-- **Contrast examples** — Show default Claude (avoid) vs this style (use).
-- **Consolidation** — Merge overlapping rules into single authoritative statements. Five scattered "be direct" rules
-  become one "Directness Rule" section.
-- **Escalation patterns** — For teaching/mentoring styles, define how behavior changes when the user is frustrated or
-  explicitly requests a different mode.
+- **Reverts to sycophantic tone** — weak persona, no anti-patterns. Add explicit "Never use..." list with replacements.
+- **Ignores format** — format buried in text. Move to dedicated section, add response template.
+- **Inconsistent between turns** — no persistence language. Add "maintain throughout" with scenario list.
+- **Works initially, drifts later** — no reinforcement. Reinforce critical rules across multiple sections.
+- **Too verbose** — no length constraints. Add explicit length limits.
+- **Wrong tone in edge cases** — missing example coverage. Add contrast example for the failing scenario.
+- **Contradictory behavior** — conflicting instructions. Add priority hierarchy.
+- **SE assumptions leak** — `keep-coding-instructions` not set to `false` for non-coding style.
 
-### Rewrite vs Iterate
-
-**Iterate** when the core concept is sound, issues are specific, and the style works in most cases.
-
-**Rewrite** when the persona is wrong for the use case, more than 50% of tests fail, or conflicting rules have made the
-style unmaintainable.
-
-Detailed fix patterns with before/after examples: see `${CLAUDE_SKILL_DIR}/references/iteration.md`.
+Detailed fix patterns with before/after: see [`${CLAUDE_SKILL_DIR}/references/iteration.md`].
 
 ## Built-in Styles
 
-- **Default** — software engineering. Concise, code-focused
-- **Explanatory** — teaching while coding. Adds "Insight" blocks
-- **Learning** — collaborative mentoring. Adds `TODO(human)` markers
+- **Default** — standard Claude Code system prompt. Software engineering focus. Active when no style selected.
+- **Explanatory** — inserts educational "Insight" blocks alongside task completion. Explains implementation choices.
+- **Learning** — collaborative learn-by-doing mode. Adds `TODO(human)` markers for hands-on practice.
 
 ## Quick Start
 
@@ -302,6 +254,7 @@ Create `style-name.md`:
 ---
 name: Style Display Name
 description: Brief description for the menu
+keep-coding-instructions: true
 ---
 
 # Style Name
@@ -340,8 +293,6 @@ Before deploying:
 ## Related Skills
 
 - `prompt-engineering` — load first for instruction design techniques (output styles are system prompts)
-- `skill-engineering` — skills extend capabilities; output styles change personality — different mechanisms,
-  complementary
-- `subagent-engineering` — subagents have their own system prompts; output styles modify the main agent's
-- `claude-code-sdk` — consult for output style frontmatter fields, activation methods, and `keep-coding-instructions`
-  details
+- `skill-engineering` — skills and output styles complement each other; skills extend, styles replace
+- `subagent-engineering` — subagents have their own system prompts; output styles govern the main agent only
+- `claude-code-sdk` — consult for Agent SDK system prompt modification approaches

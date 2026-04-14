@@ -1,17 +1,14 @@
 {
-  "sources": {
-    "Official Docs - Output Styles": "https://code.claude.com/docs/en/output-styles.md",
-    "Anthropic Docs - Output Styles": "https://docs.anthropic.com/en/docs/claude-code/output-styles.md",
-    "Anthropic Engineering - Claude Code Best Practices": "https://www.anthropic.com/engineering/claude-code-best-practices",
-    "Help Center - Personalization Features": "https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features",
-    "Eesel AI - Practical Guide to Output Styles": "https://www.eesel.ai/blog/output-styles-claude-code",
-    "ClaudeLog - Output Styles Guide": "https://claudelog.com/mechanics/output-styles/",
-    "Shipyard - Pair Programming with Output Styles": "https://shipyard.build/blog/claude-code-output-styles-pair-programming/",
-    "William Callahan - Output Styles Learning and Custom Options": "https://williamcallahan.com/blog/claude-code-output-styles-learning-custom-options",
-    "Tessl - Customize Communication Style": "https://tessl.io/blog/claude-code-now-lets-you-customize-its-communication-style/",
-    "Siddharth Bharath - Complete Claude Code Guide": "https://www.siddharthbharath.com/claude-code-the-complete-guide/",
-    "Medium - Global Instructions Guide": "https://naqeebali-shamsi.medium.com/the-complete-guide-to-setting-global-instructions-for-claude-code-cli-cec8407c99a0",
-    "Example - Interactive Documentation Learner Style": "https://gist.github.com/johnlindquist/a190887485b2f76ff26dbda08677b98b"
-  },
-  "lastFetched": "2026-01-31T13:20:04.648Z"
+	"sources": {
+		"Claude Code: Output Styles Documentation": "https://code.claude.com/docs/en/output-styles.md",
+		"Claude Code: Agent SDK Modifying System Prompts": "https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts.md",
+		"Claude Code: Settings Reference": "https://code.claude.com/docs/en/settings.md",
+		"Anthropic Engineering: Claude Code Best Practices": "https://www.anthropic.com/engineering/claude-code-best-practices",
+		"Setec: Output Styles Most Underrated Feature": "https://claude-blog.setec.rs/blog/output-styles-underrated-feature/",
+		"Eesel AI: Practical Guide to Output Styles": "https://www.eesel.ai/blog/output-styles-claude-code",
+		"Shipyard: Pair Programming with Output Styles": "https://shipyard.build/blog/claude-code-output-styles-pair-programming/",
+		"Mario Ottmann: Claude Code Customization Guide": "https://marioottmann.com/articles/claude-code-customization-guide",
+		"Example: Interactive Documentation Learner Style": "https://gist.github.com/johnlindquist/a190887485b2f76ff26dbda08677b98b"
+	},
+	"lastFetched": "2026-04-14T12:12:48.833Z"
 }
