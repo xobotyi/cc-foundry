@@ -1,207 +1,146 @@
 # Subagent Specification
 
-Complete reference for subagent frontmatter fields and constraints.
+Technical reference for subagent definition files, the Agent tool, built-in agent types, permission inheritance, storage
+scopes, and hooks schema.
 
 ---
 
-## Table of Contents
+## Frontmatter Fields
 
-- [File Format](#file-format)
-- [Required Fields](#required-fields)
-- [Optional Fields](#optional-fields)
-- [System Prompt (Body)](#system-prompt-body)
-- [Storage Locations](#storage-locations)
-- [CLI-Defined Agents](#cli-defined-agents)
-- [Validation Checklist](#validation-checklist)
+Subagent files use YAML frontmatter followed by a Markdown system prompt body. Only `name` and `description` are
+required; all other fields are optional.
+
+- **`name`** — Unique identifier using lowercase letters and hyphens. Must be unique within its scope.
+- **`description`** — When Claude should delegate to this subagent. Claude uses this verbatim for routing decisions.
+  Include "use proactively" to encourage automatic delegation.
+- **`tools`** — Allowlist of tools the subagent can use. Inherits all parent tools if omitted. Use
+  `Agent(worker, researcher)` syntax to restrict which subagents it can spawn. Use `Agent` without parentheses to allow
+  spawning any subagent.
+- **`disallowedTools`** — Denylist. Applied before `tools` if both are set; a tool in both lists is removed. Format:
+  comma-separated tool names.
+- **`model`** — Model for this subagent: `sonnet`, `opus`, `haiku`, a full model ID (e.g. `claude-opus-4-6`), or
+  `inherit`. Defaults to `inherit`. Resolved in this order:
+  1. `CLAUDE_CODE_SUBAGENT_MODEL` env var
+  2. Per-invocation `model` parameter from Agent tool
+  3. Frontmatter `model`
+  4. Main conversation model
+- **`permissionMode`** — Permission behavior (see [Permission Modes](#permission-modes)). Ignored if parent uses `auto`
+  mode; cannot override `bypassPermissions` from parent.
+- **`maxTurns`** — Maximum agentic turns before the subagent halts.
+- **`skills`** — List of skill names to inject into the subagent's context at startup. Full content is injected, not
+  just made invocable. Subagents do not inherit skills from parent.
+- **`mcpServers`** — MCP servers available to the subagent. Each entry is either a string (reference to an existing
+  session server) or an inline definition keyed by server name. Inline servers connect on subagent start and disconnect
+  on finish. String references share the parent session's connection.
+- **`hooks`** — Lifecycle hooks scoped to this subagent (see [Hooks Schema](#hooks-schema)). Cleaned up when the
+  subagent finishes. `Stop` hooks are automatically converted to `SubagentStop`.
+- **`memory`** — Persistent memory scope: `user`, `project`, or `local`. When enabled, injects memory directory path and
+  first 200 lines / 25KB of `MEMORY.md` into system prompt; enables Read, Write, Edit for memory management.
+- **`background`** — `true` to always run as a background task. Default: `false`.
+- **`effort`** — Effort level: `low`, `medium`, `high`, `max` (Opus 4.6 only). Overrides session effort level.
+- **`isolation`** — `worktree` runs the subagent in a temporary git worktree (isolated copy of the repo). Worktree is
+  cleaned up automatically if the subagent makes no changes.
+- **`color`** — Display color in the task list and transcript: `red`, `blue`, `green`, `yellow`, `purple`, `orange`,
+  `pink`, `cyan`.
+- **`initialPrompt`** — Auto-submitted as first user turn when this agent runs as the main session agent (via
+  `--agent`). Commands and skills are processed. Prepended to any user-provided prompt. No effect when spawned as a
+  subagent.
+
+**Plugin restriction:** `hooks`, `mcpServers`, and `permissionMode` are ignored in plugin-bundled agents. Copy to
+`.claude/agents/` or `~/.claude/agents/` to use these fields.
 
 ---
 
-## File Format
+## Agent Tool Parameters
 
-Subagents are Markdown files with YAML frontmatter:
+When Claude spawns a subagent programmatically via the `Agent` tool (previously `Task`):
 
-```markdown
+- **`prompt`** — The task description given to the subagent.
+- **`description`** — Short label for the subagent in the task list UI.
+- **`subagent_type`** — Name of a defined subagent to use. Merges the definition's `tools` and `model` and appends its
+  body to the system prompt.
+- **`model`** — Model override for this invocation. Takes precedence over frontmatter `model`, unless
+  `CLAUDE_CODE_SUBAGENT_MODEL` is set.
+- **`mode`** — Invocation mode. Not the same as `permissionMode`.
+- **`name`** — A unique name for this subagent instance; used to target it with `SendMessage` for resumption.
+- **`team_name`** — If set, the spawned subagent joins this team as a teammate. Required for agent teams.
+- **`run_in_background`** — `true` to run concurrently, allowing the main agent to continue. Background subagents
+  pre-approve permissions before starting; auto-deny anything not pre-approved at launch.
+- **`isolation`** — `worktree` for an isolated git worktree. Can be set per-invocation even without frontmatter.
+
 ---
-name: agent-name
-description: What it does and when to use it
-tools: Read, Grep, Glob
-model: sonnet
+
+## Built-in Agents
+
+Claude Code ships with built-in subagents. All inherit parent permissions plus their own tool restrictions.
+
+- **Explore** — Fast, read-only codebase search. Model: Haiku. Tools: read-only (Write and Edit denied). Invoked with
+  thoroughness level: `quick`, `medium`, or `very thorough`.
+- **Plan** — Read-only research agent for plan mode. Model: inherits from main conversation. Tools: read-only. Cannot
+  spawn subagents (prevents infinite nesting). Active only during plan mode.
+- **General-purpose** — Complex multi-step tasks requiring both exploration and action. Model: inherits. Tools: all.
+  Used when task requires exploration + modification or multiple dependent steps.
+- **statusline-setup** — Sonnet model. Invoked automatically by `/statusline`.
+- **Claude Code Guide** — Haiku model. Answers questions about Claude Code features.
+
+**Subagents cannot spawn other subagents.** Nesting is not supported.
+
 ---
 
-System prompt content here...
-```
+## Permission Modes
 
-The frontmatter defines metadata and configuration. The body becomes the system prompt that guides the subagent's
-behavior.
+Set via `permissionMode` frontmatter. Subagents inherit the parent permission context and may restrict further, but
+cannot escalate beyond what the parent allows.
 
-## Required Fields
+- **`default`** — Standard permission checking with user prompts.
+- **`acceptEdits`** — Auto-accept file edits and common filesystem commands within working directory or
+  `additionalDirectories`.
+- **`auto`** — Background classifier reviews commands and protected-directory writes. If parent uses auto, subagent
+  inherits auto and frontmatter `permissionMode` is ignored.
+- **`dontAsk`** — Auto-deny permission prompts. Explicitly allowed tools still work.
+- **`bypassPermissions`** — Skips permission prompts. If parent uses `bypassPermissions`, this is inherited and cannot
+  be overridden by the subagent.
+- **`plan`** — Read-only exploration mode.
 
-### `name`
+**`bypassPermissions` exceptions:** Writes to `.git`, `.claude`, `.vscode`, `.idea`, `.husky` still prompt, except for
+`.claude/commands`, `.claude/agents`, and `.claude/skills`.
 
-Unique identifier for the subagent.
+**Disable a subagent entirely:** Add to `permissions.deny` in settings.json: `"Agent(subagent-name)"`. Works for
+built-in and custom subagents.
 
-**Constraints:**
+---
 
-- Lowercase letters and hyphens only
-- Max 64 characters
-- No `<` or `>` characters
-- Cannot contain "anthropic" or "claude"
+## Storage Locations and Scope Priority
 
-```yaml
-# Valid
-name: code-reviewer
-name: db-query-validator
+Higher priority overrides lower when names conflict.
 
-# Invalid
-name: Code_Reviewer      # uppercase, underscore
-name: my<agent>          # special characters
-name: claude-helper      # contains "claude"
-```
+1. **Managed settings** — Organization-wide (priority 1, highest). Admin-deployed to managed settings directory.
+2. **`--agents` CLI flag** — Current session only (priority 2). JSON with same frontmatter fields; `prompt` maps to the
+   system prompt body. Not persisted to disk.
+3. **`.claude/agents/`** — Current project (priority 3). Check into version control for team sharing.
+4. **`~/.claude/agents/`** — All projects for this user (priority 4).
+5. **Plugin `agents/` directory** — Where plugin is enabled (priority 5, lowest).
 
-### `description`
+**Discovery:** Subagents are loaded at session start. Walk up from CWD for project agents. Directories added with
+`--add-dir` grant file access only; they are not scanned for subagents. Resume session or use `/agents` to load newly
+created files without restart.
 
-When Claude should delegate to this subagent. This is the ONLY thing Claude sees when deciding whether to use the agent.
+**Persistent memory locations:**
 
-**Constraints:**
+- `user` scope → `~/.claude/agent-memory/<agent-name>/`
+- `project` scope → `.claude/agent-memory/<agent-name>/`
+- `local` scope → `.claude/agent-memory-local/<agent-name>/`
 
-- Max 1024 characters
-- No `<` or `>` characters
+**Transcript storage:** `~/.claude/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl`
 
-**Must include:**
+---
 
-- What the subagent does (1 sentence)
-- When to use it (specific contexts, triggers)
+## Hooks Schema
 
-**Should NOT include:**
+Hooks in subagent frontmatter follow the same schema as `settings.json` hooks, but are scoped to the subagent's
+lifetime. Supported events in frontmatter: all hook events. `Stop` is automatically converted to `SubagentStop`.
 
-- Execution instructions (belongs in body)
-- Keywords lists (redundant if well-written)
-- Success criteria (belongs in body)
-
-```yaml
-# Bad: vague
-description: Helps with code
-
-# Bad: execution details in description
-description: "Review code. Steps: 1. Read files 2. Find issues 3. Report"
-
-# Good: clear trigger conditions
-description: "Expert code review specialist. Proactively reviews code for
-  quality, security, and maintainability. Use immediately after writing
-  or modifying code."
-```
-
-## Optional Fields
-
-### `tools`
-
-Allowlist of tools the subagent can use. If omitted, inherits all tools from the main conversation (including MCP
-tools).
-
-```yaml
-# Read-only agent
-tools: Read, Grep, Glob
-
-# Full access (explicit)
-tools: Read, Write, Edit, Bash, Glob, Grep
-
-# With specific MCP tools
-tools: Read, Grep, mcp__slack__search_messages
-```
-
-**Available built-in tools:**
-
-- `Read` — Read files
-- `Write` — Create/overwrite files
-- `Edit` — Modify existing files
-- `Bash` — Execute shell commands
-- `Glob` — Find files by pattern
-- `Grep` — Search file contents
-- `WebFetch` — Fetch web content
-- `WebSearch` — Search the web
-- `Task` — Spawn subagents (main agent only)
-- `NotebookEdit` — Edit Jupyter notebooks
-
-### `disallowedTools`
-
-Denylist of tools to remove from inherited or specified list.
-
-```yaml
-# Inherit all tools except Write and Edit
-disallowedTools: Write, Edit
-```
-
-Use `disallowedTools` when you want most tools but need to exclude a few.
-
-### `model`
-
-Which Claude model the subagent uses.
-
-- `sonnet`: Use Claude Sonnet
-- `opus`: Use Claude Opus
-- `haiku`: Use Claude Haiku (fast, cheap)
-- `inherit`: Use same model as main conversation
-- (omitted): Defaults to `inherit`
-
-```yaml
-# Fast exploration
-model: haiku
-
-# Complex reasoning
-model: opus
-
-# Match parent
-model: inherit
-```
-
-**Model selection guidelines:**
-
-- `haiku` — Quick tasks, search, documentation
-- `sonnet` — Everyday coding, debugging, refactoring
-- `opus` — Deep reasoning, architecture, security audits
-
-### `permissionMode`
-
-How the subagent handles permission prompts.
-
-- `default`: Standard permission checking
-- `acceptEdits`: Auto-accept file edits
-- `dontAsk`: Auto-deny prompts (allowed tools still work)
-- `bypassPermissions`: Skip all permission checks
-- `plan`: Plan mode (read-only exploration)
-
-```yaml
-# Read-only exploration
-permissionMode: plan
-
-# Auto-accept edits (use with caution)
-permissionMode: acceptEdits
-```
-
-**⚠️ Security Warning:**
-
-- `bypassPermissions` skips ALL permission checks including file writes and command execution. Only use for trusted,
-  well-tested agents in controlled environments.
-- `acceptEdits` auto-accepts file modifications — ensure the agent's tools and prompt are sufficiently constrained.
-- If parent uses `bypassPermissions`, child agents inherit it and cannot override to a more restrictive mode.
-- Prefer `plan` mode for read-only agents to enforce safety at the permission level, not just in the prompt.
-
-### `skills`
-
-Skills to inject into the subagent's context at startup.
-
-```yaml
-skills:
-  - api-conventions
-  - error-handling-patterns
-```
-
-The full skill content is injected, not just made available for invocation. Subagents don't inherit skills from parent;
-list them explicitly.
-
-### `hooks`
-
-Lifecycle hooks scoped to this subagent.
+### Structure
 
 ```yaml
 hooks:
@@ -209,98 +148,87 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "./scripts/validate-command.sh"
+          command: "./scripts/validate.sh"
   PostToolUse:
     - matcher: "Edit|Write"
       hooks:
         - type: command
-          command: "./scripts/run-linter.sh"
+          command: "./scripts/lint.sh"
 ```
 
-**Supported events in frontmatter:**
+### Matcher Patterns
 
-- `PreToolUse` — Before tool execution (matcher = tool name)
-- `PostToolUse` — After tool execution (matcher = tool name)
-- `Stop` — When subagent finishes (converted to `SubagentStop`)
+The `matcher` field filters when a hook fires:
 
-See Claude Code hooks documentation for full schema.
+- `"*"`, `""`, or omitted → match all
+- Letters, digits, `_`, `|` only → exact string or `|`-separated list (e.g. `Edit|Write`)
+- Any other character → JavaScript regex (e.g. `^Notebook`, `mcp__memory__.*`)
 
-## System Prompt (Body)
+Events without matcher support (always fire): `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCreated`,
+`TaskCompleted`, `WorktreeCreate`, `WorktreeRemove`, `CwdChanged`.
 
-Everything after the frontmatter becomes the subagent's system prompt. Subagents receive ONLY this prompt plus basic
-environment details, not the full Claude Code system prompt.
+### Hook Handler Fields
 
-**Best practices:**
+**Common (all types):**
 
-- Start with role definition
-- Include clear workflow steps
-- Specify output format
-- Add checklists for consistency
-- Keep focused on single responsibility
+- **`type`** — `command`, `http`, `prompt`, or `agent`
+- **`if`** — Permission rule syntax for finer filtering (e.g. `"Bash(git *)"`, `"Edit(*.ts)"`). Tool events only.
+- **`timeout`** — Seconds before cancel. Defaults: 600 (command), 30 (prompt), 60 (agent)
+- **`statusMessage`** — Custom spinner message while hook runs
 
-```markdown
----
-name: code-reviewer
-description: Reviews code for quality and security
-tools: Read, Grep, Glob, Bash
----
+**Command hooks (`type: command`):**
 
-You are a senior code reviewer ensuring high standards.
+- **`command`** — Shell command to execute. Receives event JSON via stdin. Communicates via exit codes and stdout.
+- **`async`** — `true` to run in background without blocking
+- **`asyncRewake`** — `true` to run in background and wake Claude on exit code 2 (implies `async`)
+- **`shell`** — `"bash"` (default) or `"powershell"`
 
-When invoked:
-1. Run git diff to see recent changes
-2. Focus on modified files
-3. Begin review immediately
+**HTTP hooks (`type: http`):**
 
-Review checklist:
-- Code is clear and readable
-- No exposed secrets or API keys
-- Proper error handling
-- Good test coverage
+- **`url`** — POST endpoint. Receives event JSON as request body.
+- **`headers`** — Additional headers. Supports `$VAR_NAME` interpolation for vars in `allowedEnvVars`.
+- **`allowedEnvVars`** — List of env var names allowed for header interpolation.
 
-Provide feedback organized by priority:
-- Critical issues (must fix)
-- Warnings (should fix)
-- Suggestions (consider improving)
+**Prompt hooks (`type: prompt`) and Agent hooks (`type: agent`):**
 
-Include specific examples of how to fix issues.
-```
+- **`prompt`** — Prompt text. Use `$ARGUMENTS` for event JSON input.
+- **`model`** — Model for evaluation. Defaults to a fast model.
 
-## Storage Locations
+### Exit Code Behavior
 
-- `--agents` CLI flag — Session only (priority 1, highest)
-- `.claude/agents/` — Current project (priority 2)
-- `~/.claude/agents/` — All projects (priority 3)
-- Plugin `agents/` — Where plugin enabled (priority 4, lowest)
+For `PreToolUse`:
 
-When multiple agents share the same name, higher priority wins.
+- `0` → allow
+- `2` → block tool call; stderr (or stdout if stderr empty) shown to Claude
+- Other non-zero → non-blocking error; execution continues
 
-## CLI-Defined Agents
+### Subagent Lifecycle Events (in `settings.json`)
 
-Pass agents as JSON when launching Claude Code:
+For observing subagent lifecycle from the main session:
 
-```bash
-claude --agents '{
-  "code-reviewer": {
-    "description": "Expert code reviewer. Use proactively after changes.",
-    "prompt": "You are a senior code reviewer...",
-    "tools": ["Read", "Grep", "Glob", "Bash"],
-    "model": "sonnet"
+- **`SubagentStart`** — Fires when a subagent begins. Matcher: agent type name.
+- **`SubagentStop`** — Fires when a subagent completes. Matcher: agent type name.
+
+```json
+{
+  "hooks": {
+    "SubagentStart": [
+      {
+        "matcher": "db-agent",
+        "hooks": [{ "type": "command", "command": "./scripts/setup.sh" }]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [{ "type": "command", "command": "./scripts/cleanup.sh" }]
+      }
+    ]
   }
-}'
+}
 ```
 
-Use `prompt` for the system prompt (equivalent to markdown body). Session-only, not saved to disk.
+### `settingSources` Requirement
 
-## Validation Checklist
-
-Before deploying a subagent:
-
-- [ ] `name` is lowercase with hyphens only
-- [ ] `name` doesn't contain "anthropic" or "claude"
-- [ ] `description` explains what AND when (under 1024 chars)
-- [ ] `description` has no execution instructions
-- [ ] `tools` is minimal (only what's needed)
-- [ ] `model` matches task complexity
-- [ ] System prompt is focused on single responsibility
-- [ ] Output format is clearly specified
+When using the Agent SDK, include `settingSources` in your configuration so skills and subagent definitions load from
+the standard locations (`~/.claude/agents/`, `.claude/agents/`). Without it, custom subagents and skills are not
+discovered.
