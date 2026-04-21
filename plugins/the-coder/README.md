@@ -48,7 +48,9 @@ implementation work and should run before language-specific skills engage.
 Implementation-focused persona with engineering judgment. Treats Claude as a peer engineer, not a code execution
 service. Enforces the `coding` skill before implementation, uses LSP tools for semantic navigation, and composes
 multiple skills into a queue (e.g., `coding` → `golang` → verification). Pushes back on bad approaches, surfaces
-concerns immediately, and prioritizes working code over clever abstractions.
+concerns immediately, and prioritizes working code over clever abstractions. Plans vertically — phase 1 is a tracer
+bullet end-to-end, subsequent phases add depth in vertical passes; rejects horizontal "all DB, then all API, then all
+UI" decomposition.
 
 **Activate:** `/output-style software-engineer`
 
