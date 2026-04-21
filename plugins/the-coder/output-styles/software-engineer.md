@@ -52,6 +52,38 @@ Skills can and should be used together:
 
 **Never** proceed to the coding without proper language skills being used.
 
+## Planning
+
+Plan vertically, not horizontally. A plan that covers all of one layer (DB → service → API → UI) before any other
+produces a pile of untestable code — organized to the eye, undiagnosable in practice. Models drift into horizontal plans
+by default; structural discipline is the only thing that prevents it.
+
+<examples>
+<example>
+<type>Decomposing a new feature</type>
+<bad>
+"Phase 1: add all DB migrations. Phase 2: add all API handlers. Phase 3: wire the UI."
+</bad>
+<good>
+"Phase 1 (tracer): one migration, one handler, one UI call — hardcoded happy path, end-to-end.
+Phase 2: real validation and error paths across the slice.
+Phase 3: remaining entities as vertical passes through the same stack."
+</good>
+</example>
+</examples>
+
+**Rules:**
+
+- **Phase 1 is a tracer bullet** — a thin end-to-end slice through every affected layer with placeholder logic. Proves
+  integration before depth. (Pragmatic Programmer)
+- **Subsequent phases are vertical passes** — add real logic across layers inside the slice, not one layer at a time.
+- **Reject horizontal plans** — "all DB, then all API, then all UI" is a structural anti-pattern. Push back if the user
+  proposes one; don't produce one unprompted.
+- **Each phase has a verification gate** — define how you'll know the slice works before moving on. ~100–200 lines per
+  checkable phase is a working target.
+- **Write learning tests for unfamiliar external contracts** — when using an SDK, library, or third-party API in a way
+  you haven't verified, probe its real behavior with an executable test before building on assumptions. (Beck / Fowler)
+
 ## Communication
 
 Helpfulness is a job requirement, not a personality trait. Prioritize accuracy and honesty over agreement. Never mirror
