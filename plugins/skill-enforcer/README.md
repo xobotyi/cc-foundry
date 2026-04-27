@@ -32,8 +32,9 @@ After Edit/Write →  PHASE-CHANGE: Detect phase shifts, load relevant refs
 After Skill      →  SKILL-LOAD: Read phase-relevant refs, consider related skills
 ```
 
-Each checkpoint injects an XML tag that triggers a structured evaluation. The evaluation must be output in the reasoning
-stage (thinking block) using a prescribed format with stage-specific fields. Silent acknowledgment = violation.
+Each checkpoint injects a self-contained `<SEF phase="...">` payload that carries the format invariant, the required
+`<sef-eval>` field skeleton, and the stage-specific decision rule. The evaluation must be emitted inside the model's
+native thinking stream — never in visible response. Silent acknowledgment = violation.
 
 ## Installation
 
@@ -54,8 +55,20 @@ At session start (and after context compaction), the plugin injects the complete
 - **Stage definitions** — what each checkpoint phase requires
 - **Examples** — correct behavior, phase transitions, and violations
 
-The framework costs ~1050 tokens once per session. This upfront cost enables lightweight checkpoint tags (~15 tokens
-each) instead of repeating instructions at every hook.
+The framework costs ~2300 tokens once per session. This establishes the shared vocabulary; the actual operational
+contract is restated by every per-stage trigger.
+
+### Why triggers are self-contained
+
+The original design used thin pointer tags (~15 tokens) that said "invoke stage procedure" and relied on the
+session-start framework still being in attention. That assumption holds in 200k-token contexts. It breaks at 1M-token
+scale: by the time the agent has read 50+ files and made 20+ edits, the framework definition sits deep in the U-shaped
+attention curve's low-attention middle, and the pointer trigger becomes a cargo-cult ritual the model performs without
+remembering what it actually requires.
+
+Self-contained triggers fix this by carrying the full operational contract — format invariant, eval skeleton with
+required fields, decision rule — at every firing. The trigger becomes the local source of truth; reaching back into the
+session-start definition becomes optional rather than load-bearing.
 
 ### Lifecycle Checkpoints
 
@@ -86,22 +99,22 @@ During the session, hooks inject XML tags at specific tool usage points:
 Each checkpoint tag triggers a mandatory evaluation that must follow this structure:
 
 ```xml
-<think>
+<thinking>
 <sef-eval phase="[PHASE]">
   [stage-specific fields as child elements]
   <decision>[action to take]</decision>
 </sef-eval>
-</think>
+</thinking>
 ```
 
-The evaluation is internal reasoning (inside `<think>` block), never visible to the user.
+The evaluation is internal reasoning (inside the `<thinking>` stream), never visible to the user.
 
 **What makes it enforcement:**
 
 1. **No escape hatches** — "I already know" or "continue without action" are violations
 2. **Explicit enumeration** — PHASE-CHANGE requires listing all loaded skills and unread refs
 3. **Concrete decisions** — must result in tool invocation (Skill/Read) or explicit "proceed"
-4. **Reasoning requirement** — no `<sef-eval>` in `<think>` = no evaluation = violation
+4. **Reasoning requirement** — no `<sef-eval>` in `<thinking>` = no evaluation = violation
 
 ### Compaction Handling
 
@@ -126,13 +139,17 @@ hooks/
 The single `sef-hook.js` script handles all hook events via command-line argument:
 
 ```bash
-node sef-hook.js session-start  # Outputs full framework (~1050 tokens)
+node sef-hook.js session-start  # Outputs full framework (~2300 tokens)
 node sef-hook.js pre-compact    # Outputs compaction instructions
-node sef-hook.js prompt         # Outputs <SEF phase="USER-PROMPT">
-node sef-hook.js read           # Outputs <SEF phase="EVALUATION">
-node sef-hook.js write          # Outputs <SEF phase="PHASE-CHANGE">
-node sef-hook.js skill          # Outputs <SEF phase="SKILL-LOAD">
+node sef-hook.js prompt         # Outputs USER-PROMPT trigger (~100 tokens)
+node sef-hook.js read           # Outputs EVALUATION trigger (~150 tokens)
+node sef-hook.js write          # Outputs PHASE-CHANGE trigger (~170 tokens)
+node sef-hook.js skill          # Outputs SKILL-LOAD trigger (~135 tokens)
 ```
+
+All payloads are rendered from a single `STAGES` object in `sef-hook.js`. The session-start framework block and the
+per-trigger payloads share field definitions and decision rules by construction — adding a stage or renaming a field
+updates both at once, with no risk of drift.
 
 The `hooks.json` registers lifecycle events:
 
@@ -147,14 +164,20 @@ The `hooks.json` registers lifecycle events:
 
 ## Token Efficiency
 
-The plugin uses a "framework once + keywords repeatedly" pattern:
+The plugin uses a "framework once + self-contained triggers repeatedly" pattern:
 
-- **One-time cost**: ~1050 tokens for framework at session start
-- **Per-checkpoint cost**: ~15 tokens per tag injection
-- **Savings**: Compared to ~300 tokens if each hook repeated full stage instructions
+- **One-time cost**: ~2300 tokens for framework at session start (purpose, matching rules, stage definitions, examples)
+- **Per-trigger cost**: ~100–170 tokens per checkpoint, depending on stage. Each trigger is a self-contained mini-spec
+  carrying the format invariant, the eval skeleton with required fields, and the decision rule.
 
-The framework includes three detailed examples (positive case, phase-transition, violations) which add to the token
-count but significantly improve compliance by demonstrating correct and incorrect behavior.
+In a session with 100 tool calls, per-trigger overhead lands around 12k tokens — about 1% of a 1M-token context. The
+extra cost vs. the previous thin-pointer design (~15 tokens per trigger) is the price of correctness in long sessions:
+self-contained triggers stay correctable when the session-start framework has drifted out of attention. Triggers are
+byte-identical across firings, so KV-cache reuses them after first occurrence — the marginal latency/billing cost is far
+below the raw token count.
+
+The framework includes five examples (positive case, phase-transition, three violations) which add to the session-start
+token count but significantly improve compliance by demonstrating correct and incorrect behavior.
 
 ## License
 
