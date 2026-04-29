@@ -125,6 +125,8 @@ If Decisions or Remaining Work is empty when work was done, the triage missed so
 
 ## Critical Rules
 
+- **Print, don't write.** Default to printing the handoff to the conversation so the user can copy it. Do not save to a
+  file unless the user explicitly asks for one (e.g. "write it to handoff.md"). The user controls delivery.
 - **No information gathering.** Read only from context already in the conversation. Do not fetch files, search code, or
   query memory — context may be nearly full.
 - **Rationale with every decision.** A decision without rationale forces re-derivation or blind trust.

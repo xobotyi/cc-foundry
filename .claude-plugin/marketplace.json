@@ -276,7 +276,7 @@
 		{
 			"name": "the-workflow",
 			"description": "Agentic workflow mechanics: CLAUDE.md instruction quality and structured context handoff",
-			"version": "1.2.0",
+			"version": "1.2.1",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
