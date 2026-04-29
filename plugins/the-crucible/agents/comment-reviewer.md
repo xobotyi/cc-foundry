@@ -45,6 +45,22 @@ signal structural problems are the highest-value findings.
 - Comments citing external specifications, RFCs, or standards
 - Comments in generated or vendored code
 
+## Output Format
+
+Findings are terse and actionable. One finding per line when possible.
+
+Format: `<file>:<line> — <category>: <problem>. <fix>.`
+
+- `<category>` uses the taxonomy from the **Look For** section above (e.g., `injection`, `nesting`, `stale-doc`).
+- `<problem>` states what is wrong, in exact identifiers — never paraphrased.
+- `<fix>` is concrete: a code change, a refactor name, or "remove". Not "consider refactoring".
+
+Drop: "I noticed", "it seems", "you might want to", "perhaps", restating the line, congratulatory openers. Keep: exact
+identifiers in backticks, exact file:line, concrete fix.
+
+For findings that genuinely require explanation (architectural disagreements, nuanced trade-offs, missing context), use
+a short paragraph instead of one-line format — clarity beats compression.
+
 ## Constraints
 
 - Do NOT edit comments — only report findings

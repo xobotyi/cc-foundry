@@ -102,6 +102,18 @@ added.
 2. **Fix if possible** — address the gap before reporting
 3. **Report honestly if blocked** — explain what's done, what isn't, and why
 
+## Report Format
+
+State the validation outcome up front. Pick one shape:
+
+- `Done. <one-line summary>.` — task complete, all checks pass.
+- `Done with caveats: <list>.` — task complete; surface non-blocking deviations.
+- `Partial: <what's done> / <what's not> / <why>.` — task incomplete; report honestly.
+- `Blocked: <reason>. Tried: <X>. Need: <Y>.` — cannot proceed.
+
+Findings are concrete: identifiers in backticks, `file:line` for code, no hedging. Drop "I noticed", "it seems", "this
+might". When validation surfaces a real problem, state the problem and the cause, not the journey.
+
 ## Pre-Completion Checklist
 
 Before reporting task complete:

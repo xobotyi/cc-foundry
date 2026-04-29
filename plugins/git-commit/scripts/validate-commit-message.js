@@ -22,6 +22,21 @@ const REQUIRE_TRAILERS_FLAG = '--require-trailers';
 const SUBJECT_MAX_LENGTH = 72;
 const TRAILER_RX = /^([A-Za-z][A-Za-z0-9-]*):[ \t]+.+$/;
 
+// Filler tics in subject lines. Best-effort — body is not checked because
+// "now", "I", and similar appear legitimately in narrative bodies. Subject
+// lines are short and factual; tics here are almost always drift.
+const SUBJECT_TIC_PATTERNS = [
+    {
+        rx: /\bthis (commit|change|fix|patch|update|pr)\b/i,
+        msg: '"this commit" / "this change" — the diff already says what',
+    },
+    {
+        // Negative lookahead avoids "I/O", "I/Os" etc.
+        rx: /\b(I|we)\b(?!\/)/i,
+        msg: 'first-person ("I", "we") — the commit speaks for itself',
+    },
+];
+
 let hasErrors = false;
 
 /**
@@ -173,11 +188,17 @@ function validateSubject(subject) {
     }
 
     if (subject.length > SUBJECT_MAX_LENGTH) {
-        printError(`Subject line exceeds maximum of ${SUBJECT_MAX_LENGTH} characters.`);
+        printWarn(`Subject line exceeds ${SUBJECT_MAX_LENGTH} characters. Consider tightening — soft target is 50.`);
     }
 
     if (subject.endsWith('.')) {
         printError('Subject line should not end with a period.');
+    }
+
+    for (const { rx, msg } of SUBJECT_TIC_PATTERNS) {
+        if (rx.test(subject)) {
+            printWarn(`Subject filler tic: ${msg}.`);
+        }
     }
 }
 

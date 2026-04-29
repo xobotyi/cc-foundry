@@ -58,7 +58,7 @@ trailers
 
 ```
 
-**Subject**: What changed (max 72 chars, factual)
+**Subject**: What changed (≤50 chars target, 72 hard cap, factual)
 **Body**: Why it changed, how to verify
 **Trailers**: Structured metadata (references, authorship)
 </format>
@@ -73,11 +73,12 @@ trailers
 ```
 
 <subject-rules>
-- Max 72 characters total
+- Soft target 50 chars; hard cap 72
 - Imperative mood: "add" not "added"
 - Lowercase after scope (except proper nouns)
 - No period at end
 - **Factual**: describe what, not how good
+- **No filler tics**: drop "this commit", "I", "we", "now", "currently"; never restate the scope's filename
 </subject-rules>
 
 ### Scope (Optional)
@@ -130,6 +131,45 @@ assumes 72-char body lines. Trailers are the only exception. </body-philosophy>
 - Refactoring — explain the motivation
 - Breaking change — explain migration path
 - Non-obvious change — explain rationale
+
+### Terse Register
+
+The diff carries the _what_; the message carries the _why_. Subjects and bodies are records, not narratives. Bodies may
+use fragments and drop articles where clarity survives. Identifiers, file paths, and error strings stay exact.
+
+**Never include:**
+
+- "This commit does X", "This change..." — the diff says what.
+- "I", "we" — the commit speaks for itself.
+- "now", "currently", "previously" — git history is the timeline.
+- "As requested by..." — use a `Co-Authored-By:` trailer or omit.
+- Restating the scope's filename: `[parser] update parser code` → `[parser] handle empty input`.
+- Promotional adjectives without specifics: "great", "amazing", "improved", "better" — say what is better.
+- Emoji, unless a project convention requires it.
+- Filler: "just", "really", "basically", "actually", "simply"; connective fluff: "however", "furthermore",
+  "additionally".
+
+**Bad:**
+
+```
+[parser] fix the bug in parser
+
+This commit fixes a bug we found where the parser was incorrectly handling empty input.
+I noticed that it would now sometimes panic, so I added a guard to prevent this issue.
+```
+
+**Good:**
+
+```
+[parser] handle empty input in token scanner
+
+Empty input dereferenced nil in the scanner loop. Returns empty token list instead.
+
+Fixes: #234
+```
+
+Subject drops "the bug in parser" (restates scope), states the fix. Body drops "this commit / I / we / now", uses
+fragments, names the actual cause.
 
 ### Body Patterns
 
@@ -420,6 +460,8 @@ Commits must appear as regular developer commits.
 - **Factual subjects** — describe what, not how good
 - **Explain the cause** — for bug fixes, say WHY it was broken
 - **Body is essential** — single-line commits are rarely acceptable
+- **Terse register** — diff carries the what; message carries the why. No "this commit / I / we / now"; no filler; no
+  promotional adjectives
 - **BREAKING first** — breaking changes start body with `BREAKING:` prefix
 - **Trailers for metadata** — use Title-Case, structured format
 - **Amends rewrite history** — amended messages describe the full change, not the delta

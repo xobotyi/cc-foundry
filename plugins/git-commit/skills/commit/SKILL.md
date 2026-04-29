@@ -131,6 +131,7 @@ Before each commit, verify:
 - [ ] Changes match the commit message you're about to write
 - [ ] No unrelated changes bundled together
 - [ ] Sensitive data excluded (.env, credentials, secrets)
+- [ ] Message has no filler tics ("this commit", "I", "we", "now"), no promotional adjectives, no scope-restating
 
 ```bash
 git diff --cached      # Review exactly what will be committed
