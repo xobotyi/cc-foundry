@@ -2,8 +2,9 @@
 name: claude-md
 description: >-
   CLAUDE.md instruction quality: writing effective project instructions, diagnosing why Claude ignores rules,
-  routing content to the right layer, and systematic improvement. Invoke whenever task involves any interaction
-  with CLAUDE.md files — writing, reviewing, auditing, improving, or debugging instruction compliance.
+  routing content to the right layer, progressive disclosure, and systematic improvement. Invoke whenever task
+  involves any interaction with CLAUDE.md files — creating, writing, reviewing, auditing, improving, optimizing,
+  or debugging instruction compliance.
 ---
 
 # CLAUDE.md Instruction Quality
@@ -12,6 +13,12 @@ description: >-
 modes are specific: instructions exist but get ignored, content drifts from reality, and the file grows until nothing
 gets followed. The goal is not completeness — it's compliance. A short CLAUDE.md that Claude follows beats a
 comprehensive one it ignores.
+
+## Route to Reference
+
+- **Scaffold, section ordering, creation workflow** — [`${CLAUDE_SKILL_DIR}/references/scaffold.md`] Canonical section
+  order with examples (identity → structure → stack → conventions → verification → constraints), creation-from-scratch
+  workflow, monorepo scaffold patterns
 
 ## What Belongs in CLAUDE.md
 
@@ -41,13 +48,19 @@ wouldn't change output quality, it doesn't belong.
 Content belongs in the layer where it's most effective:
 
 - **CLAUDE.md** — project identity, structure, conventions, constraints. Read at session start, shapes all work.
+- **`.claude/rules/`** — file-type-specific or path-scoped conventions. Lighter than skills (no SKILL.md ceremony),
+  conditionally loaded via glob `paths` frontmatter. Rules without `paths` load unconditionally like CLAUDE.md; rules
+  with `paths` load on-demand when Claude reads matching files. All rule files must live at the project root — no
+  per-package directories in monorepos. Use for conventions that apply to specific file types or directories but don't
+  warrant a full skill.
 - **Skills** — domain expertise, procedural workflows, behavioral rules for specific task types. Loaded on demand.
 - **Hooks** — automated enforcement, validation gates, triggered actions. Execute without Claude deciding.
 - **Settings** — permissions, env vars, model config. Structural, not instructional.
 - **Memory** — user preferences, cross-session context, project state. Recalled when relevant.
 
-**The test:** If it's a rule Claude must follow in every task regardless of domain → CLAUDE.md. If it's a rule for a
-specific type of work → skill. If it must happen automatically without Claude's judgment → hook.
+**The test:** If it's a rule Claude must follow in every task regardless of domain → CLAUDE.md. If it's a rule scoped to
+specific file types or paths → `.claude/rules/`. If it's a rule for a specific type of work → skill. If it must happen
+automatically without Claude's judgment → hook.
 
 ## Writing Effective Instructions
 
@@ -134,6 +147,65 @@ CLAUDE.md files cascade: subdirectory > project root > user global. Later files 
 **Don't repeat.** If the project root says "use Vitest", don't restate it in every subdirectory. Subdirectory files
 should contain only what differs from or adds to the root.
 
+## Progressive Disclosure
+
+When a CLAUDE.md exceeds ~500 lines, instruction compliance degrades — the model can't attend to everything equally.
+Progressive disclosure moves depth out of CLAUDE.md while preserving access to it.
+
+### The 4-Bucket Classification
+
+For each section or block in the file, classify:
+
+- **Keep** — stays in CLAUDE.md. Content that is high-frequency (used in most sessions), safety-critical (omission
+  causes harm), easy-to-violate (Claude routinely gets wrong without the reminder), or security-sensitive (access
+  control, data handling, secret management).
+- **Move to `.claude/rules/`** — useful but not needed every session. Path-scoped conventions, file-type-specific
+  patterns, module-specific rules. Offloading to rules with glob `paths` frontmatter means they load only when relevant,
+  reducing baseline context cost.
+- **Extract to skill** — reusable behavioral patterns, procedural workflows, domain expertise that activates for
+  specific task types. If a block describes "when doing X, follow these steps" — it's a skill candidate.
+- **Remove** — outdated content, rules Claude follows by default, duplicated instructions restated in different words,
+  rationale paragraphs that don't change behavior.
+
+### Exception Criteria
+
+Even infrequently used content stays in CLAUDE.md if it meets any exception:
+
+- **Safety-critical** — violating it causes data loss, security breach, or broken production
+- **Easy-to-violate** — Claude consistently gets it wrong without the instruction, regardless of frequency
+- **Security-sensitive** — governs authentication, authorization, secret handling, or data exposure
+
+The goal is to maximize LLM working efficiency, not minimize line count. A 600-line file where every instruction earns
+its place outperforms a 200-line file that moved critical rules to rarely-loaded references.
+
+### When to Apply
+
+- CLAUDE.md exceeds ~500 lines
+- Claude ignores rules that exist in the file (attention overload signal)
+- Multiple unrelated domains share a single file (mixing concerns)
+- A human can't skim the file in under 60 seconds
+
+## Creating a CLAUDE.md
+
+When building a CLAUDE.md from scratch, follow the canonical section ordering: project identity (prose) → structure map
+→ stack and tooling → conventions (bullets) → verification workflow → critical constraints. This ordering exploits the
+U-shaped attention curve — identity anchors the top, constraints anchor the bottom.
+
+Start minimal (50-100 lines) and iterate from actual usage. A CLAUDE.md created from static analysis is a starting point
+— the real improvements come from observing where Claude gets things wrong during work.
+
+**Key principles for initial creation:**
+
+- Detect project signals from config files (`package.json`, `go.mod`, `Makefile`, CI configs, linter configs)
+- Map directory structure — module boundaries and entry points, not every file
+- Identify conventions that differ from language defaults — these are what Claude needs to be told
+- Apply the deletion test before delivering — remove everything Claude does correctly without instruction
+- For monorepos, shared conventions go in root CLAUDE.md; package-specific rules go in nested CLAUDE.md files or
+  glob-scoped `.claude/rules/`
+
+Full section ordering with examples, creation workflow, and monorepo scaffold patterns: see
+[`${CLAUDE_SKILL_DIR}/references/scaffold.md`].
+
 ## Diagnosing Instruction Failures
 
 When Claude ignores CLAUDE.md rules, the cause is almost always one of these:
@@ -216,7 +288,9 @@ When improving a CLAUDE.md, follow this sequence:
   restates defaults wastes tokens and reduces compliance with rules that actually matter.
 - **Concrete and verifiable.** If two agents could interpret an instruction differently, it's too vague. Add file paths,
   command names, and specific patterns.
-- **Right layer for the content.** Domain expertise → skills. Automated behaviors → hooks. Project-universal rules →
-  CLAUDE.md. Misplaced content degrades everything.
+- **Right layer for the content.** Domain expertise → skills. Path-scoped conventions → `.claude/rules/`. Automated
+  behaviors → hooks. Project-universal rules → CLAUDE.md. Misplaced content degrades everything.
+- **Progressive disclosure over monolithic growth.** When CLAUDE.md exceeds ~500 lines, classify content into
+  keep/move/extract/remove buckets. Safety-critical and easy-to-violate content stays regardless of frequency.
 - **Maintain alongside code.** CLAUDE.md that drifts from reality is worse than no CLAUDE.md — it produces confidently
   wrong output. Update it when architecture, tooling, or conventions change.
