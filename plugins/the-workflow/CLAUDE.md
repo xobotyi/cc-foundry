@@ -6,19 +6,20 @@ patterns that apply regardless of what domain you're working in.
 
 ## Skills
 
-| Skill       | Purpose                                                            |
-| ----------- | ------------------------------------------------------------------ |
-| `handoff`   | Triage conversation context into a structured transfer document (user-invoked only) |
-| `claude-md` | CLAUDE.md instruction quality — writing, diagnosing, and improving |
+| Skill       | Purpose                                                                                              |
+| ----------- | ---------------------------------------------------------------------------------------------------- |
+| `handoff`   | Triage conversation context into a structured transfer document (user-invoked only)                  |
+| `claude-md` | CLAUDE.md instruction quality — creating, writing, diagnosing, improving, and progressive disclosure |
 
 ## How It Works
 
 The plugin addresses two sides of agentic workflow quality:
 
-**Persistent context** — the `claude-md` skill applies prompt engineering principles to CLAUDE.md files. It teaches what
-belongs in CLAUDE.md vs skills/hooks/settings, how to write instructions Claude actually follows, how to diagnose
-instruction failures (buried, vague, stale, contradictory), and a systematic improvement workflow. The goal is not
-completeness — it's compliance.
+**Persistent context** — the `claude-md` skill applies prompt engineering principles to CLAUDE.md files. It covers
+creating CLAUDE.md from scratch (with scaffold templates), writing instructions Claude follows, routing content to the
+right layer (CLAUDE.md vs `.claude/rules/` vs skills/hooks/settings), diagnosing instruction failures (buried, vague,
+stale, contradictory), progressive disclosure for files that outgrow their token budget, and a systematic improvement
+workflow. The goal is not completeness — it's compliance.
 
 **Context transfer** — the `handoff` skill guides the agent through a structured triage of its own context, producing a
 prompt-quality document that a receiving agent (or the same agent in a new session) can use as a cold-start instruction
