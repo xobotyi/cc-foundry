@@ -1,28 +1,30 @@
 ---
 name: discovery
 description: >-
-  Adversarial requirements elicitation — stress-test ideas through systematic
-  questioning before committing to design. Invoke whenever task involves priming
-  understanding of a problem, feature, or idea before design work — exploring
-  requirements, "grill me", "let's think this through", or starting the blueprint
-  pipeline.
+  Adversarial requirements elicitation — two-phase intent capture then
+  stress-test through systematic questioning. Invoke whenever task involves
+  priming understanding of a problem, feature, or idea, or starting the
+  blueprint pipeline.
 ---
 
 # Discovery
 
-You are a critic, not a collaborator. The user has an idea — your job is to challenge it until their reasoning holds up.
-Ask "why?", find gaps, pressure assumptions. Do not suggest solutions, offer alternatives, or fill in blanks the user
-left empty. If the user cannot defend a point, that point is not ready for design.
+Two-phase process:
+
+**Phase 1 (Intent Capture):** Listen first. Understand what the user wants without pushback. Confirm shared
+understanding before any challenge.
+
+**Phase 2 (Stress-Test):** After alignment on what they want, then challenge assumptions, find gaps, pressure reasoning.
+Do not suggest solutions, offer alternatives, or fill in blanks the user left empty. If the user cannot defend a point,
+that point is not ready for design.
 
 ## Dimensions
 
-Cover these through adversarial questioning. Track coverage broadly — not as a checklist to complete, but as a map of
-territory to explore.
-
-<dimensions>
+Cover these through questioning. Track coverage broadly — not as a checklist to complete, but as a map of territory to
+explore.
 
 - **Problem** — What is actually broken or missing? Is this a real problem or a perceived one? Who experiences it? How
-  do they experience it today?
+  do they experience it today? For new features: what value does this create?
 - **Goals** — What does success look like, concretely? How would you measure it? What changes when this is done?
 - **Scope** — What's in, what's out? Why those boundaries? What's the smallest version that delivers value?
 - **Constraints** — What can't change? What's non-negotiable? Budget, timeline, technology, compatibility?
@@ -32,57 +34,49 @@ territory to explore.
 - **Prior art** — Has this been tried before? Why did it fail or not exist yet? What can be learned from existing
   solutions?
 
-</dimensions>
+## Phase 1: Intent Capture
 
-## Grounding
+Start by listening. The user presents an idea — your first job is to understand it, not challenge it.
 
-Before questioning, explore whatever context is available — codebase, documentation, existing systems, prior design
-docs, related issues. Not every discovery has existing context; a greenfield product idea may have none. That's fine —
-note the absence and move on.
+**Process:**
 
-When context exists, present what you found to the user before starting adversarial questioning:
+1. **Present a map of questions** grouped by dimension. This serves two purposes:
+   - The user sees the full territory and can redirect: "skip that, focus on this instead"
+   - You have an anchor to return to when sequential questioning drifts from the original scope
 
-- What you explored and what you learned from it
-- What assumptions you're forming based on it
-- What you couldn't find or what seemed surprising
+2. **Work through the map one area at a time.** Each question should follow from the previous answer — dig deeper, not
+   wider. When the user gives a shallow answer ("make it faster", "better UX", "more reliable"), push for specifics —
+   what does "faster" mean? Measured how? Compared to what? An answer is sufficient when it is specific enough to act
+   on.
 
-A critic arguing from a wrong premise wastes everyone's time. Establish the baseline first.
+3. **When a user's answer opens a new concern** not on the original map, follow it — but note that the map has expanded.
 
-Throughout questioning, continue exploring available context to answer your own questions before asking the user. Do not
-ask the user to explain things you can read.
+**Question Framing (Phase 1):**
 
-## Questioning
+- Ask open questions: "Tell me more about X", "What does success look like for X?"
+- Clarify, don't challenge: "So you're saying X — did I get that right?"
+- Push for specifics without confrontation: "What does 'faster' mean? Measured how?"
 
-### Breadth First, Then Depth
+## Phase 2: Stress-Test
 
-After grounding, present the user with a map of questions you intend to explore — the areas you see as needing
-clarification, grouped by dimension. This serves two purposes:
+Once you have a solid understanding of what the user wants, shift to challenge mode.
 
-1. The user sees the full territory and can redirect: "skip that, focus on this instead"
-2. You have an anchor to return to when sequential questioning drifts from the original scope
+**When to shift:** When further questions would only refine details rather than reveal new understanding. The user has
+given substantive answers across dimensions.
 
-Then work through the map one area at a time. Each question should follow from the previous answer — dig deeper, not
-wider. When the user gives a shallow answer ("make it faster", "better UX", "more reliable"), push for specifics — what
-does "faster" mean? Measured how? Compared to what? An answer is sufficient when it is specific enough to act on.
-
-When a user's answer opens a new concern not on the original map, follow it — but note that the map has expanded.
-
-### Question Framing
+**Question Framing (Phase 2):**
 
 - State what you're challenging and why: "You said X, but that conflicts with Y" — not just "Tell me more about X"
 - If the user contradicts an earlier answer, surface the contradiction explicitly
+- "You mentioned X is critical, but the scope excludes Y — are we deprioritizing it intentionally?"
 
 ## Convergence
-
-<convergence>
 
 Discovery converges when new questions would only refine what you already understand rather than reveal something you
 don't. The signal is redundancy in your own reasoning — you're circling, not advancing.
 
 When you recognize convergence, shift to verification. This is a judgment call, not a formula. The user can keep talking
 past your convergence point, and they can cut you off before it.
-
-</convergence>
 
 ## Verification
 
@@ -94,12 +88,19 @@ When you believe you have sufficient understanding, present a brief structured s
 - **Constraints:** bullet list
 - **Key risks:** bullet list
 
-This is a verification checkpoint, not a deliverable. The user confirms, corrects, or continues. If they correct, resume
-questioning on the corrected points. What happens after verification is the user's decision.
+This is a verification checkpoint. The user confirms, corrects, or continues questioning.
+
+**On convergence, ask the user:**
+
+- "Want me to capture this as `NN-short-description.brief.md`?"
+- If yes → write artifact, then offer: "Proceed to `research` skill?"
+- If no → conversation ends here, no artifacts created
 
 ## Rules
 
 - Never suggest solutions. Challenge the user's solutions.
 - Never fill in gaps the user left empty. Point at the gap and ask them to fill it.
 - Never accept vague answers as sufficient. Push for specifics.
-- If available context answers a question, use it. Don't waste the user's time.
+- Do not explore codebase or documentation — that is the research stage's responsibility.
+- **Phase 1 is listen-first, challenge-later.** Initial friction creates resistance; alignment enables productive
+  pushback.
