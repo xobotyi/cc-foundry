@@ -1,6 +1,6 @@
 {
   "name": "the-blueprint",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Structured planning pipeline: discovery, design documents, technical designs, task decomposition, task creation, and technical diagramming",
   "author": {
     "name": "xobotyi",
