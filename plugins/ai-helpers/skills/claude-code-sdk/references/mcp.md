@@ -175,6 +175,9 @@ The `.mcp.json` file configures project-scoped MCP servers:
     "<server-name>": {
       "type": "http" | "sse" | "stdio",
 
+      // Common to all transports:
+      "alwaysLoad": true,  // optional, v2.1.121+ — bypass tool-search deferral
+
       // For http/sse:
       "url": "<server-url>",
       "headers": { "<header>": "<value>" },
@@ -330,6 +333,13 @@ logged in with a Claude.ai account. On Team/Enterprise plans, only admins can ad
 
 Disable with: `ENABLE_CLAUDEAI_MCP_SERVERS=false claude`
 
+### Local + connector deduplication
+
+Requires Claude Code v2.1.84+. When the same server is configured both locally and as a claude.ai connector, Claude Code
+deduplicates them — the **local config wins**. Plugins and connectors match by endpoint (URL or command), so a connector
+pointing at the same URL as a local server is treated as a duplicate (see [Scope precedence](#scope-precedence)).
+Claude.ai connectors with the same upstream URL are also deduplicated against each other (v2.1.121+).
+
 ## Claude Code as MCP Server
 
 Claude Code can itself serve as an MCP server for other applications:
@@ -367,7 +377,8 @@ Results exceeding the threshold are persisted to disk and replaced with a file r
 
 ### Per-tool limit override (server authors)
 
-Set `_meta["anthropic/maxResultSizeChars"]` in the tool's `tools/list` response:
+Requires Claude Code v2.1.91+. Set `_meta["anthropic/maxResultSizeChars"]` in the tool's `tools/list` response to raise
+the truncation cap for that tool only, up to the 500K-character ceiling:
 
 ```json
 {
@@ -379,7 +390,9 @@ Set `_meta["anthropic/maxResultSizeChars"]` in the tool's `tools/list` response:
 }
 ```
 
-Applies independently of `MAX_MCP_OUTPUT_TOKENS` for text content. Image data is still subject to the token limit.
+Applies independently of `MAX_MCP_OUTPUT_TOKENS` for text content. Image data is still subject to the token limit. Use
+this for tools that legitimately return large payloads (DB schemas, full file trees) so they stay inline instead of
+being persisted to disk as a file reference.
 
 ## Tool Search
 
@@ -413,10 +426,32 @@ Disable the ToolSearch tool specifically:
 
 Requires models supporting `tool_reference` blocks: Sonnet 4+, Opus 4+. Haiku does not support tool search.
 
+### Per-server always-load override
+
+Requires Claude Code v2.1.121+. Bypass tool-search deferral for a trusted server whose tools should be available every
+turn. Set `alwaysLoad: true` in that server's config — every tool from that server loads into context at session start
+regardless of `ENABLE_TOOL_SEARCH`:
+
+```json
+{
+  "mcpServers": {
+    "always-on": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "alwaysLoad": true
+    }
+  }
+}
+```
+
+Each upfront tool consumes context. Use sparingly — only for servers Claude needs every turn. Other servers stay
+deferred.
+
 ### Server instructions (for MCP server authors)
 
-Server instructions help Claude discover tools via search. Claude Code truncates tool descriptions and server
-instructions at 2KB each. Keep them concise and put critical details near the start. Explain:
+Requires Claude Code v2.1.84+. Server instructions help Claude discover tools via search. Claude Code truncates tool
+descriptions and server instructions at **2KB each** to prevent OpenAPI-generated servers from bloating context. Keep
+them concise and put critical details near the start. Explain:
 
 - What category of tasks the tools handle
 - When Claude should search for the tools

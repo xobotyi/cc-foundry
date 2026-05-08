@@ -50,23 +50,33 @@ All fields are optional. Only `description` is recommended so Claude knows when 
 - **`name`** (string, default: directory name) — display name. Lowercase letters, numbers, hyphens only (max 64 chars).
   Cannot start/end with hyphen. No consecutive hyphens. Cannot contain `anthropic` or `claude`.
 - **`description`** (string, default: first paragraph) — what the skill does and when to use it. Claude uses this to
-  decide when to apply the skill. Truncated at 250 chars in listing.
+  decide when to apply the skill. Combined `description` + `when_to_use` truncated at **1,536 characters** in the skill
+  listing (raised from 250 in v2.1.105). Put the key use case first.
+- **`when_to_use`** (string) — additional context for invocation: trigger phrases or example requests. Appended to
+  `description` in the listing and counts against the same 1,536-char cap.
 - **`argument-hint`** (string) — hint shown during autocomplete: `[issue-number]` or `[filename] [format]`.
+- **`arguments`** (string or list) — named positional arguments for `$name` substitution. Space-separated string or YAML
+  list. Names map to argument positions in order: `arguments: [issue, branch]` makes `$issue` = first arg, `$branch` =
+  second.
 - **`disable-model-invocation`** (boolean, default: `false`) — prevent Claude from auto-triggering. Also removes the
-  description from context entirely.
+  description from context entirely. Also blocks preloading into subagents.
 - **`user-invocable`** (boolean, default: `true`) — show in `/` menu. Setting `false` hides from menu but does NOT block
   the Skill tool.
 - **`allowed-tools`** (string or list) — tools Claude can use without per-use approval when skill is active.
   Space-separated string or YAML list.
-- **`model`** (string, default: inherited) — model to use when skill is active.
-- **`effort`** (string, default: inherited) — effort level override. Options: `low`, `medium`, `high`, `max` (Opus 4.6
-  only).
+- **`model`** (string, default: inherited) — model to use when skill is active. Override applies for the rest of the
+  current turn only; session model resumes on the next prompt. Accepts any `/model` value, or `inherit`.
+- **`effort`** (string, default: inherited) — effort level when this skill is active. **Overrides session effort** for
+  the duration of the skill. Options: `low`, `medium`, `high`, `xhigh`, `max`. Available levels depend on model: `xhigh`
+  ships on Opus 4.7. Use deliberately — `effort: max` will burn tokens even in a `low`-effort session.
 - **`context`** (string, default: inline) — set to `fork` to run in a forked subagent context.
 - **`agent`** (string, default: `general-purpose`) — subagent type when `context: fork`. Built-in: `Explore`, `Plan`,
   `general-purpose`. Or any custom agent from `.claude/agents/`.
 - **`hooks`** (object) — hooks scoped to this skill's lifecycle. Same format as hooks in settings.
-- **`paths`** (string or list) — glob patterns that limit when skill auto-activates. Comma-separated string or YAML
-  list. Same format as path-specific rules.
+- **`paths`** (string or list) — glob patterns that limit when this skill auto-activates. Comma-separated string or YAML
+  list (YAML-list form added to both rules and skills in v2.1.84). Same syntax as `.claude/rules/` `paths:` field — see
+  [`rules.md`](rules.md#paths-field-syntax) for the full syntax table. See
+  [Paths and Conditional Activation](#paths-and-conditional-activation) for behavior.
 - **`shell`** (string, default: `bash`) — shell for `` !`command` `` and ` ```! ` blocks. Options: `bash`, `powershell`.
   PowerShell requires `CLAUDE_CODE_USE_POWERSHELL_TOOL=1`.
 
@@ -97,11 +107,96 @@ Three mechanisms to control which skills Claude can invoke:
   with any arguments
 - **Hide individual skills** — `disable-model-invocation: true` in frontmatter removes from Claude's context entirely
 
+A few built-in commands are also reachable through the Skill tool, including `/init`, `/review`, and `/security-review`.
+Built-ins like `/compact` are not.
+
+### Override Skill Visibility
+
+The `skillOverrides` setting controls visibility from settings instead of the skill's frontmatter. Use it for skills you
+do not own — checked into a shared project repo or shipped by an MCP server. The `/skills` menu writes it for you:
+highlight a skill, press `Space` to cycle states, `Enter` to save to `.claude/settings.local.json`.
+
+Each key is a skill name, each value one of four states:
+
+| Value                   | Listed to Claude     | In `/` menu |
+| :---------------------- | :------------------- | :---------- |
+| `"on"`                  | Name and description | Yes         |
+| `"name-only"`           | Name only            | Yes         |
+| `"user-invocable-only"` | Hidden               | Yes         |
+| `"off"`                 | Hidden               | Hidden      |
+
+A skill absent from `skillOverrides` is treated as `"on"`.
+
+```json
+{
+  "skillOverrides": {
+    "legacy-context": "name-only",
+    "deploy": "off"
+  }
+}
+```
+
+Plugin skills are not affected by `skillOverrides` — manage those through `/plugin`.
+
+`"name-only"` is a useful budget-saving lever: low-priority skills list without descriptions and free room in the
+description budget for skills that need full context for matching.
+
+## Paths and Conditional Activation
+
+The `paths:` frontmatter field limits when Claude **auto-activates** a skill. Manual `/skill-name` invocation works
+regardless. This is the same field, syntax, and glob semantics as path-scoped rules — see
+[`rules.md`](rules.md#paths-field-syntax) for the full pattern reference and the v2.1.84 history note.
+
+```yaml
+---
+name: api-conventions
+description: API design patterns for endpoint files
+paths:
+  - "src/api/**/*.ts"
+  - "src/api/**/*.js"
+---
+```
+
+With `paths:` set, the skill description is included in the listing but Claude only auto-loads the full skill when
+working with files matching one of the patterns. Without `paths:`, the skill is eligible for auto-activation across the
+whole project.
+
+The comma-separated string form is also accepted: `paths: "src/**/*.ts, lib/**/*.ts"`. The YAML-list form was added to
+both rules and skills frontmatter in v2.1.84.
+
+### Production Gotcha — `paths:` + `disable-model-invocation`
+
+Combining `paths:` with `disable-model-invocation: true` makes auto-activation **impossible**. The reason: setting
+`disable-model-invocation: true` removes the description from Claude's context entirely, so Claude is unaware the skill
+exists and cannot auto-trigger it — regardless of which files are touched. The `paths:` filter has nothing to filter.
+
+| Frontmatter combination                     | Auto-activation | Manual `/skill-name` |
+| :------------------------------------------ | :-------------- | :------------------- |
+| `paths:` only                               | Yes (on match)  | Yes                  |
+| `disable-model-invocation: true` only       | No              | Yes                  |
+| `paths:` + `disable-model-invocation: true` | **Never**       | Yes                  |
+
+If you want manual-only with no auto-activation, drop `paths:` — it does no work in that combination.
+
+If you want path-scoped auto-activation with no manual invocation, set `user-invocable: false` instead of
+`disable-model-invocation: true`. `user-invocable: false` keeps the description in context (so Claude can match
+`paths:`) while hiding the skill from the `/` menu.
+
 ### Description Budget
 
-Skill descriptions share a character budget: 1% of context window (fallback 8,000 chars). All skill names are always
-included, but descriptions are shortened to fit. Each entry is capped at 250 chars regardless of budget. Override with
-`SLASH_COMMAND_TOOL_CHAR_BUDGET` env var. Run `/context` to check for excluded skills.
+Skill descriptions share an aggregate character budget: **1% of context window** (fallback **8,000 chars** when 1% is
+unavailable). All skill names are always included, but descriptions are shortened to fit the budget — once budget is
+exhausted, lower-priority entries list as name-only.
+
+Each entry's combined `description` + `when_to_use` text is **capped at 1,536 characters** (raised from 250 in v2.1.105;
+v2.1.105 also added a startup warning when descriptions are truncated).
+
+Override the aggregate budget with the `SLASH_COMMAND_TOOL_CHAR_BUDGET` env var (set to a higher integer to raise the
+ceiling). Run `/context` to see which skills were excluded. To free budget for high-priority skills, set low-priority
+entries to `"name-only"` in the `skillOverrides` setting (see [Override Skill Visibility](#override-skill-visibility)).
+
+Put the key use case first inside `description` — the cap truncates the tail, so the leading sentence is what Claude
+matches against.
 
 ## String Substitutions
 
@@ -110,7 +205,11 @@ Dynamic values available in skill content (the markdown body, not frontmatter):
 - **`$ARGUMENTS`** — all arguments passed when invoking. If not present in content, appended as `ARGUMENTS: <value>`.
 - **`$ARGUMENTS[N]`** — specific argument by 0-based index: `$ARGUMENTS[0]` for the first.
 - **`$N`** — shorthand for `$ARGUMENTS[N]`: `$0` for first, `$1` for second.
+- **`$name`** — named argument declared in the `arguments` frontmatter list. With `arguments: [issue, branch]`, `$issue`
+  expands to the first arg, `$branch` to the second.
 - **`${CLAUDE_SESSION_ID}`** — current session ID. For logging, session-specific files, or correlation.
+- **`${CLAUDE_EFFORT}`** — current effort level: `low`, `medium`, `high`, `xhigh`, or `max`. Use to adapt skill
+  instructions to the active effort setting.
 - **`${CLAUDE_SKILL_DIR}`** — directory containing the skill's SKILL.md. For plugin skills, the skill subdirectory
   within the plugin, not the plugin root.
 

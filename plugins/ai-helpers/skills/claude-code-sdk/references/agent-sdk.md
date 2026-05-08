@@ -85,7 +85,129 @@ The return value of `query()` extends `AsyncGenerator<SDKMessage>` with addition
 - `mcpServerStatus()`, `reconnectMcpServer()`, `toggleMcpServer()`, `setMcpServers()` -- MCP management
 - `streamInput(stream)` -- stream input messages for multi-turn
 - `stopTask(taskId)` -- stop a background task
+- `applyFlagSettings(settings)` -- change any setting on a running session (streaming input mode only); writes to the
+  flag-settings layer, shallow-merges top-level keys, pass `null` to clear a key
 - `close()` -- terminate the process
+
+### TypeScript V2 Preview (`unstable_v2_*`)
+
+Unstable preview interface — APIs may change before stabilization. Removes async-generator coordination in favor of a
+session-based `send()` / `stream()` cycle. Bundled in `@anthropic-ai/claude-agent-sdk` alongside V1; the two coexist.
+
+**Three concepts:**
+
+- `unstable_v2_createSession(options?)` — start a fresh session
+- `unstable_v2_resumeSession(sessionId, options?)` — continue a session by ID
+- `unstable_v2_prompt(prompt, options?)` — one-shot single-turn convenience
+
+**Send/stream are explicit steps:**
+
+- `session.send(prompt)` — dispatch a message to the agent loop (no return content)
+- `session.stream()` — async generator yielding `SDKMessage` for the current turn
+- `session.id` — capture for later `resumeSession`
+- `session.close()` — terminate the underlying Claude Code subprocess
+
+```typescript
+import { unstable_v2_createSession } from "@anthropic-ai/claude-agent-sdk";
+
+await using session = await unstable_v2_createSession({
+  allowedTools: ["Read", "Glob"],
+  permissionMode: "acceptEdits",
+});
+
+await session.send("What is 15 * 15?");
+for await (const message of session.stream()) {
+  if (message.type === "assistant") {
+    console.log("Claude:", message.message.content);
+  }
+}
+
+// Same session — context shared
+await session.send("Now add 10 to that result.");
+for await (const message of session.stream()) {
+  if (message.type === "result" && message.subtype === "success") {
+    console.log("Final:", message.result);
+  }
+}
+```
+
+**Resuming across processes:**
+
+```typescript
+const session = await unstable_v2_createSession();
+const sessionId = session.id;
+await session.send("Remember my favorite color is orange.");
+for await (const _ of session.stream()) {
+  /* drain */
+}
+await session.close();
+
+// Later, possibly different process
+await using resumed = await unstable_v2_resumeSession(sessionId);
+await resumed.send("What is my favorite color?");
+for await (const msg of resumed.stream()) {
+  if (msg.type === "result" && msg.subtype === "success") console.log(msg.result);
+}
+```
+
+**Cleanup:** `await using` (TypeScript 5.2+) closes the session on scope exit. For older TypeScript, call
+`session.close()` manually.
+
+**V1 vs V2 at a glance:**
+
+| Aspect              | V1 (`query()`)                     | V2 (`createSession()`)              |
+| ------------------- | ---------------------------------- | ----------------------------------- |
+| Multi-turn          | `continue: true` on each `query()` | One session object, `send`/`stream` |
+| Cleanup             | Manual `close()` on `Query`        | `await using` or `session.close()`  |
+| Cross-process       | Pass `resume: sessionId`           | `unstable_v2_resumeSession(id)`     |
+| Logic between turns | Drives the same async generator    | Separate dispatch + stream steps    |
+
+**Not yet in V2 (use V1):**
+
+- Session forking (`forkSession`)
+- Some advanced streaming-input patterns
+
+V2 is the TypeScript counterpart to Python's `ClaudeSDKClient`. Message shapes are the same `SDKMessage` union as V1
+(`AssistantMessage` and `UserMessage` wrap content under `message.message`, not `message`).
+
+## Migration
+
+### Legacy `claude-code-sdk` → Claude Agent SDK (v0.1.0)
+
+The package was renamed to reflect broader agentic scope.
+
+| Aspect              | Old                         | New                              |
+| ------------------- | --------------------------- | -------------------------------- |
+| TypeScript package  | `@anthropic-ai/claude-code` | `@anthropic-ai/claude-agent-sdk` |
+| Python package      | `claude-code-sdk`           | `claude-agent-sdk`               |
+| Python options type | `ClaudeCodeOptions`         | `ClaudeAgentOptions`             |
+
+**Breaking changes in v0.1.0:**
+
+- **System prompt no longer inherited.** The SDK now uses a minimal system prompt by default. To get Claude Code's full
+  prompt, opt in with `systemPrompt: { type: "preset", preset: "claude_code" }`.
+- **Settings sources require explicit opt-out for isolation.** Default loads `user`, `project`, `local` to match the
+  CLI. For CI/CD, multi-tenant systems, or test environments that should be isolated from filesystem settings, pass
+  `settingSources: []`. Python SDK 0.1.59 and earlier treated `setting_sources=[]` the same as omitting it — upgrade
+  before relying on isolation.
+
+### V1 → V2 Preview (TypeScript)
+
+Use V1 for production today; V2 is unstable preview. Stay on V1 if you need session forking or advanced streaming-input
+patterns.
+
+Migration steps:
+
+1. Replace `query()` calls with `unstable_v2_createSession()` for multi-turn flows.
+2. Split the send and the stream — `session.send(prompt)` then `for await (const m of session.stream())`.
+3. Wrap sessions in `await using` for automatic cleanup, or call `session.close()` manually.
+
+### Deprecated fields and env vars
+
+- `maxThinkingTokens` — replaced by the `thinking` config object (`adaptive`, `enabled`, `disabled`)
+- `TaskOutput` tool — read the background task's output file path with `Read` instead
+- `ANTHROPIC_SMALL_FAST_MODEL` env var — replaced by `ANTHROPIC_DEFAULT_HAIKU_MODEL`
+- `total_cost` — renamed to `total_cost_usd` (early SDK versions only)
 
 ## Options Reference
 
@@ -695,6 +817,49 @@ type PermissionMode =
 ```
 
 Python omits `"auto"`.
+
+## Non-Interactive Mode (Headless / `claude -p`)
+
+Formerly called "headless mode". Runs a single prompt and exits — used in CI, scripts, pipes. The Agent SDK is the
+Python/TypeScript equivalent of `claude -p`.
+
+### `--output-format stream-json`
+
+Emits a JSONL event stream. The `system/init` event is the first message (unless `CLAUDE_CODE_SYNC_PLUGIN_INSTALL` is
+set, in which case `plugin_install` events precede it).
+
+**`init` event fields:**
+
+| Field           | Type   | Description                                                                        |
+| --------------- | ------ | ---------------------------------------------------------------------------------- |
+| `type`          | string | Always `"system"`                                                                  |
+| `subtype`       | string | Always `"init"`                                                                    |
+| `model`         | string | Active model                                                                       |
+| `tools`         | array  | Tools available to Claude                                                          |
+| `mcp_servers`   | array  | Connected MCP servers                                                              |
+| `plugins`       | array  | Plugins that loaded successfully — each `{ name, path }`                           |
+| `plugin_errors` | array  | Plugin load-time errors — each `{ plugin, type, message }`. Key omitted when empty |
+| `session_id`    | string | Session identifier                                                                 |
+
+**`plugin_errors` covers two cases:**
+
+- **Dependency demotions** (v2.1.111+): plugin demoted because its dependency version requirements aren't satisfied.
+- **`--plugin-dir` load failures** (v2.1.128+): missing path, invalid archive (`.zip` archives accepted from v2.1.128).
+
+Affected plugins are demoted and absent from `plugins`. Use this field to fail CI when a plugin did not load.
+
+### `CLAUDE_CODE_FORK_SUBAGENT=1`
+
+Enables forked subagents — a subagent that inherits the full conversation history instead of starting fresh. Drops the
+input isolation that subagents otherwise provide; the fork sees the same system prompt, tools, model, and message
+history. Only the fork's final result returns to the main context.
+
+- v2.1.117+ — works in interactive mode and on external builds
+- **v2.1.121+** — works in non-interactive `claude -p` and via the Agent SDK
+
+When enabled, Claude spawns a fork wherever it would otherwise use the general-purpose subagent. Named subagents
+(Explore, etc.) still spawn as before. All subagent spawns run in the background — set
+`CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1` to keep spawns synchronous.
 
 ## SDK Differences: TypeScript vs Python
 
