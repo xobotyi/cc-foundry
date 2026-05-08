@@ -35,6 +35,17 @@ implementation without drifting from intent.
 /plugin install the-blueprint
 ```
 
+### Optional: enable agent teams for parallel research
+
+The `research` skill uses Claude Code agent teams to investigate the codebase in parallel. Agent teams are experimental
+and disabled by default. Enable them by adding to your settings:
+
+```json
+{ "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
+```
+
+Requires Claude Code v2.1.32+. Without this flag, `research` will fail fast with these instructions.
+
 ## Skills
 
 ### discovery
@@ -49,6 +60,22 @@ into whatever comes next. A brief verification summary crystallizes the shared u
 
 **Use when:** Starting a new initiative, exploring a product idea, stress-testing a plan, or beginning the blueprint
 pipeline. Also useful as a standalone content-priming tool before any complex task.
+
+### research
+
+Parallel codebase investigation that produces objective findings, blind to the intent expressed in the discovery brief.
+The lead generates factual research questions from the brief, dispatches a team of read-only `codebase-researcher`
+teammates each scoped to a different area of the codebase, collects their structured findings via SendMessage, and
+compiles them into a single research document. Teammates never see the brief, the ticket, or the user's goals — only the
+questions and their assigned scope. This information barrier prevents intent leakage that would taint investigation with
+opinion.
+
+Investigation runs in waves: dispatch, wait for all findings, decide whether new scopes or follow-up questions emerged,
+dispatch another wave if needed. The lead is sole author of the research document — no teammate writes files. The brief
+is persisted to disk only after the last wave completes, never while teammates are running.
+
+**Use when:** A brief has been produced (from `discovery` or otherwise) and you need objective codebase findings before
+making design decisions. Requires the agent teams experimental flag (see Installation).
 
 ### design-documents
 
@@ -108,12 +135,16 @@ diagrams, ER diagrams, mind maps, or any visual representation of systems and pr
 The skills form a linear pipeline with user approval gates at each transition:
 
 ```
-discovery → design-documents → technical-design → task-decomposition → task-creation
+discovery → research → design-documents → technical-design → task-decomposition → task-creation
 ```
 
 Each skill prompts the user to proceed to the next stage on completion. Approval is required before advancing. Discovery
 is optional — start there to stress-test an idea, or skip directly to design-documents when the problem is already
-well-understood.
+well-understood. Research is also optional — invoke it when objective codebase findings are needed before design, or
+skip it when the problem is already well-mapped.
+
+`research` is the first skill in the pipeline migration to the DRAFT methodology (Discovery → Research → Alignment →
+Frame → Tasks). The remaining skills retain their current names and behavior until subsequent stages are reworked.
 
 task-creation can also be invoked standalone for creating individual tasks without going through the full pipeline. When
 working with YouTrack specifically, the youtrack skill complements task-creation with tracker-specific domain knowledge.
@@ -126,11 +157,13 @@ any diagramming task.
 
 All artifacts are stored in the `design-docs/` directory with consistent numbering:
 
+- Brief: `02-cache-layer-redesign.brief.md`
+- Research: `02-cache-layer-redesign.research.md`
 - Design document: `02-cache-layer-redesign.md`
 - Technical design: `02-cache-layer-redesign.technical-design.md`
 - Decomposition: `02-cache-layer-redesign.decomposition.md`
 
-When implementation is complete, all three documents move together to `design-docs/completed/`.
+When implementation is complete, all artifacts for an initiative move together to `design-docs/completed/`.
 
 ## License
 

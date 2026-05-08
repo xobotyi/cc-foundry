@@ -92,9 +92,11 @@ This is a verification checkpoint. The user confirms, corrects, or continues que
 
 **On convergence, ask the user:**
 
-- "Want me to capture this as `NN-short-description.brief.md`?"
-- If yes → write artifact, then offer: "Proceed to `research` skill?"
-- If no → conversation ends here, no artifacts created
+- "Write the brief as `NN-short-description.brief.md`?" → write artifact, conversation ends
+- "Proceed to `research` skill?" → output the full brief into the conversation (same format as the file would have),
+  then invoke research. Do NOT write the brief to disk — writing it before research lets teammates read it, breaking the
+  information barrier. The brief in conversation serves as a checkpoint the research lead reads from context.
+- Neither → conversation ends, no artifacts created
 
 ## Rules
 
