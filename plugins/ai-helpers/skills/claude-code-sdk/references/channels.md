@@ -3,8 +3,9 @@
 Push events from external systems into a running Claude Code session via MCP servers. Channels bridge chat platforms,
 webhooks, CI pipelines, monitoring alerts, and any HTTP-capable source into the active session context.
 
-Requires Claude Code v2.1.80+. Requires claude.ai login (Console and API key auth not supported). Team/Enterprise orgs
-must explicitly enable via `channelsEnabled` managed setting.
+Requires Claude Code v2.1.80+. Requires claude.ai login by default; console (API key) authentication added in v2.1.128 —
+console orgs with managed settings must set `channelsEnabled: true` to enable. Team/Enterprise orgs must explicitly
+enable via `channelsEnabled` managed setting.
 
 ## Architecture
 
@@ -318,7 +319,7 @@ On Team/Enterprise plans, channels are off by default.
 
 - **`channelsEnabled`** (`boolean`) — master switch. Must be `true` for any channel to deliver messages. When unset or
   `false`, all channels blocked including development flag.
-- **`allowedChannelPlugins`** (`array`) — which plugins can register when channels are enabled. Replaces
+- **`allowedChannelPlugins`** (`array`, v2.1.84+) — which plugins can register when channels are enabled. Replaces
   Anthropic-maintained allowlist when set. Only applies when `channelsEnabled` is `true`. Empty array blocks all
   allowlist plugins (development flag can still bypass).
 

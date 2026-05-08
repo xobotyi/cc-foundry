@@ -8,8 +8,21 @@ context, enforce policies.
 
 - **`command`** — shell command; receives JSON on stdin. Decision support: yes. Async: yes.
 - **`http`** — POST to URL; receives JSON as request body. Decision support: yes. Async: no.
+- **`mcp_tool`** — invoke an MCP tool with hook input as arguments. Decision support: yes. Async: no.
 - **`prompt`** — single-turn LLM evaluation; returns ok/reason. Decision support: yes. Async: no.
 - **`agent`** — multi-turn subagent with tool access (Read, Grep). Decision support: yes. Async: no.
+
+### Hook Type Support per Event
+
+Not every event supports every type.
+
+- **All five types (`command`, `http`, `mcp_tool`, `prompt`, `agent`):** PreToolUse, PermissionRequest, PostToolUse,
+  PostToolUseFailure, PostToolBatch, UserPromptSubmit, UserPromptExpansion, SubagentStop, TaskCreated, TaskCompleted,
+  Stop
+- **`command`, `http`, `mcp_tool` only (no prompt/agent):** ConfigChange, CwdChanged, Elicitation, ElicitationResult,
+  FileChanged, InstructionsLoaded, Notification, PermissionDenied, PreCompact, PostCompact, SessionEnd, StopFailure,
+  SubagentStart, TeammateIdle, WorktreeCreate, WorktreeRemove
+- **`command`, `mcp_tool` only:** SessionStart, Setup
 
 ## Configuration Structure
 
@@ -62,7 +75,7 @@ MCP tools follow `mcp__<server>__<tool>` naming. Use `mcp__memory__.*` to match 
 
 ### Handler Common Fields
 
-- **`type`** (required) — `"command"`, `"http"`, `"prompt"`, or `"agent"`
+- **`type`** (required) — `"command"`, `"http"`, `"mcp_tool"`, `"prompt"`, or `"agent"`
 - **`if`** — permission rule syntax filter: `"Bash(git *)"`, `"Edit(*.ts)"`. Tool events only.
 - **`timeout`** — seconds. Defaults: 600 (command), 30 (prompt), 60 (agent).
 - **`statusMessage`** — custom spinner text while running.
@@ -109,7 +122,8 @@ When running inside a subagent, two additional fields appear:
 
 ### Exit Code Behavior
 
-- **Exit 0** — success. Stdout parsed for JSON. For `UserPromptSubmit` and `SessionStart`, stdout text added as context
+- **Exit 0** — success. Stdout parsed for JSON. For `UserPromptSubmit`, `UserPromptExpansion`, and `SessionStart`,
+  stdout text added as context
 - **Exit 2** — blocking error. Stderr fed back to Claude. Effect depends on event (see blocking table below)
 - **Other codes** — non-blocking error. Transcript shows notice with first line of stderr. Execution continues
 
@@ -128,8 +142,8 @@ Output injected into context (`additionalContext`, `systemMessage`, plain stdout
 
 ### Decision Control Summary
 
-- **UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, SubagentStop, ConfigChange** — top-level `decision`. Key
-  fields: `decision: "block"`, `reason`.
+- **UserPromptSubmit, UserPromptExpansion, PostToolUse, PostToolUseFailure, PostToolBatch, Stop, SubagentStop,
+  ConfigChange, PreCompact** — top-level `decision`. Key fields: `decision: "block"`, `reason`.
 - **TeammateIdle, TaskCreated, TaskCompleted** — exit code or `continue: false`. Exit 2 blocks with stderr. JSON
   `continue: false` stops teammate entirely.
 - **PreToolUse** — `hookSpecificOutput`. Key fields: `permissionDecision` (allow/deny/ask/defer),
@@ -139,7 +153,8 @@ Output injected into context (`additionalContext`, `systemMessage`, plain stdout
 - **PermissionDenied** — `hookSpecificOutput`. Key field: `retry: true` tells model it may retry.
 - **WorktreeCreate** — path return. Command: path on stdout. HTTP: `hookSpecificOutput.worktreePath`.
 - **Elicitation, ElicitationResult** — `hookSpecificOutput`. Key fields: `action` (accept/decline/cancel), `content`.
-- **Notification, SessionEnd, PreCompact, PostCompact, InstructionsLoaded, StopFailure, CwdChanged, FileChanged,
+- **SessionStart, Setup** — context injection only via `additionalContext`. No blocking.
+- **Notification, SessionEnd, PostCompact, InstructionsLoaded, StopFailure, CwdChanged, FileChanged, SubagentStart,
   WorktreeRemove** — no decision control. Side effects only.
 
 When multiple hooks return different decisions, precedence is: `deny` > `defer` > `ask` > `allow` (PreToolUse), or most
@@ -158,78 +173,90 @@ HTTP hooks cannot block via status codes alone. Return 2xx with JSON decision fi
 
 ### Event Lifecycle Order
 
-Session events: `SessionStart` > per-turn loop (`UserPromptSubmit` > agentic loop [`PreToolUse` > `PermissionRequest` >
-`PostToolUse`/`PostToolUseFailure` > `SubagentStart`/`SubagentStop` > `TaskCreated`/`TaskCompleted`] >
-`Stop`/`StopFailure`) > `TeammateIdle` > `PreCompact`/`PostCompact` > `SessionEnd`.
+Setup-flag events: `Setup` (only on `--init-only`, or `--init` / `--maintenance` with `-p`).
+
+Session events: `SessionStart` > per-turn loop (`UserPromptSubmit` / `UserPromptExpansion` > agentic loop [`PreToolUse`
+\> `PermissionRequest` > `PostToolUse`/`PostToolUseFailure` > `PostToolBatch` > `SubagentStart`/`SubagentStop` >
+`TaskCreated`/`TaskCompleted`] > `Stop`/`StopFailure`) > `TeammateIdle` > `PreCompact`/`PostCompact` > `SessionEnd`.
 
 Standalone async events: `Notification`, `ConfigChange`, `CwdChanged`, `FileChanged`, `InstructionsLoaded`,
 `WorktreeCreate`, `WorktreeRemove`, `Elicitation`, `ElicitationResult`, `PermissionDenied`.
 
+There are 29 distinct events across all categories.
+
 ### Event Summary Table
 
-**Can block (all 4 types):**
+**Can block (all 5 types — command, http, mcp_tool, prompt, agent):**
 
 - **UserPromptSubmit** — no matcher. Before prompt processing.
+- **UserPromptExpansion** — matcher: command/skill name. Slash command expansion before reaching Claude. Blocks the
+  expansion itself.
 - **PreToolUse** — matcher: tool name. Before tool executes.
 - **PermissionRequest** — matcher: tool name. Permission dialog shown.
 - **SubagentStop** — matcher: agent type. Subagent finishes.
 - **TaskCreated** — no matcher. Task being created.
 - **TaskCompleted** — no matcher. Task marked complete.
+- **PostToolBatch** — no matcher. After full batch of parallel tool calls resolves. Blocks the next model call.
 - **Stop** — no matcher. Claude finishes responding.
 
-**Can block (command, http):**
+**Can block (command, http, mcp_tool):**
 
 - **TeammateIdle** — no matcher. Teammate going idle.
 - **ConfigChange** — matcher: config source. Config file changed (except `policy_settings`).
+- **PreCompact** — matcher: trigger type. Blocks compaction (v2.1.105+).
 - **WorktreeCreate** — no matcher. Any non-zero exit fails creation.
 - **Elicitation** — matcher: MCP server name.
 - **ElicitationResult** — matcher: MCP server name.
 
-**Cannot block (all 4 types):**
+**Cannot block (all 5 types):**
 
 - **PostToolUse** — matcher: tool name. `decision: "block"` feeds reason but cannot undo execution.
 - **PostToolUseFailure** — matcher: tool name.
 
-**Cannot block (command, http):**
+**Cannot block (command, http, mcp_tool):**
 
 - **PermissionDenied** — matcher: tool name.
 - **InstructionsLoaded** — matcher: load reason.
 - **Notification** — matcher: notification type.
 - **SubagentStart** — matcher: agent type.
 - **StopFailure** — matcher: error type.
-- **WorktreeRemove** — no matcher.
-- **PreCompact** / **PostCompact** — matcher: trigger type.
-- **SessionEnd** — matcher: exit reason.
-
-**Cannot block (command only):**
-
-- **SessionStart** — matcher: session source.
 - **CwdChanged** — no matcher. Has `CLAUDE_ENV_FILE` access.
 - **FileChanged** — matcher: literal filenames. Has `CLAUDE_ENV_FILE` access.
+- **WorktreeRemove** — no matcher.
+- **PostCompact** — matcher: trigger type.
+- **SessionEnd** — matcher: exit reason.
+
+**Cannot block (command, mcp_tool — no http/prompt/agent):**
+
+- **SessionStart** — matcher: session source.
+- **Setup** — matcher: `init` or `maintenance`. Fires only on `--init-only` / `-p --init` / `-p --maintenance`.
 
 ### Matcher Values per Event
 
 - **PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, PermissionDenied** — tool name: `Bash`,
   `Edit|Write`, `mcp__.*`
 - **SessionStart** — `startup`, `resume`, `clear`, `compact`
+- **Setup** — `init`, `maintenance`
 - **SessionEnd** — `clear`, `resume`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other`
-- **Notification** — `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`
-- **SubagentStart, SubagentStop** — agent type: `Bash`, `Explore`, `Plan`, or custom names
+- **Notification** — `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`, `elicitation_complete`,
+  `elicitation_response`
+- **SubagentStart, SubagentStop** — agent type: `general-purpose`, `Explore`, `Plan`, or custom names
 - **PreCompact, PostCompact** — `manual`, `auto`
 - **ConfigChange** — `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills`
-- **StopFailure** — `rate_limit`, `authentication_failed`, `billing_error`, `invalid_request`, `server_error`,
-  `max_output_tokens`, `unknown`
+- **StopFailure** — `rate_limit`, `authentication_failed`, `oauth_org_not_allowed`, `billing_error`, `invalid_request`,
+  `server_error`, `max_output_tokens`, `unknown`
 - **InstructionsLoaded** — `session_start`, `nested_traversal`, `path_glob_match`, `include`, `compact`
+- **UserPromptExpansion** — command/skill name (e.g., `deploy`, `review`)
 - **Elicitation, ElicitationResult** — MCP server names
 - **FileChanged** — literal filenames: `.envrc|.env`
-- **UserPromptSubmit, Stop, TeammateIdle, TaskCreated, TaskCompleted, WorktreeCreate, WorktreeRemove, CwdChanged** — no
-  matcher support, always fires
+- **UserPromptSubmit, PostToolBatch, Stop, TeammateIdle, TaskCreated, TaskCompleted, WorktreeCreate, WorktreeRemove,
+  CwdChanged** — no matcher support, always fires
 
 ## Event Details
 
 ### SessionStart
 
-Fires when a session begins or resumes. Only `type: "command"` hooks are supported. Keep fast.
+Fires when a session begins or resumes. Only `type: "command"` and `type: "mcp_tool"` hooks are supported. Keep fast.
 
 **Input fields:** `source` (`"startup"`, `"resume"`, `"clear"`, `"compact"`), `model` (model identifier), optional
 `agent_type`.
@@ -245,6 +272,29 @@ Fires when a session begins or resumes. Only `type: "command"` hooks are support
 **Output:** Stdout text or `additionalContext` added as context for Claude.
 
 **CLAUDE_ENV_FILE:** Available. Write `export KEY=VALUE` lines to persist env vars for all subsequent Bash commands.
+
+### Setup
+
+Fires only on explicit preparation flags: `claude --init-only`, `claude -p --init`, or `claude -p --maintenance`. Does
+not fire on normal startup. Use for one-time dependency installation or scheduled cleanup triggered from CI or scripts.
+For per-session initialization, use SessionStart. Only `type: "command"` and `type: "mcp_tool"` hooks are supported.
+
+`--init-only` runs Setup hooks and SessionStart hooks (with `startup` matcher) then exits without starting a
+conversation. `--init` and `--maintenance` fire Setup hooks only when combined with `-p` (print mode); in interactive
+sessions those flags currently do not fire Setup.
+
+**Matcher values:** `init` (`--init-only`, `-p --init`), `maintenance` (`-p --maintenance`).
+
+**Input fields:** `trigger` (`"init"` or `"maintenance"`).
+
+**Decision control:** Cannot block. On exit code 2, stderr is shown to the user; on any other non-zero exit code, stderr
+appears only with `--verbose`. Execution continues in both cases. Return `additionalContext` in JSON output to pass
+information into Claude's context (plain stdout goes to debug log only).
+
+**CLAUDE_ENV_FILE:** Available — same persistence semantics as SessionStart.
+
+**Note:** Because Setup does not fire on every launch, a plugin that needs a dependency installed cannot rely on Setup
+alone. Pair with a SessionStart check that runs `npm install` if `${CLAUDE_PLUGIN_DATA}/node_modules` is absent.
 
 ### InstructionsLoaded
 
@@ -271,6 +321,26 @@ Fires when user submits a prompt, before Claude processes it.
 - `sessionTitle` — sets session title (same as `/rename`)
 
 Plain text stdout also works as context injection (no JSON needed).
+
+### UserPromptExpansion
+
+Fires when a user-typed slash command expands into a prompt, before it reaches Claude. Covers the path PreToolUse does
+not: a PreToolUse hook on the Skill tool fires only when Claude invokes the tool, but typing `/skillname` directly
+bypasses PreToolUse. UserPromptExpansion fires on that direct path.
+
+Use cases: block specific commands from direct invocation, inject context for a particular skill, or log which commands
+users invoke.
+
+**Matcher:** `command_name` — the skill or custom command name. Leave empty to fire on every prompt-type slash command.
+
+**Input fields:** `expansion_type` (`"slash_command"` for skill/custom commands, `"mcp_prompt"` for MCP server prompts),
+`command_name`, `command_args`, `command_source`, `prompt` (the original prompt string).
+
+**Decision control:**
+
+- `decision` — `"block"` prevents the slash command from expanding. Omit to allow.
+- `reason` — shown to user on block
+- `additionalContext` — string added to Claude's context alongside the expanded prompt
 
 ### PreToolUse
 
@@ -357,22 +427,39 @@ reversed.
 
 Fires after a tool completes successfully. Matches on tool name.
 
-**Input fields:** `tool_name`, `tool_input`, `tool_response`, `tool_use_id`.
+**Input fields:** `tool_name`, `tool_input`, `tool_response`, `tool_use_id`, optional `duration_ms` (excludes time spent
+in permission prompts and PreToolUse hooks).
 
 **Decision control:**
 
 - `decision` — `"block"` provides feedback to Claude (tool already ran)
 - `reason` — shown to Claude on block
 - `additionalContext` — context for Claude
-- `updatedMCPToolOutput` — for MCP tools: replaces tool output
+- `hookSpecificOutput.updatedToolOutput` — replaces tool output for **all tools** as of v2.1.121 (was MCP-only before;
+  the prior `updatedMCPToolOutput` field still works for MCP tools)
 
 ### PostToolUseFailure
 
 Fires when a tool execution fails. Matches on tool name.
 
-**Input fields:** `tool_name`, `tool_input`, `tool_use_id`, `error` (string), optional `is_interrupt` (boolean).
+**Input fields:** `tool_name`, `tool_input`, `tool_use_id`, `error` (string), optional `is_interrupt` (boolean),
+optional `duration_ms`.
 
 **Decision control:** `additionalContext` only.
+
+### PostToolBatch
+
+Fires once after every tool call in a parallel batch resolves, before Claude Code sends the next request to the model.
+PostToolUse fires once per tool (concurrently for parallel calls); PostToolBatch fires exactly once with the full batch,
+making it the right place to inject context that depends on the set of tools that ran rather than any single tool. No
+matcher support — always fires.
+
+**Input fields:** Common fields plus the resolved batch info.
+
+**Decision control:**
+
+- `additionalContext` — context string injected once before the next model call
+- `decision: "block"` or `continue: false` — stops the agentic loop before the next model call
 
 ### Notification
 
@@ -480,13 +567,21 @@ filenames) AND filters which hook groups run.
 
 ### WorktreeCreate
 
-Fires when a worktree is being created. Replaces default git worktree behavior entirely. `.worktreeinclude` is NOT
-processed when a hook is configured.
+Fires when a worktree is being created (`claude --worktree` or subagent with `isolation: "worktree"`). Replaces default
+git worktree behavior entirely — useful for non-git VCS like SVN, Perforce, or Mercurial. `.worktreeinclude` is NOT
+processed when a hook is configured. If you need to copy local config files like `.env` into the new worktree, do it
+inside the hook script.
 
 **Input fields:** `name` (slug identifier for the worktree).
 
-**Output:** Must return absolute path to created worktree. Command hooks: print to stdout. HTTP hooks:
-`hookSpecificOutput.worktreePath`. Any non-zero exit code fails creation.
+**Output:** Must return the absolute path to the created worktree directory. Claude Code uses this path as the working
+directory for the isolated session.
+
+- Command hooks: print path on stdout
+- HTTP hooks: return `{"hookSpecificOutput": {"hookEventName": "WorktreeCreate", "worktreePath": "/abs/path"}}`
+  (v2.1.84+)
+
+Any non-zero exit code fails worktree creation. If the hook produces no path, creation fails with an error.
 
 ### WorktreeRemove
 
@@ -502,7 +597,15 @@ Fires before context compaction. Matches on trigger: `manual` or `auto`.
 
 **Input fields:** `trigger`, `custom_instructions` (user input from `/compact`, empty for auto).
 
-**Decision control:** None.
+**Decision control (v2.1.105+):** Can block compaction.
+
+- Exit code 2 — blocks compaction. For manual `/compact`, stderr is shown to the user.
+- JSON `{"decision": "block"}` — equivalent block.
+
+Blocking automatic compaction has different effects depending on when it fires. If compaction was triggered proactively
+before the context limit, Claude Code skips it and the conversation continues uncompacted. If compaction was triggered
+to recover from a context-limit error already returned by the API, the underlying error surfaces and the current request
+fails.
 
 ### PostCompact
 
@@ -557,12 +660,15 @@ Default timeout: 1.5 seconds. Override with `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOU
 - **PreToolUse** — blocks the tool call
 - **PermissionRequest** — denies permission
 - **UserPromptSubmit** — blocks and erases prompt
+- **UserPromptExpansion** — blocks the slash command expansion
+- **PostToolBatch** — stops the agentic loop before the next model call
 - **Stop** — prevents stopping, continues conversation
 - **SubagentStop** — prevents subagent from stopping
 - **TeammateIdle** — continues teammate with stderr feedback
 - **TaskCreated** — rolls back task creation
 - **TaskCompleted** — prevents completion
 - **ConfigChange** — blocks config change (except `policy_settings`)
+- **PreCompact** — blocks compaction (v2.1.105+)
 - **Elicitation** — denies the elicitation
 - **ElicitationResult** — blocks response (becomes decline)
 - **WorktreeCreate** — any non-zero exit code fails creation
@@ -573,8 +679,8 @@ Default timeout: 1.5 seconds. Override with `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOU
 - **PostToolUseFailure** — shows stderr to Claude
 - **PermissionDenied** — ignored (use JSON `retry: true` instead)
 - **StopFailure** — output and exit code ignored
-- **Notification, SubagentStart, SessionStart, SessionEnd, CwdChanged, FileChanged, PreCompact, PostCompact** — shows
-  stderr to user only
+- **Notification, SubagentStart, SessionStart, Setup, SessionEnd, CwdChanged, FileChanged, PostCompact** — shows stderr
+  to user only
 - **InstructionsLoaded** — exit code ignored
 - **WorktreeRemove** — logged in debug only
 

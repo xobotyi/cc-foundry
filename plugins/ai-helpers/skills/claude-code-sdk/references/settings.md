@@ -24,10 +24,42 @@ across scopes, not replaced.
   - Windows: `C:\Program Files\ClaudeCode\managed-settings.json`
   - Drop-in dir: `managed-settings.d/*.json` (merged alphabetically on top of base file)
   - MDM: macOS plist `com.anthropic.claudecode`, Windows registry `HKLM\SOFTWARE\Policies\ClaudeCode`
-  - Server: delivered via Claude.ai admin console
+  - Server: delivered via Claude.ai admin console (see [Server-Managed Settings](#server-managed-settings))
 
 Managed tier internal precedence: server-managed > MDM/OS-level > file-based > HKCU registry (Windows). Only one managed
 source is used; sources do not merge across tiers.
+
+### Server-Managed Settings
+
+Centrally-delivered configuration from the Claude.ai admin console. Designed for organizations without device-management
+infrastructure (MDM) or with users on unmanaged devices. Distinct from endpoint-managed (`managed-settings.json`, plist,
+registry) — server-managed is **not** an MDM channel.
+
+| Aspect           | Server-managed                                      | Endpoint-managed                                  |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------- |
+| Source           | Claude.ai admin console                             | OS policy / `managed-settings.json` / MDM profile |
+| Delivery         | Authenticated client fetch at startup + hourly poll | OS-level deployment (plist, registry, file)       |
+| Best for         | Orgs without MDM; unmanaged devices                 | Orgs with MDM/endpoint management                 |
+| Security         | Client-side control after auth                      | OS-protected; users with admin/sudo cannot modify |
+| Min version      | v2.1.30 (Enterprise), v2.1.38 (Teams)               | All versions                                      |
+| MCP distribution | **Not supported**                                   | Supported via `allowedMcpServers`                 |
+| Per-group config | **Not supported**                                   | Possible via deployment tooling                   |
+
+**Precedence inside the managed tier**: server-managed checked first; if it delivers any keys, endpoint-managed is
+**ignored entirely** (sources do not merge). If server-managed is empty, endpoint-managed applies. Cached settings
+persist on clients until the next successful fetch — clearing the server config does not immediately fall back to
+endpoint policies. Run `/status` to see the active managed source.
+
+**Fail-closed startup** — `forceRemoteSettingsRefresh: true` blocks startup until remote settings are freshly fetched
+and exits if the fetch fails. Self-perpetuates: once delivered, it is cached locally to enforce the same behavior on
+subsequent startups before the first fetch.
+
+**Audit logging** — settings changes available through the compliance API or audit log export. Events include action
+type, account, device, and previous/new values. Contact your Anthropic account team for access.
+
+**Requirements** — Claude for Teams or Claude for Enterprise plan; client v2.1.30+ (Enterprise) or v2.1.38+ (Teams);
+network access to `api.anthropic.com`. Most settings can be set in either managed channel; see
+[managed-only settings](#managed-only-settings) for the keys that require the managed tier specifically.
 
 Global config (`~/.claude.json`) stores preferences, OAuth, MCP servers, and per-project state. These keys go there, not
 in `settings.json`: `autoConnectIde`, `autoInstallIdeExtension`, `editorMode`, `showTurnDuration`,
@@ -230,13 +262,18 @@ over allow rules.
 
 ## Permission Modes
 
-- **`default`** — reads only. Use for: getting started, sensitive work.
-- **`acceptEdits`** — reads, file edits, filesystem commands (`mkdir`, `mv`, etc.) in working dir. Use for: code
-  iteration with post-hoc review.
-- **`plan`** — reads only (Claude proposes but does not modify). Use for: exploration before changes.
-- **`auto`** — everything, with background classifier safety checks. Use for: long tasks, reducing prompt fatigue.
-- **`dontAsk`** — only pre-approved tools (explicit `allow` rules). Use for: locked-down CI and scripts.
-- **`bypassPermissions`** — everything except protected paths. Use for: isolated containers/VMs only.
+Six modes, in the canonical order shown by `claude --permission-mode <mode>`:
+
+1. **`default`** — reads only. Use for: getting started, sensitive work.
+2. **`acceptEdits`** — reads, file edits, filesystem commands (`mkdir`, `mv`, etc.) in working dir. Use for: code
+   iteration with post-hoc review.
+3. **`plan`** — reads only (Claude proposes but does not modify). Use for: exploration before changes.
+4. **`auto`** — everything, with background classifier safety checks. Use for: long tasks, reducing prompt fatigue.
+   **Requires v2.1.83+.** See [`auto-mode.md`](./auto-mode.md) for full configuration, plan/provider gates, classifier
+   internals, and managed-lockdown options.
+5. **`dontAsk`** — only pre-approved tools (explicit `allow` rules). Use for: locked-down CI and scripts.
+6. **`bypassPermissions`** — everything except catastrophic-removal circuit breaker. Use for: isolated containers/VMs
+   only.
 
 ### Switching Modes
 
@@ -245,6 +282,8 @@ over allow rules.
 - **At startup**: `claude --permission-mode <mode>`
 - **Persistent default**: `permissions.defaultMode` in settings
 - `dontAsk` is set only via `--permission-mode dontAsk` (never in cycle)
+- `auto` shows an opt-in prompt the first time it appears in the cycle; **Don't ask again** removes it from the cycle
+  (v2.1.118+)
 
 ### acceptEdits Mode
 
@@ -254,56 +293,17 @@ or wrappers (`timeout`, `nice`, `nohup`). Paths outside scope and all other Bash
 
 ### Auto Mode
 
-Requirements: Team/Enterprise/API plan, Claude Sonnet 4.6 or Opus 4.6, Anthropic API only, admin-enabled on
-Team/Enterprise, v2.1.83+.
+See [`auto-mode.md`](./auto-mode.md) for the complete reference: classifier internals, prompt-injection resistance,
+plan/provider gates, default block list, `autoMode.environment`/`allow`/`soft_deny` configuration with `$defaults`
+sentinel, CLI subcommands, failure modes, and enterprise lockdown via managed settings.
 
-**Blocked by default**: `curl | bash`, sending data to external endpoints, production deploys, mass deletion, IAM
-changes, force push, pushing to `main`.
+Quick summary:
 
-**Allowed by default**: local file ops in working dir, installing declared dependencies, reading `.env` and sending
-creds to matching API, read-only HTTP, pushing to current/Claude-created branch.
-
-**Fallback**: 3 consecutive blocks or 20 total blocks pauses auto mode and resumes prompting. Any allowed action resets
-the consecutive counter.
-
-**Classifier**: runs on Sonnet 4.6 regardless of session model. Counts toward token usage. Reads user messages, tool
-calls, CLAUDE.md — tool results are stripped (immune to prompt injection in file/web content).
-
-On entering auto mode, broad allow rules are dropped: blanket `Bash(*)`, wildcarded interpreters, package-manager run
-commands, `Agent` allow rules. Narrow rules like `Bash(npm test)` carry over.
-
-### Auto Mode Configuration
-
-Set in user settings, `.claude/settings.local.json`, or managed settings. NOT read from shared project settings.
-
-```json
-{
-  "autoMode": {
-    "environment": [
-      "Source control: github.example.com/acme-corp",
-      "Trusted cloud buckets: s3://acme-builds",
-      "Trusted internal domains: *.corp.example.com"
-    ],
-    "allow": [
-      "Deploying to staging namespace is allowed: isolated, resets nightly"
-    ],
-    "soft_deny": [
-      "Never run database migrations outside the migrations CLI"
-    ]
-  }
-}
-```
-
-- `environment` — prose descriptions of trusted infrastructure (repos, buckets, domains, services). Leaves default
-  allow/soft_deny intact.
-- `allow` — **replaces** the entire default allow list. Exceptions to soft_deny rules.
-- `soft_deny` — **replaces** the entire default block list.
-
-Precedence inside classifier: `soft_deny` blocks first, `allow` overrides as exceptions, explicit user intent overrides
-both.
-
-Run `claude auto-mode defaults` to get the full built-in lists before customizing. Run `claude auto-mode config` to see
-effective rules. Run `claude auto-mode critique` for AI feedback on custom rules.
+- **Min version**: v2.1.83. `--enable-auto-mode` removed in v2.1.111 — use `--permission-mode auto`.
+- **Plans**: Max, Team, Enterprise, API. Not on Pro. Anthropic API only.
+- **Models**: Sonnet 4.6, Opus 4.6, or Opus 4.7 (Max plan: Opus 4.7 only).
+- **Configuration**: `autoMode.{environment,allow,soft_deny}` in user/local/managed settings (not shared project).
+- **Circuit breaker**: 3 consecutive or 20 total blocks pauses auto mode and resumes prompting.
 
 ### dontAsk Mode
 
@@ -312,13 +312,31 @@ non-interactive for CI.
 
 ### bypassPermissions Mode
 
-Disables all permission prompts. Writes to protected paths still prompt. Must start with
-`--permission-mode bypassPermissions` or `--dangerously-skip-permissions`. Admins block via
-`permissions.disableBypassPermissionsMode: "disable"` in managed settings.
+Disables all permission prompts and safety checks; tool calls execute immediately. Must start with
+`--permission-mode bypassPermissions` or `--dangerously-skip-permissions` — cannot enter mid-session from a session that
+wasn't started with one of the enabling flags.
+
+**v2.1.126+ scope expansion** — `--dangerously-skip-permissions` (and `bypassPermissions`) now bypass prompts for writes
+to **previously-protected paths**:
+
+- `.claude/` (including `skills/`, `agents/`, `commands/`)
+- `.git/`, `.vscode/`, `.idea/`, `.husky/`
+- Shell config files: `.bashrc`, `.bash_profile`, `.zshrc`, `.zprofile`, `.profile`
+- Other protected files: `.gitconfig`, `.gitmodules`, `.ripgreprc`, `.mcp.json`, `.claude.json`
+
+Earlier versions still prompted for these in bypass mode.
+
+**Circuit breaker** — catastrophic removal commands targeting the filesystem root (`rm -rf /`) or home directory
+(`rm -rf ~`) **still prompt** even with `--dangerously-skip-permissions`. This is not configurable.
+
+**Lockdown** — admins block via `permissions.disableBypassPermissionsMode: "disable"` in managed settings.
+`bypassPermissions` offers no protection against prompt injection — for background safety checks without prompts, use
+[auto mode](./auto-mode.md) instead.
 
 ### Protected Paths
 
-Writes to these paths are never auto-approved in any mode:
+These paths are never auto-approved in `default`, `acceptEdits`, or `plan`. In `auto` they route to the classifier; in
+`dontAsk` they are denied; in `bypassPermissions` (v2.1.126+) they are allowed.
 
 **Directories**: `.git`, `.vscode`, `.idea`, `.husky`, `.claude` (except `.claude/commands`, `.claude/agents`,
 `.claude/skills`, `.claude/worktrees`)
@@ -445,12 +463,77 @@ where `/path` is project-relative and `//path` is absolute.
 - Overly broad `allowWrite` to `$PATH` dirs or shell config files enables privilege escalation
 - `enableWeakerNestedSandbox` considerably weakens isolation (use only with additional isolation)
 
+## Environment Variables
+
+Selected env vars added or formalized in 2026 weekly releases. For the full env-var catalog, see the Claude Code env
+vars docs.
+
+### Session and rendering (W17–W18)
+
+| Variable                               | Default    | Min ver  | Purpose                                                                                                                                                                                        |
+| -------------------------------------- | ---------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAUDE_CODE_SESSION_ID`               | (auto-set) | v2.1.132 | Set in Bash/PowerShell tool subprocess env; matches the session ID and the `session_id` field passed to hooks; updated on `/clear`                                                             |
+| `CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN` | `0`        | v2.1.132 | Set to `1` to disable fullscreen renderer; conversation stays in terminal native scrollback (Cmd+F, tmux copy mode work). Takes precedence over `CLAUDE_CODE_NO_FLICKER` and the `tui` setting |
+
+### Streaming and budgets (W13)
+
+| Variable                         | Default                                   | Min ver       | Purpose                                                                                                                                                                                                                                                       |
+| -------------------------------- | ----------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAUDE_STREAM_IDLE_TIMEOUT_MS`  | `300000` (5m); was `90000` (90s) at intro | v2.1.84       | Threshold before streaming idle watchdog closes a stalled connection; applies to byte-level and event-level watchdogs; lower values silently clamped to absorb extended thinking pauses; for third-party providers requires `CLAUDE_ENABLE_STREAM_WATCHDOG=1` |
+| `SLASH_COMMAND_TOOL_CHAR_BUDGET` | 1% of context window, fallback `8000`     | (legacy name) | Override character budget for skill metadata shown to the Skill tool                                                                                                                                                                                          |
+| `TASK_MAX_OUTPUT_LENGTH`         | `32000` (max `160000`)                    | (existing)    | Maximum characters in subagent output before truncation; full output saved to disk and path included in truncated response                                                                                                                                    |
+
+### Model capability overrides (W13)
+
+For pinned default models on third-party providers (Bedrock, Vertex, Foundry) where provider-specific IDs (Bedrock ARNs,
+custom deployment names) don't match the patterns Claude Code uses to detect effort levels and extended thinking.
+
+| Variable                                   | Min ver | Purpose                                                              |
+| ------------------------------------------ | ------- | -------------------------------------------------------------------- |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTS`    | v2.1.84 | Comma-separated capabilities the pinned Opus model actually supports |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL_SUPPORTS`  | v2.1.84 | Same for pinned Sonnet                                               |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL_SUPPORTS`   | v2.1.84 | Same for pinned Haiku                                                |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL_NAME`        | v2.1.84 | Display name for pinned Opus in `/model` picker                      |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION` | v2.1.84 | Display description for pinned Opus in `/model` picker               |
+
+The `_NAME`, `_DESCRIPTION`, and `_SUPPORTS` suffixes are also available for `ANTHROPIC_DEFAULT_SONNET_MODEL`,
+`ANTHROPIC_DEFAULT_HAIKU_MODEL`, and `ANTHROPIC_CUSTOM_MODEL_OPTION`.
+
+## Local Data Management
+
+### `claude project purge [path]` (v2.1.126)
+
+Deletes all local Claude Code state for one project. Omit `[path]` to pick from an interactive list.
+
+**What it removes**:
+
+- Transcripts and auto memory under `projects/`
+- Per-session `tasks/`, `debug/`, and `file-history/` entries
+- Matching prompt-history lines for that project in `history.jsonl`
+- The project's entry in `~/.claude.json`
+
+**What it leaves alone**: `shell-snapshots/` and `backups/` (not project-scoped) — warned about in the plan output.
+
+**Flags**:
+
+| Flag                   | Behavior                                                                           |
+| ---------------------- | ---------------------------------------------------------------------------------- |
+| `--dry-run`            | Preview the deletion plan; nothing is removed                                      |
+| `-y` / `--yes`         | Skip confirmation prompt (for scripts)                                             |
+| `-i` / `--interactive` | Step through deletion plan one item at a time                                      |
+| `--all`                | Purge state for **every** project on the machine; deletes `history.jsonl` outright |
+
+Exits with status `1` if no state matches the given path.
+
 ## Verify Configuration
 
-- `/status` — shows active settings sources and their origins
-- `/permissions` — lists all permission rules and their source files
+- `/status` — shows active settings sources and their origins; includes active managed source (server-managed vs
+  endpoint-managed)
+- `/permissions` — lists all permission rules and their source files; **Recently denied** tab shows auto-mode denials
+  (press `r` to retry)
 - `/sandbox` — configure sandbox modes
 - `/config` — open settings UI
 - `claude auto-mode defaults` — print built-in auto mode rules
 - `claude auto-mode config` — print effective auto mode config
 - `claude auto-mode critique` — AI review of custom auto mode rules
+- `claude project purge --dry-run` — preview project state cleanup (v2.1.126+)

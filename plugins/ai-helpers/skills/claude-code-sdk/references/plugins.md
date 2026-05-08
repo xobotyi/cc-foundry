@@ -44,6 +44,13 @@ scanned. To keep the default and add more, include the default in the array (e.g
 - `userConfig` (object) — user-configurable values prompted at enable time (see
   [User Configuration](#user-configuration))
 - `channels` (array) — channel declarations for message injection (see [Channels](#channels))
+- `dependencies` (array) — plugins this plugin requires, optionally with semver constraints (see
+  [Plugin Dependencies](#plugin-dependencies))
+- `experimental.monitors` (string | string[] | array) — background monitor configs that auto-arm at session start (see
+  [Monitors](#monitors)). v2.1.105+. Top-level `monitors` still works in v2.1.105–v2.1.128 but is deprecated; v2.1.129+
+  warns via `claude plugin validate`.
+- `experimental.themes` (string | string[]) — directories containing color theme JSON files. Default `themes/` (see
+  [Themes](#themes)). v2.1.118+. Top-level `themes` is deprecated as of v2.1.129.
 
 ### Path Rules
 
@@ -72,6 +79,9 @@ plugin-name/
 │   ├── hooks.json            # Main hook config
 │   └── extra-hooks.json      # Additional hook files
 ├── bin/                      # Executables added to Bash tool PATH
+├── themes/                   # Color theme JSON files (experimental, v2.1.118+)
+├── monitors/                 # Background monitor config (experimental, v2.1.105+)
+│   └── monitors.json
 ├── settings.json             # Default settings (only `agent` key supported)
 ├── .mcp.json                 # MCP server definitions
 ├── .lsp.json                 # LSP server configurations
@@ -93,7 +103,9 @@ be at the plugin root.
 - **Hooks** — `hooks/hooks.json`
 - **MCP servers** — `.mcp.json`
 - **LSP servers** — `.lsp.json`
-- **Executables** — `bin/`
+- **Executables** — `bin/` (added to Bash tool PATH while plugin enabled)
+- **Themes** — `themes/` (experimental, v2.1.118+)
+- **Monitors** — `monitors/monitors.json` (experimental, v2.1.105+)
 - **Default settings** — `settings.json`
 
 ### `settings.json`
@@ -111,7 +123,17 @@ declared in `plugin.json`.
 ### `bin/` Directory
 
 Files in `bin/` are added to the Bash tool's `PATH` while the plugin is enabled. They become invokable as bare commands
-in any Bash tool call without specifying the full path.
+in any Bash tool call without specifying the full path. Added W14 2026 (v2.1.84-era).
+
+### `themes/` Directory
+
+JSON files declaring color themes that appear in the `/theme` picker as `custom:<plugin-name>:<slug>`. Each theme picks
+a base preset and supplies a sparse overrides map of color tokens. Plugin themes are read-only; users press `Ctrl+E` in
+`/theme` to copy one into `~/.claude/themes/` for local editing. See [Themes](#themes).
+
+### `monitors/` Directory
+
+Default location `monitors/monitors.json` for background monitor declarations. See [Monitors](#monitors).
 
 ## Environment Variables
 
@@ -224,6 +246,181 @@ binds to an MCP server the plugin provides.
 - `server` (required) — must match a key in the plugin's `mcpServers`
 - `userConfig` (optional) — per-channel user config, same schema as top-level `userConfig`
 
+## Plugin Dependencies
+
+Available v2.1.110+. Plugins declare other plugins they require via the `dependencies` array in `plugin.json`.
+Auto-update fetches the highest tag satisfying every installed plugin's range, so a single shared dependency stays on a
+version that all dependents accept.
+
+### Entry Forms
+
+```json
+{
+  "dependencies": [
+    "audit-logger",
+    { "name": "secrets-vault", "version": "~2.1.0" },
+    { "name": "shared-utils", "version": "^1.4", "marketplace": "acme-shared" }
+  ]
+}
+```
+
+- **Bare string** — depends on whatever version the plugin's marketplace currently provides
+- **Object** — `name` (required), `version` (semver range, optional), `marketplace` (optional, see
+  [Cross-Marketplace Dependencies](#cross-marketplace-dependencies))
+
+### Semver Ranges
+
+Any expression supported by Node's `semver` package:
+
+- `~2.1.0` — patch-level updates (`>=2.1.0 <2.2.0`)
+- `^2.0` — minor and patch (`>=2.0.0 <3.0.0`)
+- `>=1.4` — comparator
+- `=2.1.0` — exact pin
+- Hyphen ranges, OR groups, etc.
+
+Pre-release versions like `2.0.0-beta.1` are excluded by default. Opt in by including a pre-release suffix in the range,
+e.g., `^2.0.0-0`.
+
+### Resolution Rules
+
+When the same dependency is constrained by multiple installed plugins:
+
+- All ranges intersect → highest tag satisfying every range is installed
+- Ranges do not intersect → install of the new dependent fails with a constraint error
+- Last constraining plugin uninstalled → dependency resumes tracking its marketplace entry on the next update
+
+When auto-update skips a dependency because no tag satisfies all ranges, the skip surfaces in `/doctor` and the
+`/plugin` Errors tab, naming the constraining plugin.
+
+### Cross-Marketplace Dependencies
+
+By default, Claude Code refuses to auto-install a dependency from a marketplace different from the one hosting the
+declaring plugin. To allow it, the **root marketplace** (the one hosting the user-installed plugin) must list the target
+in `allowCrossMarketplaceDependenciesOn` in its `marketplace.json`:
+
+```json
+{
+  "name": "deploy-kit",
+  "owner": { "name": "Acme" },
+  "allowCrossMarketplaceDependenciesOn": ["acme-shared"],
+  "plugins": [...]
+}
+```
+
+Trust does not chain — only the root marketplace's allowlist is consulted. Users can install the dependency manually
+first as a workaround.
+
+### Tag Convention
+
+Version constraints resolve against git tags on the marketplace repository. Tag each release as
+`{plugin-name}--v{version}` where the version matches `plugin.json` at that commit:
+
+```
+secrets-vault--v2.1.0
+```
+
+The `--v` separator is parsed as a prefix match on the full plugin name, so plugin names containing hyphens are handled
+correctly. Cache directory names for tag-resolved installs include a 12-character commit-SHA suffix, so a force-moved
+tag triggers a fresh cache rather than reusing stale content.
+
+### `claude plugin tag [options]`
+
+Available v2.1.118+. Run from inside a plugin directory. Derives the tag name from the plugin's manifest and enclosing
+marketplace entry, then creates the git tag.
+
+Validation before tagging:
+
+- Plugin contents validate (same as `claude plugin validate`)
+- `plugin.json` and the marketplace entry agree on the version
+- Working tree under the plugin directory is clean
+- Tag does not already exist
+
+Options:
+
+- `--push` — push the tag to the remote after creating it
+- `--dry-run` — print the tag name without creating it
+
+Running `git tag <name>--v<version>` directly is equivalent if you keep `plugin.json` and the marketplace entry in sync
+manually.
+
+### `claude plugin prune [options]`
+
+Available v2.1.121+. Lists and removes auto-installed dependencies that no longer have any installed plugin requiring
+them. Plugins installed directly are never pruned.
+
+Options:
+
+- `-s, --scope <scope>` — `user` (default), `project`, `local`
+- `--dry-run` — list what would be removed without changing anything
+- `-y, --yes` — skip confirmation prompt (required when stdin is not a TTY)
+
+Pass `--prune` to `claude plugin uninstall` to cascade: after removing the named plugin, Claude Code scans for and
+removes orphaned dependencies in one step.
+
+## Monitors
+
+Available v2.1.105+. Plugins declare background monitors that Claude Code starts automatically when the plugin is
+active. Each monitor runs a shell command for the lifetime of the session and delivers every stdout line to Claude as a
+notification, so Claude reacts to log entries, status changes, or polled events without being asked to start the watch.
+
+Monitors are **experimental**. Declare under `experimental.monitors` in `plugin.json` (v2.1.129+) — the top-level
+`monitors` key still works for backward compatibility but `claude plugin validate` warns. They run only in interactive
+CLI sessions, run unsandboxed at hook trust level, and are skipped on hosts where the Monitor tool is unavailable.
+
+### Configuration
+
+Default location: `monitors/monitors.json` in the plugin root. Format: JSON array of monitor entries. Inline by setting
+`experimental.monitors` to the array directly, or load from a non-default path with a relative string like
+`"./config/monitors.json"`.
+
+```json
+[
+  {
+    "name": "deploy-status",
+    "command": "curl -sN https://deploy.example.com/events",
+    "description": "Watches deployment status events"
+  },
+  {
+    "name": "error-log",
+    "command": "tail -F ${CLAUDE_PROJECT_DIR}/logs/error.log",
+    "description": "Streams new error log lines",
+    "when": "on-skill-invoke:debug-deploy"
+  }
+]
+```
+
+### Required Fields
+
+- `name` — identifier unique within the plugin. Prevents duplicate processes on plugin reload or repeat skill invoke.
+- `command` — shell command run as a persistent background process in the session working directory. Supports
+  `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`, `${user_config.*}`, and any `${ENV_VAR}` substitutions. Prefix with
+  `cd "${CLAUDE_PLUGIN_ROOT}" &&` if the script must run from the plugin's own directory.
+- `description` — short summary shown in the task panel and notification summaries.
+
+### Optional Fields
+
+- `when` — when to arm. Defaults to `always` (auto-arm at session start). Set to `on-skill-invoke:<skill-name>` to arm
+  only when a specific skill is invoked.
+
+Disabling a plugin mid-session does not stop monitors that are already running. They stop when the session ends.
+
+## Themes
+
+Available v2.1.118+. Plugins ship custom color themes that appear in `/theme` alongside the built-in presets and the
+user's local themes. Themes are **experimental**; declare under `experimental.themes` in `plugin.json` (v2.1.129+ — the
+top-level `themes` key still works but warns on validate).
+
+### Configuration
+
+Default directory: `themes/`. Each theme is a JSON file picking a base preset and supplying a sparse overrides map of
+color tokens.
+
+### Behavior
+
+- Themes appear in `/theme` as `custom:<plugin-name>:<slug>`
+- Selecting a plugin theme persists `custom:<plugin-name>:<slug>` in the user's config
+- Plugin themes are read-only; pressing `Ctrl+E` on one in `/theme` copies it into `~/.claude/themes/` for local editing
+
 ## Plugin Components
 
 ### Skills
@@ -246,22 +443,8 @@ NOT supported for plugin agents.
 
 Location: `hooks/hooks.json` or inline in `plugin.json`
 
-Same format as user-defined hooks. Plugin hooks respond to all 22 lifecycle events:
-
-**Can block (all 4 types):** `UserPromptSubmit`, `PreToolUse`, `PermissionRequest`, `SubagentStop`, `TaskCompleted`,
-`Stop`
-
-**Can block (command, http):** `TeammateIdle`, `ConfigChange` (except `policy_settings`), `WorktreeCreate` (replaces
-default git behavior; must print path), `Elicitation`, `ElicitationResult`
-
-**Cannot block (all 4 types):** `PostToolUse` (`decision: "block"` feeds reason but doesn't undo), `PostToolUseFailure`
-
-**Cannot block (command, http):** `PermissionDenied`, `Notification`, `WorktreeRemove`, `PreCompact`, `PostCompact`,
-`SessionEnd`
-
-**Cannot block (command only):** `SessionStart`, `SubagentStart`, `StopFailure`, `CwdChanged`, `FileChanged`
-
-**Cannot block (command, http — read-only):** `InstructionsLoaded`, `TaskCreated`
+Same format as user-defined hooks. Plugin hooks respond to all 29 lifecycle events. See
+[references/hooks.md](./hooks.md) for the full event catalog.
 
 Hook types:
 
@@ -388,6 +571,9 @@ impersonating official marketplaces are also blocked.
 - `metadata.version` (string) — marketplace version
 - `metadata.pluginRoot` (string) — base directory prepended to relative plugin source paths (e.g., `"./plugins"` lets
   you write `"source": "formatter"` instead of `"source": "./plugins/formatter"`)
+- `allowCrossMarketplaceDependenciesOn` (string[]) — top-level field. Other marketplaces that plugins in this
+  marketplace are allowed to declare dependencies on. Required for cross-marketplace dependency auto-install. See
+  [Cross-Marketplace Dependencies](#cross-marketplace-dependencies).
 
 ### Plugin Entries
 
@@ -592,6 +778,26 @@ Add to `.claude/settings.json` to auto-prompt team members:
 }
 ```
 
+### `allowedChannelPlugins` (Managed Setting)
+
+Available v2.1.84+. Managed-settings allowlist of channel plugins permitted to push messages. Replaces the default
+Anthropic-maintained channel allowlist when set. Requires `channelsEnabled: true` to take effect.
+
+```json
+{
+  "channelsEnabled": true,
+  "allowedChannelPlugins": [{ "marketplace": "claude-plugins-official", "plugin": "telegram" }]
+}
+```
+
+- **Undefined** — falls back to the default Anthropic allowlist
+- **`[]`** (empty array) — blocks all channel plugins from the allowlist (`--dangerously-load-development-channels` can
+  still bypass for local testing)
+- **List of entries** — only the named `{plugin, marketplace}` pairs may register
+
+If a user passes a plugin to `--channels` that isn't on the list, Claude Code starts normally but the channel doesn't
+register and the startup notice explains why.
+
 ### Managed Marketplace Restrictions
 
 `strictKnownMarketplaces` in managed settings restricts which marketplaces users can add:
@@ -646,6 +852,7 @@ Aliases: `remove`, `rm`
 - `<plugin>` — plugin name or `plugin-name@marketplace-name`
 - `-s, --scope <scope>` — `user` (default), `project`, `local`
 - `--keep-data` — preserve `${CLAUDE_PLUGIN_DATA}` directory
+- `--prune` — after removing the named plugin, also remove auto-installed dependencies that became orphaned (v2.1.121+)
 
 ### `claude plugin enable <plugin> [options]`
 
@@ -662,7 +869,26 @@ Aliases: `remove`, `rm`
 ### `claude plugin validate <path>`
 
 Validates `plugin.json`, skill/agent/command frontmatter, and `hooks/hooks.json` for syntax and schema errors. Also
-validates `marketplace.json` when run on a marketplace directory.
+validates `marketplace.json` when run on a marketplace directory. As of v2.1.129, warns when `themes` or `monitors` are
+declared at the top level instead of under `experimental`.
+
+### `claude plugin tag [options]`
+
+Available v2.1.118+. Run from inside a plugin directory. Creates a release git tag using the convention
+`{plugin-name}--v{version}` derived from the plugin's manifest. Validates plugin contents, manifest/marketplace version
+agreement, clean working tree, and tag uniqueness before tagging. See [Plugin Dependencies](#plugin-dependencies).
+
+- `--push` — push the tag to the remote after creating it
+- `--dry-run` — print the tag name without creating it
+
+### `claude plugin prune [options]`
+
+Available v2.1.121+. Removes auto-installed dependencies no longer required by any installed plugin. Plugins installed
+directly are never pruned. See [Plugin Dependencies](#plugin-dependencies).
+
+- `-s, --scope <scope>` — `user` (default), `project`, `local`
+- `--dry-run` — list what would be removed
+- `-y, --yes` — skip confirmation prompt (required when stdin is not a TTY)
 
 ### `claude plugin marketplace add <source> [options]`
 
