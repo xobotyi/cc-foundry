@@ -45,7 +45,8 @@ Before starting, verify the environment:
 4. Self-check questions against the bias validation gate.
 5. Create team `research-{slug}` via TeamCreate.
 6. For each scope cluster, create a task via TaskCreate using the task description format below, then spawn one teammate
-   via Agent with `subagent_type: "codebase-researcher"` and `team_name: "research-{slug}"`.
+   via Agent with `subagent_type: "codebase-researcher"`, `team_name: "research-{slug}"`, and an intent-free spawn
+   prompt (see Spawn Prompt below).
    - Task descriptions contain only questions and scope boundaries. Never the brief, ticket, or intent.
    - Explicit `subagent_type` ensures the teammate inherits the agent's tool restrictions and system prompt; without it,
      the platform falls back to the general-purpose agent.
@@ -170,6 +171,34 @@ question to the team lead via SendMessage. Mark the task complete when all quest
 
 Nothing else. No brief context, no intent, no background.
 
+### Spawn Prompt
+
+The `prompt` parameter on the Agent call is visible to the teammate. The leak we care about is **intent**, not
+**context**. Distinguish:
+
+- **Context (allowed)** — what the teammate is doing, where they're working, what role they play. The project name, the
+  scope area they'll investigate, the fact that they're doing read-only codebase research. None of this biases the
+  investigation.
+- **Intent (forbidden)** — why we're investigating, what problem we're trying to solve, what change we're considering,
+  what outcome we want, any framing that suggests a desired direction. This is what taints the research.
+
+The teammate already gets stable context from its agent definition (role, tools, output format). The spawn prompt can
+add light orientation — project name, scope tag, "claim a task" routing — but every word should pass the test: _would
+removing this change what the teammate looks for?_ If yes, it's intent. If no, it's safe context.
+
+<examples>
+<example name="safe-spawn-prompts">
+- "You're a codebase-researcher on team research-auth-rework. Claim a task and follow its instructions."
+- "Investigating the cc-foundry plugins directory. Claim your task on team research-{slug}."
+</example>
+
+<example name="leaky-spawn-prompts">
+- "We're trying to add OAuth to the auth module — claim your task." — leaks the goal
+- "Help us figure out why the API middleware is slow." — assumes a problem, frames the search
+- "Find out where we'd need to refactor for the new caching layer." — leaks the change being considered
+</example>
+</examples>
+
 ## Research Document Format
 
 ```markdown
@@ -218,6 +247,9 @@ Nothing else. No brief context, no intent, no background.
   the project. The brief contains intent — if it exists on disk during investigation, the information barrier is broken.
   The brief is persisted in Phase 3, after the last wave has completed and no further dispatch is planned.
 - **Teammates never see the brief.** Task descriptions contain only questions and scope boundaries.
+- **Spawn prompts may carry context, never intent.** The `prompt` parameter on Agent is visible to the teammate.
+  Project, scope area, role are fine. Goals, problems being solved, desired outcomes, or any framing that suggests a
+  direction are not — those bias the investigation.
 - **You are sole author of research.md.** No teammate writes to any file.
 - **No opinions in research.md.** Findings are factual observations with file references. Interpretation belongs in the
   alignment stage.
