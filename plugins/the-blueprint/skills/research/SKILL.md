@@ -44,9 +44,11 @@ Before starting, verify the environment:
    - Don't fix a question count up-front. Let the brief's complexity determine how many.
 4. Self-check questions against the bias validation gate.
 5. Create team `research-{slug}` via TeamCreate.
-6. For each scope cluster, create a task via TaskCreate using the task description format below, then spawn one
-   `codebase-researcher` teammate via Agent with `team_name`.
+6. For each scope cluster, create a task via TaskCreate using the task description format below, then spawn one teammate
+   via Agent with `subagent_type: "codebase-researcher"` and `team_name: "research-{slug}"`.
    - Task descriptions contain only questions and scope boundaries. Never the brief, ticket, or intent.
+   - Explicit `subagent_type` ensures the teammate inherits the agent's tool restrictions and system prompt; without it,
+     the platform falls back to the general-purpose agent.
 
 ### Phase 2 — Collect and Iterate
 
