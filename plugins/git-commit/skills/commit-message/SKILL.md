@@ -131,6 +131,7 @@ assumes 72-char body lines. Trailers are the only exception. </body-philosophy>
 - Refactoring — explain the motivation
 - Breaking change — explain migration path
 - Non-obvious change — explain rationale
+- Part of a commit chain — state what related work follows
 
 ### Terse Register
 
@@ -200,6 +201,15 @@ interval.
 Preparation for the new package resolution algorithm.
 
 ```
+
+**Commit chain — state what follows:**
+```
+
+Integration with the order processing pipeline follows in a separate change.
+
+```
+
+Name the specific work that follows. Not "more changes coming" — say what and where.
 </body-patterns>
 
 ## Breaking Changes
