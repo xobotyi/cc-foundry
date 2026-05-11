@@ -22,8 +22,8 @@ change.
 
 ## When to Use
 
-**From the pipeline:** After task-decomposition produces a decomposition document with task descriptions, this skill
-handles creating those tasks in the issue tracker with proper fields, categorization, and linking.
+**From the pipeline:** After `frame` produces a frame document with vertical slice phases, this skill handles creating
+tasks from those phases in the issue tracker with proper fields, categorization, and linking.
 
 **Standalone:** When a user requests a task directly — "create a bug for the pagination issue" or "add a task to upgrade
 the dependency." No decomposition document needed; gather context from the conversation.
@@ -356,14 +356,13 @@ When all tasks are created:
 
 - Report created task IDs and URLs to the user.
 - Flag any tasks that need manual linking not supported by the tracker's tools.
-- If working from a decomposition document, list any remaining items not yet created.
-- Update the decomposition document if task descriptions changed during creation.
+- If working from a frame document, list any remaining phases not yet covered by tasks.
+- Update the frame document with task IDs if descriptions changed during creation.
 
 ## Related Skills
 
-- **task-decomposition** — Produces the input for pipeline-mode task creation
-- **technical-design** — Source material referenced in task descriptions
-- **design-documents** — The origin of the pipeline: problem analysis and solution decision
+- **frame** — Produces the input for pipeline-mode task creation: vertical slice phases with acceptance criteria
+- **alignment** — Source material referenced in task descriptions: solution direction and pattern decisions
 
 ## Quality Checklist
 

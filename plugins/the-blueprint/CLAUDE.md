@@ -1,7 +1,6 @@
 # the-blueprint Plugin
 
-Structured planning pipeline that converts problem analysis into tracked work items. The pipeline is being migrated to
-the **DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks) — see issue #8.
+Structured planning pipeline implementing the **DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks).
 
 ## Skills
 
@@ -11,15 +10,12 @@ DRAFT pipeline skills live in `skills/DRAFT/`, numbered by stage:
 - **`research`** (`DRAFT/02-research`) — Parallel codebase investigation via agent teams; produces objective findings
 - **`alignment`** (`DRAFT/03-alignment`) — Human-agent alignment on solution direction; surfaces patterns for
   correction, conditional ADR sections
+- **`frame`** (`DRAFT/04-frame`) — Vertical slice phases with per-phase testing strategy; structurally prevents
+  horizontal layering
 
-Remaining pipeline skills retain current names until reworked into DRAFT stages:
+Standalone skills (not pipeline stages, invocable independently):
 
-- **`technical-design`** — Maps chosen solution to codebase components, tools, sequencing (future: `frame`)
-- **`task-decomposition`** — Breaks technical design into actionable task hierarchies (future: merged into `frame`)
-- **`task-creation`** — Creates individual tasks in issue trackers with proper categorization (future: `tasks`)
-
-Cross-cutting skills (not pipeline stages):
-
+- **`task-creation`** — Creates individual tasks in issue trackers with structured descriptions and acceptance criteria
 - **`youtrack`** — YouTrack domain knowledge: data model, fields, queries, commands, linking
 - **`diagramming`** — Technical diagram creation with visual design principles (Excalidraw, Mermaid)
 
@@ -37,17 +33,15 @@ research (brief → parallel codebase investigation → objective findings)
     ↓
 alignment (research + brief → pattern surfacing → end state → conditional ADR → alignment.md)
     ↓
-technical-design (solution → components, tools, sequencing)  [future: frame]
+frame (alignment → vertical slice phases → per-phase testing → frame.md)
     ↓
-task-decomposition (technical design → task hierarchies)  [future: merged into frame]
-    ↓
-task-creation (tasks → tracked work items)  [future: tasks]
+task-creation (frame phases → tracked work items in issue tracker)
 
-diagramming ← invoked alongside alignment or technical-design when visual artifacts are needed
+diagramming ← invoked alongside alignment or frame when visual artifacts are needed
 ```
 
 Each pipeline skill prompts the user to proceed to the next stage on completion. User approval is required at every
-stage before advancing.
+stage before advancing. `task-creation` is standalone — Frame transitions to it, but it can also be invoked directly.
 
 ## Requirements
 
@@ -57,20 +51,18 @@ enablement instructions when the flag is missing.
 ## Pipeline Usage
 
 **From idea to tasks:** Start with `discovery` to stress-test the idea, then follow the prompts through each stage. The
-pipeline produces deliverables at each stage: the brief (problem statement from discovery), the research document
-(objective codebase findings), the alignment document (pattern decisions, end state, conditional ADRs), the technical
-design (how at the component level), and the decomposition document with links to tracked tasks.
+pipeline produces deliverables at each stage: the brief (discovery), the research document (objective findings), the
+alignment document (pattern decisions, end state, conditional ADRs), and the frame document (vertical slice phases with
+testing strategy). Finally, invoke `task-creation` to convert frame phases into tracked work items.
 
 **Standalone task creation:** Invoke `task-creation` directly when creating individual tasks outside the pipeline
 context.
 
-**YouTrack-specific work:** The `youtrack` skill provides domain knowledge for YouTrack's data model, custom fields,
-query language, commands, and linking. It complements `task-creation` (which is tracker-agnostic) with YouTrack-specific
-field handling and conventions. Invoke both when creating issues in YouTrack.
+**YouTrack-specific work:** The `youtrack` skill complements `task-creation` with YouTrack-specific field handling and
+conventions. Invoke both when creating issues in YouTrack.
 
-**Diagrams:** The `diagramming` skill is a cross-cutting companion — not a pipeline stage. Invoke it alongside
-`alignment` or `technical-design` when creating architecture diagrams, flowcharts, sequence diagrams, or any visual
-artifact.
+**Diagrams:** The `diagramming` skill is a cross-cutting companion. Invoke alongside `alignment` or `frame` when
+creating architecture diagrams, flowcharts, or any visual artifact.
 
 ## Conventions
 
@@ -78,15 +70,16 @@ artifact.
 
 - **Brief** (`brief.md`) and **research** (`research.md`) are **immutable** snapshots — they capture what was true at a
   point in time and do not change after creation.
-- **Alignment** (`alignment.md`) is a **living artifact** — it may be updated throughout development as new information
-  emerges. It becomes immutable only when moved to `completed/`.
+- **Alignment** (`alignment.md`) and **frame** (`frame.md`) are **living artifacts** — they may be updated throughout
+  development as new information emerges. Immutable only when moved to `completed/`.
 
 **Artifact persistence:**
 
 - **Brief** and **research** have **optional** file persistence. The user may choose to keep them in conversation
   context only, or write to disk. When not written to disk, the full content is output to conversation as a context
   checkpoint.
-- **Alignment** has **mandatory** file persistence. It always writes to `design-docs/` — there is no "skip file" option.
+- **Alignment** and **frame** have **mandatory** file persistence. They always write to `design-docs/`. Tasks link back
+  to frame.md; alignment contains living ADR sections.
 
 **Briefs:** Output of `discovery`. Store in `design-docs/` as `NN-short-description.brief.md`. When discovery hands off
 directly to research, the brief is held in conversation context and persisted by `research` after investigation
@@ -99,11 +92,9 @@ completes — never written to disk while teammates are running, or they could r
 (`NN-short-description.alignment.md`). Contains pattern decisions, current→desired end state, resolved questions, and
 conditional ADR sections when trade-offs were committed.
 
-**Technical designs:** Pair with their alignment doc using the same number prefix
-(`NN-short-description.technical-design.md`).
-
-**Decomposition documents:** Pair with their alignment doc using the same number prefix
-(`NN-short-description.decomposition.md`), contain task descriptions and links to issue tracker items.
+**Frame documents:** Output of `frame`. Pair with alignment using the same number prefix
+(`NN-short-description.frame.md`). Contains vertical slice phases with components, testing strategy, verification gates,
+and acceptance criteria per phase.
 
 **Completed artifacts:** All artifacts for an initiative move together to `design-docs/completed/` when the work is
 implemented.
