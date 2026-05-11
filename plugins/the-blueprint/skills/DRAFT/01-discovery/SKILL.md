@@ -1,33 +1,32 @@
 ---
 name: discovery
 description: >-
-  Adversarial requirements elicitation — two-phase intent capture then
-  stress-test through systematic questioning. Invoke whenever task involves
-  priming understanding of a problem, feature, or idea, or starting the
-  DRAFT pipeline.
+  Requirements elicitation and validation through structured questioning.
+  Invoke whenever task involves defining what to build, scoping a problem
+  or feature, or starting the DRAFT pipeline.
 ---
 
 # Discovery
+
+The user's domain expertise, lived experience, and value judgments are inputs you cannot generate independently.
+Discovery exists to externalize them into a form downstream stages can act on. Extract, don't contribute — never suggest
+solutions, fill in gaps, or accept vague answers.
 
 Two-phase process:
 
 **Phase 1 (Intent Capture):** Listen first. Understand what the user wants without pushback. Confirm shared
 understanding before any challenge.
 
-**Phase 2 (Stress-Test):** After alignment on what they want, then challenge assumptions, find gaps, pressure reasoning.
-Do not suggest solutions, offer alternatives, or fill in blanks the user left empty. If the user cannot defend a point,
-that point is not ready for design.
-
-The user's domain expertise, lived experience, and value judgments are inputs an agent cannot generate independently.
-Discovery exists to externalize them into a form downstream stages can act on.
+**Phase 2 (Stress-Test):** After alignment on what they want, challenge assumptions, find gaps, pressure reasoning. If
+the user cannot defend a point, that point is not ready for design.
 
 ## Dimensions
 
 Cover these through questioning. Track coverage broadly — not as a checklist to complete, but as a map of territory to
 explore.
 
-- **Problem** — What is actually broken or missing? Is this a real problem or a perceived one? Who experiences it? How
-  do they experience it today? For new features: what value does this create?
+- **Motivation** — Why are we doing this? For problems: what is broken, who experiences it, how do they experience it
+  today? For features: what value does this create? Is the motivation validated or assumed?
 - **Goals** — What does success look like, concretely? How would you measure it? What changes when this is done?
 - **Scope** — What's in, what's out? Why those boundaries? What's the smallest version that delivers value?
 - **Constraints** — What can't change? What's non-negotiable? Budget, timeline, technology, compatibility?
@@ -76,16 +75,18 @@ given substantive answers across dimensions.
 ## Convergence
 
 Discovery converges when new questions would only refine what you already understand rather than reveal something you
-don't. The signal is redundancy in your own reasoning — you're circling, not advancing.
+don't. The signal is redundancy in your own reasoning — you're circling, not advancing. Concrete test: you can predict
+the user's answer before they give it.
 
 When you recognize convergence, shift to verification. This is a judgment call, not a formula. The user can keep talking
 past your convergence point, and they can cut you off before it.
 
 ## Verification
 
-When you believe you have sufficient understanding, present a brief structured summary:
+When you believe you have sufficient understanding, present a structured summary — this is also the brief artifact
+format:
 
-- **Problem:** one paragraph
+- **Motivation:** one paragraph
 - **Goals:** bullet list
 - **Non-goals:** bullet list (things that could be goals but aren't)
 - **Constraints:** bullet list
@@ -96,16 +97,14 @@ This is a verification checkpoint. The user confirms, corrects, or continues que
 **On convergence, ask the user:**
 
 - "Write the brief as `NN-short-description.brief.md`?" → write artifact, conversation ends
-- "Proceed to `research` skill?" → output the full brief into the conversation (same format as the file would have),
-  then invoke research. Do NOT write the brief to disk — writing it before research lets teammates read it, breaking the
-  information barrier. The brief in conversation serves as a checkpoint the research lead reads from context.
+- "Proceed to `research` skill?" → output the full brief into the conversation, then invoke research. Do NOT write the
+  brief to disk — research teammates must not be able to read it (information barrier).
 - Neither → conversation ends, no artifacts created
 
 ## Rules
 
-- Never suggest solutions. Challenge the user's solutions.
-- Never fill in gaps the user left empty. Point at the gap and ask them to fill it.
-- Never accept vague answers as sufficient. Push for specifics.
-- Do not explore codebase or documentation — that is the research stage's responsibility.
-- **Phase 1 is listen-first, challenge-later.** Initial friction creates resistance; alignment enables productive
-  pushback.
+- Challenge the user's solutions — never offer your own.
+- Point at gaps and ask the user to fill them — never fill in blanks yourself.
+- Push for specifics when answers are vague — "faster", "better UX", "more reliable" are not actionable.
+- Leave codebase and documentation exploration to the research stage.
+- **Listen first, challenge later.** Initial friction creates resistance; alignment enables productive pushback.

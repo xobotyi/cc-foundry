@@ -1,10 +1,10 @@
 ---
 name: frame
 description: >-
-  Convert aligned solution into vertical slice phases with per-phase testing
-  strategy — structurally prevents horizontal layering. Invoke whenever task
-  involves the F stage of the DRAFT pipeline, planning implementation phases,
-  or structuring work into vertical slices before coding begins.
+  Vertical-slice implementation planning — phases that cross all layers
+  end-to-end with per-phase testing. Invoke whenever task involves the F
+  stage of the DRAFT pipeline, planning implementation phases, or structuring
+  work before coding begins.
 ---
 
 # Frame
@@ -13,6 +13,32 @@ Structure implementation as vertical slices — each phase crosses all affected 
 integrated path. Phase 1 is the tracer bullet: the thinnest possible slice wired through every layer. Models default to
 horizontal plans (all DB, then all API, then all UI); this skill enforces vertical structure that cannot be prompted
 away.
+
+<examples>
+<example name="horizontal-vs-vertical">
+Feature: add user notifications (email + in-app). Affects: DB schema, notification service, API endpoints, UI.
+
+**Horizontal (wrong — layer by layer):**
+
+- Phase 1: All DB — notification tables, preferences, delivery log
+- Phase 2: All service — email sender, in-app dispatcher, preference resolver
+- Phase 3: All API — notification endpoints, preference endpoints
+- Phase 4: All UI — notification center, preference panel, toast
+
+By Phase 4, the agent has generated hundreds of lines across every layer. Integration reveals the notification table
+schema assumed a delivery model the service layer doesn't support. Fix cascades through all layers — most work is
+discarded.
+
+**Vertical (correct — slice by slice):**
+
+- Phase 1 (tracer bullet): Email notification, one path — table, service, endpoint, toast. Validates the full stack.
+- Phase 2: In-app notifications — extends schema, adds dispatcher, wires notification center.
+- Phase 3: User preferences — preference table, resolver, settings endpoint, preference panel.
+
+Schema error surfaces in Phase 1, not Phase 4. Each phase is testable and deployable independently.
+
+</example>
+</examples>
 
 ## Prerequisites
 
@@ -37,8 +63,8 @@ Locate the inputs:
 4. Each subsequent phase adds depth as a vertical pass — new behavior, edge cases, integration points — always crossing
    layers, never completing one layer in isolation.
 5. Target 3–5 phases total. More than 5 suggests the scope is too large for a single frame — consider splitting.
-6. Cross-cutting concerns (auth, logging, error handling) that multiple phases depend on become a dedicated
-   infrastructure phase sequenced before the phases that need it.
+6. Cross-cutting concerns (auth, logging, error handling) are established within the vertical phases that need them —
+   the tracer bullet wires the minimal cross-cutting path, subsequent phases extend it.
 
 ### Phase 3 — Detail Each Phase
 
@@ -147,10 +173,3 @@ Phase 3 (parallel with Phase 2, depends on Phase 1)
 - **Outline, not implementation.** The frame shows what changes and in what order. No function bodies, no production
   code. Signatures and type definitions are acceptable when they clarify boundaries.
 - **Create only.** One frame per initiative. Revise the living artifact directly; formal update mode deferred.
-
-## Related Skills
-
-- **alignment** — Produces the input: aligned solution direction with pattern decisions
-- **tasks** — Next step: decomposes frame phases into individually trackable work items
-- **task-creation** — Standalone skill that handles tracker operations after decomposition
-- **research** — Optional reference for codebase details when defining phase components
