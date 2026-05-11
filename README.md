@@ -44,12 +44,11 @@ validation before execution.
 
 ### the-blueprint
 
-Planning is either too shallow or too detailed. This plugin provides a multi-stage pipeline that produces artifacts
-consumable by both humans and agents: discovery briefs (problem statement from adversarial questioning), research
-documents (objective codebase findings via parallel agent teams), design documents (problem analysis and
-recommendation), technical designs (component mapping and sequencing), task decomposition (actionable hierarchies with
-acceptance criteria), and task creation (issue tracker items). Each stage builds on the previous with explicit approval
-gates.
+Planning is either too shallow or too detailed. This plugin implements the **DRAFT** methodology (Discovery → Research →
+Alignment → Frame → Tasks) — a pipeline that produces artifacts consumable by both humans and agents. Discovery
+stress-tests ideas, research investigates the codebase blind to intent, alignment surfaces patterns for human
+correction, frame enforces vertical-slice implementation phases, and tasks decompose phases into sized work items. Each
+stage builds on the previous with explicit approval gates.
 
 ```
 /plugin install the-blueprint
