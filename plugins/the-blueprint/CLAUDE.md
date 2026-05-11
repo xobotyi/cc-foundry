@@ -17,6 +17,7 @@ DRAFT pipeline skills live in `skills/DRAFT/`, numbered by stage:
 Standalone skills (not pipeline stages, invocable independently):
 
 - **`task-creation`** — Creates individual tasks in issue trackers with structured descriptions and acceptance criteria
+- **`glossary`** — Project vocabulary consumable by humans and agents; prevents naming drift with prohibited aliases
 - **`youtrack`** — YouTrack domain knowledge: data model, fields, queries, commands, linking
 - **`diagramming`** — Technical diagram creation with visual design principles (Excalidraw, Mermaid)
 
