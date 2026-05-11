@@ -47,7 +47,7 @@ Skip when:
 ### Step 1: Read the Design Document
 
 1. Read the design document's decision, constraints, and conditions. A technical design requires a design document as
-   input — if none exists, stop and create one first using the `design-documents` skill.
+   input — if none exists, stop and create one first using the `alignment` skill.
 2. Confirm understanding with the user before proceeding — restate the decided solution in your own terms.
 
 ### Step 2: Identify Affected Components
@@ -324,7 +324,8 @@ When the user approves the technical design:
 
 ## Related Skills
 
-- **design-documents** — Produces the input for this skill: the decided solution with rationale
+- **alignment** — Produces the input for this skill: the aligned solution direction with pattern decisions and
+  conditional ADRs
 - **task-decomposition** — Consumes this skill's output: decomposes the technical design into tracked work items
 - **task-creation** — Creates individual tasks from decomposition output
 

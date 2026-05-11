@@ -53,7 +53,8 @@ Send one message to the team lead per question. Follow this structure exactly:
 
 **What it does:** [concrete description of logic, data flow, and control flow as written in the files]
 
-**Patterns observed:** [conventions, recurring structures, architectural patterns in this area]
+**Patterns observed:** [conventions, recurring structures, architectural patterns — for each, note prevalence within the
+scope (e.g., "used in 12/15 files" vs "single instance in one file")]
 
 **Integration points:** [callers, consumers, dependencies — what connects to this code]
 

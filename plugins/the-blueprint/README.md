@@ -14,19 +14,27 @@ decision records.
 
 **Agent-driven workflows make this worse.** An agent implementing from a vague task drifts from the intended solution.
 An agent implementing from an overly prescriptive task follows outdated instructions instead of adapting to the codebase
-as discovered.
+as discovered. And critically — an agent that silently adopts legacy codebase patterns without human review embeds
+mistakes no one asked for.
 
 ## The Solution
 
-the-blueprint provides a four-stage pipeline that produces artifacts consumable by both humans and agents: design
-documents (problem analysis, solution exploration, and committed decisions), technical designs (component mapping and
-sequencing), decomposition documents (actionable task hierarchies), and issue tracker tasks with acceptance criteria.
+the-blueprint provides a pipeline that produces artifacts consumable by both humans and agents. The pipeline is being
+migrated to the **DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks), which separates intent
+gathering from objective investigation, surfaces codebase patterns for human correction before implementation, and
+enforces vertical slice planning.
+
+The first three stages (D, R, A) are DRAFT-migrated. Remaining stages retain current names until reworked:
+
+- **Discovery** — stress-test the idea through adversarial questioning → brief
+- **Research** — parallel codebase investigation blind to intent → research document
+- **Alignment** — surface patterns, align on end state, conditional ADRs → alignment document
+- Technical design → component mapping and sequencing (future: Frame)
+- Task decomposition → actionable task hierarchies (future: merged into Frame)
+- Task creation → issue tracker tasks with acceptance criteria (future: Tasks)
 
 Each stage builds on the previous one with explicit user approval gates. The pipeline preserves the reasoning behind
 decisions, making them discoverable months later when someone asks "why did we build it this way?"
-
-The artifacts serve dual purposes: humans read them to understand context and trade-offs; agents consume them to plan
-implementation without drifting from intent.
 
 ## Installation
 
@@ -52,14 +60,12 @@ Requires Claude Code v2.1.32+. Without this flag, `research` will fail fast with
 
 Adversarial requirements elicitation that stress-tests ideas before committing to design. The agent acts as a critic —
 challenging assumptions, finding gaps, and pressuring vague reasoning until the user's thinking holds up. Explores
-available context (codebase, docs, existing systems) first, presents findings, then systematically questions across
-problem, goals, scope, constraints, risks, and prior art dimensions.
+dimensions across problem, goals, scope, constraints, risks, and prior art.
 
 The primary output isn't a document — it's the primed conversation context. The agent's enriched understanding carries
 into whatever comes next. A brief verification summary crystallizes the shared understanding for the user to confirm.
 
-**Use when:** Starting a new initiative, exploring a product idea, stress-testing a plan, or beginning the blueprint
-pipeline. Also useful as a standalone content-priming tool before any complex task.
+**Use when:** Starting a new initiative, exploring a product idea, stress-testing a plan, or beginning the pipeline.
 
 ### research
 
@@ -71,37 +77,41 @@ questions and their assigned scope. This information barrier prevents intent lea
 opinion.
 
 Investigation runs in waves: dispatch, wait for all findings, decide whether new scopes or follow-up questions emerged,
-dispatch another wave if needed. The lead is sole author of the research document — no teammate writes files. The brief
-is persisted to disk only after the last wave completes, never while teammates are running.
+dispatch another wave if needed. The lead is sole author of the research document — no teammate writes files.
 
 **Use when:** A brief has been produced (from `discovery` or otherwise) and you need objective codebase findings before
 making design decisions. Requires the agent teams experimental flag (see Installation).
 
-### design-documents
+### alignment
 
-Decision records that explore problems and commit to solutions before implementation. Produces design documents with
-options comparison, committed decisions, and cross-cutting concerns. Documents serve as thinking tools (forcing
-structured analysis), review artifacts (enabling pre-implementation feedback), and architecture decision records
-(preserving rationale).
+Human-agent alignment on solution direction before implementation begins. The agent reads the brief and research,
+extracts codebase patterns with prevalence data, and declares which patterns it intends to follow and why. The user
+reviews this pattern catalog and corrects wrong assumptions — "that's the old way, go find the new way" — before any
+code is planned. This pattern-surfacing step is the critical piece that was missing from the old pipeline.
 
-**Use when:** Creating, updating, reviewing, or asking questions about design documents. Start here when beginning the
-planning pipeline.
+After patterns are corrected, the agent presents a current state → desired end state proposal with open questions. When
+genuine trade-offs surface, conditional ADR sections capture committed decisions with options, rationale, and
+consequences. The alignment document is a living artifact — it may be updated throughout development and becomes
+immutable only when the initiative is completed.
+
+**Use when:** Research findings are available and you need to align on solution direction before implementation. This is
+the "brain surgery" step — where you correct the agent's understanding before it writes 2,000 lines of code.
 
 ### technical-design
 
 Maps a decided solution onto the codebase: affected components, tool selection, dependencies, sequencing, and scope
 boundaries.
 
-**Use when:** A design document has been created and a solution was decided. This skill translates strategic decisions
-into component-level planning.
+**Use when:** An alignment document (or design document) has been created and a solution direction was decided. This
+skill translates strategic decisions into component-level planning. _(Future: replaced by `frame`.)_
 
 ### task-decomposition
 
 Breaks technical designs into estimated, dependency-mapped task hierarchies with detailed descriptions and acceptance
 criteria. Validates that no leaf task exceeds 8 hours.
 
-**Use when:** A technical design is complete and needs to be converted into actionable work items. Produces the
-decomposition document that connects planning to execution.
+**Use when:** A technical design is complete and needs to be converted into actionable work items. _(Future: merged into
+`frame`.)_
 
 ### task-creation
 
@@ -109,7 +119,7 @@ Creates individual tasks in issue trackers with tracker-agnostic field discovery
 linking between related tasks.
 
 **Use when:** Creating tasks from a decomposition document (pipeline mode) or creating standalone tasks outside the
-pipeline context.
+pipeline context. _(Future: replaced by `tasks`.)_
 
 ### youtrack
 
@@ -127,31 +137,29 @@ control, Mermaid for portable markdown-embedded diagrams), Gestalt-based layout 
 complexity budgets, and layout templates that compensate for LLM spatial reasoning limitations.
 
 **Use when:** Creating, reviewing, or improving any visual diagram — architecture diagrams, flowcharts, sequence
-diagrams, ER diagrams, mind maps, or any visual representation of systems and processes. Works with both Excalidraw
-(`.excalidraw` JSON files) and Mermaid (inline markdown).
+diagrams, ER diagrams, mind maps, or any visual representation of systems and processes.
 
 ## Skill Relationships
 
 The skills form a linear pipeline with user approval gates at each transition:
 
 ```
-discovery → research → design-documents → technical-design → task-decomposition → task-creation
+discovery → research → alignment → technical-design → task-decomposition → task-creation
 ```
 
 Each skill prompts the user to proceed to the next stage on completion. Approval is required before advancing. Discovery
-is optional — start there to stress-test an idea, or skip directly to design-documents when the problem is already
-well-understood. Research is also optional — invoke it when objective codebase findings are needed before design, or
-skip it when the problem is already well-mapped.
+is optional — start there to stress-test an idea, or skip to alignment when the problem is already well-understood.
+Research is also optional — invoke it when objective codebase findings are needed, or skip when the codebase is already
+well-mapped.
 
-`research` is the first skill in the pipeline migration to the DRAFT methodology (Discovery → Research → Alignment →
-Frame → Tasks). The remaining skills retain their current names and behavior until subsequent stages are reworked.
+The first three stages (discovery, research, alignment) are DRAFT-migrated. The remaining stages retain their current
+names and behavior until subsequent stages are reworked into `frame` and `tasks`.
 
 task-creation can also be invoked standalone for creating individual tasks without going through the full pipeline. When
 working with YouTrack specifically, the youtrack skill complements task-creation with tracker-specific domain knowledge.
 
-diagramming is a cross-cutting companion skill — not a pipeline stage. It can be invoked alongside design-documents or
-technical-design to create visual artifacts (architecture diagrams, flowcharts, data flow diagrams), or standalone for
-any diagramming task.
+diagramming is a cross-cutting companion skill — not a pipeline stage. It can be invoked alongside alignment or
+technical-design to create visual artifacts, or standalone for any diagramming task.
 
 ## Document Conventions
 
@@ -159,9 +167,12 @@ All artifacts are stored in the `design-docs/` directory with consistent numberi
 
 - Brief: `02-cache-layer-redesign.brief.md`
 - Research: `02-cache-layer-redesign.research.md`
-- Design document: `02-cache-layer-redesign.md`
+- Alignment: `02-cache-layer-redesign.alignment.md`
 - Technical design: `02-cache-layer-redesign.technical-design.md`
 - Decomposition: `02-cache-layer-redesign.decomposition.md`
+
+Brief and research have optional file persistence — the user may keep them in conversation context only. Alignment
+always persists to disk as a living artifact.
 
 When implementation is complete, all artifacts for an initiative move together to `design-docs/completed/`.
 
