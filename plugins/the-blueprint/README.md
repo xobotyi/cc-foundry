@@ -28,7 +28,8 @@ slice planning.
 - **Research** — parallel codebase investigation blind to intent → research document
 - **Alignment** — surface patterns, align on end state, conditional ADRs → alignment document
 - **Frame** — vertical slice phases with per-phase testing strategy → frame document
-- **task-creation** (standalone) — convert frame phases into tracked work items
+- **Tasks** — decompose phases into sized, dependency-mapped work items → task breakdown
+- **task-creation** (standalone) — create tracked items in issue tracker
 
 Each stage builds on the previous one with explicit user approval gates. The pipeline preserves the reasoning behind
 decisions, making them discoverable months later when someone asks "why did we build it this way?"
@@ -103,6 +104,15 @@ testable integrated path. Phase 1 is always the tracer bullet: the thinnest end-
 
 **Use when:** An alignment document exists and you need to plan implementation as vertical phases before coding begins.
 
+### tasks
+
+Decomposes frame phases into individually trackable work items. Each task gets a title, estimate, dependencies, expected
+artifact, and an AFK/HITL classification indicating whether it can run autonomously or needs a human at the keyboard.
+The task breakdown bridges the frame's vertical phases to the mechanical task creation in an issue tracker.
+
+**Use when:** A frame document exists and you need to break phases into assignable, sized work items before creating
+tracker tasks.
+
 ### task-creation
 
 Creates individual tasks in issue trackers with tracker-agnostic field discovery, proper categorization, and native
@@ -134,7 +144,7 @@ diagrams, ER diagrams, mind maps, or any visual representation of systems and pr
 The DRAFT pipeline skills form a linear flow with user approval gates at each transition:
 
 ```
-discovery → research → alignment → frame → task-creation
+discovery → research → alignment → frame → tasks → task-creation
 ```
 
 Each DRAFT skill prompts the user to proceed to the next stage on completion. Approval is required before advancing.
@@ -156,9 +166,10 @@ All artifacts are stored in the `design-docs/` directory with consistent numberi
 - Research: `02-cache-layer-redesign.research.md`
 - Alignment: `02-cache-layer-redesign.alignment.md`
 - Frame: `02-cache-layer-redesign.frame.md`
+- Tasks: `02-cache-layer-redesign.tasks.md`
 
-Brief and research have optional file persistence — the user may keep them in conversation context only. Alignment and
-frame always persist to disk as living artifacts.
+Brief, research, and tasks have optional file persistence — the user may keep them in conversation context only.
+Alignment and frame always persist to disk as living artifacts.
 
 When implementation is complete, all artifacts for an initiative move together to `design-docs/completed/`.
 

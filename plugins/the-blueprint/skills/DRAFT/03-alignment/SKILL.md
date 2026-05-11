@@ -167,6 +167,8 @@ Target ~200 lines. Exceeding 300 indicates content belongs in the frame stage.
   always writes to the filesystem.
 - **ADR sections are durable.** Conditional, but once written, must remain self-contained for future proposals that need
   to understand why the architecture looks the way it does.
+- **Complexity is a signal.** If the user struggles to answer your questions during alignment, the scope is too large or
+  ill-defined. Push to split or simplify before proceeding — don't paper over the uncertainty.
 - **Create only.** One alignment per initiative. Revise the living artifact directly; formal update mode deferred.
 
 ## Related Skills
