@@ -1,10 +1,10 @@
 ---
 name: glossary
 description: >-
-  Project glossary — shared vocabulary consumable by both humans and agents.
-  Invoke whenever task involves creating, updating, or referencing a project
-  glossary, defining domain terms, establishing ubiquitous language, or when
-  inconsistent naming causes confusion in code or planning artifacts.
+  Project glossary for consistent domain terminology. Invoke whenever task
+  involves creating, updating, or referencing a glossary, defining domain
+  terms, establishing ubiquitous language, or when inconsistent naming
+  causes confusion in code or planning artifacts.
 ---
 
 # Glossary
@@ -59,13 +59,23 @@ Store glossary files in the project alongside agent instructions:
 - **Single glossary:** `docs/glossary.md` or `docs/ubiquitous-language/glossary.md`
 - **Per-context:** `docs/ubiquitous-language/{context}-glossary.md` (e.g., `billing-glossary.md`,
   `orchestration-glossary.md`)
-- **Reference from CLAUDE.md:** add a pointer so the glossary is discoverable. Do not inline the glossary in CLAUDE.md —
-  use progressive disclosure:
+- **Reference from CLAUDE.md:** add a pointer early in the file (top sections) so the glossary is discoverable. Early
+  placement exploits primacy attention — standards positioned at the start of context reduce naming violations by
+  35-40%. Do not inline the glossary in CLAUDE.md — use progressive disclosure:
 
 ```markdown
 ## Domain Vocabulary
 See `docs/glossary.md` for project terminology and prohibited aliases.
 ```
+
+## Referencing a Glossary
+
+When invoked to look up or apply terminology (not to create or update):
+
+1. Locate the glossary file(s) — check `docs/glossary.md`, `docs/ubiquitous-language/`, or ask the user.
+2. Read the glossary and find the relevant term(s).
+3. Apply the correct name and actively avoid the listed aliases. If the requested concept isn't in the glossary, flag
+   the gap — this is a trigger for an update.
 
 ## Updating a Glossary
 
@@ -95,7 +105,6 @@ Do not create a new file for each update. Edit in place. The glossary is a singl
 
 ## Related Skills
 
-- **discovery** — Naturally surfaces domain terms during adversarial questioning; a good trigger for initial glossary
-  creation
-- **alignment** — Pattern surfacing may reveal naming inconsistencies that the glossary should resolve
-- **diagramming** — Domain models and context maps complement the glossary with visual representations
+- **discovery** — surfaces domain terms during questioning; trigger for initial glossary creation
+- **alignment** — pattern surfacing may reveal naming inconsistencies to resolve
+- **diagramming** — domain models and context maps complement the glossary visually
