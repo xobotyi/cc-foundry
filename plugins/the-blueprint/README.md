@@ -121,6 +121,16 @@ linking between related tasks. Standalone skill — not a DRAFT pipeline stage, 
 **Use when:** Creating tasks from frame phases (pipeline mode) or creating standalone tasks outside the pipeline
 context.
 
+### glossary
+
+Creates and maintains a project glossary — a shared vocabulary consumable by both humans and AI agents. Based on
+Domain-Driven Design's Ubiquitous Language: each term gets a definition, prohibited aliases (what NOT to call it), and
+related terms. The glossary lives alongside CLAUDE.md as structural context, preventing agents from inventing synonyms
+or using generic terms where the project has specific ones.
+
+**Use when:** Starting a new project, encountering naming inconsistencies, or when agents keep using the wrong terms for
+domain concepts. Invoke alongside `discovery` to capture domain vocabulary from the start.
+
 ### youtrack
 
 YouTrack issue tracker domain knowledge — data model, custom fields, query language, commands, linking, state machines,
