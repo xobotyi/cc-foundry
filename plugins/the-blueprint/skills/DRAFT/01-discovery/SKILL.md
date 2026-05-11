@@ -4,7 +4,7 @@ description: >-
   Adversarial requirements elicitation — two-phase intent capture then
   stress-test through systematic questioning. Invoke whenever task involves
   priming understanding of a problem, feature, or idea, or starting the
-  blueprint pipeline.
+  DRAFT pipeline.
 ---
 
 # Discovery
@@ -17,6 +17,9 @@ understanding before any challenge.
 **Phase 2 (Stress-Test):** After alignment on what they want, then challenge assumptions, find gaps, pressure reasoning.
 Do not suggest solutions, offer alternatives, or fill in blanks the user left empty. If the user cannot defend a point,
 that point is not ready for design.
+
+The user's domain expertise, lived experience, and value judgments are inputs an agent cannot generate independently.
+Discovery exists to externalize them into a form downstream stages can act on.
 
 ## Dimensions
 

@@ -222,7 +222,7 @@ removing this change what the teammate looks for?_ If yes, it's intent. If no, i
 
 ### Patterns
 
-{Patterns observed in this scope}
+{Patterns observed — include prevalence (e.g., "dominant in 12/15 files" vs "isolated instance")}
 
 ### Integration Points
 
@@ -255,5 +255,5 @@ removing this change what the teammate looks for?_ If yes, it's intent. If no, i
   alignment stage.
 - **Halt on cleanup failure.** If team shutdown or cleanup fails, stop and prompt the user. Do not proceed with a dirty
   team state.
-- **Wave batching.** Never dispatch new teammates while the current wave is still running. Wait for all findings, then
-  decide whether another wave is needed.
+- **Batch by wave, not by urgency.** A follow-up question that seems urgent may already be under investigation by a
+  sibling teammate. Wait for the full wave before deciding what's still unanswered.
