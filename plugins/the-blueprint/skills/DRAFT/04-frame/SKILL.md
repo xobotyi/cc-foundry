@@ -53,7 +53,9 @@ For each phase, define:
 
 ### Phase 4 — Sequence and Dependencies
 
-7. Map phase ordering: which phases must complete first, which can run in parallel, where handoff points exist.
+7. Map phase ordering: which phases must complete first, which can run in parallel, where handoff points exist. Design
+   for maximum parallelism — phases that don't share dependencies should be executable concurrently by independent
+   agents, each in a clean context window.
 8. Every phase must appear in the sequence. A phase listed but not sequenced creates orphan work.
 
 ### Phase 5 — Write Artifact
@@ -67,7 +69,7 @@ For each phase, define:
 
 On user approval:
 
-> Frame is complete. Ready to create tasks from these phases? Invoke `task-creation` to begin.
+> Frame is complete. Proceed to `tasks` to decompose phases into trackable work items?
 
 ## Frame Document Format
 
@@ -149,5 +151,6 @@ Phase 3 (parallel with Phase 2, depends on Phase 1)
 ## Related Skills
 
 - **alignment** — Produces the input: aligned solution direction with pattern decisions
-- **task-creation** — Standalone skill that consumes frame phases to create tracked work items
+- **tasks** — Next step: decomposes frame phases into individually trackable work items
+- **task-creation** — Standalone skill that handles tracker operations after decomposition
 - **research** — Optional reference for codebase details when defining phase components

@@ -12,6 +12,7 @@ DRAFT pipeline skills live in `skills/DRAFT/`, numbered by stage:
   correction, conditional ADR sections
 - **`frame`** (`DRAFT/04-frame`) — Vertical slice phases with per-phase testing strategy; structurally prevents
   horizontal layering
+- **`tasks`** (`DRAFT/05-tasks`) — Decompose frame phases into sized, dependency-mapped, AFK/HITL-classified work items
 
 Standalone skills (not pipeline stages, invocable independently):
 
@@ -35,7 +36,9 @@ alignment (research + brief → pattern surfacing → end state → conditional 
     ↓
 frame (alignment → vertical slice phases → per-phase testing → frame.md)
     ↓
-task-creation (frame phases → tracked work items in issue tracker)
+tasks (frame phases → sized work items with artifacts, deps, AFK/HITL classification)
+    ↓
+task-creation (task descriptions → tracked work items in issue tracker)
 
 diagramming ← invoked alongside alignment or frame when visual artifacts are needed
 ```
@@ -52,8 +55,9 @@ enablement instructions when the flag is missing.
 
 **From idea to tasks:** Start with `discovery` to stress-test the idea, then follow the prompts through each stage. The
 pipeline produces deliverables at each stage: the brief (discovery), the research document (objective findings), the
-alignment document (pattern decisions, end state, conditional ADRs), and the frame document (vertical slice phases with
-testing strategy). Finally, invoke `task-creation` to convert frame phases into tracked work items.
+alignment document (pattern decisions, end state, conditional ADRs), the frame document (vertical slice phases with
+testing strategy), and the task breakdown (sized work items with artifacts and dependencies). Finally, invoke
+`task-creation` to create tracked items in the issue tracker.
 
 **Standalone task creation:** Invoke `task-creation` directly when creating individual tasks outside the pipeline
 context.
@@ -95,6 +99,11 @@ conditional ADR sections when trade-offs were committed.
 **Frame documents:** Output of `frame`. Pair with alignment using the same number prefix
 (`NN-short-description.frame.md`). Contains vertical slice phases with components, testing strategy, verification gates,
 and acceptance criteria per phase.
+
+**Task documents:** Output of `tasks`. Optional persistence — write as `NN-short-description.tasks.md` when
+cross-session continuity matters. Contains sized work items grouped by frame phase, with artifacts, dependencies, and
+AFK/HITL classification. Immutable snapshot — the tracked tasks in the issue tracker become the source of truth after
+creation.
 
 **Completed artifacts:** All artifacts for an initiative move together to `design-docs/completed/` when the work is
 implemented.
