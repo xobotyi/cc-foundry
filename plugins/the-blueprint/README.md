@@ -19,19 +19,16 @@ mistakes no one asked for.
 
 ## The Solution
 
-the-blueprint provides a pipeline that produces artifacts consumable by both humans and agents. The pipeline is being
-migrated to the **DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks), which separates intent
-gathering from objective investigation, surfaces codebase patterns for human correction before implementation, and
-enforces vertical slice planning.
-
-The first three stages (D, R, A) are DRAFT-migrated. Remaining stages retain current names until reworked:
+the-blueprint provides a pipeline that produces artifacts consumable by both humans and agents, implementing the
+**DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks). DRAFT separates intent gathering from
+objective investigation, surfaces codebase patterns for human correction before implementation, and enforces vertical
+slice planning.
 
 - **Discovery** — stress-test the idea through adversarial questioning → brief
 - **Research** — parallel codebase investigation blind to intent → research document
 - **Alignment** — surface patterns, align on end state, conditional ADRs → alignment document
-- Technical design → component mapping and sequencing (future: Frame)
-- Task decomposition → actionable task hierarchies (future: merged into Frame)
-- Task creation → issue tracker tasks with acceptance criteria (future: Tasks)
+- **Frame** — vertical slice phases with per-phase testing strategy → frame document
+- **task-creation** (standalone) — convert frame phases into tracked work items
 
 Each stage builds on the previous one with explicit user approval gates. The pipeline preserves the reasoning behind
 decisions, making them discoverable months later when someone asks "why did we build it this way?"
@@ -97,29 +94,22 @@ immutable only when the initiative is completed.
 **Use when:** Research findings are available and you need to align on solution direction before implementation. This is
 the "brain surgery" step — where you correct the agent's understanding before it writes 2,000 lines of code.
 
-### technical-design
+### frame
 
-Maps a decided solution onto the codebase: affected components, tool selection, dependencies, sequencing, and scope
-boundaries.
+Converts the aligned solution into vertical slice phases with per-phase testing strategy. Structurally prevents
+horizontal layering — models default to completing one layer at a time (all DB, then all API, then all UI), which defers
+integration and hides bugs. Frame enforces vertical structure where each phase crosses all affected layers, producing a
+testable integrated path. Phase 1 is always the tracer bullet: the thinnest end-to-end slice.
 
-**Use when:** An alignment document (or design document) has been created and a solution direction was decided. This
-skill translates strategic decisions into component-level planning. _(Future: replaced by `frame`.)_
-
-### task-decomposition
-
-Breaks technical designs into estimated, dependency-mapped task hierarchies with detailed descriptions and acceptance
-criteria. Validates that no leaf task exceeds 8 hours.
-
-**Use when:** A technical design is complete and needs to be converted into actionable work items. _(Future: merged into
-`frame`.)_
+**Use when:** An alignment document exists and you need to plan implementation as vertical phases before coding begins.
 
 ### task-creation
 
 Creates individual tasks in issue trackers with tracker-agnostic field discovery, proper categorization, and native
-linking between related tasks.
+linking between related tasks. Standalone skill — not a DRAFT pipeline stage, but the natural next step after frame.
 
-**Use when:** Creating tasks from a decomposition document (pipeline mode) or creating standalone tasks outside the
-pipeline context. _(Future: replaced by `tasks`.)_
+**Use when:** Creating tasks from frame phases (pipeline mode) or creating standalone tasks outside the pipeline
+context.
 
 ### youtrack
 
@@ -141,25 +131,22 @@ diagrams, ER diagrams, mind maps, or any visual representation of systems and pr
 
 ## Skill Relationships
 
-The skills form a linear pipeline with user approval gates at each transition:
+The DRAFT pipeline skills form a linear flow with user approval gates at each transition:
 
 ```
-discovery → research → alignment → technical-design → task-decomposition → task-creation
+discovery → research → alignment → frame → task-creation
 ```
 
-Each skill prompts the user to proceed to the next stage on completion. Approval is required before advancing. Discovery
-is optional — start there to stress-test an idea, or skip to alignment when the problem is already well-understood.
-Research is also optional — invoke it when objective codebase findings are needed, or skip when the codebase is already
-well-mapped.
+Each DRAFT skill prompts the user to proceed to the next stage on completion. Approval is required before advancing.
+Discovery is optional — start there to stress-test an idea, or skip to alignment when the problem is already
+well-understood. Research is also optional — invoke when objective codebase findings are needed.
 
-The first three stages (discovery, research, alignment) are DRAFT-migrated. The remaining stages retain their current
-names and behavior until subsequent stages are reworked into `frame` and `tasks`.
+task-creation is standalone — the natural endpoint of the pipeline, but also invocable directly for creating individual
+tasks without the full DRAFT flow. When working with YouTrack, the youtrack skill complements task-creation with
+tracker-specific domain knowledge.
 
-task-creation can also be invoked standalone for creating individual tasks without going through the full pipeline. When
-working with YouTrack specifically, the youtrack skill complements task-creation with tracker-specific domain knowledge.
-
-diagramming is a cross-cutting companion skill — not a pipeline stage. It can be invoked alongside alignment or
-technical-design to create visual artifacts, or standalone for any diagramming task.
+diagramming is a cross-cutting companion — not a pipeline stage. Invoke alongside alignment or frame when creating
+visual artifacts, or standalone for any diagramming task.
 
 ## Document Conventions
 
@@ -168,11 +155,10 @@ All artifacts are stored in the `design-docs/` directory with consistent numberi
 - Brief: `02-cache-layer-redesign.brief.md`
 - Research: `02-cache-layer-redesign.research.md`
 - Alignment: `02-cache-layer-redesign.alignment.md`
-- Technical design: `02-cache-layer-redesign.technical-design.md`
-- Decomposition: `02-cache-layer-redesign.decomposition.md`
+- Frame: `02-cache-layer-redesign.frame.md`
 
-Brief and research have optional file persistence — the user may keep them in conversation context only. Alignment
-always persists to disk as a living artifact.
+Brief and research have optional file persistence — the user may keep them in conversation context only. Alignment and
+frame always persist to disk as living artifacts.
 
 When implementation is complete, all artifacts for an initiative move together to `design-docs/completed/`.
 
