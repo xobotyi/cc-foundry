@@ -56,9 +56,10 @@ Requires Claude Code v2.1.32+. Without this flag, `research` will fail fast with
 
 ### discovery
 
-Adversarial requirements elicitation that stress-tests ideas before committing to design. The agent acts as a critic —
-challenging assumptions, finding gaps, and pressuring vague reasoning until the user's thinking holds up. Explores
-dimensions across problem, goals, scope, constraints, risks, and prior art.
+Requirements elicitation and validation that stress-tests ideas before committing to design. The agent extracts the
+user's domain expertise through structured questioning — first listening to understand intent, then challenging
+assumptions, finding gaps, and pressuring vague reasoning. Explores dimensions across motivation, goals, scope,
+constraints, risks, and prior art.
 
 The primary output isn't a document — it's the primed conversation context. The agent's enriched understanding carries
 into whatever comes next. A brief verification summary crystallizes the shared understanding for the user to confirm.
@@ -93,7 +94,7 @@ consequences. The alignment document is a living artifact — it may be updated 
 immutable only when the initiative is completed.
 
 **Use when:** Research findings are available and you need to align on solution direction before implementation. This is
-the "brain surgery" step — where you correct the agent's understanding before it writes 2,000 lines of code.
+where you correct the agent's understanding before it writes 2,000 lines of code based on wrong assumptions.
 
 ### frame
 

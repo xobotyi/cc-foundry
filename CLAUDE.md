@@ -12,7 +12,7 @@ cc-foundry/
 │   ├── ai-helpers/       # AI artifact engineering (prompts, skills, agents, styles)
 │   ├── git-commit/       # Structured commit workflow with validation
 │   ├── skill-enforcer/   # Skill activation enforcement via lifecycle hooks
-│   ├── the-blueprint/    # Planning pipeline — DRAFT (discovery → research → alignment → technical design → tasks)
+│   ├── the-blueprint/    # Planning pipeline — DRAFT (discovery → research → alignment → frame → tasks)
 │   ├── the-coder/        # Language-agnostic coding discipline
 │   ├── the-crucible/     # Quality validation and multi-agent code review
 │   ├── the-statusline/   # Session metrics status line

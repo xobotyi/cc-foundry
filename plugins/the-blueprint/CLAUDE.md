@@ -4,15 +4,13 @@ Structured planning pipeline implementing the **DRAFT** methodology (Discovery �
 
 ## Skills
 
-DRAFT pipeline skills live in `skills/DRAFT/`, numbered by stage:
+DRAFT pipeline skills (D → R → A → F → T):
 
-- **`discovery`** (`DRAFT/01-discovery`) — Adversarial requirements elicitation; stress-tests ideas before design
-- **`research`** (`DRAFT/02-research`) — Parallel codebase investigation via agent teams; produces objective findings
-- **`alignment`** (`DRAFT/03-alignment`) — Human-agent alignment on solution direction; surfaces patterns for
-  correction, conditional ADR sections
-- **`frame`** (`DRAFT/04-frame`) — Vertical slice phases with per-phase testing strategy; structurally prevents
-  horizontal layering
-- **`tasks`** (`DRAFT/05-tasks`) — Decompose frame phases into sized, dependency-mapped, AFK/HITL-classified work items
+- **`discovery`** — Requirements elicitation and validation through structured questioning
+- **`research`** — Objective codebase investigation via agent teams; produces factual findings
+- **`alignment`** — Solution direction synthesis; design opinions for human correction, decision capture
+- **`frame`** — Vertical-slice implementation planning with per-phase testing
+- **`tasks`** — Work item decomposition with sizing, dependencies, AFK/HITL classification
 
 Standalone skills (not pipeline stages, invocable independently):
 
