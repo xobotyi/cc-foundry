@@ -1,11 +1,10 @@
 ---
 name: alignment
 description: >-
-  Align on solution direction — surface codebase patterns for human correction,
-  present current-to-desired end state, resolve open questions, capture
-  decisions with conditional ADR sections. Invoke whenever task involves the A
-  stage of the DRAFT pipeline, aligning on solution direction before
-  implementation, or creating design decision records for a planned change.
+  Solution direction synthesis — design opinions from research findings,
+  presented for human correction, with decision capture. Invoke whenever
+  task involves the A stage of the DRAFT pipeline, aligning on approach
+  before implementation, or recording design decisions.
 ---
 
 # Alignment
@@ -32,7 +31,7 @@ Locate the inputs:
    - Codebase patterns with prevalence (dominant convention vs isolated instance).
    - Integration points and boundaries relevant to the brief's goals.
 3. From the brief, extract:
-   - Problem, desired end state, constraints, non-goals.
+   - Motivation, desired end state, constraints, non-goals.
 4. Form opinions: which patterns to follow, which to deviate from, and why.
 
 ### Phase 2 — Surface Patterns
@@ -170,9 +169,3 @@ Target ~200 lines. Exceeding 300 indicates content belongs in the frame stage.
 - **Complexity is a signal.** If the user struggles to answer your questions during alignment, the scope is too large or
   ill-defined. Push to split or simplify before proceeding — don't paper over the uncertainty.
 - **Create only.** One alignment per initiative. Revise the living artifact directly; formal update mode deferred.
-
-## Related Skills
-
-- **discovery** — Produces the brief consumed by this skill
-- **research** — Produces the objective codebase findings consumed by this skill
-- **frame** — Next step: vertical slice phases from aligned solution

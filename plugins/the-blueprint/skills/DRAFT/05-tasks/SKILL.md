@@ -1,10 +1,10 @@
 ---
 name: tasks
 description: >-
-  Decompose frame phases into individually trackable work items with sizing,
-  dependencies, and acceptance criteria. Invoke whenever task involves the T
-  stage of the DRAFT pipeline, breaking vertical slice phases into assignable
-  tasks, or creating a task breakdown from a frame document.
+  Work item decomposition — break implementation phases into sized,
+  dependency-mapped tasks with acceptance criteria. Invoke whenever task
+  involves the T stage of the DRAFT pipeline, decomposing phases into
+  tasks, or creating a task breakdown.
 ---
 
 # Tasks
@@ -54,7 +54,7 @@ gap.
 
 ### Phase 3 — Write Descriptions
 
-For each approved task, write a description. Two rules agents violate constantly:
+For each approved task, write a description. Three rules agents violate constantly:
 
 **Descriptions are plans, not reports.** Write as if the work has not started — because from the implementer's
 perspective, it hasn't. "Add a compound index" — not "Added a compound index."
@@ -62,6 +62,10 @@ perspective, it hasn't. "Add a compound index" — not "Added a compound index."
 **Descriptions contain no implementation.** Describe WHAT should change and what "done" looks like. No code, no function
 signatures, no class names. Pseudocode acceptable for complex logic; configuration samples acceptable when config is the
 deliverable.
+
+**But specific enough to act on.** Agents don't ask clarifying questions — they fill gaps with plausible defaults.
+Unspecified constraints produce confidently wrong code. If an implementer would need to ask a question before starting,
+the description is underspecified.
 
 Structure each description:
 
@@ -166,16 +170,10 @@ Use `design-docs/NN-name.tasks.md`.
   done. Name the artifact upfront.
 - **Classify AFK vs HITL.** Tasks that can run autonomously (implementation, refactoring) are AFK. Tasks needing human
   judgment (QA, alignment, taste decisions) are HITL. The classification informs execution strategy.
-- **Dependency rules.** No circular deps. Minimize cross-phase deps. Infrastructure before business logic. Interfaces
-  before implementations. Artificial serialization blocks parallelism.
+- **Keep dependencies real and minimal.** Artificial serialization blocks parallelism — verify every dependency is
+  genuine, not accidental.
 - **Plans, not reports.** Every description uses imperative mood and reads as future work. Past tense is a violation.
 - **No implementation in descriptions.** Describe what changes and what "done" looks like. The implementer decides how.
 - **Optional file persistence.** The tracked tasks in the issue tracker become source of truth after creation. The
   tasks.md document is a persistent external record for cross-session continuity — it survives context rot when agents
   start fresh sessions.
-
-## Related Skills
-
-- **frame** — Produces the input: vertical slice phases with acceptance criteria
-- **task-creation** — Standalone skill that handles tracker operations: field discovery, drafting, creating, linking
-- **alignment** — Reference for pattern decisions and ADRs cited in task descriptions

@@ -1,11 +1,10 @@
 ---
 name: research
 description: >-
-  Parallel codebase investigation via agent teams — generates neutral research
-  questions from a discovery brief, dispatches read-only teammates per codebase
-  scope, and compiles objective findings. Invoke whenever task involves the R
-  stage of the DRAFT pipeline, or objective codebase research for a planning
-  initiative.
+  Objective codebase investigation — factual findings about existing code,
+  patterns, and architecture. Invoke whenever task involves the R stage of
+  the DRAFT pipeline, technical codebase research, or understanding existing
+  code before design.
 ---
 
 # Research
@@ -243,16 +242,15 @@ removing this change what the teammate looks for?_ If yes, it's intent. If no, i
 
 ## Rules
 
-- **Never write the brief to disk while waves are running.** Teammates have Read/Grep/Glob and can encounter any file in
-  the project. The brief contains intent — if it exists on disk during investigation, the information barrier is broken.
-  The brief is persisted in Phase 3, after the last wave has completed and no further dispatch is planned.
-- **Teammates never see the brief.** Task descriptions contain only questions and scope boundaries.
-- **Spawn prompts may carry context, never intent.** The `prompt` parameter on Agent is visible to the teammate.
-  Project, scope area, role are fine. Goals, problems being solved, desired outcomes, or any framing that suggests a
-  direction are not — those bias the investigation.
+- **Write the brief to disk only in Phase 3, after all waves complete.** Teammates have Read/Grep/Glob and can encounter
+  any file in the project. The brief contains intent — if it exists on disk during investigation, the information
+  barrier is broken.
+- **Task descriptions contain only questions and scope boundaries** — teammates never see the brief.
+- **Spawn prompts carry context, never intent.** The `prompt` parameter on Agent is visible to the teammate. Project,
+  scope area, role are fine. Goals, problems being solved, desired outcomes, or any framing that suggests a direction
+  bias the investigation.
 - **You are sole author of research.md.** No teammate writes to any file.
-- **No opinions in research.md.** Findings are factual observations with file references. Interpretation belongs in the
-  alignment stage.
+- **research.md contains factual observations with file references** — interpretation belongs in the alignment stage.
 - **Halt on cleanup failure.** If team shutdown or cleanup fails, stop and prompt the user. Do not proceed with a dirty
   team state.
 - **Batch by wave, not by urgency.** A follow-up question that seems urgent may already be under investigation by a
