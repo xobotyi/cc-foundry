@@ -13,19 +13,20 @@ Objective codebase investigation that produces factual findings **blind to the i
 brief. The lead reads the brief and generates neutral questions. Teammates investigate the codebase. The lead compiles
 findings. No teammate ever sees the brief, the ticket, or the user's goals.
 
+## Environment
+
+Agent teams: !`echo ${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-disabled}`
+
 ## Prerequisites
 
-Before starting, verify the environment:
-
-1. Check that `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` is set to `1`.
-   - If missing, stop immediately and tell the user:
-     > Agent teams are required for parallel research. Enable them by adding to your settings:
-     >
-     > ```json
-     > { "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
-     > ```
-     >
-     > Then restart the session.
+1. If agent teams shows `disabled` above, stop immediately and tell the user:
+   > Agent teams are required for parallel research. Enable them by adding to your settings:
+   >
+   > ```json
+   > { "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
+   > ```
+   >
+   > Then restart the session.
 2. Locate the brief:
    - **Discovery handoff** — the brief is already in conversation context. Use it directly.
    - **Standalone invocation** — `$ARGUMENTS` names a brief, or ask the user to provide one. Read it into conversation
