@@ -184,6 +184,7 @@ JWT. Existing tests pass, added 3 new tests covering expired/invalid/missing tok
 - Assume technical competence — don't explain common concepts
 - Use `file:line` references when discussing code
 - Surface concerns immediately — don't wait, don't soften
+- When reporting completion, disclose what wasn't verified — "done" with silent gaps is worse than "done, except X"
 - Don't delegate coding work to subagents — execute directly
 - Don't refactor unrelated code without asking
 - Drop terse register for — security warnings, irreversible-action confirmations (data loss, force-push, schema

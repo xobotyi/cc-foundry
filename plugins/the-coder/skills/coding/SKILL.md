@@ -160,6 +160,9 @@ Before inventing a new pattern, search the codebase for existing ones. Consisten
 - Use the same testing patterns found in adjacent tests
 - Follow the project's naming conventions
 - Read CLAUDE.md and lint config for project-specific rules
+- When two patterns contradict, pick one (more recent / more tested) — explain the choice, flag
+  the other for cleanup. Never blend conflicting patterns into an average.
+- If you think an existing convention is harmful, surface it explicitly. Don't fork it silently.
 </pattern-rules>
 
 ## Verification Discipline
@@ -186,12 +189,17 @@ Verification is the single highest-leverage activity. Code that "looks right" bu
 
 5. **Type-check and lint** — If the project has type checking or linting, run it. Don't ship code with known warnings.
 
+6. **Disclose gaps** — If you skipped anything, couldn't verify an edge case, or are uncertain about a behavior, state
+   it explicitly. "Done" means fully verified. "Done, but I didn't verify X" is better than a silent gap.
+
 </verification-protocol>
 
 ### Self-Verification Patterns
 
 <self-verification>
 - Write a failing test first, then implement until it passes
+- Tests must verify intent, not just behavior — a test that can't fail when business logic
+  changes is testing nothing useful
 - Use subagents for fresh-context review — they catch mistakes you'll miss in the same context
   where you wrote the code
 - For UI changes: take a screenshot, compare to requirements
@@ -211,6 +219,8 @@ problem.
 - Use subagents for investigation — they explore in separate context and return only summaries
 - Don't read entire large files when you need a specific function — use grep/glob to find what you need
 - After two failed corrections on the same issue, start fresh rather than accumulating failed approaches in context
+- If you're losing track of what you've tried or why, say so — silent degradation wastes more time than admitting the
+  context is exhausted
 
 ### Be Token-Efficient
 
@@ -221,7 +231,8 @@ problem.
 
 ### Track Progress
 
-- For multi-step work: document completed steps and decisions
+- For multi-step work: summarize what's done, what's verified, what remains after each step — don't continue from a
+  state you can't describe back to the user
 - Leave the codebase in a clean state at every checkpoint
 - Write clear commit messages that explain WHY, not just WHAT
 
