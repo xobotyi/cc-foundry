@@ -14,7 +14,7 @@ cc-foundry/
 │   ├── skill-enforcer/   # Skill activation enforcement via lifecycle hooks
 │   ├── the-blueprint/    # Planning pipeline — DRAFT (discovery → research → alignment → frame → tasks)
 │   ├── the-coder/        # Language-agnostic coding discipline
-│   ├── the-crucible/     # Quality validation and multi-agent code review
+│   ├── the-kensai/       # Local multi-agent code review with adversarial falsification
 │   ├── the-statusline/   # Session metrics status line
 │   ├── infrastructure/   # Infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
 │   ├── the-workflow/     # Agentic workflow mechanics (CLAUDE.md quality, context handoff)

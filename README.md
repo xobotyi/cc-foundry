@@ -69,16 +69,16 @@ skills as a prerequisite.
 
 ---
 
-### the-crucible
+### the-kensai
 
-Code quality is checked manually or not at all. This plugin provides a two-level validation pipeline:
-`quality-validation` checks that deliverables match the original request before completion, and
-`code-quality-evaluation` orchestrates 8 specialized review agents (naming, complexity, comments, tests, error handling,
-security, observability, documentation) that evaluate code in parallel. All agents are read-only — they report, you
-decide.
+AI code review produces shallow, noisy output — fixed checklists, speculative findings, false positives burying real
+issues. This plugin implements a 4-phase review pipeline: **grounding** (read the diff, map integration surface, build a
+three-layer Plan/Intent/Reality model), **surfacing** (spawn 2-4 parallel teammates per change-derived dimensions),
+**proving** (4 adversarial falsification gates per finding — reject what can't survive disproof), and **filing** (final
+report with severity, evidence, suggested fixes). Fewer findings, but the ones that survive are real.
 
 ```
-/plugin install the-crucible
+/plugin install the-kensai
 ```
 
 ---
