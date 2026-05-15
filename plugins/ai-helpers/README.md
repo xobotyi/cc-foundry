@@ -74,6 +74,15 @@ scoring, and iteration diagnostics.
 **Use when:** Building personas, customizing tone, creating domain-specific response patterns, evaluating style quality,
 or debugging style drift and reversion.
 
+### prompt-terser
+
+Retrospective terseness audit for iteratively-edited prompts and skills. Three-phase workflow: mechanical wording
+substitutions, decorative format cleanup, and falsification-gated structural cuts targeting drift patterns (layered
+additions, rationale stacking, duplicated constraints, vestigial scaffolding, calibration prose).
+
+**Use when:** Auditing or tightening an existing prompt that has accumulated bloat through many edits — skills, system
+prompts, output styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead).
+
 ### claude-code-sdk
 
 Reference documentation for Claude Code extensibility: plugins, skills, hooks, MCP servers, output styles, settings,
@@ -88,10 +97,10 @@ consulting API documentation.
 
 Collaborative persona for AI artifact work. Direct communication without sycophancy, conclusions first, challenge ideas
 freely. Optimized for iterative refinement with peer-level interaction. Plans vertically — tracer-bullet first, expand
-components in vertical passes; rejects horizontal "finish all of one layer before the next" decomposition.
-Collaborative AI engineering persona. Direct communication without sycophancy, conclusions first, challenge ideas
-freely. Adversarial self-checks on recommendations, frustration-aware responses. Optimized for iterative refinement with
-peer-level interaction.
+components in vertical passes; rejects horizontal "finish all of one layer before the next" decomposition. Collaborative
+AI engineering persona. Direct communication without sycophancy, conclusions first, challenge ideas freely. Adversarial
+self-checks on recommendations, frustration-aware responses. Optimized for iterative refinement with peer-level
+interaction.
 
 **Activate:** `/output-style ai-engineer`
 
@@ -102,7 +111,8 @@ prompt-engineering (foundation)
     ↑
     ├── skill-engineering (skills are prompts)
     ├── subagent-engineering (agent prompts are system prompts)
-    └── output-style-engineering (styles are system prompts)
+    ├── output-style-engineering (styles are system prompts)
+    └── prompt-terser (audits existing prompts for drift)
 
 claude-code-sdk (reference)
     ↑

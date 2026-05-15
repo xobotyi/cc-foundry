@@ -115,8 +115,9 @@ systematic improvement. The `handoff` skill produces structured transfer documen
 
 Creating prompts, skills, agents, and output styles is guesswork without structured guidance. This plugin provides
 skills encoding best practices for each artifact type: `prompt-engineering` (foundation), `skill-engineering`,
-`subagent-engineering`, `output-style-engineering`, and `claude-code-sdk` (reference). All skills build on
-prompt-engineering fundamentals. Includes an `ai-engineer` output style for collaborative artifact work.
+`subagent-engineering`, `output-style-engineering`, `prompt-terser` (retrospective audit), and `claude-code-sdk`
+(reference). All skills build on prompt-engineering fundamentals. Includes an `ai-engineer` output style for
+collaborative artifact work.
 
 ```
 /plugin install ai-helpers

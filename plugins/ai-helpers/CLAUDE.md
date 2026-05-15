@@ -11,6 +11,8 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   evaluation, troubleshooting
 - **`output-style-engineering`** — design output styles that replace the system prompt: persona, tone, behavioral rules,
   non-coding domains, evaluation framework
+- **`prompt-terser`** — retrospective terseness audit for iteratively-edited prompts: mechanical wording cuts, format
+  cleanup, falsification-gated structural cuts
 - **`claude-code-sdk`** — Claude Code extensibility reference: plugins, hooks, skills, subagents, agent teams, MCP,
   output styles, settings, Agent SDK
 
@@ -26,7 +28,8 @@ prompt-engineering (foundation)
     ↑
     ├── skill-engineering (skills are prompts)
     ├── subagent-engineering (agent prompts are system prompts)
-    └── output-style-engineering (styles are system prompts)
+    ├── output-style-engineering (styles are system prompts)
+    └── prompt-terser (audits existing prompts for drift)
 
 claude-code-sdk (reference)
     ↑

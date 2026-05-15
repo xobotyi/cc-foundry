@@ -28,7 +28,7 @@
 		{
 			"name": "ai-helpers",
 			"description": "AI artifact engineering: prompts, skills, subagents, and output styles",
-			"version": "1.8.0",
+			"version": "1.9.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
@@ -60,7 +60,7 @@
 		{
 			"name": "the-blueprint",
 			"description": "Structured planning pipeline implementing DRAFT: discovery, research, alignment, frame, tasks, glossary, and technical diagramming",
-			"version": "2.0.2",
+			"version": "2.1.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
