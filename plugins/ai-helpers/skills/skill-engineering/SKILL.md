@@ -112,8 +112,8 @@ Description optimization tiers, hook implementation details: see [`${CLAUDE_SKIL
 
 ## Content Architecture
 
-SKILL.md must be **behaviorally self-sufficient**. An agent reading only SKILL.md — without loading any references —
-must be able to do the job correctly. References provide depth, not breadth.
+SKILL.md must be behaviorally self-sufficient. An agent reading only SKILL.md — without loading any references — must be
+able to do the job correctly. References provide depth, not breadth.
 
 ### What Goes Where
 
@@ -216,7 +216,7 @@ Match instruction specificity to task fragility:
 ### Declarative vs Procedural
 
 - **Declarative** (bullet-list rules, constraints) — for behavioral boundaries, conventions, safety guardrails. Models
-  utilize factual constraints more reliably across varied inputs. Use for the majority of skill content.
+  use factual constraints more reliably across varied inputs. Use for the majority of skill content.
 - **Procedural** (numbered steps) — for tasks with strict ordering. Cap at ~10-15 steps; decompose beyond that into
   sub-procedures (Hierarchical Task Networks).
 
@@ -225,7 +225,7 @@ in the majority of tasks.
 
 ### Instruction Placement
 
-Models follow a **U-shaped attention curve**: instructions at the beginning and end are followed most reliably; middle
+Models follow a U-shaped attention curve: instructions at the beginning and end are followed most reliably; middle
 content suffers from attention decay.
 
 - **Top 20% (primacy zone):** Identity, philosophy, critical constraints
@@ -345,19 +345,14 @@ Full vulnerability taxonomy and enterprise vetting checklist: see [`${CLAUDE_SKI
 
 - **Deletion test before adding.** Every rule competes for attention. Before adding a rule to a skill, verify the
   model's default behavior is insufficient. If removing the rule doesn't change output quality, it shouldn't exist.
-
 - **References must not duplicate SKILL.md.** References provide genuinely different depth: detailed rubrics, extended
   examples, full catalogs, comparison tables, edge case coverage. Not restated rules.
-
 - **Description is activation, not documentation.** Every token in the description must increase activation probability.
   Slogans, philosophy, cross-skill dependencies, and filler verbs have zero activation value.
-
 - **Declarative by default.** Use numbered steps only for workflows with strict ordering. Bullet-list rules for
   everything else.
-
 - **One skill, one purpose.** If scope creeps, split. Broad skills produce mediocre results because instructions compete
   for attention.
-
 - **Check for interference.** New rules can conflict with existing harness directives or other loaded skills. Test in
   fresh context; the executing model smooths over contradictions silently (Observer's Paradox).
 
