@@ -270,6 +270,9 @@ config or implementation details documented in code and have no plausible-wrong 
 
 ## Related Skills
 
-- **discovery** — surfaces domain terms during questioning; trigger for initial glossary creation.
-- **alignment** — pattern surfacing may reveal naming inconsistencies worth recording.
+- **discovery** — loads this glossary at the start so questions are framed in the project's language; surfaces term
+  conflicts in Phase 1 and lists flagged ambiguities in the brief. Discovery never updates the glossary itself.
+- **alignment** — creates this glossary on the first iteration (when none exists); updates it on subsequent iterations
+  to resolve ambiguities discovery flagged and add new entries that pass the trap test. Glossary maintenance happens
+  here, not in discovery.
 - **diagramming** — domain models and context maps complement the glossary visually.

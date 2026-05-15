@@ -24,9 +24,10 @@ the-blueprint provides a pipeline that produces artifacts consumable by both hum
 objective investigation, surfaces codebase patterns for human correction before implementation, and enforces vertical
 slice planning.
 
-- **Discovery** — stress-test the idea through adversarial questioning → brief
+- **Discovery** — stress-test the idea through adversarial questioning, against the project glossary → brief
 - **Research** — parallel codebase investigation blind to intent → research document
-- **Alignment** — surface patterns, align on end state, conditional ADRs → alignment document
+- **Alignment** — surface patterns, align on end state, write standalone ADRs, maintain the glossary → alignment
+  document
 - **Frame** — vertical slice phases with per-phase testing strategy → frame document
 - **Tasks** — decompose phases into sized, dependency-mapped work items → task breakdown
 - **task-creation** (standalone) — create tracked items in issue tracker
@@ -61,8 +62,14 @@ user's domain expertise through structured questioning — first listening to un
 assumptions, finding gaps, and pressuring vague reasoning. Explores dimensions across motivation, goals, scope,
 constraints, risks, and prior art.
 
+Discovery loads the project glossary (`docs/glossary.md`) before starting so questions are framed in the project's
+language. In Phase 1, terminology gets clarified inline — synonyms surfaced ("when you said buyer, did you mean
+`Customer`?"), new concepts flagged for alignment, glossary contradictions surfaced as signals the glossary may need
+updating. Architecture-shaped knowledge (CLAUDE.md, ADRs, prior design docs, code) stays out — that's research's job.
+
 The primary output isn't a document — it's the primed conversation context. The agent's enriched understanding carries
-into whatever comes next. A brief verification summary crystallizes the shared understanding for the user to confirm.
+into whatever comes next. A brief verification summary crystallizes the shared understanding for the user to confirm,
+and lists any flagged term ambiguities for alignment to resolve.
 
 **Use when:** Starting a new initiative, exploring a product idea, stress-testing a plan, or beginning the pipeline.
 
@@ -83,15 +90,17 @@ making design decisions. Requires the agent teams experimental flag (see Install
 
 ### alignment
 
-Human-agent alignment on solution direction before implementation begins. The agent reads the brief and research,
-extracts codebase patterns with prevalence data, and declares which patterns it intends to follow and why. The user
-reviews this pattern catalog and corrects wrong assumptions — "that's the old way, go find the new way" — before any
-code is planned. This pattern-surfacing step is the critical piece that was missing from the old pipeline.
+Human-agent alignment on solution direction before implementation begins. The agent reads the brief, research, and
+glossary, extracts codebase patterns with prevalence data, and declares which patterns it intends to follow and why. The
+user reviews this pattern catalog and corrects wrong assumptions — "that's the old way, go find the new way" — before
+any code is planned. This pattern-surfacing step is the critical piece that was missing from the old pipeline.
 
-After patterns are corrected, the agent presents a current state → desired end state proposal with open questions. When
-genuine trade-offs surface, conditional ADR sections capture committed decisions with options, rationale, and
-consequences. The alignment document is a living artifact — it may be updated throughout development and becomes
-immutable only when the initiative is completed.
+After patterns are corrected, the agent presents a current state → desired end state proposal with open questions.
+Before completing the end-state phase, alignment maintains the glossary — resolving ambiguities discovery flagged,
+sharpening definitions, and (on the first iteration) creating the glossary if none exists. When genuine trade-offs
+surface, alignment writes standalone ADRs to `design-docs/adr/{N.M}-slug.md` and updates the `design-docs/ADR.md` index.
+ADRs are gated by a strict three-part test: hard-to-reverse, surprising-without-context, and a real trade-off. ADRs
+outlive their parent initiative — they stay in `design-docs/adr/` even when the initiative moves to `completed/`.
 
 **Use when:** Research findings are available and you need to align on solution direction before implementation. This is
 where you correct the agent's understanding before it writes 2,000 lines of code based on wrong assumptions.
@@ -125,12 +134,17 @@ context.
 ### glossary
 
 Creates and maintains a project glossary — a shared vocabulary consumable by both humans and AI agents. Based on
-Domain-Driven Design's Ubiquitous Language: each term gets a definition, prohibited aliases (what NOT to call it), and
-related terms. The glossary lives alongside CLAUDE.md as structural context, preventing agents from inventing synonyms
-or using generic terms where the project has specific ones.
+Domain-Driven Design's Ubiquitous Language: each term gets a definition and a rationale-bearing `Avoid` line listing the
+wrong names a reviewer or agent would plausibly reach for. Entries are gated by the trap test — if no plausible wrong
+name exists, the term doesn't belong. The glossary lives alongside CLAUDE.md as structural context, preventing agents
+from inventing synonyms or using generic terms where the project has specific ones.
+
+Inside the DRAFT pipeline, glossary maintenance is `alignment`'s responsibility — `discovery` loads the glossary but
+never updates it, and `alignment` invokes this skill on the first iteration to create the glossary and on subsequent
+iterations to resolve ambiguities discovery flagged.
 
 **Use when:** Starting a new project, encountering naming inconsistencies, or when agents keep using the wrong terms for
-domain concepts. Invoke alongside `discovery` to capture domain vocabulary from the start.
+domain concepts. Inside DRAFT, it runs automatically — invoked from `alignment` Phase 3.
 
 ### youtrack
 
@@ -171,7 +185,7 @@ visual artifacts, or standalone for any diagramming task.
 
 ## Document Conventions
 
-All artifacts are stored in the `design-docs/` directory with consistent numbering:
+Initiative artifacts are stored in `design-docs/` with consistent numbering:
 
 - Brief: `02-cache-layer-redesign.brief.md`
 - Research: `02-cache-layer-redesign.research.md`
@@ -179,10 +193,20 @@ All artifacts are stored in the `design-docs/` directory with consistent numberi
 - Frame: `02-cache-layer-redesign.frame.md`
 - Tasks: `02-cache-layer-redesign.tasks.md`
 
-Brief, research, and tasks have optional file persistence — the user may keep them in conversation context only.
-Alignment and frame always persist to disk as living artifacts.
+ADRs and the glossary live alongside but on different lifecycles:
 
-When implementation is complete, all artifacts for an initiative move together to `design-docs/completed/`.
+- ADR: `design-docs/adr/{N.M}-slug.md` — `N` is the initiative number that birthed the ADR, `M` is the sequence within
+  that initiative (initiative `04` writing two ADRs creates `4.1-*.md` and `4.2-*.md`).
+- ADR index: `design-docs/ADR.md` — flat index grouped by status (Accepted / Deprecated / Superseded), updated by
+  `alignment` on every ADR write.
+- Glossary: `docs/glossary.md` — created by `alignment` when missing, updated as terms are resolved during alignment.
+
+Brief, research, and tasks have optional file persistence — the user may keep them in conversation context only.
+Alignment, frame, ADRs, and the ADR index always persist to disk.
+
+When implementation is complete, brief / research / alignment / frame / tasks for an initiative move together to
+`design-docs/completed/`. **ADRs, the ADR index, and the glossary never move** — they are system-wide and outlive any
+single initiative.
 
 ## License
 

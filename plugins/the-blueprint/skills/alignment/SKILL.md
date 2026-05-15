@@ -21,18 +21,24 @@ Locate the inputs:
    run discovery.
 2. **Research** — check conversation context first; fall back to `design-docs/NN-name.research.md`; if absent, ask
    whether to run research.
+3. **Glossary** — load `docs/glossary.md` if present. If absent (first iteration), schedule creation at Phase 3 end (see
+   Glossary maintenance below).
 
 ## Process
 
 ### Phase 1 — Synthesize
 
-1. Read the brief and research.
+1. Read the brief, research, and glossary (if present).
 2. From research, extract:
    - Codebase patterns with prevalence (dominant convention vs isolated instance).
    - Integration points and boundaries relevant to the brief's goals.
 3. From the brief, extract:
    - Motivation, desired end state, constraints, non-goals.
-4. Form opinions: which patterns to follow, which to deviate from, and why.
+   - Flagged term ambiguities — unresolved terms discovery surfaced for alignment to resolve.
+4. From the glossary, extract:
+   - Canonical vocabulary to use throughout alignment.
+   - Definitions that constrain pattern choices (e.g., "Customer owns CustomerId" forbids cross-context FKs).
+5. Form opinions: which patterns to follow, which to deviate from, and why.
 
 ### Phase 2 — Surface Patterns
 
@@ -88,20 +94,89 @@ With corrected patterns, present:
 
 Iterate until end state is clear and all questions are resolved.
 
-### Phase 4 — Conditional ADR Sections
+**Glossary maintenance.** Before completing Phase 3, reconcile vocabulary:
 
-When the dialog surfaces two or more viable approaches and the user expresses uncertainty, prompt: "Multiple paths exist
-— add an ADR section to commit to one?"
+- **If glossary exists:** apply term resolutions surfaced in this initiative — sharpen definitions, resolve ambiguities
+  the brief flagged, add new entries that pass the glossary skill's trap test. Invoke the `glossary` skill for the
+  update.
+- **If glossary missing (first iteration):** invoke the `glossary` skill to create one from canonical terms used in
+  brief, research, and alignment dialog. The glossary is a sibling artifact, not a section of `alignment.md`.
 
-Include ADR sections when:
+### Phase 4 — Conditional ADRs
 
-- Significant architectural choice must be made
-- Cross-cutting concerns involved (security, observability, compatibility)
-- Rationale invisible to future contributors once code is merged
-- Same trade-off risks re-litigation without a record
+ADRs are standalone files at `design-docs/adr/{N.M}-slug.md` — never embedded in `alignment.md`. The number tracks the
+initiative that birthed the ADR; the ADR itself is system-wide and outlives its parent initiative.
 
-ADR sections use the structure in the document format below. They are durable — must remain self-contained and
-meaningful when the initiative moves to `completed/`.
+**Numbering.** Initiative `04-orders-refactor` writing its first ADR creates `design-docs/adr/4.1-{slug}.md`. Second ADR
+from the same initiative is `4.2-{slug}.md`. Different initiatives never collide because the prefix matches the
+initiative number.
+
+**Trigger gate (all three must be true):**
+
+1. **Hard to reverse** — changing the decision later carries meaningful cost.
+2. **Surprising without context** — a future reader will look at the code and ask "why on earth did they do it this
+   way?"
+3. **Result of a real trade-off** — genuine alternatives existed, and one was picked for specific reasons.
+
+If any of the three is missing, skip the ADR. Easy-to-reverse decisions get reversed; non-surprising ones don't need a
+record; "we did the obvious thing" isn't worth preserving.
+
+**Qualifying types (non-exhaustive — the gate is the test, this list is the catalog):**
+
+- **Architectural shape.** "Write model is event-sourced, read model projects into Postgres."
+- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
+- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target — not every
+  library, just the ones that would take a quarter to replace.
+- **Boundary and scope decisions.** "Customer data is owned by the Customer context; others reference by ID only."
+- **Deliberate deviations from the obvious path.** "We use manual SQL instead of an ORM because X."
+- **Constraints not visible in code.** "Response times must stay under 200ms because of partner API contract."
+- **Rejected alternatives when rejection is non-obvious.** Considered GraphQL, picked REST for subtle reasons — record
+  it, or someone re-proposes GraphQL in six months.
+- **Compliance, legal, regulatory, or security boundary decisions** — even when not architecturally surprising.
+
+**When to prompt.** When the dialog surfaces two or more viable approaches and the user expresses uncertainty, ask:
+"Multiple paths exist — write an ADR to commit to one?" Run the trigger gate before writing — uncertainty isn't enough
+on its own.
+
+**ADR file format:**
+
+```markdown
+# {Short title of the decision}
+
+- **Status:** accepted
+- **Date:** {YYYY-MM-DD}
+- **Initiative:** {NN-slug}
+
+{1-3 paragraphs: context, what was decided, why.}
+```
+
+A one-paragraph ADR is fine. Status values: `accepted | deprecated | superseded by {N.M}`. Optional sections
+(`Considered Options`, `Consequences`) only when they add genuine value — most ADRs don't need them.
+
+**Write the file, then update the index.** After writing `design-docs/adr/{N.M}-slug.md`, update `design-docs/ADR.md`:
+
+```markdown
+# ADR Index
+
+## Accepted
+
+- [4.1 Event-sourced write model](./adr/4.1-event-sourced-write-model.md) — initiative `04-orders-refactor`, 2026-05-15
+- ...
+
+## Deprecated
+
+- [2.1 ...] — superseded by 4.1
+
+## Superseded
+
+- ...
+```
+
+If `design-docs/ADR.md` does not exist, create it on the first ADR write. Create `design-docs/adr/` lazily on the same
+write.
+
+**Cross-reference from alignment.md.** Add a line under `## Recorded ADRs` pointing at the ADR file. Do not copy ADR
+content into `alignment.md` — the ADR file is the source of truth.
 
 ### Phase 5 — Write Artifact
 
@@ -119,7 +194,7 @@ On user approval:
 
 ## Alignment Document Format
 
-Target ~200 lines. Exceeding 300 indicates content belongs in the frame stage.
+Target ~150 lines. Exceeding 250 indicates content belongs in the frame stage or in ADR files.
 
 ```markdown
 # Alignment: {title from brief}
@@ -127,6 +202,7 @@ Target ~200 lines. Exceeding 300 indicates content belongs in the frame stage.
 - **Date:** {date}
 - **Brief:** {path or "in conversation context"}
 - **Research:** {path or "in conversation context"}
+- **Glossary:** {path, or "(created during this alignment)"}
 
 ## Patterns Adopted
 
@@ -144,17 +220,11 @@ Target ~200 lines. Exceeding 300 indicates content belongs in the frame stage.
 
 - [Question] → [Resolution]
 
-## Decision: [title]
+## Recorded ADRs
 
-(Repeatable. Only when ADR sections exist.)
+(Only when ADRs were written during this alignment. List paths — ADR content lives in the files, not here.)
 
-**Status:** accepted
-**Context:** [forces at play]
-**Options considered:**
-1. [Option] — [pros, cons]
-2. [Option] — [pros, cons]
-**Decision:** [which and why]
-**Consequences:** [what follows]
+- [ADR 4.1: Event-sourced write model](./adr/4.1-event-sourced-write-model.md)
 ```
 
 ## Rules
@@ -164,8 +234,14 @@ Target ~200 lines. Exceeding 300 indicates content belongs in the frame stage.
 - **Living artifact.** `alignment.md` may be updated throughout development. Immutable only when moved to `completed/`.
 - **Always persists to disk.** No "skip file" option. Brief and research may live in conversation context; alignment
   always writes to the filesystem.
-- **ADR sections are durable.** Conditional, but once written, must remain self-contained for future proposals that need
-  to understand why the architecture looks the way it does.
+- **ADRs are standalone files, not alignment sections.** Each ADR lives at `design-docs/adr/{N.M}-slug.md`. The ADR file
+  is the source of truth; `alignment.md` only references it.
+- **ADRs outlive their initiative.** When the initiative moves to `completed/`, ADRs stay in `design-docs/adr/`.
+  Lifecycle is decoupled.
+- **Update the ADR index on every write.** `design-docs/ADR.md` is the single discoverability surface for ADRs across
+  all initiatives — a stale index is a broken contract.
+- **Glossary maintenance is alignment's job.** Discovery flags ambiguities; alignment resolves them by invoking the
+  `glossary` skill before Phase 4.
 - **Complexity is a signal.** If the user struggles to answer your questions during alignment, the scope is too large or
   ill-defined. Push to split or simplify before proceeding — don't paper over the uncertainty.
 - **Create only.** One alignment per initiative. Revise the living artifact directly; formal update mode deferred.

@@ -27,11 +27,12 @@ Standalone skills (not pipeline stages, invocable independently):
 ## Skill Flow
 
 ```
-discovery (idea → shared understanding via adversarial questioning)
+discovery (idea + glossary → shared understanding + flagged term ambiguities)
     ↓
 research (brief → parallel codebase investigation → objective findings)
     ↓
-alignment (research + brief → pattern surfacing → end state → conditional ADR → alignment.md)
+alignment (research + brief + glossary → pattern surfacing → end state →
+           glossary update + standalone ADRs → alignment.md)
     ↓
 frame (alignment → vertical slice phases → per-phase testing → frame.md)
     ↓
@@ -39,6 +40,7 @@ tasks (frame phases → sized work items with artifacts, deps, AFK/HITL classifi
     ↓
 task-creation (task descriptions → tracked work items in issue tracker)
 
+glossary    ← loaded by discovery on every iteration after the first; created/updated by alignment
 diagramming ← invoked alongside alignment or frame when visual artifacts are needed
 ```
 
@@ -82,7 +84,9 @@ creating architecture diagrams, flowcharts, or any visual artifact.
   context only, or write to disk. When not written to disk, the full content is output to conversation as a context
   checkpoint.
 - **Alignment** and **frame** have **mandatory** file persistence. They always write to `design-docs/`. Tasks link back
-  to frame.md; alignment contains living ADR sections.
+  to frame.md; alignment references standalone ADR files in `design-docs/adr/`.
+- **ADRs** have **mandatory** file persistence. Each ADR is a standalone file at `design-docs/adr/{N.M}-slug.md`. The
+  `design-docs/ADR.md` index is maintained on every ADR write.
 
 **Briefs:** Output of `discovery`. Store in `design-docs/` as `NN-short-description.brief.md`. When discovery hands off
 directly to research, the brief is held in conversation context and persisted by `research` after investigation
@@ -93,7 +97,19 @@ completes — never written to disk while teammates are running, or they could r
 
 **Alignment documents:** Output of `alignment`. Pair with the brief and research using the same number prefix
 (`NN-short-description.alignment.md`). Contains pattern decisions, current→desired end state, resolved questions, and
-conditional ADR sections when trade-offs were committed.
+cross-references to any ADRs recorded during this alignment. ADR content lives in the ADR files, not in `alignment.md`.
+
+**ADRs:** Standalone files at `design-docs/adr/{N.M}-slug.md`. The number tracks the initiative that birthed the ADR
+(initiative `04` writing its first ADR creates `4.1-{slug}.md`; second is `4.2-{slug}.md`). The ADR itself is
+system-wide and **never moves to `completed/`** when its parent initiative does — lifecycle is decoupled. Each ADR has a
+`Status` field (`accepted | deprecated | superseded by N.M`). Written and updated by the `alignment` skill.
+
+**ADR index:** `design-docs/ADR.md` lists all ADRs grouped by status (Accepted, Deprecated, Superseded). Sibling to the
+`adr/` folder. Maintained by the `alignment` skill on every ADR write. Index never moves to `completed/`.
+
+**Glossary:** `docs/glossary.md` is loaded by `discovery` (vocabulary contract) and maintained by `alignment` (terms
+sharpened, ambiguities resolved, new entries added per the `glossary` skill's trap test). First iteration may run
+without a glossary; alignment creates one as a sibling artifact at the end of Phase 3.
 
 **Frame documents:** Output of `frame`. Pair with alignment using the same number prefix
 (`NN-short-description.frame.md`). Contains vertical slice phases with components, testing strategy, verification gates,
@@ -104,5 +120,6 @@ cross-session continuity matters. Contains sized work items grouped by frame pha
 AFK/HITL classification. Immutable snapshot — the tracked tasks in the issue tracker become the source of truth after
 creation.
 
-**Completed artifacts:** All artifacts for an initiative move together to `design-docs/completed/` when the work is
-implemented.
+**Completed artifacts:** Brief, research, alignment, frame, and tasks for an initiative move together to
+`design-docs/completed/` when the work is implemented. ADRs and the ADR index **never move** — they remain at
+`design-docs/adr/` and `design-docs/ADR.md` regardless of which initiatives have completed.
