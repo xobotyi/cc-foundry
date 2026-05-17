@@ -76,12 +76,16 @@ or debugging style drift and reversion.
 
 ### prompt-terser
 
-Retrospective terseness audit for iteratively-edited prompts and skills. Three-phase workflow: mechanical wording
-substitutions, decorative format cleanup, and falsification-gated structural cuts targeting drift patterns (layered
-additions, rationale stacking, duplicated constraints, vestigial scaffolding, calibration prose).
+Adherence-driven terseness audit for iteratively-edited prompts and skills. Same-thought-fewer-words cuts reduce
+attention competition and improve model compliance — token reduction is a side effect, not the goal. Three-phase
+workflow (wording substitutions, format cleanup, structural cuts) with a three-check falsification gate (verbosity-type
+→ terseness → behavior preservation) that distinguishes narrative bloat from load-bearing structural verbosity (rubrics,
+checklists). Catches drift patterns including rationale stacking, duplicated constraints, and ambiguity-zone paragraphs
+(~20-40 word narrative blocks at the worst-case length for adherence).
 
-**Use when:** Auditing or tightening an existing prompt that has accumulated bloat through many edits — skills, system
-prompts, output styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead).
+**Use when:** Auditing or tightening an existing prompt that has accumulated bloat through many edits, or when adherence
+to prompt rules feels unreliable and verbose wording may be competing for attention — skills, system prompts, output
+styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead).
 
 ### claude-code-sdk
 

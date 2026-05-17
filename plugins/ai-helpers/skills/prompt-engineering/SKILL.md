@@ -8,6 +8,14 @@ description: "Prompt design techniques for LLMs: structure, examples, reasoning 
 **Every prompt is an interface contract — clarity of intent determines quality of output.** Apply when crafting skills,
 agents, output styles, system prompts, or any AI instructions.
 
+## Read first when
+
+- **You are writing a prompt for another model** (skill, subagent, system prompt, agent instruction, output style) →
+  load [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`] **BEFORE drafting**. Agent-authored prompts have
+  distinct failure modes (over-specification, context leakage, ambiguous output contracts, silent degradation across
+  pipeline stages) that the diagnostic table below does NOT cover. The summary in
+  [Writing Prompts as an Agent](#writing-prompts-as-an-agent) is incomplete — the reference holds the workflow.
+
 ## What's Wrong With Your Prompt?
 
 - **Wrong format** — add explicit format + example. See [Output Format](#output-format)
@@ -92,9 +100,8 @@ Example output:
 
 ### Use Examples (Few-Shot)
 
-3-5 examples typically sufficient. Cover edge cases. Examples function as **calibration** — they help the model locate
-pre-trained patterns rather than learn new semantics. Format and input distribution matter more than perfect label
-accuracy. Performance plateaus after 8-16 examples.
+3-5 examples typically sufficient. Cover edge cases. Format consistency and input distribution matter more than perfect
+label accuracy. Performance plateaus after 8-16 examples.
 
 **Example selection rules:**
 
@@ -164,9 +171,8 @@ Then provide your answer in <answer> tags.
 - Use extended thinking when the problem requires exploring multiple approaches
 - Use neither for simple factual tasks
 
-**CoT trade-off:** explicit CoT can degrade adherence to simple constraints (word limits, format rules). Reasoning
-widens the contextual gap between instructions and output. Use CoT selectively: beneficial for structural formatting and
-complex logic, harmful for tasks with many simple mechanical constraints.
+**CoT trade-off:** helpful for structural formatting and complex logic; harmful for tasks with many mechanical
+constraints (word limits, format rules).
 
 Detailed techniques, ToT, self-consistency: see [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`].
 
@@ -197,9 +203,8 @@ Format choice measurably affects LLM accuracy — up to 16pp between best and wo
 
 **Test:** if removing a column would lose comparative meaning → table. Otherwise → KV list.
 
-**Output format restrictions degrade reasoning.** Forcing JSON/XML output causes significant reasoning drops (Tam et
-al., 2024). Use structured output only when the downstream consumer requires it; prefer post-processing free-form output
-for reasoning-heavy tasks.
+**Output format restrictions degrade reasoning.** Use structured output only when downstream consumers require it;
+prefer post-processing free-form output for reasoning-heavy tasks.
 
 Full benchmarks and selection rules: see [`${CLAUDE_SKILL_DIR}/references/structured-data-formats.md`].
 
@@ -269,22 +274,12 @@ Single paragraph → XML-separated components.
 
 Techniques behave differently in persistent context (skills, system prompts, CLAUDE.md) vs. one-shot user messages.
 
-**Instruction placement — the U-shaped curve.** Models follow instructions at the beginning and end of context most
-reliably; middle content suffers from attention decay. Place identity and critical constraints at the top, reinforce
-critical rules at the end.
-
-**Declarative over procedural.** Rules and constraints work better as bullet lists than step-by-step procedures. Reserve
-numbered steps for workflows with strict ordering. Decompose complex procedures beyond ~10-15 steps into sub-procedures.
-
-**Domain priming over persona assignment.** "This is a security review task" outperforms "You are an expert security
-auditor." Persona prompting is volatile — negated personas often match or exceed positive persona performance.
-
-**Format affects compliance.** Format alone can swing performance by up to 40% on the same task. XML tags and Markdown
-headers outperform prose. JSON/YAML are for data payloads, not instruction framing. Formatting tokens (indentation,
-blank lines) add ~24.5% overhead with no LLM benefit.
-
-**Every instruction must earn its place.** Unnecessary requirements reduce task success even when the model can follow
-them. Apply the deletion test: if removing a rule doesn't change output quality, remove it.
+- **Place critical rules at top and end of context.** The U-shaped attention curve makes the middle the worst location.
+- **Prefer declarative bullets over numbered procedures** — except when ordering matters; cap sequences at ~10-15 steps.
+- **Prime the domain, don't assign a persona.** "This is a security review task" beats "You are an expert auditor."
+- **Format swings compliance up to 40%.** XML tags and Markdown headers beat prose; JSON/YAML are for data, not
+  instructions.
+- **Every instruction must earn its place.** Apply the deletion test: if removing it doesn't change output, remove it.
 
 Full research synthesis: see [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`].
 
@@ -422,6 +417,10 @@ OWASP Top 10, attack taxonomy, defense patterns: see [`${CLAUDE_SKILL_DIR}/refer
 
 ## Writing Prompts as an Agent
 
+**STOP — load [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`] before drafting.** The summary below is
+orientation only; the reference holds the decomposition workflow, failure-mode taxonomy, and pipeline rules required to
+write a non-broken agent prompt.
+
 When you (the AI) are authoring a prompt for another model to execute — skills, system prompts, subagent instructions:
 
 - Treat prompts as programs — define signature (inputs, outputs, success criteria) before writing text
@@ -433,8 +432,6 @@ When you (the AI) are authoring a prompt for another model to execute — skills
 
 **Key failure modes:** blob-prompts (unstructured paragraphs), context leakage (embedding orchestrator state), ambiguous
 output contracts, instruction drift across iterative rewrites.
-
-Full workflow and optimization patterns: see [`${CLAUDE_SKILL_DIR}/references/agent-authored-prompts.md`].
 
 ---
 
@@ -461,6 +458,15 @@ Before finalizing a prompt:
 - [ ] No blanket CoT — let reasoning models decide depth per request
 - [ ] KV lists for lookups; tables only for genuinely 2D comparisons
 - [ ] Few-shot examples calibrate format/style, not teach known patterns
+
+**When you authored the prompt as an agent (skill, subagent, system prompt, output style):**
+
+- [ ] Loaded [`agent-authored-prompts.md`] BEFORE drafting — not after
+- [ ] Generated prompt is self-contained — no orchestrator context leakage
+- [ ] Output format example included (concrete, not just a description)
+- [ ] Validation criteria embedded for the receiving agent to self-check
+- [ ] User-supplied content sanitized before incorporation
+- [ ] Output contract (signature: inputs, outputs, success criteria) defined before text was written
 
 ## Related Skills
 

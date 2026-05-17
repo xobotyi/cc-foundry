@@ -292,7 +292,7 @@ to reason based on request complexity. Default on Mythos Preview; recommended on
 
 ---
 
-## Academic Citations
+## Citations
 
 - Wei et al. (2022) — Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. arXiv:2201.11903
 - Kojima et al. (2022) — Large Language Models are Zero-Shot Reasoners. arXiv:2205.11916

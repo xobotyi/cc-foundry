@@ -51,9 +51,6 @@ ordering, placement). This section provides the research findings behind those r
 - **Order sensitivity** is fundamental and does not diminish with model scale. The specific sequence of examples can
   swing performance from near-SOTA to random-guess levels.
 
-**Key papers:** "Where to show Demos in Your Prompt" (Cobbina & Zhou); "How Few-shot Demonstrations Affect Prompt-based
-Defenses" (multiple authors); "Rethinking the Role of Demonstrations" (Min et al.)
-
 ### Chain-of-Thought
 
 **Transfer:** Mixed — frequently degrades instruction-following in persistent context. SKILL.md covers practical rules
@@ -71,9 +68,6 @@ Defenses" (multiple authors); "Rethinking the Role of Demonstrations" (Min et al
   (rare characters, specific word counts). These are cases where reasoning acts as a checklist.
 - Structuring reasoning as **discrete numbered steps** (a "Thought MDP") enables models to self-localize errors and
   backtrack — 20-40% self-correction lift vs. unstructured CoT.
-
-**Key papers:** "When Thinking Fails" (Li et al.); "Scaling Reasoning, Losing Control" (multiple authors); "Diminishing
-Returns of CoT" (Meincke, Mollick et al.)
 
 ### XML Structuring
 
@@ -110,8 +104,6 @@ Returns of CoT" (Meincke, Mollick et al.)
 - Even when models generate their own "optimal" personas, the underlying instability persists. Model-generated domain
   priming is more reliable than model-generated personas.
 
-**Key papers:** "'You are a brilliant mathematician' Does Not Make LLMs Act Like One" (Bai, Holtzman, Tan)
-
 ### Sequential Steps
 
 **Transfer:** Highly effective for agentic workflows, with a ceiling. SKILL.md covers practical rules (numbered steps
@@ -127,9 +119,6 @@ for ordering, bullets for rules, 10-15 step cap). This section provides the rese
   extract..."
 - **Performance collapses beyond ~10-15 steps** in a single sequence. Decompose via HTN: break complex workflows into
   sub-procedures, each with its own numbered step list.
-
-**Key papers:** "Procedural Knowledge Improves Agentic LLM Workflows" (Hsiao et al.); "Structure Enables Effective
-Self-Localization of Errors in LLMs" (Samanta et al.)
 
 ---
 
@@ -214,9 +203,6 @@ Order of preference for system prompts and skills, highest to lowest reliability
 - **Consistency beats elegance.** A consistent, slightly verbose format the model reliably parses outperforms a clean
   format that introduces ambiguity.
 
-**Key papers:** "Does Prompt Formatting Have Any Impact on LLM Performance?" (Rungta et al., arXiv:2411.10541); "The
-Hidden Cost of Readability: How Code Formatting Silently Consumes Your LLM Budget" (Pan et al., arXiv:2508.13666)
-
 ---
 
 ## Declarative vs Procedural Instructions
@@ -226,14 +212,14 @@ knowledge** ("knowing how" — step-by-step workflows, strategies).
 
 ### When to Use Each
 
-- Behavioral constraints, conventions — **Declarative**. Models utilize factual constraints more reliably across varied
+- Behavioral constraints, conventions — **Declarative**. Models use factual constraints more reliably across varied
   inputs
 - Safety guardrails, formatting rules — **Declarative**. Explicit rules are more robust for enforcing boundaries
 - Simple sequential workflows — **Procedural**. Clear strategy is highly effective for reproducible logical paths
 - Complex multi-step agent tasks — **Procedural (HTN)**. Task decomposition prevents looping and reduces per-step
   complexity
 - Complex logic / reasoning — **Declarative**. Models struggle to follow intricate multi-step plans; facts are more
-  reliably utilized
+  reliably used
 - Broad specialized domains — **Declarative**. Knowledge hints outperform process hints for most STEM, humanities, legal
   tasks
 
@@ -263,13 +249,9 @@ steps.
 
 ### Key Finding
 
-Declarative knowledge provides greater performance benefits than procedural knowledge in the majority of tasks. Larger
-models show significantly higher improvement from external declarative information than from procedural hints.
-Procedural knowledge outperforms declarative only in reasoning tasks with simple logic (elementary arithmetic, basic
-commonsense).
-
-**Key papers:** "Meta-Cognitive Analysis: Evaluating Declarative and Procedural Knowledge" (Li et al.); "Procedural
-Knowledge Improves Agentic LLM Workflows" (Hsiao et al.)
+Declarative knowledge provides greater performance benefits than procedural knowledge in most tasks. Larger models show
+significantly higher improvement from external declarative information than from procedural hints. Procedural knowledge
+outperforms declarative only in reasoning tasks with simple logic (elementary arithmetic, basic commonsense).
 
 ---
 
@@ -325,6 +307,21 @@ are invisible instruction budget leaks. A skill with 30% formatting overhead is 
 be — pushing content further into the middle-zone attention penalty. Prefer compact, well-anchored structure over
 visually polished but token-heavy layout.
 
-**Key papers:** "Impact of AGENTS.md on AI Coding Agent Efficiency" (multiple authors); "Do Context Files Help Coding
-Agents?" (multiple authors); "Does Prompt Formatting Have Any Impact on LLM Performance?" (Rungta et al.,
-arXiv:2411.10541); "The Hidden Cost of Readability" (Pan et al., arXiv:2508.13666)
+---
+
+## Citations
+
+- "Where to show Demos in Your Prompt" — Cobbina & Zhou
+- "How Few-shot Demonstrations Affect Prompt-based Defenses"
+- "Rethinking the Role of Demonstrations" — Min et al.
+- "When Thinking Fails" — Li et al.
+- "Scaling Reasoning, Losing Control"
+- "Diminishing Returns of CoT" — Meincke, Mollick et al.
+- "'You are a brilliant mathematician' Does Not Make LLMs Act Like One" — Bai, Holtzman, Tan
+- "Procedural Knowledge Improves Agentic LLM Workflows" — Hsiao et al.
+- "Structure Enables Effective Self-Localization of Errors in LLMs" — Samanta et al.
+- "Does Prompt Formatting Have Any Impact on LLM Performance?" — Rungta et al., arXiv:2411.10541
+- "The Hidden Cost of Readability: How Code Formatting Silently Consumes Your LLM Budget" — Pan et al., arXiv:2508.13666
+- "Meta-Cognitive Analysis: Evaluating Declarative and Procedural Knowledge" — Li et al.
+- "Impact of AGENTS.md on AI Coding Agent Efficiency"
+- "Do Context Files Help Coding Agents?"

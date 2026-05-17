@@ -1,8 +1,7 @@
 # Agent-Authored Prompts
 
-Agents that write prompts for other agents (or for themselves in future turns) require deliberate design. The failure
-modes differ from human-authored prompts: agents over-specify, omit tacit constraints, and produce prompts that degrade
-silently across pipeline stages.
+Agent-authored prompts have distinct failure modes — over-specification, missing tacit constraints, and silent
+degradation across pipeline stages — that require deliberate design.
 
 ---
 

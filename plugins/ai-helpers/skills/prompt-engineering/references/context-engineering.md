@@ -24,8 +24,8 @@ inference, including all the other information that may land there outside of th
 
 ## Why Context Engineering Matters
 
-**Most agent failures are context failures, not model failures.** The model receives incomplete, stale, or noisy
-information and produces a bad output — not because it lacks capability, but because it lacks situational awareness.
+**Most agent failures are context failures, not model failures** — the model lacks situational awareness, not
+capability.
 
 Root causes:
 
