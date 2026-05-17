@@ -9,25 +9,28 @@ description: >-
 
 # Prompt Terser
 
-**Prompts drift.** Each edit adds — rarely removes. Over iterations, "please make sure to" creeps in, rules get restated
-in different sections, rationale paragraphs stack, decorative formatting bloats whitespace. Even prompts authored with
-sound prompt engineering accumulate bloat through _time_, not authoring failure.
+**Terser wording improves adherence.** For the same thought, fewer or clearer words usually produces more reliable model
+behavior — less attention competition, smaller constraint surface, less noise in the instruction layer. The goal is not
+to save tokens; the goal is to make the prompt work better. Token reduction is a side effect, not the target.
 
-A **retrospective audit pass** on an existing prompt. **Behavior is preserved**; bloat is removed. Output is a
-diff-proposal with per-cut justification — a reviewer decides what to apply.
+Prompts drift toward verbose wording across edit cycles. "Please make sure to" creeps in, rationale paragraphs stack,
+hedges accumulate. This skill audits an existing prompt and proposes terser wording for the same semantic content —
+every meaning preserved, every restatement compressed. Output is a diff-proposal with per-cut justification.
 
 ## When to invoke
 
 - A skill, system prompt, output style, or agent prompt that has been edited many times
-- Before shipping a skill update, as a quality gate
-- When a prompt feels long or repetitive on read
-- When a prompt exceeds a token budget and behavior must stay intact
+- Before shipping a skill update, as an adherence quality gate
+- When a prompt feels verbose or repetitive on read
+- When adherence is unreliable and verbose wording may be competing for attention
 
 **Do not invoke for:**
 
 - Newly authored prompts (use `prompt-engineering` — this skill is for drift, not authoring)
 - One-shot user prompts (these don't drift)
-- Prompts you intend to redesign — this skill preserves behavior, it does not change it
+- Prompts you intend to redesign — this skill preserves meaning, it does not change it
+- Pure style or visual consistency refactors — terser is wording reduction for the same content, not format unification
+- Token-budget squeezing that allows meaning loss — that's compression, a different operation
 
 ## Workflow
 
@@ -63,6 +66,8 @@ Apply these substitutions to the entire prompt body. Rewrite rules, not judgment
 - "be able to" → drop (where grammar holds)
 - "absolutely" + modal verb ("absolutely must", "absolutely cannot") → drop "absolutely"
 - Redundant "that" clauses → drop "that" where grammar holds
+- "Remember that X" / "Note that X" / "Be aware that X" → state X directly (self-referential framing shifts attention to
+  the reminder rather than the content)
 
 ### Emphasis exception
 
@@ -86,14 +91,34 @@ Apply these substitutions to the entire prompt body. Rewrite rules, not judgment
 
 Scan the prompt for the drift patterns below. For each candidate cut, apply the falsification gate before recommending.
 
+### Two principles before scanning
+
+**The U-curve.** Constraint compliance follows a U-shape against length: peaks at extreme compression (≤10 words), dips
+in the ~20–40 word "ambiguity zone," then rises again for structured rubrics (≥150 words). The middle is worst —
+medium-length narrative paragraphs degrade adherence even relative to either extreme. Every cut should push content out
+of the ambiguity zone, not into it. Compress to <10-word imperative OR commit to a structured rubric; do not stop in the
+middle.
+
+**Narrative vs structural verbosity.** Not all verbosity is drift. Distinguish two types:
+
+- **Narrative verbosity** — rationale paragraphs, background descriptions, "we believe / because past experience
+  shows...". Low instructional density. Often ignored; sometimes triggers hallucinations. **Bloat — candidate for cut.**
+- **Structural verbosity** — rubrics, checklists, decision tables, multi-step procedures with explicit constraints. High
+  instructional density. Externalized memory the model can reference during generation. **Load-bearing — keep even when
+  verbose.**
+
+The test: does each token act as an active constraint, or as descriptive background? Active → structural. Descriptive →
+narrative.
+
 ### Drift patterns to detect
 
 - **Layered additions** — rules tacked on with "Also," / "And remember," / "One more thing" without merging into
   existing rule blocks. Sign: a rule block has rules that don't share a parent topic.
 - **Rationale stacking** — inline "why" paragraphs added for each rule. If the rule is self-evident or its rationale
   lives in a reference, the inline rationale is bloat.
-- **Style inconsistency** — sections edited at different times use different formats (some bullets, some prose, some
-  tables) for the same kind of content. Sign: same content type has two presentations in the same prompt.
+- **Style inconsistency that enables terser unification** — same content stated multiple times at different times in
+  different formats. Flag ONLY when unification eliminates restated content (3 statements → 1 statement). Pure visual
+  reformatting without word reduction is a style refactor, not a terser concern.
 - **Duplicated constraints** — same rule restated in different sections. Sign: searching for the rule's key noun finds
   multiple imperatives saying the same thing.
 - **Vestigial scaffolding** — examples or anti-patterns that no longer match the rules they were written for. Sign: an
@@ -104,19 +129,31 @@ Scan the prompt for the drift patterns below. For each candidate cut, apply the 
   than the model. Sign: the prose uses second-person addressing the human ("you might wonder why...").
 - **Defensive hedging** — "in most cases" / "generally" / "as a rule of thumb" softening rules that should be hard.
   Sign: the surrounding context shows the rule is enforced strictly.
+- **Ambiguity-zone paragraphs** — narrative paragraphs of ~20–40 words explaining a rule. Worst-case length for
+  adherence. Either compress to a <10-word imperative or expand into a structured rubric/checklist. Sign: rule has
+  one-paragraph rationale that isn't a checklist and doesn't fit on a single line.
 
 ### Falsification gate
 
-Before recommending a structural cut, answer in one sentence:
+Every structural cut must pass three checks, in order. State all three in the diff-proposal.
 
-> _If I delete this, what specifically changes in model output?_
+**1. Verbosity type:** is the content **structural** or **narrative**?
 
-Then classify the answer:
+- **Structural** (rubric, checklist, decision table, multi-step procedure with explicit constraints) — externalized
+  memory the model can reference during generation. **Load-bearing.** Reject the cut.
+- **Narrative** (rationale paragraph, background description, "we believe / past experience shows...") — descriptive
+  background, low instructional density. Proceed to check 2.
 
-- **Concrete** — a specific input produces a different specific behavior. The content is **load-bearing**. Keep.
+**2. Terseness:** does the cut reduce word/token count for the same semantic content?
+
+- **Yes** — fewer words express the same thought. Proceed to check 3.
+- **No** — token-neutral reorganization. Not a terser concern; reject the cut (it may be a style refactor — different
+  operation).
+
+**3. Behavior preservation:** if I delete this, what specifically changes in model output?
+
 - **Vague** — "the prompt would be less thorough" / "the agent might be less careful". The content is **bloat**. Cut.
-
-State the answer in the diff-proposal.
+- **Concrete** — a specific input produces a different specific behavior. The content is **load-bearing**. Keep.
 
 ## Output format
 
@@ -194,10 +231,19 @@ Validate input parameters before processing. Log validation failures for the aud
 **Phase 3 (structural)** — the dropped rationale sentence is flagged as Cut 1 with falsification: "if removed, the rule
 'validate input parameters' is still stated. The model sees no change; only the human loses context."
 
-Token reduction: ~50% with zero behavior change.
+Word count: 67 → 34 (~50%) with zero meaning lost. Same content, fewer words — the model's attention budget is no longer
+competing with hedges, restatements, and stale rationale. Adherence improves; token reduction is the byproduct.
 
 ## Critical rules
 
+- **Every cut must be terser AND meaning-preserving.** Same thought, fewer words. Token-neutral reorganization is a
+  style refactor — not a terser cut. Reject it.
+- **Adherence is the goal, not token reduction.** Terser wording reduces attention competition; tokens saved is the side
+  effect, not the target.
+- **Polarize, don't compromise.** Compliance peaks at ≤10-word imperatives and ≥150-word rubrics; it dips in the ~20–40
+  word ambiguity zone. Push every cut to one extreme, not to the middle.
+- **Distinguish narrative from structural verbosity.** Rubrics, checklists, and decision tables are externalized memory
+  — load-bearing. Rationale paragraphs and background descriptions are bloat.
 - **Behavior preservation is non-negotiable.** Flag any cut that might change model output for reviewer judgment.
 - **Diff-proposal output only.** Never wholesale rewrite without review.
 - **Keep emphasis at critical-rule boundaries.** Strip it from descriptive prose.
