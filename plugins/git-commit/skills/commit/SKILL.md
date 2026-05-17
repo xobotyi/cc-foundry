@@ -57,8 +57,7 @@ Project-specific commit guidance goes here.
 <command-format>
 **One git command per Bash call.** Every Bash invocation must start with
 `git` or `node`. Never chain commands with `&&`, `||`, or `;`. Never pipe
-input to git commands. This ensures each call matches `allowed-tools`
-patterns and runs without manual approval.
+input to git commands.
 </command-format>
 
 <pipeline-awareness>

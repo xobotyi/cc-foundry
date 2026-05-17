@@ -113,7 +113,7 @@ affected.
 ## Body
 
 <body-philosophy>
-A good commit message is very rarely single-line.
+A good commit message is rarely single-line.
 
 The body is where you communicate with future readers. It answers:
 
@@ -261,8 +261,6 @@ git standards.
 </trailer-conventions>
 
 ## Examples
-
-Each example includes: context (what led to the change), the message, and analysis (why it works or doesn't).
 
 <examples>
 
