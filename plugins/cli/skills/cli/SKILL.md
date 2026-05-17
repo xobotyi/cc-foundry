@@ -162,8 +162,8 @@ composability.
   one at a time.
 - **Make operations idempotent where possible.** Running the same command twice should produce the same result, not an
   error or doubled state.
-- **Make operations recoverable.** If the program fails partway through, the user should be able to hit up-arrow and
-  enter to retry from where it left off.
+- **Make operations recoverable.** If the program fails partway through, the user can hit up-arrow and enter to retry
+  from where it left off.
 - **Set network timeouts.** Allow timeout configuration and have a reasonable default. Never hang indefinitely on a
   network call.
 
