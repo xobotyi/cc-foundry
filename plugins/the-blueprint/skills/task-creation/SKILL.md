@@ -13,13 +13,6 @@ Create well-formed tasks in an issue tracker. The input is either a decompositio
 standalone request from a user. The output is a tracked task with enough context for an implementer to start work
 without asking questions.
 
-## Why Task Creation Matters
-
-A task is the handoff point — where planning ends and implementation begins. The sweet spot is a description that
-communicates intent, scope, and completion criteria without dictating how to get there. Tasks also serve as
-institutional memory: months later, the description and linked design documents reconstruct the reasoning behind a
-change.
-
 ## When to Use
 
 **From the pipeline:** After `frame` produces a frame document with vertical slice phases, this skill handles creating
@@ -324,7 +317,7 @@ task ID and URL.
 
 ## Writing Rules
 
-Two rules from the decomposition skill apply equally here:
+Two rules from the `tasks` skill apply equally here:
 
 **Descriptions are plans, not reports.** Write every description as if the work has not started. "Add pagination to the
 search results" — not "Added pagination" or "Pagination was implemented." The implementer reads this fresh. Tell them

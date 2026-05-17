@@ -1,6 +1,6 @@
 {
 	"name": "the-blueprint",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"description": "Structured planning pipeline implementing DRAFT: discovery, research, alignment, frame, tasks, glossary, and technical diagramming",
 	"author": {
 		"name": "xobotyi",

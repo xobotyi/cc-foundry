@@ -38,7 +38,7 @@ user as the source of truth. Glossary updates are alignment's job; discovery onl
 
 ## Dimensions
 
-Cover these through questioning. Track coverage broadly — not as a checklist to complete, but as a map of territory to
+Cover these through questioning. Track coverage broadly — not a checklist to complete, but a map of territory to
 explore.
 
 - **Motivation** — Why are we doing this? For problems: what is broken, who experiences it, how do they experience it
@@ -135,7 +135,7 @@ This is a verification checkpoint. The user confirms, corrects, or continues que
 
 - "Write the brief as `NN-short-description.brief.md`?" → write artifact, conversation ends
 - "Proceed to `research` skill?" → output the full brief into the conversation, then invoke research. Do NOT write the
-  brief to disk — research teammates must not be able to read it (information barrier).
+  brief to disk — research teammates must not read it (information barrier).
 - Neither → conversation ends, no artifacts created
 
 ## Rules

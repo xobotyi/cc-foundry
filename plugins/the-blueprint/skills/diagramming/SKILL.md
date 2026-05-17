@@ -198,9 +198,8 @@ Created: authentication flow diagram (7 nodes, 7 edges). Embedded inline in the 
 
 Diagrams are a design-phase artifact. They compose naturally with the blueprint pipeline:
 
-- During `design-documents` — create diagrams to illustrate the problem space, compare solution options visually
-- During `technical-design` — create architecture diagrams showing component relationships, data flow, deployment
-  topology
+- During `alignment` — create diagrams to illustrate the problem space, compare solution options visually
+- During `frame` — create architecture diagrams showing component relationships, data flow, deployment topology
 - Standalone — create diagrams on request outside the pipeline context
 
 ## Quality Gate

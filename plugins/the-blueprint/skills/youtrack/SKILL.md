@@ -245,10 +245,10 @@ specific rule and show the fix. Common review findings:
 ## Integration
 
 This skill provides YouTrack domain knowledge. The `task-creation` skill provides tracker-agnostic writing discipline.
-The `task-decomposition` skill breaks technical designs into task hierarchies. Use them together:
+The `tasks` skill decomposes frame phases into work items. Use them together:
 
 - **task-creation** → title format, description structure, acceptance criteria quality
-- **task-decomposition** → task hierarchy design that maps to YouTrack's parent/subtask linking model
+- **tasks** → task hierarchy design that maps to YouTrack's parent/subtask linking model
 - **youtrack** → field discovery, correct field types, valid state transitions, proper linking, query syntax for
   duplicate search
 
