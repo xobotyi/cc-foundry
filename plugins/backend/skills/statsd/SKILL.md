@@ -11,8 +11,8 @@ description: >-
 # StatsD
 
 Choose the right metric type, name it with dot-delimited hierarchy, tag dimensions instead of encoding them in names.
-StatsD is fire-and-forget: UDP means zero latency impact on your application, but wrong metric types or bad naming
-corrupt your data silently.
+StatsD is fire-and-forget: UDP means zero latency impact, but wrong metric types or bad naming corrupt your data
+silently.
 
 ## References
 
@@ -44,7 +44,7 @@ Wire format: `<metric_name>:<value>|<type>[|@<sample_rate>][|#<tags>]`
 | How many unique X occurred?           | Set (`s`)                          |
 | What is the global distribution of X? | Distribution (`d`, DogStatsD only) |
 
-Wrong metric type = wrong math at the server. A gauge used as a counter loses data between flushes. A counter used as a
+Wrong metric type = wrong math at the server. A gauge used as a counter loses data between flushes; a counter used as a
 gauge produces meaningless rates.
 
 ### Counter (`|c`)
@@ -200,7 +200,7 @@ When **writing** StatsD instrumentation:
 
 - Choose the metric type based on what the value represents, not convenience.
 - Apply naming conventions silently — don't narrate each rule.
-- If an existing codebase contradicts a convention, follow the codebase pattern and flag the divergence once.
+- If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.
 - Always configure client-side buffering for production use.
 
 When **reviewing** StatsD instrumentation:

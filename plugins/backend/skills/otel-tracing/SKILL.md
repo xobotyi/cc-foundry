@@ -30,8 +30,8 @@ visibility.
 
 ## Spans
 
-A span represents a single unit of work in a trace — an HTTP request handler, a database query, a message publish. Not
-every function call.
+A span represents one unit of work in a trace — an HTTP request handler, a database query, a message publish. Not every
+function call.
 
 ### Span Naming
 
@@ -40,8 +40,8 @@ names destroy it.
 
 - Use the most general string that identifies a statistically interesting class
 - Never embed high-cardinality values (IDs, emails, paths with IDs)
-- HTTP span names: `{METHOD} {route}` — server: `GET /users/:id`; client: `GET`
-- Database span names: `{operation} {table}` — `SELECT users`, `INSERT orders`
+- HTTP: `{METHOD} {route}` — server: `GET /users/:id`; client: `GET`
+- DB: `{operation} {table}` — `SELECT users`, `INSERT orders`
 
 | Name                         | Verdict                   |
 | ---------------------------- | ------------------------- |
@@ -124,7 +124,7 @@ See `${CLAUDE_SKILL_DIR}/references/span-data.md` for events format, links forma
 ## Context Propagation
 
 Context propagation correlates spans across service boundaries. Without it, each service produces isolated spans — no
-distributed trace.
+trace.
 
 ### Inject / Extract Pattern
 
@@ -185,7 +185,7 @@ operation? -> Create span (INTERNAL). Would a span event on parent suffice? -> A
 
 ### Library Instrumentation Rules
 
-- **Depend on OpenTelemetry API only** — never SDK. The API is a no-op without SDK, so zero overhead for users who don't
+- **Depend on OpenTelemetry API only** — never SDK. The API is a no-op without SDK — zero overhead for users who don't
   use OTel.
 - Follow semantic conventions for your domain
 - Set the `schema_url` to record which semantic convention version you use
@@ -197,7 +197,7 @@ patterns, plus testing guidance.
 
 ## Sampling
 
-Sampling controls which traces are recorded and exported — the primary mechanism for managing tracing costs.
+Sampling controls which traces are recorded and exported — the primary cost management mechanism.
 
 ### Head Sampling
 
@@ -217,7 +217,7 @@ Decision after all spans in a trace complete. Requires collector infrastructure.
 
 - All services export at 100%
 - OTel Collector with tail sampling processor buffers spans by trace ID
-- **All spans with the same trace ID MUST reach the same collector** — use trace-ID-aware load balancing
+- All spans with the same trace ID **MUST reach the same collector** — use trace-ID-aware load balancing
 
 ### Sampling Principles
 
@@ -260,7 +260,7 @@ types, environment variable configuration, and Collector deployment patterns.
 
 When **writing** tracing code:
 
-- Apply all conventions silently — don't narrate each rule being followed.
+- Apply all conventions silently — don't narrate each rule.
 - Use semantic conventions for attribute names. Check the reference for your domain (HTTP, DB, messaging) before
   inventing names.
 - If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.

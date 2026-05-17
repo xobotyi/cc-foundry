@@ -13,14 +13,6 @@ description: >-
 **If you cannot ask arbitrary questions about your system's behavior from the outside, your system is not observable —
 it is merely monitored.**
 
-Observability is the ability to understand internal system state from its external outputs. Three complementary signals
-make this possible: **logs** (discrete events), **metrics** (aggregate measurements), and **traces** (request-scoped
-causal chains). Each pillar answers different questions. Using the wrong pillar for a question wastes resources and
-hides the answer.
-
-This skill covers high-level observability discipline — purposes, interconnection, and good practices for all three
-pillars. It is technology-agnostic: specific tools (Prometheus, StatsD, OpenTelemetry) have their own dedicated skills.
-
 ---
 
 ## The Three Pillars
@@ -104,11 +96,11 @@ a queue publish).
 ### Always Structured
 
 Emit logs as structured records (JSON or equivalent key-value format) with a consistent schema. Unstructured string logs
-are acceptable only in local development. Structured logs are machine-parseable, indexable, and filterable at scale.
+are for local development only. Structured logs are machine-parseable, indexable, and filterable at scale.
 
 ### Log Levels
 
-Use levels consistently. Every team member must agree on what each level means.
+Use levels consistently. Agree on what each level means across the team.
 
 - **FATAL/CRITICAL** — Process cannot continue; about to crash. Alerting: Page immediately
 - **ERROR** — Operation failed; requires investigation. Alerting: Alert / ticket
@@ -123,8 +115,8 @@ Rules:
   window.
 - WARN is not a dumping ground. If it never leads to action, it is noise — downgrade to DEBUG or remove it.
 - ERROR means something is broken. Expected conditions (404 for missing resources, validation failures from bad input)
-  are not errors — they are INFO with a status field.
-- Make log level configurable at runtime without restarts.
+  are not errors — log at INFO with a status field.
+- Log level must be configurable at runtime without restarts.
 
 ### Structured Fields
 
@@ -159,7 +151,7 @@ Never log:
 - Request/response bodies containing user-submitted personal data
 
 When user identifiers are needed, log opaque IDs (user_id), not email addresses or names. If regulations (GDPR, HIPAA)
-apply, verify that logged fields comply. When in doubt, omit the field.
+apply, verify logged fields comply. When in doubt, omit the field.
 
 ### Logging at Boundaries
 
@@ -182,8 +174,7 @@ apply, verify that logged fields comply. When in doubt, omit the field.
 ### Log Once, at the Right Level
 
 Log a raised exception **once**. Do not catch-log-rethrow at every layer. Let exceptions propagate to the top-level
-handler, which logs with full context. If you must log and rethrow, do it only when adding context that would otherwise
-be lost.
+handler, which logs with full context. Log and rethrow only when adding context that would otherwise be lost.
 
 </structured-logging>
 
@@ -202,13 +193,12 @@ be lost.
 
 Rules:
 
-- Use counters for events that accumulate. Derive rates from counters (`rate()`, `increase()`), never store pre-computed
-  rates.
+- Use counters for events that accumulate. Derive rates with `rate()` / `increase()` — never store pre-computed rates.
 - Use gauges for current-state snapshots. Never `rate()` a gauge.
 - Use histograms for latency and size distributions. Histograms enable percentile calculation across instances;
   summaries do not aggregate.
 - Export timestamps as Unix epoch seconds, not "time since" values.
-- Initialize all metrics with a zero value at startup to avoid missing-metric problems.
+- Initialize all metrics with zero at startup to avoid missing-metric problems.
 
 ### What to Measure
 
@@ -221,8 +211,7 @@ For every user-facing service, measure these four:
 - **Errors** — Rate of failed requests. Example: `http_requests_total{status=~"5.."}`
 - **Saturation** — How "full" the service is. Example: CPU usage, memory, queue depth, thread pool
 
-Distinguish **successful latency from error latency**. A fast 500 is not good latency. A slow error is worse than a fast
-error. Track both.
+Distinguish **successful latency from error latency**. A fast 500 is not good latency. Track both.
 
 #### RED Method (Request-Centric)
 
@@ -334,19 +323,17 @@ dominate user experience when users hit multiple services per page load.
 
 ### Context Propagation
 
-Context propagation is the mechanism that connects spans across process boundaries into a single trace. Without it, you
-get disconnected spans, not traces.
+Context propagation connects spans across process boundaries into a single trace. Without it, you get disconnected
+spans, not traces.
 
 Rules:
 
 - **Propagate context on every outgoing call.** HTTP headers (W3C Trace Context or B3), message metadata, gRPC metadata
   — every cross-process boundary must carry trace context.
-- **Extract context on every incoming call.** The receiving service must extract trace context and create a child span
-  under the propagated parent.
+- **Extract context on every incoming call.** Extract trace context and create a child span under the propagated parent.
 - **Use W3C Trace Context (`traceparent`/`tracestate`)** as the default propagation format unless the ecosystem requires
   otherwise (e.g., legacy B3).
-- **Never generate a new trace ID** when you should be continuing an existing trace. A new trace ID means a broken
-  trace.
+- **Never generate a new trace ID** when continuing an existing trace. A new trace ID means a broken trace.
 
 ### What to Trace
 
@@ -385,20 +372,19 @@ like 404 on a server span — the server operated correctly.
 
 ### Sampling
 
-At high traffic volumes, tracing 100% of requests is expensive. Sampling reduces cost while preserving signal.
-
-| Strategy                 | How It Works                                           | Trade-off                                      |
-| ------------------------ | ------------------------------------------------------ | ---------------------------------------------- |
-| **Head-based**           | Decide at trace start whether to sample                | Simple; may miss rare errors                   |
-| **Tail-based**           | Decide after trace completes based on content          | Catches errors; needs buffering infrastructure |
-| **Always-on for errors** | Sample 100% of error traces, probabilistic for success | Good default balance                           |
+At high traffic volumes, tracing 100% of requests is expensive. Sampling reduces cost while preserving signal. |
+Strategy | How It Works | Trade-off | | ------------------------ |
+------------------------------------------------------ | ---------------------------------------------- | |
+**Head-based** | Decide at trace start whether to sample | Simple; may miss rare errors | | **Tail-based** | Decide
+after trace completes based on content | Catches errors; needs buffering infrastructure | | **Always-on for errors** |
+Sample 100% of error traces, probabilistic for success | Good default balance |
 
 Rules:
 
 - Never drop error traces. If cost is a concern, sample successful traces at a lower rate but keep 100% of error and
   high-latency traces.
-- Sample at the entry point (head) and propagate the decision. Do not let each service decide independently — this
-  creates partial traces.
+- Sample at the entry point (head) and propagate the decision. Each service deciding independently creates partial
+  traces.
 - Start with a low sampling rate (1-10%) and increase based on need, not the reverse.
 
 </tracing>
@@ -421,12 +407,12 @@ points to a span → the span's logs reveal the root cause.
 
 Rules:
 
-- **Embed trace_id and span_id in every log record** emitted within a request context. This is the primary bridge
-  between logs and traces.
-- **Use a correlation/request ID** that is assigned at the edge (API gateway, load balancer) and propagated to all
-  downstream services.
-- **Attach exemplars to metrics.** An exemplar is a trace_id attached to a specific metric observation, enabling
-  drill-down from a metric spike to a representative trace.
+- **Embed trace_id and span_id in every log record** emitted within a request context — the primary bridge between logs
+  and traces.
+- **Use a correlation/request ID** assigned at the edge (API gateway, load balancer) and propagated to all downstream
+  services.
+- **Attach exemplars to metrics.** An exemplar is a trace_id on a specific metric observation, enabling drill-down from
+  a metric spike to a representative trace.
 
 ### The Correlation Workflow
 
@@ -496,8 +482,8 @@ trace. This bidirectional linking is the backbone of incident investigation.
   first production deploy — not after the first incident.
 - **Follow the conventions silently.** Apply structured logging, metric naming, and tracing patterns without narrating
   each rule.
-- **If the codebase has existing patterns, follow them.** Consistency within a codebase beats theoretical correctness.
-  Flag divergences from this skill's guidance once, then move on.
+- **If the codebase has existing patterns, follow them.** Consistency beats theoretical correctness. Flag divergences
+  once, then move on.
 - **Choose the right pillar.** Before adding instrumentation, ask: "Is this a metric, a log, or a span?" Use the
   decision table above.
 - **Connect the signals.** Every log in a request context must carry `trace_id` and `span_id`. Every error metric should
@@ -541,5 +527,3 @@ This skill provides observability discipline alongside other skills:
 
 The coding skill governs workflow. This skill governs observability design decisions. Tool-specific skills govern
 implementation details for their respective technologies.
-
-**Observability is not an afterthought. Instrument from day one. If you cannot observe it, you cannot operate it.**

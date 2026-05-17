@@ -12,7 +12,7 @@ description: >-
 
 Choose the right metric type, name it clearly, label it sparingly. Prometheus is a pull-based monitoring system built on
 a dimensional data model — every metric is a time series identified by a name and key-value label pairs. Getting this
-right at instrumentation time prevents expensive rework later.
+right at instrumentation time prevents rework later.
 
 ## References
 
@@ -31,7 +31,7 @@ right at instrumentation time prevents expensive rework later.
 
 ## Metric Type Selection
 
-Choose correctly at instrumentation time — changing later requires migration of dashboards, alerts, and recording rules.
+Choose correctly at instrumentation time — changing later requires migrating dashboards, alerts, and recording rules.
 
 | Question                                                                       | Answer | Type      |
 | ------------------------------------------------------------------------------ | ------ | --------- |
@@ -126,8 +126,8 @@ separate metrics per status. Do not put label names in metric names.
 
 ### Cardinality
 
-Every unique label combination is a new time series. Each costs RAM, CPU, disk, and network. **Cardinality math:** total
-series = metric cardinality x number of targets.
+Every unique label combination is a new time series — each costs RAM, CPU, disk, and network. **Cardinality math:**
+total series = metric cardinality x number of targets.
 
 - `< 10`: Safe for most metrics
 - `10-100`: Acceptable, monitor growth
@@ -188,7 +188,7 @@ tuning in hot paths.
 - `rate(counter[5m])` — per-second rate. Use for alerts and dashboards.
 - `increase(counter[5m])` — total increase. Sugar for `rate() * range_seconds`.
 - `irate(counter[5m])` — instant rate from last two samples. Only for graphing volatile counters.
-- **`rate()` first, then aggregate:** `sum(rate(x[5m]))`, never `rate(sum(x)[5m])`. Rate must see individual counter
+- **`rate()` first, then aggregate:** `sum(rate(x[5m]))` — never `rate(sum(x)[5m])`. Rate must see individual counter
   resets.
 - Never `rate()` a gauge — use `deriv()` or `delta()`.
 
@@ -203,7 +203,7 @@ tuning in hot paths.
 
 - **Staleness:** most recent sample within lookback period (default 5 min). Series disappears if not scraped within that
   window.
-- **Rate window size:** `rate()` needs at least 2 samples. Range should be at least 4x scrape interval. With 15s scrape,
+- **Rate window size:** `rate()` needs at least 2 samples. Range should be at least 4x scrape interval. With 15s scrape
   use `rate(x[5m])` or wider.
 - **Expensive queries:** bare metric names can expand to thousands of series. Always filter or aggregate before
   graphing. Use recording rules for expensive expressions.
@@ -220,8 +220,8 @@ Alert on **symptoms** (user-visible impact), not causes. Use dashboards to pinpo
 - **Batch jobs** — Job has not succeeded recently enough (>= 2x normal cycle)
 - **Capacity** — Approaching resource limits that will cause outage without intervention
 
-Only page on latency at one point in the stack — if overall user latency is fine, don't page on a slow sub-component.
-Avoid noisy alerts — if an alert fires and there's nothing to do, remove it.
+Only page on latency at one point in the stack — if overall user latency is fine, don't page on a slow sub-component. If
+an alert fires and there's nothing to do, remove it.
 
 See `${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md` for alert design, naming conventions, and recording rule
 details.
@@ -230,11 +230,10 @@ details.
 
 Pre-compute frequently used or expensive expressions. Format: `level:metric:operations`.
 
-- Aggregate ratios correctly — aggregate numerator and denominator separately, then divide. Never average a ratio or
-  average an average.
-- Use `without` for aggregation — preserves all labels except those being removed. Prefer over `by`.
-- Use recording rules for dashboard queries that are expensive and queried frequently, expressions used in multiple
-  alerts, or complex multi-step aggregations.
+- Aggregate ratios correctly — aggregate numerator and denominator separately, then divide. Never average a ratio.
+- Use `without` for aggregation — preserves all labels except those removed. Prefer over `by`.
+- Use recording rules for expensive dashboard queries, expressions used in multiple alerts, or complex multi-step
+  aggregations.
 
 See `${CLAUDE_SKILL_DIR}/references/alerting-and-rules.md` for full naming convention and recording rule anti-patterns.
 
@@ -246,8 +245,8 @@ library directly.
 - Prefix all metrics with exporter name: `haproxy_up`, `mysql_global_status_threads_connected`
 - Create fresh metric instances per scrape — do NOT use global metric variables updated each scrape (race conditions,
   stale labels)
-- Drop pre-computed rates, min/max since start, stddev from source systems — export raw counters and current values; let
-  Prometheus `rate()` handle the rest
+- Drop pre-computed rates, min/max since start, and stddev from source systems — export raw counters and current values;
+  let Prometheus `rate()` handle the rest
 
 See `${CLAUDE_SKILL_DIR}/references/exporters.md` for architecture, collectors, help strings, label rules, and
 push-based sources.
@@ -256,7 +255,7 @@ push-based sources.
 
 When **writing** Prometheus instrumentation:
 
-- Apply all conventions silently — don't narrate each rule being followed.
+- Apply all conventions silently — don't narrate each rule.
 - Choose metric types based on the decision criteria above.
 - If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.
 
@@ -274,7 +273,7 @@ When **writing** alerting or recording rules:
 When **reviewing** Prometheus code:
 
 - Cite the specific violation and show the fix inline.
-- Don't lecture — state what's wrong and how to fix it.
+- State what's wrong and how to fix it.
 
 ## Integration
 
