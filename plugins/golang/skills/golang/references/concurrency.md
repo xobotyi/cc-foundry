@@ -13,8 +13,7 @@ Goroutines that violate this leak memory, hold references, and cause data races.
 
 ### Context-Based Cancellation (Primary)
 
-`context.Context` is the idiomatic mechanism for cancellation propagation in Go. Use it as the default for all goroutine
-lifecycle management:
+Use `context.Context` as the default for all goroutine lifecycle management:
 
 ```go
 func (w *Worker) Run(ctx context.Context) error {
@@ -119,8 +118,6 @@ close(stop)
 
 Prefer `context.Context` over raw stop/done channels in new code.
 
-````
-
 ## Channels vs Mutexes
 
 Choose based on goroutine relationship:
@@ -129,8 +126,8 @@ Choose based on goroutine relationship:
 - **Concurrent goroutines coordinating work** — channels (communication / orchestration)
 - **Transferring ownership of a resource** — channels (signaling completion)
 
-**Parallel** = doing the same thing simultaneously (e.g., workers processing a queue).
-**Concurrent** = doing different steps of a pipeline (e.g., producer → consumer).
+**Parallel** = doing the same thing simultaneously (e.g., workers processing a queue). **Concurrent** = doing different
+steps of a pipeline (e.g., producer → consumer).
 
 Mutexes protect shared state. Channels coordinate independent actors.
 
@@ -138,13 +135,13 @@ Mutexes protect shared state. Channels coordinate independent actors.
 
 ### Size: Zero or One
 
-Channels should be unbuffered (0) or size 1. Larger buffers require justification —
-you must know what prevents the channel from filling and blocking writers.
+Channels should be unbuffered (0) or size 1. Larger buffers require justification — you must know what prevents the
+channel from filling and blocking writers.
 
 ```go
 c := make(chan int)    // unbuffered — synchronous handoff
 c := make(chan int, 1) // buffered — one item of slack
-````
+```
 
 ### Direction in Signatures
 

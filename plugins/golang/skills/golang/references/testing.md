@@ -329,8 +329,7 @@ func TestRedisCache(t *testing.T) {
 }
 ```
 
-Gate slow or resource-intensive tests behind environment variables and skip when not set. This keeps `go test ./...`
-fast while CI runs the full suite.
+Gate slow or resource-intensive tests behind environment variables and skip when not set.
 
 ## Runnable Examples
 

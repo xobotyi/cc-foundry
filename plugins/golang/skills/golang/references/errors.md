@@ -194,9 +194,6 @@ return fmt.Errorf("process request: %v", err)
 - The error source is an implementation detail (e.g., which database you use)
 - Wrapping would commit you to an underlying dependency
 
-Wrapping makes the error part of your API. If you wrap `sql.ErrNoRows`, you can never switch databases without breaking
-callers who check for it.
-
 ### Context in Wrapping
 
 Keep context succinct. Avoid "failed to" — it stacks up the call chain:
