@@ -69,20 +69,6 @@ skills as a prerequisite.
 
 ---
 
-### the-kensai
-
-AI code review produces shallow, noisy output — fixed checklists, speculative findings, false positives burying real
-issues. This plugin implements a 4-phase review pipeline: **grounding** (read the diff, map integration surface, build a
-three-layer Plan/Intent/Reality model), **surfacing** (spawn 2-4 parallel teammates per change-derived dimensions),
-**proving** (4 adversarial falsification gates per finding — reject what can't survive disproof), and **filing** (final
-report with severity, evidence, suggested fixes). Fewer findings, but the ones that survive are real.
-
-```
-/plugin install the-kensai
-```
-
----
-
 ### the-statusline
 
 No visibility into context window usage, cost, or model. This plugin installs a 3-row status line to your user-level
