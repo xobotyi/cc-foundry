@@ -79,7 +79,6 @@ Both work together — a grid item can be a flex container and vice versa.
 
 - Never use `float` for layout — floats are for wrapping text around images
 - Intrinsic sizing first — use `flex-wrap`, `min()`, `max()`, `clamp()` before reaching for media queries
-- `gap` over margin hacks in both flexbox and grid
 
 ## CSS Nesting
 

@@ -45,15 +45,10 @@ variables declared before rendering.
   invisible outside that render.
 - **Event handlers don't need to be pure** — they run outside of rendering.
 
-- **User clicks, form submits** — Event handlers
-- **Sync with external system (DOM, network)** — `useEffect` (last resort)
-- **Data transformation** — Compute during render
-- **Shared logic between handlers** — Extract a function, call from handlers
-
 ### Component Structure
 
 - One component per file. Small helpers co-located in the same file are acceptable but extract when reused.
-- Always prefer function declarations for components.
+- Prefer function declarations for components.
 - Do not use `React.FC` — it adds implicit `children` typing and complicates generics. Use
   `function Component(props: Props)`.
 
@@ -393,7 +388,7 @@ When **writing** React code:
 
 - Apply all conventions silently — don't narrate each rule.
 - If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.
-- Always prefer function declarations for components.
+- Prefer function declarations for components.
 
 When **reviewing** React code:
 

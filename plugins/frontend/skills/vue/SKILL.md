@@ -247,8 +247,6 @@ Composables can call other composables — build complex logic by composing simp
 - **Renderless components** — Extra component instance overhead
 - **Utility functions** — No reactive state or lifecycle hooks
 
-Composables are explicit, namespaced through destructuring, and integrate with Vue's reactivity and lifecycle.
-
 ## TypeScript
 
 ### Props

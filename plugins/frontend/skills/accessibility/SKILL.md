@@ -272,7 +272,7 @@ For WCAG 2.2 AA compliance checklist with criterion numbers, see [`wcag.md`](${C
 
 When **writing** accessible code:
 
-- Apply all conventions silently -- do not narrate each ARIA attribute or WCAG criterion being followed.
+- Apply all conventions silently -- don't narrate each ARIA attribute or WCAG criterion being followed.
 - Use native HTML elements before reaching for ARIA.
 - Include keyboard interaction handlers for every custom interactive widget.
 - If an existing codebase contradicts a convention, follow the codebase pattern and flag the divergence once.
@@ -281,7 +281,7 @@ When **reviewing** code for accessibility:
 
 - Cite the specific violation and show the fix inline.
 - Reference the WCAG criterion number when relevant (e.g., "1.4.3 Contrast").
-- Do not lecture -- state what is wrong and how to fix it.
+- Don't lecture -- state what's wrong and how to fix it.
 
 ## Integration
 
