@@ -102,7 +102,7 @@ Same structure as self-handoff, with these sections added before Decisions:
 
 ## Compression
 
-Target 500-2000 tokens. When work is extensive:
+Target 500-2000 tokens. When work is large:
 
 - **Decisions** — keep all. Highest-value content.
 - **Constraints** — keep all. Losing these causes wrong decisions.

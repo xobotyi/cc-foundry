@@ -11,8 +11,8 @@ description: >-
 
 **CLAUDE.md is a prompt that persists across every session.** All prompt engineering principles apply, but the failure
 modes are specific: instructions exist but get ignored, content drifts from reality, and the file grows until nothing
-gets followed. The goal is not completeness — it's compliance. A short CLAUDE.md that Claude follows beats a
-comprehensive one it ignores.
+gets followed. The goal is not completeness — it's compliance. A short CLAUDE.md that Claude follows beats a full one it
+ignores.
 
 ## Route to Reference
 
@@ -88,9 +88,7 @@ Instructions must describe behaviors Claude can actually perform, not qualities 
 
 ### Brevity = Compliance
 
-Every token in CLAUDE.md competes for attention. The IFScale benchmark (2025) demonstrated a clear negative correlation
-between instruction density and compliance — even frontier models drop to 68% accuracy under high instruction load.
-Shorter CLAUDE.md files produce higher instruction adherence.
+Every token in CLAUDE.md competes for attention. Shorter CLAUDE.md files produce higher instruction adherence.
 
 - State each rule once, in the section where it's contextually relevant
 - Prefer bullet lists over prose paragraphs — they're faster to scan and harder to miss
@@ -98,9 +96,6 @@ Shorter CLAUDE.md files produce higher instruction adherence.
 - Delete rules that pass the deletion test (removing them doesn't change behavior)
 
 ### Prose vs Bullet Lists
-
-Explanatory prose and terse directives serve different purposes. Using the wrong style in the wrong place degrades
-compliance.
 
 **Prose (1-3 paragraphs) for project identity only.** A brief "what is this project and why does it exist" section at
 the top orients Claude for edge cases where rules don't cover the situation. This is the one place where explaining
@@ -131,7 +126,7 @@ Models follow a U-shaped attention curve: beginning and end are followed most re
 - **Middle:** Conventions, detailed rules by topic
 - **Bottom:** Critical constraints, verification workflow — the "don't forget" reinforcement
 
-For rules that absolutely must be followed, state them early AND reinforce at the end with different phrasing.
+For rules that must be followed, state them early AND reinforce at the end with different phrasing.
 
 ## The Multi-Layer Hierarchy
 
