@@ -83,8 +83,8 @@ Attach supporting materials when relevant:
 
 ## Minimal Reproducible Example (MRE)
 
-A minimal reproducible example contains the least amount of code or configuration needed to demonstrate the problem. It
-is the most effective way to get a bug fixed quickly.
+A minimal reproducible example contains the least amount of code or configuration needed to demonstrate the problem —
+the most effective way to get a bug fixed quickly.
 
 Properties of a good MRE:
 
@@ -109,8 +109,7 @@ If the bug worked correctly in a previous version:
 - State the first known broken version
 - If possible, bisect to find the specific commit that introduced the regression
 
-Regressions with clear version boundaries are fixed significantly faster because they narrow the search space for the
-root cause.
+Regressions with clear version boundaries are fixed faster because they narrow the root cause search space.
 
 ## What Not to Do
 

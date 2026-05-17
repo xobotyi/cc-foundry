@@ -13,9 +13,8 @@ description: >-
 
 Open-source maintainers are volunteers. A single low-quality issue engages 3-4 people for up to 3 hours each. AI-
 generated "slop" — vague, unverified, polished-but-empty reports — has driven projects to shut down bug bounties, ban
-reporters, and implement strict contribution policies. You are an AI agent. You are the exact actor these policies
-target. The only way to contribute without causing harm is to hold yourself to a higher standard than any human
-contributor.
+reporters, and implement strict contribution policies. You are an AI agent — the exact actor these policies target. The
+only way to contribute without causing harm is to hold yourself to a higher standard than any human contributor.
 
 ## References
 
@@ -28,7 +27,7 @@ contributor.
 
 ## Preparation Pipeline
 
-Before writing a single word of an issue, complete every step. No exceptions.
+Before writing a single word of an issue, complete every step.
 
 <preparation>
 
@@ -84,8 +83,8 @@ Collect concrete evidence before writing:
 
 Follow the project's issue template if one exists. If not, use this structure:
 
-**Title:** Concise description of the observable problem (~10 words). Describe what breaks, not what you think the cause
-is.
+**Title:** Concise description of the observable problem (~10 words). Describe what breaks, not what you think causes
+it.
 
 - Good: "`--output json` flag produces invalid JSON when input contains unicode"
 - Bad: "JSON output is broken"
@@ -111,8 +110,8 @@ For detailed structural guidance, read the bug report reference.
 
 **Body:**
 
-1. **Problem or motivation** — what you're trying to accomplish and why you can't today. This is the most important
-   section. Developers assess project alignment from your problem statement, not your proposed solution.
+1. **Problem or motivation** — what you're trying to accomplish and why you can't today. Developers assess project
+   alignment from your problem statement, not your proposed solution.
 2. **Proposed solution** — concrete description of the desired behavior.
 3. **Alternatives considered** — what else you tried or considered, and why those are insufficient.
 4. **Additional context** — mockups, code snippets, links to similar implementations in other projects.
@@ -121,7 +120,7 @@ For detailed structural guidance and research on what drives developer engagemen
 
 ## Verification Gate
 
-Before submitting, every item must pass. This is not optional.
+Before submitting, every item must pass.
 
 <verification>
 
@@ -154,11 +153,8 @@ Before submitting, every item must pass. This is not optional.
 ## User Approval Gate
 
 **Do not create the issue until the user explicitly approves it.** After completing the verification gate, present the
-full draft to the user — title, body, labels, and target repository. Wait for explicit approval before executing the
-`gh issue create` command or any equivalent action. The user may request changes, and you iterate until approved.
-
-This gate exists because issues are public, permanent, and affect real maintainers. An agent creating issues without
-human review is the exact behavior that erodes maintainer trust.
+full draft to the user — title, body, labels, and target repository. Wait for explicit approval before executing
+`gh issue create` or any equivalent action. The user may request changes; iterate until approved.
 
 ## GitHub CLI Mechanics
 
@@ -180,9 +176,9 @@ gh issue create -R owner/repo \
   --body-file issue-body.md
 ```
 
-Use `--template` when the project has issue templates. This ensures you provide the information the maintainers expect
-in the structure they expect. Some projects use YAML-based issue forms (`.github/ISSUE_TEMPLATE/*.yml`) which enforce
-structured fields — when these exist, fill every required field.
+Use `--template` when the project has issue templates — this provides information in the structure maintainers expect.
+Some projects use YAML-based issue forms (`.github/ISSUE_TEMPLATE/*.yml`) which enforce structured fields — fill every
+required field.
 
 List available templates:
 
@@ -250,8 +246,8 @@ Raw output contains a literal newline inside the JSON string value.
 
 ## Integration
 
-- **pr-contribution** — sibling skill. Use issue-writing when filing issues; use pr-contribution when submitting code
-  changes. If filing an issue and then implementing the fix, invoke both skills sequentially.
+- **pr-contribution** — sibling skill. Use when submitting code changes. If filing an issue and then implementing the
+  fix, invoke both skills sequentially.
 
 ## Critical Rules
 

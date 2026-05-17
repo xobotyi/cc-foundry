@@ -44,7 +44,7 @@ strong signals:
 ## What This Means For Agents Writing Issues
 
 **You are exactly the kind of actor that creates slop.** An AI agent that generates an issue without deep verification
-is indistinguishable from the actors that are destroying maintainer trust and causing burnout. The bar for AI-generated
+is indistinguishable from the actors destroying maintainer trust and causing burnout. The bar for AI-generated
 contributions is higher than for humans, not lower.
 
 Projects are actively implementing policies against AI-generated contributions:

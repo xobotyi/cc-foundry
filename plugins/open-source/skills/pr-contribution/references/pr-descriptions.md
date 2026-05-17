@@ -1,6 +1,6 @@
 # PR Description Anatomy
 
-Detailed guidance for writing pull request descriptions that serve both reviewers and future historians.
+Guidance for writing pull request descriptions that serve both reviewers and future historians.
 
 ## Structure
 

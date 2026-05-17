@@ -1,7 +1,7 @@
 # Agent PR Quality
 
-Why AI-generated pull requests get rejected and how to avoid the common failure modes. Based on research analyzing
-hundreds of rejected agent PRs and maintainer feedback from major open-source projects.
+Why AI-generated pull requests get rejected and how to avoid common failure modes. Based on research analyzing hundreds
+of rejected agent PRs and maintainer feedback from major open-source projects.
 
 ## The Core Problem
 
@@ -47,17 +47,7 @@ Most open-source projects rely on undocumented knowledge:
 - Error handling expectations that downstream components rely on but are never written down
 
 Agents do not know these things. Code that "works in isolation" can violate system-wide assumptions. Example: catching
-and logging every exception appears robust but can mask critical failures that other components expect to propagate.
-
-## Maintainer Burnout Context
-
-The volume of low-quality AI contributions has created a crisis for maintainers:
-
-- Reviewers can no longer assume authors understand the code they submit
-- Line-by-line review is still mandatory but does not scale with large AI-assisted PRs
-- Maintainers must now evaluate both the code AND whether the author understands it
-- Some projects have begun automatically closing PRs from external contributors
-- Review burden is higher than pre-AI, not lower
+and logging every exception can mask critical failures that other components expect to propagate.
 
 ## Quality Signals That Build Trust
 

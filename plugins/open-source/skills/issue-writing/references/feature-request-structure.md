@@ -26,8 +26,8 @@ Clear, descriptive title that identifies the requested capability. Frame as the 
 
 ### 1. Problem or Motivation
 
-Explain the problem you're trying to solve, not the solution you've imagined. This is the most important section —
-developers prioritize requests that align with project goals, and they assess alignment by understanding your problem.
+Explain the problem you're trying to solve, not the solution you've imagined. Developers prioritize requests that align
+with project goals — they assess alignment by understanding your problem, not your proposed solution.
 
 - What are you trying to accomplish?
 - Why can't you accomplish it with the current software?
@@ -58,7 +58,7 @@ internally.
 
 ### 3. Alternatives Considered
 
-Show that you've thought about other approaches. This demonstrates investment and helps developers evaluate trade-offs.
+Show you've thought about other approaches. This demonstrates investment and helps developers evaluate trade-offs.
 
 - What workarounds have you tried?
 - What other tools or approaches partially solve this?

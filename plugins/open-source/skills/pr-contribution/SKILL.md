@@ -14,7 +14,7 @@ description: >-
 exist.**
 
 Agent-generated PRs are rejected more often than human PRs — not because the code is wrong, but because they lack
-context, violate implicit norms, and burden maintainers with unnecessary review work. This skill exists to prevent that.
+context, violate implicit norms, and burden maintainers with unnecessary review work.
 
 ## References
 
@@ -29,8 +29,8 @@ context, violate implicit norms, and burden maintainers with unnecessary review 
 
 ## Preparation Pipeline
 
-Before writing any code or opening any PR, complete these checks. Skipping preparation is the primary cause of rejected
-contributions.
+Before writing any code or opening any PR, complete these checks. Skipping preparation is the primary cause of
+rejection.
 
 ### Read the Project
 
@@ -79,7 +79,7 @@ contributions.
 
 ## PR Titles
 
-The title is the first thing a reviewer reads. It determines whether they engage now, later, or never.
+The title is the first thing a reviewer reads — it determines whether they engage now, later, or never.
 
 **Rules:**
 
@@ -167,11 +167,8 @@ For complete fork mechanics and gh CLI commands, read `${CLAUDE_SKILL_DIR}/refer
 
 **Do not create the pull request until the user explicitly approves it.** After completing the pre-submission checklist,
 present the full draft to the user — title, description, target repository, base branch, and any labels. Wait for
-explicit approval before executing the `gh pr create` command or any equivalent action. The user may request changes,
-and you iterate until approved.
-
-This gate exists because pull requests are public, affect real maintainers, and represent the user's reputation. An
-agent submitting PRs without human review is the exact behavior that causes maintainer distrust.
+explicit approval before executing `gh pr create` or any equivalent action. The user may request changes; iterate until
+approved.
 
 ## GitHub / gh CLI
 
@@ -195,8 +192,8 @@ gh pr create --draft --title "[WIP] Add rate limiting" --body "..."
 gh pr checks
 ```
 
-For non-trivial changes, open a draft PR early — before the work is complete. This gets feedback on approach before you
-invest heavily, and signals to maintainers that you're working on the problem.
+For non-trivial changes, open a draft PR early — before the work is complete. This gets feedback on approach before
+heavy investment, and signals to maintainers that you're working on the problem.
 
 ## Agent-Specific Discipline
 
@@ -278,9 +275,8 @@ for Chrome/Firefox users.
 
 ## Integration
 
-- **issue-writing** — sibling skill. Use pr-contribution when submitting code changes; use issue-writing when filing
-  issues. If reporting a bug and then submitting a fix, invoke both skills — file the issue first, then reference it in
-  the PR.
+- **issue-writing** — sibling skill. Use when filing issues. If reporting a bug and then submitting a fix, invoke both
+  skills — file the issue first, then reference it in the PR.
 
 ## Pre-Submission Checklist
 
