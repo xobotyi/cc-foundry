@@ -55,8 +55,7 @@ def test_user_creation_sets_defaults():
 ```
 
 - **One act per test.** If you need multiple acts, write multiple tests.
-- **Comments optional** when phases are obvious. Add them when the test is long enough that phases aren't immediately
-  clear.
+- **Comments optional** when phases are obvious. Add when the test is long enough that phases aren't immediately clear.
 
 ### Test Granularity
 
