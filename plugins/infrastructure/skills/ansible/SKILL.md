@@ -14,7 +14,7 @@ Idempotency is the highest Ansible virtue. Every task must describe desired stat
 
 ## References
 
-Extended examples, patterns, and detailed rationale for the rules below live in `${CLAUDE_SKILL_DIR}/references/`.
+Extended examples, patterns, and rationale for the rules below live in `${CLAUDE_SKILL_DIR}/references/`.
 
 - **playbook-patterns** — [`${CLAUDE_SKILL_DIR}/references/playbook-patterns.md`]: Play execution order, static vs
   dynamic reuse comparison table, batched execution with `serial`, verification flags, standard directory layouts
@@ -263,14 +263,6 @@ update and no jobs launch. Automate signing in CI via `ANSIBLE_SIGN_GPG_PASSPHRA
 - Integrate OpenSCAP for compliance scanning and report generation.
 - Watch for IaC security smells: root SSH login, command injection, plaintext secrets, unvalidated paths, outdated
   dependencies.
-
-### Non-Negotiable Security Rules
-
-- Never store passwords in plaintext variable files
-- Never commit vault password files to version control
-- Use `no_log: true` on tasks that handle secrets
-- Use `become: true` at task level, not play level
-- Use SSH key authentication, not password authentication
 
 ## Error Handling
 

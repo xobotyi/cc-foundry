@@ -39,11 +39,9 @@ Extended configuration details, command examples, and decision tables live in th
 
 Unraid supports three storage approaches. Choose based on workload:
 
-| Approach                               | Use When                                                            |
-| -------------------------------------- | ------------------------------------------------------------------- |
-| Traditional array (XFS/BTRFS + parity) | Growing media collections, power efficiency matters, easy expansion |
-| ZFS pools                              | Data integrity critical, multi-user throughput, snapshots needed    |
-| Hybrid (array + ZFS pools)             | Mixed workloads — fast pool for active data, array for cold storage |
+- **Traditional array (XFS/BTRFS + parity)** — Growing media collections, power efficiency matters, easy expansion
+- **ZFS pools** — Data integrity critical, multi-user throughput, snapshots needed
+- **Hybrid (array + ZFS pools)** — Mixed workloads — fast pool for active data, array for cold storage
 
 Unraid 7+ supports **array-free operation** for all-SSD/NVMe builds using only pools.
 
