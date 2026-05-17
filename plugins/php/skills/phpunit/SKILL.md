@@ -12,7 +12,7 @@ description: >-
 does, rewrite it.**
 
 PHPUnit is PHP's standard testing framework. It uses test case classes extending `TestCase`, `setUp()`/`tearDown()` for
-fixtures, and a rich assertion API. All patterns target PHPUnit 11+ on PHP 8.5+. Use PHP 8 attributes exclusively —
+fixtures, and a full assertion API. All patterns target PHPUnit 11+ on PHP 8.5+. Use PHP 8 attributes exclusively —
 annotations are deprecated in 11, removed in 12.
 
 ## References

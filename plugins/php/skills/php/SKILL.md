@@ -82,7 +82,7 @@ class Config
 }
 ```
 
-- Type all class constants. Interface constants benefit especially — they enforce the contract at compile time.
+- Type all class constants. Interface constants especially — they enforce the contract at compile time.
 
 ### Variance
 
