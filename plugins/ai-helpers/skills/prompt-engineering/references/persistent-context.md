@@ -274,9 +274,9 @@ system prompt:
 └─────────────────────────────────────┘
 ```
 
-**Dual-placement strategy:** For rules that absolutely must be followed, state them near the top AND reinforce at the
-end. This exploits both primacy and recency bias. Use different phrasing to avoid appearing redundant — frame as a
-principle at the top, as a checklist item at the bottom.
+**Dual-placement strategy:** For rules that must be followed, state them near the top AND reinforce at the end. This
+exploits both primacy and recency bias. Use different phrasing to avoid appearing redundant — frame as a principle at
+the top, as a checklist item at the bottom.
 
 **Avoid the middle for critical rules.** If a rule is important enough to enforce, place it in the top 20% or bottom 20%
 of the document. Middle placement is appropriate for detailed topic rules, lookup tables, and examples — content that's

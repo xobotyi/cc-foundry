@@ -1,10 +1,9 @@
 # Prompt Techniques for Skills — Extended Depth
 
 Deepening material for the instruction design rules in SKILL.md. Read SKILL.md first — this reference provides research
-context, trade-off analysis, and edge case guidance that goes beyond the working-resolution rules.
+context, trade-off analysis, and edge cases beyond the working-resolution rules.
 
-**Consider invoking the `prompt-engineering` skill** for the full prompt engineering toolkit beyond skill-specific
-application.
+**Consider invoking `prompt-engineering`** for the full prompt engineering toolkit beyond skill-specific application.
 
 ## Contents
 
@@ -19,8 +18,8 @@ application.
 
 ## Instruction Budget and Applicability
 
-Skills inject additional instructions into an already-loaded context. Understanding the budget helps you decide what
-belongs in a skill versus what should be left to the harness.
+Skills inject additional instructions into an already-loaded context. Understanding the budget helps decide what belongs
+in a skill versus what to leave to the harness.
 
 ### The Budget Problem
 
@@ -32,12 +31,12 @@ is loaded. Research on frontier models indicates:
 - **Uniform degradation**: as instruction count grows, compliance drops across all rules equally — the model does not
   simply ignore "later" instructions, it degrades on all of them
 
-This means skills that add 20+ instructions are burning budget that affects harness rules too, not just their own.
+Skills that add 20+ instructions burn budget that affects harness rules too, not just their own.
 
 ### Applicability Rule
 
-CLAUDE.md research shows: the more instructions in context that are irrelevant to the current task, the worse the model
-performs. Skills trigger contextually, but their full content is loaded when triggered.
+The more instructions in context irrelevant to the current task, the worse the model performs. Skills trigger
+contextually, but their full content is loaded when triggered.
 
 - Include only instructions that apply to **every** invocation of the skill
 - Move task-specific depth to `references/` and instruct the skill to read them on demand (progressive disclosure)
@@ -74,12 +73,12 @@ studied agents. These are not implementation bugs — they are structural proper
 
 ### The Observer's Paradox
 
-The executing model "smooths over" contradictions — it resolves them using judgment, which prevents it from recognizing
+The executing model "smooths over" contradictions — resolves them using judgment, which prevents it from recognizing
 them as contradictions. The model that follows your skill is the worst validator of whether your skill conflicts with
 other rules.
 
-**Implication**: test skill instructions with a different model than the executing one, or with a model in a fresh
-context without the harness system prompt.
+Test skill instructions with a different model than the executing one, or with a model in a fresh context without the
+harness system prompt.
 
 ### Conflict-Check Protocol Before Shipping a Skill
 
@@ -170,11 +169,11 @@ aggressive:
 4. **Consequence** — state what happens if ignored: "If validation is skipped, the output will corrupt downstream data"
 5. **Dual-place** — top + bottom reinforcement: principle at top, checklist at bottom
 
-**Use sparingly.** If everything is emphasized, nothing is. Reserve strong language for rules that repeatedly fail in
+**Use sparingly** — if everything is emphasized, nothing is. Reserve strong language for rules that repeatedly fail in
 testing.
 
-**Prefer restructuring over emphasis.** Moving a constraint to XML tags at the end of a skill is more reliable than
-capitalizing words in the middle. Placement beats emphasis.
+**Prefer restructuring over emphasis.** Moving a constraint to XML tags at the end is more reliable than capitalizing
+words in the middle. Placement beats emphasis.
 
 ---
 
@@ -249,5 +248,5 @@ Try fixes in this order — most issues are solved by #1-3:
 4. **Emphasize** — strengthen language (ALWAYS, NEVER, REQUIRED)
 5. **Split** — decompose into simpler sub-tasks or separate skills
 
-Adding more text (instructions, constraints, rules) should be the last resort. Research shows adding unnecessary
-requirements reduces task success. Try restructuring existing content first.
+Adding more text is the last resort. Research shows unnecessary requirements reduce task success. Restructure existing
+content first.

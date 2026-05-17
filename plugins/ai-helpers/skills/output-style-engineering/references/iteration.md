@@ -4,17 +4,17 @@ Patterns for diagnosing and fixing output style problems after deployment.
 
 ## The Core Principle: Replace, Don't Augment
 
-Output styles work by replacing the system prompt at the core level. This has a critical implication for iteration:
-**you cannot remove default behaviors by adding instructions on top of them.** Adding "don't be sycophantic" to
-CLAUDE.md or a session-start hook will lose effectiveness over multiple turns. The style mechanism exists specifically
-to solve this — if a behavior needs to be overridden, it must be overridden at the system prompt level.
+Output styles work by replacing the system prompt at the core level. This has a critical implication: **you cannot
+remove default behaviors by adding instructions on top of them.** Adding "don't be sycophantic" to CLAUDE.md or a
+session-start hook will lose effectiveness over multiple turns. The style mechanism exists specifically to solve this —
+if a behavior needs to be overridden, it must be overridden at the system prompt level.
 
 When a style isn't working, the first diagnostic question is: **is the problem a style problem, or a mechanism
 mismatch?**
 
 ## Mechanism Mismatch
 
-Before iterating on the style itself, verify the right mechanism is in use. Iteration cannot fix a mechanism mismatch.
+Before iterating, verify the right mechanism is in use. Iteration cannot fix a mechanism mismatch.
 
 **Symptoms of mechanism mismatch:**
 

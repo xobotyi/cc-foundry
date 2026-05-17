@@ -569,8 +569,8 @@ filenames) AND filters which hook groups run.
 
 Fires when a worktree is being created (`claude --worktree` or subagent with `isolation: "worktree"`). Replaces default
 git worktree behavior entirely — useful for non-git VCS like SVN, Perforce, or Mercurial. `.worktreeinclude` is NOT
-processed when a hook is configured. If you need to copy local config files like `.env` into the new worktree, do it
-inside the hook script.
+processed when a hook is configured. To copy local config files like `.env` into the new worktree, do so inside the hook
+script.
 
 **Input fields:** `name` (slug identifier for the worktree).
 

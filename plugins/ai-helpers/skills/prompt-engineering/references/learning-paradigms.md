@@ -152,9 +152,8 @@ or most informative for the model.
 3. Select the most uncertain questions for human annotation with CoT reasoning
 4. Use the newly annotated exemplars for inference
 
-**Why disagreement works as an uncertainty signal:** If the model produces consistent answers across k samples, it has
-strong priors — human annotation adds little. If answers vary widely, the model is confused — this is where exemplar
-quality matters most.
+**Why disagreement works as an uncertainty signal:** Consistent answers across k samples → strong priors, human
+annotation adds little. Wide variation → model is confused, exemplar quality matters most.
 
 **Parameters:**
 
@@ -181,12 +180,6 @@ A hybrid approach: train a small, tuneable policy LM to generate hints/stimuli t
 - Policy LM — small, fine-tuned with RL to generate optimal hints for a given input
 - Executor LLM — large, frozen, receives the original input plus the policy-generated hint
 - The hint is a directional stimulus: a keyword, constraint, or partial answer that steers generation
-
-**Why a separate policy LM:**
-
-- The large LLM cannot be fine-tuned (cost, access)
-- Prompt engineering by hand does not scale to task-specific optimization
-- RL over the policy LM optimizes hint quality directly against task reward
 
 **Typical use case:** Summarization — the policy LM generates keywords that should appear in the summary; the executor
 LLM produces the summary conditioned on those keywords.

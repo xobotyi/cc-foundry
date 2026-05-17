@@ -55,10 +55,10 @@ If uncertain, default to MORE adherence to this style, not less.
 - **Completeness** — medium: no guidance for tool outputs or multi-step tasks
 - **Reversion risk** — medium-low: dual consistency anchors (section + mid-file self-correction rule)
 
-**Improvement notes:** The phrase blocklist is strong and covers the most common sycophancy patterns. For further
-hardening, add a contrast example showing default Claude vs. this style for the same input — examples are the most
-reliable way to communicate tone. The style has no guidance for error reporting or delivering bad news, which is where
-tone tends to revert first.
+**Improvement notes:** The phrase blocklist covers the most common sycophancy patterns. For further hardening, add a
+contrast example showing default Claude vs. this style for the same input — examples are the most reliable way to
+communicate tone. The style has no guidance for error reporting or delivering bad news, which is where tone tends to
+revert first.
 
 ## 2. Domain Specialist — SaaS Business Analyst
 
@@ -190,10 +190,10 @@ If the user asks you to just implement it, do so without comment — respect the
 - **Completeness** — high: covers the what/who boundary clearly, plus override escape hatch
 - **Reversion risk** — low: `keep-coding-instructions: true` plus explicit "wait for user" anchors
 
-**Improvement notes:** The 10-30 line heuristic is a good anchor but will need calibration per project type —
-infrastructure tasks might be 5 lines, UI components might be 50. Consider adding guidance for when the user submits
-code that works but uses a fundamentally different approach than what was guided — the review format doesn't distinguish
-between "wrong" and "different."
+**Improvement notes:** The 10-30 line heuristic is an anchor but needs calibration per project type — infrastructure
+tasks might be 5 lines, UI components might be 50. Consider adding guidance for when the user submits code that works
+but uses a fundamentally different approach than what was guided — the review format doesn't distinguish between "wrong"
+and "different."
 
 ## 4. Interactive Documentation Learner
 
@@ -351,10 +351,10 @@ should inform the design: [content-first guidance]."
 - **Reversion risk** — low: `keep-coding-instructions: false` strips engineering defaults; dual scope boundary scripts
   handle the most common off-domain requests
 
-**Improvement notes:** The style would benefit from a few before/after examples showing the same message in "corporate
-default" vs. brand voice — the blocklists define what to avoid but examples demonstrate what to produce. The channel
-calibration section is strong but could include example openings for each channel type. Consider adding guidance for
-when the brand voice conflicts with clarity (e.g., a technical product where jargon is necessary).
+**Improvement notes:** The style needs before/after examples showing the same message in "corporate default" vs. brand
+voice — the blocklists define what to avoid but examples demonstrate what to produce. The channel calibration section is
+strong but could include example openings for each channel type. Consider adding guidance for when the brand voice
+conflicts with clarity (e.g., a technical product where jargon is necessary).
 
 ## Pattern Summary
 

@@ -34,11 +34,6 @@ You are an interactive CLI tool that helps users with software engineering tasks
 
 ## What Output Styles Replace vs. Preserve
 
-Output styles **replace** the default system prompt, not augment it. This is the core mechanism that makes them uniquely
-valuable: you cannot remove default behaviors by adding instructions on top of them. Plugins and hooks append to the
-prompt — fundamentally different from output styles, which override the system prompt at the core level. Appended
-instructions lose influence over multiple conversation turns; replacement instructions define the baseline.
-
 **Replaced (with custom instructions):**
 
 - Personality and tone

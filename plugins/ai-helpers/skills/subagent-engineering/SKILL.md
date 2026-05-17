@@ -36,8 +36,7 @@ Skip only for trivial edits (typos, formatting).
 - **Architecture and examples** — [`${CLAUDE_SKILL_DIR}/references/patterns.md`] Pipeline, parallel, orchestrator
   patterns, Agent Teams, worktree isolation, background execution, Agent SDK, 6 full agent examples
 
-Read the relevant reference for extended depth. The rules below are sufficient for correct work without loading
-references.
+Read the relevant reference for extended depth. Rules below are sufficient for correct work without loading references.
 
 ## When to Use Subagents
 
@@ -108,7 +107,7 @@ When names collide, higher priority wins.
 
 ### `description`
 
-Claude sees ONLY `name` and `description` when deciding to delegate. The body loads AFTER delegation. This makes the
+Claude sees ONLY `name` and `description` when deciding to delegate. The body loads AFTER delegation — making the
 description the highest-leverage field.
 
 **Formula:** `[What it does in 1 sentence]. [When to use it — specific trigger context].`
@@ -214,21 +213,10 @@ Agent Teams scale subagents into coordinated crews with a shared task list and p
 - Standalone: tasks are fully independent, no coordination needed
 - Teams: tasks share findings, have dependencies, or need lead/worker structure
 
-**Key rule:** standalone subagents pollute the caller's context (TaskOutput injects full output). Teammates communicate
-via short SendMessage summaries — much more context-efficient.
+Standalone subagents pollute the caller's context (TaskOutput injects full output). Teammates communicate via short
+SendMessage summaries — much more context-efficient.
 
 Architecture patterns and team examples: see [`${CLAUDE_SKILL_DIR}/references/patterns.md`].
-
-## Core Design Principles
-
-- **Description is the trigger.** Claude sees ONLY `name` + `description` when deciding to delegate. Specific
-  descriptions enable correct delegation.
-- **Single responsibility.** Each subagent excels at ONE task. Swiss Army knife agents are hard to trigger correctly and
-  mediocre at everything.
-- **Minimal tool access.** Grant only necessary permissions. Read-only agents don't need Edit/Write.
-- **Clear handoffs.** Design subagents to return actionable summaries, not raw data dumps.
-- **Context efficiency.** Subagents should use Grep before Read, stop when they have enough information, and return
-  synthesized findings.
 
 ## Evaluation Criteria
 

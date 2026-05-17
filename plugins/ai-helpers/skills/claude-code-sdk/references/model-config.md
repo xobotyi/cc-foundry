@@ -3,27 +3,6 @@
 Complete reference for Claude Code model selection, aliases, effort levels, extended context, and related environment
 variables.
 
----
-
-## Table of Contents
-
-- [Model Aliases](#model-aliases)
-- [Setting the Model](#setting-the-model)
-- [Default Model Behavior](#default-model-behavior)
-- [Opusplan Mode](#opusplan-mode)
-- [Effort Levels](#effort-levels)
-- [Extended Context (1M)](#extended-context-1m)
-- [Restricting Model Selection](#restricting-model-selection)
-- [Custom Model Option](#custom-model-option)
-- [Model Override Environment Variables](#model-override-environment-variables)
-- [Third-Party Provider Pinning](#third-party-provider-pinning)
-- [Pinned Model Display and Capabilities](#pinned-model-display-and-capabilities)
-- [modelOverrides Setting](#modeloverrides-setting)
-- [Prompt Caching Configuration](#prompt-caching-configuration)
-- [Checking Current Model](#checking-current-model)
-
----
-
 ## Model Aliases
 
 - **`default`** — clears any model override, reverts to recommended model for account type. Not itself a model alias.

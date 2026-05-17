@@ -1,7 +1,7 @@
 # Troubleshooting Subagents
 
-Reference for the `subagent-engineering` skill. Covers diagnostic steps, error catalog, debug mode, and common failure
-patterns for Claude Code subagents — including agent teams, background agents, worktree isolation, and the Agent SDK.
+Diagnostic steps, error catalog, debug mode, and common failure patterns for Claude Code subagents — agent teams,
+background agents, worktree isolation, and the Agent SDK.
 
 ---
 
@@ -26,9 +26,7 @@ patterns for Claude Code subagents — including agent teams, background agents,
 
 ## Agent Discovery Failures
 
-The agent exists but `@agent-name` returns "agent not found" or similar.
-
-Checklist:
+The agent exists but `@agent-name` returns "agent not found" or similar:
 
 - **File location** — agent file must be in `.claude/agents/` (project-scoped) or `~/.claude/agents/` (global). No other
   directories are scanned.
@@ -52,17 +50,17 @@ Verification steps:
 
 ### Over-triggering (agent activates for wrong requests)
 
-Cause: description is too vague or uses generic language that matches many request types.
+Cause: description too vague or generic — matches too many request types.
 
 Fix:
 
-- Narrow the description to specific nouns and verbs: "Reviews Go code for error handling patterns" not "Reviews code".
+- Narrow to specific nouns and verbs: "Reviews Go code for error handling patterns" not "Reviews code".
 - Add a "when NOT to use" line in the description.
 - Test with 5 out-of-scope requests; if any activate the agent, tighten further.
 
 ### Under-triggering (agent never activates for correct requests)
 
-Cause: description is too specific, uses jargon the user won't use, or lacks delegation language.
+Cause: description too specific, uses jargon the user won't use, or lacks delegation language.
 
 Fix:
 
@@ -86,22 +84,23 @@ Fix:
 
 ### Tool not available to agent
 
-Cause: tool not listed in `tools` frontmatter field, or field is missing entirely.
+Cause: tool not listed in `tools` frontmatter, or field missing entirely.
 
 Fix:
 
-- Add the tool to `tools:` list. Tool names are case-sensitive: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`,
-  `WebSearch`, `WebFetch`, `Task`, `TodoWrite`, `TodoRead`, `Bash`.
+- Add the tool to `tools:`. Names are case-sensitive: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `WebSearch`,
+  `WebFetch`, `Task`, `TodoWrite`, `TodoRead`, `Bash`.
 - If `tools:` is absent, the agent inherits the parent's tool set — check whether the parent session has the tool.
 
 ### Tool blocked despite being in `tools` list
 
-Cause: `disallowedTools` in `settings.json` conflicts with the agent's `tools` list. `disallowedTools` takes precedence.
+Cause: `disallowedTools` in `settings.json` conflicts with the agent's `tools` list — `disallowedTools` takes
+precedence.
 
 Fix:
 
-- Check `settings.json` for `disallowedTools` entries that overlap with the agent's required tools.
-- Either remove the tool from `disallowedTools` or accept the restriction and redesign the agent's approach.
+- Check `settings.json` for `disallowedTools` entries overlapping the agent's required tools.
+- Remove from `disallowedTools` or accept the restriction and redesign the agent's approach.
 
 ### Permission denied on Bash command
 
@@ -120,10 +119,10 @@ Fix:
 
 Cause: system prompt lacks explicit format specification.
 
-Fix (apply in order until resolved):
+Fix (in order):
 
-1. Add a dedicated `## Output Format` section to the system prompt specifying exact structure, sections, and length.
-2. Add a concrete example of expected output — agents follow examples more reliably than abstract descriptions.
+1. Add `## Output Format` section specifying exact structure, sections, and length.
+2. Add a concrete example — agents follow examples more reliably than abstract descriptions.
 3. Add a prefill-style opening line: "Start your response with: `## Summary`" to anchor the format.
 
 ### Output varies between runs
@@ -141,7 +140,7 @@ Fix:
 
 Agent returns before finishing all steps.
 
-Cause: no sequential workflow, no explicit completion criteria, or no verification checklist.
+Cause: no sequential workflow, no explicit completion criteria, no verification checklist.
 
 Fix:
 
@@ -153,7 +152,7 @@ Fix:
   - [ ] Step 2 completed
   - [ ] Output written to correct location
   ```
-- Add an explicit final instruction: "Do not return until all checklist items are checked."
+- Add final instruction: "Do not return until all checklist items are checked."
 
 ---
 
@@ -161,19 +160,19 @@ Fix:
 
 ### Teammate not receiving messages
 
-Cause: `SendMessage` tool not included in the sender's `tools` list, or message sent with wrong recipient name.
+Cause: `SendMessage` not in sender's `tools`, or message sent with wrong recipient name.
 
 Diagnosis:
 
 - Confirm `SendMessage` is in the sending agent's `tools` list.
 - Confirm `to:` uses the teammate's name exactly as defined in `TeamCreate` — not a UUID, not a display name variant.
-- Remember: plain text output is NOT visible to teammates. `SendMessage` is the only inter-agent communication channel.
+- Plain text output is NOT visible to teammates. `SendMessage` is the only inter-agent communication channel.
 
 Fix:
 
 - Add `SendMessage` to `tools` in the sender's frontmatter.
-- Verify recipient name spelling matches the team member name exactly.
-- If broadcasting, use `to: "*"` sparingly — it scales linearly with team size.
+- Verify recipient name matches the team member name exactly.
+- Use `to: "*"` sparingly — it scales linearly with team size.
 
 ### Task coordination failures
 
@@ -184,8 +183,8 @@ Cause: missing `blockedBy` dependencies, or agents claimed the same task before 
 Fix:
 
 - Use `addBlockedBy` when creating dependent tasks to enforce order.
-- Agents must call `TaskUpdate` with `owner` immediately when claiming a task — before starting work.
-- Check `TaskList` before claiming to confirm no other agent already owns the task.
+- Call `TaskUpdate` with `owner` immediately when claiming — before starting work.
+- Check `TaskList` before claiming to confirm no other agent owns the task.
 - Task descriptions must be fully self-contained — teammates have no shared conversation history, so all context (file
   paths, function names, acceptance criteria) must be in the description itself.
 
@@ -215,8 +214,8 @@ Fix:
 
 Background agents run asynchronously. To check status:
 
-- In Claude Code UI: check the Agents panel for the running agent's status indicator.
-- Via SDK: poll the agent run object — status transitions through `running` → `completed` / `failed`.
+- Claude Code UI: check the Agents panel for the running agent's status indicator.
+- SDK: poll the agent run object — status transitions `running` → `completed` / `failed`.
 - Look for `TaskCompleted` or `TeammateIdle` hook events if the agent is part of a team.
 
 ### Agent appears stuck
@@ -231,11 +230,11 @@ Fix:
 
 ### Timeout handling
 
-Background agents do not have a built-in timeout by default. For long-running agents:
+Background agents have no built-in timeout. For long-running agents:
 
 - Set an explicit deadline in the task description: "Complete within 10 tool calls or return partial results."
-- Use `TeammateIdle` hook to detect when an agent has been idle longer than expected and inject a stop instruction.
-- Design agents to emit progress via `SendMessage` so the team lead can detect stalls.
+- Use `TeammateIdle` hook to detect idle-longer-than-expected and inject a stop instruction.
+- Emit progress via `SendMessage` so the team lead can detect stalls.
 
 ---
 
@@ -247,7 +246,7 @@ Cause: `ExitWorktree` not called, or agent crashed before cleanup.
 
 Fix:
 
-- Always wrap worktree work in try/finally equivalent: emit cleanup instructions at the end of the system prompt.
+- Emit cleanup instructions at the end of the system prompt.
 - If a stale worktree exists: `git worktree remove --force <path>` from the main repo root.
 - List existing worktrees with `git worktree list` to identify orphans.
 
@@ -276,15 +275,14 @@ Fix:
 
 ### `settingSources` missing (most common SDK failure)
 
-Cause: the `ClaudeCodeOptions` object was constructed without the `settingSources` field, or it was set to an empty
-array.
+Cause: `ClaudeCodeOptions` constructed without `settingSources`, or set to empty array.
 
-Symptom: agent runs with no settings applied — no tools, no hooks, no model restrictions — or throws a validation error
-on startup.
+Symptom: agent runs with no settings — no tools, no hooks, no model restrictions — or throws a validation error on
+startup.
 
 Fix:
 
-- Always include `settingSources` in options:
+- Always include `settingSources`:
   ```typescript
   const options: ClaudeCodeOptions = {
     settingSources: ["user", "project"],
@@ -292,8 +290,7 @@ Fix:
   };
   ```
 - Valid values: `"user"` (loads `~/.claude/settings.json`), `"project"` (loads `.claude/settings.json`), `"enterprise"`.
-- If `settingSources` is intentionally empty (fully isolated agent), confirm this is deliberate — it disables all
-  configured tools and hooks.
+- If intentionally empty (fully isolated agent), confirm deliberately — it disables all configured tools and hooks.
 
 ### `allowedTools` not including required tools
 

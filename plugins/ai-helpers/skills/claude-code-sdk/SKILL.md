@@ -62,9 +62,8 @@ debugging any Claude Code extension mechanism.
   patterns, scheduling (`/loop`/`/proactive` alias, cron tools, cloud/desktop), checkpointing and rewind, extension
   mechanism selection table
 
-Read the relevant reference before making detailed changes. The sections below cover working-resolution rules for each
-mechanism — enough for correct decisions. References provide field-level schemas, complete tables, and implementation
-details.
+Read the relevant reference before making detailed changes. References provide field-level schemas, complete tables, and
+implementation details.
 
 ## Concepts
 
@@ -420,9 +419,6 @@ Effort levels: `low`, `medium`, `high`, `xhigh`, `max`. **Available levels depen
 `/team-onboarding`, `/autofix-pr`, `/usage`, `/branch`, `/skills`, `/permissions`, `/effort`, `/remote-control`.
 
 ## Related Skills
-
-This skill provides the SDK reference (what exists, how it works). The engineering skills provide design guidance (how
-to build it well):
 
 - `prompt-engineering` — instruction design techniques for any AI artifact
 - `skill-engineering` — SKILL.md design, description formulas, content architecture

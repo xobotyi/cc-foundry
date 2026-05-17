@@ -1,13 +1,13 @@
 # Creating Subagents
 
-Step-by-step guide for building effective Claude Code subagents: when to use them, how to configure them, and common
-patterns that work.
+Step-by-step guide for building effective Claude Code subagents: when to use them, how to configure them, and what
+patterns work.
 
 ---
 
 ## When to Use a Subagent
 
-Subagents are not always the right tool. Pick the right primitive for the job:
+Subagents are not always the right tool — pick the right primitive for the job:
 
 **Use a subagent when:**
 
@@ -149,7 +149,7 @@ Only `name` and `description` are required. Everything else is optional.
 ## Writing an Effective Description
 
 The description is the routing signal — Claude uses only `name` and `description` to decide whether to delegate. It must
-answer two questions: what does this agent do, and when should it be invoked.
+answer two questions: what does this agent do, and when to invoke it.
 
 **Formula:** `[Role/what it does]. [When to invoke it].`
 
@@ -166,13 +166,13 @@ Bad patterns:
 - Keyword stuffing: `"review, quality, lint, security"` — not how routing works
 
 **Proactive delegation:** Include "use proactively" to have Claude delegate automatically when it recognizes matching
-context, without waiting for an explicit instruction.
+context, without an explicit instruction.
 
 ---
 
 ## Choosing Tools
 
-Grant minimum necessary permissions. Do not leave `tools` blank unless full tool access is intentional.
+Grant minimum necessary permissions. Don't leave `tools` blank unless full tool access is intentional.
 
 Common tool sets by agent type:
 
@@ -238,7 +238,7 @@ Key principles:
 - Numbered workflow steps — explicit sequence prevents drift
 - Constraints section — narrows scope, prevents feature creep
 - Output format section — eliminates formatting ambiguity
-- Challenge the user — include "ask follow-up questions" or "be critical" to prevent sycophantic behavior
+- Challenge — include "ask follow-up questions" or "be critical" to prevent sycophantic behavior
 
 ---
 

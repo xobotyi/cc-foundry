@@ -11,9 +11,8 @@ LLMs use transformer attention: every token attends to every other token (O(n²)
 pairwise attention is stretched thin across more tokens. This is not a cliff — it is a gradient of degrading precision
 called **context rot**: recall and long-range reasoning degrade steadily as token count rises.
 
-Consequence: treat context as a scarce resource with diminishing marginal returns. The goal is the **smallest set of
-high-signal tokens** that maximizes the likelihood of the desired output — not the largest set of potentially relevant
-tokens.
+Treat context as a scarce resource with diminishing marginal returns. The goal is the **smallest set of high-signal
+tokens** that maximizes the likelihood of the desired output — not the largest set of potentially relevant tokens.
 
 ---
 
@@ -202,8 +201,8 @@ When a task requires exploring more content than fits in one focused context:
 - Sub-agents handle deep-dive tasks in isolated clean contexts
 - Sub-agents return condensed summaries (1,000–2,000 tokens) not raw results
 
-This achieves separation of concerns: detailed search context stays within sub-agents; the lead agent stays focused on
-coordination and synthesis. See `references/agent-patterns.md` for implementation patterns.
+Detailed search context stays within sub-agents; the lead agent stays focused on coordination and synthesis. See
+`references/agent-patterns.md` for implementation patterns.
 
 ---
 
@@ -214,8 +213,8 @@ coordination and synthesis. See `references/agent-patterns.md` for implementatio
 - **Examples** → immediately before the task, after documents, to prime output format
 - **Task** → always last in the user turn; never bury it under documents
 
-Rationale: models exhibit stronger recall for content at the beginning and end of context (primacy- recency effect).
-Critical instructions placed only in the middle of a long document block are at highest risk of being under-attended.
+Rationale: models exhibit stronger recall at the beginning and end of context (primacy-recency effect). Critical
+instructions placed only in the middle of a long document block are at highest risk of being under-attended.
 
 ---
 

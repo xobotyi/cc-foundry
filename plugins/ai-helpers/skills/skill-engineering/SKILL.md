@@ -54,8 +54,8 @@ Read the relevant reference before proceeding.
 
 ## Description Formula
 
-The description determines when Claude activates your skill. It's the highest-leverage field — poor descriptions cause
-missed activations.
+The description determines when Claude activates your skill — the highest-leverage field; poor descriptions cause missed
+activations.
 
 ```
 [What it does] + [When to invoke — broad domain claim with trigger examples]

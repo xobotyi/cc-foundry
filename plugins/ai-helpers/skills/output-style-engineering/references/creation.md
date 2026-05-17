@@ -2,10 +2,9 @@
 
 ## Why Output Styles Exist
 
-Output styles **replace** Claude Code's system prompt — they don't augment it. This is the defining characteristic and
-the reason they exist as a separate mechanism.
+Output styles **replace** Claude Code's system prompt — they don't augment it.
 
-You cannot remove default behaviors by adding instructions on top of them. Users have repeatedly proven this:
+You cannot remove default behaviors by adding instructions on top of them. Users have proven this:
 
 - **CLAUDE.md** adds project context but cannot override the coding personality
 - **`--append-system-prompt`** appends without substituting — default behaviors remain
@@ -64,8 +63,7 @@ Run in Claude Code:
 /output-style:new [name] [verbose description of desired behavior]
 ```
 
-Claude generates a Markdown file in `~/.claude/output-styles/`. Treat this as a first draft — review and tighten before
-using.
+Claude generates a Markdown file in `~/.claude/output-styles/`. Treat as a first draft — review and tighten before use.
 
 ### Manual file creation
 
@@ -82,7 +80,7 @@ programmatically, then reference it via `settingSources` in SDK options. Details
 
 ### Step 1: Clarify purpose
 
-Answer before writing a single line:
+Answer before writing:
 
 - What is the user _not_ getting from the default style?
 - What role does this style play? (teacher, critic, domain specialist, persona)
@@ -237,7 +235,7 @@ create a tone-only style (e.g., "be more direct") accidentally lose coding capab
 
 **Instructions too vague** — "Be professional" is underspecified — two readers would imagine different behaviors. Fix:
 list concrete behaviors ("never use emoji", "always give verdict before rationale", "no hedging phrases") rather than
-adjectives. Every instruction should be verifiable: you can check whether a response complies or not.
+adjectives. Every instruction should be verifiable: you can check whether a response complies.
 
 **Style ignored in tool output** — Style controls Claude's prose, not the output of bash commands, file reads, or MCP
 tool results. Don't expect the style to reformat tool results — it governs how Claude frames and presents information,

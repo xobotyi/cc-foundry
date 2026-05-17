@@ -1,7 +1,6 @@
 # Skill Quality Evaluation
 
-Detailed scoring rubrics and evaluation procedures. For the quick deployment checklist, see the "Quick Checks" section
-in SKILL.md.
+Detailed scoring rubrics and evaluation procedures. For the quick deployment checklist, see "Quick Checks" in SKILL.md.
 
 ## Contents
 
@@ -17,9 +16,9 @@ in SKILL.md.
 
 ## Description Quality
 
-The description is the **highest-leverage field**. It is the only signal Claude uses to decide whether to invoke a skill
-— no algorithmic routing, no intent classification, pure LLM reasoning against the description text. Poor descriptions
-cause activation failures or false triggers.
+The description is the **highest-leverage field** — the only signal Claude uses to decide whether to invoke a skill. No
+algorithmic routing, no intent classification; pure LLM reasoning against description text. Poor descriptions cause
+activation failures or false triggers.
 
 ### Trigger Keyword Density
 
@@ -83,7 +82,6 @@ description: >-
 ### Clarity Test
 
 Could a colleague follow these instructions without asking clarifying questions? If not, the instructions need work.
-(This is the golden rule of prompt engineering.)
 
 ### Evaluation Criteria
 
@@ -232,26 +230,15 @@ For most skills, include at least:
 
 ### Worked Examples Are Refinement Artifacts
 
-Complete input→output worked examples (showing a realistic request and the skill's full output) are high-value but
-rarely available during initial skill creation. They typically emerge from real usage: a problem is encountered, solved,
-and the solution documented as an example.
+Complete input→output worked examples are high-value but rarely available during initial skill creation. They emerge
+from real usage: a problem is encountered, solved, and the solution documented as an example.
 
 Treat worked examples as a refinement goal, not an initial requirement. Populate them during iteration as you observe
-the skill in use. Pre-existing context (existing codebases, prior conversations) can sometimes provide material, but
-this is the exception.
+the skill in use.
 
 ## Evaluation-Driven Development
 
-Build evaluations BEFORE writing extensive documentation:
-
-1. **Identify gaps** — run Claude on representative tasks without the skill. Document specific failures or missing
-   context.
-2. **Create evaluations** — build 3+ scenarios that test these gaps.
-3. **Establish baseline** — measure performance without the skill.
-4. **Write minimal instructions** — only content that addresses observed failures.
-5. **Iterate** — run evaluations, compare against baseline, refine.
-
-This prevents over-engineering. You only add content that addresses real failures, not anticipated ones.
+See [`${CLAUDE_SKILL_DIR}/references/creation.md`] Step 8 for the EDD workflow.
 
 ## Testing Protocol
 

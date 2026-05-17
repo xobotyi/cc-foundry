@@ -1,7 +1,8 @@
 # Skill Security — Authoring and Vetting
 
 Research baseline: 26.1% of skills in the wild contain vulnerabilities. Claude treats SKILL.md as a trusted system
-prompt — a malicious skill has the same authority as a legitimate one.
+prompt — a malicious skill has the same authority as a legitimate one. Skills bundling executable scripts are **2.12×
+more likely** to contain vulnerabilities than instruction-only skills.
 
 ## The Consent Gap
 
@@ -10,8 +11,6 @@ The core risk: mismatch between what users approve and what a skill actually doe
 - **Example**: User installs "GIF Creator" → skill downloads ransomware on first use
 - **Why it works**: The skill description is what users read; SKILL.md content is what Claude executes
 - **Claude's position**: No independent verification of skill intent — it follows instructions
-
-Skills bundling executable scripts are **2.12× more likely** to contain vulnerabilities than instruction-only skills.
 
 ---
 

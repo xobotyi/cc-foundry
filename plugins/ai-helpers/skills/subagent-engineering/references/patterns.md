@@ -6,7 +6,7 @@ Architecture patterns, coordination models, and real examples for multi-agent wo
 
 ## Pattern Selection
 
-Choose the right structure before building. Wrong pattern choice is the most common cause of over-engineered or
+Choose the right structure before building — wrong pattern choice is the most common cause of over-engineered or
 underperforming agent systems.
 
 **Decision questions:**
@@ -17,15 +17,6 @@ underperforming agent systems.
 - Is the task long-running and user shouldn't wait? → Background execution
 - Is the code change experimental or risky? → Worktree isolation
 - Is this headless CI/CD automation? → Agent SDK
-
-**Pattern summary:**
-
-- Independent tasks, no coordination needed → standalone parallel subagents
-- Tasks need to share findings across agents → Agent Teams with shared task list
-- Sequential transformation (output feeds next stage) → pipeline pattern
-- Long-running work user shouldn't wait for → background execution
-- Experimental code changes that may be discarded → worktree isolation
-- Headless automation (CI/CD, scripting) → Agent SDK programmatic orchestration
 
 ---
 
@@ -93,8 +84,8 @@ the caller's context. Design each to return concise summaries, not raw file cont
 **When to use:** Independent investigations where research paths don't depend on each other.
 
 **When standalone subagents beat Agent Teams here:** For simple one-shot research with no cross-agent coordination,
-standalone parallel subagents are cheaper and simpler. Teams add overhead (team creation, task claiming) that isn't
-justified for small fan-outs.
+standalone parallel subagents are cheaper and simpler. Teams add overhead (team creation, task claiming) not justified
+for small fan-outs.
 
 ### Master-Clone (General-Purpose Delegation)
 
@@ -129,8 +120,8 @@ orchestrator
 └── test-runner (Bash, Read)
 ```
 
-The orchestrator's job is task decomposition and synthesis. Workers should be focused enough that their description is
-unambiguous — Claude delegates based on the `description` field, so vague descriptions cause mis-routing.
+The orchestrator's job is task decomposition and synthesis. Workers must be focused enough that their description is
+unambiguous — Claude delegates based on `description`, so vague descriptions cause mis-routing.
 
 ---
 
@@ -149,7 +140,7 @@ context), teammates communicate via short `SendMessage` summaries and share a ta
   sequencing.
 - Cross-task coordination — teammates can message each other directly without going through the lead.
 
-**Enable Agent Teams** (requires v2.1.32+):
+**Enable Agent Teams** (v2.1.32+):
 
 ```json
 {
@@ -283,7 +274,7 @@ tools: Read, Edit, Write, Bash
 - Large-scale refactors where mid-process state would be messy
 - Two subagents modifying overlapping files in parallel (give each its own worktree)
 
-Note: Worktree isolation is per-subagent, not per-team. For team-level isolation, include `isolation: worktree` in the
+Worktree isolation is per-subagent, not per-team. For team-level isolation, include `isolation: worktree` in the
 subagent definition used as the teammate template.
 
 ### Background Execution
@@ -301,7 +292,7 @@ tools: Bash, Read
 ---
 ```
 
-**Or request at runtime:**
+**Or at runtime:**
 
 ```
 Run the test suite in the background and let me know when it's done.
@@ -413,7 +404,7 @@ options = ClaudeAgentOptions(
 - One-off tasks → CLI
 - Production automation → SDK
 
-Many teams use both: CLI for daily development, SDK for production pipelines.
+Many teams use both: CLI for daily development, SDK for production.
 
 ---
 
@@ -657,8 +648,7 @@ Before creating the PR, output a summary of changes for human review.
 
 ## Anti-Patterns
 
-**God agent** — Agent that does everything. Hard to trigger correctly, poor at all tasks. Single-purpose agents
-outperform.
+**God agent** — Does everything. Hard to trigger correctly, poor at all tasks. Single-purpose agents outperform.
 
 **Vague description** — "Helps with code." Over-triggers on unrelated requests. Be specific about task type and trigger
 condition.
@@ -675,11 +665,11 @@ headers, severity levels, file:line format.
 **Context hogging** — Agent reads entire codebase for simple queries. Scope the investigation in the prompt or use the
 built-in Explore subagent (Haiku, read-only) for targeted lookups.
 
-**Verbose SendMessage in teams** — Injecting 2000-token messages into every teammate's context degrades reasoning
-quality. Keep teammate messages under ~500 tokens.
+**Verbose SendMessage in teams** — 2000-token messages injected into every teammate's context degrades reasoning. Keep
+teammate messages under ~500 tokens.
 
 **Missing blockedBy in teams** — Two teammates modifying overlapping files without declared dependencies causes
-conflicts. Always use `blockedBy` when task B consumes task A's output.
+conflicts. Use `blockedBy` when task B consumes task A's output.
 
-**Nested subagents** — Subagents cannot spawn other subagents. If your workflow requires nested delegation, use Skills
-or chain subagents from the main conversation instead.
+**Nested subagents** — Subagents cannot spawn other subagents. Use Skills or chain subagents from the main conversation
+instead.

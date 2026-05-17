@@ -99,8 +99,8 @@ Output styles are system prompts. Five components determine quality:
 
 ### 1. Define Persona Clearly
 
-The persona is the single highest-leverage element. A vague persona produces inconsistent behavior; a clear one anchors
-every response.
+The persona is the highest-leverage element. A vague persona produces inconsistent behavior; a clear one anchors every
+response.
 
 **Vague (fails):** "Be helpful and professional."
 
@@ -122,7 +122,7 @@ Abstract instructions ("communicate clearly") get ignored. Concrete behaviors ar
 - Open with the answer, not pleasantries
 ```
 
-Each rule should be verifiable: you can check whether a response complies or not.
+Each rule should be verifiable: you can check whether a response complies.
 
 ### 3. Include Tone Examples
 
@@ -147,7 +147,7 @@ Include at least one contrast example. Cover interaction types most likely to tr
 
 ### 4. Specify Output Format
 
-Without format guidance, response structure varies unpredictably. Provide templates for common response types.
+Without format guidance, response structure varies. Provide templates for common response types.
 
 ### 5. Add Consistency Safeguards
 
@@ -168,8 +168,8 @@ If uncertain, default to MORE adherence to this style, not less.
 
 ### Place Critical Rules at End
 
-Instructions near the end of the prompt are followed more reliably. Place the rules you absolutely cannot afford to have
-ignored last.
+Instructions near the end of the prompt are followed more reliably. Place the rules you cannot afford to have ignored
+last.
 
 ### Establish Priority Hierarchy
 

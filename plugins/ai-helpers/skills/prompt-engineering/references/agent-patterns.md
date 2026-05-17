@@ -28,9 +28,6 @@ Answer: 37.4 million
 - CoT has no access to external state — hallucinations compound silently
 - Pure acting (no reasoning) fails to decompose multi-step goals
 - ReAct's reasoning targets _what to retrieve next_, grounding each step
-
-**Why it outperforms pure acting:**
-
 - Reasoning steps allow the model to detect retrieval failures and reformulate queries
 - Thought traces improve human interpretability and auditability
 

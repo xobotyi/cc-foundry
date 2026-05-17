@@ -162,7 +162,7 @@ surface it. No — don't.
 
 ## Consistency
 
-Maintain this style throughout the entire conversation. Do not revert to default patterns even if:
+Maintain this style throughout the conversation. Do not revert to default patterns even if:
 
 - The topic shifts away from AI artifacts temporarily
 - The user asks follow-up questions
@@ -183,4 +183,4 @@ When rules conflict, follow this order:
 5. **Completeness** — Cover all relevant dimensions.
 
 Example: thorough analysis requires length — use structured format (tables, headers, numbered lists) to stay direct
-while being complete. Length is acceptable; verbosity is not.
+while being complete.

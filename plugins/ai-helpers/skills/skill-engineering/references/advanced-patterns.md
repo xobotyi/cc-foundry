@@ -1,7 +1,7 @@
 # Advanced Skill Patterns
 
 Reference for multi-file skills, fork pattern, workflow skills, composable skills, verifiable intermediate outputs,
-permission scoping, plugin packaging, Agent SDK integration, and agent team coordination.
+permission scoping, plugin packaging, Agent SDK integration, and agent teams.
 
 ---
 
@@ -23,7 +23,7 @@ my-skill/
 
 **Rules for supporting files:**
 
-- `SKILL.md` must stay self-sufficient — all behavioral rules the agent must follow go here, not in supporting files
+- `SKILL.md` must stay self-sufficient — all behavioral rules go here, not in supporting files
 - Supporting files hold catalog/lookup content loaded on demand for specific sub-tasks
 - Reference each supporting file from `SKILL.md` with an explicit description so Claude knows what it contains and when
   to load it
@@ -69,7 +69,7 @@ allowed-tools: Bash(gh *)
 Summarize the intent, risk, and missing test coverage.
 ```
 
-**Execution order:** All `` !`...` `` substitutions run first as preprocessing, before Claude sees anything.
+**Execution order:** All `` !`...` `` substitutions run as preprocessing — before Claude sees anything.
 
 **Multi-line variant** — use a fenced block opened with ` ```! `:
 
@@ -215,8 +215,8 @@ Stop if build output is missing or empty.
 - Git operations → `git log --oneline -3` or `git status`
 - Test runs → parse exit code AND scan for "failed" in output
 
-Verifiable intermediate outputs prevent the common failure mode where Claude reports success but the actual effect
-silently failed.
+Verifiable intermediate outputs prevent the failure mode where Claude reports success but the actual effect silently
+failed.
 
 ---
 
@@ -245,10 +245,10 @@ Fix issue $ARGUMENTS and ship it:
 - The composition is a specific workflow, not just a concatenation of prompts
 - The sub-skills have stable interfaces (their `$ARGUMENTS` contracts are clear)
 
-**Composability anti-patterns:**
+**Anti-patterns:**
 
 - Chaining skills that are too tightly coupled (better as a single workflow skill)
-- Invoking skills purely to avoid writing the instructions inline (adds indirection without gain)
+- Invoking skills purely to avoid writing instructions inline (adds indirection without gain)
 - Assuming a sub-skill's output format in the parent (fragile coupling)
 
 ---
@@ -464,9 +464,9 @@ Orchestrate a multi-agent code review of $ARGUMENTS:
 
 **When team coordination belongs in a skill:**
 
-- The workflow is well-defined and repeatable (same phases each time)
+- Workflow is well-defined and repeatable (same phases each time)
 - The user wants `/parallel-review` as a direct command
-- The orchestration logic is domain-specific and should be versioned with the codebase
+- Orchestration logic is domain-specific and should be versioned with the codebase
 
 **When team coordination belongs in ad-hoc prompts:** One-off investigations, exploratory work, or workflows that vary
 significantly each time — these don't benefit from the overhead of packaging.
@@ -490,8 +490,8 @@ Understanding how skill content persists through a session prevents common confu
   skill, 25,000 token shared budget); older skills can be dropped if the budget is exceeded
 - **Re-invocation** — re-invoke a skill after compaction to restore full content if it was dropped
 
-If a skill stops influencing behavior mid-session, it was likely dropped during compaction. Re-invoke it or strengthen
-the description and instructions so the model maintains alignment without repeated prompting.
+If a skill stops influencing behavior mid-session, it was likely dropped during compaction. Re-invoke it, or strengthen
+description and instructions so the model maintains alignment without repeated prompting.
 
 ---
 

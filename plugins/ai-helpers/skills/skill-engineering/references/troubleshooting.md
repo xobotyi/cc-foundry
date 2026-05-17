@@ -100,8 +100,7 @@ instruction hook — no better than no hook at all. This is a systemic limitatio
 
 **Why it happens:** Claude sees skill descriptions in the Skill tool definition and must decide to invoke the tool
 before proceeding. In practice, Claude often skips this step and proceeds directly with implementation, especially for
-multi-skill prompts. The selection mechanism is pure LLM reasoning — no algorithmic routing or keyword matching at the
-code level.
+multi-skill prompts. The selection mechanism is pure LLM reasoning — no algorithmic routing or keyword matching.
 
 **Measured rates (Scott Spence, 200+ test runs, Haiku 4.5):**
 
@@ -259,10 +258,9 @@ Read `${CLAUDE_SKILL_DIR}/references/guide.md` completely before proceeding.
 
 ## Token Budget Issues
 
-The `<available_skills>` list embedded in the Skill tool description has a character budget of **1% of the context
-window (fallback: 8,000 characters)**. Each entry is capped at 250 characters. When the total exceeds this limit, Claude
-Code truncates the list — skills that appear late are silently excluded. Claude cannot see excluded skills and will
-never invoke them.
+The `<available_skills>` list has a character budget of **1% of context window (fallback: 8,000 characters)**. Each
+entry is capped at 250 characters. When the total exceeds the limit, Claude Code truncates the list — skills that appear
+late are silently excluded. Claude cannot see excluded skills and will never invoke them.
 
 ### Symptoms
 
@@ -325,7 +323,7 @@ Look for the same plugin directory appearing in more than one location.
 When asking for help, provide:
 
 - Full SKILL.md content
-- Expected vs actual behavior
+- Expected vs. actual behavior
 - Exact prompt that failed
 - Any error messages
 - Output of `/context` if token budget is suspected

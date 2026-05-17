@@ -1,7 +1,7 @@
 # Skill Iteration
 
-Skills improve through observation and refinement. Apply prompt engineering debugging techniques — when Claude doesn't
-follow instructions, the prompt needs work, not stronger language.
+Skills improve through observation and refinement. When Claude doesn't follow instructions, the prompt needs work, not
+stronger language.
 
 ## Iteration Cycle
 
@@ -20,8 +20,8 @@ failure modes:
 - **Keyword gap** — Claude does shallow pattern matching at activation. Specific terms (`$state`, `command()`) activate
   every time; conceptual queries miss 60-80% of the time.
 - **Context window pressure** — Long conversations push skill checks to lower priority as context fills.
-- **Token budget truncation** — Available skills live in a budget of 1% of the context window (fallback: 8K chars)
-  inside the Skill tool description. Too many skills → truncation → invisible to Claude.
+- **Token budget truncation** — Skills live in a budget of 1% of context window (fallback: 8K chars) inside the Skill
+  tool description. Too many skills → truncation → invisible to Claude.
 - **Passive suggestion ignored** — Simple hook instructions are background noise. Claude acknowledges them mentally and
   proceeds without acting.
 
@@ -216,5 +216,3 @@ A skill is done when:
 - Instructions followed consistently
 - No recurring complaints
 - Maintenance burden is low
-
-Effectiveness over perfection.

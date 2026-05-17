@@ -1,7 +1,6 @@
 # Evaluating Subagents
 
-Reference for the `subagent-engineering` skill. Covers the five-dimension scoring rubric, testing protocol, and
-benchmarking practices for Claude Code subagents.
+Scoring rubric, testing protocol, and benchmarking practices for Claude Code subagents.
 
 ---
 
@@ -17,7 +16,7 @@ Evaluate on five dimensions. Each dimension has a weight; final score is the wei
 - **Context efficiency** — 10%
 - **Tool usage** — 10%
 
-Task completion carries the highest weight: an agent that doesn't finish its job fails regardless of other qualities.
+Task completion carries the highest weight — an agent that doesn't finish its job fails regardless of other qualities.
 
 ---
 
@@ -134,7 +133,7 @@ Map the weighted score to an action:
 
 ## Testing Protocol
 
-Five levels of testing, applied in order. Do not skip levels — later tests are only meaningful if earlier ones pass.
+Five levels, applied in order. Don't skip — later tests are only meaningful if earlier ones pass.
 
 ### Level 1: Smoke test
 
@@ -195,7 +194,7 @@ Use a fixed test suite to detect regressions across versions.
 
 ### Building a test suite
 
-Create 10–20 test cases covering:
+Create 10–20 cases covering:
 
 - Core use cases (≥ 50% of suite)
 - Edge cases (≥ 20%)
@@ -228,7 +227,7 @@ now fails — this is a regression, not just a score change.
 
 ## Continuous Monitoring
 
-Beyond structured testing, monitor agents in active use.
+Monitor agents in active use:
 
 **Session reviews:**
 

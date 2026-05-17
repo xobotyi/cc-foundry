@@ -1,8 +1,8 @@
 # Creating Skills — Extended Depth
 
-Step-by-step creation workflow with scope sizing guidance, evaluation-driven development, and archetype deep dives.
-SKILL.md contains the description formula, content architecture rules, instruction design guidance, and archetype
-structures — this reference provides the sequential workflow for applying them.
+Step-by-step creation workflow with scope sizing, evaluation-driven development, and archetype deep dives. SKILL.md
+contains the description formula, content architecture rules, instruction design, and archetype structures — this
+reference provides the sequential workflow for applying them.
 
 ## Contents
 
@@ -34,8 +34,8 @@ Before writing anything, identify what you're encoding.
 - Highly variable tasks — can't standardize effectively
 - Tasks needing real-time data — use MCP instead
 
-**Discovery method:** Complete the task once with Claude using normal prompting. Notice what context you repeatedly
-provide. That repeated context is the skill candidate.
+**Discovery method:** Complete the task once with normal prompting. Notice what context you repeatedly provide. That
+repeated context is the skill candidate.
 
 ### Step 2: Size the Scope
 
@@ -72,8 +72,8 @@ Apply Writing Instructions rules from SKILL.md body. Key decisions:
 ### Step 7: Write References (if needed)
 
 References must provide **genuinely different depth** from SKILL.md — detailed rubrics, extended examples, full
-catalogs, edge case coverage. Never restate rules already in SKILL.md. Keep references one level deep from SKILL.md;
-nested references may only be partially read via `head -100`.
+catalogs, edge case coverage. Never restate rules already in SKILL.md. Keep references one level deep; nested references
+may only be partially read via `head -100`.
 
 ### Step 8: Test with Evaluation-Driven Development
 
@@ -152,7 +152,7 @@ route correctly across 100+ available skills.
 
 - Be specific — include domain terms, tool names, file types
 - State when to use AND when not to use (negative triggers prevent false activations)
-- Third person imperative: "Extracts text..." not "I extract..." or "You should extract..."
+- Third-person imperative: "Extracts text..." not "I extract..." or "You should extract..."
 - Max 1024 characters; aim for 200-400 in practice
 - Test by generating 3 prompts that should trigger it and 3 that should not
 
@@ -166,8 +166,7 @@ route correctly across 100+ available skills.
 
 ## Evaluation-Driven Development
 
-Build evaluations **before** writing extensive content. This prevents over-engineering by anchoring rules to observed
-failures, not anticipated ones.
+Build evaluations **before** writing extensive content — anchors rules to observed failures, not anticipated ones.
 
 For the full evaluation process, scoring rubrics, and testing protocol, see
 [`${CLAUDE_SKILL_DIR}/references/evaluation.md`].
@@ -205,7 +204,7 @@ A skill is done when:
 - No recurring quality gaps
 - Maintenance burden is low
 
-A 200-line skill that works reliably beats a 500-line skill that's theoretically comprehensive but attention-starved.
+A 200-line skill that works reliably beats a 500-line skill that's comprehensive but attention-starved.
 
 ### Testing Breadth
 
@@ -343,9 +342,9 @@ The **[other-skill]** skill governs [X]; this skill governs [Y]. When both apply
 ```
 
 **Why the Application section matters:** Without it, the agent may narrate every rule application or fail to apply
-conventions during code review. The section explicitly programs two behavioral modes.
+conventions during review. The section explicitly programs two behavioral modes.
 
-**Why the Integration section matters:** Prevents conflicts when multiple discipline skills are loaded. Gives the agent
+**Why the Integration section matters:** Prevents conflicts when multiple discipline skills are loaded — gives the agent
 clear precedence rules rather than forcing it to guess.
 
 ---
@@ -401,18 +400,18 @@ them — just ask the questions."
 ## Common Creation Mistakes
 
 - **Writing references first** — seems logical to gather depth before rules. Fix: write SKILL.md first; it defines what
-  depth is needed
+  depth is needed.
 - **Duplicating SKILL.md in references** — copy-paste habit, fear of missing content. Fix: each reference must provide
-  content SKILL.md doesn't have
+  content SKILL.md doesn't have.
 - **Over-scoping initial version** — trying to cover all cases upfront. Fix: start with the 3 most common scenarios,
-  expand from observed failures
+  expand from observed failures.
 - **Skipping evaluation** — "I know what the skill needs." Fix: run Claude without the skill first; failures reveal real
-  gaps
+  gaps.
 - **Writing 40+ rules** — more rules = more thorough (false). Fix: more rules = more attention competition; apply the
-  deletion test
+  deletion test.
 - **Procedural style for everything** — steps feel more concrete. Fix: declarative for constraints, procedural only for
-  genuinely ordered workflows
-- **Nested references** — "advanced.md links to details.md links to the actual info." Fix: all references one level deep
-  from SKILL.md; nested content may only be partially read
+  genuinely ordered workflows.
+- **Nested references** — "advanced.md links to details.md links to the actual info." Fix: all references one level
+  deep; nested content may only be partially read.
 - **Vague negative triggers** — description says what skill does, not what it doesn't. Fix: add explicit negative
-  triggers ("Don't use for Vue, Svelte, or vanilla CSS projects") to prevent false activations
+  triggers ("Don't use for Vue, Svelte, or vanilla CSS projects") to prevent false activations.

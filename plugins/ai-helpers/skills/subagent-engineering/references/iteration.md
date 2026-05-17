@@ -1,6 +1,6 @@
 # Iterating on Subagents
 
-Guide to improving existing subagents based on observed behavior — from targeted prompt fixes to full redesigns.
+Improving existing subagents based on observed behavior — targeted prompt fixes to full redesigns.
 
 ---
 
@@ -15,14 +15,14 @@ Guide to improving existing subagents based on observed behavior — from target
 6. Commit or revert
 ```
 
-Change one thing per iteration. Changing multiple variables makes it impossible to know what helped.
+Change one thing per iteration — changing multiple variables makes it impossible to know what helped.
 
 ---
 
 ## Description Optimization
 
-The `description` field controls when Claude delegates. It is the highest-leverage field to tune — wrong descriptions
-cause all trigger problems.
+The `description` field controls when Claude delegates — the highest-leverage field to tune. Wrong descriptions cause
+all trigger problems.
 
 **Trigger accuracy formula:**
 
@@ -278,8 +278,8 @@ when the same pattern applies broadly.
 
 ## Parallel Session Bias Avoidance
 
-When evaluating whether an agent change is an improvement, avoid reviewing it in the same session where you wrote it.
-The writing context biases judgment toward "this looks right."
+Avoid reviewing an agent change in the same session where you wrote it — writing context biases judgment toward "this
+looks right."
 
 **Pattern:**
 

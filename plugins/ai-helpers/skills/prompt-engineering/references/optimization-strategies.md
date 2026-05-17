@@ -12,7 +12,7 @@ The **promptware engineering** paradigm (Chen et al., 2025, ACM TOSEM) reframes 
 artifacts subject to full SE lifecycle discipline.
 
 Key insight: prompts are programs. They have requirements, design, implementation, testing, debugging, and evolution
-phases — each of which benefits from principled methodology rather than intuition.
+phases — each benefits from principled methodology rather than intuition.
 
 ---
 
@@ -27,7 +27,7 @@ Before writing a prompt, specify:
 - `Constraints` — latency, cost, output format, safety, model compatibility
 - `Evaluation criteria` — how will you know the prompt works? What metric, what dataset?
 
-Prompts without defined evaluation criteria cannot be improved systematically — you have no signal to optimize toward.
+Prompts without defined evaluation criteria cannot be improved systematically — no signal to optimize toward.
 
 ### Design
 
@@ -71,8 +71,8 @@ When a prompt fails on specific inputs:
 
 ## DSPy: Declarative Prompt Optimization
 
-DSPy (Khattab et al.) replaces hand-written prompts with **declarative modules** that are optimized automatically
-against a metric. The core shift: specify _what_ you want (a metric), not _how_ to say it (the exact prompt text).
+DSPy (Khattab et al.) replaces hand-written prompts with **declarative modules** optimized automatically against a
+metric. The core shift: specify _what_ you want (a metric), not _how_ to say it (the exact prompt text).
 
 ### Core Concepts
 

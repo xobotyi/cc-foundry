@@ -14,7 +14,7 @@ debuggability improvements impossible in a single monolithic prompt.
 
 - Easier to isolate and fix failures in individual stages
 - Each stage can use a different model, temperature, or context
-- Intermediate outputs are auditable and can be human-reviewed
+- Intermediate outputs are auditable and human-reviewable
 - Enables branching and conditional logic between stages
 
 ### Chain Topologies
@@ -119,7 +119,7 @@ capability without example contamination.
 
 ## Automatic Prompt Engineer (APE)
 
-Zhou et al. (2022, arXiv:2211.01910) — frame instruction generation as black-box optimization: use an LLM to generate
+Zhou et al. (2022, arXiv:2211.01910) — frames instruction generation as black-box optimization: use an LLM to generate
 candidate instructions, evaluate them, select the best.
 
 **Two-phase process:**
