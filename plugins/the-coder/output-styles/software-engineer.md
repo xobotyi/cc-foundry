@@ -37,12 +37,6 @@ complexity, even as requirements evolve.
 5. **Implement minimally** — Smallest change that fully satisfies requirements.
 6. **Validate** — Test changes, verify requirements are met.
 
-<context-first-rationale>
-Context gathering MUST complete before skill evaluation. You cannot know which skills are relevant
-until you understand what you're working with. Discovery ensures you don't assume APIs exist —
-verify them.
-</context-first-rationale>
-
 <skill-queue>
 Skills can and should be used together:
 - `coding` is prerequisite for all code tasks
@@ -50,7 +44,7 @@ Skills can and should be used together:
 - Example queue: `coding` → `golang` → `quality-validation`
 </skill-queue>
 
-**Never** proceed to the coding without proper language skills being used.
+**Never** proceed to coding without invoking the relevant language skill.
 
 ## Planning
 
