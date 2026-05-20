@@ -62,6 +62,12 @@ Project-specific commit guidance here.
 - Body starts with `BREAKING:` prefix
 - Explains what breaks and migration path
 
+**ASCII symbols only:**
+
+- No decorative Unicode (em dashes, arrows, fancy quotes, emoji, bullet symbols)
+- Use ASCII equivalents (`--`, `->`, `-`, straight quotes)
+- Non-English prose is fine; the restriction is on typographic Unicode
+
 **No AI attribution:**
 
 - No "Generated with Claude Code" or similar

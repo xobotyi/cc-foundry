@@ -63,6 +63,23 @@ trailers
 **Trailers**: Structured metadata (references, authorship)
 </format>
 
+### ASCII Symbols
+
+<charset>
+Stick to ASCII punctuation and symbols. Non-English prose is fine — the restriction is on decorative/typographic
+Unicode, not natural language.
+
+- No em/en dashes (—, –) — use `--` or `-`
+- No arrows (→, ←, ↔) — use `->`, `<-`, `<->`
+- No bullet symbols (•, ▸) — use `-` or `*`
+- No fancy quotes (“”, ‘’) — use straight quotes
+- No emoji (🐛, ✅, 🚀) — unless project convention requires it
+- No other decorative symbols (©, ™, §, ¶, ∞)
+
+Git tooling, terminals, email patches, and `git log` render ASCII reliably everywhere. Unicode symbols break in some
+environments and add no information over their ASCII equivalents.
+</charset>
+
 ## Subject Line
 
 ```
@@ -146,7 +163,7 @@ use fragments and drop articles where clarity survives. Identifiers, file paths,
 - "As requested by..." — use a `Co-Authored-By:` trailer or omit.
 - Restating the scope's filename: `[parser] update parser code` → `[parser] handle empty input`.
 - Promotional adjectives without specifics: "great", "amazing", "improved", "better" — say what is better.
-- Emoji, unless a project convention requires it.
+- Decorative Unicode — em dashes, arrows, fancy quotes, emoji, bullet symbols (see ASCII Symbols above).
 - Filler: "just", "really", "basically", "actually", "simply"; connective fluff: "however", "furthermore",
   "additionally".
 
@@ -473,5 +490,6 @@ Commits must appear as regular developer commits.
 - **BREAKING first** — breaking changes start body with `BREAKING:` prefix
 - **Trailers for metadata** — use Title-Case, structured format
 - **Amends rewrite history** — amended messages describe the full change, not the delta
+- **ASCII symbols** — no decorative Unicode (em dashes, arrows, fancy quotes, emoji); ASCII equivalents only
 - **No AI attribution** — commits appear as regular developer work
   </critical>
