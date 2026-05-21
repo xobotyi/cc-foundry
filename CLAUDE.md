@@ -19,6 +19,7 @@ cc-foundry/
 │   ├── the-workflow/     # Agentic workflow mechanics (CLAUDE.md quality, context handoff)
 │   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
 │   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
+│   ├── grafana/          # Grafana platform (dashboards, PromQL, MetricsQL, LogsQL, alerting, provisioning, dataviz)
 │   ├── cli/              # CLI platform discipline (CLI design, shell scripting)
 │   ├── open-source/      # Open-source contribution discipline (issues, pull requests)
 │   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)

@@ -1,0 +1,24 @@
+{
+  "version": {
+    "victoriametrics_single_node": "v1.143.0",
+    "victoriametrics_cluster": "v1.143.0",
+    "released": "2026-05-08",
+    "verified_at": "2026-05-21"
+  },
+  "sources": {
+    "MetricsQL Overview and Features": "https://docs.victoriametrics.com/metricsql/",
+    "Rollup Functions": "https://docs.victoriametrics.com/metricsql/#rollup-functions",
+    "Transform Functions": "https://docs.victoriametrics.com/metricsql/#transform-functions",
+    "Label Manipulation Functions": "https://docs.victoriametrics.com/metricsql/#label-manipulation-functions",
+    "Aggregate Functions": "https://docs.victoriametrics.com/metricsql/#aggregate-functions",
+    "Subqueries": "https://docs.victoriametrics.com/metricsql/#subqueries",
+    "Implicit Query Conversions": "https://docs.victoriametrics.com/metricsql/#implicit-query-conversions",
+    "keep_metric_names Modifier": "https://docs.victoriametrics.com/metricsql/#keep_metric_names",
+    "Prometheus Querying API Usage (single-node)": "https://docs.victoriametrics.com/single-server-victoriametrics/#prometheus-querying-api-usage",
+    "Prometheus Querying API Enhancements (extra_label, extra_filters, round_digits, limit)": "https://docs.victoriametrics.com/single-server-victoriametrics/#prometheus-querying-api-enhancements",
+    "Cluster Query Endpoints (vmselect)": "https://docs.victoriametrics.com/cluster-victoriametrics/",
+    "VictoriaMetrics Changelog (release notes for MetricsQL additions)": "https://docs.victoriametrics.com/changelog/",
+    "MetricsQL FAQ Entry (single-server doc)": "https://docs.victoriametrics.com/single-server-victoriametrics/#what-is-metricsql"
+  },
+  "lastFetched": "2026-05-21T07:11:12.559Z"
+}

@@ -1,0 +1,23 @@
+{
+	"grafana_version": "12.4.1 (current stable, 13.0.1 latest supported as of 2026-05)",
+	"sources": {
+		"Grafana Alerting overview": "https://grafana.com/docs/grafana/latest/alerting/",
+		"Alerting fundamentals": "https://github.com/grafana/grafana/blob/main/docs/sources/alerting/fundamentals/_index.md",
+		"Alert rule evaluation": "https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/",
+		"State and health of alert rules": "https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/state-and-health/",
+		"No Data and Error states": "https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/",
+		"Label matchers and alert grouping": "https://grafana.com/docs/grafana/v10.4/alerting/fundamentals/annotation-label/labels-and-label-matchers/",
+		"Notification policies (fundamentals)": "https://grafana.com/docs/grafana/latest/alerting/fundamentals/notifications/notification-policies/",
+		"Configure notification policies": "https://grafana.com/docs/grafana/latest/alerting/configure-notifications/create-notification-policy/",
+		"Configure notifications (contact points, policies, silences)": "https://grafana.com/docs/grafana/latest/alerting/configure-notifications/",
+		"Configure silences": "https://grafana.com/docs/grafana/latest/alerting/configure-notifications/create-silence/",
+		"Template annotations and labels (alert rule templates)": "https://grafana.com/docs/grafana/latest/alerting/alerting-rules/templates/",
+		"Notification template language (Go text/template)": "https://grafana.com/docs/grafana/latest/alerting/configure-notifications/template-notifications/language/",
+		"Notification template reference": "https://grafana.com/docs/grafana/latest/alerting/configure-notifications/template-notifications/reference/",
+		"Notification template examples": "https://grafana.com/docs/grafana/latest/alerting/configure-notifications/template-notifications/examples/",
+		"Grafana Mimir or Loki managed alert rules": "https://grafana.com/docs/grafana/latest/alerting/alerting-rules/create-mimir-loki-managed-rule/",
+		"Grafana Mimir or Loki managed recording rules": "https://grafana.com/docs/grafana/latest/alerting/alerting-rules/create-mimir-loki-managed-recording-rule/",
+		"Loki alerting and recording rules": "https://grafana.com/docs/loki/latest/alert/"
+	},
+	"lastFetched": "2026-05-21T07:42:00.000Z"
+}

@@ -1,0 +1,26 @@
+{
+  "version": {
+    "victorialogs": "v1.50.0",
+    "released": "2026-04-14",
+    "verified_at": "2026-05-21"
+  },
+  "sources": {
+    "LogsQL Overview and Tutorial": "https://docs.victoriametrics.com/victorialogs/logsql/",
+    "Stream Filter": "https://docs.victoriametrics.com/victorialogs/logsql/#stream-filter",
+    "Time Filter": "https://docs.victoriametrics.com/victorialogs/logsql/#time-filter",
+    "Word, Phrase, Exact, Prefix Filters": "https://docs.victoriametrics.com/victorialogs/logsql/#word-filter",
+    "Regexp Filter": "https://docs.victoriametrics.com/victorialogs/logsql/#regexp-filter",
+    "Range, IPv4 Range, String Range, Length Range Filters": "https://docs.victoriametrics.com/victorialogs/logsql/#range-filter",
+    "Sequence Filter": "https://docs.victoriametrics.com/victorialogs/logsql/#sequence-filter",
+    "Pipes Overview": "https://docs.victoriametrics.com/victorialogs/logsql/#pipes",
+    "stats Pipe and Stats Functions": "https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe",
+    "math Pipe": "https://docs.victoriametrics.com/victorialogs/logsql/#math-pipe",
+    "format, extract, unpack_json, unpack_logfmt, replace Pipes": "https://docs.victoriametrics.com/victorialogs/logsql/#format-pipe",
+    "sort, uniq, top, fields Pipes": "https://docs.victoriametrics.com/victorialogs/logsql/#sort-pipe",
+    "stream_context Pipe": "https://docs.victoriametrics.com/victorialogs/logsql/#stream_context-pipe",
+    "LogsQL Query Examples (common patterns)": "https://docs.victoriametrics.com/victorialogs/logsql-examples/",
+    "VictoriaLogs HTTP Querying API": "https://docs.victoriametrics.com/victorialogs/querying/",
+    "VictoriaLogs Changelog (LogsQL additions per release)": "https://docs.victoriametrics.com/victorialogs/changelog/"
+  },
+  "lastFetched": "2026-05-21T07:11:06.946Z"
+}

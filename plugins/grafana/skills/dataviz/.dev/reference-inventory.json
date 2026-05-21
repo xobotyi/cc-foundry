@@ -1,0 +1,364 @@
+{
+  "metadata": {
+    "skill": "dataviz",
+    "compiled": "2026-05-21",
+    "phase": "research",
+    "summary": "Sources grounded across 8 research areas: visual perception science, information visualization theory, chart-type selection, color theory for monitoring, dashboard layout, time-series visualization, observability-specific patterns, anti-patterns."
+  },
+  "sources": [
+    {
+      "id": "cleveland-mcgill-1984",
+      "title": "Graphical Perception: Theory, Experimentation, and Application to the Development of Graphical Methods",
+      "authors": ["William S. Cleveland", "Robert McGill"],
+      "year": 1984,
+      "publication": "Journal of the American Statistical Association",
+      "url": "https://www.statsclass.org/dsci310/Notes/Cleveland_McGill_EPT.pdf",
+      "type": "academic-paper",
+      "topics": ["encoding-hierarchy", "perceptual-tasks"],
+      "fetch_status": "binary-pdf-unavailable",
+      "grounded_via": "secondary-sources-with-direct-quote-references",
+      "key_findings": "Established the ordering of elementary perceptual tasks by accuracy: position along common scale > positions along non-aligned scales > length, direction, angle > area > volume, curvature > shading, color saturation."
+    },
+    {
+      "id": "informationvisuals-perceptual-tasks",
+      "title": "Elementary Perceptual Tasks",
+      "url": "https://www.informationvisuals.com/information-design-theory/elementary-perceptual-tasks",
+      "type": "secondary-explainer",
+      "topics": ["encoding-hierarchy"],
+      "fetch_status": "ok",
+      "key_findings": "Confirms Cleveland-McGill ordering with task descriptions and chart-type mappings."
+    },
+    {
+      "id": "cairo-perceptual-hierarchy",
+      "title": "Alberto Cairo's hierarchy of elementary perceptual tasks",
+      "url": "https://badriadhikari.github.io/data-viz-workshop-2021/activity-perceptual-task/Solution.html",
+      "type": "course-material",
+      "topics": ["encoding-hierarchy", "chart-selection"],
+      "fetch_status": "ok",
+      "key_findings": "Modernized version of Cleveland-McGill, with practical chart-selection rule: 'use tasks as high in the hierarchy as possible.'"
+    },
+    {
+      "id": "healey-preattentive-1993",
+      "title": "Harnessing Preattentive Processes for Multivariate Data Visualization",
+      "authors": ["Christopher G. Healey", "Kellogg S. Booth", "James T. Enns"],
+      "year": 1993,
+      "url": "https://healey.csc.ncsu.edu/publications/15885-harnessing-preattentive-processes-for-multivariate-data-visualization",
+      "type": "academic-paper",
+      "topics": ["pre-attentive-features"],
+      "fetch_status": "ok",
+      "key_findings": "Identifies pre-attentive features as colour, orientation, intensity, size, shape, curvature, line length. Hue and orientation operate independently — combinable for multivariate encoding."
+    },
+    {
+      "id": "infovis-wiki-data-ink",
+      "title": "Data-Ink Ratio",
+      "url": "https://infovis-wiki.net/wiki/Data-Ink_Ratio",
+      "type": "wiki-reference",
+      "topics": ["tufte", "data-ink"],
+      "fetch_status": "ok",
+      "key_findings": "Definition: proportion of ink used to represent data vs total ink. Tufte's principle 'above all else show the data.' Includes Inbar et al. (2007) counter-finding that some 'non-data ink' aids interpretation."
+    },
+    {
+      "id": "tufte-perplexity-research",
+      "title": "Tufte chartjunk lie factor data-ink small multiples sparklines (Perplexity research synthesis)",
+      "source": "perplexity_research",
+      "topics": ["tufte", "chartjunk", "lie-factor", "small-multiples", "sparklines"],
+      "fetch_status": "synthesized",
+      "key_findings": "Lie Factor = size-of-effect-in-graphic / size-of-effect-in-data; ~1.0 is honest, far from 1 is distortion. Sparklines = tiny axis-less line charts for intra-period trends. Small multiples = repeated identical chart format across categories/time for direct comparison. Data density = info per visual unit; high density preferred."
+    },
+    {
+      "id": "chartio-dashboard-types",
+      "title": "Dashboards Explained: Operational, Strategic and Analytical",
+      "url": "https://chartio.com/blog/dashboards-explained-operational-strategic-and-analytical/",
+      "type": "industry-explainer",
+      "topics": ["dashboard-typology", "few"],
+      "fetch_status": "ok",
+      "key_findings": "Stephen Few's three dashboard types: Strategic (high-level KPIs, org-wide), Analytical (drill-down, departmental, exploratory), Operational (real-time monitoring, glanceable)."
+    },
+    {
+      "id": "few-information-dashboard-design",
+      "title": "Information Dashboard Design: Displaying Data for At-A-Glance Monitoring",
+      "authors": ["Stephen Few"],
+      "year": 2013,
+      "edition": "2nd",
+      "url": "https://www.barnesandnoble.com/w/information-dashboard-design-stephen-few/1124335044",
+      "type": "book",
+      "topics": ["dashboard-design", "glanceability"],
+      "fetch_status": "metadata-only",
+      "grounded_via": "secondary-summaries",
+      "key_findings": "Three pillars: Clarity (no decoration), Purpose-driven design, At-a-glance monitoring as the goal of operational dashboards."
+    },
+    {
+      "id": "colorbrewer",
+      "title": "ColorBrewer 2.0",
+      "authors": ["Cynthia Brewer", "Mark Harrower"],
+      "url": "https://colorbrewer2.org",
+      "type": "tool",
+      "topics": ["color-palettes", "sequential", "diverging", "qualitative"],
+      "fetch_status": "ok",
+      "key_findings": "Three palette types: Sequential (ordered low-to-high), Diverging (meaningful midpoint), Qualitative (categorical). Colorblind-safe filter available. 3-12 classes supported."
+    },
+    {
+      "id": "rcolorbrewer-cran",
+      "title": "RColorBrewer Package Documentation",
+      "url": "https://cran.r-project.org/web/packages/RColorBrewer/RColorBrewer.pdf",
+      "type": "documentation",
+      "topics": ["color-palettes"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Sequential = lightness steps low-to-high. Diverging = equal emphasis on midpoint and extremes; light colors in middle, dark at both ends. Qualitative = no inherent ordering."
+    },
+    {
+      "id": "nichols-colorblind",
+      "title": "Coloring for Colorblindness",
+      "authors": ["David Nichols"],
+      "url": "https://davidmathlogic.com/colorblind/",
+      "type": "interactive-tool",
+      "topics": ["colorblind-accessibility"],
+      "fetch_status": "empty-page",
+      "grounded_via": "search-snippets-and-secondary",
+      "key_findings": "Interactive simulator for testing palettes under deuteranopia/protanopia/tritanopia. Foundational reference for colorblind safety."
+    },
+    {
+      "id": "krzywinski-colorblind",
+      "title": "Designing for Color blindness",
+      "authors": ["Martin Krzywinski"],
+      "url": "https://mk.bcgsc.ca/colorblind/palettes.mhtml",
+      "type": "reference",
+      "topics": ["colorblind-accessibility", "palettes"],
+      "fetch_status": "ok",
+      "key_findings": "Deuteranopia most common. 8-color Wong palette (Nature Methods Points of View) is the foundational categorical safe palette. Use perceptual luminance uniformity in color-blind space; LCH luminance steps."
+    },
+    {
+      "id": "okabe-ito-wong-palette",
+      "title": "Color blindness (Points of View)",
+      "authors": ["Bang Wong"],
+      "year": 2011,
+      "publication": "Nature Methods",
+      "type": "academic-paper",
+      "topics": ["colorblind-palettes"],
+      "fetch_status": "referenced",
+      "grounded_via": "krzywinski-colorblind",
+      "key_findings": "8-color palette designed for colorblind safety, widely adopted as 'Okabe-Ito' or 'Wong' palette. Hex codes: #000000 #E69F00 #56B4E9 #009E73 #F0E442 #0072B2 #D55E00 #CC79A7."
+    },
+    {
+      "id": "tableau-colorblind-blog",
+      "title": "5 Tips on Designing Colorblind-Friendly Visualizations",
+      "url": "https://www.tableau.com/blog/examining-data-viz-rules-dont-use-red-green-together",
+      "type": "industry-best-practice",
+      "topics": ["colorblind-accessibility"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Don't use red/green together; substitute with blue/red, blue/orange. About 8% of males, 0.5% of females have red-green color vision deficiency."
+    },
+    {
+      "id": "wilkie-red-method",
+      "title": "The RED Method: How to Instrument Your Services",
+      "authors": ["Tom Wilkie"],
+      "url": "https://grafana.com/blog/2018/08/02/the-red-method-how-to-instrument-your-services/",
+      "type": "industry-talk-blog",
+      "topics": ["observability-dashboards", "red-method"],
+      "fetch_status": "ok",
+      "key_findings": "RED = Rate (req/s), Errors (failing req), Duration (latency). Complement of USE; RED for services/microservices, USE for hardware. Mirrors Google's Four Golden Signals (RED + Saturation)."
+    },
+    {
+      "id": "grafana-observability-strategies",
+      "title": "Common Observability Strategies",
+      "url": "https://grafana.com/docs/grafana/v9.0/best-practices/common-observability-strategies/",
+      "type": "official-docs",
+      "topics": ["red-method", "use-method", "golden-signals"],
+      "fetch_status": "ok",
+      "key_findings": "RED for user-facing services; USE for hardware (CPU/memory/network); Four Golden Signals = RED + Saturation. Alert on RED (symptoms), use USE to identify causes."
+    },
+    {
+      "id": "google-sre-book",
+      "title": "Site Reliability Engineering — Monitoring Distributed Systems",
+      "authors": ["Google SRE Team", "Beyer et al."],
+      "year": 2016,
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+      "type": "book",
+      "topics": ["golden-signals", "slo"],
+      "fetch_status": "referenced",
+      "grounded_via": "secondary",
+      "key_findings": "Four Golden Signals = Latency, Traffic, Errors, Saturation. Standard SRE monitoring framework."
+    },
+    {
+      "id": "gregg-use-method",
+      "title": "The USE Method",
+      "authors": ["Brendan Gregg"],
+      "url": "https://www.brendangregg.com/usemethod.html",
+      "type": "industry-reference",
+      "topics": ["use-method"],
+      "fetch_status": "referenced",
+      "grounded_via": "wilkie-red-method-and-grafana-docs",
+      "key_findings": "USE = Utilization, Saturation, Errors. Applied to every resource (CPU, memory, network device). Complement to RED for hardware monitoring."
+    },
+    {
+      "id": "datadog-burn-rate",
+      "title": "Defining Burn Rates",
+      "url": "https://www.datadoghq.com/blog/burn-rate-is-better-error-rate/",
+      "type": "industry-blog",
+      "topics": ["slo", "burn-rate", "error-budget"],
+      "fetch_status": "ok",
+      "key_findings": "Burn rate = error rate / error budget. Burn rate = 1 means on pace to exhaust budget. Multi-window multi-burn-rate alerts use short + long windows together to balance noise and recovery."
+    },
+    {
+      "id": "slo-foo",
+      "title": "SLO Calculator — Burn Rate Alert Visualizer",
+      "url": "https://www.slo.foo",
+      "type": "tool",
+      "topics": ["burn-rate", "slo"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Standard 14.4x burn rate triggers when 2% of budget is consumed in 1 hour for a 30-day SLO. Formula: burn_rate = (budget%/100) * (window_days * 24 / alert_hours)."
+    },
+    {
+      "id": "eagereyes-banking-45",
+      "title": "Aspect Ratio and Banking to 45 Degrees",
+      "authors": ["Robert Kosara"],
+      "url": "https://eagereyes.org/blog/2013/banking-45-degrees",
+      "type": "industry-blog",
+      "topics": ["aspect-ratio", "time-series"],
+      "fetch_status": "ok",
+      "key_findings": "Banking to 45° = aspect ratio that makes average line slope ≈ 45°. Cleveland-McGill-McGill 1988. Specifically for slope comparison between lines, not universal. Talbot et al. (2011) found shallower slopes can outperform; treat as heuristic not rule."
+    },
+    {
+      "id": "stanford-multi-scale-banking",
+      "title": "Multi-Scale Banking to 45°",
+      "authors": ["Jeffrey Heer", "Maneesh Agrawala"],
+      "year": 2006,
+      "url": "http://vis.stanford.edu/files/2006-Banking-InfoVis.pdf",
+      "type": "academic-paper",
+      "topics": ["aspect-ratio"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Mathematical analysis of banking. Average-absolute-orientation banking. Multi-scale version handles charts with varying line scales."
+    },
+    {
+      "id": "europa-aspect-ratio",
+      "title": "Line chart aspect ratios",
+      "url": "https://data.europa.eu/apps/data-visualisation-guide/line-chart-aspect-ratios",
+      "type": "guide",
+      "topics": ["aspect-ratio"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Wide aspect ratio flattens trends; tall aspect ratio dramatises them. Banking to 45° is a reasonable starting heuristic."
+    },
+    {
+      "id": "uncharted-dual-axis",
+      "title": "Why Two Y-Axes (Y2Y): A Case Study for Visual Correlation",
+      "url": "https://uncharted.software/assets/WhyTwoYAxes_Y2Y.pdf",
+      "type": "academic-paper",
+      "topics": ["dual-axis", "anti-patterns"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Dual-axis useful for visual correlation when magnitude matters and normalization would obscure context. Acceptable for export/print/seminar use; problematic when scales can be arbitrarily aligned to manufacture correlation."
+    },
+    {
+      "id": "kevingee-anti-patterns",
+      "title": "Seven Anti-Patterns for Analytics Dashboards",
+      "authors": ["Kevin Gee"],
+      "url": "https://kevingee.biz/?p=144",
+      "fetch_status": "403-forbidden",
+      "type": "industry-blog",
+      "topics": ["anti-patterns"],
+      "grounded_via": "search-snippets-and-metricgate",
+      "key_findings": "Pie chart anti-pattern, 3D effects anti-pattern; reinforces Cleveland-McGill perceptual hierarchy as the WHY behind each."
+    },
+    {
+      "id": "metricgate-anti-patterns",
+      "title": "Common Mistakes in Data Visualization",
+      "url": "https://metricgate.com/blogs/common-mistakes-in-data-visualization/",
+      "type": "industry-blog",
+      "topics": ["anti-patterns"],
+      "fetch_status": "ok",
+      "key_findings": "Comprehensive catalog: truncated axes (violate lie-factor), dual axes (manufacture correlation), 3D charts (distort perception), rainbow colormaps (jet is not perceptually uniform, colorblind-unsafe), >7 pie slices (poor angle judgment), chartjunk (steals attention from data)."
+    },
+    {
+      "id": "munzner-vad-book",
+      "title": "Visualization Analysis and Design",
+      "authors": ["Tamara Munzner"],
+      "year": 2014,
+      "url": "https://www.cs.ubc.ca/~tmm/vadbook/",
+      "type": "book",
+      "topics": ["what-why-how", "marks-channels", "task-abstraction"],
+      "fetch_status": "metadata-only",
+      "grounded_via": "vienna-slides-and-keynote-pdfs-search-snippets",
+      "key_findings": "Three-question framework: What (data abstraction), Why (task abstraction), How (visual encoding via marks & channels). Channel effectiveness: magnitude (ordered) channels rank position > length > tilt/angle > area > depth > color luminance > color saturation > curvature > volume. Identity (categorical) channels rank: spatial region > color hue > motion > shape."
+    },
+    {
+      "id": "nngroup-f-pattern",
+      "title": "F-Shaped Pattern of Reading on the Web: Misunderstood, But Still Relevant",
+      "authors": ["Kara Pernice"],
+      "url": "https://www.nngroup.com/articles/f-shaped-pattern-reading-web-content/",
+      "type": "industry-research",
+      "topics": ["dashboard-layout", "eye-tracking"],
+      "fetch_status": "ok",
+      "key_findings": "F-pattern appears when text is unformatted, user prioritizes efficiency, low engagement. Mitigation: clear headings, bullets, visual hierarchy. Multiple scanning patterns exist (layer-cake, spotted, marking, bypassing, commitment)."
+    },
+    {
+      "id": "igc-dashboard-layout",
+      "title": "Dashboard Layout: Visual Hierarchy & Structure",
+      "url": "https://www.intelligentgraphicandcode.com/design/dashboard-design/dashboard-layout",
+      "type": "industry-guide",
+      "topics": ["dashboard-layout", "hierarchy", "progressive-disclosure"],
+      "fetch_status": "ok",
+      "key_findings": "Z-pattern for sparse (KPI cards), F-pattern for dense (operational). Top-left = first eye landing. Inverted pyramid: Layer 1 = status/targets, Layer 2 = trends/context, Layer 3 = detail/drill-down. Five-second glance test."
+    },
+    {
+      "id": "miller-magical-seven",
+      "title": "The Magical Number Seven, Plus or Minus Two",
+      "authors": ["George A. Miller"],
+      "year": 1956,
+      "publication": "Psychological Review",
+      "type": "academic-paper",
+      "topics": ["cognitive-load", "working-memory"],
+      "fetch_status": "referenced",
+      "grounded_via": "wikipedia-and-secondary",
+      "key_findings": "Working memory limits ≈ 7±2 chunks. Implication for dashboards: keep top-level groups within 5-9 items before requiring sub-grouping/drill-down."
+    },
+    {
+      "id": "toucan-gestalt",
+      "title": "7 Gestalt principles for data visualization",
+      "url": "https://www.toucantoco.com/en/blog/data-viz-best-practices-gestalt-principles",
+      "type": "industry-guide",
+      "topics": ["gestalt"],
+      "fetch_status": "ok",
+      "key_findings": "Proximity, similarity, enclosure, closure, continuity, connection, symmetry — with dashboard applications."
+    },
+    {
+      "id": "huppenkothen-gestalt",
+      "title": "Visual Hierarchy and Gestalt Psychology — Data Visualization Tutorial",
+      "authors": ["Daniela Huppenkothen"],
+      "url": "https://huppenkothen.org/data-visualization-tutorial/07-gestalt/index.html",
+      "type": "course-tutorial",
+      "topics": ["gestalt"],
+      "fetch_status": "ok",
+      "key_findings": "Common region / closure: enclosing data points in a rectangle makes them appear related. Connection: lines between points are stronger grouping than proximity."
+    },
+    {
+      "id": "ibm-cognos-whitepaper",
+      "title": "Visual communication — Core design principles for displaying quantitative information",
+      "url": "https://public.dhe.ibm.com/software/data/sw-library/cognos/pdfs/whitepapers/wp_visual_communications_core_design_principles.pdf",
+      "type": "industry-whitepaper",
+      "topics": ["encoding", "pre-attentive"],
+      "fetch_status": "search-snippet",
+      "key_findings": "Principle: use length or 2-D location of objects to encode quantitative values unless those channels are already used. Pre-attentive attributes are processed quickly without conscious effort."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Cleveland-McGill original PDF could not be parsed (binary)",
+      "mitigation": "Two independent secondary sources converged on the same ordering; ranking is well-established and uncontroversial.",
+      "blocking": false
+    },
+    {
+      "gap": "Munzner channel rankings could not be parsed from primary PDF",
+      "mitigation": "Search snippets and Vienna slide summary aligned on the framework; ranking is well-documented in the field.",
+      "blocking": false
+    },
+    {
+      "gap": "Coloring for Colorblindness page rendered empty",
+      "mitigation": "Krzywinski palettes, Wong/Okabe-Ito reference, Tableau guidance, and metricgate all cover colorblind-safe design.",
+      "blocking": false
+    },
+    {
+      "gap": "Few's book contents only summarized, not directly accessed",
+      "mitigation": "Chartio summary plus secondary explainers cover the three-dashboard-type typology adequately for skill-level rules.",
+      "blocking": false
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "prometheus_version": "3.11.3",
+  "sources": {
+    "Querying basics (data types, selectors, time durations, offset modifier, @ modifier)": "https://prometheus.io/docs/prometheus/latest/querying/basics/",
+    "Operators (arithmetic, comparison, logical/set, vector matching, on/ignoring, group_left/group_right, aggregation operators, precedence)": "https://prometheus.io/docs/prometheus/latest/querying/operators/",
+    "Query functions (rate, irate, increase, histogram_quantile, predict_linear, delta, deriv, resets, changes, absent, absent_over_time, clamp_*, label_replace, label_join, sort, time, vector, scalar, *_over_time)": "https://prometheus.io/docs/prometheus/latest/querying/functions/",
+    "Query examples (idiomatic PromQL patterns)": "https://prometheus.io/docs/prometheus/latest/querying/examples/",
+    "HTTP API (instant queries, range queries, series, labels, exemplars)": "https://prometheus.io/docs/prometheus/latest/querying/api/",
+    "Recording rules (configuration, naming convention level:metric:operations)": "https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/",
+    "Alerting rules (rule syntax, for, labels, annotations, templating)": "https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/",
+    "Recording rules best practices (naming convention, when to precompute)": "https://prometheus.io/docs/practices/rules/",
+    "Alerting best practices (how to alert, what to alert on, SLO-style alerts)": "https://prometheus.io/docs/practices/alerting/",
+    "Histograms and summaries practices (bucket tuning, histogram_quantile usage, native histograms intro)": "https://prometheus.io/docs/practices/histograms/",
+    "Native Histograms specification (sparse buckets, query semantics, histogram_* functions)": "https://prometheus.io/docs/specs/native_histograms/",
+    "Subquery Support (blog post: syntax, semantics, range-vector-over-range-vector use cases)": "https://prometheus.io/blog/2019/01/28/subquery-support/",
+    "PromLabs — Anatomy of a PromQL Query (query structure walkthrough)": "https://promlabs.com/blog/2020/06/18/the-anatomy-of-a-promql-query/",
+    "PromLabs — Selecting Data in PromQL (instant/range selector semantics, lookback delta)": "https://promlabs.com/blog/2020/07/02/selecting-data-in-promql/",
+    "PromLabs — PromQL Cheat Sheet (canonical reference of common patterns)": "https://promlabs.com/promql-cheat-sheet/",
+    "Robust Perception — PromQL Subqueries and Alignment (subquery alignment pitfalls)": "https://www.robustperception.io/promql-subqueries-and-alignment/",
+    "Robust Perception blog index (rate semantics, counter resets, staleness, label cardinality)": "https://www.robustperception.io/blog/"
+  },
+  "lastFetched": "2026-05-21T07:11:06.230Z"
+}

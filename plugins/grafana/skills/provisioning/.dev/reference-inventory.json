@@ -1,0 +1,28 @@
+{
+	"grafana_version": "12.4.1 (current stable, 13.0.1 latest supported as of 2026-05)",
+	"sources": {
+		"Provision Grafana (file-based, dashboards/datasources/plugins)": "https://grafana.com/docs/grafana/latest/administration/provisioning/",
+		"Provisioning source (grafana repo, dashboards.yaml/datasources.yaml schemas)": "https://github.com/grafana/grafana/blob/main/docs/sources/administration/provisioning/index.md",
+		"Provision alerting resources (overview)": "https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/",
+		"Alerting file provisioning (alerting.yaml)": "https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/",
+		"Export alerting resources": "https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/export-alerting-resources/",
+		"Dashboard HTTP API": "https://grafana.com/docs/grafana/latest/developer-resources/api-reference/http-api/dashboard/",
+		"Folder HTTP API": "https://grafana.com/docs/grafana/latest/developer-resources/api-reference/http-api/folder/",
+		"Data source HTTP API": "https://grafana.com/docs/grafana/latest/developer-resources/api-reference/http-api/api-legacy/data_source/",
+		"Grafana HTTP API index (admin, org, user, annotations, etc.)": "https://grafana.com/docs/grafana/v9.0/developers/http_api/",
+		"Grafana Terraform provider": "https://grafana.com/docs/grafana/next/as-code/infrastructure-as-code/terraform/",
+		"Terraform provisioning of alerting resources": "https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/terraform-provisioning/",
+		"Provision Grafana Cloud with infrastructure as code (overview)": "https://grafana.com/docs/grafana/latest/as-code/infrastructure-as-code/",
+		"Observability as Code (get started)": "https://grafana.com/docs/grafana/latest/observability-as-code/get-started/",
+		"Grafana CLI (intro)": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/",
+		"gcx CLI (overview page)": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/gcx/",
+		"gcx CLI — Overview / features": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/gcx/overview/",
+		"gcx CLI — Install": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/gcx/installation/",
+		"gcx CLI — Configure": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/gcx/configuration/",
+		"grafanactl CLI (superseded by gcx, repo archives 2026-06-01) — install": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/grafanactl/",
+		"grafanactl CLI (superseded by gcx, repo archives 2026-06-01) — workflows": "https://grafana.com/docs/grafana/latest/as-code/observability-as-code/grafana-cli/grafanactl/grafanacli-workflows/",
+		"Grizzly (deprecated) — historical reference only": "https://grafana.com/docs/grafana/latest/as-code/infrastructure-as-code/grizzly/",
+		"Terraform + GitHub Actions for dashboards": "https://grafana.com/docs/grafana-cloud/developer-resources/infrastructure-as-code/terraform/dashboards-github-action/"
+	},
+	"lastFetched": "2026-05-21T07:42:00.000Z"
+}

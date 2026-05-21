@@ -182,6 +182,22 @@ Technology-agnostic guidance in `observability`; tool-specific depth in the othe
 
 ---
 
+### grafana
+
+The observability consumption stack — querying, visualizing, alerting on, and managing telemetry through Grafana. Seven
+skills cover the full surface: `dashboards` (JSON model, panels, variables, transformations), `promql` (Prometheus query
+writing, native histograms, optimization), `metricsql` (VictoriaMetrics PromQL superset — behavioral diffs, rollup
+extensions, WITH templates), `logsql` (VictoriaLogs log querying — filters, pipes, stats), `alerting` (unified alerting,
+notification routing, templates), `provisioning` (file YAML, HTTP API, gcx CLI, Terraform), and `dataviz` (encoding
+hierarchy, color theory, dashboard layout, observability frameworks). Companion to `backend` — backend produces
+telemetry, grafana consumes it.
+
+```
+/plugin install grafana
+```
+
+---
+
 ### cli
 
 CLI platform discipline — command-line interface design, shell scripting conventions, and terminal UX patterns. Two

@@ -1,0 +1,87 @@
+{
+	"meta": {
+		"grafana_stable_version": "12.4.1",
+		"docs_channel": "latest",
+		"captured_on": "2026-05-21",
+		"notes": "All URLs target the 'latest' channel on grafana.com/docs which currently resolves to the Grafana 12.4.x stable line. Prefer 'latest' over pinned versions so the skill tracks Grafana releases without per-version edits. AWS Managed Grafana mirrors of these pages were intentionally excluded — content lags upstream and rebrands UI terminology."
+	},
+	"sources": {
+		"Dashboards overview": "https://grafana.com/docs/grafana/latest/dashboards/",
+		"Build dashboards": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/",
+		"Manage dashboards": "https://grafana.com/docs/grafana/latest/dashboards/manage-dashboards/",
+		"Use dashboards": "https://grafana.com/docs/grafana/latest/dashboards/use-dashboards/",
+		"Modify dashboard settings": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/modify-dashboard-settings/",
+		"Dashboard JSON model": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/view-dashboard-json-model/",
+		"Dashboard JSON schema v2 (Observability as Code)": "https://grafana.com/docs/grafana/latest/observability-as-code/schema-v2/",
+		"Dashboard JSON schema v2 — v12.1 (top-level spec, layouts)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/",
+		"Dashboard JSON schema v2 — v12.1 panel-schema (PanelKind)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/panel-schema/",
+		"Dashboard JSON schema v2 — v12.1 variables-schema (all 8 variable kinds)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/variables-schema/",
+		"Dashboard JSON schema v2 — v12.1 annotations-schema (AnnotationQueryKind)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/annotations-schema/",
+		"Dashboard JSON schema v2 — v12.1 layout-schema (Grid/Auto/Rows/Tabs + conditional rendering)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/layout-schema/",
+		"Dashboard JSON schema v2 — v12.1 librarypanel-schema (LibraryPanelKind)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/librarypanel-schema/",
+		"Dashboard JSON schema v2 — v12.1 links-schema (DashboardLink)": "https://grafana.com/docs/grafana/v12.1/observability-as-code/schema-v2/links-schema/",
+		"Panels and visualizations overview": "https://grafana.com/docs/grafana/latest/panels-visualizations/",
+		"Visualizations catalog (panel types)": "https://grafana.com/docs/grafana/latest/panels-visualizations/visualizations/",
+		"Panel editor overview": "https://grafana.com/docs/grafana/latest/panels-visualizations/panel-editor-overview/",
+		"Configure panel options": "https://grafana.com/docs/grafana/latest/panels-visualizations/configure-panel-options/",
+		"Configure standard options (units, min, max, colors)": "https://grafana.com/docs/grafana/latest/panels-visualizations/configure-standard-options/",
+		"Configure thresholds": "https://grafana.com/docs/grafana/latest/panels-visualizations/configure-thresholds/",
+		"Configure value mappings": "https://grafana.com/docs/grafana/latest/panels-visualizations/configure-value-mappings/",
+		"Configure field overrides": "https://grafana.com/docs/grafana/latest/panels-visualizations/configure-overrides/",
+		"Configure data links and actions": "https://grafana.com/docs/grafana/latest/panels-visualizations/configure-data-links/",
+		"Query and transform data": "https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/",
+		"Transform data (transformations reference)": "https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/transform-data/",
+		"Panel inspector": "https://grafana.com/docs/grafana/latest/panels-visualizations/panel-inspector/",
+		"Variables overview": "https://grafana.com/docs/grafana/latest/dashboards/variables/",
+		"Add and manage variables (all variable types)": "https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/",
+		"Variable syntax and formatting": "https://grafana.com/docs/grafana/latest/dashboards/variables/variable-syntax/",
+		"Repeat panels and rows (dynamic dashboards)": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/create-dashboard/#configure-repeating-rows",
+		"Library panels": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-library-panels/",
+		"Manage dashboard links": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-dashboard-links/",
+		"Annotate visualizations (annotations)": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/",
+		"Manage dashboard version history": "https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-version-history/",
+		"Time series visualization": "https://grafana.com/docs/grafana/latest/panels-visualizations/visualizations/time-series/",
+		"Stat visualization": "https://grafana.com/docs/grafana/latest/panels-visualizations/visualizations/stat/",
+		"Table visualization": "https://grafana.com/docs/grafana/latest/panels-visualizations/visualizations/table/"
+	},
+	"skill_scope": {
+		"summary": "Authoring and maintaining Grafana dashboards as JSON and via the UI: dashboard structure, panel selection and configuration, variables, transformations, links/annotations, library panels, version history, and provisioning-ready JSON. Excludes alerting, data source configuration, and PromQL/LogsQL/MetricsQL syntax — those are sibling skills.",
+		"in_scope": [
+			"Dashboard JSON model (v1 legacy schema and v2 Observability-as-Code schema)",
+			"Panel types selection guidance (timeseries, stat, gauge, bar gauge, table, logs, heatmap, histogram, geomap, canvas, node graph, traces, flame graph, text, news, etc.)",
+			"Panel editor: queries, transformations, standard options, thresholds, value mappings, field overrides, data links",
+			"Variables: query, custom, constant, datasource, interval, ad-hoc filters, text box, chained variables, repeat panels/rows",
+			"Dashboard settings: general, time options, variables, annotations, links, permissions",
+			"Library panels: create, link, unlink, propagation semantics",
+			"Annotations: built-in, query-based, alert state changes",
+			"Dashboard links and data links",
+			"Version history: view, compare, restore",
+			"Sharing and exporting dashboards"
+		],
+		"out_of_scope": [
+			"Alert rule authoring and notification routing (separate skill)",
+			"Provisioning files (separate skill or sibling)",
+			"PromQL/LogsQL/MetricsQL query authoring (separate skills)",
+			"Plugin development",
+			"Data source configuration"
+		]
+	},
+	"key_topics": [
+		"Dashboard JSON schema (v1 vs v2 — v2 is the Observability-as-Code schema introduced for Grafana 12)",
+		"Panel editor structure: Query / Transform / Visualization tabs and the field-config + override system",
+		"Variable types and chained variables (dependencies between variables)",
+		"Repeat panels and rows driven by multi-value/Include-all variables",
+		"Library panels as the canonical reuse mechanism (changes propagate to all instances)",
+		"Annotation sources: native (manual), query-based, and alert state changes",
+		"Dashboard links vs panel links vs data links — three distinct mechanisms",
+		"Version history saved on every Save; diff and restore in Settings > Versions",
+		"Time controls: dashboard-level time picker, panel relative-time overrides, refresh intervals"
+	],
+	"gaps_and_concerns": [
+		"The 'Repeat rows/panels' page in latest is now consolidated under 'Configure panel options' and 'Create dashboard'; older standalone /add-panels-dynamically/ URLs no longer exist in latest. The inventory uses the anchor on the create-dashboard page.",
+		"Grafana introduced JSON schema v2 for Observability-as-Code in Grafana 12; v1 JSON model still works but the skill should clearly mark which schema a snippet targets.",
+		"Variables page URL paths shifted between 11.x and 12.x; current canonical path is /dashboards/variables/ (not /visualizations/dashboards/variables/ which is the Grafana Cloud mirror).",
+		"Several panel-type pages live under /panels-visualizations/visualizations/<type>/ — when the skill enumerates panel types it should link to the catalog index page and let users drill in, rather than listing 25+ URLs."
+	],
+	"lastFetched": "2026-05-21T07:11:01.911Z"
+}
