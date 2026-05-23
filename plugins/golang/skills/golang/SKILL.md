@@ -604,6 +604,8 @@ Embedding in `internal/` types is lower risk.
 Every exported symbol gets a doc comment starting with its name. Complete sentences, period-terminated. Package comment
 in `doc.go` or primary `.go` file. Unexported types: comment when behavior is non-obvious, skip when trivial.
 
+When modifying an exported symbol's behavior or signature, update its doc comment in the same edit.
+
 ## Global State
 
 Libraries must not force global state. Expose instance-based APIs. Global state is safe only when logically constant,

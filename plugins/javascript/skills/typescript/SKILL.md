@@ -201,6 +201,16 @@ validated strings (`Email`), units (`Meters` vs `Kilometers`). Pattern:
 Use `T[]` for simple element types (`string[]`, `User[]`). Use `Array<T>` for complex element types
 (`Array<string | number>`). Same rule applies to readonly variants.
 
+## Doc Comments
+
+Doc comments (`/** */`) are API documentation, not code comments — the "no comments" default does not apply.
+
+Every exported function, class, interface, and type gets a doc comment. Use `@param`, `@returns`, `@throws` — describe
+behavior and semantics, not types already visible in the signature. Skip `@param` descriptions only when the name alone
+is unambiguous.
+
+When modifying an exported symbol's behavior or signature, update its doc comment in the same edit.
+
 ## Configuration (tsconfig.json)
 
 - **`strict: true` always.** Non-negotiable. Also enable `noUncheckedIndexedAccess` and `noImplicitOverride`.

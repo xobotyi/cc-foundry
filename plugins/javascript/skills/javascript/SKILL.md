@@ -219,6 +219,15 @@ type import syntax.
 - **Use `@typedef` for shared shapes** — define once near file top or in `types.js`.
 - **Don't annotate the obvious** — if `const x = 5` is clearly a number, skip `@type`.
 
+## Doc Comments
+
+Doc comments (`/** */`) are API documentation, not code comments — the "no comments" default does not apply.
+
+Every exported function, class, and module-level constant gets a doc comment. Include `@param`, `@returns`, `@throws`
+for non-trivial signatures. Describe behavior and intent, not implementation.
+
+When modifying an exported symbol's behavior or signature, update its doc comment in the same edit.
+
 ## Application
 
 When **writing** JavaScript code:
