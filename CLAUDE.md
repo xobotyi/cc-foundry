@@ -25,7 +25,8 @@ cc-foundry/
 │   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)
 │   ├── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
 │   ├── php/              # PHP language discipline (conventions, types, OOP, PHPUnit, Intelephense LSP)
-│   └── python/           # Python language discipline (conventions, typing, pytest, uv)
+│   ├── python/           # Python language discipline (conventions, typing, pytest, uv)
+│   └── rust/             # Rust language discipline (ownership, concurrency, cargo/clippy, rust-analyzer LSP)
 └── CLAUDE.md
 ```
 

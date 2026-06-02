@@ -1,0 +1,19 @@
+{
+  "name": "rust",
+  "version": "1.0.0",
+  "description": "Rust language discipline: ownership, idioms, error handling, concurrency, toolchain, and LSP-powered code intelligence",
+  "lspServers": "./.lsp.json",
+  "author": {
+    "name": "xobotyi",
+    "email": "xog3@yandex.ru"
+  },
+  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/rust",
+  "repository": "https://github.com/xobotyi/cc-foundry",
+  "license": "MIT",
+  "keywords": [
+    "rust",
+    "cargo",
+    "conventions",
+    "idioms"
+  ]
+}

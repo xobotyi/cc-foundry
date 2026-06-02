@@ -1,0 +1,20 @@
+{
+  "sources": {
+    "Test Organization (Unit/Integration/Doctest Layout)": "https://doc.rust-lang.org/book/ch11-03-test-organization.html",
+    "Writing Tests and Assertion Macros": "https://doc.rust-lang.org/book/ch11-01-writing-tests.html",
+    "Documentation Tests (Doctests)": "https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html",
+    "std assert_matches! Macro": "https://doc.rust-lang.org/std/macro.assert_matches.html",
+    "cargo-nextest Test Runner": "https://nexte.st/book/running",
+    "Async Tests with tokio::test": "https://docs.rs/tokio/latest/tokio/attr.test.html",
+    "tokio-test Async Test Utilities": "https://docs.rs/tokio-test/latest/tokio_test/",
+    "Proptest (Property Testing)": "https://proptest-rs.github.io/proptest/intro.html",
+    "QuickCheck (Property Testing)": "https://raw.githubusercontent.com/BurntSushi/quickcheck/master/README.md",
+    "Insta (Snapshot Testing)": "https://insta.rs/docs/",
+    "Criterion.rs (Benchmarking)": "https://bheisler.github.io/criterion.rs/book/",
+    "Mockall (Mocking)": "https://docs.rs/mockall/latest/mockall/",
+    "rstest (Parameterized/Fixture Tests)": "https://docs.rs/rstest/latest/rstest/",
+    "assert_cmd (CLI Binary Testing)": "https://docs.rs/assert_cmd/latest/assert_cmd/",
+    "predicates (CLI Assertion Predicates)": "https://docs.rs/predicates/latest/predicates/"
+  },
+  "lastFetched": "2026-06-02T18:09:18.251Z"
+}

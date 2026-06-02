@@ -234,6 +234,20 @@ handling, packaging (pyproject.toml, uv, ruff), and project structure, while `py
 /plugin install python
 ```
 
+---
+
+### rust
+
+Rust language discipline targeting the 2024 edition. Two skills cover the language and its test ecosystem: `rust`
+handles ownership and borrowing, error handling (`thiserror`/`anyhow`), traits and generics, iterators, concurrency
+(CPU-bound parallelism with threads/rayon vs I/O-bound async with Tokio), the cargo/clippy/rustfmt toolchain, and Rust
+2024 edition specifics, while `rust-testing` covers testing conventions (unit/integration/doctest layout, cargo-nextest,
+proptest, insta, criterion, mockall, rstest). Bundled rust-analyzer LSP for semantic code navigation.
+
+```
+/plugin install rust
+```
+
 ## License
 
 MIT
