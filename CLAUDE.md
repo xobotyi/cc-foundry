@@ -50,13 +50,22 @@ process (Research → Scaffold → Write → Ship) using Perplexity for discover
 **Skill structure:**
 
 - Router pattern: SKILL.md routes to `references/` for detailed content
-- Keep SKILL.md under 500 lines; move depth to references
+- SKILL.md must be behaviorally self-sufficient; route only lookup-oriented depth to `references/`. No hard line cap —
+  length is governed by the deletion test, not a line budget (see `docs/adr/0002`)
 
 **Development artifacts:**
 
 - `.dev/` directories contain build tooling and source materials
 - `.dev/reference/` holds fetched docs (raw source, not shipped as-is)
 - `references/` holds processed content (shipped with plugin)
+
+**Design decisions:**
+
+- Load-bearing decisions about how cc-foundry's own skills and plugins are authored are recorded as ADRs in `docs/adr/`
+  (sequential `NNNN-slug.md`, indexed in `docs/adr/README.md`). Record one when the rationale would otherwise live only
+  in a commit message or memory — so future authors neither re-litigate nor cargo-cult it.
+- These are distinct from the per-project ADRs the `the-blueprint:alignment` skill writes to a downstream project's
+  `design-docs/adr/`.
 
 **Plugin context:**
 
