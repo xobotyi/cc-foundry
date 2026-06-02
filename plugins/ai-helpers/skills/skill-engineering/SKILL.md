@@ -250,6 +250,21 @@ composition" — not "Don't use `.pipe()`" in a separate anti-pattern table. Kee
 Instruction strengthening patterns, interference detection, CoT trade-offs: see
 [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`].
 
+## Skill Dependencies
+
+A skill often relies on another. How you express the dependency depends on whether the output is _wrong_ or merely _less
+sharp_ without it.
+
+- **Hard dependency** — skipping the other skill produces wrong output. Emit an explicit pointer in the body: a
+  `<prerequisite>` block (`invoke prompt-engineering before drafting`) or a load-bearing step. The reader must act on
+  it.
+- **Soft dependency** — the other skill only sharpens output; the skill still works without it. Name it in prose (a
+  Related Skills bullet) with no invoke pointer.
+
+Putting an explicit "run X first" pointer on a soft dependency is cargo-culting — it spends attention and tokens where
+nothing is load-bearing, and trains readers to ignore the pointer when it does matter. Reserve the explicit pointer for
+the hard case.
+
 ## Skill Archetypes
 
 ### Workflow Skill
@@ -374,6 +389,7 @@ Before deploying:
 - [ ] At least one input/output example (few-shot) for generative skills
 - [ ] Critical rules in top 20% and/or bottom 20% (not only in middle)
 - [ ] Every instruction earns its place (deletion test: removing it changes output)
+- [ ] Dependencies expressed by tier — hard = explicit pointer (`<prerequisite>`), soft = prose mention only
 - [ ] No secrets in SKILL.md, references, or scripts
 - [ ] Under 500 lines (exceeding is acceptable when all content is behavioral)
 - [ ] Name matches directory (lowercase, hyphens)

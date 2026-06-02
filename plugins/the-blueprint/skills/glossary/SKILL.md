@@ -30,6 +30,28 @@ Decide how many glossaries the project needs:
   billing vs fulfillment). In DDD terms, each bounded context speaks its own dialect of the ubiquitous language; one
   glossary per dialect. Create one file per context; name each context explicitly.
 
+### Context map (multiple contexts only)
+
+A per-context glossary defines terms _within_ its dialect, but the relationships _between_ contexts — which context
+emits an event another consumes, which value types they share — live in no single glossary. When a project has several
+context glossaries, an optional `docs/ubiquitous-language/context-map.md` names each context with a one-line purpose and
+the directional flows between them:
+
+```markdown
+## Contexts
+
+- **Ordering** — places and tracks customer orders.
+- **Fulfillment** — picks, packs, ships.
+
+## Relationships
+
+- Ordering emits `OrderPlaced`; Fulfillment consumes it.
+- Ordering and Billing share `CustomerId` and `Money`.
+```
+
+Add it only when multiple contexts genuinely exist and the cross-talk is not obvious from the names. It is prose, not a
+table, and it complements — does not replace — a context-map _diagram_ (see the `diagramming` skill).
+
 ## Selecting Terms — the trap test
 
 For each candidate term, apply the trap test: **would a reviewer or agent plausibly reach for a wrong name here?** If
@@ -167,6 +189,7 @@ cases the definitions missed — especially useful when two concepts could plaus
 
 - **Single glossary:** `docs/glossary.md` or `docs/ubiquitous-language/glossary.md`
 - **Per-context:** `docs/ubiquitous-language/{context}-glossary.md` (e.g., `billing-glossary.md`)
+- **Context map (multiple contexts):** `docs/ubiquitous-language/context-map.md`
 - **Reference from CLAUDE.md** early — primacy attention reduces naming violations significantly. Do not inline the
   glossary in CLAUDE.md; use progressive disclosure:
 

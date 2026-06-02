@@ -180,6 +180,10 @@ Different types of work call for different description structures. These pattern
 
 For broken functionality. The reader needs to understand what's wrong, how to see it, and what should happen instead.
 
+Reproduce the bug before drafting — read the reported steps, trace the code, run the failing path. A confirmed
+reproduction yields precise Steps to Reproduce and a real Actual Behavior; a failed or partial reproduction is the
+signal to gather more detail first, not a reason to file a vague task.
+
 ```markdown
 ## Context
 [What feature is affected and how it relates to the system]

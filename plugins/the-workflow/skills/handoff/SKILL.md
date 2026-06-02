@@ -47,6 +47,8 @@ Separate your context into two categories before writing anything.
 - Intermediate exploration and search paths
 - Failed approaches (unless the failure constrains remaining work)
 - Content already committed to files or git history
+- Content already captured in upstream artifacts (PRDs, plans, ADRs, issue trackers) — reference by path or ID, don't
+  restate
 - Information derivable from the codebase (file structure, function signatures)
 - Raw tool output
 
@@ -132,4 +134,6 @@ If Decisions or Remaining Work is empty when work was done, the triage missed so
 - **Rationale with every decision.** A decision without rationale forces re-derivation or blind trust.
 - **Identifiers, not descriptions.** "PR #247" not "the pull request we opened." "src/auth/middleware.ts:42" not "the
   auth file around line 42."
+- **Redact secrets and PII.** Strip API keys, tokens, passwords, and personal data before emitting — the document gets
+  printed, copied, and shared.
 - **The document is standalone.** The receiver has no access to this conversation.

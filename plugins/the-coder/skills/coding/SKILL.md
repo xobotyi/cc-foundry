@@ -148,7 +148,29 @@ Agents overcomplicate by default. Actively resist this.
   next reader won't find
 - Use descriptive names — longer is better than ambiguous
 - Do the simplest thing that works, then optimize if measured performance requires it
+- Prefer deep modules — a small interface hiding substantial implementation — over shallow ones that
+  expose nearly as much as they hide. A wrapper that only forwards calls earns nothing.
+- Don't introduce a seam (interface, port, strategy) until two concrete implementations need it —
+  typically production plus test. One implementation behind an interface is indirection, not abstraction.
+- Deletion test before adding an abstraction: imagine the module gone. If its complexity reappears in
+  every caller, it earns its place. If the complexity merely moves, it was a shallow pass-through —
+  inline it.
 </simplicity-rules>
+
+### Isolate Dependencies for Testing
+
+A module is hard to test when a dependency hides behind it. Match the strategy to the dependency's nature instead of
+reaching for a mock by default.
+
+<dependency-rules>
+- **Pure logic, no I/O** — test through the interface directly. No doubles needed.
+- **Locally substitutable (in-memory DB, temp filesystem, fake clock)** — run the real code against the
+  substitute. A working stand-in beats a mock.
+- **A service you own, across the network** — hide it behind a port with two adapters: the real HTTP/RPC
+  one for production, an in-memory one for tests.
+- **Third-party or external** — inject it behind your own narrow interface and mock that interface, not
+  the vendor SDK.
+</dependency-rules>
 
 ### Follow Existing Patterns
 
@@ -165,6 +187,21 @@ Before inventing a new pattern, search the codebase for existing ones. Consisten
 - If you think an existing convention is harmful, surface it explicitly. Don't fork it silently.
 </pattern-rules>
 
+### Refactor Targets
+
+When the goal is to improve existing code, hunt for named smells and apply the matching move. Naming the smell turns
+"this feels messy" into a concrete change.
+
+<refactor-targets>
+- **Duplication** — extract a shared function or type.
+- **Long function doing several things** — split it along the boundaries of what it does.
+- **Shallow module** (interface nearly as large as its implementation) — deepen it, or fold it into its
+  caller.
+- **Feature envy** (a function reaching repeatedly into another type's internals) — move the logic to the
+  data it operates on.
+- **Primitive obsession** (bare strings or ints carrying domain meaning) — introduce a value type.
+</refactor-targets>
+
 ## Verification Discipline
 
 Verification is the single highest-leverage activity. Code that "looks right" but hasn't been tested is unverified code.
@@ -177,8 +214,10 @@ Verification is the single highest-leverage activity. Code that "looks right" bu
 
 2. **Check for regressions** — If you modified existing behavior, run the full relevant test suite, not just new tests.
 
-3. **Validate against success criteria** — Revisit the criteria defined during planning. Does the implementation
-   actually meet them? Not "probably meets them" — actually meets them.
+3. **Check both axes — spec and standards.** _Spec:_ does it do what was actually asked — the success criteria defined
+   during planning — not merely something plausible? _Standards:_ does it follow this repo's documented conventions
+   (CLAUDE.md, lint and type config, ADRs)? Check them separately: code can satisfy every convention and still implement
+   the wrong thing, and a correct result can still violate the conventions. One axis passing never excuses the other.
 
 4. **Review your own diff** — Read it as if reviewing someone else's code. Look for:
    - Leftover debug code or TODO comments
