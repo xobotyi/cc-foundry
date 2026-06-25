@@ -140,6 +140,24 @@ Don't one-shot complex features.
 
 Agents overcomplicate by default. Actively resist this.
 
+Before writing new code, climb the reuse ladder and stop at the first rung that holds. The ladder runs _after_ you
+understand the problem — read the code the change touches and trace the real flow first, then climb. It shortens the
+solution, never the reading: a small diff you don't understand is laziness dressed up as efficiency, not minimalism.
+
+<reuse-ladder>
+1. **Does this need to exist?** Speculative need → skip it, say so in one line. (YAGNI)
+2. **Already in this codebase?** A helper, util, type, or pattern that already lives here → reuse it. Re-implementing
+   what's a few files over is the most common waste.
+3. **Stdlib does it?** Use it.
+4. **Native platform feature covers it?** `<input type="date">` over a picker lib, CSS over JS, a DB constraint over
+   app-level code.
+5. **An already-installed dependency solves it?** Use it. Never add a new dependency for what a few lines or an existing
+   one can do.
+6. **Can it be one line?** One line.
+7. **Only then** write the minimum code that works.
+
+Two rungs hold → take the higher one and move on. </reuse-ladder>
+
 <simplicity-rules>
 - Prefer functions over classes when either works
 - Avoid inheritance unless the problem demands it
@@ -156,6 +174,20 @@ Agents overcomplicate by default. Actively resist this.
   every caller, it earns its place. If the complexity merely moves, it was a shallow pass-through —
   inline it.
 </simplicity-rules>
+
+### Mark Deliberate Shortcuts
+
+A simplification you chose on purpose is intent; an unmarked one reads as ignorance. When you take a shortcut with a
+known ceiling — a global lock, an O(n²) scan, a naive heuristic — mark it with a `shortcut:` comment that names the
+ceiling and the upgrade trigger, so a deferral can't quietly become permanent.
+
+<shortcut-marker>
+- `// shortcut: global lock — switch to per-account locks if throughput matters`
+- `# shortcut: O(n²) scan, fine under ~1k rows — index if the set grows`
+
+A marker that names no trigger is the kind that rots into permanent. Grep them with `rg -n 'shortcut:'` to review
+deferred work before it's forgotten. Mark only deliberate ceilings, not every simplification — a shortcut the reader
+would never mistake for a bug needs no comment. </shortcut-marker>
 
 ### Isolate Dependencies for Testing
 
