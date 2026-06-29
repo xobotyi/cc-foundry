@@ -59,7 +59,7 @@ trailers
 ```
 
 **Subject**: What changed (≤50 chars target, 72 hard cap, factual)
-**Body**: Why it changed, how to verify
+**Body**: Why it changed, how a reader can reproduce/verify it
 **Trailers**: Structured metadata (references, authorship)
 </format>
 
@@ -136,7 +136,12 @@ The body is where you communicate with future readers. It answers:
 
 - **What** changed beyond the subject
 - **Why** this change was needed
-- **How to verify** if not obvious
+- **How a reader can verify** it later, if not obvious -- reproduction steps they can follow (`run X, confirm Y`), not
+  the results you happened to produce this session
+
+"How to verify" means instructions for a future reader, never a log of the checks you ran.
+`Run the deduper twice and confirm idempotence` belongs here; `ran the suite, 55/55 passing` does not -- that is a fact
+about your terminal at commit time, not about the change (see Never include below).
 
 Wrap all body lines at 72 characters. This is a hard limit, not a guideline — git tooling (log, format-patch, email)
 assumes 72-char body lines. Trailers are the only exception. </body-philosophy>
@@ -166,6 +171,11 @@ use fragments and drop articles where clarity survives. Identifiers, file paths,
 - Decorative Unicode — em dashes, arrows, fancy quotes, emoji, bullet symbols (see ASCII Symbols above).
 - Filler: "just", "really", "basically", "actually", "simply"; connective fluff: "however", "furthermore",
   "additionally".
+- Local session/process artifacts: test pass counts ("55 of 55 tests passing", "all tests green"),
+  lint/typecheck/build/quality-gate status ("lint clean", "quality gate passed"), CI results, "all checks pass". These
+  record your session at commit time, not the change — they are unverifiable by a future reader, rot on the next commit,
+  and duplicate what CI tracks. Reproduction steps a reader can follow are fine (see Body above); the log of checks you
+  ran is not.
 
 **Bad:**
 
@@ -487,6 +497,8 @@ Commits must appear as regular developer commits.
 - **Body is essential** — single-line commits are rarely acceptable
 - **Terse register** — diff carries the what; message carries the why. No "this commit / I / we / now"; no filler; no
   promotional adjectives
+- **No session artifacts** — test pass counts, lint/CI/quality-gate status, "all checks pass" record your session at
+  commit time, not the change; keep them out. "How to verify" means reader reproduction steps, not the checks you ran
 - **BREAKING first** — breaking changes start body with `BREAKING:` prefix
 - **Trailers for metadata** — use Title-Case, structured format
 - **Amends rewrite history** — amended messages describe the full change, not the delta

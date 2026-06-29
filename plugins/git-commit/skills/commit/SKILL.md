@@ -119,6 +119,10 @@ For each identified unit, classify and order:
 
 4. **On success:** Continue to self-review.
 
+**Gate results stay out of the commit message.** Test pass counts, lint/typecheck/build status, and "all checks pass"
+are facts about this session, not the change. They belong nowhere in the subject, body, or trailers — keep them in the
+terminal.
+
 **After returning from fixes:** Re-read `<pipeline-awareness>` above. Verify you're resuming at step 4, not starting
 over or skipping steps. </quality-gate>
 
@@ -131,6 +135,7 @@ Before each commit, verify:
 - [ ] No unrelated changes bundled together
 - [ ] Sensitive data excluded (.env, credentials, secrets)
 - [ ] Message has no filler tics ("this commit", "I", "we", "now"), no promotional adjectives, no scope-restating
+- [ ] Message has no session artifacts (test counts, lint/CI/quality-gate status, "all checks pass")
 
 ```bash
 git diff --cached      # Review exactly what will be committed
