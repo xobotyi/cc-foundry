@@ -24,3 +24,5 @@ neither re-litigate it nor cargo-cult it.
   accepted
 - [0002 — No SKILL.md line cap](0002-no-skill-md-line-cap.md) — accepted
 - [0003 — Skill dependencies: soft vs hard tiers](0003-skill-dependencies-soft-vs-hard.md) — accepted
+- [0004 — Behavioral nudges as declarative rules, not emitted reasoning artifacts](0004-declarative-rules-over-emitted-reasoning-artifacts.md)
+  — accepted
