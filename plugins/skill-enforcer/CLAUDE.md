@@ -1,71 +1,85 @@
 # skill-enforcer Plugin
 
-Enforces skill invocation and reference reading via lifecycle hooks.
+Injects skill-discipline reminders at lifecycle checkpoints so matching skills get invoked proactively and their
+phase-relevant references get read — not skipped.
 
 ## How It Works
 
-The plugin injects a Skill Enforcement Framework (SEF) at session start, then injects self-contained per-stage triggers
-at key lifecycle events. Each trigger restates the format invariant, the required `<sef-eval>` field skeleton, and the
-stage-specific decision rule — so it stays correctable even when the session-start framework has drifted into the
-low-attention middle of a long context window. The framework treats skills as non-atomic — a skill isn't exhausted until
-all phase-relevant references have been read.
+At session start the plugin injects the SEF framework (~600 tokens: purpose, matching rule, and the four checkpoint
+rules). At each lifecycle event it injects a terse, self-contained `<SEF phase="...">` reminder carrying one declarative
+behavioral rule plus a silent-apply contract. The reminder is the operational source of truth — it stays correct even
+when the session-start framework has drifted into low-attention context.
 
 **Lifecycle flow:**
 
-1. **Session start** — inject full framework definition (~2300 tokens)
-2. **User prompt** — inject self-contained `USER-PROMPT` trigger (~100 tokens)
-3. **After Read** — inject self-contained `EVALUATION` trigger (~150 tokens)
-4. **After Edit/Write** — inject self-contained `PHASE-CHANGE` trigger (~170 tokens)
-5. **After Skill** — inject self-contained `SKILL-LOAD` trigger (~135 tokens)
+1. **Session start** (startup|resume|clear|compact) — inject the full framework (~600 tokens)
+2. **User prompt** — `USER-PROMPT` rule: invoke every matching skill before responding
+3. **After Read** — `EVALUATION` rule: act if the read opened a skill-covered domain
+4. **After Edit/Write** — `PHASE-CHANGE` rule: act if the type of work shifted
+5. **After Skill** — `SKILL-LOAD` rule: read phase-relevant references; invoke sibling skills
+6. **Pre-compact** — strip reminders, preserve the list of references read
 
-Each trigger carries: format invariant (`emit inside thinking only`), the eval skeleton with required fields, and the
-decision rule for the stage. Silent acknowledgment = violation.
+Each reminder carries: one declarative rule for the checkpoint, plus the shared silent-apply contract (act on it, never
+echo the reminder or narrate the check). Skill invocations (via the Skill tool) and reference reads (via Read) stay
+visible; only the deliberation behind them is silent.
 
-**Enforcement mechanism:**
+## Design: declarative rules, not an evaluation artifact
 
-- Skills that match the task MUST be invoked (no "I already know" excuses)
-- Phase shifts (coding → testing) MUST trigger re-evaluation of loaded skills for unread refs
-- Each evaluation MUST enumerate loaded skills, unread refs, and reach explicit decision
-- The evaluation MUST appear inside `<thinking><sef-eval>...</sef-eval></thinking>`
+Each checkpoint injects ONE declarative rule that constrains the action. It does **not** ask the model to emit a
+structured `<sef-eval>` block in its reasoning.
+
+The previous design (<= v1.5.0) handed the model a `<thinking><sef-eval>...fields...</thinking>` skeleton and told it to
+reproduce the evaluation in its thinking stream, never in visible output. On reasoning models (Opus 4.8+) this failed
+two ways:
+
+- **Tag leak** — the native reasoning channel is not addressable by typing `<thinking>`. Handed a tag-shaped template,
+  the model completed it into the _visible_ reply.
+- **No-think skip** — at low/medium effort the model may not enter a thinking block on a given step, so "emit in
+  thinking" had nowhere to land; the evaluation was skipped or spilled into the visible reply.
+
+A declarative rule constrains the action regardless of whether the model thinks on a given step, and carries no
+tag-shaped artifact to echo. This is the load-bearing reason the plugin shed the `<sef-eval>` ceremony — do not
+reintroduce it.
 
 ## Components
 
-**`hooks/sef-hook.js`** — Unified Node.js script handling all hook events via command-line arg:
+**`hooks/sef-hook.js`** — single Node script dispatched by CLI argument:
 
-- `session-start` — outputs full framework definition
-- `pre-compact` — outputs compaction instructions
-- `prompt` — outputs USER-PROMPT tag
-- `read` — outputs EVALUATION tag
-- `write` — outputs PHASE-CHANGE tag
-- `skill` — outputs SKILL-LOAD tag
+- `session-start` — full framework
+- `pre-compact` — compaction instructions
+- `prompt` / `read` / `write` / `skill` — the four checkpoint reminders
 
-**`hooks/hooks.json`** — Hook registration mapping lifecycle events to script invocations:
+**`hooks/hooks.json`** — maps lifecycle events to script invocations:
 
-- `SessionStart` (startup|resume|clear|compact) → `session-start`
-- `PreCompact` → `pre-compact`
-- `UserPromptSubmit` → `prompt`
-- `PostToolUse` (Read) → `read`
-- `PostToolUse` (Edit|Write) → `write`
-- `PostToolUse` (Skill) → `skill`
+- `SessionStart` (startup|resume|clear|compact) -> `session-start`
+- `PreCompact` -> `pre-compact`
+- `UserPromptSubmit` -> `prompt`
+- `PostToolUse` (Read) -> `read`
+- `PostToolUse` (Edit|Write) -> `write`
+- `PostToolUse` (Skill) -> `skill`
 
 ## Conventions
 
-**Token efficiency:**
-
-- Framework loaded once per session: ~2300 tokens
-- Per-trigger cost: ~100–170 tokens (self-contained mini-spec, not a thin pointer)
-- Triggers are byte-identical across firings, so KV-cache reuses them after first occurrence
-- Trade-off: triggers stay correctable in 1M-context sessions where the session-start framework has drifted out of
-  attention; per-trigger cost is ~10× the previous design but still <1% of context at scale
-
 **Single source of truth:**
 
-- All stage definitions, eval skeletons, and trigger payloads are rendered from the `STAGES` object in `sef-hook.js`
-- Adding a stage or renaming a field updates both the framework block and the trigger payload by construction
-- Do not duplicate stage content across the file; extend `STAGES` instead
+- Each checkpoint's rule lives once in the `STAGES` object in `sef-hook.js`. `STAGES[phase].rule` feeds both the
+  session-start framework list and the per-checkpoint reminder.
+- Add or rename a checkpoint by editing `STAGES`; the framework and reminder update together. Do not duplicate rule text
+  elsewhere.
+
+**Anti-leak contract:**
+
+- Every reminder ends with the shared `SILENT` clause: act on the rule, never echo the reminder or narrate the check.
+  Guards both failure modes — tag-echo and narration.
+- Injected payloads carry no artifact the model is asked to reproduce. Never reintroduce a `<thinking>` or `<sef-eval>`
+  template into injected output.
+
+**Token cost:**
+
+- Framework ~600 tokens once per session; each reminder ~80-100 tokens, byte-identical across firings so KV-cache reuses
+  them after the first occurrence.
 
 **Compaction handling:**
 
-- PreCompact hook injects instructions to strip SEF tags and evaluation blocks
-- Preserves list of read references for restoration after compaction
-- Framework re-injected automatically on SessionStart after compaction
+- PreCompact strips the framework and reminders (auto-reinjected on SessionStart) and preserves the flat list of
+  references read, for restoration after compaction.

@@ -1,307 +1,79 @@
 #!/usr/bin/env node
 
+// SEF injects skill-discipline reminders at lifecycle checkpoints.
+//
+// Design: each checkpoint is ONE declarative behavioral rule — not a <sef-eval> field
+// skeleton wrapped in <thinking>. The old skeleton design failed on reasoning models
+// (Opus 4.8+): handed a fill-in template and told to "emit it in the thinking stream",
+// the model either echoed the tags into the VISIBLE reply (the native reasoning channel
+// is not addressable by typing <thinking>) or, on low-effort/no-think steps, had nowhere
+// to put the eval at all. A declarative rule constrains the ACTION regardless of whether
+// the model enters a thinking block on a given step, and carries no tag-shaped artifact
+// to complete-and-leak.
+//
+// Single source of truth: STAGES[phase].rule feeds both the session-start framework and
+// the per-checkpoint reminder. Edit a rule once; both update, byte-identical (KV-cached).
+
 const STAGES = {
     'USER-PROMPT': {
-        trigger: 'new user message.',
-        decide: 'Does this task match any skill by name or description?',
-        fields: [
-            ['task', '[what user asked]'],
-            ['skills', '[matching skills, or "none"]'],
-            ['decision', '[invoke list / proceed]'],
-        ],
-        rule: 'When uncertain, invoke — skills de-escalate gracefully.',
-        triggerNote: 'Decide: does this task match any skill? When uncertain, invoke — skills de-escalate gracefully.',
+        event: 'a new user message arrives',
+        rule: 'Invoke every available skill that matches this task by name or description before responding — a task often matches several, so invoke each, not just the closest. Your own knowledge is not a substitute for an unread skill — "I already know this" is not a reason to skip. When unsure whether a skill applies, invoke it; skills de-escalate gracefully.',
     },
     'SKILL-LOAD': {
-        trigger: 'after Skill invocation.',
-        decide: 'Does this skill have references relevant to the current phase? Should other skills be batched?',
-        fields: [
-            ['loaded', '[skill name]'],
-            ['phase', '[current work type]'],
-            ['refs', '[references to read now, or "none"]'],
-            ['batch', '[other skills to invoke, or "none"]'],
-            ['decision', '[read refs / invoke skills / proceed]'],
-        ],
-        rule: 'A skill is "related" when it covers a different facet of the same task — e.g., a language skill alongside a general coding skill.',
-        triggerNote: 'Decide: read phase-relevant refs of this skill, and invoke any related skills (different facet of the same task) before proceeding.',
+        event: 'a skill is invoked',
+        rule: "Invoking a skill does not exhaust it. Read the references relevant to the current phase now, and invoke any sibling skills covering a different facet of the same task (e.g. a language skill beside a general coding skill).",
     },
     'EVALUATION': {
-        trigger: 'after Read.',
-        decide: 'Did this read shift understanding enough to reconsider skills or references?',
-        fields: [
-            ['source', '[file path or name — never reproduce content]'],
-            ['impact', '[one-line: what shifted, or "nothing — no new domain or scope change"]'],
-            ['skills', '[now relevant, or "none"]'],
-            ['refs', '[to read, or "none"]'],
-            ['decision', '[invoke list / read refs / proceed]'],
-        ],
-        rule: 'The question is: does what was read change which skills or references are needed? If the read reveals a new domain, unfamiliar pattern, or shifts task requirements — act on it.',
-        triggerNote: 'Decide: did the read reveal a new domain, unfamiliar pattern, or shift task scope? If yes, invoke skills or read refs before proceeding.',
+        event: 'a file is read',
+        rule: 'If what you just read opens a domain, pattern, or scope a skill covers — or makes a reference of an already-loaded skill newly relevant — invoke or read it before continuing. If nothing shifted, continue.',
     },
     'PHASE-CHANGE': {
-        trigger: 'after Edit/Write.',
-        decide: 'Did the type of work change?',
-        fields: [
-            ['previous', '[phase before this edit]'],
-            ['current', '[phase after this edit]'],
-            ['shift', '[yes/no]'],
-            ['loaded-skills', '[enumerate each by name]'],
-            ['unread-refs', '[per skill, or "none"]'],
-            ['new-skills', '[not yet loaded, or "none"]'],
-            ['decision', '[read refs / invoke skills / proceed]'],
-        ],
-        rule: 'Writing tests after implementation = shift. Editing the same implementation file = not a shift.',
-        triggerNote: 'Decide: did the type of work change (e.g., coding → testing)? If yes, enumerate loaded skills, identify unread refs for the new phase, and read them before proceeding.',
+        event: 'a file is edited or written',
+        rule: "If the type of work has shifted (e.g. coding → testing, implementation → review), invoke the skills and read the already-loaded skills' references the new phase needs before continuing. Editing the same file within the same phase is not a shift.",
     },
 };
 
-const INVARIANT = "Emit inside the model's native thinking stream only — visible output is a violation.";
+// Anti-leak contract, restated at every checkpoint so it survives context drift. Guards
+// both failure modes: tag-echo (reproducing the reminder) and narration (answering it aloud).
+const SILENT = 'Apply silently — act on this, do not echo the reminder or narrate the check in your reply.';
 
-const renderEval = (phase, fields) =>
-    `<sef-eval phase="${phase}">\n${fields.map(([n, h]) => `<${n}>${h}</${n}>`).join('\n')}\n</sef-eval>`;
+const renderTrigger = (phase) => `<SEF phase="${phase}">\n${STAGES[phase].rule}\n\n${SILENT}\n</SEF>`;
 
-const renderStage = (phase) => {
-    const s = STAGES[phase];
-    return `<stage name="${phase}">
-Trigger: ${s.trigger}
-Decide: ${s.decide}
-
-<thinking>
-${renderEval(phase, s.fields)}
-</thinking>
-
-${s.rule}
-</stage>`;
-};
-
-const renderTrigger = (phase) => {
-    const s = STAGES[phase];
-    return `<SEF phase="${phase}">
-${INVARIANT}
-
-<thinking>
-${renderEval(phase, s.fields)}
-</thinking>
-
-${s.triggerNote}
-</SEF>`;
-};
-
-const STAGES_BLOCK = Object.keys(STAGES).map(renderStage).join('\n\n');
+const RULES_BLOCK = Object.entries(STAGES)
+    .map(([phase, s]) => `- **${phase}** (when ${s.event}): ${s.rule}`)
+    .join('\n');
 
 const FRAMEWORK = `<SEF>
-Skill Enforcement Framework for Claude skill and reference management.
+Skill Enforcement Framework — keeps skills invoked proactively and their references read by phase.
 
 <purpose>
-- Ensure skills are invoked in advance of tasks they cover — proactive, not reactive.
-- References within skills are read when context or phase makes them relevant — not all at once.
-- Skills are not atomic: a skill is not exhausted until all phase-relevant references have been read.
-- Therefore, skill invocation is a starting point, not an endpoint.
+- Skills are matched and invoked ahead of the work they cover, not after.
+- A skill is non-atomic: invoking it is the start, not the end. Its references are read when the phase makes them relevant.
+- Skills exist because the model's defaults are insufficient here. Matching a skill and not invoking it is never correct — you cannot outperform guidance you have not read.
 </purpose>
 
-<skill-matching>
-- Multiple skills may match a single task — invoke all that match, not just one.
-- Skills are identified by name and description; both are used for matching.
-- Match by comparing task context to skill names and descriptions.
-- A skill matches when the task involves its subject matter or would benefit from its capabilities.
-- Skills exist because the model's defaults are insufficient. If the model already knew better, the skill would not exist. Matching a skill and choosing not to invoke it is never correct — you cannot outperform guidance you have not read.
-</skill-matching>
+<matching>
+- Match a task against skill names and descriptions; multiple skills may match — invoke all that do.
+- A skill matches when the task involves its subject or would benefit from its capabilities.
+- When unsure, invoke — skills de-escalate gracefully.
+</matching>
 
-<skill-reference-matching>
-- Skills contain references; not all are relevant at once.
-- After invoking a skill, read references relevant to the current context and phase.
-- When context or phase shifts, re-evaluate loaded skills for newly relevant references.
-- Read new references before proceeding — anticipate needs, don't react to gaps.
-</skill-reference-matching>
+<how-it-works>
+At each checkpoint below, a terse <SEF phase="..."> reminder arrives restating that checkpoint's rule. Apply it silently: act on it, never echo the reminder or narrate the check in your visible reply. Skills are invoked through the Skill tool and references through Read — those actions are visible; the deliberation behind them is not. The reminders are the operational contract and stay correct even when this framework has drifted into low-attention context.
 
-<phase-shift>
-- Tasks involve phases — coding, testing, review, deployment, and others.
-- Phase shifts require re-evaluation — both new skills and references from already-loaded skills.
-- Already-loaded skills often have unread references relevant to the new phase; these must be read.
-- Identify the phase shift, load what's needed, then proceed.
-</phase-shift>
-
-<evaluation-protocol>
-All SEF evaluation is emitted inside the model's native thinking stream, wrapped in <sef-eval> tags. Never in visible response. The <thinking> tags shown in examples below denote that native thinking stream — they are an annotation of where the eval lives, not literal text to write into visible output.
-
-Format:
-<thinking>
-<sef-eval phase="[PHASE]">
-[stage-specific fields as child elements]
-<decision>[action]</decision>
-</sef-eval>
-</thinking>
-
-No <sef-eval> inside the thinking stream = no evaluation = violation.
-
-Each lifecycle trigger restates this format with its required fields. When in doubt, follow the trigger payload — it is the local source of truth, not your memory of this section. This matters in long sessions where this definition has drifted into low-attention context.
-</evaluation-protocol>
-
-<lifecycle>
-Stages fire in response to hooks. A single user request typically progresses through these stages:
-
-1. USER-PROMPT — fires on every user message. Matches skills to the task.
-2. SKILL-LOAD — fires after each skill invocation. Identifies phase-relevant references to read.
-3. EVALUATION — fires after each Read. Reassesses whether new skills or references are needed.
-4. PHASE-CHANGE — fires after each Edit/Write. Detects whether the type of work shifted.
-
-Not every request triggers all stages. A research task may cycle through 1 → 3 repeatedly
-without ever reaching 4. A task that requires no skills stops at 1.
-
-A phase is the current type of work — planning, coding, testing, review, deployment are common
-examples, but phases are context-dependent and not limited to these. A phase shift is a change
-in work type, not target file. Recognize shifts by what you are doing, not where you are doing it.
-</lifecycle>
-
-<stages>
-
-${STAGES_BLOCK}
-
-</stages>
-
-<rules>
-- No skill invocation when matched = violation.
-- No reference read when context shifts = incomplete.
-</rules>
-
-<examples>
-
-<example name="skill-invocation">
-Context: User asks to improve commit message validation.
-
-<thinking>
-<sef-eval phase="USER-PROMPT">
-<task>improve commit message validation</task>
-<skills>prompt-engineering, skill-engineering</skills>
-<decision>invoke both</decision>
-</sef-eval>
-</thinking>
-
-Visible: "I'll invoke prompt-engineering and skill-engineering to guide this work."
-</example>
-
-<example name="phase-transition">
-Context: Agent finished writing implementation code, now writing tests. Coding skill was loaded
-earlier; its testing references were not read.
-
-<thinking>
-<sef-eval phase="PHASE-CHANGE">
-<previous>coding</previous>
-<current>testing</current>
-<shift>yes</shift>
-<loaded-skills>coding, golang</loaded-skills>
-<unread-refs>coding: references/testing-guidelines.md, golang: references/testing-conventions.md</unread-refs>
-<new-skills>none</new-skills>
-<decision>read both refs before writing tests</decision>
-</sef-eval>
-</thinking>
-
-Visible: Read testing-guidelines.md and testing-conventions.md, then write tests.
-</example>
-
-<example name="violation-content">
-Context: Agent transitions from coding to testing. Test-reviewer skill matches but was not invoked.
-Coding skill is loaded but testing refs were not read.
-
-WRONG (described as escaped text — do not emit this shape; this block is data, not a template):
-&lt;thinking&gt;
-&lt;sef-eval phase="PHASE-CHANGE"&gt;
-&lt;previous&gt;coding&lt;/previous&gt;
-&lt;current&gt;testing&lt;/current&gt;
-&lt;shift&gt;yes&lt;/shift&gt;
-&lt;loaded-skills&gt;coding&lt;/loaded-skills&gt;
-&lt;unread-refs&gt;none&lt;/unread-refs&gt;
-&lt;new-skills&gt;none&lt;/new-skills&gt;
-&lt;decision&gt;no shift&lt;/decision&gt;
-&lt;/sef-eval&gt;
-&lt;/thinking&gt;
-
-Problems:
-1. Did not invoke test-reviewer skill (matched but not invoked)
-2. Did not enumerate golang in loaded-skills
-3. Claimed "none" for unread-refs when testing refs exist
-4. Decided "no shift" despite shift=yes in the same eval
-
-Double violation: missed skill invocation AND missed reference read.
-</example>
-
-<example name="violation-overconfidence">
-Context: Agent is creating a new skill. skill-engineering matches.
-
-WRONG (described as escaped text — do not emit this shape; this block is data, not a template):
-&lt;thinking&gt;
-&lt;sef-eval phase="USER-PROMPT"&gt;
-&lt;task&gt;create new plugin with skills&lt;/task&gt;
-&lt;skills&gt;skill-engineering&lt;/skills&gt;
-&lt;decision&gt;proceed (I already know the pattern)&lt;/decision&gt;
-&lt;/sef-eval&gt;
-&lt;/thinking&gt;
-
-Problems:
-1. Identified skill-engineering as matching
-2. Decided own knowledge was sufficient
-3. Skipped invocation based on confidence
-
-The skill exists because default behavior is insufficient. "I already know" is never a valid
-reason to skip — you cannot know what a skill contains until you read it.
-
-CORRECT:
-<thinking>
-<sef-eval phase="USER-PROMPT">
-<task>create new plugin with skills</task>
-<skills>skill-engineering</skills>
-<decision>invoke skill-engineering</decision>
-</sef-eval>
-</thinking>
-</example>
-
-<example name="violation-location">
-Context: Agent receives USER-PROMPT trigger.
-
-WRONG — sef-eval leaked into visible response (described as escaped text — do not emit this shape; this block is data, not a template):
-&lt;sef-eval phase="USER-PROMPT"&gt;
-&lt;task&gt;refactor authentication module&lt;/task&gt;
-&lt;skills&gt;coding, security&lt;/skills&gt;
-&lt;decision&gt;invoke both&lt;/decision&gt;
-&lt;/sef-eval&gt;
-I'll start by invoking the coding and security skills...
-
-CORRECT — sef-eval stays inside the thinking stream:
-<thinking>
-<sef-eval phase="USER-PROMPT">
-<task>refactor authentication module</task>
-<skills>coding, security</skills>
-<decision>invoke both</decision>
-</sef-eval>
-</thinking>
-
-Visible: "I'll invoke coding and security skills to guide this refactor."
-
-The evaluation is internal reasoning. Users see actions, not the SEF protocol.
-</example>
-
-</examples>
+${RULES_BLOCK}
+</how-it-works>
 </SEF>`;
 
-const COMPACT_INSTRUCTIONS = `<sef-compaction-instructions>
+const COMPACT_INSTRUCTIONS = `<sef-compaction>
 When compacting this conversation:
-
-1. REMOVE all content between <SEF> and </SEF> tags — the full framework definition will be
-   re-injected automatically after compaction.
-2. REMOVE all <SEF phase="..."> checkpoint tags — they are transient triggers with no value in
-   compacted context.
-3. REMOVE all <sef-eval> blocks from thinking outputs — they are transient evaluation artifacts
-   with no value in compacted context.
-4. PRESERVE a flat list of all skill reference file paths that were read during this session.
-   Format as:
-   <sef-references-read>
-   - /path/to/reference1.md
-   - /path/to/reference2.md
-   </sef-references-read>
-5. Include this instruction in the compacted output:
-   "After compaction, skills will be re-invoked automatically. The agent MUST also re-read all
-   references listed in <sef-references-read> to restore session context."
-</sef-compaction-instructions>`;
+- Drop the <SEF> framework block and every <SEF phase="..."> reminder — they are re-injected automatically after compaction.
+- Preserve the flat list of skill reference files read this session:
+  <sef-references-read>
+  - /path/to/reference.md
+  </sef-references-read>
+- After compaction, skills are re-invoked automatically; the references listed above must be re-read to restore context.
+</sef-compaction>`;
 
 const RESPONSES = {
     'session-start': { event: 'SessionStart', context: FRAMEWORK },
