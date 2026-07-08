@@ -5,11 +5,12 @@ code intelligence via `gopls`.
 
 ## Skills
 
-| Skill    | Purpose                                                                                                                                                        |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `golang` | Go language conventions, idioms, error handling, concurrency patterns, project structure, testing, toolchain (go mod, golangci-lint), and LSP navigation rules |
-| `templ`  | templ (a-h/templ) type-safe HTML templating: syntax, components, attributes, styling, CSS/JS integration, and testing                                          |
-| `zog`    | Zog schema validation library: schema definition, parsing, validation, error handling, HTTP/JSON/env integration, custom tests, and transforms                  |
+- **`golang`** — Go language conventions, idioms, error handling, concurrency patterns, project structure, testing,
+  toolchain (go mod, golangci-lint), and LSP navigation rules
+- **`templ`** — templ (a-h/templ) type-safe HTML templating: syntax, components, attributes, styling, CSS/JS
+  integration, and testing
+- **`zog`** — Zog schema validation library: schema definition, parsing, validation, error handling, HTTP/JSON/env
+  integration, custom tests, and transforms
 
 ## LSP Integration
 
