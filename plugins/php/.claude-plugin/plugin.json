@@ -1,6 +1,6 @@
 {
   "name": "php",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "PHP language discipline: conventions, modern idioms, type system, OOP, and testing",
   "author": {
     "name": "xobotyi",
@@ -15,6 +15,8 @@
     "conventions",
     "typing",
     "oop",
-    "phpunit"
+    "phpunit",
+    "pest",
+    "testing"
   ]
 }

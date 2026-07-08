@@ -20,12 +20,14 @@ namespace boundaries.
 
 ## The Solution
 
-This plugin provides two skills and an Intelephense LSP configuration that give Claude deep PHP fluency targeting 8.5+.
-The `php` skill covers core language conventions (naming, type declarations, enums, OOP, closures, error handling),
-modern features (pipe operator, property hooks, asymmetric visibility, lazy objects, `#[NoDiscard]`), project structure
-(Composer, PSR-4, PER-CS formatting), and LSP-first code navigation rules. The `phpunit` skill covers testing
-conventions (test structure, data providers, assertions, mocking/stubs, attributes, configuration). Both skills include
-reference guides for extended patterns.
+This plugin provides three skills and an Intelephense LSP configuration that give Claude deep PHP fluency targeting
+8.5+. The `php` skill covers core language conventions (naming, type declarations, enums, OOP, closures, error
+handling), modern features (pipe operator, property hooks, asymmetric visibility, lazy objects, `#[NoDiscard]`), project
+structure (Composer, PSR-4, PER-CS formatting), and LSP-first code navigation rules. The `phpunit` skill covers PHPUnit
+testing conventions (test structure, data providers, assertions, mocking/stubs, attributes, configuration). The `pest`
+skill covers the Pest framework — function-style tests, the `expect()` API, datasets, and architecture/mutation/
+type-coverage/browser testing — as a layer over `phpunit`. All three skills include reference guides for extended
+patterns.
 
 The bundled Intelephense LSP configuration enables semantic code intelligence — go to definition, find references, hover
 for type info, workspace symbol search — directly in Claude Code for `.php` files.
@@ -74,6 +76,22 @@ skip/conditional, coverage, fixture, behavior), test organization (unit/integrat
 suites), and configuration (phpunit.xml strict settings, source element, coverage).
 
 **Use when:** writing or reviewing PHP tests with PHPUnit.
+
+### pest
+
+Enforces Pest 4 testing conventions for projects using the Pest framework (built on the PHPUnit 12 engine, PHP 8.5+).
+Covers test structure (`test`/`it`/`describe`, function-style tests, no test classes), the `expect()` expectation API
+(strict `toBe` over loose `toEqual`, chaining, higher-order and custom expectations), hooks
+(`beforeEach`/`afterEach`/`beforeAll`/`afterAll`, `$this` binding), datasets (inline, named, shared, bound — Pest's data
+providers), exceptions (`->throws()`, `toThrow()`), filtering/skipping/focus (`skip`, `todo`, `group`, `only`,
+`depends`, `flaky`), mocking via Mockery, higher-order testing, `Pest.php` configuration, architecture testing (`arch()`
+with `php`/`security`/`laravel`/`strict` presets), the Pest 4 advanced modes (mutation testing, type coverage, snapshot,
+stress, browser testing), and the `pest` CLI.
+
+Designed as a layer over `phpunit`: it owns Pest's functional API and Pest-only features and defers shared testing
+philosophy, the PHPUnit assertion/double API, coverage attributes, and `phpunit.xml` internals to the `phpunit` skill.
+
+**Use when:** writing or reviewing PHP tests with Pest.
 
 ## LSP Integration
 

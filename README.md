@@ -211,11 +211,12 @@ implementation layer (strict mode, quoting, portability, error handling) for scr
 
 ### php
 
-PHP language discipline targeting 8.5+. Two skills cover the full PHP surface: `php` handles conventions, type
+PHP language discipline targeting 8.5+. Three skills cover the full PHP surface: `php` handles conventions, type
 declarations (union, intersection, DNF), enums, readonly classes, property hooks, closures, Fibers, error handling,
-Composer, PSR-4/PER-CS, and project structure, while `phpunit` handles testing conventions (test structure, data
-providers, assertions, stubs vs mocks, attributes, configuration). Bundled Intelephense LSP for semantic code
-navigation.
+Composer, PSR-4/PER-CS, and project structure; `phpunit` handles PHPUnit testing conventions (test structure, data
+providers, assertions, stubs vs mocks, attributes, configuration); and `pest` handles the Pest framework (function-style
+tests, the `expect()` API, datasets, architecture/mutation/type-coverage/browser testing). Bundled Intelephense LSP for
+semantic code navigation.
 
 ```
 /plugin install php

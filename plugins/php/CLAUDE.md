@@ -9,6 +9,7 @@ intelligence via Intelephense.
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `php`     | PHP 8.5+ language conventions, type declarations (union, intersection, DNF), enums, readonly classes, property hooks, closures, Fibers, error handling, Composer, project structure, and LSP navigation rules |
 | `phpunit` | PHPUnit 11+ testing conventions (test structure, data providers, assertions, mocking/stubs, attributes, configuration, code coverage)                                                                         |
+| `pest`    | Pest 4 testing conventions (function-style `test`/`it`/`describe`, the `expect()` API, datasets, hooks, `Pest.php`, architecture/mutation/type-coverage/browser testing, CLI)                                 |
 
 ## LSP Integration
 
@@ -29,7 +30,15 @@ The `php` skill provides language-specific conventions and covers the full PHP l
 and enums through OOP patterns and Composer packaging. The `phpunit` skill extends those conventions to the testing
 domain and references PHP naming, exception, and typing rules from the `php` skill.
 
-Both skills assume the `the-coder` plugin for language-agnostic coding discipline (discovery, planning, verification).
+The `pest` skill covers the Pest framework, which runs on the PHPUnit engine. It is a layer over `phpunit`: it owns
+Pest's functional API and Pest-only features (`expect()`, datasets, architecture/mutation/type-coverage/browser testing,
+`Pest.php`) and defers shared testing philosophy, the PHPUnit assertion/double API, coverage attributes, and
+`phpunit.xml` internals to the `phpunit` skill. Which testing skill applies depends on the project: Pest (a `Pest.php`
+exists, `pestphp/pest` in `composer.json`, function-style tests) → `pest`; PHPUnit class-based tests
+(`extends TestCase`) → `phpunit`.
+
+All three skills assume the `the-coder` plugin for language-agnostic coding discipline (discovery, planning,
+verification).
 
 ## Plugin Scope
 
