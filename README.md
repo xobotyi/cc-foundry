@@ -115,8 +115,9 @@ collaborative artifact work.
 
 Go has strong idioms that differ from other languages — premature abstraction, incorrect error handling, interface
 misuse, and concurrency bugs are common pitfalls. This plugin provides a `golang` skill covering conventions, error
-handling, interfaces, concurrency, testing, and project structure, plus a `templ` skill for type-safe HTML templating
-with component composition, attribute handling, and JS integration.
+handling, interfaces, concurrency, testing, and project structure, plus library skills: `templ` for type-safe HTML
+templating, `charm-tui` for terminal UIs with the Charmbracelet v2 stack (Bubble Tea, Bubbles, Lip Gloss, Huh, Glamour),
+and `zog` for schema validation.
 
 ```
 /plugin install golang

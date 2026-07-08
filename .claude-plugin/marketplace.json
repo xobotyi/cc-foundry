@@ -108,7 +108,7 @@
 		{
 			"name": "golang",
 			"description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-			"version": "1.3.3",
+			"version": "1.4.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"

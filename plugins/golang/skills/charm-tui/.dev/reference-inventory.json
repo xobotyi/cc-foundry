@@ -1,0 +1,27 @@
+{
+	"sources": {
+		"Charm v2 announcement (2026-02-23)": "https://charm.land/blog/v2/",
+		"Lip Gloss v2 beta 2 — compositing and layers": "https://charm.land/blog/lipgloss-v2-beta-2/",
+		"Bubble Tea README": "https://raw.githubusercontent.com/charmbracelet/bubbletea/main/README.md",
+		"Bubble Tea v2 Upgrade Guide": "https://raw.githubusercontent.com/charmbracelet/bubbletea/main/UPGRADE_GUIDE_V2.md",
+		"Bubble Tea Tutorial Basics (v2)": "https://raw.githubusercontent.com/charmbracelet/bubbletea/main/tutorials/basics/README.md",
+		"Bubble Tea Tutorial Commands (v2)": "https://raw.githubusercontent.com/charmbracelet/bubbletea/main/tutorials/commands/README.md",
+		"Bubble Tea v2 What's New (discussion #1374)": "https://github.com/charmbracelet/bubbletea/discussions/1374",
+		"Bubbles README": "https://raw.githubusercontent.com/charmbracelet/bubbles/main/README.md",
+		"Bubbles v2 Upgrade Guide": "https://raw.githubusercontent.com/charmbracelet/bubbles/main/UPGRADE_GUIDE_V2.md",
+		"Lip Gloss README": "https://raw.githubusercontent.com/charmbracelet/lipgloss/main/README.md",
+		"Lip Gloss v2 Upgrade Guide": "https://raw.githubusercontent.com/charmbracelet/lipgloss/main/UPGRADE_GUIDE_V2.md",
+		"Lip Gloss v2 What's New (discussion #506)": "https://github.com/charmbracelet/lipgloss/discussions/506",
+		"Huh README": "https://raw.githubusercontent.com/charmbracelet/huh/main/README.md",
+		"Huh v2 Upgrade Guide": "https://raw.githubusercontent.com/charmbracelet/huh/main/UPGRADE_GUIDE_V2.md",
+		"Huh v2 What's New": "https://raw.githubusercontent.com/charmbracelet/huh/main/WHATS_NEW_V2.md",
+		"Glamour README": "https://raw.githubusercontent.com/charmbracelet/glamour/main/README.md",
+		"Glamour v2 Upgrade Guide": "https://raw.githubusercontent.com/charmbracelet/glamour/main/UPGRADE_GUIDE_V2.md",
+		"Fang README": "https://raw.githubusercontent.com/charmbracelet/fang/main/README.md",
+		"Fang v2 Upgrade Guide": "https://raw.githubusercontent.com/charmbracelet/fang/main/UPGRADE_GUIDE_V2.md",
+		"Log README": "https://raw.githubusercontent.com/charmbracelet/log/main/README.md",
+		"Ultraviolet README": "https://raw.githubusercontent.com/charmbracelet/ultraviolet/main/README.md",
+		"Crush UI AGENTS.md (creator intent)": "https://raw.githubusercontent.com/charmbracelet/crush/main/internal/ui/AGENTS.md",
+		"Teatest — official testing post (v1-era samples)": "https://charm.land/blog/teatest/"
+	}
+}

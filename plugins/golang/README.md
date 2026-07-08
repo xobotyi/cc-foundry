@@ -15,11 +15,12 @@ hierarchies. Without LSP-powered navigation, exploration is imprecise and error-
 
 ## The Solution
 
-This plugin provides two skills and a `gopls` LSP server that together give Claude deep Go fluency. The `golang` skill
-covers core Go conventions (naming, error handling, interfaces, concurrency, testing, project structure) and enforces
-LSP-first code navigation — agents must use `goToDefinition`, `findReferences`, `hover`, and other LSP tools instead of
-text search for semantic navigation tasks. The `templ` skill extends those conventions to type-safe HTML templating.
-Both skills include anti-pattern references and route to detailed topic-specific guides.
+This plugin provides language and library skills plus a `gopls` LSP server that together give Claude deep Go fluency.
+The `golang` skill covers core Go conventions (naming, error handling, interfaces, concurrency, testing, project
+structure) and enforces LSP-first code navigation — agents must use `goToDefinition`, `findReferences`, `hover`, and
+other LSP tools instead of text search for semantic navigation tasks. The `templ` skill extends those conventions to
+type-safe HTML templating, `charm-tui` covers the Charmbracelet v2 terminal UI stack, and `zog` covers schema
+validation. Skills include anti-pattern references and route to detailed topic-specific guides.
 
 ## Prerequisites
 
@@ -63,6 +64,17 @@ render-once), styling (class/style expressions, CSS components), JavaScript inte
 testing (expectation vs snapshot). Includes anti-pattern reference and detailed topic guides for syntax, attributes,
 components, styling, JavaScript, and patterns. **Use when:** writing or reviewing `.templ` files, creating components,
 composing templates, or testing rendered output.
+
+### charm-tui
+
+Covers the Charmbracelet v2 stack for terminal UIs — Bubble Tea (Elm-architecture framework), Bubbles (components), Lip
+Gloss (styling and layout), Huh (forms), Glamour (markdown rendering), fang (CLI entry), and log. The skill is strictly
+v2-focused (`charm.land/*/v2` imports): it encodes the declarative `tea.View` model, command/message discipline,
+explicit light/dark color handling, component lifecycle rules, the stack authors' own production architecture patterns
+(from crush), and testing with golden files and teatest.
+
+**Use when:** building, reviewing, debugging, or testing terminal UIs, bubbletea programs, terminal styling,
+keybindings, forms, or interactive terminal output in Go.
 
 ### zog
 

@@ -9,6 +9,9 @@ code intelligence via `gopls`.
   toolchain (go mod, golangci-lint), and LSP navigation rules
 - **`templ`** — templ (a-h/templ) type-safe HTML templating: syntax, components, attributes, styling, CSS/JS
   integration, and testing
+- **`charm-tui`** — Charmbracelet v2 TUI stack (`charm.land/*/v2`): Bubble Tea Elm architecture, Bubbles components, Lip
+  Gloss styling/layout, Huh forms, Glamour markdown, fang/log, at-scale architecture (crush patterns), golden-file and
+  teatest testing
 - **`zog`** — Zog schema validation library: schema definition, parsing, validation, error handling, HTTP/JSON/env
   integration, custom tests, and transforms
 
@@ -26,8 +29,8 @@ search tools remain appropriate for non-semantic searches (comments, string lite
 ## Skill Dependencies
 
 The `golang` skill provides language-specific conventions. The `templ` skill extends those conventions to `.templ` files
-and references `golang` error handling and naming rules. The `zog` skill is standalone — it covers the Zog validation
-library API and patterns, deferring to `golang` for general Go conventions.
+and references `golang` error handling and naming rules. The `zog` and `charm-tui` skills are standalone — they cover
+their library stacks (Zog validation; Charmbracelet v2 TUI), deferring to `golang` for general Go conventions.
 
 All skills assume the `the-coder` plugin for language-agnostic coding discipline (discovery, planning, verification).
 
