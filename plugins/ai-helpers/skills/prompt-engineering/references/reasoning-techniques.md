@@ -28,7 +28,7 @@ answer. An emergent capability: only effective in sufficiently large models.
 - **Neutral or hurts**: simple factual lookup, straightforward classification, tasks where answer is immediately
   deducible — CoT adds token cost with no accuracy gain
 - **Hurts on reasoning models** (o-series, Claude extended thinking): these models already reason internally; explicit
-  "think step by step" instructions are redundant and can degrade performance (OpenAI o3/o4-mini guide)
+  "think step by step" instructions are redundant and can degrade performance (OpenAI reasoning guides)
 
 ### Implementation patterns
 
@@ -153,38 +153,43 @@ producing output.
 
 Two modes for enabling internal reasoning:
 
-- **Adaptive thinking** (recommended for Opus 4.6, Sonnet 4.6, Mythos Preview) — `thinking: {type: "adaptive"}`. Claude
-  dynamically determines when and how much to think. Use the `effort` parameter (`max`/`high`/`medium`/`low`) to guide
-  depth. Automatically enables interleaved thinking between tool calls.
-- **Manual thinking** (legacy, deprecated on 4.6 models) — `thinking: {type: "enabled", budget_tokens: N}`. Fixed token
-  budget for reasoning. Minimum 1,024 tokens.
+- **Adaptive thinking** (the only mode on current models — Opus 4.7+, Sonnet 5, Fable 5) —
+  `thinking: {type: "adaptive"}`. Claude dynamically determines when and how much to think. Use `output_config.effort`
+  (`max`/`xhigh`/`high`/`medium`/`low`) to guide depth. Automatically enables interleaved thinking between tool calls.
+  On Fable 5 thinking is always on (omit the parameter); on Sonnet 5 adaptive is the default when omitted.
+- **Manual thinking** (legacy models only) — `thinking: {type: "enabled", budget_tokens: N}`. Fixed token budget for
+  reasoning, minimum 1,024 tokens. Deprecated on 4.6 models; returns 400 on Opus 4.7+, Sonnet 5, and Fable 5.
 
 Key behaviors:
 
-- Claude 4 models return summarized thinking by default (full thinking access requires contacting sales)
-- At `high`/`max` effort, Claude almost always thinks; at `low`, it may skip thinking for simple queries
+- Thinking display defaults to `omitted` (empty thinking text) on current models — set `display: "summarized"` to
+  surface a readable summary; the raw chain of thought is never returned on Fable 5
+- At `high`+ effort, Claude almost always thinks; at `low`, it may skip thinking for simple queries
 - Extended thinking improves performance on: math, code, multi-step analysis, ambiguous instructions
 - Do not prompt "think step by step" — it's redundant and may degrade quality on thinking models
 
-### OpenAI o-series (o3, o4-mini)
+### OpenAI reasoning models (GPT-5.x, o-series)
 
-Trained to reason internally before responding. Key behavioral differences from standard models:
+Trained to reason internally before responding. GPT-5.x is the current flagship family — prompting guidance carries
+forward across 5 → 5.1 → 5.2 (each has an official cookbook prompting guide). Key behavioral differences from standard
+models:
 
-- **Developer messages replace system messages** (from o1-2024-12-17 onward) — system prompts are auto-converted
-  internally
+- **`reasoning_effort` parameter** controls deliberation depth (default `medium`); GPT-5.1+ adds `none` for low-latency
+  paths — scale by task difficulty, as with Claude's effort
+- **Developer messages replace system messages** — system prompts are auto-converted internally
 - **No CoT prompting** — "think step by step" is counterproductive; do not include it
 - **Zero-shot first** — reasoning models often don't need few-shot examples; add them only if zero-shot underperforms
-- **Markdown off by default** — include `"Formatting re-enabled"` on first line of developer message to enable markdown
-  in responses
-- **Persisted reasoning items** (o3/o4-mini): reasoning tokens generated during tool calls are preserved across turns
-  via Responses API; Chat Completions API drops them, degrading agentic performance
+- **Persisted reasoning items**: reasoning tokens generated during tool calls are preserved across turns via the
+  Responses API; Chat Completions API drops them, degrading agentic performance
 - **Function call ordering**: explicitly define required sequences in developer prompt; models can misjudge tool call
   order without guidance
 
 ### Model selection: reasoning models vs. standard models
 
-- Speed/cost + well-defined tasks → standard (GPT-4.1, Claude Sonnet at low effort)
-- Accuracy/reliability + complex multi-step → reasoning (o3, o4-mini, Claude with adaptive thinking at high/max effort)
+- Speed/cost + well-defined tasks → low reasoning settings (GPT-5.x at `none`/`low` reasoning effort, Claude at low
+  effort)
+- Accuracy/reliability + complex multi-step → reasoning (GPT-5.x at `medium`+, Claude with adaptive thinking at
+  high/xhigh/max effort)
 - Most production workflows use both: reasoning model as planner, standard model as executor (OpenAI reasoning best
   practices)
 
@@ -198,7 +203,7 @@ Trained to reason internally before responding. Key behavioral differences from 
 - Ask for self-verification: "Before you finish, verify your answer against [criteria]"
 - Avoid explicit CoT prompts ("think step by step") — redundant on reasoning models, may degrade quality
 - For function calling: put critical usage criteria first in tool descriptions; key rules before context (6% accuracy
-  improvement observed by putting escape rules first in grep tool description — OpenAI o3/o4-mini guide)
+  improvement observed by putting escape rules first in grep tool description — OpenAI reasoning guides)
 - Thinking triggering is promptable — add system prompt guidance to steer how often Claude thinks
 
 ---
@@ -256,7 +261,8 @@ just the task state.
 ## Adaptive Thinking
 
 Anthropic's adaptive thinking (`thinking: {type: "adaptive"}`) allows Claude to dynamically determine when and how much
-to reason based on request complexity. Default on Mythos Preview; recommended on Opus 4.6 and Sonnet 4.6.
+to reason based on request complexity. The only thinking mode on current models (Opus 4.7+, Sonnet 5, Fable 5 —
+always-on there); recommended on Opus 4.6 and Sonnet 4.6.
 
 **Key differences from manual extended thinking:**
 
@@ -268,17 +274,18 @@ to reason based on request complexity. Default on Mythos Preview; recommended on
 
 **Prompting implications:**
 
-- Use `effort` parameter to control depth, not `budget_tokens`
+- Use `output_config.effort` to control depth, not `budget_tokens`
 - Do not pre-specify reasoning structure — the model infers appropriate depth
 - Thinking triggering is promptable: add system prompt guidance if Claude thinks too often or too rarely
-- For Sonnet 4.6: consider `medium` effort as default (balanced speed/cost/quality); `high` for complex reasoning
+- Effort defaults to `high`; use `xhigh` for the hardest coding/agentic work; step down to `medium` for cost-sensitive
+  routes (Sonnet 5 at `medium` ≈ Sonnet 4.6 at `high`)
 
 ---
 
 ## Anti-Patterns
 
-- **CoT on reasoning models**: "Let's think step by step" on o3 or Claude extended thinking wastes tokens and can
-  degrade accuracy — the model already reasons internally
+- **CoT on reasoning models**: "Let's think step by step" on GPT-5.x/o-series or Claude adaptive thinking wastes tokens
+  and can degrade accuracy — the model already reasons internally
 - **Few-shot CoT with inconsistent examples**: mismatched reasoning styles across demonstrations degrade performance
   more than zero-shot (Auto-CoT motivation for diversity)
 - **High-temperature self-consistency on open-ended tasks**: majority vote is undefined when answers are free-form — use
@@ -286,7 +293,7 @@ to reason based on request complexity. Default on Mythos Preview; recommended on
 - **Full-generation grammar constraints**: constraining every token to valid syntax eliminates reasoning space; CRANE
   shows augmented grammars are required
 - **Verbose tool descriptions for reasoning models**: burying key invocation criteria under general context reduces
-  tool-call accuracy; put constraints first (OpenAI o3/o4-mini guide)
+  tool-call accuracy; put constraints first (OpenAI reasoning guides)
 - **Long agent chains without handoff structure**: reasoning coherence degrades past 10 transitions without explicit
   coordination mechanisms (Dhrif et al.)
 

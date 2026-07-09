@@ -11,7 +11,7 @@ Claude's API uses a top-level `system` parameter — not a message role:
 
 ```json
 {
-  "model": "claude-opus-4-5",
+  "model": "claude-opus-4-8",
   "system": "You are a code reviewer...",
   "messages": [{ "role": "user", "content": "Review this PR..." }]
 }
@@ -22,102 +22,85 @@ Claude's API uses a top-level `system` parameter — not a message role:
 - No equivalent to OpenAI's `instructions` parameter — use `system` directly
 - `system` content does NOT persist across requests when using stateless API; pass it every turn
 
+**Mid-conversation system messages (Opus 4.8):** append `{"role": "system", "content": "..."}` to `messages` to inject
+an operator instruction — a mode switch, updated constraints, runtime-fetched context. Unlike editing the top-level
+`system` (which invalidates the entire cached prefix), a system message sits after the history and preserves the cache.
+It is also the non-spoofable operator channel — text embedded in a user turn can be forged by anything that writes user
+input. Phrase these as context, not overrides ("This project's codebase is Go" beats "ignore what the user said").
+Unsupported models return a 400; fall back to a `<system-reminder>` block in the user turn.
+
 **vs. OpenAI:** OpenAI's `instructions` parameter (Responses API) scopes to the current request and doesn't persist
 across `previous_response_id` chains. Claude's `system` is always explicitly passed per request — same behavior, more
 explicit contract.
 
 ---
 
-## Prefilling Assistant Turns
+## Prefilling Assistant Turns (removed on current models)
 
-Claude allows seeding the assistant response by passing a partial `assistant` message as the last message:
+Prefilling — seeding the response with a partial `assistant` message as the last message — **returns a 400 error on
+Claude 4.6+ models and Claude Fable 5**. It remains functional only on legacy models (Sonnet 4.5 and earlier). Assistant
+messages elsewhere in the conversation (few-shot examples) are unaffected.
 
-```json
-{
-  "messages": [
-    { "role": "user", "content": "What is the capital of France?" },
-    { "role": "assistant", "content": "The capital of France is" }
-  ]
-}
-```
+**Migration map — what the prefill did → what replaces it:**
 
-Claude completes from that prefix. No other major API supports this natively.
-
-**Rules:**
-
-- Prefill must be the final message; role must be `assistant`
-- Prefill is included in output token count
-- Use for: forcing output format, skipping preamble, steering JSON/XML structure
-- Do not use when streaming and latency matters — prefill is not returned in the stream (it was already sent by you)
-- Prefill interacts with extended thinking: if thinking is enabled, prefill is applied after thinking, not before
-
-**High-value patterns:**
-
-- Force JSON: prefill with `{`
-- Skip preamble: prefill with `Here is the` or the opening sentence
-- Force XML wrapper: prefill with `<result>`
-- Lock response language: prefill with the first word in target language
+- Forcing JSON/YAML/schema output → structured outputs (`output_config.format`); for classification, a tool with an enum
+  field of valid labels
+- Skipping preamble (`Here is the summary:\n`) → system prompt instruction: "Respond directly without preamble. Do not
+  start with phrases like 'Here is...' or 'Based on...'"
+- Steering around bad refusals → no longer needed; current models refuse far more appropriately
+- Continuing an interrupted response → move into the user turn: "Your previous response was interrupted and ended with
+  `[last text]`. Continue from there."
+- Context hydration / role reinforcement → inject into the user turn, or hydrate via tools / during compaction in
+  agentic systems
 
 ---
 
 ## Extended Thinking
 
-Extended thinking enables Claude to reason internally before producing its visible response. Two modes exist:
+Extended thinking enables Claude to reason internally before producing its visible response.
 
-**Adaptive thinking (recommended for Claude 4.6+):**
+**Adaptive thinking (the only mode on current models):**
 
 ```json
 {
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-4-8",
   "max_tokens": 16000,
   "thinking": { "type": "adaptive" },
-  "effort": "high",
+  "output_config": { "effort": "high" },
   "messages": [...]
 }
 ```
 
-- Claude dynamically determines when and how much to think based on request complexity
+- Claude dynamically determines when and how much to think based on `effort` and request complexity
 - Automatically enables interleaved thinking (reasoning between tool calls)
-- Default on Claude Mythos Preview; recommended on Opus 4.6 and Sonnet 4.6
-- Use the `effort` parameter (not `budget_tokens`) to guide thinking depth
+- Per-model defaults when `thinking` is omitted: **Fable 5** — thinking always on (omit the parameter; explicit
+  `disabled` returns 400); **Sonnet 5** — runs adaptive; **Opus 4.7/4.8** — runs without thinking (set adaptive
+  explicitly)
+- Use `output_config.effort` (not `budget_tokens`) to guide thinking depth
 - Previous assistant turns don't need to start with thinking blocks (more flexible than manual mode)
 
-**Manual thinking (legacy, deprecated on 4.6 models):**
+**Manual thinking (legacy models only):**
 
-```json
-{
-  "model": "claude-sonnet-4-5",
-  "max_tokens": 16000,
-  "thinking": { "type": "enabled", "budget_tokens": 10000 },
-  "messages": [...]
-}
-```
+- `thinking: {type: "enabled", budget_tokens: N}` — fixed reasoning budget (minimum 1,024; must be < `max_tokens`)
+- Deprecated on Opus 4.6 / Sonnet 4.6; **returns 400 on Opus 4.7+, Sonnet 5, and Fable 5**
+- `max_tokens` remains a strict hard limit on total output (thinking + response text) in every mode
 
-- `budget_tokens` — target token count for internal reasoning (minimum: 1,024; must be < `max_tokens`)
-- `max_tokens` is a strict hard limit on total output (thinking + response text)
-- Deprecated on Opus 4.6 and Sonnet 4.6 — will be removed in a future release
+**Thinking display:**
 
-**Thinking display (Claude 4 models):**
-
-- `display: "summarized"` — returns summarized thinking (default on Claude 4 models)
-- `display: "omitted"` — returns empty thinking field, signature only (default on Mythos Preview)
-- Claude Sonnet 3.7 returns full thinking output; Claude 4 models return summaries only
-- Full thinking access for Claude 4 requires contacting sales
+- `display: "omitted"` — empty thinking field, signature only (**default on current models** — Fable 5, Opus 4.8/4.7,
+  Sonnet 5); to a streaming UI this looks like a long pause before output
+- `display: "summarized"` — returns a readable summary; set explicitly if reasoning is surfaced to users or logs
+- `display` controls visibility only — thinking happens and is billed identically either way
+- On Fable 5 the raw chain of thought is never returned; asking the model to echo its reasoning in the response can
+  trigger a `reasoning_extraction` refusal — read `thinking` blocks instead
 
 **Streaming with thinking:**
 
 - `thinking_delta` events deliver thinking content; `signature_delta` delivers encrypted signature
 - `redacted_thinking` blocks — distinct block type with encrypted `data` field; safety-redacted reasoning
-- Pass `redacted_thinking` blocks back unchanged in multi-turn tool-use conversations
-- Filter code must include both `block.type == "thinking"` AND `block.type == "redacted_thinking"`
+- Pass thinking blocks back unchanged in multi-turn tool-use conversations; filter code must handle both
+  `block.type == "thinking"` AND `block.type == "redacted_thinking"`
 - With `display: "omitted"`, no `thinking_delta` events are emitted; only signature arrives
-
-**Interleaved thinking:**
-
-- Claude reasons between tool calls within a single assistant turn
-- Automatic with adaptive mode on Opus 4.6, Sonnet 4.6, Mythos Preview
-- Manual mode: requires `interleaved-thinking-2025-05-14` beta header on Sonnet 4.6; not available on Opus 4.6
-- On Mythos Preview, inter-tool reasoning always lives inside thinking blocks
 
 **Prompting for thinking models:**
 
@@ -132,38 +115,42 @@ Extended thinking enables Claude to reason internally before producing its visib
 
 ## Effort Parameter
 
-A separate, generally available parameter that controls Claude's token spending across ALL response types — text, tool
-calls, and thinking. Works with or without extended thinking enabled.
+A generally available parameter that controls Claude's token spending across ALL response types — text, tool calls, and
+thinking. Lives inside `output_config`, not top-level.
 
 ```json
 {
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-4-8",
   "thinking": { "type": "adaptive" },
-  "effort": "medium",
+  "output_config": { "effort": "medium" },
   "messages": [...]
 }
 ```
 
-**Supported models:** Claude Mythos Preview, Opus 4.6, Sonnet 4.6, Opus 4.5. No beta header required.
-
 **Effort levels:**
 
-- `max` — absolute maximum capability, no constraints on token spending. Opus 4.6, Sonnet 4.6, Mythos only
-- `high` (default) — deep reasoning, complex tasks. Equivalent to omitting the parameter
-- `medium` — balanced speed/cost/performance. Recommended default for Sonnet 4.6
-- `low` — minimizes token spend, skips thinking for simple tasks. Good for subagents, classification
+- `max` — absolute maximum capability, no constraints on token spending; can show diminishing returns and overthinking —
+  test before committing
+- `xhigh` — extended capability for long-horizon work; **the recommended setting for hard coding and agentic tasks**
+  (Fable 5, Mythos 5, Opus 4.8/4.7, Sonnet 5 only); set a large `max_tokens` (64k+) so the model has room to think and
+  act
+- `high` (default) — balances token usage and intelligence; equivalent to omitting the parameter; minimum for
+  intelligence-sensitive work
+- `medium` — cost-saving step-down (Sonnet 5 at `medium` ≈ Sonnet 4.6 at `high`)
+- `low` — short, scoped, latency-sensitive tasks; good for subagents and classification
 
 **Key behaviors:**
 
 - Effort is a behavioral signal, not a strict token budget — Claude still thinks on hard problems at low effort
-- At `high`/`max`, Claude almost always thinks; at `low`, it may skip thinking entirely for simple queries
-- Lower effort: fewer tool calls, terse confirmations, no preamble
-- Higher effort: detailed summaries, explains plans before acting, more comprehensive output
-- For Opus 4.6 and Sonnet 4.6, effort replaces `budget_tokens` as the recommended thinking depth control
+- At `high`+ Claude almost always thinks; at `low` it may skip thinking entirely for simple queries
+- Lower effort: fewer tool calls, terse confirmations, no preamble. Higher effort: more tool use, detailed summaries,
+  more comprehensive output
+- Current models respect effort strictly, especially at the low end — they scope work to what was asked. If you see
+  shallow reasoning on complex problems, **raise effort rather than prompting around it**
+- Effort replaces `budget_tokens` as the thinking-depth control on all current models
 
-**vs. OpenAI reasoning:** OpenAI exposes `reasoning.effort` (`low`/`medium`/`high`) — a categorical dial similar to
-Claude's effort. Both platforms now use categorical effort levels; Claude additionally supports `max` and retains the
-(deprecated) `budget_tokens` for precise token-level control on older models.
+**vs. OpenAI reasoning:** OpenAI exposes a categorical `reasoning_effort` dial (GPT-5.1+ adds a `none` mode for
+low-latency paths). Both platforms now steer reasoning depth with categorical effort levels, not token budgets.
 
 ---
 
@@ -201,14 +188,18 @@ references the entire prompt — tools, system, then messages (in that order) �
 
 **Minimum cacheable token thresholds (vary by model):**
 
-- 4,096 tokens — Opus 4.6, Opus 4.5, Haiku 4.5, Mythos Preview
-- 2,048 tokens — Sonnet 4.6, Haiku 3.5
-- 1,024 tokens — Sonnet 4.5, Opus 4.1, Opus 4, Sonnet 4, Sonnet 3.7
+- 512 tokens — Fable 5, Mythos 5
+- 1,024 tokens — Opus 4.8, Sonnet 5, Sonnet 4.6, Sonnet 4.5
+- 2,048 tokens — Opus 4.7
+- 4,096 tokens — Opus 4.6, Opus 4.5, Haiku 4.5
+
+Below the threshold, requests process without caching and without error — verify via `cache_read_input_tokens` in the
+response usage.
 
 **TTL options:**
 
 - 5-minute (default) — refreshed for no additional cost on each cache hit
-- 1-hour — specify `"ttl": 3600` in the `cache_control` object; costs 2x base input price
+- 1-hour — specify `"ttl": "1h"` in the `cache_control` object; costs 2x base input price
 - When mixing TTLs, longer TTL must appear before shorter in the prompt sequence
 
 **Cost model:**
@@ -238,13 +229,13 @@ what gets cached and at what TTL; OpenAI's is simpler but less configurable.
 
 ## Context Window and Output Limits
 
-All current Claude models support 200k token context windows.
+Current models (Fable 5, Mythos 5, Opus 4.8/4.7/4.6, Sonnet 5, Sonnet 4.6) have a **1M-token context window by default**
+— no beta header, standard pricing. Older models (Sonnet 4.5, Haiku 4.5) have 200k.
 
 **Maximum output tokens:**
 
-- Opus 4.6, Mythos Preview — 128k output tokens
-- Sonnet 4.6, Haiku 4.5 — 64k output tokens
-- Batch API — 300k output for Opus 4.6 and Sonnet 4.6 with `output-300k-2026-03-24` beta header
+- Current 1M-context models — 128k output tokens (streaming required for large outputs)
+- Haiku 4.5 — 64k output tokens
 - Interleaved thinking exception: when using interleaved thinking with tools, the token limit becomes the entire context
   window (can exceed standard max_tokens)
 
@@ -332,19 +323,18 @@ blocks. Grammar state resets between sections — Claude can think freely before
 
 ## Claude vs. OpenAI: Key Structural Differences
 
-| Dimension         | Claude                                           | OpenAI (Responses API)                           |
-| ----------------- | ------------------------------------------------ | ------------------------------------------------ |
-| System prompt     | Top-level `system` param                         | `instructions` param or `developer` role message |
-| Authority model   | `system` > `user` > `assistant`                  | `developer` > `user` > `assistant`               |
-| Prefilling        | Supported (deprecated on 4.6 models)             | Not supported                                    |
-| Reasoning control | `effort` param + adaptive thinking               | `reasoning.effort` (`low`/`medium`/`high`)       |
-| Prompt caching    | Explicit + automatic `cache_control`             | Automatic (position-based)                       |
-| Structured output | `output_config.format` + `strict: true` on tools | `response_format` with JSON schema               |
+| Dimension         | Claude                                           | OpenAI (Responses API)                             |
+| ----------------- | ------------------------------------------------ | -------------------------------------------------- |
+| System prompt     | Top-level `system` param                         | `instructions` param or `developer` role message   |
+| Authority model   | `system` > `user` > `assistant`                  | `developer` > `user` > `assistant`                 |
+| Prefilling        | Removed on current models (400); legacy only     | Not supported                                      |
+| Reasoning control | `output_config.effort` + adaptive thinking       | `reasoning_effort` (`none` on 5.1+ through `high`) |
+| Prompt caching    | Explicit + automatic `cache_control`             | Automatic (position-based)                         |
+| Structured output | `output_config.format` + `strict: true` on tools | `response_format` with JSON schema                 |
 
 **When prompting Claude after OpenAI experience:**
 
-- Both platforms now use categorical effort levels; Claude additionally supports `max`
+- Both platforms use categorical effort levels; Claude also supports `xhigh` and `max`
 - OpenAI's `developer` role is equivalent to Claude's `system` parameter (not a message role)
-- Claude's prefill capability has no OpenAI equivalent (deprecated on 4.6 but functional on older models)
 - OpenAI few-shot in `developer` message maps directly to Claude few-shot in `system` parameter
 - Claude thinking models prefer goal statements; avoid explicit step-by-step CoT instructions

@@ -1,17 +1,20 @@
 {
   "sources": {
-    "Anthropic: Prompting Best Practices": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
-    "Anthropic: Prompt Engineering Overview": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
-    "Anthropic: Adaptive Thinking": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking",
-    "Anthropic: Effort Parameter": "https://platform.claude.com/docs/en/build-with-claude/effort",
-    "Anthropic: Extended Thinking": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking",
-    "Anthropic: Structured Outputs": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
-    "Anthropic: Prompt Caching": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
-    "Anthropic: Context Windows": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
+    "Anthropic: Prompting Best Practices": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md",
+    "Anthropic: Prompting Claude Fable 5": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5.md",
+    "Anthropic: Prompting Claude Opus 4.8": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8.md",
+    "Anthropic: Prompting Claude Sonnet 5": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5.md",
+    "Anthropic: Prompt Engineering Overview": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md",
+    "Anthropic: Adaptive Thinking": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking.md",
+    "Anthropic: Effort Parameter": "https://platform.claude.com/docs/en/build-with-claude/effort.md",
+    "Anthropic: Extended Thinking": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking.md",
+    "Anthropic: Structured Outputs": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs.md",
+    "Anthropic: Prompt Caching": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching.md",
+    "Anthropic: Context Windows": "https://platform.claude.com/docs/en/build-with-claude/context-windows.md",
     "Anthropic: Effective Context Engineering": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
-    "OpenAI: Prompt Engineering Guide": "https://platform.openai.com/docs/guides/prompt-engineering.md",
+    "OpenAI: Prompt Engineering Guide": "https://developers.openai.com/api/docs/guides/prompt-engineering.md",
     "OpenAI: Reasoning Best Practices": "https://developers.openai.com/api/docs/guides/reasoning-best-practices",
-    "OpenAI: o3/o4-mini Prompting Guide": "https://developers.openai.com/cookbook/examples/o-series/o3o4-mini_prompting_guide",
+    "OpenAI: GPT-5.2 Prompting Guide": "https://cookbook.openai.com/examples/gpt-5/gpt-5-2_prompting_guide",
     "DAIR: Zero-shot Prompting": "https://www.promptingguide.ai/techniques/zeroshot",
     "DAIR: Few-shot Prompting": "https://www.promptingguide.ai/techniques/fewshot",
     "DAIR: Chain-of-Thought": "https://www.promptingguide.ai/techniques/cot",
@@ -53,7 +56,8 @@
     "Paper: Hidden Cost of Readability": "https://arxiv.org/abs/2508.13666",
     "Paper: Reasoning-Aware Prompt Orchestration": "https://arxiv.org/abs/2510.00326",
     "Paper: Pathological Chain-of-Thought": "https://arxiv.org/abs/2412.12368",
+    "Paper: MOSAIC (Granular Instruction Compliance)": "https://arxiv.org/abs/2601.18554",
     "OWASP: Top 10 for LLM Applications 2025": "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/"
   },
-  "lastFetched": "2026-04-12T15:49:56.410Z"
+  "lastFetched": "2026-07-09T11:00:51.693Z"
 }

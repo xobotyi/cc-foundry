@@ -31,8 +31,8 @@ agents, output styles, system prompts, or any AI instructions.
 ## References
 
 - **Reasoning techniques** — [`${CLAUDE_SKILL_DIR}/references/reasoning-techniques.md`] CoT variants (zero-shot,
-  few-shot, auto), Tree-of-Thoughts, Self-Consistency, extended thinking (adaptive + manual), reasoning models
-  (o3/o4-mini), CRANE constrained reasoning, academic citations
+  few-shot, auto), Tree-of-Thoughts, Self-Consistency, adaptive thinking, reasoning models (GPT-5.x), CRANE constrained
+  reasoning, academic citations
 - **Learning paradigms** — [`${CLAUDE_SKILL_DIR}/references/learning-paradigms.md`] ICL theory, zero/few-shot
   techniques, example selection research, generated knowledge prompting, active prompting
 - **Workflow patterns** — [`${CLAUDE_SKILL_DIR}/references/workflow-patterns.md`] Prompt chaining topologies, iterative
@@ -42,8 +42,12 @@ agents, output styles, system prompts, or any AI instructions.
 - **Optimization strategies** — [`${CLAUDE_SKILL_DIR}/references/optimization-strategies.md`] Promptware engineering
   lifecycle, DSPy declarative optimization, RAG integration, manual iteration discipline
 - **Claude-specific** — [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`] Adaptive thinking, effort parameter,
-  prefilling, prompt caching (automatic + explicit, 1-hour TTL), structured outputs, context windows, technique
-  combinations
+  prefill migration, mid-conversation system messages, prompt caching (automatic + explicit, 1-hour TTL), structured
+  outputs, context windows, technique combinations
+- **Model behavior** — [`${CLAUDE_SKILL_DIR}/references/model-behavior.md`] Per-model behavioral prompting: the
+  migration trap (over-prescriptive prompts overtrigger on newer models), cross-model shifts (literal instruction
+  following, effort as primary lever, tool triggering), Claude Fable 5 / Opus 4.8 / Sonnet 5 steering patterns, GPT-5.x
+  profile
 - **Long context** — [`${CLAUDE_SKILL_DIR}/references/long-context.md`] Document organization patterns, XML structuring
   for multi-doc, chunking strategies, context rot mitigation
 - **Agent & tool patterns** — [`${CLAUDE_SKILL_DIR}/references/agent-patterns.md`] ReAct, PAL, Reflexion, ART, ACE
@@ -157,7 +161,7 @@ Then provide your answer in <answer> tags.
 
 **Critical:** Claude must output its thinking. Without outputting the thought process, no thinking actually occurs.
 
-**Reasoning models (Claude adaptive thinking, OpenAI o-series):**
+**Reasoning models (Claude adaptive thinking, OpenAI GPT-5.x):**
 
 - These models reason internally — do NOT add "think step by step" (it's redundant and may degrade quality)
 - Prefer general instructions ("think thoroughly") over prescriptive step-by-step plans
@@ -289,25 +293,27 @@ Full research synthesis: see [`${CLAUDE_SKILL_DIR}/references/persistent-context
 
 ### Adaptive Thinking and Effort
 
-Claude 4.6 models use **adaptive thinking** — Claude dynamically determines when and how deeply to reason:
+Current Claude models (Opus 4.7+, Sonnet 5, Fable 5) use **adaptive thinking** — the only thinking mode; Claude
+dynamically determines when and how deeply to reason:
 
 ```json
-{ "thinking": { "type": "adaptive" }, "effort": "high" }
+{ "thinking": { "type": "adaptive" }, "output_config": { "effort": "high" } }
 ```
 
-- **effort levels:** `max` (deepest, Opus/Sonnet 4.6 only), `high` (default), `medium`, `low`
-- Effort affects all tokens: text, tool calls, and thinking
-- At `high`/`max`, Claude almost always thinks; at `low`, it may skip thinking for simple queries
-- `budget_tokens` is deprecated on 4.6 models — use effort + adaptive thinking instead
+- **effort levels:** `low`, `medium`, `high` (default), `xhigh` (best for hard coding/agentic work), `max`
+- Effort affects all tokens: text, tool calls, and thinking; raise effort rather than prompting around shallow reasoning
+- Defaults when `thinking` is omitted: Fable 5 always thinks (omit the param; `disabled` returns 400); Sonnet 5 runs
+  adaptive; Opus 4.7/4.8 run without thinking
+- `budget_tokens` returns 400 on current models — use effort + adaptive thinking
+- Thinking display defaults to `omitted` — set `display: "summarized"` if reasoning is surfaced to users
 
-### Prefilling
+### Prefilling (removed)
 
-Start Claude's response to control format by including a partial `assistant` message:
+Prefilling a partial `assistant` message returns a 400 on Claude 4.6+ and Fable 5 (legacy models only). Migrate:
 
-- Force JSON: prefill with `{`
-- Skip preamble: prefill with the opening sentence
-- Force XML wrapper: prefill with `<result>`
-- Deprecated on 4.6 models but still functional on older models
+- Forcing JSON/schema → structured outputs (`output_config.format`)
+- Skipping preamble → system instruction: "Respond directly without preamble"
+- Continuing an interrupted response → quote the last text in the user turn and ask to continue
 
 ### Prompt Caching
 
@@ -324,6 +330,13 @@ breakpoints). Key rules:
 Constrained decoding guaranteeing schema-compliant JSON. Use `output_config.format` for response format or
 `strict: true` on tool definitions. Incompatible with citations and prefilling. Grammar applies only to final text
 output — thinking is unconstrained.
+
+### Model-Specific Behavior
+
+Behavioral defaults (verbosity, tool eagerness, subagent use, design taste) shift per model release — techniques
+transfer, defaults don't. When tuning for a specific model, first remove prior-model scaffolding (it overtriggers on
+newer models), then check the model's own prompting guide. Per-model profiles and steering patterns: see
+[`${CLAUDE_SKILL_DIR}/references/model-behavior.md`].
 
 Full API details and technique combinations: see [`${CLAUDE_SKILL_DIR}/references/claude-specific.md`].
 
@@ -458,6 +471,7 @@ Before finalizing a prompt:
 - [ ] No blanket CoT — let reasoning models decide depth per request
 - [ ] KV lists for lookups; tables only for genuinely 2D comparisons
 - [ ] Few-shot examples calibrate format/style, not teach known patterns
+- [ ] Prior-model scaffolding removed when targeting a newer model (old triggers overtrigger)
 
 **When you authored the prompt as an agent (skill, subagent, system prompt, output style):**
 

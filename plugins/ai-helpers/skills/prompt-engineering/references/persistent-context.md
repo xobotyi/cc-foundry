@@ -156,6 +156,11 @@ penalty.
 Adding too many constraints overwhelms the model's "working memory," causing incidental errors where relevant clauses
 are omitted or applied inconsistently. More guardrails does not monotonically improve compliance.
 
+Granular evidence (MOSAIC benchmark, up to 20 simultaneous constraints): compliance varies with constraint **type,
+quantity, and position** — not uniformly; constraints **interact**, synergizing or conflicting; and instruction position
+shows the same primacy/recency effects as content. Consequences: audit rule sets for conflicts before adding more; place
+the constraints that matter most at the context edges.
+
 ---
 
 ## Format and Template Sensitivity
@@ -321,6 +326,7 @@ visually polished but token-heavy layout.
 - "Procedural Knowledge Improves Agentic LLM Workflows" — Hsiao et al.
 - "Structure Enables Effective Self-Localization of Errors in LLMs" — Samanta et al.
 - "Does Prompt Formatting Have Any Impact on LLM Performance?" — Rungta et al., arXiv:2411.10541
+- "MOSAIC: Deconstructing Instruction-Following" — arXiv:2601.18554
 - "The Hidden Cost of Readability: How Code Formatting Silently Consumes Your LLM Budget" — Pan et al., arXiv:2508.13666
 - "Meta-Cognitive Analysis: Evaluating Declarative and Procedural Knowledge" — Li et al.
 - "Impact of AGENTS.md on AI Coding Agent Efficiency"

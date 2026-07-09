@@ -44,7 +44,8 @@ minimal filler, iterative refinement focus.
 ### prompt-engineering
 
 Prompt design techniques for LLMs: structure, examples, reasoning patterns, optimization strategies. Covers zero-shot,
-few-shot, chain-of-thought, and Claude-specific features (prefill, extended thinking, system prompts).
+few-shot, chain-of-thought, Claude-specific features (adaptive thinking, effort, prompt caching, system prompts), and
+per-model behavioral prompting (Claude Fable 5 / Opus 4.8 / Sonnet 5, GPT-5.x).
 
 **Use when:** Crafting any AI instructions, debugging unexpected behavior, improving response quality, or working with
 prompts in any context.
