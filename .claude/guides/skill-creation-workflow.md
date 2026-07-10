@@ -130,11 +130,13 @@ fixed set of documents.
     - **Add specification pages** alongside tutorial pages for the same topic (e.g., the pyproject.toml specification
       alongside the "Writing pyproject.toml" guide). Tutorials explain the happy path; specs cover edge cases and full
       field lists.
-    - **Skip tutorials** — they paraphrase official docs, go stale, and add noise. Official docs and canonical style
-      guides are sufficient.
-    - **Include blog posts only when they contain original findings** — reverse-engineered internals, undocumented
-      behavior, activation patterns, or novel techniques not covered by official docs. Posts that merely repackage
-      official documentation as a walkthrough are tutorials in disguise — skip them.
+    - **Prize practitioner experience-sharing.** Posts where users share first-hand experience — their own workflows,
+      discovered behaviors, measurements, failure stories — are high-signal, sometimes ahead of official docs. The same
+      goes for original findings: reverse-engineered internals, undocumented behavior, activation patterns, novel
+      techniques.
+    - **Skip doc-repackaging guides** — walkthroughs that paraphrase official docs without first-hand experience go
+      stale and add noise. The test is provenance, not format: a guide grounded in the author's own use is worth
+      keeping; a polished tutorial that restates the manual is not.
     - **Use Perplexity or web search** to discover sources you might not know about, but be selective — most results for
       well-known ecosystems are obvious. The real value is for niche tools or discovering lesser-known official doc
       pages.
