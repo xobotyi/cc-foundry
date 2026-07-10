@@ -34,7 +34,8 @@ brings engineering judgment, LSP-first navigation, and a skill queue system that
 Universal coding discipline that runs before language-specific skills. Enforces the core loop: Discover → Plan →
 Implement → Verify. Contains assumption interrupt patterns that flag reasoning mistakes before they become code
 mistakes. Requires reading actual API signatures instead of guessing them. Demands test execution before declaring work
-complete.
+complete. Includes debugging discipline (reproduce, hypothesize, bisect, never ship a fix you can't explain) and a hard
+rule against silencing failing checks — tests, lint, and type errors get fixed, not suppressed.
 
 **Use when:** Starting any code task — writing, modifying, debugging, or refactoring. This skill is a prerequisite for
 implementation work and should run before language-specific skills engage.
@@ -52,7 +53,8 @@ concerns immediately, and prioritizes working code over clever abstractions. Pla
 bullet end-to-end, subsequent phases add depth in vertical passes; rejects horizontal "all DB, then all API, then all
 UI" decomposition.
 
-**Activate:** `/output-style software-engineer`
+**Activate:** `/config` → **Output style** → `Software Engineer`, or set `"outputStyle": "Software Engineer"` in a
+settings file. (The standalone `/output-style` command was removed in Claude Code v2.1.91.)
 
 ## Related Plugins
 

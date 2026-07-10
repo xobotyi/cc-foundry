@@ -4,9 +4,9 @@ Language-agnostic software engineering discipline for Claude Code.
 
 ## Skills
 
-| Skill    | Purpose                                                                         |
-| -------- | ------------------------------------------------------------------------------- |
-| `coding` | Discovery-first workflow: verify APIs before coding, test before declaring done |
+| Skill    | Purpose                                                                                              |
+| -------- | ---------------------------------------------------------------------------------------------------- |
+| `coding` | Discovery-first workflow: verify APIs before coding, debug by hypothesis, test before declaring done |
 
 ## Output Styles
 
@@ -21,8 +21,9 @@ This plugin covers universal coding practices that apply across all languages:
 - Discovery → Plan → Implement → Verify workflow
 - Assumption interrupts (never assume API signatures, always verify)
 - Incremental implementation discipline
+- Debugging discipline (reproduce → hypothesize → bisect → explain)
+- Verification before completion; failing checks get fixed, never silenced
 - Context management and token efficiency
-- Verification before completion
 
 Language-specific patterns, idioms, and toolchains belong in dedicated discipline plugins (golang, javascript, etc.).
 The `coding` skill runs before language-specific skills as a prerequisite.

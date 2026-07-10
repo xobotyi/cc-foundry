@@ -38,24 +38,19 @@ planning causes scope creep. Skipping verification ships broken code.
 
 ## The Assumption Interrupt
 
-This pattern must become automatic in your reasoning:
+One declarative rule — apply it silently, don't narrate the check:
 
-<cognitive-interrupt>
-WHENEVER you find yourself:
+<assumption-rule>
+Never build on a contract you haven't read in this session. Each of these is an unverified
+assumption — and every unverified assumption is a potential compile failure, runtime bug, or
+behavioral regression:
+
 - Using a method/type/interface without having read its definition
-- Using words like "probably", "likely", "should have", "typically"
 - Recalling an API from memory instead of reading current source
 - Planning changes to code you haven't read in this session
 - Assuming a method signature, type structure, or interface shape
 
-STOP. Ask yourself:
-
-1. "Do I have evidence in current context that this exists?"
-2. "Have I actually read this code, or am I assuming?"
-3. If no evidence exists → VERIFY before proceeding.
-
-Every unverified assumption is a potential compile failure, runtime bug, or behavioral regression.
-</cognitive-interrupt>
+When you catch one, read the source before continuing. </assumption-rule>
 
 <assumption-markers>
 These words in your reasoning are RED FLAGS:
@@ -130,6 +125,9 @@ Don't one-shot complex features.
 
 <incremental-rules>
 - One logical change at a time
+- Wear one hat at a time — never mix refactoring and behavior change in the same step. Refactor
+  first with behavior identical, verify, then change behavior; a diff that does both can't be
+  reviewed or bisected
 - Verify each change works before moving to the next
 - If a change touches 5+ files, break it into smaller steps
 - Leave the codebase in a clean, working state at every step
@@ -189,6 +187,21 @@ A marker that names no trigger is the kind that rots into permanent. Grep them w
 deferred work before it's forgotten. Mark only deliberate ceilings, not every simplification — a shortcut the reader
 would never mistake for a bug needs no comment. </shortcut-marker>
 
+### Handle Errors Deliberately
+
+<error-handling-rules>
+- Fail fast — reject the bad state where it enters the system, not three layers deeper where it
+  finally crashes
+- Don't catch what you can't handle — log-and-continue converts a loud failure into silent
+  corruption; let it propagate
+- Add context when propagating — wrap the error with what was being attempted and with which
+  inputs, so the operator can act without a debugger
+- No silent fallbacks — substituting a default value on failure is a deliberate, visible decision,
+  never a reflex
+- Match the codebase's existing error strategy (exceptions, result types, error codes) — don't
+  introduce a second one
+</error-handling-rules>
+
 ### Isolate Dependencies for Testing
 
 A module is hard to test when a dependency hides behind it. Match the strategy to the dependency's nature instead of
@@ -234,9 +247,54 @@ When the goal is to improve existing code, hunt for named smells and apply the m
 - **Primitive obsession** (bare strings or ints carrying domain meaning) — introduce a value type.
 </refactor-targets>
 
+## Debugging Discipline
+
+A bug fix is a claim about cause and effect. Debugging is how you earn the right to make it.
+
+<debugging-protocol>
+
+1. **Reproduce first** — a bug you can't reproduce isn't fixed by any change you make, only perturbed. Capture the
+   failing case as a command or test you can re-run.
+
+2. **Read the error literally** — the message names a symbol, a line, a state. Chase what it says before theorizing
+   about what it might mean.
+
+3. **Hypothesize before editing** — state the suspected cause and what you expect to observe if it's right, then check.
+   An edit made without a hypothesis is a guess with side effects.
+
+4. **Change one variable at a time** — two simultaneous changes that fix the bug tell you nothing about which one
+   mattered, or what the other one broke.
+
+5. **Bisect when lost** — no hypothesis survives contact? Halve the search space instead of staring: `git bisect` across
+   history, disable half the pipeline, shrink the input to minimal.
+
+6. **Explain the fix or keep digging** — "it works now but I don't know why" means the root cause is still at large and
+   will return. Done means you can state why the bug happened and why the change removes it.
+
+</debugging-protocol>
+
+Before closing, turn the reproduction into a regression test — the bug that happened once is the bug most likely to
+happen again.
+
 ## Verification Discipline
 
 Verification is the single highest-leverage activity. Code that "looks right" but hasn't been tested is unverified code.
+
+### Never Silence the Signal
+
+A failing check is information about the code, not an obstacle to green. Make checks pass by fixing the code — never by
+weakening the check.
+
+<signal-rules>
+- Never delete, skip, or comment out a failing test to get green
+- Never loosen an assertion until it passes — that asserts the bug, not the behavior
+- Never add a lint or type suppression (`eslint-disable`, `# type: ignore`, `as any`) to silence an
+  error you haven't understood
+- Never wrap failing code in catch-and-ignore or a silent fallback — an error that vanishes is a
+  bug that relocated
+- The one legitimate case: the check itself is wrong (it asserts old behavior the task explicitly
+  changes). Prove it, say so, then change the check visibly — never as a side effect.
+</signal-rules>
 
 <verification-protocol>
 
@@ -260,7 +318,10 @@ Verification is the single highest-leverage activity. Code that "looks right" bu
 
 5. **Type-check and lint** — If the project has type checking or linting, run it. Don't ship code with known warnings.
 
-6. **Disclose gaps** — If you skipped anything, couldn't verify an edge case, or are uncertain about a behavior, state
+6. **Show evidence, not assertions** — Report the actual output of the check: the test summary line, the exit code, the
+   screenshot. "Tests pass" is a claim; the output is proof the user can act on without re-running anything.
+
+7. **Disclose gaps** — If you skipped anything, couldn't verify an edge case, or are uncertain about a behavior, state
    it explicitly. "Done" means fully verified. "Done, but I didn't verify X" is better than a silent gap.
 
 </verification-protocol>
