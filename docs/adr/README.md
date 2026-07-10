@@ -26,3 +26,4 @@ neither re-litigate it nor cargo-cult it.
 - [0003 — Skill dependencies: soft vs hard tiers](0003-skill-dependencies-soft-vs-hard.md) — accepted
 - [0004 — Behavioral nudges as declarative rules, not emitted reasoning artifacts](0004-declarative-rules-over-emitted-reasoning-artifacts.md)
   — accepted
+- [0005 — Per-plugin GitHub releases as the changelog](0005-per-plugin-github-releases-as-changelog.md) — accepted

@@ -103,6 +103,8 @@ process (Research → Scaffold → Write → Ship) using Perplexity for discover
 - Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and the repo-root
   `.claude-plugin/marketplace.json` (which lists all plugins in a single file)
 - Update both files when bumping versions
+- Every plugin version bump pushed to master ships with a GitHub release whose notes are the plugin's changelog — no
+  CHANGELOG.md files. Workflow: the `release` skill (`.claude/skills/release/`); rationale: `docs/adr/0005`
 
 **Licensing:**
 
