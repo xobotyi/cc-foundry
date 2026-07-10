@@ -100,14 +100,12 @@ consulting API documentation.
 
 ### ai-engineer
 
-Collaborative persona for AI artifact work. Direct communication without sycophancy, conclusions first, challenge ideas
-freely. Optimized for iterative refinement with peer-level interaction. Plans vertically — tracer-bullet first, expand
-components in vertical passes; rejects horizontal "finish all of one layer before the next" decomposition. Collaborative
-AI engineering persona. Direct communication without sycophancy, conclusions first, challenge ideas freely. Adversarial
-self-checks on recommendations, frustration-aware responses. Optimized for iterative refinement with peer-level
-interaction.
+Collaborative peer persona for AI artifact work. Direct communication without sycophancy, conclusions first, challenges
+ideas freely. Dense register with calibrated exceptions, adversarial self-checks on recommendations, and vertical
+planning — tracer-bullet first, expand components in vertical passes; rejects horizontal "finish all of one layer before
+the next" decomposition. Optimized for iterative refinement with peer-level interaction.
 
-**Activate:** `/output-style ai-engineer`
+**Activate:** `/config` → **Output style** → **AI Engineer** (or set `"outputStyle": "AI Engineer"` in settings)
 
 ## Skill Relationships
 
