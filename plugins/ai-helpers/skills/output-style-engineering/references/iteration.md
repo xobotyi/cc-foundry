@@ -57,8 +57,8 @@ Form a specific, testable hypothesis:
 
 ### 4. Modify
 
-Make ONE targeted change. Multiple simultaneous changes make debugging impossible — you won't know which change fixed
-(or broke) something.
+Make ONE targeted change. Multiple changes make debugging impossible — you won't know which change fixed (or broke)
+something.
 
 ### 5. Test
 
@@ -69,8 +69,7 @@ Re-run the failing prompt. If fixed, run the full testing protocol (see evaluati
 Symptom → Root cause → Fix pattern:
 
 - **Reverts to sycophantic tone** — weak persona, no anti-patterns → add explicit forbidden phrases list with
-  replacements. Community evidence: users report emoji-spam and "Great question!" persisting despite instructions —
-  generic "don't be sycophantic" is too weak; enumerate specific phrases to ban.
+  replacements. Generic "don't be sycophantic" is too weak; enumerate specific phrases to ban.
 - **Ignores format** — format buried in prose → move format specification to a dedicated section near the end, add a
   response template with an example
 - **Inconsistent between turns** — no persistence language → add explicit "maintain throughout entire conversation"

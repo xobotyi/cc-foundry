@@ -46,6 +46,8 @@ keep-coding-instructions: false
 - **`description`** — shown in `/config` picker; make it scannable
 - **`keep-coding-instructions`** — `true` preserves the default coding system prompt alongside your style instructions;
   `false` (default) replaces it entirely
+- **`force-for-plugin`** — plugin-shipped styles only: auto-applies the style while the plugin is enabled, overriding
+  the user's `outputStyle` setting
 
 ### File Locations
 
@@ -55,20 +57,11 @@ keep-coding-instructions: false
 
 ## Creation Methods
 
-### `/output-style:new` (recommended start)
+### Manual file creation (primary)
 
-Run in Claude Code:
-
-```
-/output-style:new [name] [verbose description of desired behavior]
-```
-
-Claude generates a Markdown file in `~/.claude/output-styles/`. Treat as a first draft — review and tighten before use.
-
-### Manual file creation
-
-Create a `.md` file directly in one of the storage locations above. Full control from the start, but requires
-understanding the file format and writing effective style instructions.
+Create a `.md` file directly in one of the storage locations above. The `/output-style:new` scaffolding command was
+removed in v2.1.91 along with `/output-style` — writing the file yourself is the only interactive path. To scaffold a
+draft, ask Claude in-session to write the file, then review and tighten before use.
 
 ### SDK programmatic creation
 
@@ -94,21 +87,18 @@ below.
 
 ### Step 3: Draft
 
-Use `/output-style:new` for a starting point or write manually. Either way, apply the pattern's structural requirements.
+Write the file manually (see Creation Methods) and apply the pattern's structural requirements.
 
 ### Step 4: Activate and test
 
-```
-/output-style [name]
-```
-
-Or set directly in `.claude/settings.local.json`:
+Run `/config`, select **Output style**, pick the style. Or set directly in `.claude/settings.local.json`:
 
 ```json
 { "outputStyle": "MyStyleName" }
 ```
 
-The style is applied once at session start — it cannot change mid-session. Start a new session to pick up changes.
+The style is applied once at session start — it cannot change mid-session. Run `/clear` or start a new session to pick
+up changes.
 
 ### Step 5: Iterate
 
@@ -226,8 +216,7 @@ Comparison.
 **Style reverts mid-session** — Default personality traits are deeply embedded. A single consistency reminder at the end
 is insufficient for long sessions. Fix: distribute anti-reversion language throughout the style — at least two anchors
 in different sections. Include explicit scenario lists ("even if the topic changes, even if multiple turns have
-passed"). Users who moved style instructions from CLAUDE.md to an output style specifically because of this problem
-report that replacement is more effective than augmentation, but still requires reinforcement.
+passed").
 
 **Coding capability lost** — `keep-coding-instructions: false` (the default) removes all coding guidance. Users who
 create a tone-only style (e.g., "be more direct") accidentally lose coding capability. Fix: set
@@ -237,6 +226,5 @@ create a tone-only style (e.g., "be more direct") accidentally lose coding capab
 list concrete behaviors ("never use emoji", "always give verdict before rationale", "no hedging phrases") rather than
 adjectives. Every instruction should be verifiable: you can check whether a response complies.
 
-**Style ignored in tool output** — Style controls Claude's prose, not the output of bash commands, file reads, or MCP
-tool results. Don't expect the style to reformat tool results — it governs how Claude frames and presents information,
-not the raw output of tools.
+**Style ignored in tool output** — Style controls Claude's prose — how it frames and presents information — not the
+output of bash commands, file reads, or MCP tool results.

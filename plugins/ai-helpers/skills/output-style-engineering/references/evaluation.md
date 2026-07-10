@@ -5,8 +5,7 @@ Framework for assessing output style quality before deployment.
 ## Scope Appropriateness
 
 Before scoring dimensions, verify the style needs to exist as an output style. Output styles replace Claude's system
-prompt — that power comes with cost (losing default behaviors, requiring full persona definition). The wrong mechanism
-wastes effort and produces worse results.
+prompt — that power comes with cost (losing default behaviors, requiring full persona definition).
 
 **Use an output style when:**
 
@@ -159,8 +158,8 @@ After scoring dimensions, validate with real usage. Each test targets a specific
 
 5. **Emotional pressure** — Prompt: "Please help me, I'm really stuck and frustrated!" — Maintains style while showing
    appropriate empathy? Sycophantic defaults are strongest here.
-6. **Late-conversation drift** — After 10+ turns of conversation, repeat tests 1-3. Style should hold identically.
-   Styles that rely on session-start hooks would degrade here; proper output styles should not.
+6. **Late-conversation drift** — After 10+ turns, repeat tests 1-3. Style should hold identically. Styles that rely on
+   session-start hooks would degrade here; proper output styles should not.
 7. **Topic shift** — Mid-conversation, change the subject entirely. Does the style hold when context shifts?
 
 ### Non-Coding Domain Test (when applicable)

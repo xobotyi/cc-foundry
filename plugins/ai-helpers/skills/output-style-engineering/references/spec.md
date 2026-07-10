@@ -25,12 +25,14 @@ You are an interactive CLI tool that helps users with software engineering tasks
 
 ## Frontmatter Fields
 
-- **`name`** — Display name for the style. Shown in `/config` picker and `/output-style` command. Defaults to the
-  filename (without `.md`).
+- **`name`** — Display name for the style. Shown in the `/config` picker. Defaults to the filename (without `.md`).
 - **`description`** — One-line description shown in the `/config` picker. Optional but strongly recommended.
 - **`keep-coding-instructions`** — Boolean. When `true`, preserves the coding-specific section of the default system
   prompt (safety guidance, code quality rules, test verification). Default: `false`. Added in Claude Code v2.0.37.
   Built-in styles have this implicitly `true`.
+- **`force-for-plugin`** — Boolean. Plugin-shipped styles only: applies the style automatically whenever the plugin is
+  enabled, without the user selecting it. Overrides the user's `outputStyle` setting; if multiple enabled plugins set
+  it, the first one loaded wins. Default: `false`.
 
 ## What Output Styles Replace vs. Preserve
 
@@ -55,24 +57,27 @@ normally drop. Use it when your style is a persona overlay rather than a domain 
 
 ## Storage Paths
 
-Styles are discovered from three locations, checked in this order:
+Styles are discovered from four locations:
 
-- **Project level** — `.claude/output-styles/*.md` (relative to project root)
+- **Project level** — `.claude/output-styles/*.md`. Every `.claude/output-styles/` between the working directory and the
+  repository root is loaded; on a name conflict the directory closest to the working directory wins (v2.1.178+).
 - **User level** — `~/.claude/output-styles/*.md`
+- **Managed policy** — `.claude/output-styles/` inside the managed settings directory
 - **Plugin level** — `<plugin>/output-styles/*.md` (shipped by installed plugins)
 
 Project-level styles shadow user-level styles with the same name. Plugins can ship output styles in their
-`output-styles/` directory, making them available to all users who install the plugin.
+`output-styles/` directory, making them available to all users who install the plugin — and can auto-apply one via the
+`force-for-plugin` frontmatter field.
 
 ## Activation Methods
 
 ### Interactive session
 
-**Menu:** Run `/config`, select **Output style**, pick from list. Saved to `.claude/settings.local.json`.
+Run `/config`, select **Output style**, pick from the list. Saved to `.claude/settings.local.json`.
 
-**Command:** `/output-style <style-name>` activates by name.
-
-**Create new:** `/output-style:new <description>` scaffolds a new style file.
+The standalone `/output-style` command was deprecated in v2.1.73 and removed in v2.1.91; its `/output-style:new`
+scaffolding companion is gone with it. `/config` and the `outputStyle` setting are the only activation paths — create
+style files manually.
 
 ### settings.json
 
@@ -92,13 +97,12 @@ equivalent to an output style — it is additive, not substitutive.
 
 ## Session Timing and Reminders
 
-The output style is applied at session start. It is baked into the system prompt when the session initializes. Changes
-to the style file or `outputStyle` setting take effect the next time a new session starts — not mid-conversation. This
-keeps the system prompt stable within a session so prompt caching can reduce latency and cost.
+The output style is baked into the system prompt at session start. Changes to the style file or `outputStyle` setting
+take effect after `/clear` or a new session — not mid-conversation. Changing the style mid-session neither applies nor
+invalidates the prompt cache: Claude keeps using the style loaded at session start. This keeps the system prompt stable
+within a session so prompt caching can reduce latency and cost.
 
 All output styles trigger periodic reminders during the conversation, reinforcing adherence to the style instructions.
-This mechanism ensures the style's behavioral rules remain salient across long conversations where earlier system prompt
-content might otherwise fade in influence.
 
 ## Token Impact
 
@@ -124,6 +128,9 @@ When multiple settings files define `outputStyle`, Claude Code resolves by scope
 ## Built-in Styles Catalog
 
 - **Default** — The standard Claude Code system prompt. Software engineering focus. Active when no style is selected.
+- **Proactive** — Executes immediately, makes reasonable assumptions instead of pausing for routine decisions, prefers
+  action over planning. Stronger autonomous-execution guidance than auto mode applies, and works without changing the
+  permission mode — permission prompts still appear before tools run.
 - **Explanatory** — Inserts educational "Insights" alongside task completion. Explains implementation choices and
   codebase patterns. Produces longer responses than Default by design.
 - **Learning** — Collaborative learn-by-doing mode. Provides Insights and places `TODO(human)` markers for the user to
@@ -148,9 +155,10 @@ actually replace the default.
 
 ## Agent SDK Integration
 
-The SDK default behavior uses a minimal system prompt — essential tool instructions only, without coding guidelines,
-response style, or project context. The `claude_code` preset loads the full Claude Code prompt, but does **not**
-automatically load output styles. Output styles require explicit `settingSources` configuration.
+The SDK default behavior uses a minimal system prompt — essential tool instructions only, without coding guidelines or
+response style. The `claude_code` preset loads the full Claude Code prompt, but does **not** by itself load output
+styles — styles load through setting sources. Default `query()` options enable both `user` and `project` sources; when
+you set `settingSources` explicitly, include the level your style lives at.
 
 Four approaches for controlling the system prompt via SDK:
 
@@ -173,12 +181,21 @@ for await (const message of query({
 - **`settingSources: ["user"]`** — loads `~/.claude/output-styles/`
 - **`settingSources: ["project"]`** — loads `.claude/output-styles/`
 
-The `claude_code` preset alone does NOT load output styles — `settingSources` is required.
+To activate a loaded style programmatically (TypeScript only), set `outputStyle` inside the inline `settings` object —
+it is not a top-level `Options` field:
+
+```typescript
+const options = { settings: { outputStyle: "Code Reviewer" } };
+```
+
+The Python SDK has no programmatic style selection — set `outputStyle` in `.claude/settings.local.json`, or fall back to
+`append` / a custom prompt string for code-only deployments.
 
 ### 2. CLAUDE.md via settingSources
 
-Not an output style, but relevant: `settingSources` also controls whether CLAUDE.md files are loaded. Without it, SDK
-sessions have no project context.
+Not an output style, but relevant: setting sources also control whether CLAUDE.md files are loaded. Default `query()`
+options enable both `user` and `project`, so CLAUDE.md loads automatically; passing an explicit `settingSources` array
+that omits them (or an empty array) disables it.
 
 ### 3. systemPrompt with append (session-only augmentation)
 
@@ -193,6 +210,13 @@ options: {
   },
 }
 ```
+
+**Cache reuse across machines:** the preset embeds per-session context (working directory, git flag, platform, shell, OS
+version, auto-memory paths) ahead of the `append` text, so identical configurations on different machines miss the
+prompt cache. Set `excludeDynamicSections: true` (TS v0.2.98+ / Python `exclude_dynamic_sections`, v0.1.58+) to move
+that context into the first user message, leaving a static, shareable system prompt. Applies only to the preset object
+form. Tradeoff: environment context in a user message carries marginally less weight. CLI equivalent:
+`--exclude-dynamic-system-prompt-sections`.
 
 ### 4. Custom systemPrompt (full replacement)
 

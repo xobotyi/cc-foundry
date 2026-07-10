@@ -27,9 +27,9 @@ Skip only for trivial edits (typos, formatting).
   reminders, token impact, built-in styles catalog, feature comparison table, Agent SDK system prompt approaches (4
   methods)
 - **Creating a style from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Replace-not-augment principle,
-  creation methods (/output-style:new, manual, SDK), creation workflow, style pattern templates (direct professional,
-  domain specialist with non-coding use cases, interaction mode, learning/educational with voice-first design), token
-  impact, common failure modes
+  creation methods (manual, SDK), creation workflow, style pattern templates (direct professional, domain specialist
+  with non-coding use cases, interaction mode, learning/educational with voice-first design), token impact, common
+  failure modes
 - **Evaluating style quality** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Scope appropriateness pre-check,
   per-dimension scoring rubrics (1-10), weighted scoring formula, testing protocol (4 core + 3 persistence + 1 domain),
   deployment readiness go/no-go, red flags
@@ -87,8 +87,9 @@ Controls whether Claude retains its software engineering guidance.
     team-style.md
 ```
 
-Filename becomes the style identifier (without `.md`). Activate with `/output-style style-name` or via settings.
-Project-level styles shadow user-level styles with the same name.
+Filename becomes the style identifier (without `.md`). Activate via `/config` → **Output style**, or the `outputStyle`
+setting — the standalone `/output-style` command was removed in v2.1.91. Project-level styles shadow user-level styles
+with the same name.
 
 Full format details, frontmatter fields, activation methods, Agent SDK integration: see
 [`${CLAUDE_SKILL_DIR}/references/spec.md`].
@@ -236,6 +237,8 @@ Detailed fix patterns with before/after: see [`${CLAUDE_SKILL_DIR}/references/it
 ## Built-in Styles
 
 - **Default** — standard Claude Code system prompt. Software engineering focus. Active when no style selected.
+- **Proactive** — executes immediately, assumes instead of pausing on routine decisions, prefers action over planning.
+  Works without changing the permission mode.
 - **Explanatory** — inserts educational "Insight" blocks alongside task completion. Explains implementation choices.
 - **Learning** — collaborative learn-by-doing mode. Adds `TODO(human)` markers for hands-on practice.
 
@@ -271,7 +274,7 @@ Maintain this style throughout the entire conversation.
 [Most important rules — placement at end improves compliance]
 ```
 
-Activate: `/output-style style-name`
+Activate: `/config` → **Output style** → pick the style (or set `outputStyle` in settings).
 
 ## Quick Checks
 

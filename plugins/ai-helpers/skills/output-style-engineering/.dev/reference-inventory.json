@@ -1,14 +1,14 @@
 {
-	"sources": {
-		"Claude Code: Output Styles Documentation": "https://code.claude.com/docs/en/output-styles.md",
-		"Claude Code: Agent SDK Modifying System Prompts": "https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts.md",
-		"Claude Code: Settings Reference": "https://code.claude.com/docs/en/settings.md",
-		"Anthropic Engineering: Claude Code Best Practices": "https://www.anthropic.com/engineering/claude-code-best-practices",
-		"Setec: Output Styles Most Underrated Feature": "https://claude-blog.setec.rs/blog/output-styles-underrated-feature/",
-		"Eesel AI: Practical Guide to Output Styles": "https://www.eesel.ai/blog/output-styles-claude-code",
-		"Shipyard: Pair Programming with Output Styles": "https://shipyard.build/blog/claude-code-output-styles-pair-programming/",
-		"Mario Ottmann: Claude Code Customization Guide": "https://marioottmann.com/articles/claude-code-customization-guide",
-		"Example: Interactive Documentation Learner Style": "https://gist.github.com/johnlindquist/a190887485b2f76ff26dbda08677b98b"
-	},
-	"lastFetched": "2026-04-14T12:12:48.833Z"
+  "sources": {
+    "Claude Code: Output Styles Documentation": "https://code.claude.com/docs/en/output-styles.md",
+    "Claude Code: Agent SDK Modifying System Prompts": "https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts.md",
+    "Claude Code: Settings Reference": "https://code.claude.com/docs/en/settings.md",
+    "Claude Code: Prompt Caching Behavior": "https://code.claude.com/docs/en/prompt-caching.md",
+    "Setec: Output Styles Most Underrated Feature": "https://claude-blog.setec.rs/blog/output-styles-underrated-feature/",
+    "Shipyard: Pair Programming with Output Styles": "https://shipyard.build/blog/claude-code-output-styles-pair-programming/",
+    "Mario Ottmann: Claude Code Customization Guide": "https://marioottmann.com/articles/claude-code-customization-guide",
+    "Awesome Claude Code Output Styles: Community Examples": "https://github.com/hesreallyhim/awesome-claude-code-output-styles-that-i-really-like",
+    "Example: Interactive Documentation Learner Style": "https://gist.github.com/johnlindquist/a190887485b2f76ff26dbda08677b98b"
+  },
+  "lastFetched": "2026-07-10T13:15:06.530Z"
 }
