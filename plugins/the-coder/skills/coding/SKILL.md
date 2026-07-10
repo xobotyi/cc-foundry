@@ -253,28 +253,43 @@ A bug fix is a claim about cause and effect. Debugging is how you earn the right
 
 <debugging-protocol>
 
-1. **Reproduce first** — a bug you can't reproduce isn't fixed by any change you make, only perturbed. Capture the
-   failing case as a command or test you can re-run.
+1. **Build the loop first** — capture the failing case as one re-runnable command that goes red on this bug and will go
+   green when it's fixed. Run it at least once before theorizing: no red command, no hypothesis. A bug you can't
+   reproduce isn't fixed by any change you make, only perturbed.
 
-2. **Read the error literally** — the message names a symbol, a line, a state. Chase what it says before theorizing
+2. **Tighten the loop** — make it fast (skip unrelated setup, narrow the scope), sharp (assert the exact symptom, not
+   "didn't crash"), and deterministic (pin time, seed randomness, isolate filesystem and network). For flaky bugs the
+   goal is a higher reproduction rate, not a clean repro — loop the trigger, add stress, narrow timing windows until it
+   fails often enough to debug against.
+
+3. **Minimize the repro** — cut inputs, callers, config, and steps one at a time, re-running the loop after each cut,
+   until every remaining element is load-bearing. Fewer moving parts, fewer suspects.
+
+4. **Read the error literally** — the message names a symbol, a line, a state. Chase what it says before theorizing
    about what it might mean.
 
-3. **Hypothesize before editing** — state the suspected cause and what you expect to observe if it's right, then check.
-   An edit made without a hypothesis is a guess with side effects.
+5. **Rank falsifiable hypotheses** — write 3–5 before testing any; a single hypothesis anchors on the first plausible
+   idea. Each states its prediction: "if X is the cause, changing Y makes the bug disappear." No prediction — discard or
+   sharpen it.
 
-4. **Change one variable at a time** — two simultaneous changes that fix the bug tell you nothing about which one
+6. **Change one variable at a time** — each probe tests one prediction. Tag every debug log with a unique prefix (e.g.
+   `[DBG-a4f2]`) so cleanup is a single grep. Two simultaneous changes that fix the bug tell you nothing about which one
    mattered, or what the other one broke.
 
-5. **Bisect when lost** — no hypothesis survives contact? Halve the search space instead of staring: `git bisect` across
+7. **Bisect when lost** — no hypothesis survives contact? Halve the search space instead of staring: `git bisect` across
    history, disable half the pipeline, shrink the input to minimal.
 
-6. **Explain the fix or keep digging** — "it works now but I don't know why" means the root cause is still at large and
+8. **Explain the fix or keep digging** — "it works now but I don't know why" means the root cause is still at large and
    will return. Done means you can state why the bug happened and why the change removes it.
 
 </debugging-protocol>
 
+If you genuinely cannot build a loop, stop and say so — list what was tried, then ask for what's missing: a reproducing
+environment, a captured artifact (log dump, trace, recording), or permission to add temporary instrumentation. Do not
+hypothesize without a loop.
+
 Before closing, turn the reproduction into a regression test — the bug that happened once is the bug most likely to
-happen again.
+happen again — and grep the debug-log prefix to confirm no instrumentation survived.
 
 ## Verification Discipline
 

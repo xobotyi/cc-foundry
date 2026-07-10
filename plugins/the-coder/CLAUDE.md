@@ -21,7 +21,7 @@ This plugin covers universal coding practices that apply across all languages:
 - Discovery → Plan → Implement → Verify workflow
 - Assumption interrupts (never assume API signatures, always verify)
 - Incremental implementation discipline
-- Debugging discipline (reproduce → hypothesize → bisect → explain)
+- Debugging discipline (build a red loop → minimize → hypothesize → bisect → explain)
 - Verification before completion; failing checks get fixed, never silenced
 - Context management and token efficiency
 
