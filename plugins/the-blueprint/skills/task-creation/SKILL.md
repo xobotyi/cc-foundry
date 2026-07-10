@@ -331,6 +331,11 @@ what to do, not what was done.
 function signatures, no class names to create. Pseudocode is acceptable for complex logic. Configuration samples are
 acceptable when configuration is the deliverable. Describe the capability needed, not the code to write.
 
+**Anchor to what survives the wait.** A task may sit in the tracker for weeks while the codebase moves under it.
+Existing types, interfaces, and behavioral contracts are durable anchors — name them freely ("`SkillConfig` gains an
+optional `schedule` field"). File paths and line numbers go stale between writing and pickup — the same razor behind the
+References rule's code-path ban applies to description prose.
+
 ## Application
 
 **When creating:** Apply all rules silently. Follow the workflow steps, discover project configuration before drafting,

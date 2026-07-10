@@ -67,6 +67,11 @@ language. In Phase 1, terminology gets clarified inline — synonyms surfaced ("
 `Customer`?"), new concepts flagged for alignment, glossary contradictions surfaced as signals the glossary may need
 updating. Architecture-shaped knowledge (CLAUDE.md, ADRs, prior design docs, code) stays out — that's research's job.
 
+Questions are rationed by kind: decisions — values, priorities, trade-offs — belong to the user and get asked one per
+message; fact-shaped questions (how the codebase behaves, what the data looks like) are deferred to research instead of
+spent on the user's patience. Unknowns still too dim to phrase as precise questions aren't forced into premature answers
+— they land in the brief's "Not yet specified" section as in-scope fog that later stages sharpen and graduate.
+
 The primary output isn't a document — it's the primed conversation context. The agent's enriched understanding carries
 into whatever comes next. A brief verification summary crystallizes the shared understanding for the user to confirm,
 and lists any flagged term ambiguities for alignment to resolve.
@@ -95,7 +100,10 @@ glossary, extracts codebase patterns with prevalence data, and declares which pa
 user reviews this pattern catalog and corrects wrong assumptions — "that's the old way, go find the new way" — before
 any code is planned. This pattern-surfacing step is the critical piece that was missing from the old pipeline.
 
-After patterns are corrected, the agent presents a current state → desired end state proposal with open questions.
+After patterns are corrected, the agent presents a current state → desired end state proposal with open questions —
+including not-yet-specified items from the brief that research has sharpened enough to graduate. When a genuine
+trade-off surfaces and no option is clearly right, alignment can fan out parallel subagents, each designing the same
+decision under a different bias, then compare and recommend — the first workable design no longer wins by default.
 Before completing the end-state phase, alignment maintains the glossary — resolving ambiguities discovery flagged,
 sharpening definitions, and (on the first iteration) creating the glossary if none exists. When genuine trade-offs
 surface, alignment writes standalone ADRs to `design-docs/adr/{N.M}-slug.md` and updates the `design-docs/ADR.md` index.
@@ -112,13 +120,19 @@ horizontal layering — models default to completing one layer at a time (all DB
 integration and hides bugs. Frame enforces vertical structure where each phase crosses all affected layers, producing a
 testable integrated path. Phase 1 is always the tracer bullet: the thinnest end-to-end slice.
 
+Wide mechanical refactors — one change whose blast radius breaks every call site at once — are the recognized exception:
+frame sequences those as expand–contract (add the new form beside the old, migrate call sites in blast-radius-sized
+batches, delete the old form) instead of forcing a vertical slice that can't land green.
+
 **Use when:** An alignment document exists and you need to plan implementation as vertical phases before coding begins.
 
 ### tasks
 
 Decomposes frame phases into individually trackable work items. Each task gets a title, estimate, dependencies, expected
 artifact, and an AFK/HITL classification indicating whether it can run autonomously or needs a human at the keyboard.
-The task breakdown bridges the frame's vertical phases to the mechanical task creation in an issue tracker.
+Descriptions anchor to durable contracts — existing types, interfaces, behavior — never to file paths or line numbers,
+so they stay actionable while the task waits in the tracker and the codebase moves under it. The task breakdown bridges
+the frame's vertical phases to the mechanical task creation in an issue tracker.
 
 **Use when:** A frame document exists and you need to break phases into assignable, sized work items before creating
 tracker tasks.

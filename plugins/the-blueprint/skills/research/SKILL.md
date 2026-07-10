@@ -42,6 +42,8 @@ Agent teams: !`echo ${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-disabled}`
 3. For each scope, formulate the questions worth investigating. Follow the question generation rules below.
    - Multiple questions per scope is normal. Group questions that share files to avoid duplicate reads across teammates.
    - Don't fix a question count up-front. Let the brief's complexity determine how many.
+   - The brief's **Questions for research** list (facts discovery deferred) is mandatory input — every entry becomes an
+     investigation question, rewritten through the same neutrality rules as any other.
 4. Self-check questions against the bias validation gate.
 5. Create team `research-{slug}` via TeamCreate.
 6. For each scope cluster, create a task via TaskCreate using the task description format below, then spawn one teammate

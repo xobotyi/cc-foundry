@@ -27,7 +27,7 @@ Standalone skills (not pipeline stages, invocable independently):
 ## Skill Flow
 
 ```
-discovery (idea + glossary → shared understanding + flagged term ambiguities)
+discovery (idea + glossary → shared understanding + flagged terms + research questions + not-yet-specified fog)
     ↓
 research (brief → parallel codebase investigation → objective findings)
     ↓

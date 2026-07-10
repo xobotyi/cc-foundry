@@ -97,6 +97,23 @@ On user approval:
 
 > Frame is complete. Proceed to `tasks` to decompose phases into trackable work items?
 
+## Wide Refactors — the Exception
+
+A **wide refactor** is one mechanical change — rename a column, retype a shared symbol, swap a logging API — whose blast
+radius fans across the whole codebase: a single edit breaks every call site at once, so no vertical slice can land
+green. Don't force it into tracer-bullet phases; sequence it as **expand–contract**:
+
+1. **Expand** — add the new form beside the old so nothing breaks. This replaces the tracer bullet as Phase 1.
+2. **Migrate** — move call sites to the new form in batches sized by blast radius (per package, per directory). Each
+   batch is its own phase, depends only on the expand phase, and lands green because the old form still exists —
+   disjoint batches run in parallel. Batch count follows blast radius, not the 3–5 phase target.
+3. **Contract** — delete the old form once no caller remains. The final phase, dependent on every migrate batch.
+
+When even individual batches can't stay green alone, keep the same sequence on a shared integration branch and add a
+final integrate-and-verify phase — green is promised only there.
+
+Everything else in this skill still applies: per-phase testing strategy, verification gates, and acceptance criteria.
+
 ## Frame Document Format
 
 Concise outline, not implementation detail. The frame is to the implementation what a C header file is to the source —
@@ -167,6 +184,7 @@ Phase 3 (parallel with Phase 2, depends on Phase 1)
 
 - **Vertical, not horizontal.** Every phase must cross layers. A phase that completes one layer (all DB, all API) is a
   horizontal slice — restructure it. This is structural enforcement; models cannot be prompted into vertical planning.
+  Wide refactors are the one exception — sequence those as expand–contract (see Wide Refactors).
 - **Living artifact.** `frame.md` may be updated as implementation reveals the plan was wrong. Immutable only when moved
   to `completed/`.
 - **Always persists to disk.** Tasks link back to frame.md; it must exist on the filesystem.

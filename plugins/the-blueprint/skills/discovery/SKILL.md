@@ -52,6 +52,17 @@ explore.
 - **Prior art** — Has this been tried before? Why did it fail or not exist yet? What can be learned from existing
   solutions?
 
+## Facts vs Decisions
+
+Every candidate question is one of two kinds:
+
+- **Decisions** — values, priorities, intent, trade-offs. These belong to the user; ask them.
+- **Facts** — how the codebase behaves, what the data looks like, what an external system does. These belong to
+  research; asking the user spends their patience on answers the pipeline can establish itself. Discovery's information
+  barrier means you don't look facts up either — record them in the brief under **Questions for research** and move on.
+
+When a question mixes both, split it: ask for the decision, defer the fact.
+
 ## Phase 1: Intent Capture
 
 Start by listening. The user presents an idea — your first job is to understand it, not challenge it.
@@ -62,10 +73,11 @@ Start by listening. The user presents an idea — your first job is to understan
    - The user sees the full territory and can redirect: "skip that, focus on this instead"
    - You have an anchor to return to when sequential questioning drifts from the original scope
 
-2. **Work through the map one area at a time.** Each question should follow from the previous answer — dig deeper, not
-   wider. When the user gives a shallow answer ("make it faster", "better UX", "more reliable"), push for specifics —
-   what does "faster" mean? Measured how? Compared to what? An answer is sufficient when it is specific enough to act
-   on.
+2. **Work through the map one area at a time, one question per message.** A batch of questions bewilders and buys
+   shallow answers to all of them — wait for each answer before the next question. Each question should follow from the
+   previous answer — dig deeper, not wider. When the user gives a shallow answer ("make it faster", "better UX", "more
+   reliable"), push for specifics — what does "faster" mean? Measured how? Compared to what? An answer is sufficient
+   when it is specific enough to act on.
 
 3. **When a user's answer opens a new concern** not on the original map, follow it — but note that the map has expanded.
 
@@ -112,6 +124,13 @@ the user's answer before they give it.
 When you recognize convergence, shift to verification. This is a judgment call, not a formula. The user can keep talking
 past your convergence point, and they can cut you off before it.
 
+**Convergence does not require dissolving every unknown.** Apply the test to each remaining one: can the question be
+stated precisely now — regardless of whether it can be answered now? A precisely-stated question is either asked (a
+decision) or deferred to research (a fact). One too dim to phrase yet is **fog** — record it in the brief under **Not
+yet specified** as loosely or as fully as the current view allows, and don't pre-slice it into question-sized pieces.
+Fog is in-scope territory downstream stages revisit once nearby answers sharpen it; forcing a premature question out of
+it produces a premature answer.
+
 ## Verification
 
 When you believe you have sufficient understanding, present a structured summary — this is also the brief artifact
@@ -125,6 +144,11 @@ format:
 - **Flagged term ambiguities:** bullet list — include only when any exist. Capture terms used contrary to the glossary,
   synonyms surfaced in Phase 1 that need a glossary decision, and new concepts the user introduced. Alignment is the
   consumer of this list.
+- **Questions for research:** bullet list — include only when any exist. Fact-shaped questions discovery deferred
+  instead of asking the user. Research is the consumer of this list.
+- **Not yet specified:** bullet list — include only when any exist. In-scope unknowns too dim to phrase as precise
+  questions yet (see Convergence). Alignment revisits these; anything research or alignment sharpens graduates into an
+  open question, the rest carries forward.
 
 Write all entries using canonical glossary terms. Vocabulary mismatch between brief and glossary produces drift
 downstream.
@@ -142,6 +166,8 @@ This is a verification checkpoint. The user confirms, corrects, or continues que
 
 - Challenge the user's solutions — never offer your own.
 - Point at gaps and ask the user to fill them — never fill in blanks yourself.
+- Ask the user for decisions, never for facts — facts are deferred to research via the brief's **Questions for
+  research** list.
 - Push for specifics when answers are vague — "faster", "better UX", "more reliable" are not actionable.
 - Leave codebase, ADRs, prior design docs, and architecture documentation to research. **Glossary is the exception** —
   load it as the project's vocabulary contract.

@@ -35,6 +35,9 @@ Locate the inputs:
 3. From the brief, extract:
    - Motivation, desired end state, constraints, non-goals.
    - Flagged term ambiguities — unresolved terms discovery surfaced for alignment to resolve.
+   - Not-yet-specified items — unknowns discovery could not yet phrase as precise questions. Check each against the
+     research findings: graduate the ones research has sharpened into open questions for Phase 3; carry the rest into
+     the alignment document unchanged.
 4. From the glossary, extract:
    - Canonical vocabulary to use throughout alignment.
    - Definitions that constrain pattern choices (e.g., "Customer owns CustomerId" forbids cross-context FKs).
@@ -90,11 +93,14 @@ With corrected patterns, present:
 
 - **Current state** — how the affected area works today, derived from research.
 - **Desired end state** — what it should look like after the change, derived from brief + corrected patterns.
-- **Open questions** — anything not determinable from brief and research alone.
+- **Open questions** — anything not determinable from brief and research alone, including not-yet-specified items that
+  graduated during synthesis.
 
-Iterate until end state is clear and all questions are resolved.
+Iterate until end state is clear and all questions are resolved. Not-yet-specified items that remain too dim to phrase
+stay in the alignment document's **Not yet specified** section — resolving them is not a gate for completing alignment.
 
-**Glossary maintenance.** Before completing Phase 3, reconcile vocabulary:
+**Glossary maintenance.** Apply term resolutions the moment they crystallize during Phases 2–3 — a batched cleanup at
+the end loses the rationale that was live when the term was resolved. Before completing Phase 3, sweep for stragglers:
 
 - **If glossary exists:** apply term resolutions surfaced in this initiative — sharpen definitions, resolve ambiguities
   the brief flagged, add new entries that pass the glossary skill's trap test. Invoke the `glossary` skill for the
@@ -133,6 +139,20 @@ record; "we did the obvious thing" isn't worth preserving.
 - **Rejected alternatives when rejection is non-obvious.** Considered GraphQL, picked REST for subtle reasons — record
   it, or someone re-proposes GraphQL in six months.
 - **Compliance, legal, regulatory, or security boundary decisions** — even when not architecturally surprising.
+
+**Explore alternatives before committing (optional).** The first workable design anchors — when a genuine trade-off
+surfaces and no option is clearly right, generate alternatives before asking the user to commit:
+
+1. Write the problem framing — constraints from brief and research, adopted patterns, what any solution must satisfy —
+   and present it to the user.
+2. While the user reads, spawn 2–3 parallel subagents via the Agent tool, each designing the same decision under a
+   different bias: follow dominant patterns with minimal change; design the clean target state ignoring migration cost;
+   optimize for operational simplicity. Give each the problem framing; each returns its direction, what it changes, and
+   where its trade-offs bite.
+3. Compare the returns on named dimensions, recommend one — or a hybrid — with reasoning. The user picks; the chosen
+   direction feeds the ADR gate below.
+
+Fire this only when a real trade-off exists — routine alignments never need it.
 
 **When to prompt.** When the dialog surfaces two or more viable approaches and the user expresses uncertainty, ask:
 "Multiple paths exist — write an ADR to commit to one?" Run the trigger gate before writing — uncertainty isn't enough
@@ -219,6 +239,13 @@ Target ~150 lines. Exceeding 250 indicates content belongs in the frame stage or
 ## Resolved Questions
 
 - [Question] → [Resolution]
+
+## Not Yet Specified
+
+(Only when unphrased unknowns remain. In-scope territory future iterations revisit — carried from the brief or surfaced
+during alignment, written as loosely as the current view allows.)
+
+- [Unknown — what's dim about it, what would sharpen it]
 
 ## Recorded ADRs
 

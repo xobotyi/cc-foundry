@@ -54,14 +54,18 @@ gap.
 
 ### Phase 3 — Write Descriptions
 
-For each approved task, write a description. Three rules agents violate constantly:
+For each approved task, write a description. Four rules agents violate constantly:
 
 **Descriptions are plans, not reports.** Write as if the work has not started — because from the implementer's
 perspective, it hasn't. "Add a compound index" — not "Added a compound index."
 
-**Descriptions contain no implementation.** Describe WHAT should change and what "done" looks like. No code, no function
-signatures, no class names. Pseudocode acceptable for complex logic; configuration samples acceptable when config is the
-deliverable.
+**Descriptions contain no implementation.** Describe WHAT should change and what "done" looks like. No production code,
+no prescriptions of new functions or classes to create. Pseudocode acceptable for complex logic; configuration samples
+acceptable when config is the deliverable.
+
+**Descriptions survive the wait.** A task may sit in the tracker for weeks while the codebase moves under it. Anchor to
+what survives refactors — existing types, interfaces, behavioral contracts ("`SkillConfig` gains an optional `schedule`
+field") — never to file paths or line numbers, which go stale between writing and pickup.
 
 **But specific enough to act on.** Agents don't ask clarifying questions — they fill gaps with plausible defaults.
 Unspecified constraints produce confidently wrong code. If an implementer would need to ask a question before starting,
@@ -75,8 +79,8 @@ Structure each description:
   thresholds over vague "works correctly."
 - **Artifact** — the expected output: specific file, passing test suite, working endpoint. Every task must produce a
   verifiable artifact that can be checked and rolled back if wrong.
-- **References** — links to alignment, frame, or relevant code. Never reference other tasks — inter-task dependencies
-  use native tracker links created by `task-creation`.
+- **References** — links to alignment, frame, or other design docs. Never code paths — they go stale in the tracker.
+  Never other tasks — inter-task dependencies use native tracker links created by `task-creation`.
 
 Ask the user for approval of descriptions before proceeding.
 
@@ -149,7 +153,7 @@ Use `design-docs/NN-name.tasks.md`.
 
 **References:**
 
-- [Links to frame, alignment, relevant code — never other tasks]
+- [Links to frame, alignment, design docs — never code paths or other tasks]
 
 ## Phase 2: {phase name}
 
@@ -174,6 +178,8 @@ Use `design-docs/NN-name.tasks.md`.
   genuine, not accidental.
 - **Plans, not reports.** Every description uses imperative mood and reads as future work. Past tense is a violation.
 - **No implementation in descriptions.** Describe what changes and what "done" looks like. The implementer decides how.
+- **Durable anchors only.** Name existing types, interfaces, and behavioral contracts; never file paths or line numbers
+  — descriptions must survive refactors that happen while the task waits.
 - **Optional file persistence.** The tracked tasks in the issue tracker become source of truth after creation. The
   tasks.md document is a persistent external record for cross-session continuity — it survives context rot when agents
   start fresh sessions.
