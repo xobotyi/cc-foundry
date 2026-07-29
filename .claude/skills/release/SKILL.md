@@ -41,6 +41,12 @@ Every plugin version bump that lands on master ships with a GitHub release. The 
 
 Written for people who install the plugin, not for repo contributors.
 
+<prerequisite>
+Invoke `the-writer:humanize` before drafting. All release prose — the lead sentence and every bullet — is written in
+its writing mode and passes its self-audit before `gh release create`. If the skill is unavailable, ask the user to
+install the `the-writer` plugin before proceeding.
+</prerequisite>
+
 - Lead with one sentence stating what the release is about.
 - Segment by changed component, one `###` section per component: ``### `<name>` skill``, ``### `<name>` output style`` —
   same pattern for hooks, commands, and agents. A plugin bumps its version even when a single component moved; the
