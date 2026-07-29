@@ -72,6 +72,9 @@ The model performs considered-ness instead of committing to a claim. Rhetorical 
   in 2026 corpus data (2.5× over-represented). Fix: make the comparison (state why X) or drop Y entirely.
 - **Negative parallelism** — "It's not just X, it's Y", "not only... but also", and clipped tailing negations ("no
   guessing", "no wasted motion"). Fix: assert the positive claim as a real clause.
+- **Contrast-frame pileup** — "it is X, not Y" recurring through a text. One instance with a real contrast earns its
+  place; the frame is a default sentence shape for every current model, so two or more in the same passage convict even
+  when each is individually defensible. Fix: keep the strongest one, restate the rest as direct claims without the foil.
 - **Rule of three** — ideas forced into triads for fake comprehensiveness. Fix: keep the items that carry weight, one,
   two, or four as reality dictates.
 - **Intensifiers without evidence** — "significantly", "effectively", "seamlessly", "dramatically". Fix: back it with a

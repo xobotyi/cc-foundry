@@ -161,6 +161,36 @@ guessing", "no config", "no surprises").
 
 > It lints, formats, and sorts imports with one binary. The defaults work without a config file.
 
+### Contrast-frame pileup
+
+Watch for: "it is X, not Y", "X, not Y", "not X but Y" — recurring through a text. Distinct from hedged comparison (a
+single empty contrast) and negative parallelism (the not-just-but escalation): here each instance may be individually
+fine, and the density is the tell. Every current model reaches for the contrast frame as a default sentence shape;
+humans use it for one deliberate emphasis, not as a rhythm.
+
+**Before:**
+
+> The pipeline is a discipline, not a formality. Reviews exist to catch design drift, not typos. The goal is
+> correctness, not coverage. What matters is the reader's time, not the writer's convenience.
+
+**After:**
+
+> The pipeline is a discipline, not a formality. Reviews exist to catch design drift; typos are the linter's job. The
+> goal is correctness — coverage follows from it. Write for the reader's time.
+
+Keep the strongest contrast (usually the first or the one carrying a genuine surprise) and restate the rest as direct
+claims without the foil.
+
+Often the frame stands in for one precise word the sentence never found — the fix is that word, not two clauses:
+
+**Before:**
+
+> The walk itself is enforced, not entrusted.
+
+**After:**
+
+> The walk is programmatic.
+
 ### Rule of three
 
 Watch for: any list of exactly three abstractions, especially adjectives or gerunds: "innovation, inspiration, and
