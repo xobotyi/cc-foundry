@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "Wikipedia: Signs of AI writing": "https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing?action=raw",
+    "WriteHuman: AI tells in 2026 (80k humanization pairs)": "https://writehuman.ai/blog/ai-tells-in-2026",
+    "Bloomberry: AI Sentence DNA corpus study": "https://www.bloomberry.ai/research/ai-writing-patterns",
+    "Kobak et al: Excess vocabulary in academic writing": "https://arxiv.org/pdf/2406.07016.pdf",
+    "Reinhart et al (PNAS): Do LLMs write like humans?": "https://pnas.org/doi/10.1073/pnas.2422455122",
+    "blader/humanizer (original community skill)": "https://raw.githubusercontent.com/blader/humanizer/main/SKILL.md",
+    "Aboudjem/humanizer-skill (43-pattern successor)": "https://raw.githubusercontent.com/Aboudjem/humanizer-skill/main/skills/humanizer/SKILL.md"
+  }
+}

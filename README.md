@@ -95,6 +95,20 @@ systematic improvement. The `handoff` skill produces structured transfer documen
 /plugin install the-workflow
 ```
 
+---
+
+### the-writer
+
+Agent-written prose carries fingerprints — inflated significance, hedged comparisons, participle padding, chat-register
+leaks, leftover citation tokens — and readers discount the substance along with the style. The `humanize` skill
+organizes these tells into six generative mechanism families instead of a flat pattern list, so the agent catches
+variants no list names and knows when not to edit (clusters convict; single tells don't). Hard constraints: never
+fabricate specifics, conserve every claim, fix writing for readers rather than for AI detectors.
+
+```
+/plugin install the-writer
+```
+
 ## AI Artifact Plugins
 
 ### ai-helpers

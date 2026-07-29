@@ -15,6 +15,7 @@ cc-foundry/
 │   ├── the-blueprint/    # Planning pipeline — DRAFT (discovery → research → alignment → frame → tasks)
 │   ├── the-coder/        # Language-agnostic coding discipline
 │   ├── the-statusline/   # Session metrics status line
+│   ├── the-writer/       # Prose discipline for agent-authored text (humanize)
 │   ├── infrastructure/   # Infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
 │   ├── the-workflow/     # Agentic workflow mechanics (CLAUDE.md quality, context handoff)
 │   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
