@@ -13,8 +13,8 @@ types, write inefficient queries, misconfigure alert routing, and choose the wro
 
 Seven skills covering the full Grafana observability consumption stack: from query writing through visualization to
 alerting and provisioning-as-code. Each skill is grounded in official documentation (Grafana, Prometheus,
-VictoriaMetrics) with research-verified reference material. A dedicated data visualization discipline ensures agents
-make perceptually sound design choices, not just technically valid ones.
+VictoriaMetrics), with reference material verified against it. A dedicated data visualization discipline teaches
+perceptually sound design choices, not just technically valid ones.
 
 ## Installation
 

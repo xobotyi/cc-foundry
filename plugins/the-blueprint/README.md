@@ -6,7 +6,7 @@ Structured planning pipeline that converts problem analysis into tracked work it
 
 **Planning work is either too shallow or too detailed.** Shallow planning produces vague tasks that force implementers
 to reverse-engineer intent from chat history or institutional memory. Detailed planning wastes effort prescribing
-implementation before understanding is complete, resulting in rework when reality diverges from assumptions.
+implementation before understanding is complete; the result is rework when reality diverges from assumptions.
 
 The gap between "we should build this" and "here are the tasks to do it" is filled with ad-hoc decisions made during
 implementation — decisions that could have been caught earlier, shared with the team, and preserved as architecture
@@ -19,10 +19,9 @@ mistakes no one asked for.
 
 ## The Solution
 
-the-blueprint provides a pipeline that produces artifacts consumable by both humans and agents, implementing the
-**DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks). DRAFT separates intent gathering from
-objective investigation, surfaces codebase patterns for human correction before implementation, and enforces vertical
-slice planning.
+the-blueprint implements the **DRAFT** methodology (Discovery → Research → Alignment → Frame → Tasks) — a pipeline that
+produces artifacts consumable by both humans and agents. DRAFT separates intent gathering from objective investigation,
+surfaces codebase patterns for human correction before implementation, and enforces vertical slice planning.
 
 - **Discovery** — stress-test the idea through adversarial questioning, against the project glossary → brief
 - **Research** — parallel codebase investigation blind to intent → research document
@@ -33,7 +32,7 @@ slice planning.
 - **task-creation** (standalone) — create tracked items in issue tracker
 
 Each stage builds on the previous one with explicit user approval gates. The pipeline preserves the reasoning behind
-decisions, making them discoverable months later when someone asks "why did we build it this way?"
+decisions, so it stays discoverable months later when someone asks "why did we build it this way?"
 
 ## Installation
 
@@ -98,12 +97,13 @@ making design decisions. Requires the agent teams experimental flag (see Install
 Human-agent alignment on solution direction before implementation begins. The agent reads the brief, research, and
 glossary, extracts codebase patterns with prevalence data, and declares which patterns it intends to follow and why. The
 user reviews this pattern catalog and corrects wrong assumptions — "that's the old way, go find the new way" — before
-any code is planned. This pattern-surfacing step is the critical piece that was missing from the old pipeline.
+any code is planned. Without this step, the agent silently adopts whatever patterns it finds — including deprecated
+ones.
 
 After patterns are corrected, the agent presents a current state → desired end state proposal with open questions —
 including not-yet-specified items from the brief that research has sharpened enough to graduate. When a genuine
 trade-off surfaces and no option is clearly right, alignment can fan out parallel subagents, each designing the same
-decision under a different bias, then compare and recommend — the first workable design no longer wins by default.
+decision under a different bias, then compare and recommend — so the first workable design doesn't win by default.
 Before completing the end-state phase, alignment maintains the glossary — resolving ambiguities discovery flagged,
 sharpening definitions, and (on the first iteration) creating the glossary if none exists. When genuine trade-offs
 surface, alignment writes standalone ADRs to `design-docs/adr/{N.M}-slug.md` and updates the `design-docs/ADR.md` index.
@@ -150,8 +150,8 @@ context.
 Creates and maintains a project glossary — a shared vocabulary consumable by both humans and AI agents. Based on
 Domain-Driven Design's Ubiquitous Language: each term gets a definition and a rationale-bearing `Avoid` line listing the
 wrong names a reviewer or agent would plausibly reach for. Entries are gated by the trap test — if no plausible wrong
-name exists, the term doesn't belong. The glossary lives alongside CLAUDE.md as structural context, preventing agents
-from inventing synonyms or using generic terms where the project has specific ones.
+name exists, the term doesn't belong. The glossary lives alongside CLAUDE.md as structural context; it stops agents from
+inventing synonyms or using generic terms where the project has specific ones.
 
 Inside the DRAFT pipeline, glossary maintenance is `alignment`'s responsibility — `discovery` loads the glossary but
 never updates it, and `alignment` invokes this skill on the first iteration to create the glossary and on subsequent

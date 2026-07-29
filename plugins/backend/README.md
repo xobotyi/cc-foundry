@@ -4,15 +4,15 @@ Backend platform discipline plugin for Claude Code.
 
 ## The Problem
 
-Building reliable services requires consistent approaches to observability, metrics instrumentation, and distributed
-tracing. Without standardized practices, teams reinvent logging strategies, monitoring conventions, and instrumentation
-patterns on every project.
+Observability choices are easy to get wrong and expensive to change: metric names that violate Prometheus conventions,
+unbounded label cardinality, logs that can't be correlated with traces. Without encoded standards, every project
+reinvents logging strategy, metric naming, and instrumentation patterns from scratch.
 
 ## The Solution
 
-Provides skills that encode proven practices for building observable services. The `observability` skill covers the
-three pillars at a high level; technology-specific skills (`prometheus`, `statsd`, `otel-tracing`) cover tooling
-conventions. Focuses on platform-level concerns that apply across languages.
+Provides skills that encode conventions for building observable services. The `observability` skill covers the three
+pillars at a high level; technology-specific skills (`prometheus`, `statsd`, `otel-tracing`) cover tooling conventions.
+Focuses on platform-level concerns that apply across languages.
 
 ## Installation
 

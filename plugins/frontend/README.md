@@ -5,8 +5,7 @@ Frontend platform discipline plugin for Claude Code.
 ## The Problem
 
 Browser development requires specialized knowledge beyond general programming — CSS layout systems, accessibility
-standards, framework-specific patterns, and cross-browser compatibility. Generic coding skills don't capture these
-platform-specific practices.
+standards, framework-specific patterns, and cross-browser compatibility.
 
 ## The Solution
 

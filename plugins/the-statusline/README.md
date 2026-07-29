@@ -16,12 +16,12 @@ status visibility mid-session.
 
 ## The Solution
 
-This plugin installs a comprehensive 3-row status line to your user-level Claude configuration (`~/.claude/`), ensuring
-it persists across all sessions and survives agent directory changes.
+This plugin installs a 3-row status line to your user-level Claude configuration (`~/.claude/`), where it persists
+across all sessions and survives agent directory changes.
 
 **Row 1** — Output style, model name, session cost (USD), API time spent **Row 2** — Context window remaining (%),
-input/output ratio, cache hit rate **Row 3** — Current working directory (relative to project root, intelligently
-collapsed)
+input/output ratio, cache hit rate **Row 3** — Current working directory (relative to project root, collapsed when too
+long)
 
 Color urgency increases as you approach context limits: gray → yellow → orange → red.
 

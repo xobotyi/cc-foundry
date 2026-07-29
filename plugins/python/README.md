@@ -5,10 +5,10 @@ Pyright.
 
 ## The Problem
 
-Python's flexibility is a double-edged sword. Without explicit guidance, Claude may produce code using outdated patterns
-(`Optional[str]` instead of `str | None`, `os.path` instead of `pathlib`, `setup.py` instead of `pyproject.toml`), miss
-modern language features (pattern matching, type parameter syntax, exception groups), or use inconsistent conventions
-across a codebase. Each project ends up re-teaching the same standards.
+Without explicit guidance, Claude may produce Python code using outdated patterns (`Optional[str]` instead of
+`str | None`, `os.path` instead of `pathlib`, `setup.py` instead of `pyproject.toml`), miss modern language features
+(pattern matching, type parameter syntax, exception groups), or use inconsistent conventions across a codebase. Each
+project ends up re-teaching the same standards.
 
 The Python ecosystem has modernized rapidly — `uv` for package management, `ruff` for linting/formatting, built-in
 generics, the `type` statement, lazy annotation evaluation — but Claude's defaults often lag behind the current state of
