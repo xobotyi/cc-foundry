@@ -107,6 +107,12 @@ Example output:
 3-5 examples typically sufficient. Cover edge cases. Format consistency and input distribution matter more than perfect
 label accuracy. Performance plateaus after 8-16 examples.
 
+**On current frontier models, examples constrain as much as they teach.** Worked examples anchor the model to the
+demonstrated paths and narrow its exploration space — use them to pin format and style, not to demonstrate behavior the
+model already handles. For tool and agentic behavior, prefer interface design over usage examples: expressive parameter
+names, enums, and constraints in the tool definition (a `status` enum of `pending | in_progress | completed` plus "keep
+exactly one item in_progress") define the behavior without spending example tokens.
+
 **Example selection rules:**
 
 - Cover diversity — represent different categories, edge cases, styles
@@ -470,7 +476,8 @@ Before finalizing a prompt:
 - [ ] Domain priming over persona assignment
 - [ ] No blanket CoT — let reasoning models decide depth per request
 - [ ] KV lists for lookups; tables only for genuinely 2D comparisons
-- [ ] Few-shot examples calibrate format/style, not teach known patterns
+- [ ] Few-shot examples calibrate format/style, not teach known patterns; tool behavior encoded in interface design
+      (parameters, enums, tool descriptions), not usage examples
 - [ ] Prior-model scaffolding removed when targeting a newer model (old triggers overtrigger)
 
 **When you authored the prompt as an agent (skill, subagent, system prompt, output style):**

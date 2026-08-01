@@ -21,7 +21,8 @@ instructions more literally.
 
 The fix is almost always to dial language back, not to add guardrails. Prompts and skills written for prior models are
 often too prescriptive for newer ones and degrade output — A/B with old scaffolding removed; prefer stating the goal and
-constraints over enumerating steps.
+constraints over enumerating steps. The scale of removable scaffolding is large: Anthropic cut over 80% of Claude Code's
+system prompt for the Claude 5 generation with no measurable loss on coding evals.
 
 ---
 
@@ -37,6 +38,10 @@ constraints over enumerating steps.
 - **Reasoning is favored over tool calls** — higher effort substantially raises tool usage; for under-used tools, state
   when and how to call them in the tool description itself ("Call this when the user asks about current prices"), not
   just the system prompt.
+- **Examples narrow the exploration space** — worked usage examples anchor current models to the demonstrated paths.
+  Reserve examples for pinning format and style; for tool behavior, encode intent in the interface — parameter names,
+  enums (`pending | in_progress | completed`), and constraints in the tool description ("keep exactly one item
+  in_progress") outperform worked examples.
 - **Design defaults are persistent** — each model settles into a house style on open-ended frontend briefs (Opus 4.8:
   cream backgrounds, serif display type, terracotta accents). Generic "make it clean" swaps one fixed palette for
   another. Either specify a concrete alternative (exact hex values, typefaces, layout) or have the model propose 3–4
