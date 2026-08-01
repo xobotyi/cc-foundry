@@ -31,7 +31,7 @@ proc-macro server for full fidelity.
 
 Rust language specifics, Rust-specific tooling (cargo, clippy, rustfmt, rust-analyzer), and the test ecosystem.
 Language-agnostic practices come from `the-coder`; platform concerns from `cli`/`backend`. Library-specific skills
-(axum, serde, sqlx) are deferred to post-v1.
+(axum, serde, sqlx) are out of scope.
 
 ## Conventions
 

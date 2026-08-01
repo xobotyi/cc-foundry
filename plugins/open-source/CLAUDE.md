@@ -4,10 +4,10 @@ Open-source contribution discipline: structured issue creation and pull request 
 
 ## Skills
 
-| Skill             | Purpose                                                                                                                      |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `issue-writing`   | Issue creation for external repos: bug reports, feature requests, preparation pipeline, anti-slop verification, gh CLI usage |
-| `pr-contribution` | PR submission for external repos: descriptions, titles, fork workflow, contribution compliance, agent-specific discipline    |
+- **`issue-writing`** — issue creation for external repos: bug reports, feature requests, preparation pipeline,
+  anti-slop verification, gh CLI usage
+- **`pr-contribution`** — PR submission for external repos: descriptions, titles, fork workflow, contribution
+  compliance, agent-specific discipline
 
 ## Skill Dependencies
 

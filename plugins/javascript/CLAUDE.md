@@ -5,13 +5,12 @@ LSP-powered code intelligence via `typescript-language-server`.
 
 ## Skills
 
-| Skill        | Purpose                                                                                                                      |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `javascript` | Core JavaScript language conventions, idioms, modern practices (ESM, async/await, closures, JSDoc), and LSP navigation rules |
-| `typescript` | TypeScript type system, strict mode, and TS-specific patterns (extends `javascript`)                                         |
-| `nodejs`     | Node.js runtime conventions, APIs, and ecosystem practices (event loop, streams, modules)                                    |
-| `bun`        | Bun runtime conventions, APIs, and toolchain (native APIs, HTTP server, file I/O, testing)                                   |
-| `vitest`     | Vitest testing framework conventions and practices (mocking, assertions, configuration)                                      |
+- **`javascript`** — core JavaScript language conventions, idioms, modern practices (ESM, async/await, closures, JSDoc),
+  and LSP navigation rules
+- **`typescript`** — TypeScript type system, strict mode, and TS-specific patterns (extends `javascript`)
+- **`nodejs`** — Node.js runtime conventions, APIs, and ecosystem practices (event loop, streams, modules)
+- **`bun`** — Bun runtime conventions, APIs, and toolchain (native APIs, HTTP server, file I/O, testing)
+- **`vitest`** — Vitest testing framework conventions and practices (mocking, assertions, configuration)
 
 ## LSP Integration
 

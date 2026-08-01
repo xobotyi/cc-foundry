@@ -4,10 +4,10 @@ CLI platform discipline: command-line interface design, shell scripting conventi
 
 ## Skills
 
-| Skill             | Purpose                                                                                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `cli`             | CLI application design: argument conventions, output streams, exit codes, configuration hierarchy, interactive modes, signal handling, and terminal UX |
-| `shell-scripting` | Shell script conventions and defensive patterns: strict mode, quoting, portability, error handling, and common pitfalls                                |
+- **`cli`** — CLI application design: argument conventions, output streams, exit codes, configuration hierarchy,
+  interactive modes, signal handling, and terminal UX
+- **`shell-scripting`** — shell script conventions and defensive patterns: strict mode, quoting, portability, error
+  handling, and common pitfalls
 
 ## Skill Dependencies
 

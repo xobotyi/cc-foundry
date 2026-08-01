@@ -25,21 +25,17 @@ visible; only the deliberation behind them is silent.
 
 ## Design: declarative rules, not an evaluation artifact
 
-Each checkpoint injects ONE declarative rule that constrains the action. It does **not** ask the model to emit a
-structured `<sef-eval>` block in its reasoning.
+Each checkpoint injects ONE declarative rule that constrains the action — never a structured evaluation artifact (a
+`<sef-eval>` block or `<thinking>` skeleton) for the model to reproduce. Do not introduce such templates; they fail two
+ways:
 
-The previous design (<= v1.5.0) handed the model a `<thinking><sef-eval>...fields...</thinking>` skeleton and told it to
-reproduce the evaluation in its thinking stream, never in visible output. On reasoning models (Opus 4.8+) this failed
-two ways:
-
-- **Tag leak** — the native reasoning channel is not addressable by typing `<thinking>`. Handed a tag-shaped template,
-  the model completed it into the _visible_ reply.
+- **Tag leak** — the native reasoning channel is not addressable by typing `<thinking>`; handed a tag-shaped template,
+  the model completes it into the _visible_ reply.
 - **No-think skip** — at low/medium effort the model may not enter a thinking block on a given step, so "emit in
-  thinking" had nowhere to land; the evaluation was skipped or spilled into the visible reply.
+  thinking" has nowhere to land; the evaluation gets skipped or spills into the visible reply.
 
 A declarative rule constrains the action regardless of whether the model thinks on a given step, and carries no
-tag-shaped artifact to echo. This is the load-bearing reason the plugin shed the `<sef-eval>` ceremony — do not
-reintroduce it.
+tag-shaped artifact to echo.
 
 ## Components
 

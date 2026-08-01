@@ -5,10 +5,10 @@ structure targeting Python 3.14+, and LSP-powered code intelligence via `pyright
 
 ## Skills
 
-| Skill    | Purpose                                                                                                                                                                  |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `python` | Python language conventions, idioms, type annotations, data classes, pattern matching, packaging (pyproject.toml, uv, ruff), project structure, and LSP navigation rules |
-| `pytest` | pytest testing framework conventions and practices (fixtures, parametrize, markers, assertions, conftest patterns)                                                       |
+- **`python`** — Python language conventions, idioms, type annotations, data classes, pattern matching, packaging
+  (pyproject.toml, uv, ruff), project structure, and LSP navigation rules
+- **`pytest`** — pytest testing framework conventions and practices (fixtures, parametrize, markers, assertions,
+  conftest patterns)
 
 ## LSP Integration
 

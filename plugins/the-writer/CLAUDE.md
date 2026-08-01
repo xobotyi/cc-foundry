@@ -5,9 +5,8 @@ humans.
 
 ## Skills
 
-| Skill      | Purpose                                                                                                  |
-| ---------- | -------------------------------------------------------------------------------------------------------- |
-| `humanize` | Remove AI-writing tells from prose (and prevent them when drafting) while preserving substance and voice |
+- **`humanize`** — remove AI-writing tells from prose (and prevent them when drafting) while preserving substance and
+  voice
 
 ## Plugin Scope
 

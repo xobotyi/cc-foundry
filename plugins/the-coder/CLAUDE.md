@@ -4,15 +4,11 @@ Language-agnostic software engineering discipline for Claude Code.
 
 ## Skills
 
-| Skill    | Purpose                                                                                              |
-| -------- | ---------------------------------------------------------------------------------------------------- |
-| `coding` | Discovery-first workflow: verify APIs before coding, debug by hypothesis, test before declaring done |
+- **`coding`** — discovery-first workflow: verify APIs before coding, debug by hypothesis, test before declaring done
 
 ## Output Styles
 
-| Style               | Purpose                                                                           |
-| ------------------- | --------------------------------------------------------------------------------- |
-| `software-engineer` | Implementation-focused persona with engineering judgment and LSP-first navigation |
+- **`software-engineer`** — implementation-focused persona with engineering judgment and LSP-first navigation
 
 ## Plugin Scope
 

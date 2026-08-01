@@ -5,11 +5,12 @@ intelligence via Intelephense.
 
 ## Skills
 
-| Skill     | Purpose                                                                                                                                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `php`     | PHP 8.5+ language conventions, type declarations (union, intersection, DNF), enums, readonly classes, property hooks, closures, Fibers, error handling, Composer, project structure, and LSP navigation rules |
-| `phpunit` | PHPUnit 11+ testing conventions (test structure, data providers, assertions, mocking/stubs, attributes, configuration, code coverage)                                                                         |
-| `pest`    | Pest 4 testing conventions (function-style `test`/`it`/`describe`, the `expect()` API, datasets, hooks, `Pest.php`, architecture/mutation/type-coverage/browser testing, CLI)                                 |
+- **`php`** — PHP 8.5+ language conventions, type declarations (union, intersection, DNF), enums, readonly classes,
+  property hooks, closures, Fibers, error handling, Composer, project structure, and LSP navigation rules
+- **`phpunit`** — PHPUnit 11+ testing conventions (test structure, data providers, assertions, mocking/stubs,
+  attributes, configuration, code coverage)
+- **`pest`** — Pest 4 testing conventions (function-style `test`/`it`/`describe`, the `expect()` API, datasets, hooks,
+  `Pest.php`, architecture/mutation/type-coverage/browser testing, CLI)
 
 ## LSP Integration
 

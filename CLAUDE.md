@@ -5,31 +5,26 @@ styles, hooks, and workflow automation.
 
 ## Structure
 
-```
-cc-foundry/
-├── .dev/                 # Development CLI tools
-├── plugins/
-│   ├── ai-helpers/       # AI artifact engineering (prompts, skills, agents, styles)
-│   ├── git-commit/       # Structured commit workflow with validation
-│   ├── skill-enforcer/   # Skill activation enforcement via lifecycle hooks
-│   ├── the-blueprint/    # Planning pipeline — DRAFT (discovery → research → alignment → frame → tasks)
-│   ├── the-coder/        # Language-agnostic coding discipline
-│   ├── the-statusline/   # Session metrics status line
-│   ├── the-writer/       # Prose discipline for agent-authored text (humanize)
-│   ├── infrastructure/   # Infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
-│   ├── the-workflow/     # Agentic workflow mechanics (CLAUDE.md quality, context handoff)
-│   ├── frontend/         # Frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
-│   ├── backend/          # Backend platform discipline (observability, Prometheus, StatsD, OTel)
-│   ├── grafana/          # Grafana platform (dashboards, PromQL, MetricsQL, LogsQL, alerting, provisioning, dataviz)
-│   ├── cli/              # CLI platform discipline (CLI design, shell scripting)
-│   ├── open-source/      # Open-source contribution discipline (issues, pull requests)
-│   ├── golang/           # Go language discipline (conventions, templ, gopls LSP)
-│   ├── javascript/       # JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
-│   ├── php/              # PHP language discipline (conventions, types, OOP, PHPUnit, Pest, Intelephense LSP)
-│   ├── python/           # Python language discipline (conventions, typing, pytest, uv)
-│   └── rust/             # Rust language discipline (ownership, concurrency, cargo/clippy, rust-analyzer LSP)
-└── CLAUDE.md
-```
+- `.dev/` — development CLI tools
+- `plugins/ai-helpers/` — AI artifact engineering (prompts, skills, agents, styles)
+- `plugins/git-commit/` — structured commit workflow with validation
+- `plugins/skill-enforcer/` — skill activation enforcement via lifecycle hooks
+- `plugins/the-blueprint/` — planning pipeline: DRAFT (discovery → research → alignment → frame → tasks)
+- `plugins/the-coder/` — language-agnostic coding discipline
+- `plugins/the-statusline/` — session metrics status line
+- `plugins/the-writer/` — prose discipline for agent-authored text (humanize)
+- `plugins/infrastructure/` — infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
+- `plugins/the-workflow/` — agentic workflow mechanics (CLAUDE.md quality, context handoff)
+- `plugins/frontend/` — frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
+- `plugins/backend/` — backend platform discipline (observability, Prometheus, StatsD, OTel)
+- `plugins/grafana/` — Grafana platform (dashboards, PromQL, MetricsQL, LogsQL, alerting, provisioning, dataviz)
+- `plugins/cli/` — CLI platform discipline (CLI design, shell scripting)
+- `plugins/open-source/` — open-source contribution discipline (issues, pull requests)
+- `plugins/golang/` — Go language discipline (conventions, templ, gopls LSP)
+- `plugins/javascript/` — JS/TS language discipline (Node.js, Bun, Vitest, TS LSP)
+- `plugins/php/` — PHP language discipline (conventions, types, OOP, PHPUnit, Pest, Intelephense LSP)
+- `plugins/python/` — Python language discipline (conventions, typing, pytest, uv)
+- `plugins/rust/` — Rust language discipline (ownership, concurrency, cargo/clippy, rust-analyzer LSP)
 
 Each plugin has its own `CLAUDE.md` with plugin-specific context.
 
@@ -68,15 +63,11 @@ process (Research → Scaffold → Write → Ship) using Perplexity for discover
 - These are distinct from the per-project ADRs the `the-blueprint:alignment` skill writes to a downstream project's
   `design-docs/adr/`.
 
-**Plugin context:**
-
-- Each plugin has `CLAUDE.md` explaining its components
-- Each plugin has `README.md` for user-facing documentation
-
 **Plugin documentation style:**
 
 - **CLAUDE.md** — Claude's internal reference. Brief prose introduction (what the plugin does, 1-3 sentences), then
-  structured content: skill tables, dependency diagrams, bullet-list conventions. Optimize for LLM compliance — terse
+  structured content: skill KV lists, dependency diagrams, bullet-list conventions. KV bullet lists over tables — skill
+  rosters and component inventories are independent entries, not 2D comparisons. Optimize for LLM compliance — terse
   bullets over explanatory paragraphs for rules and conventions.
 - **README.md** — user-facing documentation. Explanatory prose that frames the plugin around the problem it solves ("The
   Problem" / "The Solution"), explains what each skill does and when to use it, shows relationships between skills.
@@ -87,7 +78,7 @@ process (Research → Scaffold → Write → Ship) using Perplexity for discover
 - **Plugin CLAUDE.md** — update when: adding/removing/renaming skills, output styles, hooks, or commands; changing skill
   purpose, scope, or dependencies; adding/removing conventions
 - **Plugin README.md** — update when: any change that affects what users see or install
-- **Root CLAUDE.md** — update structure diagram when: adding/removing a plugin
+- **Root CLAUDE.md** — update plugin list when: adding/removing a plugin
 - **Root README.md** — update plugin listing when: plugin purpose or skill roster changes significantly
 
 **Installation instructions:**

@@ -4,12 +4,11 @@ Backend platform discipline: observability, metrics instrumentation, and distrib
 
 ## Skills
 
-| Skill           | Purpose                                                                                             |
-| --------------- | --------------------------------------------------------------------------------------------------- |
-| `observability` | Three pillars (logging, metrics, tracing) — interconnection, purposes, and high-level practices     |
-| `prometheus`    | Prometheus metric types, naming, labels, cardinality, PromQL, alerting, instrumentation             |
-| `statsd`        | StatsD metric types, naming, UDP push model, DogStatsD extensions, aggregation patterns             |
-| `otel-tracing`  | OpenTelemetry tracing — spans, context propagation, instrumentation, sampling, semantic conventions |
+- **`observability`** — three pillars (logging, metrics, tracing): interconnection, purposes, and high-level practices
+- **`prometheus`** — Prometheus metric types, naming, labels, cardinality, PromQL, alerting, instrumentation
+- **`statsd`** — StatsD metric types, naming, UDP push model, DogStatsD extensions, aggregation patterns
+- **`otel-tracing`** — OpenTelemetry tracing: spans, context propagation, instrumentation, sampling, semantic
+  conventions
 
 ## Plugin Scope
 

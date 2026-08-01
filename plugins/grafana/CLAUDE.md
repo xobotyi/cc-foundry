@@ -47,8 +47,8 @@ promql ←→ metricsql    dashboards ←→ alerting
 
 ## Conventions
 
-- Grafana docs use `latest` channel URLs (tracks current stable, currently 12.4.x)
+- Grafana docs use `latest` channel URLs (tracks current stable)
 - V2 dashboard schema references pin to `v12.1` (only channel with full sub-pages)
 - VictoriaMetrics docs at docs.victoriametrics.com (single-page with anchors per topic)
-- gcx is the current Grafana CLI tool; grafanactl is superseded (repo archives 2026-06-01)
+- gcx is the current Grafana CLI tool; grafanactl is superseded
 - Grizzly is deprecated — mention only as historical context

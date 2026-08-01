@@ -21,11 +21,9 @@ Color urgency increases as context approaches limits: gray → yellow → orange
 
 ## Components
 
-| Type   | Path                       | Purpose                                          |
-| ------ | -------------------------- | ------------------------------------------------ |
-| Hook   | `hooks/sync-statusline.js` | SessionStart hook that syncs script and settings |
-| Script | `statusline.js`            | Status line renderer (installed to `~/.claude/`) |
-| Config | `hooks/hooks.json`         | Hook registration                                |
+- **Hook** — `hooks/sync-statusline.js`: SessionStart hook that syncs script and settings
+- **Script** — `statusline.js`: status line renderer (installed to `~/.claude/`)
+- **Config** — `hooks/hooks.json`: hook registration
 
 ## Why User-Level Installation
 

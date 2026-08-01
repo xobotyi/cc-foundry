@@ -5,14 +5,18 @@ Proxmox virtualization, Unraid NAS management, and network architecture.
 
 ## Skills
 
-| Skill        | Purpose                                                                                                                                                                |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `devops`     | Foundational discipline: IaC principles, deliverable standards, change management, security posture (zero trust), observability (SLI/SLO), disaster recovery (RTO/RPO) |
-| `ansible`    | Ansible automation: playbook design, roles, inventory, vault, collections, execution environments, Molecule testing, variable precedence, error handling, performance  |
-| `containers` | Container management: Docker/Podman, Compose v2, Dockerfile optimization, Quadlet/systemd, networking, volumes, supply chain security, signal handling                 |
-| `proxmox`    | Proxmox VE: VM/LXC provisioning, storage (ZFS/Ceph/LVM), networking/SDN, clustering/HA, API automation, cloud-init, backups/PBS, PCIe passthrough                      |
-| `unraid`     | Unraid server management: arrays, Docker, VMs/GPU passthrough, shares, plugins, user scripts, backup (3-2-1), UPS/NUT, GraphQL API                                     |
-| `networking` | Network infrastructure: VLANs, firewalls (nftables), DNS, reverse proxies, VPN (WireGuard), TLS, IPv6, IDS/IPS (Suricata/CrowdSec), auth proxies (Authelia/Authentik)  |
+- **`devops`** — foundational discipline: IaC principles, deliverable standards, change management, security posture
+  (zero trust), observability (SLI/SLO), disaster recovery (RTO/RPO)
+- **`ansible`** — Ansible automation: playbook design, roles, inventory, vault, collections, execution environments,
+  Molecule testing, variable precedence, error handling, performance
+- **`containers`** — container management: Docker/Podman, Compose v2, Dockerfile optimization, Quadlet/systemd,
+  networking, volumes, supply chain security, signal handling
+- **`proxmox`** — Proxmox VE: VM/LXC provisioning, storage (ZFS/Ceph/LVM), networking/SDN, clustering/HA, API
+  automation, cloud-init, backups/PBS, PCIe passthrough
+- **`unraid`** — Unraid server management: arrays, Docker, VMs/GPU passthrough, shares, plugins, user scripts, backup
+  (3-2-1), UPS/NUT, GraphQL API
+- **`networking`** — network infrastructure: VLANs, firewalls (nftables), DNS, reverse proxies, VPN (WireGuard), TLS,
+  IPv6, IDS/IPS (Suricata/CrowdSec), auth proxies (Authelia/Authentik)
 
 ## Skill Relationships
 
