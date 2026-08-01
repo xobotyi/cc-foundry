@@ -79,10 +79,13 @@ or debugging style drift and reversion.
 
 Adherence-driven terseness audit for iteratively-edited prompts and skills. Same-thought-fewer-words cuts reduce
 attention competition and improve model compliance — token reduction is a side effect, not the goal. Three-phase
-workflow (wording substitutions, format cleanup, structural cuts) with a three-check falsification gate (verbosity-type
-→ terseness → behavior preservation) that distinguishes narrative bloat from load-bearing structural verbosity (rubrics,
-checklists). Catches drift patterns including rationale stacking, duplicated constraints, and ambiguity-zone paragraphs
-(~20-40 word narrative blocks at the worst-case length for adherence).
+workflow (wording substitutions, format cleanup, structural cuts) bracketed by a preservation inventory: load-bearing
+literals (triggers, commands, paths, numbers, error messages, security rules) are enumerated before cutting and verified
+verbatim after. A three-check falsification gate (verbosity-type → terseness → behavior preservation) distinguishes
+narrative bloat from load-bearing structural verbosity (rubrics, checklists), and hard cut vetoes protect trigger
+synonyms, superseding corrections, and concrete lists from "safe-looking" merges. Catches drift patterns including
+rationale stacking, duplicated constraints, and ambiguity-zone paragraphs (~20-40 word narrative blocks at the
+worst-case length for adherence).
 
 **Use when:** Auditing or tightening an existing prompt that has accumulated bloat through many edits, or when adherence
 to prompt rules feels unreliable and verbose wording may be competing for attention — skills, system prompts, output
