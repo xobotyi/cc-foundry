@@ -755,7 +755,8 @@ provisioning pipelines that haven't migrated.
 
 ## Editing the JSON directly
 
-Grafana UI: **Edit → Dashboard options → Settings → JSON Model**.
+Grafana UI: **Edit → Dashboard options → Settings → JSON Model**. For editing dashboard **files** with jq — mapping,
+targeted mutation, extract/splice, validation — see `json-surgery.md`.
 
 - `schemaVersion`, `version`, `id` are managed by Grafana; don't edit unless writing migrations.
 - Saving from the JSON Model tab triggers schema migration if `schemaVersion` is behind.

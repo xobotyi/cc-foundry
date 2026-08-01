@@ -48,6 +48,30 @@ Data shape drives the visualization; variables make dashboards reusable; links c
   fields, filtering, reshaping, grouping, histograms, time-series modeling), common patterns, debugging mechanics.
 - **Annotations and links** — [`${CLAUDE_SKILL_DIR}/references/annotations-links.md`] Native annotations, annotation
   queries, time regions, dashboard/panel/data links, data link variables, cross-dashboard navigation patterns.
+- **JSON surgery** — [`${CLAUDE_SKILL_DIR}/references/json-surgery.md`] Verified jq recipes for dashboard files:
+  structure/panel/variable mapping, targeted mutation, extract → edit → splice, add/delete panels, row-nesting
+  traversal, validation, V2 element access, gcx/mcp-grafana handoff for live instances.
+
+## Working with dashboard files
+
+Dashboard JSON runs thousands of lines. Never read a whole dashboard into context, and never rewrite one wholesale —
+work surgically with `jq`. Full recipe catalog: `json-surgery.md`.
+
+1. **Map first.** Build a structural picture without reading the file:
+
+   ```bash
+   jq -r '(.panels[], .panels[].panels[]?) | [.id, .type, .title] | @tsv' dash.json
+   ```
+
+2. **Edit surgically.** Single field → targeted jq mutation on the selected path. Substantial panel work → extract the
+   panel to a small file, edit that, splice it back. Select panels by `.id`, never by title.
+3. **Validate.** `jq empty` for syntax, then a semantic diff against the pre-edit copy
+   (`diff <(jq -S . before) <(jq -S . after)`) — it must show exactly the intended change and nothing else.
+
+The load-bearing detail is row nesting: collapsed rows nest their panels in `row.panels[]`, expanded rows keep them as
+top-level siblings. `(.panels[], .panels[].panels[]?)` covers both — plain `.panels[]` silently misses collapsed-row
+panels. For dashboards in a live Grafana instance rather than files, `gcx` (see `provisioning`) patches server-side and
+the `mcp-grafana` MCP tools provide summary/property/patch access without full JSON.
 
 ## Dashboard structure
 
@@ -285,6 +309,8 @@ When **reviewing** dashboards:
 
 ## Critical rules
 
+- **Never read or rewrite a whole dashboard file.** Map with jq, mutate the selected path or splice an extracted panel,
+  then verify with a semantic diff. Use `(.panels[], .panels[].panels[]?)` to cover collapsed-row panels.
 - **`uid` is the durable handle.** Externalize all cross-system references (provisioning, links, scripts) via `uid`,
   never `id` or `title`.
 - **Never hand-edit `schemaVersion` or `version`.** Grafana manages both.

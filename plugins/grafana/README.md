@@ -28,8 +28,10 @@ perceptually sound design choices, not just technically valid ones.
 ### dashboards
 
 Grafana dashboard authoring: JSON model (Classic and V2 schemas), panel types and selection, standard options,
-thresholds, value mappings, field overrides, transformations, variables, annotations, links, and library panels. **Use
-when:** creating, editing, reviewing, or debugging Grafana dashboards.
+thresholds, value mappings, field overrides, transformations, variables, annotations, links, and library panels.
+Includes a surgical jq workflow for editing dashboard JSON files — mapping structure, mutating targeted paths, and
+splicing panels instead of reading or rewriting multi-thousand-line files whole. **Use when:** creating, editing,
+reviewing, or debugging Grafana dashboards.
 
 ### promql
 

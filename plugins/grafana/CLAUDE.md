@@ -6,7 +6,8 @@ data visualization discipline.
 ## Skills
 
 - **`dashboards`** — Grafana dashboard authoring: JSON model (Classic + V2), panel types, standard options, variables,
-  transformations, annotations, links, library panels
+  transformations, annotations, links, library panels, surgical jq editing of dashboard files (map → mutate/splice →
+  validate; never whole-file reads or rewrites)
 - **`promql`** — PromQL query writing: selectors, operators, vector matching, functions, subqueries, recording/alerting
   rules, native histograms, optimization
 - **`metricsql`** — VictoriaMetrics MetricsQL: PromQL superset extensions, behavioral diffs, rollup functions, WITH
