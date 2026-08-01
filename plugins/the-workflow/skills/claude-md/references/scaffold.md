@@ -18,24 +18,19 @@ A real-time event processing pipeline for payment fraud detection. Processes ~2M
 through a rules engine with sub-100ms p99 latency requirement.
 ```
 
-### 2. Structure Map
+### 2. Capability Map
 
-Directory tree or bullet list showing key directories, module boundaries, and entry points. Not every file — just enough
-to orient Claude when navigating the codebase.
+Which module owns which functionality, and where new code of each kind goes. An ownership map, not a directory tree —
+the tree is inferable from the filesystem; ownership and boundaries are not.
 
 ```markdown
-## Structure
+## Where Things Live
 
-\`\`\`
-my-project/
-├── cmd/              # CLI entrypoints
-├── internal/
-│   ├── engine/       # Rules engine core
-│   ├── pipeline/     # Event processing pipeline
-│   └── store/        # Persistence layer (Postgres + Redis)
-├── api/              # gRPC service definitions
-└── deploy/           # Kubernetes manifests
-\`\`\`
+- Rules engine core — `internal/engine`; new detection rules go in `internal/engine/rules/`
+- Event ingestion and processing — `internal/pipeline`
+- Persistence — `internal/store`; Postgres + Redis behind one interface, new queries live here, never in handlers
+- gRPC service definitions — `api/`; run `buf generate` after editing
+- CLI entrypoints — `cmd/`, one binary per subdirectory
 ```
 
 ### 3. Stack and Tooling
@@ -113,8 +108,8 @@ When creating a CLAUDE.md from scratch:
 1. **Detect project signals.** Read `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`, `Makefile`, `Dockerfile`,
    CI configs, and similar. These reveal the stack, test runner, build tools, and project structure.
 
-2. **Map the directory structure.** Run `find` or `ls -R` to identify key directories. Focus on module boundaries and
-   entry points, not every file.
+2. **Map capabilities to locations.** Identify which module owns which functionality and where new code of each kind
+   belongs. The output is an ownership map, not a directory tree — the tree is inferable from the filesystem.
 
 3. **Identify non-obvious conventions.** Look at existing code patterns that differ from language defaults — naming
    styles, error handling patterns, import conventions. Check linter configs (`.eslintrc`, `golangci.yml`,
@@ -147,20 +142,11 @@ in either:
 Monorepo for the Payments platform. Three packages share common conventions
 defined here; package-specific rules live in each package's CLAUDE.md.
 
-## Structure
+## Where Things Live
 
-\`\`\`
-my-monorepo/
-├── packages/
-│   ├── api/           # REST API (Express + TypeScript)
-│   ├── worker/        # Queue consumer (Node.js)
-│   └── shared/        # Shared types and utilities
-├── .claude/
-│   └── rules/
-│       ├── api.md     # paths: ["packages/api/**/*"] — API-specific conventions
-│       └── worker.md  # paths: ["packages/worker/**/*"] — worker-specific conventions
-└── CLAUDE.md          # This file — shared conventions
-\`\`\`
+- REST API (Express + TypeScript) — `packages/api/`; package rules in `.claude/rules/api.md`
+- Queue consumer (Node.js) — `packages/worker/`; package rules in `.claude/rules/worker.md`
+- Shared types and utilities — `packages/shared/`
 
 ## Shared Conventions
 

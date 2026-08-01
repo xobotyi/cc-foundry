@@ -17,19 +17,24 @@ ignores.
 ## Route to Reference
 
 - **Scaffold, section ordering, creation workflow** — [`${CLAUDE_SKILL_DIR}/references/scaffold.md`] Canonical section
-  order with examples (identity → structure → stack → conventions → verification → constraints), creation-from-scratch
-  workflow, monorepo scaffold patterns
+  order with examples (identity → capability map → stack → conventions → verification → constraints),
+  creation-from-scratch workflow, monorepo scaffold patterns
 
 ## What Belongs in CLAUDE.md
 
-CLAUDE.md is for **project-specific instructions that change Claude's default behavior**. If removing an instruction
-wouldn't change output quality, it doesn't belong.
+CLAUDE.md is for **project-specific instructions that change Claude's default behavior**. Two tests, both mandatory: if
+removing an instruction wouldn't change output quality, it doesn't belong; if Claude can infer it by reading the
+codebase, it doesn't belong either.
 
 **Include:**
 
-- Project structure — key directories, module boundaries, entry points
+- Capability map — which module owns which functionality ("auth lives in `internal/auth`, billing in
+  `services/billing`"), where new code of each kind goes. An ownership map, not a directory tree — trees are inferable
+  from the filesystem
 - Tech stack and tooling — frameworks, test runners, package managers, build tools
 - Coding conventions that differ from language defaults — naming, import style, error handling patterns
+- Decisions as present-tense rules — "IDs are UUIDs — prevents enumeration, enables offline generation." One causal
+  clause of why; chronology never
 - Verification workflows — how to run tests, lint, build; what commands to use
 - Critical constraints — "never modify X", "always do Y before Z"
 - Non-obvious gotchas — things Claude would get wrong without being told
@@ -41,6 +46,10 @@ wouldn't change output quality, it doesn't belong.
 - Procedural workflows with strict ordering — these belong in skills
 - Domain expertise — skills are the right artifact for behavioral rules tied to a specific domain
 - Ephemeral state — current sprint goals, in-progress migrations, temporary flags (use memory or tasks)
+- Project history — changelogs, session logs, past-work records, migration narratives, abandoned approaches. History
+  lives in `git log`, the tracker, and ADRs; a described abandoned approach reads as a current option and gets
+  resurrected
+- Directory trees and file listings — anything reproducible with `ls`; state ownership and boundaries, not structure
 - Automated behaviors — "whenever X happens, do Y" requires hooks in settings.json, not instructions
 
 ### The Layer Routing Decision
@@ -61,6 +70,14 @@ Content belongs in the layer where it's most effective:
 **The test:** If it's a rule Claude must follow in every task regardless of domain → CLAUDE.md. If it's a rule scoped to
 specific file types or paths → `.claude/rules/`. If it's a rule for a specific type of work → skill. If it must happen
 automatically without Claude's judgment → hook.
+
+**Instructions are not enforcement.** Models route around soft constraints stated as prose — working from a different
+directory to dodge a path restriction, rephrasing to dodge a wording rule. Anything that must never happen goes in
+permissions, sandbox config, or hooks; CLAUDE.md states working defaults.
+
+**Where the record goes instead.** The urge to write "what we did" into CLAUDE.md routes elsewhere: past work → commit
+messages and the tracker; a lesson from a single incident → memory, promoted to a CLAUDE.md rule only on recurrence; a
+decision → one present-tense rule here, with any why longer than a clause → an ADR the rule links to.
 
 ## Writing Effective Instructions
 
@@ -86,6 +103,15 @@ Instructions must describe behaviors Claude can actually perform, not qualities 
 - **Observable:** `Prefer composition over inheritance. No class hierarchies deeper than 2.`
 - **Aspirational:** `Use good object-oriented design.`
 
+### Present Tense Only
+
+CLAUDE.md describes the current state of the project — it never narrates how the project got here. Decisions enter as
+present-tense rules; the path to them stays in `git log` and ADRs.
+
+- Past-tense narration is a defect: "we migrated from REST to gRPC" → "services communicate over gRPC"
+- Temporal markers rot silently: "recently", "new", "now uses", "as of March" — delete the marker or the whole line
+- A described abandoned approach reads as an available option — name only what is true now
+
 ### Brevity = Compliance
 
 Every token in CLAUDE.md competes for attention. Shorter CLAUDE.md files produce higher instruction adherence.
@@ -106,17 +132,22 @@ Claude must _do_ goes in bullet lists. Research consistently shows:
 
 - Bullet lists increase signal density — critical rules can't hide inside paragraphs
 - Prose introduces rhetorical padding that competes for attention without changing behavior
-- Adding "because..." rationale to individual rules is actively harmful — it doubles the token cost of each rule while
-  the model rarely needs the justification to follow it
+- Rationale padding on mechanical rules is waste — "run `yarn lint` before committing" needs no justification, and
+  explaining it doubles the rule's token cost
 - When the model encounters conflicting prose-wrapped rules, it produces mediocre compromises instead of following
   either rule strictly
 
 **The split:** Top 10-15% of the file can be explanatory prose (project context). The remaining 85-90% should be
 structured bullet lists organized by topic.
 
-**Exception:** If a rule is genuinely counterintuitive and Claude would resist following it without understanding why, a
-one-sentence rationale after the rule is acceptable. This is rare — most rules don't need justification, they need
-clarity.
+**Decisions carry a one-clause why.** For contestable choices — "IDs are UUIDs — prevents enumeration, enables offline
+generation" — the causal clause improves the model's judgment between equivalent approaches and stops it from "fixing"
+the decision. One clause, present tense, causal not chronological. A why that needs more than a clause goes to an ADR
+the rule links to.
+
+**Lists over tables.** Commands, conventions, and capability maps are independent entries — KV bullet lists, not tables.
+A table earns its place only when rows are compared across columns, which CLAUDE.md content almost never needs. Numbered
+lists only where order is the content.
 
 ### Placement Matters
 
@@ -130,7 +161,9 @@ For rules that must be followed, state them early AND reinforce at the end with 
 
 ## The Multi-Layer Hierarchy
 
-CLAUDE.md files cascade: subdirectory > project root > user global. Later files override earlier ones on the same topic.
+CLAUDE.md files concatenate into one context: user global, then project root, then subdirectory. Load order is not
+precedence — when layers conflict, Claude may follow either rule. Reconcile conflicts across layers instead of relying
+on "later wins."
 
 - **Global (`~/.claude/CLAUDE.md`)** — personal defaults: communication preferences, tool preferences, workflow habits
   that apply across all projects
@@ -182,7 +215,7 @@ its place outperforms a 200-line file that moved critical rules to rarely-loaded
 
 ## Creating a CLAUDE.md
 
-When building a CLAUDE.md from scratch, follow the canonical section ordering: project identity (prose) → structure map
+When building a CLAUDE.md from scratch, follow the canonical section ordering: project identity (prose) → capability map
 → stack and tooling → conventions (bullets) → verification workflow → critical constraints. This ordering exploits the
 U-shaped attention curve — identity anchors the top, constraints anchor the bottom.
 
@@ -192,7 +225,7 @@ Start minimal (50-100 lines) and iterate from actual usage. A CLAUDE.md created 
 **Key principles for initial creation:**
 
 - Detect project signals from config files (`package.json`, `go.mod`, `Makefile`, CI configs, linter configs)
-- Map directory structure — module boundaries and entry points, not every file
+- Map capabilities to locations — which module owns what and where new code goes, not a directory tree
 - Identify conventions that differ from language defaults — these are what Claude needs to be told
 - Apply the deletion test before delivering — remove everything Claude does correctly without instruction
 - For monorepos, shared conventions go in root CLAUDE.md; package-specific rules go in nested CLAUDE.md files or
@@ -231,7 +264,8 @@ specific patterns.
 Claude references files that don't exist, suggests deprecated patterns, or proposes tooling the team abandoned.
 
 **Diagnosis:** CLAUDE.md mentions old frameworks, directory names, or commands. Major architecture shifts never made it
-into the file. No one updates it alongside code changes.
+into the file. No one updates it alongside code changes. Past-tense narration and temporal markers ("recently", "now
+uses") are the early warning.
 
 **Fix:** Audit against the actual codebase. Remove dead references. Add a convention: update CLAUDE.md alongside
 architecture changes, not as a separate task.
@@ -284,7 +318,10 @@ When improving a CLAUDE.md, follow this sequence:
 - **Concrete and verifiable.** If two agents could interpret an instruction differently, it's too vague. Add file paths,
   command names, and specific patterns.
 - **Right layer for the content.** Domain expertise → skills. Path-scoped conventions → `.claude/rules/`. Automated
-  behaviors → hooks. Project-universal rules → CLAUDE.md. Misplaced content degrades everything.
+  behaviors → hooks. Hard boundaries → permissions and hooks, never instructions. Project-universal rules → CLAUDE.md.
+  Misplaced content degrades everything.
+- **Present tense, no history.** CLAUDE.md states what is true now. Changelogs, session logs, migration narratives, and
+  abandoned approaches go to `git log`, the tracker, or ADRs — never here.
 - **Progressive disclosure over monolithic growth.** When CLAUDE.md exceeds ~500 lines, classify content into
   keep/move/extract/remove buckets. Safety-critical and easy-to-violate content stays regardless of frequency.
 - **Maintain alongside code.** CLAUDE.md that drifts from reality is worse than no CLAUDE.md — it produces confidently

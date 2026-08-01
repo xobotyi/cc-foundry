@@ -6,10 +6,8 @@ patterns that apply regardless of what domain you're working in.
 
 ## Skills
 
-| Skill       | Purpose                                                                                              |
-| ----------- | ---------------------------------------------------------------------------------------------------- |
-| `handoff`   | Triage conversation context into a structured transfer document (user-invoked only)                  |
-| `claude-md` | CLAUDE.md instruction quality — creating, writing, diagnosing, improving, and progressive disclosure |
+- **`handoff`** — triage conversation context into a structured transfer document (user-invoked only)
+- **`claude-md`** — CLAUDE.md instruction quality: creating, writing, diagnosing, improving, and progressive disclosure
 
 ## How It Works
 
