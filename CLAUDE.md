@@ -15,7 +15,7 @@ styles, hooks, and workflow automation.
 - `plugins/the-writer/` — prose discipline for agent-authored text (humanize)
 - `plugins/infrastructure/` — infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
 - `plugins/the-workflow/` — agentic workflow mechanics (CLAUDE.md quality, context handoff)
-- `plugins/frontend/` — frontend platform discipline (CSS, React, Vue, Svelte, accessibility)
+- `plugins/frontend/` — frontend platform discipline (CSS, Tailwind, React, Vue, Svelte, accessibility)
 - `plugins/backend/` — backend platform discipline (observability, Prometheus, StatsD, OTel)
 - `plugins/grafana/` — Grafana platform (dashboards, PromQL, MetricsQL, LogsQL, alerting, provisioning, dataviz)
 - `plugins/cli/` — CLI platform discipline (CLI design, shell scripting)
