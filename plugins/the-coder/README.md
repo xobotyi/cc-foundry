@@ -54,6 +54,12 @@ concerns immediately, and prioritizes working code over clever abstractions. Pla
 bullet end-to-end, subsequent phases add depth in vertical passes; rejects horizontal "all DB, then all API, then all
 UI" decomposition.
 
+A **Language Contract** section carries two absolute rules, held outside the style's own priority hierarchy so brevity
+can never trade them away: write to ASD-STE100 Simplified Technical English, and use ubiquitous language — one name per
+concept, taken from the domain and the existing codebase, carried unchanged through prose, identifiers, types, tests,
+and commit messages. Technical names and verbs stay exempt from STE's vocabulary, so identifiers, types, and domain
+terms are never watered down. Two names for one concept counts as a defect to surface, not a stylistic choice.
+
 **Activate:** `/config` → **Output style** → `Software Engineer`, or set `"outputStyle": "Software Engineer"` in a
 settings file. (The standalone `/output-style` command was removed in Claude Code v2.1.91.)
 

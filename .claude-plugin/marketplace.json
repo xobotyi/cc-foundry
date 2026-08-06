@@ -28,7 +28,7 @@
 		{
 			"name": "ai-helpers",
 			"description": "AI artifact engineering: prompts, skills, subagents, and output styles",
-			"version": "1.15.0",
+			"version": "1.16.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
@@ -92,7 +92,7 @@
 		{
 			"name": "the-coder",
 			"description": "Software engineering discipline: output styles, coding fundamentals, and universal development practices",
-			"version": "1.6.0",
+			"version": "1.7.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"

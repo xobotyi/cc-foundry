@@ -20,8 +20,8 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
 
 ## Output Styles
 
-- **`ai-engineer`** — collaborative AI engineering persona: direct communication, no sycophancy, adversarial
-  self-checks, iterative refinement
+- **`ai-engineer`** — collaborative AI engineering persona: direct communication, no sycophancy, Simplified Technical
+  English (ASD-STE100) and ubiquitous language, adversarial self-checks, iterative refinement
 
 ## Skill Dependencies
 

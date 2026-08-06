@@ -8,7 +8,8 @@ Language-agnostic software engineering discipline for Claude Code.
 
 ## Output Styles
 
-- **`software-engineer`** — implementation-focused persona with engineering judgment and LSP-first navigation
+- **`software-engineer`** — implementation-focused persona with engineering judgment, LSP-first navigation, and
+  controlled-language discipline (ASD-STE100 plus ubiquitous language)
 
 ## Plugin Scope
 
