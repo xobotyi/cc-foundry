@@ -68,12 +68,14 @@ right solution for a task.
 
 ### output-style-engineering
 
-Design output styles that replace Claude's system prompt. Covers the replace-not-augment principle, persona definition,
-non-coding domain patterns (business analysis, content strategy, research), evaluation framework with dimensional
-scoring, and iteration diagnostics.
+Design output styles for Claude Code — the only file-based mechanism that removes parts of the default system prompt and
+gets harness-reinforced adherence. Covers frontier-era authoring (role as outcome instead of persona theater,
+intent-carrying rules, tone exemplars, subtraction over scaffolding), non-coding domain patterns (business analysis,
+content strategy, research), an evaluation framework with dimensional scoring including scaffolding debt, and iteration
+diagnostics from silent non-injection to overtriggering.
 
-**Use when:** Building personas, customizing tone, creating domain-specific response patterns, evaluating style quality,
-or debugging style drift and reversion.
+**Use when:** Building styles, customizing voice and tone, creating domain-specific response patterns, evaluating style
+quality, migrating styles to a new model generation, or debugging styles that misfire or silently fail to load.
 
 ### prompt-terser
 

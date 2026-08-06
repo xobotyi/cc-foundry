@@ -2,17 +2,17 @@
 
 ## Why Output Styles Exist
 
-Output styles **replace** Claude Code's system prompt — they don't augment it.
+Output styles hold two powers no additive mechanism has — the two reasons the Claude Code team kept them when
+deprecation was reversed:
 
-You cannot remove default behaviors by adding instructions on top of them. Users have proven this:
+1. **They turn off parts of the default system prompt.** You cannot remove default behaviors by adding instructions on
+   top of them — CLAUDE.md, `--append-system-prompt`, and hooks are purely additive, so the default response-style and
+   coding instructions keep competing with yours.
+2. **The harness reinforces them.** Styles trigger adherence reminders during the conversation; instructions in
+   CLAUDE.md or a `UserPromptSubmit` hook need hand-built reinforcement to get the same effect.
 
-- **CLAUDE.md** adds project context but cannot override the coding personality
-- **`--append-system-prompt`** appends without substituting — default behaviors remain
-- **Hooks** lose influence after several conversation rounds
-- Users report "Claude's ingrained celebratory defaults seemingly overrode the style guidance" when using CLAUDE.md
-  alone
-
-Output styles are the only file-based mechanism that replaces the core personality. Everything else augments it.
+Practitioners converge on the same split: tone and register rules moved from CLAUDE.md into an output style hold where
+the CLAUDE.md version drifted.
 
 ## File Format
 
@@ -45,7 +45,7 @@ keep-coding-instructions: false
 - **`name`** — display name; defaults to filename (without `.md`) if omitted
 - **`description`** — shown in `/config` picker; make it scannable
 - **`keep-coding-instructions`** — `true` preserves the default coding system prompt alongside your style instructions;
-  `false` (default) replaces it entirely
+  `false` (default) removes it
 - **`force-for-plugin`** — plugin-shipped styles only: auto-applies the style while the plugin is enabled, overriding
   the user's `outputStyle` setting
 
@@ -87,7 +87,10 @@ below.
 
 ### Step 3: Draft
 
-Write the file manually (see Creation Methods) and apply the pattern's structural requirements.
+Write the file manually (see Creation Methods) and apply the pattern's structural requirements. Draft lean: role as
+outcome and perspective, a voice description built on adjective contrasts, intent-carrying rules, one or two tone
+contrast pairs, response formats. Do not draft persistence sections, repeated rules, or MUST/CRITICAL emphasis — the
+harness reminders and the model's instruction adherence make them counterproductive.
 
 ### Step 4: Activate and test
 
@@ -102,9 +105,18 @@ up changes.
 
 ### Step 5: Iterate
 
-Test with representative prompts covering normal use and edge cases. Adjust instructions where behavior diverges from
-intent. Keep the file under ~300 lines; move detailed rules into referenced behaviors. Make one change per iteration —
-multiple changes make debugging impossible.
+First verify injection with a canary (the loader silently drops the body on a filename/`name` case mismatch — see
+[`${CLAUDE_SKILL_DIR}/references/spec.md`]). Then test with representative prompts covering normal use and edge cases.
+Adjust instructions where behavior diverges from intent — and prefer deleting an instruction over adding one. Keep the
+file under ~200 lines. Make one change per iteration — multiple changes make debugging impossible.
+
+### Step 6: Recalibrate per model generation
+
+A style tuned for one model generation ages: instructions compensating for an old model's failure modes execute with
+precision on a newer one and distort output (a production voice profile measured as improving one generation's output
+degraded the previous one's). On every model migration, re-run the style's tests before editing, then subtract stale
+compensations before adding anything. Check the target model's own prompting guide for its defaults — verbosity, tool
+eagerness, output length.
 
 ## Style Patterns
 
@@ -122,10 +134,10 @@ multiple changes make debugging impossible.
 - Professional tone without warmth padding
 - No hedging phrases ("it's worth noting that...", "might potentially")
 
-**Reversion risk:** High. Default personality traits are deeply embedded — Claude acknowledges the instructions but
-reverts to celebratory defaults mid-session. Mitigate with multiple consistency anchors distributed throughout the
-style, not just one section at the end. Include explicit anti-reversion language: "If you notice yourself softening
-tone, correct immediately."
+**Risk profile:** Current models follow phrase blocklists faithfully — the harness reminders carry persistence, so
+anti-reversion anchors are dead weight. The live risk is over-correction: a style built purely from "never" rules
+produces curt, stilted output on complex tasks. Pair the blocklist with a positive description of the target register
+(what a good opener looks like, how depth scales with task complexity).
 
 ### Domain Specialist
 
@@ -204,7 +216,8 @@ Learning styles produce longer output tokens by design — this is intentional, 
 
 - **`CLAUDE.md`** — added as a user message after the system prompt; project/user context, not persona
 - **`--append-system-prompt`** — appends to the system prompt; preserves default coding behavior
-- **Output styles** — replace the system prompt; fullest control over role and behavior
+- **Output styles** — remove default prompt sections and append their own, with harness-reinforced adherence; fullest
+  file-based control over role and register
 - **Subagents** — separate invocations with their own tools/model; output styles affect the main loop only
 - **Skills** — invoked on-demand for specific workflows; output styles are always-on once selected
 
@@ -213,10 +226,13 @@ Comparison.
 
 ## Common Failure Modes
 
-**Style reverts mid-session** — Default personality traits are deeply embedded. A single consistency reminder at the end
-is insufficient for long sessions. Fix: distribute anti-reversion language throughout the style — at least two anchors
-in different sections. Include explicit scenario lists ("even if the topic changes, even if multiple turns have
-passed").
+**Style silently not applied** — the loader matches frontmatter `name` against the filename case-sensitively and drops
+the body on mismatch while the UI shows the style active. Fix: keep filename and `name` identical and lowercase; verify
+with a canary rule before iterating on content.
+
+**Style over-applied** — aggressive emphasis (MUST, CRITICAL, "always/never" without a real failure mode behind it)
+overtriggers on current models: unusably curt answers, refusing depth where depth is wanted. Fix: dial the language back
+to plain conditions and describe the target register positively.
 
 **Coding capability lost** — `keep-coding-instructions: false` (the default) removes all coding guidance. Users who
 create a tone-only style (e.g., "be more direct") accidentally lose coding capability. Fix: set

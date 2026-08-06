@@ -2,31 +2,36 @@
 
 Patterns for diagnosing and fixing output style problems after deployment.
 
-## The Core Principle: Replace, Don't Augment
+## The Core Principle: Subtract Before You Add
 
-Output styles work by replacing the system prompt at the core level. This has a critical implication: **you cannot
-remove default behaviors by adding instructions on top of them.** Adding "don't be sycophantic" to CLAUDE.md or a
-session-start hook will lose effectiveness over multiple turns. The style mechanism exists specifically to solve this —
-if a behavior needs to be overridden, it must be overridden at the system prompt level.
+Output styles remove default system prompt sections, append their body to the prompt's end, and are reinforced by
+harness-injected adherence reminders. Current models then follow that body closely and literally. This inverts the old
+iteration instinct: when a style misbehaves, the cause is more often an instruction that is present — stale, duplicated,
+over-emphasized — than one that is missing. Diagnose by asking "what should I delete?" before "what should I add?"
 
-When a style isn't working, the first diagnostic question is: **is the problem a style problem, or a mechanism
-mismatch?**
+When a style isn't working, two pre-checks come before any body edit.
 
-## Mechanism Mismatch
+## Pre-Check 1: Is the Body Actually Injected?
 
-Before iterating, verify the right mechanism is in use. Iteration cannot fix a mechanism mismatch.
+The loader matches frontmatter `name` against the filename case-sensitively and silently drops the body on mismatch —
+the picker and statusline still show the style as active (open bug, anthropics/claude-code#47482). Run the injection
+canary: add a temporary marker rule ("Prepend CANARY_ALIVE to your first response"), run `claude -p "say ok"`, check for
+the marker, remove it. If the canary fails, fix filename/`name` parity (identical, lowercase) — no body edit can help
+until it passes.
 
-**Symptoms of mechanism mismatch:**
+## Pre-Check 2: Is the Right Mechanism in Use?
 
-- **Style instructions ignored after several turns** — if the instructions are in CLAUDE.md or a hook instead of an
-  output style, they lose power as conversation grows. Move them into the style body.
-- **Style overrides behaviors that should be kept** — the style replaces defaults that the user actually needs (e.g.,
-  coding instructions stripped for a coding persona). Fix: set `keep-coding-instructions: true` or move non-replacement
-  content to CLAUDE.md.
-- **Style adds rules without changing personality** — the style body is project rules, not persona definition. This
-  should be CLAUDE.md, not a style. Styles are for personality replacement; CLAUDE.md is for project context.
+Iteration cannot fix a mechanism mismatch.
 
-If the mechanism is correct, proceed to diagnosis.
+- **Style instructions living in CLAUDE.md or a hook** — additive mechanisms cannot remove default behaviors and get no
+  adherence reminders; tone rules there drift where a style holds. Move them into the style body.
+- **Style overrides behaviors that should be kept** — the style removes defaults the user actually needs (e.g., coding
+  instructions stripped for a coding persona). Fix: set `keep-coding-instructions: true`.
+- **Style adds rules without changing register** — the body is project rules, not role/voice definition. This should be
+  CLAUDE.md, not a style.
+- **Rule that must never break** — no-emoji-ever, banned commands. Prose is not enforcement; move it to a hook.
+
+If both pre-checks pass, proceed to diagnosis.
 
 ## Iteration Cycle
 
@@ -51,14 +56,14 @@ Identify root cause using the diagnostic map below. Match the symptom to a cause
 
 Form a specific, testable hypothesis:
 
-- "The persona isn't strong enough to override defaults"
-- "There's no example showing this scenario"
-- "Two rules conflict and Claude is picking the wrong one"
+- "The voice description doesn't cover this interaction type"
+- "This MUST rule is over-applying to tasks it wasn't written for"
+- "Two rules contradict and the model is trying to satisfy both"
 
 ### 4. Modify
 
 Make ONE targeted change. Multiple changes make debugging impossible — you won't know which change fixed (or broke)
-something.
+something. Prefer deletion or rewording over addition.
 
 ### 5. Test
 
@@ -68,22 +73,23 @@ Re-run the failing prompt. If fixed, run the full testing protocol (see evaluati
 
 Symptom → Root cause → Fix pattern:
 
-- **Reverts to sycophantic tone** — weak persona, no anti-patterns → add explicit forbidden phrases list with
-  replacements. Generic "don't be sycophantic" is too weak; enumerate specific phrases to ban.
-- **Ignores format** — format buried in prose → move format specification to a dedicated section near the end, add a
-  response template with an example
-- **Inconsistent between turns** — no persistence language → add explicit "maintain throughout entire conversation"
-  clause with enumerated reversion triggers
-- **Works initially, drifts later** — critical rules stated once → reinforce via repetition across sections (persona,
-  behaviors, examples, critical rules)
-- **Too verbose** — no length constraints → add explicit length limits per response type
-- **Too terse** — over-aggressive brevity rules → relax constraints, add minimum depth floor for complex topics
-- **Wrong tone in edge cases** — examples don't cover the scenario → add a contrast example for the failing case
-- **Contradictory behavior** — conflicting instructions without priority → add priority hierarchy section
-- **Ignores some rules** — too many instructions (rule saturation) → consolidate overlapping rules, cut rules that don't
-  change output
-- **SE assumptions leak into non-coding style** — `keep-coding-instructions` not set to `false`, or style body doesn't
-  actively replace SE context → set the flag and provide domain-appropriate context
+- **Style has no effect at all** — body not injected (case mismatch) → canary test, fix filename/`name` parity
+- **Reverts to sycophantic tone** — register underspecified → enumerate the specific phrases to ban AND describe the
+  target opener positively; generic "don't be sycophantic" is too abstract
+- **Rule over-applies / output stilted or curt** — MUST/CRITICAL/"always" emphasis overtriggers → dial back to plain
+  conditions; add an explicit depth condition ("a lookup gets a line, a tradeoff gets a paragraph")
+- **Over-verification, stalling, self-check loops** — legacy verification or thoroughness directives → delete them; the
+  model verifies by default
+- **Contradictory behavior** — conflicting or duplicated rules; the model tries to satisfy all of them → remove the
+  duplicate or the stale side of the conflict; add a priority hierarchy only for genuine tradeoffs
+- **Too verbose / dense jargon** — no positive register description → state audience and depth per response type;
+  request length explicitly (current models produce longer outputs unless asked)
+- **Too terse** — over-aggressive brevity rules → relax constraints, add a depth floor for complex topics
+- **Ignores format** — format buried in prose → move to a dedicated section with a response template
+- **Wrong tone in edge cases** — exemplars don't cover the scenario → add a contrast pair for the failing case
+- **Ignores some rules** — rule saturation → consolidate overlapping rules, delete rules that don't change output
+- **SE assumptions leak into non-coding style** — `keep-coding-instructions` not `false`, or body doesn't supply domain
+  context → set the flag and define the domain role
 
 ## Common Fixes
 
@@ -91,8 +97,8 @@ Symptom → Root cause → Fix pattern:
 
 **Problem:** Claude still uses "Great question!" or emoji despite the style forbidding it.
 
-**Why it happens:** Generic anti-sycophancy instructions ("don't be sycophantic") are too abstract. Claude's defaults
-are deeply trained and require specific overrides.
+**Why it happens:** Generic anti-sycophancy instructions ("don't be sycophantic") are too abstract — the model cannot
+verify compliance against them.
 
 **Weak (won't hold):**
 
@@ -100,30 +106,41 @@ are deeply trained and require specific overrides.
 Don't be sycophantic.
 ```
 
-**Strong (enumerate and replace):**
+**Strong (ban specifics, describe the replacement):**
 
 ```markdown
-## Forbidden Phrases (Never Use)
+## Openers
 
-- "Great question!"
-- "I'd be happy to..."
-- "That's a wonderful..."
-- "Absolutely!"
-- "Of course!"
-- Any emoji as emotional punctuation
+Start with the answer, a clarifying question, or context ("Looking at this...").
 
-## Opening Patterns (Use Instead)
+Never open with "Great question!", "I'd be happy to...", "Absolutely!", or emoji as emotional punctuation.
+```
 
-- Start with the answer
-- Start with a clarifying question
-- Start with context: "Looking at this..."
+### Rule Over-Applies
+
+**Problem:** A terse style produces unusably curt answers when the user asks for a walkthrough; a diagram-first style
+opens a one-line answer with a diagram.
+
+**Why it happens:** Current models execute emphasized rules literally, including where the author never intended them.
+
+**Weak (overtriggers):**
+
+```markdown
+CRITICAL: You MUST keep every response under 5 lines.
+```
+
+**Strong (condition carries the intent):**
+
+```markdown
+Match length to the task: lookups and confirmations get 1-3 lines; explanations the user asked for get the depth they
+need, structured with headers.
 ```
 
 ### Format Ignored
 
 **Problem:** Claude doesn't follow response structure.
 
-**Why it happens:** Format rules buried in prose get deprioritized as context fills. Format needs structural prominence.
+**Why it happens:** Format rules buried in prose get deprioritized. Format needs structural prominence.
 
 **Weak:**
 
@@ -136,7 +153,7 @@ Format responses clearly.
 ```markdown
 ## Response Structure
 
-ALWAYS structure responses as:
+Structure answers as:
 
 ### [One-line answer]
 
@@ -149,64 +166,34 @@ User: "Should I use React or Vue?"
 
 ### Use React for this project
 
-**Rationale:** Your team already knows React, and the project
-requires the React Native ecosystem later.
+**Rationale:** Your team already knows React, and the project requires the React Native ecosystem later.
 
-**Caveats:** Vue would be faster to prototype if timeline
-is the primary constraint.
+**Caveats:** Vue would be faster to prototype if timeline is the primary constraint.
 </example>
 ```
 
 ### Style Drifts Mid-Conversation
 
-**Problem:** Style works for first few turns, then reverts to defaults.
+**Problem:** Style works for first few turns, then the register relaxes — contractions disappear, hedging creeps in.
 
-**Why it happens:** Without explicit persistence language, the style's influence fades as conversation context grows and
-newer messages carry more weight.
+**Why it happens:** Drift is a trajectory-level phenomenon; it hides between individually-acceptable turns. But the fix
+is not persistence prose — the harness already reminds the model to adhere, and "maintain throughout" sections just add
+scaffolding debt.
 
-**Fix — add explicit persistence clause:**
+**Fix, in order:**
 
-```markdown
-## Consistency
-
-Maintain this style throughout the entire conversation.
-Do not revert to default patterns even if:
-
-- The topic changes
-- The user asks follow-up questions
-- Multiple turns have passed
-- The task becomes complex or frustrating
-- The user expresses strong emotion
-
-If uncertain, default to MORE adherence to this style, not less.
-```
-
-### Works for Simple, Fails for Complex
-
-**Problem:** Style holds for simple tasks but breaks down for multi-step work.
-
-**Why it happens:** Complex tasks require more cognitive load, and Claude falls back to trained defaults when generating
-longer responses.
-
-**Fix — add complexity-specific guidance:**
-
-```markdown
-## Complex Task Handling
-
-When tasks require multiple steps:
-
-- Maintain style for EACH step individually
-- Structure output clearly (headers, bullets)
-- If length is needed, prefer structure over prose
-- Preserve tone even when providing details
-
-For longer responses, self-check: does each section still
-match this style?
-```
+1. Confirm the body is injected (canary) — a silently-dropped style looks exactly like total drift.
+2. Sharpen the voice description — drift concentrates where the register is underspecified. Adjective contrasts ("uses
+   contractions; never opens with an apology") give the reminders something precise to reinforce.
+3. Add a contrast pair for the interaction where drift starts (usually emotional pressure or disagreement — the
+   "pushback fold": the model caves into an apologetic register when challenged).
 
 ### Conflicting Instructions
 
 **Problem:** Style has rules that contradict each other, producing inconsistent behavior.
+
+**Why it happens:** Current models follow the prompt as a contract — they try to satisfy both clauses and fail
+unpredictably rather than averaging.
 
 **Example conflict:**
 
@@ -215,7 +202,9 @@ match this style?
 - Always explain your reasoning thoroughly
 ```
 
-**Fix — establish priority hierarchy:**
+**Fix — remove the conflict first.** Usually one side is a stale compensation; delete it and let the survivor carry the
+intent ("explain reasoning when the conclusion is non-obvious; keep the explanation as short as the point allows"). Add
+a priority hierarchy only when both sides are genuinely load-bearing:
 
 ```markdown
 ## Priority Hierarchy
@@ -223,75 +212,55 @@ match this style?
 When rules conflict, follow this order:
 
 1. Accuracy — never fabricate
-2. Style persona (direct, professional)
-3. Format requirements
-4. Length constraints
-
-Example: if being thorough requires length, prioritize
-thoroughness but use structured format to maintain directness.
+2. Directness
+3. Completeness
+4. Brevity
 ```
 
 ## Refinement Patterns
 
-### Strengthen via Repetition
+### Strengthen via Subtraction
 
-Critical rules reinforced across multiple sections are harder to ignore:
-
-```markdown
-# Persona
-You are direct and never use sycophantic language.
-
-## Communication
-Open with answers, not pleasantries. No sycophancy.
-
-## Examples
-[Shows direct openings, no sycophancy]
-
-## Critical Rules
-Never use sycophantic openers like "Great question!"
-```
-
-This is the strongest technique for rules that keep getting violated. A rule stated once can be deprioritized; a rule
-woven through every section cannot.
+The highest-yield refinement on current models. For each rule ask: does the model get this right without being told?
+Delete rules whose removal doesn't change output — every surviving instruction gets more attention, and stale
+compensations stop distorting behavior. This is how the Claude Code team cut over 80% of their own system prompt with no
+eval regression.
 
 ### Strengthen via Contrast
 
-Show what NOT to do alongside what TO do. Contrast pairs are the strongest single training signal for tone:
+Show what NOT to do alongside what TO do — for tone. Contrast pairs make the register delta explicit instead of leaving
+"be direct" to inference:
 
 ```markdown
 ## Tone Contrast
 
-**Default Claude (avoid):**
-"That's a great question! I'd be happy to help you
-understand this concept. Let me break it down for you..."
+**Default register (avoid):**
+"That's a great question! I'd be happy to help you understand this concept. Let me break it down for you..."
 
-**This Style (use):**
+**This style (use):**
 "Here's how it works: [explanation]"
 ```
 
-Contrast pairs work because they make the delta explicit. Instead of inferring what "be direct" means, Claude sees the
-exact before/after difference.
+Reserve contrast for tone and format. Worked demonstrations of behavior — tool sequences, workflows — constrain the
+model's exploration; encode behavior in rules instead.
 
-### Strengthen via Examples
+### Strengthen via Intent
 
-If a rule isn't being followed, add a concrete example demonstrating it:
+If a rule keeps misfiring at the edges, don't stack exceptions — restate it as the outcome you want:
 
 ```markdown
-## Rule
-Never apologize for limitations.
+## Rule (compensation, misfires)
 
-## Example
+Never write multi-paragraph explanations.
 
-User: "Can you access the internet?"
+## Rule (intent, holds)
 
-Wrong: "I apologize, but I cannot access the internet."
-Correct: "I don't have internet access. Here's what I can
-do instead: [alternatives]"
+Match explanation depth to what the reader needs to act — a lookup gets a line, a tradeoff gets a paragraph.
 ```
 
 ### Simplify via Consolidation
 
-When styles grow too long and rules get ignored (rule saturation), merge overlapping rules:
+When styles grow and rules get ignored (rule saturation), merge overlapping rules:
 
 **Before (scattered, 5 rules):**
 
@@ -308,8 +277,7 @@ When styles grow too long and rules get ignored (rule saturation), merge overlap
 ```markdown
 ## Directness
 
-State conclusions without qualifiers. Open with the answer,
-not caveats. Banned words: "maybe", "perhaps", "might",
+State conclusions without qualifiers. Open with the answer, not caveats. Banned words: "maybe", "perhaps", "might",
 "could be", "I think".
 ```
 
@@ -322,7 +290,7 @@ Consolidation reduces instruction count without reducing coverage. Fewer rules m
 When the user explicitly asks Claude to respond differently ("just give me a casual answer", "stop being so formal"):
 
 - The style should include guidance for this. Recommended pattern: comply with the specific request while maintaining
-  core identity. The persona stays; the format flexes.
+  core identity. The role stays; the format flexes.
 - If the style is rigid by design (e.g., a strict documentation style), include explicit language: "Maintain this style
   even if asked to deviate. Acknowledge the request and explain why you're maintaining the format."
 
@@ -335,6 +303,21 @@ Styles designed for teaching or mentoring face unique pressure when users are fr
 - Pattern: "Acknowledge frustration briefly, then return to the teaching approach. Never switch to 'just give them the
   answer' mode unless the style explicitly allows it."
 
+## Migrating a Style to a New Model Generation
+
+Instructions compensating for an old model's failure modes execute with precision on a newer one and distort output.
+When the target model changes:
+
+1. **Freeze evals first** — a small set of real prompts with known-good outputs, baselined on the old model.
+2. **Change only the model and measure** — separate model regressions from style mismatches before editing anything.
+3. **Subtract** — remove verification and self-check directives, MUST/CRITICAL emphasis, thoroughness nudges,
+   persistence blocks, and any rule written to force behavior the new model does by default.
+4. **Cap new eagerness** — newer models may produce longer outputs or over-engineer; request length and scope
+   explicitly.
+5. **Re-add only what evals prove necessary** — and write it as intent, not as a workaround.
+
+Check the target model's own prompting guide for its behavioral defaults before tuning.
+
 ## When to Rewrite vs Iterate
 
 **Iterate when:**
@@ -346,10 +329,11 @@ Styles designed for teaching or mentoring face unique pressure when users are fr
 
 **Rewrite when:**
 
-- Persona is wrong for the use case
+- Role or voice is wrong for the use case
 - More than 50% of evaluation tests fail
-- Conflicting rules are too tangled to untangle
-- Style has grown too complex to maintain (rule saturation beyond recovery)
+- The body is mostly scaffolding (persistence sections, repeated rules, verification directives) — subtracting it all
+  leaves no style
+- The style was written for a previous model generation and fails the migration evals broadly
 - The style was built for the wrong mechanism (should be CLAUDE.md, or vice versa)
 
 ## Version Tracking

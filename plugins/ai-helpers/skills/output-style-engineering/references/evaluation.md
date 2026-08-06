@@ -4,8 +4,9 @@ Framework for assessing output style quality before deployment.
 
 ## Scope Appropriateness
 
-Before scoring dimensions, verify the style needs to exist as an output style. Output styles replace Claude's system
-prompt — that power comes with cost (losing default behaviors, requiring full persona definition).
+Before scoring dimensions, verify the style needs to exist as an output style. Output styles remove default system
+prompt sections and append their own — that power comes with cost (losing default behaviors, owning the register
+definition).
 
 **Use an output style when:**
 
@@ -26,57 +27,60 @@ behavior overrides, just project rules — it should not be a style.
 
 ## Evaluation Dimensions
 
-Six dimensions, each scored 1-10. Three are weighted 2x (persona, behaviors, examples) because they directly drive
-compliance. The other three are supporting elements.
+Six dimensions, each scored 1-10. Three are weighted 2x (role & voice, rule intent, exemplars) because they directly
+drive compliance. The other three are supporting elements.
 
-### 1. Persona Clarity (Weight: 2x)
+### 1. Role & Voice Clarity (Weight: 2x)
 
-Does the style define WHO Claude is?
+Does the style frame what Claude is doing, for whom, and in what voice?
 
-- **1-3** — No persona, or vague ("be helpful"). Two readers would imagine different personas.
-- **4-6** — Role defined but lacks specificity. "You are a senior engineer" without perspective, values, or constraints.
-- **7-8** — Clear persona with role, domain expertise, and perspective. One-sentence summary is obvious.
-- **9-10** — Rich persona with motivations, constraints, and values. Persona naturally implies behaviors without stating
-  them.
+- **1-3** — No framing, or persona theater ("world-class expert with 12+ years"). Two readers would imagine different
+  behavior.
+- **4-6** — Role named but no perspective or audience; voice described with bare adjectives ("professional",
+  "friendly").
+- **7-8** — Role framed as outcome and perspective; voice described with adjective contrasts pinning what it is and is
+  not.
+- **9-10** — Role and audience are so concrete the right behaviors follow without stating them; voice description gives
+  a calibrated band (5–7 contrast sentences).
 
 **Checks:**
 
-- Can you describe the persona in one sentence?
-- Would two people reading the style imagine the same persona?
-- Does the persona imply the right behaviors naturally?
+- Is the role stated as what Claude does and for whom — not as invented credentials?
+- Would two people reading the voice description produce the same register?
+- Does the framing imply the right depth and format choices naturally?
 
-### 2. Behavioral Specificity (Weight: 2x)
+### 2. Rule Intent (Weight: 2x)
 
-Are behaviors concrete and testable?
+Do rules state desired outcomes the model can generalize, rather than compensations that age?
 
-- **1-3** — Abstract instructions ("be professional", "communicate clearly"). Cannot verify compliance.
-- **4-6** — Mix of concrete and abstract. Some rules are testable, others are aspirational.
-- **7-8** — Mostly concrete, actionable instructions. Each rule has a clear pass/fail condition.
-- **9-10** — All behaviors are specific, testable, and unambiguous. Includes both positive rules and explicit
-  anti-patterns.
+- **1-3** — Abstract directives ("be professional") or bare prohibition stacks with no rationale.
+- **4-6** — Mix: some rules carry intent, others are unexplained "never X" compensations or MUST/CRITICAL emphasis.
+- **7-8** — Rules state the outcome and, where non-obvious, the why; prohibitions map to real observed failures;
+  emphasis language is plain.
+- **9-10** — Every rule survives the deletion test and would survive a model upgrade — it encodes what is wanted, not
+  what an older model got wrong.
 
 **Checks:**
 
 - Could you write a pass/fail test for each rule?
-- Are there concrete do/don't pairs?
-- Do rules use specific language ("Never open with 'Great question!'") rather than vague directives ("Don't be
-  sycophantic")?
+- Does each "never" rule correspond to a failure you have actually observed with the current model?
+- Is there any MUST/CRITICAL/"always" emphasis that a plain condition would serve?
 
-### 3. Example Quality (Weight: 2x)
+### 3. Exemplar Quality (Weight: 2x)
 
-Do examples demonstrate expected behavior effectively?
+Do tone exemplars calibrate the register without constraining behavior?
 
-- **1-3** — No examples. Behavior expectations are ambiguous.
-- **4-6** — Examples present but limited — only positive examples, or only one scenario type.
-- **7-8** — Multiple examples covering key scenarios. Includes contrast pairs (good vs bad).
-- **9-10** — Comprehensive examples with contrast pairs across different interaction types (simple request,
-  disagreement, complex task, emotional pressure).
+- **1-3** — No exemplars. The register is left to inference.
+- **4-6** — Exemplars present but only in-style samples, or they demonstrate workflows/tool behavior instead of tone.
+- **7-8** — Contrast pairs (in-style vs default register) for the key interaction types.
+- **9-10** — Contrast pairs cover the interactions most likely to pull toward the default register (emotional pressure,
+  disagreement, error reporting) — and nothing else; no behavior demos.
 
 **Checks:**
 
-- Do examples show both correct and incorrect behavior (contrast pairs)?
-- Do examples cover different interaction types, not just one?
-- Would someone unfamiliar with the style learn the right tone from examples alone?
+- Do exemplars show the same input answered in-style and in the generic default?
+- Do they cover default-pulling interactions, not just the happy path?
+- Are exemplars limited to tone and format — no worked tool-use or workflow demonstrations?
 
 ### 4. Output Format Clarity (Weight: 1x)
 
@@ -92,22 +96,24 @@ Is response structure explicitly defined?
 - Would Claude know exactly how to structure any response type?
 - Does format guidance scale across response complexity (one-liner vs detailed analysis)?
 
-### 5. Consistency Safeguards (Weight: 1x)
+### 5. Scaffolding Debt (Weight: 1x, inverse)
 
-Does the style prevent reversion to default behaviors?
+Is the style free of legacy scaffolding that current models no longer need — and are actively harmed by? The harness
+injects adherence reminders; the model verifies its own work and follows instructions literally. Scaffolding written for
+older models duplicates those mechanisms and causes overtriggering, over-verification, and contradiction.
 
-- **1-3** — No safeguards. Will revert to defaults within a few turns.
-- **4-6** — Some "avoid" instructions but no reinforcement strategy. Defaults will creep back mid-conversation.
-- **7-8** — Clear anti-patterns with alternatives. Includes explicit persistence language ("maintain throughout entire
-  conversation").
-- **9-10** — Comprehensive safeguards: critical rules reinforced in multiple sections (persona, behaviors, examples,
-  critical rules). Explicit persistence clause with enumerated reversion triggers.
+- **1-3** — Persistence blocks ("maintain throughout"), rules repeated across sections, verification/thoroughness
+  directives, heavy MUST/CRITICAL emphasis.
+- **4-6** — One or two scaffolding artifacts remain (a consistency clause, a duplicated rule).
+- **7-8** — Clean of persistence language and repetition; at most isolated emphasis that a plain condition would serve.
+- **9-10** — Every instruction appears exactly once, in the section that owns it; no persistence, verification, or
+  emphasis scaffolding; the body passes the deletion test line by line.
 
 **Checks:**
 
-- Are common default behaviors explicitly forbidden with replacements?
-- Does the style include persistence language for long conversations?
-- Are critical rules reinforced through repetition across sections?
+- Is any rule stated more than once?
+- Is there a consistency/persistence section duplicating the harness reminders?
+- Are there verification, self-check, or thoroughness directives the model performs by default?
 
 ### 6. Appropriate Scope (Weight: 1x)
 
@@ -130,8 +136,8 @@ Is the style focused and correctly bounded?
 Calculate weighted score:
 
 ```
-Score = (Persona x 2 + Behaviors x 2 + Examples x 2 +
-         Format x 1 + Safeguards x 1 + Scope x 1) / 9
+Score = (RoleVoice x 2 + RuleIntent x 2 + Exemplars x 2 +
+         Format x 1 + ScaffoldingDebt x 1 + Scope x 1) / 9
 ```
 
 - **8-10** — Deploy. Style is robust and will hold across sessions.
@@ -142,6 +148,13 @@ Score = (Persona x 2 + Behaviors x 2 + Examples x 2 +
 ## Testing Protocol
 
 After scoring dimensions, validate with real usage. Each test targets a specific failure mode observed in production.
+
+### Test 0: Injection Canary
+
+Before any behavioral test, confirm the body is actually in the system prompt: add a temporary marker rule (e.g.
+"Prepend CANARY_ALIVE to your first response"), run `claude -p "say ok"`, and check for the marker. The loader silently
+drops the body on a filename/`name` case mismatch while showing the style as active — every downstream test result is
+meaningless until the canary passes. Remove the marker afterward.
 
 ### Core Tests
 
@@ -162,9 +175,15 @@ After scoring dimensions, validate with real usage. Each test targets a specific
    session-start hooks would degrade here; proper output styles should not.
 7. **Topic shift** — Mid-conversation, change the subject entirely. Does the style hold when context shifts?
 
+### Overtriggering Test
+
+8. **Over-application** — Prompt with a task the style's strongest rule should NOT dominate (e.g., for a terse style: "I
+   don't understand X — walk me through it"). Current models execute style rules literally; a rule that over-applies
+   here needs its emphasis dialed back or an explicit depth condition, not more rules.
+
 ### Non-Coding Domain Test (when applicable)
 
-8. **SE assumption leak** — For styles with `keep-coding-instructions: false`, prompt: "Help me with [non-coding task]"
+9. **SE assumption leak** — For styles with `keep-coding-instructions: false`, prompt: "Help me with [non-coding task]"
    — Any software engineering assumptions leaking? References to code, files, or technical tools that don't belong?
 
 ## Deployment Readiness
@@ -173,16 +192,18 @@ Go/no-go criteria for shipping a style:
 
 **Go (all must be true):**
 
+- Injection canary (test 0) passes
 - Weighted score >= 6
 - All core tests (1-4) pass
-- Persistence test (6) shows no drift
+- Persistence test (6) shows no drift; overtriggering test (8) shows no over-application
 - No red flags present (see below)
 - `keep-coding-instructions` explicitly set (not relying on default)
 
 **No-go (any one blocks deployment):**
 
-- Weighted score < 4 on any 2x dimension (persona, behaviors, examples)
-- Style reverts to defaults within 5 turns
+- Injection canary fails — nothing else is measurable
+- Weighted score < 4 on any 2x dimension (role & voice, rule intent, exemplars)
+- Style reverts to defaults within 5 turns, or over-applies its rules on the overtriggering test
 - Any red flag present
 - Style works identically without being a style (should be CLAUDE.md instead)
 
@@ -190,13 +211,19 @@ Go/no-go criteria for shipping a style:
 
 Immediate issues requiring attention before deployment:
 
-- **No persona definition** — inconsistent behavior across turns, nothing to anchor the style
-- **Only positive instructions** — will revert to defaults without explicit anti-patterns and replacements
-- **No examples** — ambiguous expectations, compliance is unpredictable
-- **Contradictory rules without priority hierarchy** — Claude picks arbitrarily between conflicting instructions
-- **Over 1000 lines** — instructions will be progressively ignored as context fills
+- **No role or voice definition** — inconsistent behavior across turns, nothing to anchor the register
+- **Prohibition-only rule set** — bare "never" stacks without a positive register description produce curt, stilted
+  output; current models execute prohibitions literally
+- **Persistence/consistency scaffolding** — "maintain throughout" sections and rules repeated across sections duplicate
+  the harness reminders and cause overtriggering
+- **Verification or thoroughness directives** — "always verify", "be thorough" trigger over-verification loops on
+  current models
+- **Contradictory rules** — Claude tries to satisfy both and fails unpredictably; remove the conflict rather than
+  arbitrate it
+- **Over ~200 lines** — a style is a register layer, not a manual; length signals content that belongs in CLAUDE.md,
+  skills, or hooks
 - **No format guidance** — inconsistent output structure across responses
-- **Style that doesn't leverage replacement** — body could work as CLAUDE.md content, wasting the style mechanism
-- **No consistency safeguards** — style will drift within a few turns, especially under emotional pressure
+- **Style that doesn't leverage removal** — body could work as CLAUDE.md content, wasting the style mechanism
+- **Filename/`name` case mismatch** — body silently not injected (loader bug); canary test fails
 - **Missing `keep-coding-instructions` decision** — relying on default (`false`) without considering whether the style
   needs coding capabilities

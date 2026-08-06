@@ -9,8 +9,8 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   architecture, quality evaluation
 - **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
   evaluation, troubleshooting
-- **`output-style-engineering`** — design output styles that replace the system prompt: persona, tone, behavioral rules,
-  non-coding domains, evaluation framework
+- **`output-style-engineering`** — design output styles injected into the system prompt: role and voice framing,
+  intent-carrying rules, tone exemplars, non-coding domains, evaluation framework
 - **`prompt-terser`** — adherence-driven terseness audit for iteratively-edited prompts: same-thought-fewer-words cuts
   with U-curve discipline, narrative-vs-structural distinction, three-check falsification gate (verbosity-type →
   terseness → behavior preservation), and a bracketing preservation inventory that verifies load-bearing literals

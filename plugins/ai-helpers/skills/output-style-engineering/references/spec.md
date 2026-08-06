@@ -4,8 +4,9 @@ Technical reference for Claude Code output style files: format, fields, storage,
 
 ## File Format
 
-Output styles are Markdown files with YAML frontmatter. The frontmatter supplies metadata; the body is injected directly
-into Claude's system prompt — **replacing** the default style instructions, not augmenting them.
+Output styles are Markdown files with YAML frontmatter. The frontmatter supplies metadata; the body is appended to the
+end of Claude's system prompt while the default response-style instructions (and, for custom styles, the software
+engineering instructions) are removed.
 
 ```markdown
 ---
@@ -28,20 +29,25 @@ You are an interactive CLI tool that helps users with software engineering tasks
 - **`name`** — Display name for the style. Shown in the `/config` picker. Defaults to the filename (without `.md`).
 - **`description`** — One-line description shown in the `/config` picker. Optional but strongly recommended.
 - **`keep-coding-instructions`** — Boolean. When `true`, preserves the coding-specific section of the default system
-  prompt (safety guidance, code quality rules, test verification). Default: `false`. Added in Claude Code v2.0.37.
-  Built-in styles have this implicitly `true`.
+  prompt (change scoping, code quality rules, test verification). Default: `false`. Built-in styles have this implicitly
+  `true`.
 - **`force-for-plugin`** — Boolean. Plugin-shipped styles only: applies the style automatically whenever the plugin is
   enabled, without the user selecting it. Overrides the user's `outputStyle` setting; if multiple enabled plugins set
   it, the first one loaded wins. Default: `false`.
 
-## What Output Styles Replace vs. Preserve
+**Loader case-sensitivity bug (open as of v2.1.205, anthropics/claude-code#47482):** the frontmatter `name` is matched
+against the filename case-sensitively. On mismatch (`name: Technical Reviewer` in `technical-reviewer.md`) the body is
+silently dropped from the system prompt while the picker and statusline still show the style as active. Keep the
+filename and `name` identical and lowercase; verify injection with a canary rule and `claude -p "say ok"`.
 
-**Replaced (with custom instructions):**
+## What Output Styles Remove vs. Preserve
 
-- Personality and tone
-- Task prioritization and interaction patterns
-- Formatting and response structure
-- Coding workflow instructions (unless `keep-coding-instructions: true`)
+**Removed from the system prompt:**
+
+- Default response-style instructions (such as responding concisely) — removed by every style, built-in or custom
+- Software engineering workflow instructions — removed by custom styles unless `keep-coding-instructions: true`
+
+**Added:** the style body, at the end of the system prompt.
 
 **Always preserved regardless of style:**
 
@@ -102,7 +108,13 @@ take effect after `/clear` or a new session — not mid-conversation. Changing t
 invalidates the prompt cache: Claude keeps using the style loaded at session start. This keeps the system prompt stable
 within a session so prompt caching can reduce latency and cost.
 
-All output styles trigger periodic reminders during the conversation, reinforcing adherence to the style instructions.
+All output styles trigger reminders during the conversation, reinforcing adherence to the style instructions. This
+harness-level mechanism is one of the two reasons styles outperform additive alternatives (the other: removing default
+prompt sections) — style bodies do not need their own persistence language. Delivery varies by model: Sonnet 5 sessions
+stopped using the mid-conversation `system` role for harness reminders in v2.1.201.
+
+Style instructions live in the system prompt, so they survive conversation compaction intact — unlike skill
+instructions, which sit in conversation history and are subject to compaction budgets.
 
 ## Token Impact
 
@@ -141,17 +153,15 @@ replace it.
 
 ## Comparison: Output Styles vs. Related Features
 
-| Mechanism                | Replaces default prompt | Persistence   | Scope           |
-| ------------------------ | ----------------------- | ------------- | --------------- |
-| Output style             | Yes (selective)         | File on disk  | User or project |
-| CLAUDE.md                | No (user message after) | File on disk  | Project or user |
-| `--append-system-prompt` | No (appends)            | CLI flag only | Session         |
-| `systemPrompt` (append)  | No (appends)            | Code          | SDK session     |
-| Custom `systemPrompt`    | Yes (full replacement)  | Code          | SDK session     |
+- **Output style** — removes default prompt sections selectively and appends its body; file on disk; user, project,
+  managed, or plugin scope
+- **CLAUDE.md** — added as a user message after the system prompt, removes nothing; file on disk; project or user scope
+- **`--append-system-prompt`** — appends to the system prompt, removes nothing; CLI flag; single session
+- **`systemPrompt` with `append` (SDK)** — appends to the preset prompt, removes nothing; code; SDK session
+- **Custom `systemPrompt` (SDK)** — replaces the entire system prompt; code; SDK session
 
-CLAUDE.md content is added as a user message following the system prompt — it does not modify the system prompt itself.
-`--append-system-prompt` appends to the prompt without removing anything. Only output styles (and custom `systemPrompt`)
-actually replace the default.
+Only output styles (and a custom `systemPrompt`) can remove default prompt content — and only output styles come with
+harness adherence reminders.
 
 ## Agent SDK Integration
 

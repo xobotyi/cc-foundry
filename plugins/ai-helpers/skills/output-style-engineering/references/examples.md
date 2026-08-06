@@ -33,32 +33,20 @@ You are a professional technical collaborator. Respond with precision and brevit
 - Verdict or answer first
 - Supporting detail in descending importance
 - Stop when the point is made
-
-## Consistency
-
-Maintain this style throughout the entire session. Do not revert to default patterns even if:
-
-- The topic changes
-- The user asks follow-up questions
-- Multiple turns have passed
-- The task becomes complex or frustrating
-
-If you notice yourself softening tone or adding filler, correct immediately.
-
-If uncertain, default to MORE adherence to this style, not less.
+- Depth scales with the task: a lookup gets a line, an explanation the user asked for gets the depth it needs
 ```
 
 **Dimensional score:**
 
-- **Clarity of role** — high: unambiguous behavior contract
-- **Specificity** — high: lists exact phrases to avoid, including euphemistic hedging
-- **Completeness** — medium: no guidance for tool outputs or multi-step tasks
-- **Reversion risk** — medium-low: dual consistency anchors (section + mid-file self-correction rule)
+- **Role & voice clarity** — high: unambiguous behavior contract
+- **Rule intent** — high: bans exact phrases and pairs them with positive opener/structure rules
+- **Exemplar quality** — low: no tone contrast pair yet
+- **Scaffolding debt** — none: no persistence sections or repeated rules; the harness reminders carry adherence
 
-**Improvement notes:** The phrase blocklist covers the most common sycophancy patterns. For further hardening, add a
-contrast example showing default Claude vs. this style for the same input — examples are the most reliable way to
-communicate tone. The style has no guidance for error reporting or delivering bad news, which is where tone tends to
-revert first.
+**Improvement notes:** Add a contrast example showing the default register vs. this style for the same input — exemplars
+are the most reliable way to communicate tone. The style has no guidance for error reporting or delivering bad news,
+which is where the register slips first. The depth-scaling rule guards against over-application — without it, a terse
+style produces unusably curt walkthroughs.
 
 ## 2. Domain Specialist — SaaS Business Analyst
 
@@ -120,11 +108,11 @@ you'd want a different perspective."
 
 **Dimensional score:**
 
-- **Clarity of role** — high: business analyst identity is specific and the non-engineering framing is explicit
-- **Specificity** — high: structured analysis format with named metrics, vocabulary register defined
-- **Completeness** — high: scope boundaries handle both code requests and off-topic requests
-- **Reversion risk** — low: `keep-coding-instructions: false` strips engineering defaults; scope boundary scripts
-  reinforce the domain
+- **Role & voice clarity** — high: business analyst identity is specific and the non-engineering framing is explicit
+- **Rule intent** — high: structured analysis format with named metrics, vocabulary register defined
+- **Exemplar quality** — low: no contrast pair showing business analysis vs default engineering framing
+- **Scaffolding debt** — none: `keep-coding-instructions: false` strips engineering defaults; scope boundary scripts
+  carry the domain without persistence language
 
 **Improvement notes:** The style could benefit from a contrast example showing how a default Claude response to CSV data
 differs from this style's response — default Claude would likely suggest pandas code, while this style should produce
@@ -185,10 +173,10 @@ If the user asks you to just implement it, do so without comment — respect the
 
 **Dimensional score:**
 
-- **Clarity of role** — high: navigator/driver metaphor is precise
-- **Specificity** — high: turn structure and review format are explicit
-- **Completeness** — high: covers the what/who boundary clearly, plus override escape hatch
-- **Reversion risk** — low: `keep-coding-instructions: true` plus explicit "wait for user" anchors
+- **Role & voice clarity** — high: navigator/driver metaphor is precise
+- **Rule intent** — high: turn structure and review format are explicit and testable
+- **Exemplar quality** — medium: review format doubles as a format exemplar; no tone contrast pair
+- **Scaffolding debt** — none: the turn structure is genuine interaction design, not persistence scaffolding
 
 **Improvement notes:** The 10-30 line heuristic is an anchor but needs calibration per project type — infrastructure
 tasks might be 5 lines, UI components might be 50. Consider adding guidance for when the user submits code that works
@@ -256,19 +244,19 @@ When all concepts are covered:
 2. Ask if the user wants to revisit any concept
 3. Close with a count: "You covered [N] concepts. [M] correct on first attempt."
 
-## Consistency
+## Edge Case: User Types Code
 
-Maintain the voice-first constraint throughout. If the user types a code snippet, acknowledge it but continue
-asking speakable questions — do not switch to a code-review mode.
+If the user types a code snippet, acknowledge it but continue asking speakable questions — do not switch to a
+code-review mode.
 ```
 
 **Dimensional score:**
 
-- **Clarity of role** — high: tutor identity is specific, anchored to the voice-first constraint
-- **Specificity** — high: question types, pacing, feedback language, and session flow all explicit
-- **Completeness** — high: handles correct, incorrect, confusion states, and session completion
-- **Reversion risk** — low: "NEVER ask user to type code" is emphatic; consistency section reinforces the constraint
-  even when the user types code
+- **Role & voice clarity** — high: tutor identity is specific, anchored to the voice-first constraint
+- **Rule intent** — high: question types, pacing, feedback language, and session flow all explicit; the voice-first
+  constraint carries its own rationale (dictation)
+- **Exemplar quality** — medium: feedback language doubles as micro-exemplars; no full contrast pair
+- **Scaffolding debt** — none: the typed-code edge case is genuine interaction design, stated once where it belongs
 
 **Improvement notes:** The feedback language section blocks the most common sycophancy words but could be extended —
 "You nailed it!" and "Spot on!" are the kind of phrases that drift in after 10+ turns. The session flow assumes the user
@@ -345,11 +333,12 @@ should inform the design: [content-first guidance]."
 
 **Dimensional score:**
 
-- **Clarity of role** — high: editorial/voice specialist identity is unambiguous
-- **Specificity** — high: concrete blocklists for words and phrases, channel-specific tone calibration
-- **Completeness** — high: covers review, creation, and two scope boundary scenarios
-- **Reversion risk** — low: `keep-coding-instructions: false` strips engineering defaults; dual scope boundary scripts
-  handle the most common off-domain requests
+- **Role & voice clarity** — high: editorial/voice specialist identity is unambiguous; voice standards use contrasts
+  ("conversational but authoritative — informed, not lectured")
+- **Rule intent** — high: concrete blocklists paired with positive voice standards, channel-specific tone calibration
+- **Exemplar quality** — low: blocklists define what to avoid, but no before/after pair demonstrates the target voice
+- **Scaffolding debt** — none: `keep-coding-instructions: false` strips engineering defaults; scope boundary scripts
+  handle off-domain requests without persistence language
 
 **Improvement notes:** The style needs before/after examples showing the same message in "corporate default" vs. brand
 voice — the blocklists define what to avoid but examples demonstrate what to produce. The channel calibration section is
@@ -358,8 +347,8 @@ conflicts with clarity (e.g., a technical product where jargon is necessary).
 
 ## Pattern Summary
 
-- **Direct Professional** — strongest for eliminating sycophancy; reversion is the main risk. Mitigate with distributed
-  consistency anchors and explicit phrase blocklists.
+- **Direct Professional** — strongest for eliminating sycophancy; over-application is the main risk on current models
+  (curt output where depth is wanted). Pair phrase blocklists with a positive register description and depth scaling.
 - **Domain Specialist** — scope boundary scripts are essential; `keep-coding-instructions: false` strips the engineering
   assumptions that contaminate domain advice. Works for both technical (security auditor) and non-technical (business
   analyst, content strategist) domains.
@@ -367,5 +356,5 @@ conflicts with clarity (e.g., a technical product where jargon is necessary).
   the exercise. `keep-coding-instructions: true` almost always appropriate.
 - **Learning / Educational** — pacing and feedback format do the heavy lifting; voice-first constraint is the strongest
   design forcing function. Add session completion handling.
-- **Persona** — most fragile pattern (not shown above); works best when persona is grounded in specific behaviors, not
-  adjectives. Persona styles that rely on "be enthusiastic" or "be friendly" revert fastest.
+- **Persona** — works when grounded in outcome, audience, and a contrast-based voice description; bare adjectives ("be
+  enthusiastic", "be friendly") leave the register to inference, and invented credentials add nothing.
