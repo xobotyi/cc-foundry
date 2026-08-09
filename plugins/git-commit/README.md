@@ -19,7 +19,7 @@ changes. The commit sequence doesn't tell a coherent story, making git bisect an
 
 ## The Solution
 
-The `commit` skill enforces an 8-step pipeline that identifies logical units in your diff, plans their commit order,
+The `commit` skill enforces a staged pipeline that identifies logical units in your diff, plans their commit order,
 validates quality, and creates atomic commits with meaningful messages.
 
 Each commit message runs through automated validation before execution. Errors block the commit; warnings advise. The
@@ -45,16 +45,12 @@ The skill walks through the complete pipeline automatically. No configuration re
 
 ## The Pipeline
 
-| Step                | Purpose                                           |
-| ------------------- | ------------------------------------------------- |
-| 1. Identify units   | Find separate logical changes in the diff         |
-| 2. Plan order       | Sort by type: style → refactor → fix → feature    |
-| 3. Quality gate     | Verify tests/lint pass before committing          |
-| 4. Self-review      | Check diff matches intent, no debug code          |
-| 5. Stage files      | Selective staging per logical unit                |
-| 6. Validate message | Check conventions via validation script           |
-| 7. Commit           | Display message as blockquote, then execute       |
-| 8. Verify           | Confirm with `git log -1 --stat` and `git status` |
+1. **Survey changes** — find the separate logical changes in the diff
+2. **Plan units and order** — sort by type (style → refactor → fix → feature); dependency order wins over type order
+3. **Quality gate** — verify tests/lint pass before committing
+4. **Commit loop** — for each unit: stage, draft the message to a file, self-review the staged diff, validate the
+   message, commit
+5. **Verify** — confirm with `git log --stat` and `git status`
 
 ## Message Validation
 
@@ -119,6 +115,7 @@ trailers
 
 - Explains why change was needed
 - Describes how to verify the change
+- Records the change — documentation belongs in the artifact (code comments, design docs, README)
 - For bug fixes: explain the cause, not just the symptom
 - For features: explain the use case
 - For refactoring: explain the motivation

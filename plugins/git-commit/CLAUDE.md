@@ -4,8 +4,8 @@ Structured git commit workflow with atomic commits, message validation, and conv
 
 ## Skills
 
-- **`commit`** — 8-step commit pipeline: identify units → plan order → quality gate → self-review → stage → validate →
-  commit → verify
+- **`commit`** — commit pipeline: survey changes → plan units → quality gate → commit loop (stage → draft → self-review
+  → validate → commit) → verify
 - **`commit-message`** — Message formatting conventions and structure rules
 
 ## Scripts
@@ -15,9 +15,9 @@ Structured git commit workflow with atomic commits, message validation, and conv
 ## Workflow
 
 1. `commit` skill loads `commit-message` skill first for formatting rules
-2. Pipeline identifies logical units in diff and plans commit order
-3. Quality gate checks pass before staging
-4. Each message validated before commit execution
+2. Pipeline identifies logical units in the diff and plans the commit order
+3. Quality gate checks pass before the commit loop
+4. Each message is drafted to a file, validated, then committed with `git commit -F`
 5. Final verification with `git log` and `git status`
 
 ## Validator Flags
@@ -48,7 +48,8 @@ Project-specific commit guidance here.
 **Commit message structure:**
 
 - Subject line: `[scope] verb description` (max 72 chars, factual, imperative mood)
-- Body: explains why change was needed, how to verify
+- Body: explains why the change was needed and how to verify it; records the change — documentation belongs in the
+  artifact (code comments, design docs, README)
 - Trailers: structured metadata (Task, Fixes, Refs, etc.)
 
 **Scope usage:**

@@ -5,17 +5,19 @@ description: >-
   message validation, and post-commit verification. Invoke whenever task involves any interaction
   with git commits — committing changes, staging work, splitting diffs into atomic units, or
   preparing work for version control.
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git branch:*), Bash(git reset:*), Bash(git restore:*), Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js)
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git branch:*), Bash(git restore:*), Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js:*)
 ---
 
+# Commit Pipeline
+
 <prerequisite>
-**Invoke commit-message skill first** to load formatting conventions:
+**Invoke the commit-message skill first** to load the message conventions:
 
 ```
 Skill(git-commit:commit-message)
 ```
 
-Do not proceed without loading the skill.
+Do not start the pipeline before that skill is loaded.
 
 </prerequisite>
 
@@ -27,10 +29,12 @@ Do not proceed without loading the skill.
 - Unstaged: !`git diff --stat`
 - Recent commits: !`git log --oneline -5`
 
+If Status shows no changes, report that there is nothing to commit and stop.
+
 ## Project Configuration
 
 <project-config>
-Projects can define commit requirements in their CLAUDE.md using `<git-commit-config>`:
+A project can define commit requirements in its CLAUDE.md with `<git-commit-config>`:
 
 ```xml
 <git-commit-config>
@@ -44,145 +48,151 @@ Project-specific commit guidance goes here.
 </git-commit-config>
 ```
 
-**Before starting the pipeline**, check project CLAUDE.md for `<git-commit-config>`:
+**Before the pipeline starts**, check the project CLAUDE.md for `<git-commit-config>`:
 
-- **`<validator-args>`** — Pass all defined flags directly to the validator. Each `<flag name="X" value="Y"/>` becomes
-  `--X "Y"` in the command.
+- **`<validator-args>`** — pass each flag to the validator: `<flag name="X" value="Y"/>` becomes `--X "Y"` on the
+  command line.
+- **`<extra-instructions>`** — the highest-priority guidance for this commit process. Follow it through the whole
+  pipeline; it overrides the defaults here. </project-config>
 
-- **`<extra-instructions>`** — Highest priority guidance for this commit process. Follow these instructions throughout
-  the pipeline. They override defaults. </project-config>
-
-## Commit Pipeline
+## Ground Rules
 
 <command-format>
-**One git command per Bash call.** Every Bash invocation must start with
-`git` or `node`. Never chain commands with `&&`, `||`, or `;`. Never pipe
-input to git commands.
+**One git command per Bash call.** Each git and validator invocation is a single command that
+starts with `git` or `node`. Do not chain these commands with `&&`, `||`, or `;`. Do not pipe
+input into git. This rule covers git and validator calls only — Quality Gate checks (tests, lint,
+build) use the project's usual commands.
 </command-format>
 
 <pipeline-awareness>
-**Context drift prevention.** Steps like Quality Gate may require fixing
-code, running tests, or debugging — work that can span many turns. Before
-executing any git command, verify you haven't lost the pipeline:
+**Context drift prevention.** The Quality Gate can branch into fixes, test runs, and debugging
+that span many turns. Before each git command, confirm your position:
 
-1. **Am I in the commit pipeline?** (If not, return to step 1)
-2. **Which step am I on?**
-3. **Were prior steps completed?**
+1. Am I in the commit pipeline?
+2. Which pipeline step am I on?
+3. Are the earlier steps complete?
 
-If uncertain, re-read staged changes with `git diff --cached` to re-anchor. </pipeline-awareness>
+Refer to steps by name ("resuming the Commit Loop at Self-Review"). When uncertain, re-read the staged changes with
+`git diff --cached` to re-anchor. </pipeline-awareness>
 
-### 1. Identify Atomic Units
+## Pipeline
 
-Review the diff and identify **separate logical changes**:
+### 1. Survey Changes
+
+Review the full diff and identify the separate logical changes:
 
 ```bash
-git diff HEAD          # All changes
-git diff --cached      # Staged only
+git diff HEAD
 ```
 
 <atomic-commit-rule>
-**One logical change per commit.** Look for boundaries:
+**One logical change per commit.** Boundaries to look for:
 
-- Different files serving different purposes
-- Formatting/style changes mixed with logic changes
+- Different files that serve different purposes
+- Formatting or style changes mixed with logic changes
 - Refactoring mixed with new behavior
 - Unrelated bug fixes bundled together
 
-Each independent change becomes its own commit. </atomic-commit-rule>
+Each independent change becomes its own commit — a unit. </atomic-commit-rule>
 
-### 2. Plan Commit Order
+### 2. Plan Units and Order
 
-For each identified unit, classify and order:
+Classify each unit and plan the commit order:
 
-- **Style (1st)** — Formatting, whitespace, naming
-- **Refactor (2nd)** — Code restructuring, no behavior change
-- **Fix (3rd)** — Bug corrections
-- **Feature (4th)** — New functionality
-- **Docs (any)** — Documentation only
-- **Test (any)** — Adding or fixing tests
-- **Chore (any)** — Build, tooling, dependencies
+- **Style (1st)** — formatting, whitespace, naming
+- **Refactor (2nd)** — restructuring without behavior change
+- **Fix (3rd)** — bug corrections
+- **Feature (4th)** — new functionality
+- **Docs / Test / Chore (any)** — documentation, tests, build and tooling
 
-**Commit style/refactor first** — keeps behavior-changing commits clean.
+Commit style and refactor units first — this keeps the behavior-changing commits clean. Dependency order wins over type
+order: when a fix builds on a feature, the feature commits first. Tests that cover a unit belong in that unit's commit,
+not in a separate test commit.
 
 ### 3. Quality Gate
 
 <quality-gate>
-**Before committing, ensure code quality checks pass.**
+**Make sure the quality checks pass before any commit.**
 
-1. **Review context:** Were lint/test/build commands run earlier in this session for the changed files? If yes and they
-   passed, proceed.
+1. Were lint, test, or build commands run earlier in this session for the changed files, and did they pass? Then enter
+   the Commit Loop.
+2. If not verified: run the checks that apply to this project. Scope them to the changed files when possible.
+3. On failure: fix the problems first. Do not commit broken code.
+4. On success: enter the Commit Loop.
 
-2. **If not verified:** Run appropriate quality checks for the project. Use your knowledge of the codebase to determine
-   what checks apply. Scope to changed files when possible for faster feedback.
+Gate results stay out of the commit message — they are session artifacts (see the commit-message conventions).
 
-3. **On failure:** Fix issues before proceeding. Do not commit broken code.
+After you return from fixes, re-read `<pipeline-awareness>` above and resume at the start of the Commit Loop — do not
+restart the pipeline and do not skip steps. </quality-gate>
 
-4. **On success:** Continue to self-review.
+### 4. Commit Loop
 
-**Gate results stay out of the commit message.** Test pass counts, lint/typecheck/build status, and "all checks pass"
-are facts about this session, not the change. They belong nowhere in the subject, body, or trailers — keep them in the
-terminal.
+Run the steps below for each unit, in the planned order.
 
-**After returning from fixes:** Re-read `<pipeline-awareness>` above. Verify you're resuming at step 4, not starting
-over or skipping steps. </quality-gate>
-
-### 4. Self-Review Before Commit
-
-Before each commit, verify:
-
-- [ ] Diff contains only intended changes (no debug code, temp files)
-- [ ] Changes match the commit message you're about to write
-- [ ] No unrelated changes bundled together
-- [ ] Sensitive data excluded (.env, credentials, secrets)
-- [ ] Message has no filler tics ("this commit", "I", "we", "now"), no promotional adjectives, no scope-restating
-- [ ] Message has no session artifacts (test counts, lint/CI/quality-gate status, "all checks pass")
-
-```bash
-git diff --cached      # Review exactly what will be committed
-```
-
-### 5. Stage Files
-
-For each logical unit:
+#### 4a. Stage
 
 ```bash
 git add <files>
 ```
 
-Do not use `git add -p` or pipe input to interactive commands — these break tool permission matching. Stage by explicit
-file path. If a file contains mixed changes, split it in a prior refactoring commit or accept the broader staging.
-
-### 6. Validate Message
-
-<mandatory>
-**Before committing, validate the message against conventions:**
+Stage by explicit file path. Do not use `git add -p` and do not pipe input into interactive commands — they break tool
+permission matching. If the wrong file is staged, unstage it:
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js [validator-args] --msg "<commit-message>"
+git restore --staged <file>
 ```
 
-- If `<validator-args>` exists in project config, include those flags
-- Fix any ERROR issues before proceeding
-- WARN issues are recommendations — address if reasonable
+If one file interleaves two units: back out one change with the Edit tool, commit the first unit, then restore the
+change — or accept the broader staging and record both units in the message.
+
+#### 4b. Draft Message
+
+Write the message for this unit per the commit-message conventions. Save it to `/tmp/commit-msg.txt` with the Write tool
+— a file passes multi-line messages, quotes, and backticks to git intact, where shell quoting would mangle them.
+
+#### 4c. Self-Review
+
+```bash
+git diff --cached
+```
+
+Verify before continuing:
+
+- [ ] The staged diff contains only the intended unit — no debug code, no temp files
+- [ ] The staged diff matches the drafted message
+- [ ] No sensitive data (.env, credentials, secrets)
+- [ ] The message follows the commit-message conventions — terse register, no session artifacts, record not
+      documentation
+
+#### 4d. Validate
+
+<mandatory>
+Validate the drafted message:
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js --file /tmp/commit-msg.txt
+```
+
+- Add the flags from `<validator-args>` when the project config defines them
+- Fix every ERROR before you continue
+- WARN issues are recommendations — address them when reasonable
 - Do not commit until validation passes without errors
   </mandatory>
 
-### 7. Commit
+#### 4e. Commit
 
-**Before executing git commit, display the full message as a blockquote.**
-
-Then commit:
+Display the full message as a blockquote, then commit:
 
 ```bash
-git commit -m "<validated-message>"
+git commit -F /tmp/commit-msg.txt
 ```
 
-### 8. Verify
+### 5. Verify
 
-After committing, run each as a **separate Bash call**:
+After the last unit, run each command as a separate Bash call:
 
 ```bash
-git log -1 --stat
+git log --stat -3    # -3 = the number of commits created
 ```
 
 ```bash
@@ -191,23 +201,21 @@ git status
 
 ## Breaking Changes
 
-When a commit breaks backward compatibility:
-
-<breaking-change-process>
-1. **Prefer incremental migration:**
-   - Add new code without removing old
-   - Migrate callers from old to new
-   - Remove old code when no callers remain
-
-2. **If breaking in single commit:**
-   - Start body with `BREAKING:` prefix
-   - Explain what breaks and migration path
-   - Link to migration docs if available </breaking-change-process>
+A commit that breaks backward compatibility starts its body with `BREAKING:` and explains the migration path — the
+commit-message conventions define the format. When the break can be staged out, prefer a migration series: add the new
+code, migrate the callers, remove the old code in a later commit.
 
 ## Output
 
-After completing all commits, show:
+After all commits, show:
 
-- List of created commits with subjects
-- Current branch status
+- The created commits with their subjects
+- The current branch status
 - Any remaining uncommitted changes
+
+<critical>
+- One logical change per commit — split; do not bundle.
+- Draft, validate, then commit. Never run `git commit` with a message that failed validation.
+- The message records the change; it does not document the artifact.
+- Session artifacts — test counts, gate status, verification stories — never enter the message.
+</critical>
