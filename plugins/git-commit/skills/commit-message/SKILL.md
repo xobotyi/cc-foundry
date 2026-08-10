@@ -10,16 +10,17 @@ user-invocable: false
 # Commit Message Format
 
 <scope>
-These rules apply **only to git commit messages**. Do not apply the line-length limits, formatting
-conventions, or structure requirements of this skill to other files (code, documentation, configs).
+These rules apply only to git commit messages. Do not apply the line-length limits, the format
+rules, or the structure rules of this skill to other files. Code, documentation, and configuration
+files keep their own rules.
 </scope>
 
 A commit message is a factual record of one change. It tells the reader why the change happened. The reader has the diff
-and the docs; the message adds only what they cannot show.
+and the docs. The message adds only what the diff and the docs cannot show.
 
 <mental-model>
-Write for the colleague who reads `git log` at 3am to find what broke. They can open the diff.
-They cannot recover your reasons. Record the reasons.
+Write for the colleague who reads `git log` at 3am to find the defect. That colleague can open the
+diff. That colleague cannot recover your reasons. Record the reasons.
 </mental-model>
 
 ## What Makes a Good Message
@@ -27,27 +28,31 @@ They cannot recover your reasons. Record the reasons.
 <context-principle>
 A good message draws from three sources:
 
-- **The task** — the problem that was solved
-- **The implementation context** — why this approach won
-- **The deliverable** — what was built
+- **The task** — the problem that you solved
+- **The implementation context** — the reason that this approach won
+- **The deliverable** — the code that you built
 
-Draw the _why_ from these sources; do not transcribe them into the message. When context is incomplete, record what the
-code and the available information can verify. </context-principle>
+Draw the _why_ from these three sources. Do not copy the sources into the message. If the context is incomplete, record
+what the code and the available information can verify.
+
+</context-principle>
 
 ### Factual, Not Promotional
 
 <factual-principle>
-A commit message is a **factual record**, not marketing copy.
+A commit message is a **factual record**. It is not marketing copy.
 
-- **Subject**: strictly factual, imperative mood, no judgment. It says what was done, not how good it is.
-- **Body**: can explain reasoning and trade-offs; stays objective, without promotional language.
+- **Subject** — only facts, in the imperative mood, with no judgment. It says what you did, not how good the change is.
+- **Body** — it can give the reasons and the trade-offs. It stays objective. It has no promotional words.
 
-The subject answers "What did this commit do?" — not "Why is this commit amazing?" </factual-principle>
+The subject answers this question: what did this commit do? It does not answer this question: why is this commit good?
+
+</factual-principle>
 
 ## Structure
 
 <format>
-The message has three blocks, separated by blank lines:
+The message has three blocks. A blank line separates the blocks:
 
 ```text
 [scope] subject
@@ -57,260 +62,263 @@ body
 trailers
 ```
 
-- **Subject** — what changed; 50 characters as the target, 72 as the hard cap; factual
-- **Body** — why it changed, and how a reader can verify it
-- **Trailers** — structured metadata (references, authorship)
-  </format>
+- **Subject** — what changed. The target is 50 characters. The hard limit is 72 characters. Write only facts.
+- **Body** — the reason for the change, and the procedure that verifies it.
+- **Trailers** — structured metadata such as references and authorship.
+
+</format>
 
 ### ASCII Symbols
 
 <charset>
-Use ASCII punctuation and symbols only. Non-English prose is fine — the restriction is on
-decorative and typographic Unicode, not on natural language.
+Use ASCII punctuation and ASCII symbols only. Prose in a different language is correct. This rule
+applies to decorative and typographic Unicode, not to natural language.
 
-- No em/en dashes (—, –) — use `--` or `-`
-- No arrows (→, ←, ↔) — use `->`, `<-`, `<->`
-- No bullet symbols (•, ▸) — use `-` or `*`
-- No fancy quotes (“”, ‘’) — use straight quotes
-- No emoji (🐛, ✅, 🚀) — unless project convention requires it
-- No other decorative symbols (©, ™, §, ¶, ∞)
+- No em dash and no en dash (—, –). Use `--` or `-`.
+- No arrows (→, ←, ↔). Use `->`, `<-`, and `<->`.
+- No bullet symbols (•, ▸). Use `-` or `*`.
+- No fancy quotes (“”, ‘’). Use straight quotes.
+- No emoji (🐛, ✅, 🚀), unless the project conventions make them necessary.
+- No other decorative symbols (©, ™, §, ¶, ∞).
 
-Git tooling, terminals, email patches, and `git log` render ASCII reliably everywhere. Unicode symbols break in some
-environments and add no information over their ASCII equivalents.
+Git tools, terminals, email patches, and `git log` show ASCII correctly in all environments. Some environments break
+Unicode symbols. Those symbols add no information.
 
 </charset>
 
 ## Subject Line
 
-- With scope (monorepos): `[scope] <verb> <description>`
-- Without scope (single-purpose repos): `<verb> <description>`
+- With a scope, for a monorepo: `[scope] <verb> <description>`
+- Without a scope, for a single-purpose repo: `<verb> <description>`
 
 <subject-rules>
-- Target 50 characters or less; hard cap 72
-- Imperative mood: "add", not "added"
-- Lowercase after the scope (proper nouns keep their case)
-- No period at the end
-- **Factual**: say what changed, not how good the change is
-- **No filler tics**: drop "this commit", "I", "we", "now", "currently"; never restate the scope
+- Write 50 characters or less. The hard limit is 72 characters.
+- Use the imperative mood: "add", not "added".
+- Use lowercase after the scope. Proper nouns keep their capital letters.
+- Do not put a period at the end.
+- **Write only facts.** Say what changed, not how good the change is.
+- **Remove the filler words.** Drop "this commit", "I", "we", "now", and "currently". Never repeat the scope.
+
 </subject-rules>
 
 ### Scope (Optional)
 
-Scope is useful for **monorepos** and repositories with multiple deliverables. A single-purpose repository can omit it.
+A scope helps in a **monorepo** and in a repo with more than one deliverable. A single-purpose repo can omit it.
 
 <scope-guidance>
-**Use scope when:**
+**Use a scope when one of these conditions is true:**
 
-- The repository is a monorepo with multiple projects or packages
-- The repository contains distinct subsystems (frontend, backend, libs)
-- Readers filter `git log` by component
+- The repo is a monorepo with more than one project or package.
+- The repo holds separate subsystems such as a frontend, a backend, and libraries.
+- Readers filter `git log` by component.
 
-**Omit scope when:**
+**Omit the scope when one of these conditions is true:**
 
-- The repository has a single purpose
-- All code serves one deliverable
-- The scope would always be the same </scope-guidance>
+- The repo has one purpose.
+- All code serves one deliverable.
+- The scope is always the same.
 
-The scope names the affected subsystem:
+</scope-guidance>
 
-- `[parser]` — top-level project
-- `[core/auth]` — nested path
-- `[web/api]` — component within a project
+The scope names the subsystem that you changed:
 
-Derive the scope from file paths, not from file contents — use the common parent directory or the most significant
-affected component. Use one spelling for one component: `[myapp/backend]` and `[myapp/b]` in the same log break the
-filtering that scope exists for.
+- `[parser]` — a top-level project
+- `[core/auth]` — a nested path
+- `[web/api]` — a component in a project
 
-Version directories in the path (`v2` and similar, in any language) follow the reader's-candidates rule: while one
-version is alive, omit the segment — `[core/engine]`, not `[core/engine/v2]`; the reader has one candidate. When
-versions coexist, the segment is the distinction that matters — `[core/engine/v1]` and `[core/engine/v2]`.
+Derive the scope from the file paths, not from the file contents. Use the common parent directory, or the most
+significant component that you changed. Use one spelling for one component. `[myapp/backend]` and `[myapp/b]` in the
+same log break the filtering that the scope exists for.
+
+A path can hold a version directory, such as `v2` or its equivalent in another language. Such a directory follows the
+reader's-candidates rule. While one version is alive, omit the segment. Write `[core/engine]`, not `[core/engine/v2]`,
+because the reader has one candidate. When two versions are alive, the segment is the distinction that matters. Write
+`[core/engine/v1]` and `[core/engine/v2]`.
 
 ## Body
 
 <body-philosophy>
-A good commit message is rarely a single line.
+A good commit message is rarely one line.
 
-The body is the channel to future readers. It answers:
+The body is the channel to future readers. It answers three questions:
 
-- **What** changed beyond the subject
-- **Why** the change was needed
-- **How a reader can verify it** later, when that is not obvious — reproduction steps they can follow
-  (`run X, confirm Y`), not the results you produced this session
+- **What** changed, in addition to the subject.
+- **Why** the change was necessary.
+- **How a reader can verify it** later, when that is not obvious. Give the steps that the reader can repeat
+  (`run X, confirm Y`). Do not give the results that you produced in this session.
 
-"How to verify" means instructions for a future reader, never a log of the checks you ran.
-`Run the deduper twice and confirm idempotence` belongs here; `ran the suite, 55/55 passing` does not — that is a fact
-about your terminal at commit time, not about the change.
+"How to verify" means instructions for a future reader. It never means a log of the checks that you ran.
+`Run the deduper twice and confirm idempotence` belongs here. `Ran the suite, 55/55 passing` does not. That sentence is
+a fact about your terminal at commit time, not about the change.
 
-Wrap body lines at 72 characters. This is a hard limit, not a guideline — git tooling (log, format-patch, email) assumes
-72-character body lines. Trailers are the only exception. </body-philosophy>
+Wrap each body line at 72 characters. This is a hard limit, not a recommendation. Git tools such as `log`,
+`format-patch`, and email expect 72-character body lines. Trailers are the only exception.
+
+</body-philosophy>
 
 ### Record, Not Documentation
 
 <record-not-documentation>
-The body records why this change happened. It does not document the result — the changed files do
-that. A rationale, invariant, or behavior description that is worth keeping goes into the artifact
-(a code comment, a design doc, the README); the diff then carries it into history.
+The body records why this change happened. It does not document the result. The changed files
+document the result. Keep a rationale, an invariant, or a behavior description in the artifact: a
+code comment, a design doc, or the README. The diff then carries it into the history.
 
-Signs that a body has become documentation:
+These signs show that a body became documentation:
 
-- A paragraph for each decision inside the artifact — that is the artifact's design doc
-- A list of the surfaces, files, or tests the change touches — the diff already lists them
-- A restatement of what the updated docs say
-- A story of how you verified the change ("verified by building X", "measured on Y") — that is a session artifact
+- A paragraph for each decision inside the artifact. That is the design doc of the artifact.
+- A list of the surfaces, the files, or the tests that the change touches. The diff already lists them.
+- A repeat of what the updated docs say.
+- A story of your verification, such as "verified by building X" or "measured on Y". That is a session artifact.
 
-**The test:** would the paragraph stay true and useful if you pasted it into the repo's docs? Then it belongs in the
-repo's docs, not in the message. A body past ~20 lines usually fails this test. </record-not-documentation>
+**The test:** paste the paragraph into the repo's docs. Does it stay true and useful there? Then it belongs in the
+repo's docs, not in the message. A body of more than approximately 20 lines usually fails this test.
+
+</record-not-documentation>
 
 ### When Body is Essential
 
-- Bug fix — explain why the bug existed, not only what you fixed
-- Feature — explain the use case
-- Refactoring — explain the motivation
-- Breaking change — explain the migration path
-- Non-obvious change — explain the rationale
-- Part of a commit chain — state what related work follows
+- A bug fix. Explain why the bug existed, not only what you corrected.
+- A feature. Explain the use case.
+- A refactor. Explain the motivation.
+- A breaking change. Explain the migration path.
+- A change that is not obvious. Explain the rationale.
+- One commit in a chain. State the related work that follows.
 
-Explain the decisions that shaped the change — not every decision inside the artifact.
+Explain the decisions that shaped the change. Do not explain each decision inside the artifact.
 
 ### Terse Register
 
-The diff carries the _what_; the message carries the _why_. Subjects and bodies are records, not narratives. Bodies can
-use fragments and drop articles where clarity survives. Identifiers, file paths, and error strings stay exact.
+The diff carries the _what_. The message carries the _why_. Subjects and bodies are records, not narratives. A body can
+use fragments, and it can drop articles where the meaning stays clear. Identifiers, file paths, and error strings stay
+exact.
 
-**Tense carries the timeline.** State the old behavior in the past tense — it is the cause. State the new behavior in
-the plain present tense — the commit itself marks the "now":
+**The tense carries the timeline.** State the old behavior in the past tense, because it is the cause. State the new
+behavior in the plain present tense, because the commit itself marks the "now":
 `Empty input dereferenced nil. Returns empty token list instead.`
 
 **Never include:**
 
-- "This commit does X", "This change..." — the diff says what.
-- "I", "we" — the commit speaks for itself.
-- "now", "currently", "previously" — tense already carries the timeline.
-- "As requested by..." — use a `Co-Authored-By:` trailer or omit.
-- The scope restated: `[parser] update parser code` → `[parser] handle empty input`.
-- Promotional adjectives without specifics: "great", "amazing", "improved", "better" — say what is better.
-- Decorative Unicode — em dashes, arrows, fancy quotes, emoji, bullet symbols (see ASCII Symbols above).
-- Filler: "just", "really", "basically", "actually", "simply"; connective fluff: "however", "furthermore",
+- "This commit does X", "This change...". The diff says what.
+- "I", "we". The commit speaks for itself.
+- "now", "currently", "previously". The tense already carries the timeline.
+- "As requested by...". Use a `Co-Authored-By:` trailer, or write nothing.
+- The scope repeated: `[parser] update parser code` becomes `[parser] handle empty input`.
+- Promotional adjectives without data: "great", "amazing", "improved", "better". Say what is better.
+- Decorative Unicode: em dashes, arrows, fancy quotes, emoji, and bullet symbols. See ASCII Symbols above.
+- Filler: "just", "really", "basically", "actually", "simply". Connective fluff: "however", "furthermore",
   "additionally".
-- Session artifacts: test pass counts ("55 of 55 tests passing", "all tests green"), lint/typecheck/build/quality-gate
-  status, CI results, "all checks pass", and verification stories ("verified by building X", "measured on Y"). These
-  record your session at commit time, not the change — a future reader cannot verify them, and the next commit makes
-  them stale. Reproduction steps a reader can follow are fine (see Body above); the log of checks you ran is not.
+- Session artifacts: test pass counts, lint status, typecheck status, build status, quality-gate status, CI results, and
+  verification stories. Examples: "55 of 55 tests passing", "all tests green", "all checks pass", "verified by building
+  X", "measured on Y". These record your session at commit time, not the change. A future reader cannot verify them, and
+  the next commit makes them stale. Steps that a reader can repeat are correct in the body. A log of the checks that you
+  ran is not.
 
 **Bad:**
 
-```
-
+```text
 [parser] fix the bug in parser
 
 This commit fixes a bug we found where the parser was incorrectly handling empty input. I noticed that it would now
 sometimes panic, so I added a guard to prevent this issue.
-
 ```
 
 **Good:**
 
-```
-
+```text
 [parser] handle empty input in token scanner
 
 Empty input dereferenced nil in the scanner loop. Returns empty token list instead.
 
 Fixes: #234
-
 ```
 
-The subject drops "the bug in parser" (a scope restatement) and states the fix. The body drops "this commit / I / we /
-now", uses fragments, and names the actual cause.
+The subject drops "the bug in parser", which repeats the scope, and states the fix. The body drops "this commit", "I",
+"we", and "now". It uses fragments, and it names the true cause.
 
 ### Body Patterns
 
 <body-patterns>
-**Bug fix — name the cause:**
+**A bug fix names the cause:**
 
-```
-
+```text
 Session cache returned nil when the key existed but the value had expired. The TTL check ran after the nil check, so
 expired sessions caused panics.
 
 Returns ErrExpired instead, so callers can tell "not found" from "expired".
-
 ```
 
-**Feature — name the purpose:**
+**A feature names the purpose:**
 
-```
-
+```text
 Buffers push attempts and sends them as one batch request on a configured interval. Reduces request volume to the API.
-
 ```
 
-**Refactoring — name the benefit:**
+**A refactor names the benefit:**
 
-```
-
+```text
 - Use Dependency by-pointer to simplify usage patterns
 - Add convenience methods: BorrowByName, BorrowByID
 
 Preparation for the new package resolution algorithm.
-
 ```
 
-**Commit chain — state what follows:**
+**A commit in a chain states what follows:**
 
-```
-
+```text
 Integration with the order processing pipeline follows in a separate change.
-
 ```
 
-Name the specific work that follows. Not "more changes coming" — say what and where. </body-patterns>
+Name the specific work that follows. Do not write "more changes coming". Say what the work is and where it goes.
+
+</body-patterns>
 
 ## Breaking Changes
 
 <breaking-changes>
-When a commit breaks backward compatibility, the body MUST start with a `BREAKING:` declaration as
-the first paragraph:
+A commit can break backward compatibility. The body of such a commit MUST start with a `BREAKING:`
+declaration as the first paragraph:
 
-```
-
+```text
 BREAKING: <what is broken>
 
 <explanation and migration path>
 ```
 
-The `BREAKING:` prefix is uppercase, followed by a short description of what breaks. The next paragraphs explain why and
-how to migrate. </breaking-changes>
+Write the `BREAKING:` prefix in capital letters. Give a short description of what breaks after it. The paragraphs that
+follow explain the reason and the migration path.
+
+</breaking-changes>
 
 ## Trailers (Footer Metadata)
 
-Trailers are structured key-value pairs at the end of the commit message, in
+Trailers are structured key-value pairs at the end of the commit message. They use the
 [git-trailer format](https://git-scm.com/docs/git-interpret-trailers).
 
 <trailers>
-```
+```text
 Key-Name: value
 Another-Key: value with spaces
 ```
 
-A blank line separates the body from the trailers. Each trailer is on its own line.
+A blank line separates the body from the trailers. Each trailer stays on its own line.
 
 </trailers>
 
 ### Common Trailers
 
-- `Task:` — link to issue tracker — `Task: https://tracker.example.com/PROJ-123`
-- `Fixes:` — issue this commit fixes — `Fixes: #456` or `Fixes: PROJ-456`
-- `Refs:` — related issues/commits — `Refs: #123, #124`
-- `Closes:` — auto-close issue on merge — `Closes: #789`
+- `Task:` — a link to the issue tracker — `Task: https://tracker.example.com/PROJ-123`
+- `Fixes:` — the issue that this commit corrects — `Fixes: #456` or `Fixes: PROJ-456`
+- `Refs:` — related issues or commits — `Refs: #123, #124`
+- `Closes:` — the issue that closes at merge time — `Closes: #789`
 - `See:` — related documentation — `See: docs/auth.md`
-- `Reviewed-By:` — code reviewer — `Reviewed-By: Alice <alice@example.com>`
-- `Co-Authored-By:` — additional authors — `Co-Authored-By: Bob <bob@example.com>`
+- `Reviewed-By:` — the code reviewer — `Reviewed-By: Alice <alice@example.com>`
+- `Co-Authored-By:` — an additional author — `Co-Authored-By: Bob <bob@example.com>`
 
 <trailer-conventions>
-- All trailer keys use Title-Case
-- Keep values on a single line when possible
-- Multiple values: comma-separate them, or repeat the trailer
+- Write each trailer key in Title-Case.
+- Keep each value on one line when this is possible.
+- For more than one value, use a comma-separated list, or repeat the trailer.
+
 </trailer-conventions>
 
 ## Examples
@@ -319,10 +327,10 @@ A blank line separates the body from the trailers. Each trailer is on its own li
 
 ### Good: Bug fix with cause explanation
 
-**Story:** Users reported session timeouts. Investigation revealed the cache was panicking on expired entries instead of
-returning an error.
+**Story:** Users reported session timeouts. The investigation showed that the cache panicked on expired entries. It did
+not return an error.
 
-```
+```text
 [core/cache] fix nil pointer in session lookup
 
 Session cache returned nil when key existed but value had expired.
@@ -334,17 +342,17 @@ Returns ErrExpired instead, letting callers tell "not found" from
 Fixes: #127
 ```
 
-**Why it works:** The subject is factual ("fix nil pointer"), not promotional ("fix critical bug"). The body names the
-cause (TTL check order), not only the symptom.
+**Why it works:** The subject is factual ("fix nil pointer"). It is not promotional ("fix critical bug"). The body names
+the cause, the order of the TTL check, not only the symptom.
 
 ---
 
 ### Good: Feature without scope (single-purpose repo)
 
-**Story:** A metrics library was causing API rate-limits due to high request volume. Task was to reduce requests by
-batching pushes.
+**Story:** A metrics library caused API rate limits, because it sent too many requests. The task was to reduce the
+requests with batches.
 
-```
+```text
 add buffered metrics pusher
 
 Batches push attempts and sends them as a single request on a
@@ -353,39 +361,39 @@ configured interval. Reduces API request volume.
 Task: https://tracker.example.com/MRN-53
 ```
 
-**Why it works:** No scope — a single-purpose metrics library. The subject states what was added; the body states the
-mechanism and the benefit, without "amazing" or "greatly improved".
+**Why it works:** The message has no scope, because the repo is a single-purpose metrics library. The subject states
+what you added. The body states the mechanism and the benefit, without "amazing" or "greatly improved".
 
 ---
 
 ### Bad: Promotional subject
 
-**Story:** Refactored the query builder to use prepared statements instead of string concatenation.
+**Story:** The query builder moved from string concatenation to prepared statements.
 
-```
+```text
 [storage] implement better SQL query construction
 ```
 
-**Problem:** "better" is a judgment, not a fact. The subject sells instead of describing.
+**Problem:** "better" is a judgment, not a fact. The subject sells the change. It does not describe the change.
 
 **Fixed:**
 
-```
+```text
 [storage] replace SQL string concatenation with query builder
 
 Prevents SQL injection. Prepared statements carry all dynamic
 values.
 ```
 
-**Why the fix works:** The subject states the factual change (replaced X with Y). The body states the concrete benefit.
+**Why the fix works:** The subject states the factual change, X replaced Y. The body states the concrete benefit.
 
 ---
 
 ### Bad: Missing cause in bug fix
 
-**Story:** Login was failing for some users. Found that password hash comparison was case-sensitive on some databases.
+**Story:** Login failed for some users. The password hash comparison was case-sensitive on some databases.
 
-```
+```text
 [auth] fix login bug
 
 Fixed the login issue.
@@ -397,7 +405,7 @@ Fixes: #234
 
 **Fixed:**
 
-```
+```text
 [auth] fix case-sensitive password hash comparison
 
 Some database collations compare strings case-sensitively, causing
@@ -407,25 +415,25 @@ comparison explicitly.
 Fixes: #234
 ```
 
-**Why the fix works:** The subject states the actual fix. The body explains why the bug existed (database collation) and
-what changed.
+**Why the fix works:** The subject states the true fix. The body explains why the bug existed, the database collation,
+and what changed.
 
 ---
 
 ### Bad: No body on non-trivial change
 
-**Story:** Migrated authentication from session cookies to JWT tokens. This affects all API endpoints.
+**Story:** Authentication moved from session cookies to JWT tokens. The change affects all API endpoints.
 
-```
+```text
 [auth] migrate to JWT authentication
 ```
 
-**Problem:** A major architectural change with a single-line message. What happens to existing sessions? What is the
+**Problem:** A large architectural change has a message of one line. What happens to the existing sessions? What is the
 migration path?
 
 **Fixed:**
 
-```
+```text
 [auth] migrate to JWT authentication
 
 BREAKING: removes cookie-based session authentication
@@ -442,55 +450,56 @@ See: docs/auth-migration.md
 Closes: #456
 ```
 
-**Why the fix works:** The breaking change is declared first. The body states the impact and the migration steps, and
-links the documentation.
+**Why the fix works:** The message declares the breaking change first. The body states the impact and the migration
+steps, and it links the documentation.
 
 ---
 
 ### Bad: Mixed changes, vague description
 
-**Story:** While fixing a bug in the parser, also cleaned up some formatting and added a new validation method.
+**Story:** One session corrected a parser bug, cleaned some formatting, and added a validation method.
 
-```
+```text
 [parser] various improvements and fixes
 ```
 
-**Problem:** "various improvements" is meaningless. What was improved? What was fixed? This should be multiple commits.
+**Problem:** "various improvements" has no meaning. What improved? What was fixed? This work needs more than one commit.
 
-**Analysis:** This is a workflow problem, not only a message problem. Mixed changes split into atomic commits:
+**Analysis:** This is a workflow problem, not only a message problem. Split the mixed changes into atomic commits:
 
 1. `[parser] fix off-by-one error in token position`
 2. `[parser] reformat according to style guide`
 3. `[parser] add validation for nested expressions`
 
-Each commit is focused and independently reviewable.
+Each commit has one purpose, and a reviewer can read each commit independently.
 
 </examples>
 
 ## Amending Commits
 
 <amend-rule>
-When amending a commit (`git commit --amend`), **rewrite the message as if the commit is new**.
+When you amend a commit with `git commit --amend`, **write the message again as if the commit is
+new**.
 
-An amended commit replaces the original — it rewrites history. The final message must describe what the commit
-introduces, not the journey of revisions that led to it. From the reader's perspective there is no "original commit";
-there is only the resulting commit.
+An amended commit replaces the original commit and rewrites the history. The final message must describe what the commit
+introduces. It must not describe the sequence of revisions. From the reader's position there is no original commit.
+There is only the resulting commit.
 
-**Common violation:** the agent treats the amend as iterative work and describes changes relative to the original commit
-("also update the tests", "fix the edge case from the previous version", "address review feedback"). The reader has no
-access to the original commit and no context for "also" or "previous".
+**Common violation:** The agent treats the amend as iterative work. It then describes the changes against the original
+commit: "also update the tests", "fix the edge case from the previous version", "address review feedback". The reader
+has no access to the original commit, and no context for "also" or "previous".
 
-**Correct approach:** read the full staged diff after amending, then write a message that describes the complete change
-as a single introduction. Ignore the original message — start fresh.
+**Correct approach:** Read the full staged diff after the amend. Then write a message that describes the complete change
+as one introduction. Ignore the original message and start again.
 
-```
-# WRONG — describes the amend as incremental work
+```text
+# WRONG - describes the amend as incremental work
 [parser] fix edge case missed in previous commit
 
 Adds handling for empty input that was overlooked in the initial implementation.
 Also updates tests to cover the new branch.
 
-# RIGHT — describes the complete change
+# RIGHT - describes the complete change
 [parser] handle empty input in token scanner
 
 Empty input dereferenced nil in the scanner loop. Returns an empty
@@ -504,32 +513,33 @@ token list instead.
 <forbidden>
 **Never add references that indicate AI involvement:**
 
-- No "Generated with Claude Code" or similar
-- No "Co-Authored-By: Claude" or any AI co-author trailer
-- No emoji that marks AI generation (🤖, etc.)
+- No "Generated with Claude Code" or a similar sentence
+- No "Co-Authored-By: Claude" and no other AI co-author trailer
+- No emoji that marks AI generation (🤖, and similar)
 - No links to claude.com, anthropic.com, or AI tools
 
-Commits must appear as regular developer commits.
+Commits must look like regular developer commits.
 
 </forbidden>
 
 <critical>
 ## Core Principles
 
-- **Record, not documentation** — the body carries the why of the change; rationale, invariants, and behavior
+- **Record, not documentation** — the body carries the why of the change. Rationale, invariants, and behavior
   descriptions live in the artifact and travel in the diff
-- **Use available context** — draw the why from task, implementation, and deliverable; do not transcribe them
-- **Factual subjects** — what changed, not how good
-- **Explain the cause** — for a bug fix, say why it was broken
-- **Body is essential** — single-line commits are rarely acceptable; a body past ~20 lines is usually documentation in
-  disguise
-- **Terse register** — the diff carries the what; the message carries the why. No "this commit / I / we"; tense carries
-  the timeline; no filler; no promotional adjectives
-- **No session artifacts** — test counts, lint/CI/gate status, and verification stories record your session, not the
-  change; "how to verify" means reader reproduction steps
+- **Use available context** — draw the why from the task, the implementation, and the deliverable. Do not copy them
+- **Factual subjects** — what changed, not how good it is
+- **Explain the cause** — for a bug fix, say why the code was defective
+- **Body is essential** — a message of one line is rarely acceptable. A body of more than approximately 20 lines is
+  usually documentation in disguise
+- **Terse register** — the diff carries the what, the message carries the why. No "this commit", "I", or "we". The tense
+  carries the timeline. No filler. No promotional adjectives
+- **No session artifacts** — test counts, lint status, CI status, gate status, and verification stories record your
+  session, not the change. "How to verify" means steps that the reader repeats
 - **BREAKING first** — a breaking change starts the body with `BREAKING:`
-- **Trailers for metadata** — Title-Case, structured format
-- **Amends rewrite history** — an amended message describes the full change, not the delta
-- **ASCII symbols** — no decorative Unicode (em dashes, arrows, fancy quotes, emoji); ASCII equivalents only
-- **No AI attribution** — commits appear as regular developer work
-  </critical>
+- **Trailers for metadata** — Title-Case keys, structured format
+- **Amends rewrite history** — an amended message describes the full change, not the difference
+- **ASCII symbols** — no decorative Unicode (em dashes, arrows, fancy quotes, emoji). Use the ASCII equivalents
+- **No AI attribution** — commits look like regular developer work
+
+</critical>

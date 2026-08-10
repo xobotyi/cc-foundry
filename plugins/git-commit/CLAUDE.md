@@ -75,6 +75,17 @@ Project-specific commit guidance here.
 - No "Co-Authored-By: Claude" trailers
 - Commits appear as regular developer work
 
+**Skill prose (both SKILL.md files):**
+
+- Written in ASD-STE100 Simplified Technical English — keep edits in that style
+- One instruction per sentence; 20 words max in a procedure, 25 in a description
+- Active voice, imperative mood, no gerunds: "stage the file", not "staging the file"
+- One term per concept: `unit` for one logical change, plus `subject`, `body`, `trailer`, `staged`, `unstaged`,
+  `untracked`
+- Em dashes only as KV-list separators, never inside a sentence
+- Code fences carry a language label (` ```text `) — unlabeled fences get reflowed by the prettier MDX parser
+- Frontmatter `description` is exempt — it is an activation surface and follows the `skill-engineering` formula
+
 ## Extension Points
 
 - `skills/commit/SKILL.md` — commit pipeline workflow
