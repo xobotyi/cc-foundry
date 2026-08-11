@@ -21,6 +21,8 @@ const MSG_FLAG = '--msg';
 const REQUIRE_TRAILERS_FLAG = '--require-trailers';
 const SUBJECT_MAX_LENGTH = 72;
 const TRAILER_RX = /^([A-Za-z][A-Za-z0-9-]*):[ \t]+.+$/;
+// Index of the first body line: 0 is the subject, 1 is the mandatory blank line.
+const BODY_START = 2;
 
 // Filler tics in subject lines. Best-effort — body is not checked because
 // "now", "I", and similar appear legitimately in narrative bodies. Subject
@@ -178,6 +180,30 @@ function getRequiredTrailers() {
 }
 
 /**
+ * Returns the index of the first line of the trailing trailer block.
+ * Returns the count of lines when the message has no trailer block.
+ *
+ * @param lines {string[]}
+ * @returns {number}
+ */
+function findTrailerStart(lines) {
+    let end = lines.length - 1;
+    while (end >= BODY_START && lines[end] === '') {
+        end--;
+    }
+
+    let start = end + 1;
+    for (let i = end; i >= BODY_START; i--) {
+        if (lines[i] === '' || !TRAILER_RX.test(lines[i])) {
+            break;
+        }
+        start = i;
+    }
+
+    return start;
+}
+
+/**
  * Validates the subject line of the commit message.
  *
  * @param subject {string}
@@ -219,6 +245,7 @@ function validateMessage(message, requiredTrailers) {
     }
 
     const lines = message.split('\n').map(line => line.trim());
+    const trailerStart = findTrailerStart(lines);
 
     if (lines.length > 50) {
         printWarn('Commit message has more than 50 lines. Consider shortening it.');
@@ -226,8 +253,10 @@ function validateMessage(message, requiredTrailers) {
 
     validateSubject(lines[0]);
 
-    if (lines.length === 1) {
-        printWarn("Commit messages containing only subject line are discouraged.");
+    // Blank lines and the trailer block are excluded: a subject plus trailers is still bodyless.
+    const bodyLines = lines.slice(BODY_START, trailerStart).filter(line => line !== '');
+    if (bodyLines.length === 0) {
+        printWarn('Commit message has no body. A subject-only message is rarely acceptable.');
     }
 
     if (lines.length > 1) {
@@ -240,19 +269,10 @@ function validateMessage(message, requiredTrailers) {
     if (requiredTrailers.length > 0) {
         const trailers = new Set();
 
-        // Walk backwards from end to find trailer block
-        for (let i = lines.length - 1; i >= 0; i--) {
-            const line = lines[i];
-
-            if (line === '') {
-                break;
-            }
-
-            const match = line.match(TRAILER_RX);
+        for (let i = trailerStart; i < lines.length; i++) {
+            const match = lines[i].match(TRAILER_RX);
             if (match) {
                 trailers.add(match[1]);
-            } else {
-                break;
             }
         }
 
