@@ -142,7 +142,8 @@ A good commit message is rarely one line.
 
 The body is the channel to future readers. It answers three questions:
 
-- **What** changed, in addition to the subject.
+- **What** the subject cannot hold, such as a behavior change that surprises the reader. It is not a walkthrough of the
+  new code.
 - **Why** the change was necessary.
 - **How a reader can verify it** later, when that is not obvious. Give the steps that the reader can repeat
   (`run X, confirm Y`). Do not give the results that you produced in this session.
@@ -156,6 +157,49 @@ Wrap each body line at 72 characters. This is a hard limit, not a recommendation
 
 </body-philosophy>
 
+### Shape
+
+<body-shape>
+The default body is one paragraph of 2 to 5 lines. It names the cause, then the new behavior.
+
+Each paragraph after the first earns its lines, or it goes. A paragraph earns its lines when it records a fact that the
+diff and the docs cannot show:
+
+- A second reason that the first paragraph does not carry.
+- A `BREAKING:` declaration and the migration path.
+- A behavior change that the subject cannot predict, such as the new meaning of an absent value.
+- A one-line note about the work that follows in the chain.
+
+A paragraph that walks the reader through the new procedure earns nothing. Delete it. Keep the fact in a code comment,
+where the next maintainer meets it.
+
+**More than one behavior change.** One unit can change several behaviors. Give one line to each change, in one list. Do
+not give a paragraph to each change:
+
+```text
+- Rejects a duplicate id with ErrConflict, where the last write won.
+- An absent sessions root means no folder, where a bare id under the
+  launch directory used to serve.
+```
+
+Mark each item with `-`. A wrapped line then keeps its item visible in `git log`. Each line names the change that the
+caller sees. The tense pair carries the timeline, as the Terse Register section below defines. A line that names a file,
+a function, or a test is an inventory of the diff. Delete such a line.
+
+The list does not license a longer body. Several behavior changes under one reason stay in one commit, and the reason
+keeps its paragraph. Two independent reasons are two commits, whatever the number of behavior changes. A rationale for
+one of the changes belongs in a code comment beside that code.
+
+**The length follows the number of reasons, not the size of the diff.** A refactor of 2000 lines with one reason gets
+one paragraph. A migration with 6 steps gets the 6 steps. A body of 20 lines is correct only when 20 lines of reasons,
+declarations, and steps exist. Such a commit is rare. A body of that size usually holds a walkthrough, or a second unit
+that belongs in a separate commit.
+
+**When the body grows, test it before you commit.** Delete each sentence that the diff shows. Then count the reasons. If
+two independent reasons remain, split the commit.
+
+</body-shape>
+
 ### Record, Not Documentation
 
 <record-not-documentation>
@@ -166,12 +210,14 @@ code comment, a design doc, or the README. The diff then carries it into the his
 These signs show that a body became documentation:
 
 - A paragraph for each decision inside the artifact. That is the design doc of the artifact.
+- A walkthrough of the new behavior: which function does what, in which order, with which fallback. The diff shows the
+  procedure.
 - A list of the surfaces, the files, or the tests that the change touches. The diff already lists them.
 - A repeat of what the updated docs say.
 - A story of your verification, such as "verified by building X" or "measured on Y". That is a session artifact.
 
 **The test:** paste the paragraph into the repo's docs. Does it stay true and useful there? Then it belongs in the
-repo's docs, not in the message. A body of more than approximately 20 lines usually fails this test.
+repo's docs, not in the message. Apply the test to each paragraph. See Shape above for what a paragraph must earn.
 
 </record-not-documentation>
 
@@ -184,7 +230,8 @@ repo's docs, not in the message. A body of more than approximately 20 lines usua
 - A change that is not obvious. Explain the rationale.
 - One commit in a chain. State the related work that follows.
 
-Explain the decisions that shaped the change. Do not explain each decision inside the artifact.
+Explain the decisions that shaped the change. Do not explain each decision inside the artifact. One reason belongs to
+one commit. Two independent reasons in one body usually mean two commits.
 
 ### Terse Register
 
@@ -202,6 +249,8 @@ behavior in the plain present tense, because the commit itself marks the "now":
 - "I", "we". The commit speaks for itself.
 - "now", "currently", "previously". The tense already carries the timeline.
 - "As requested by...". Use a `Co-Authored-By:` trailer, or write nothing.
+- A walkthrough of the new behavior: the call order, the empty case, the fallback, the flag that gates it. A code
+  comment keeps such a fact, and the diff carries it into the history.
 - The scope repeated: `[parser] update parser code` becomes `[parser] handle empty input`.
 - Promotional adjectives without data: "great", "amazing", "improved", "better". Say what is better.
 - Decorative Unicode: em dashes, arrows, fancy quotes, emoji, and bullet symbols. See ASCII Symbols above.
@@ -455,6 +504,64 @@ steps, and it links the documentation.
 
 ---
 
+### Bad: A walkthrough of the new behavior
+
+**Story:** A local run recorded its verdict in the run manifest and dropped the comments. The change writes the comments
+into a sidecar file beside the manifest.
+
+```text
+[core/local] record a run's comments as threads
+
+A local run published its comments and forgot them: the verdict
+reached the run manifest, the conversation nowhere. With no remote,
+publishing a comment locally IS recording it -- so the local runner
+keeps the conversation itself, in the run's thread sidecar
+(threads.json) beside the manifest.
+
+PostRun opens one thread for each published comment, on the anchor
+that the comment carries, and writes the whole conversation; a run
+that filed nothing records the empty one, so a settled run always
+answers what its comments left behind. The write stages and renames,
+so a run killed mid-write leaves the previous document readable.
+Recording is auxiliary -- a failed write warns and the run stands --
+and is not gated on DryRun, which every local run sets.
+
+Options.runDir becomes the one runs-root + run-id join: the runners
+own that folder and the recorder writes into it, and a second join
+could file the two apart. No runs root means no folder, where it
+used to mean a bare run id under the launch directory.
+
+Reading the threads back, the run chain that carries them, and the
+CLI surfaces follow as separate changes.
+```
+
+**Problem:** The body has 20 lines, and 13 of them document the artifact. Paragraph 2 walks the reader through
+`PostRun`: the diff shows the loop, the empty case, the staged write, and the `DryRun` condition. Paragraph 3 argues for
+a design inside the artifact; a comment on `runDir` holds that argument, and the diff carries the comment into the
+history. Only paragraph 1 and one line of paragraph 3 record something that the diff cannot show.
+
+**Fixed:**
+
+```text
+[core/local] record a run's comments as threads
+
+A local run published its comments and forgot them: the verdict
+reached the run manifest, the conversation nowhere. With no remote,
+publishing a comment locally is recording it, so the runner writes
+the comments into a thread sidecar beside the manifest.
+
+Options.runDir joins the runs root and the run id once. Without a
+runs root there is no folder, where a bare run id under the launch
+directory used to serve.
+
+The surfaces that read the threads back follow as separate changes.
+```
+
+**Why the fix works:** The body keeps the reason and the one behavior change that the subject cannot predict. The staged
+write, the empty-thread case, and the `DryRun` condition became code comments, where the next maintainer meets them.
+
+---
+
 ### Bad: Mixed changes, vague description
 
 **Story:** One session corrected a parser bug, cleaned some formatting, and added a validation method.
@@ -525,13 +632,16 @@ Commits must look like regular developer commits.
 <critical>
 ## Core Principles
 
-- **Record, not documentation** — the body carries the why of the change. Rationale, invariants, and behavior
+- **Record, not documentation** — the body carries the reason for the change. Rationale, invariants, and behavior
   descriptions live in the artifact and travel in the diff
-- **Use available context** — draw the why from the task, the implementation, and the deliverable. Do not copy them
+- **Use available context** — draw the reason from the task, the implementation, and the deliverable. Do not copy them
 - **Factual subjects** — what changed, not how good it is
 - **Explain the cause** — for a bug fix, say why the code was defective
-- **Body is essential** — a message of one line is rarely acceptable. A body of more than approximately 20 lines is
-  usually documentation in disguise
+- **Body is essential** — a message of one line is rarely acceptable. The default body is one paragraph
+- **No walkthrough** — the body never narrates the new procedure: the call order, the empty case, the fallback, the flag
+  that gates it. A code comment keeps such a fact
+- **Length follows the reasons** — not the size of the diff. Each paragraph after the first earns its lines, or it goes.
+  Two independent reasons usually mean two commits
 - **Terse register** — the diff carries the what, the message carries the why. No "this commit", "I", or "we". The tense
   carries the timeline. No filler. No promotional adjectives
 - **No session artifacts** — test counts, lint status, CI status, gate status, and verification stories record your

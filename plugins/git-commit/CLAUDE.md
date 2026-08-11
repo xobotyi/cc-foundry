@@ -5,7 +5,7 @@ Structured git commit workflow with atomic commits, message validation, and conv
 ## Skills
 
 - **`commit`** — commit pipeline: survey changes → plan units → quality gate → commit loop (stage → draft → self-review
-  → validate → commit) → verify
+  with body audit → validate → commit) → verify
 - **`commit-message`** — Message formatting conventions and structure rules
 
 ## Scripts
@@ -50,6 +50,14 @@ Project-specific commit guidance here.
 - Subject line: `[scope] verb description` (max 72 chars, factual, imperative mood)
 - Body: explains why the change was needed and how to verify it; records the change — documentation belongs in the
   artifact (code comments, design docs, README)
+- Body shape: default is one paragraph; each further paragraph must earn its lines with a reason, a `BREAKING:`
+  declaration, a migration step, an unpredictable behavior change, or a one-line chain note. Length follows the number
+  of reasons, not the size of the diff
+- Several behavior changes under one reason: one line each in one list, never a paragraph each. A line naming a file, a
+  function, or a test is an inventory of the diff. Independent reasons split into separate commits instead
+- Body audit: step 4c of the pipeline writes one `keep`/`cut` line per paragraph against the staged diff, and per list
+  line inside a paragraph. A paragraph that reports the procedure (function, call order, empty case, fallback, gating
+  flag) gets cut — the audit is written out, not silent, so the user sees the verdicts
 - Trailers: structured metadata (Task, Fixes, Refs, etc.)
 
 **Scope usage:**

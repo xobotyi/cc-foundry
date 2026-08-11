@@ -48,8 +48,8 @@ The skill walks through the complete pipeline automatically. No configuration re
 1. **Survey changes** — find the separate logical changes in the diff
 2. **Plan units and order** — sort by type (style → refactor → fix → feature); dependency order wins over type order
 3. **Quality gate** — verify tests/lint pass before committing
-4. **Commit loop** — for each unit: stage, draft the message to a file, self-review the staged diff, validate the
-   message, commit
+4. **Commit loop** — for each unit: stage, draft the message to a file, self-review the staged diff and audit the body
+   paragraph by paragraph, validate the message, commit
 5. **Verify** — confirm with `git log --stat` and `git status`
 
 ## Message Validation
@@ -116,9 +116,19 @@ trailers
 - Explains why change was needed
 - Describes how to verify the change
 - Records the change — documentation belongs in the artifact (code comments, design docs, README)
+- Default shape is one paragraph; length follows the number of reasons, not the size of the diff
+- Never walks the reader through the new code — the call order, the empty case, the fallback and the gating flag are
+  what the diff shows and what code comments keep
+- Several behavior changes under one reason get one line each in a single list, not a paragraph each; independent
+  reasons get separate commits
 - For bug fixes: explain the cause, not just the symptom
 - For features: explain the use case
 - For refactoring: explain the motivation
+
+Before validating, the pipeline audits the drafted body against the staged diff and prints one `keep` or `cut` verdict
+per paragraph. A paragraph survives only when it carries a reason, a `BREAKING:` declaration, a migration step, a
+behavior change the subject cannot predict, or a one-line note about the work that follows. The verdicts are visible, so
+a wrong call is visible too.
 
 **Trailers:**
 

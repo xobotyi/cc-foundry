@@ -240,16 +240,8 @@ function validateMessage(message, requiredTrailers) {
         process.exit(1);
     }
 
-    if (message.length > 1000) {
-        printWarn('Commit message is very long (over 1000 characters). Consider shortening it.');
-    }
-
     const lines = message.split('\n').map(line => line.trim());
     const trailerStart = findTrailerStart(lines);
-
-    if (lines.length > 50) {
-        printWarn('Commit message has more than 50 lines. Consider shortening it.');
-    }
 
     validateSubject(lines[0]);
 

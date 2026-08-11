@@ -178,6 +178,10 @@ Write the message of this unit. Obey the commit-message conventions. Save the me
 Write tool. A file gives git the multi-line message, the quotes, and the backticks without damage. Shell quoting damages
 them.
 
+Write the reason first, in one paragraph. Then cut: delete each sentence that the diff shows, and each paragraph that
+walks the reader through the new procedure. Keep a fact that the next maintainer needs in a code comment, not in the
+message.
+
 #### 4c. Self-Review
 
 ```bash
@@ -191,6 +195,37 @@ Verify each item before you continue:
 - [ ] The staged diff has no sensitive data such as an `.env` file, a credential, or a secret.
 - [ ] The message obeys the commit-message conventions: terse register, no session artifacts, a record and not
       documentation.
+
+<body-audit>
+**Audit the body against the staged diff. Write the audit in your reply.** Give one line for each body paragraph:
+
+```text
+P1: keep -- <the fact that it records>
+P2: cut -- shown by the diff
+P3.1: keep -- <the fact that it records>
+P3.2: cut -- inventory of the diff
+```
+
+A paragraph earns `keep` only when it records one of these facts:
+
+- The cause of the change.
+- A second reason that another paragraph does not carry.
+- A `BREAKING:` declaration, or a step of the migration path.
+- A behavior change that the subject cannot predict, such as the new meaning of an absent value.
+- The work that follows in the chain, in one line.
+
+A paragraph can hold a list. One unit that changes several behaviors gives one line to each change. Audit such a
+paragraph line by line, as `P3.1` and `P3.2` above. A line that names a file, a function, or a test inventories the
+diff. Cut it.
+
+A paragraph gets `cut` when it names a function, a call order, an empty case, a fallback, or a flag that gates the new
+code. Such a paragraph reports the procedure, and the staged diff shows the procedure. Move the fact into a code comment
+when the next maintainer needs it. Then delete the paragraph.
+
+The number of paragraphs follows the number of reasons, never the size of the diff. Write the message file again after
+the deletions.
+
+</body-audit>
 
 #### 4d. Validate
 
@@ -251,5 +286,6 @@ Show this data after the last commit:
 - One unit for each commit. Split the work. Do not bundle it.
 - Draft the message, validate it, then commit. Never commit a message that failed the validation.
 - The message records the change. It does not document the artifact.
+- Audit each body paragraph against the staged diff. A paragraph that reports the procedure gets cut.
 - Session artifacts never enter the message. Test counts, gate status, and verification stories stay out.
 </critical>
