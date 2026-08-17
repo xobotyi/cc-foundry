@@ -91,6 +91,14 @@ synthesis.
   ```
 - Do not use manual cp/ln installation methods
 
+**Plugin configuration:**
+
+- A plugin's user-facing environment knobs are named `FOUNDRY_<PLUGIN>_<KNOB>` — the marketplace prefix keeps them clear
+  of system and third-party variables and greppable as one family
+- Prefer that env knob over a `userConfig` key for optional tuning values, because `userConfig` prompts the user at
+  enable time. Where userConfig is warranted, plumb it into the same env name via `${user_config.KEY}` in the hook
+  command rather than reading a second variable
+
 **Version management:**
 
 - Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and the repo-root
