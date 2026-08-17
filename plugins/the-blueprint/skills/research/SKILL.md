@@ -20,6 +20,7 @@ Agent teams: !`echo ${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-disabled}`
 ## Prerequisites
 
 1. If agent teams shows `disabled` above, stop immediately and tell the user:
+
    > Agent teams are required for parallel research. Enable them by adding to your settings:
    >
    > ```json
@@ -27,6 +28,10 @@ Agent teams: !`echo ${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-disabled}`
    > ```
    >
    > Then restart the session.
+
+   Teammates also need an interactive session. Under `claude -p`, a named spawn runs as an ordinary subagent — the waves
+   still work, but findings return as subagent results instead of `SendMessage`.
+
 2. Locate the brief:
    - **Discovery handoff** — the brief is already in conversation context. Use it directly.
    - **Standalone invocation** — `$ARGUMENTS` names a brief, or ask the user to provide one. Read it into conversation
@@ -45,27 +50,33 @@ Agent teams: !`echo ${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-disabled}`
    - The brief's **Questions for research** list (facts discovery deferred) is mandatory input — every entry becomes an
      investigation question, rewritten through the same neutrality rules as any other.
 4. Self-check questions against the bias validation gate.
-5. Create team `research-{slug}` via TeamCreate.
-6. For each scope cluster, create a task via TaskCreate using the task description format below, then spawn one teammate
-   via Agent with `subagent_type: "codebase-researcher"`, `team_name: "research-{slug}"`, and an intent-free spawn
+5. For each scope cluster, create a task via TaskCreate using the task description format below, then spawn one teammate
+   via Agent with `subagent_type: "codebase-researcher"`, `name: "researcher-{scope-slug}"`, and an intent-free spawn
    prompt (see Spawn Prompt below).
+   - The `name` is what makes the spawn a teammate, and it is the address other agents use to message it. There is no
+     team to create — the session owns one team — and `team_name` is ignored.
    - Task descriptions contain only questions and scope boundaries. Never the brief, ticket, or intent.
    - Explicit `subagent_type` ensures the teammate inherits the agent's tool restrictions and system prompt; without it,
      the platform falls back to the general-purpose agent.
+   - If this session has no Task tools, skip TaskCreate and put the task description block in the spawn prompt instead.
+     It carries only questions and scope, so the information barrier holds.
 
 ### Phase 2 — Collect and Iterate
 
 Research proceeds in **waves**. A wave is a set of teammates dispatched together. Never start a new wave while the
 current one is still running.
 
-7. Wait until **all** teammates in the current wave have completed and sent their findings.
-8. Once the wave is fully in, evaluate:
+6. Wait until **all** teammates in the current wave have sent their findings. A teammate's idle notification carries no
+   output — going idle is not a finding. The wave is in only when every question has an answer by `SendMessage` or an
+   explicit "not determinable from files". If a teammate went idle with questions unanswered, message it by name and ask
+   for the missing findings.
+7. Once the wave is fully in, evaluate:
    - Are any questions still unanswered or have only partial answers?
    - Did any finding reveal a new scope or codebase area that wasn't initially identified?
    - Are there new questions that emerged from the findings (not from the brief) that need investigation?
-9. If yes to any of the above, plan and dispatch a new wave: identify new scopes, formulate questions for them, run the
-   bias self-check, create tasks, spawn new teammates on the same team. Then return to step 7 for the new wave.
-10. If no further investigation is needed, proceed to Phase 3.
+8. If yes to any of the above, plan and dispatch a new wave: identify new scopes, formulate questions for them, run the
+   bias self-check, create tasks, spawn new teammates with fresh names. Then return to step 6 for the new wave.
+9. If no further investigation is needed, proceed to Phase 3.
 
 Why waves: dispatching follow-ups while a wave is still running causes redundant investigation — a sibling teammate may
 already be answering the question you're about to ask. Batching by wave lets findings inform each other.
@@ -75,24 +86,24 @@ already be answering the question you're about to ask. Batching by wave lets fin
 By this point all waves are complete and no further teammates will be dispatched. The information barrier no longer
 applies.
 
-11. Compile all findings into `design-docs/NN-name.research.md` as sole author using the document format below.
+10. Compile all findings into `design-docs/NN-name.research.md` as sole author using the document format below.
     - Organize by scope cluster, not by teammate.
     - Preserve concrete file paths, function names, and line references from teammate findings.
     - Flag contradictions or gaps explicitly.
     - Do not inject opinions, recommendations, or solution ideas.
-12. If the brief was not yet written to disk (discovery handoff flow), write it now as `design-docs/NN-name.brief.md`.
-13. Present the compiled research.md to the user for review.
+11. If the brief was not yet written to disk (discovery handoff flow), write it now as `design-docs/NN-name.brief.md`.
+12. Present the compiled research.md to the user for review.
 
-### Phase 4 — Cleanup
+### Phase 4 — Shutdown
 
-14. Shut down all teammates.
-15. Clean up the team.
-    - If cleanup fails, halt immediately and prompt the user:
-      > Team cleanup failed. Please verify the team state manually before proceeding.
+13. Ask every teammate to shut down, by name. A teammate can reject a shutdown request with an explanation — if one
+    does, resolve what it reports before continuing.
+
+    There is no team cleanup step. The session's team directories are removed when the session ends.
 
 ### Transition
 
-16. On user approval of research.md, offer: "Proceed to `alignment` skill?"
+14. On user approval of research.md, offer: "Proceed to `alignment` skill?"
 
 ## Question Generation Rules
 
@@ -190,8 +201,8 @@ removing this change what the teammate looks for?_ If yes, it's intent. If no, i
 
 <examples>
 <example name="safe-spawn-prompts">
-- "You're a codebase-researcher on team research-auth-rework. Claim a task and follow its instructions."
-- "Investigating the cc-foundry plugins directory. Claim your task on team research-{slug}."
+- "You're a codebase-researcher on the auth-module scope. Claim a task and follow its instructions."
+- "Investigating the cc-foundry plugins directory. Claim your task and send findings to the lead."
 </example>
 
 <example name="leaky-spawn-prompts">
@@ -254,7 +265,7 @@ removing this change what the teammate looks for?_ If yes, it's intent. If no, i
   bias the investigation.
 - **You are sole author of research.md.** No teammate writes to any file.
 - **research.md contains factual observations with file references** — interpretation belongs in the alignment stage.
-- **Halt on cleanup failure.** If team shutdown or cleanup fails, stop and prompt the user. Do not proceed with a dirty
-  team state.
+- **An idle teammate is not a finished teammate.** The idle notification carries no output. Count a scope answered only
+  when its findings arrived by `SendMessage`.
 - **Batch by wave, not by urgency.** A follow-up question that seems urgent may already be under investigation by a
   sibling teammate. Wait for the full wave before deciding what's still unanswered.

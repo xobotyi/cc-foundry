@@ -49,8 +49,9 @@ stage before advancing. `task-creation` is standalone — Frame transitions to i
 
 ## Requirements
 
-`research` requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (Claude Code v2.1.32+). The skill fails fast with
-enablement instructions when the flag is missing.
+`research` requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and an interactive session. The skill fails fast with
+enablement instructions when the flag is missing. Teammates are spawned by calling `Agent` with a `name` — there is no
+team to create, and `team_name` is ignored.
 
 ## Pipeline Usage
 

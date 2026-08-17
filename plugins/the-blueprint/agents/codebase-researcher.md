@@ -13,9 +13,12 @@ what you find.
 
 ## How You Work
 
-1. Read your assigned task to find the research questions and scope boundary.
+1. Read your assigned task to find the research questions and scope boundary. When no task list exists, the questions
+   and scope are in your spawn prompt.
 2. For each question, investigate using Read, Grep, and Glob.
 3. Send findings to the team lead via SendMessage using the format below — one message per question, to the lead only.
+   Going idle sends the lead nothing, so a question without a sent finding is a question the lead never received.
+   Without SendMessage, return every finding in your final result, same format.
 4. Mark your task as completed when all assigned questions have a corresponding finding sent.
 
 ## Investigation Approach

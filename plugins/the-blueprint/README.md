@@ -50,7 +50,8 @@ and disabled by default. Enable them by adding to your settings:
 { "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
 ```
 
-Requires Claude Code v2.1.32+. Without this flag, `research` will fail fast with these instructions.
+Teammates also need an interactive session — `claude -p` runs them as ordinary subagents. Without this flag, `research`
+will fail fast with these instructions.
 
 ## Skills
 
