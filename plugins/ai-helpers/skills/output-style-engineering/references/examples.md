@@ -350,8 +350,9 @@ conflicts with clarity (e.g., a technical product where jargon is necessary).
 - **Direct Professional** — strongest for eliminating sycophancy; over-application is the main risk on current models
   (curt output where depth is wanted). Pair phrase blocklists with a positive register description and depth scaling.
 - **Domain Specialist** — scope boundary scripts are essential; `keep-coding-instructions: false` strips the engineering
-  assumptions that contaminate domain advice. Works for both technical (security auditor) and non-technical (business
-  analyst, content strategist) domains.
+  assumptions that contaminate domain advice on classic-prompt models, and does nothing on lean-prompt ones, so the body
+  must define the domain role rather than rely on removal. Works for both technical (security auditor) and non-technical
+  (business analyst, content strategist) domains.
 - **Interaction Mode** — turn structure must be explicit; include an override escape hatch for when users want to bypass
   the exercise. `keep-coding-instructions: true` almost always appropriate.
 - **Learning / Educational** — pacing and feedback format do the heavy lifting; voice-first constraint is the strongest

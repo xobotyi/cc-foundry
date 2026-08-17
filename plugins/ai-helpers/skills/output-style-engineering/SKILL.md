@@ -5,10 +5,10 @@ description: "Design Claude Code output styles: role, voice, and behavioral rule
 
 # Output Style Engineering
 
-Output styles modify Claude Code's system prompt. A style removes the default response-style instructions (all styles)
-and the software engineering instructions (custom styles, unless `keep-coding-instructions: true`), then appends its own
-instructions to the end of the prompt. Styles hold two powers no alternative has: they turn parts of the default prompt
-off, and the harness reinforces them with adherence reminders during the conversation.
+Output styles modify Claude Code's system prompt. A custom style removes the default software engineering section
+(unless `keep-coding-instructions: true`), then appends its own instructions to the end of the prompt. Styles hold two
+powers no alternative has: they turn part of the default prompt off, and the harness reinforces them with adherence
+reminders during the conversation.
 
 <prerequisite>
 **Output styles are system prompts.** Before creating or improving
@@ -40,13 +40,17 @@ Skip only for trivial edits (typos, formatting).
   refinement techniques (contrast, consolidation, subtraction), migration discipline, rewrite vs iterate criteria
 - **Real-world examples with analysis** — [`${CLAUDE_SKILL_DIR}/references/examples.md`] 5 complete styles with
   dimensional scoring and improvement notes — includes non-coding examples (SaaS analyst, content strategist)
+- **Exactly what `keep-coding-instructions` removes** — [`${CLAUDE_SKILL_DIR}/references/coding-instructions.md`]
+  Verbatim `# Doing tasks` section extracted from the binary (v2.1.233), the sections the flag cannot touch, the
+  classic-vs-lean prompt split and the model list where the flag is inert, re-derivation procedure for newer versions
 
 ## What Output Styles Change
 
 **Removed from the system prompt:**
 
-- Default response-style instructions (such as responding concisely) — removed by every style
-- Software engineering workflow instructions — removed by custom styles unless `keep-coding-instructions: true`
+- The `# Doing tasks` section (SE task framing, scope discipline, comment policy, UI verification) — removed by custom
+  styles unless `keep-coding-instructions: true`. This is the only removal, and it does not happen at all on lean-prompt
+  models (Opus 4.8, Opus 5, Fable 5) — see `references/coding-instructions.md`
 
 **Added:**
 
@@ -56,6 +60,10 @@ Skip only for trivial edits (typos, formatting).
 
 **Preserved regardless of style:**
 
+- `# Tone and style` — including "responses should be short and concise" and the no-emoji rule. Not removable by any
+  style; override it in the style body if you need different behavior
+- `# Executing actions with care` — destructive-action caution and confirmation defaults
+- `# System` and `# Using your tools` — output rendering, permission modes, prompt-injection warning, tool selection
 - All tools (Read, Write, Bash, Grep, etc.)
 - CLAUDE.md project context system
 - Subagent delegation and skills
@@ -82,14 +90,21 @@ Output styles are the only file-based way to remove parts of the default system 
 
 ## `keep-coding-instructions`
 
-Controls whether Claude retains its software engineering guidance.
+Controls one section of the default prompt: `# Doing tasks` — SE task framing, scope discipline, comment policy, UI
+verification. Verbatim text: [`${CLAUDE_SKILL_DIR}/references/coding-instructions.md`].
 
-- `false` (default) — removes coding workflow instructions. Use for non-coding domains (research, content, UX design)
-- `true` — preserves change-scoping, code quality, and test verification guidance. Use when the style changes how Claude
-  communicates but it still codes
+- `false` (default) — removes that section. Use for non-coding domains (research, content, UX design)
+- `true` — keeps it. Use when the style changes how Claude communicates but it still codes
 
 **Rule:** if the style is for someone who writes code, set `true`. If the style replaces coding with another domain, set
 `false`.
+
+**It does not remove safety or tone guidance** — destructive-action caution and the conciseness rules live in sections
+no style can touch.
+
+**It is inert on lean-prompt models** — Opus 4.8, Opus 5, and Fable 5 never receive `# Doing tasks`, so neither value
+changes their prompt. Sonnet 5 and Haiku still get the classic prompt, so the flag is live there. A non-coding style
+must carry its own domain switch in the body rather than relying on removal.
 
 ## File Structure
 

@@ -5,8 +5,7 @@ Technical reference for Claude Code output style files: format, fields, storage,
 ## File Format
 
 Output styles are Markdown files with YAML frontmatter. The frontmatter supplies metadata; the body is appended to the
-end of Claude's system prompt while the default response-style instructions (and, for custom styles, the software
-engineering instructions) are removed.
+end of Claude's system prompt while, for custom styles, the default software engineering section is removed.
 
 ```markdown
 ---
@@ -28,9 +27,10 @@ You are an interactive CLI tool that helps users with software engineering tasks
 
 - **`name`** — Display name for the style. Shown in the `/config` picker. Defaults to the filename (without `.md`).
 - **`description`** — One-line description shown in the `/config` picker. Optional but strongly recommended.
-- **`keep-coding-instructions`** — Boolean. When `true`, preserves the coding-specific section of the default system
-  prompt (change scoping, code quality rules, test verification). Default: `false`. Built-in styles have this implicitly
-  `true`.
+- **`keep-coding-instructions`** — Boolean. When `true`, preserves the `# Doing tasks` section of the default system
+  prompt (SE task framing, change scoping, comment policy, UI verification). Default: `false`. Built-in `Proactive`,
+  `Explanatory`, and `Learning` set it `true` in code. No effect on lean-prompt models, which never receive the section
+  — see [`coding-instructions.md`](coding-instructions.md) for the verbatim text and the affected model list.
 - **`force-for-plugin`** — Boolean. Plugin-shipped styles only: applies the style automatically whenever the plugin is
   enabled, without the user selecting it. Overrides the user's `outputStyle` setting; if multiple enabled plugins set
   it, the first one loaded wins. Default: `false`.
@@ -44,13 +44,16 @@ filename and `name` identical and lowercase; verify injection with a canary rule
 
 **Removed from the system prompt:**
 
-- Default response-style instructions (such as responding concisely) — removed by every style, built-in or custom
-- Software engineering workflow instructions — removed by custom styles unless `keep-coding-instructions: true`
+- The `# Doing tasks` section — removed by custom styles unless `keep-coding-instructions: true`. This is the only
+  removal any style performs, and only on models that receive the classic system prompt.
 
-**Added:** the style body, at the end of the system prompt.
+**Added:** the style body, at the end of the system prompt, under a `# Output Style: <name>` heading.
 
 **Always preserved regardless of style:**
 
+- `# Tone and style` — the conciseness and no-emoji rules included. No style removes these; override them in the body
+- `# Executing actions with care` — destructive-action caution, confirmation defaults, `git status` before discarding
+- `# System`, `# Using your tools`, and the security preamble
 - All tools (Bash, Read, Edit, Glob, Grep, Write, etc.)
 - CLAUDE.md project and user instructions
 - Subagent delegation mechanics
@@ -58,8 +61,12 @@ filename and `name` identical and lowercase; verify injection with a canary rule
 - Skills (loaded separately from styles)
 - Environment context (working directory, git status)
 
-`keep-coding-instructions: true` re-adds the safety, code quality, and test verification guidance that custom styles
-normally drop. Use it when your style is a persona overlay rather than a domain switch.
+The only other style-dependent change is the prompt's opening sentence, which points Claude at the Output Style section
+instead of naming software engineering tasks. This happens for any custom style, independent of
+`keep-coding-instructions`.
+
+For the verbatim gated text, the sections it cannot touch, and the models where the flag is a no-op, see
+[`coding-instructions.md`](coding-instructions.md).
 
 ## Storage Paths
 

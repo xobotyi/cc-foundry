@@ -5,9 +5,10 @@
 Output styles hold two powers no additive mechanism has — the two reasons the Claude Code team kept them when
 deprecation was reversed:
 
-1. **They turn off parts of the default system prompt.** You cannot remove default behaviors by adding instructions on
-   top of them — CLAUDE.md, `--append-system-prompt`, and hooks are purely additive, so the default response-style and
-   coding instructions keep competing with yours.
+1. **They turn off part of the default system prompt.** You cannot remove default behaviors by adding instructions on
+   top of them — CLAUDE.md, `--append-system-prompt`, and hooks are purely additive, so the default coding instructions
+   keep competing with yours. The removal is narrow: one section, and only on classic-prompt models — see
+   [`${CLAUDE_SKILL_DIR}/references/coding-instructions.md`].
 2. **The harness reinforces them.** Styles trigger adherence reminders during the conversation; instructions in
    CLAUDE.md or a `UserPromptSubmit` hook need hand-built reinforcement to get the same effect.
 
@@ -44,8 +45,8 @@ keep-coding-instructions: false
 
 - **`name`** — display name; defaults to filename (without `.md`) if omitted
 - **`description`** — shown in `/config` picker; make it scannable
-- **`keep-coding-instructions`** — `true` preserves the default coding system prompt alongside your style instructions;
-  `false` (default) removes it
+- **`keep-coding-instructions`** — `true` preserves the default `# Doing tasks` section alongside your style
+  instructions; `false` (default) removes it. Inert on lean-prompt models
 - **`force-for-plugin`** — plugin-shipped styles only: auto-applies the style while the plugin is enabled, overriding
   the user's `outputStyle` setting
 
@@ -163,7 +164,8 @@ produces curt, stilted output on complex tasks. Pair the blocklist with a positi
 - **DevOps** — YAML configurations, structured data generation, infrastructure documentation
 
 For all non-coding domain specialists, set `keep-coding-instructions: false` to strip the software engineering
-assumptions that would otherwise contaminate domain-specific advice.
+assumptions that would otherwise contaminate domain-specific advice. Removal only happens on classic-prompt models, so
+the body must still define the domain role positively rather than counting on absence.
 
 ### Interaction Mode
 
@@ -203,10 +205,10 @@ Learning styles produce longer output tokens by design — this is intentional, 
 
 ## Token Impact
 
-- **`keep-coding-instructions: false`** — reduces input tokens by removing the default coding prompt from the system
-  message
-- **`keep-coding-instructions: true`** — adds both the default coding prompt AND your style instructions, increasing
-  input token count
+- **`keep-coding-instructions: false`** — drops the `# Doing tasks` section, roughly 2.4 KB (~600 tokens) on
+  classic-prompt models and nothing at all on lean-prompt ones (Opus 4.8, Opus 5, Fable 5). Never choose this value for
+  token reasons alone; choose it for scope.
+- **`keep-coding-instructions: true`** — keeps `# Doing tasks` alongside your style body
 - **Prompt caching** — after the first request in a session, the system prompt (including the output style) is cached,
   reducing latency and cost for subsequent requests. Since the style is fixed per session, the cache hit rate is high.
 - **Explanatory / verbose styles** — produce longer output tokens by design. Learning and educational styles are the
@@ -234,9 +236,14 @@ with a canary rule before iterating on content.
 overtriggers on current models: unusably curt answers, refusing depth where depth is wanted. Fix: dial the language back
 to plain conditions and describe the target register positively.
 
-**Coding capability lost** — `keep-coding-instructions: false` (the default) removes all coding guidance. Users who
-create a tone-only style (e.g., "be more direct") accidentally lose coding capability. Fix: set
-`keep-coding-instructions: true` for any style that should augment coding behavior rather than replace it.
+**Coding discipline lost** — `keep-coding-instructions: false` (the default) drops the `# Doing tasks` section: SE task
+framing, scope discipline, comment policy, UI verification. Users who create a tone-only style (e.g., "be more direct")
+lose that discipline without meaning to. Fix: set `keep-coding-instructions: true` for any style that should augment
+coding behavior rather than replace it.
+
+**Assuming removal happened** — on lean-prompt models (Opus 4.8, Opus 5, Fable 5) the flag is inert, so a non-coding
+style cannot rely on removal to suppress engineering reflexes. Fix: state the domain switch positively in the body, and
+test the style on both a classic-prompt model (Sonnet 5) and a lean-prompt one.
 
 **Instructions too vague** — "Be professional" is underspecified — two readers would imagine different behaviors. Fix:
 list concrete behaviors ("never use emoji", "always give verdict before rationale", "no hedging phrases") rather than

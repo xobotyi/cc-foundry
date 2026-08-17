@@ -89,7 +89,8 @@ Symptom → Root cause → Fix pattern:
 - **Wrong tone in edge cases** — exemplars don't cover the scenario → add a contrast pair for the failing case
 - **Ignores some rules** — rule saturation → consolidate overlapping rules, delete rules that don't change output
 - **SE assumptions leak into non-coding style** — `keep-coding-instructions` not `false`, or body doesn't supply domain
-  context → set the flag and define the domain role
+  context → set the flag and define the domain role. On lean-prompt models (Opus 4.8, Opus 5, Fable 5) the flag changes
+  nothing, so the body carries the whole switch
 
 ## Common Fixes
 

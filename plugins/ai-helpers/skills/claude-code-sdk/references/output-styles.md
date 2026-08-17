@@ -48,21 +48,22 @@ keep-coding-instructions: false
 - **Type:** boolean
 - **Required:** No
 - **Default:** `false`
-- **Purpose:** controls whether Claude Code's software engineering instructions remain in the system prompt
+- **Purpose:** controls whether the `# Doing tasks` section of the default system prompt remains
 
 When `false` (default):
 
-- Software engineering guidance removed from system prompt
-- Test verification instructions removed
-- Code quality checks removed
+- `# Doing tasks` removed — SE task framing, change scoping, comment policy, UI verification
+- Tone/conciseness rules, destructive-action caution, and tool-usage guidance all remain — this flag does not touch them
 - All tools remain available (Read, Write, Bash, etc.)
 - CLAUDE.md instructions still load
 
 When `true`:
 
-- All coding instructions retained
-- Style body appended on top of the full default prompt
+- `# Doing tasks` retained; style body appended after the full default prompt
 - Use for coding-focused personality adjustments (tone, formatting) that should not disable coding behavior
+
+**No effect on lean-prompt models** (Opus 4.8, Opus 5, Fable 5), which never receive `# Doing tasks`. Verbatim text and
+model list: `ai-helpers:output-style-engineering` → `references/coding-instructions.md`.
 
 ## File Locations
 
@@ -110,10 +111,12 @@ Output style is set in the system prompt at session start. Changes to `outputSty
 When a custom output style is active:
 
 1. Default system prompt loads
-2. Efficiency instructions (concise output guidance) removed
-3. If `keep-coding-instructions: false`: coding-specific instructions removed
-4. Style body content appended to system prompt
+2. The opening sentence points Claude at the Output Style section instead of naming software engineering tasks
+3. If `keep-coding-instructions` is not `true`: the `# Doing tasks` section is omitted
+4. Style body appended under a `# Output Style: <name>` heading
 5. Periodic reminders injected during conversation to maintain style adherence
+
+Step 3 is the only removal. Concise-output guidance, destructive-action caution, and tool-usage sections stay in place.
 
 ## Token Impact
 

@@ -184,7 +184,8 @@ meaningless until the canary passes. Remove the marker afterward.
 ### Non-Coding Domain Test (when applicable)
 
 9. **SE assumption leak** — For styles with `keep-coding-instructions: false`, prompt: "Help me with [non-coding task]"
-   — Any software engineering assumptions leaking? References to code, files, or technical tools that don't belong?
+   — Any software engineering assumptions leaking? References to code, files, or technical tools that don't belong? Run
+   this on both a classic-prompt model (Sonnet 5) and a lean-prompt one (Opus 5), where the flag has no effect.
 
 ## Deployment Readiness
 
