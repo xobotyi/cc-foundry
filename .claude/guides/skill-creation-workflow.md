@@ -7,26 +7,32 @@ an existing plugin.
 
 ## Phase 1: Research
 
-Discovery must precede all structural decisions — including which plugin the skill belongs to. Two tools serve different
-roles: **Perplexity** discovers and verifies (live web search, fast answers, reasoning); **NotebookLM** synthesizes and
-persists (grounded answers from curated sources, persistent knowledge base). Use both — Perplexity for breadth and
-recency, NotebookLM for depth and grounded synthesis.
+Discovery must precede all structural decisions — including which plugin the skill belongs to. Two roles are in play:
+**web search and deep-research** discover and verify (live search, targeted page reads, one-shot landscape reports);
+**NotebookLM** synthesizes and persists (grounded answers from curated sources, persistent knowledge base). Use both —
+live search for breadth and recency, NotebookLM for depth and grounded synthesis.
 
 <research-tools>
 
-**Perplexity** — discovery, fact-checking, recency verification. Use `perplexity_search` to find official doc pages,
-changelogs, and source URLs. Use `perplexity_ask` for quick factual answers about current versions, feature status, and
-best practices. Use `perplexity_reason` to evaluate tradeoffs or compare approaches. Use `perplexity_research` for
-comprehensive landscape surveys when the domain is unfamiliar. Always include version numbers and years in queries.
+**Web search and fetch** — discovery, fact-checking, recency verification. Use `WebSearch` to find official doc pages,
+changelogs, and source URLs. Use `WebFetch` on the authoritative page for what it actually says — current versions,
+feature status, documented behavior. Evaluate tradeoffs and compare approaches yourself, over the sources you fetched.
+Always include version numbers and years in queries.
+
+**deep-research** — one-shot landscape survey when the domain is unfamiliar. `deep_research` runs many searches across
+many sources and returns a cited report; use it to seed the notebook when you do not yet know which sources exist. It
+blocks for minutes and spends subscription allowance — scope it tightly, and skip it when a search plus two fetches
+would answer. Routing rules and brief format: the `deep-research` skill.
 
 **NotebookLM** — synthesis and persistent knowledge base. Sources added to a notebook become a queryable corpus for
-grounded, citation-backed answers. NotebookLM cannot discover new sources — you bring them from Perplexity, web search,
-or manual curation. Its strength is cross-source synthesis, contradiction detection, and structured summarization over a
-fixed set of documents.
+grounded, citation-backed answers. NotebookLM cannot discover new sources — you bring them from web search,
+`deep_research`, or manual curation. Its strength is cross-source synthesis, contradiction detection, and structured
+summarization over a fixed set of documents.
 
 </research-tools>
 
-1.  **Establish the current state with Perplexity.** Before committing to deep research, use Perplexity to answer:
+1.  **Establish the current state with web search.** Before committing to a full research pass, search and fetch to
+    answer:
     - What is the current stable version of the subject technology?
     - What changed in recent releases? What was deprecated or removed?
     - What are the primary official documentation sources?
@@ -42,18 +48,19 @@ fixed set of documents.
     - Default: create a new notebook. Name with a machine-parseable convention (e.g., `proxmox-ve-9-skill-research`) and
       describe it so future agents can find it by description search.
 
-3.  **Deep research #1 — the subject domain.** Research the subject itself: official documentation, specifications,
-    capabilities, APIs, and how it works. This is a documentation-driven pass. Use Perplexity to discover source URLs,
+3.  **Research pass #1 — the subject domain.** Research the subject itself: official documentation, specifications,
+    capabilities, APIs, and how it works. This is a documentation-driven pass. Use web search to discover source URLs,
     then add them to the NotebookLM notebook. **Bias toward recency** — include version numbers and year in queries
     (e.g., "Proxmox VE 9.1 2025", "Ansible-core 2.18 2026") to surface the latest state of the technology.
 
-4.  **Deep research #2 — agentic application.** Research how people use the subject with autonomous agents: existing
+4.  **Research pass #2 — agentic application.** Research how people use the subject with autonomous agents: existing
     skills, blog posts, agentic workflows, and integration patterns. Prioritize quality sources — original findings,
     undocumented behavior, novel techniques. Skip tutorials that repackage official docs.
 
 5.  **Assess source quality and recency.** After each research pass, review source summaries and remove entries that are
-    low-quality **or outdated**. NotebookLM sometimes pulls in low-signal sources during deep research. Use Perplexity
-    to verify claims that seem outdated — `perplexity_ask` with version-specific questions is effective for this.
+    low-quality **or outdated**. NotebookLM deep research sometimes pulls in low-signal sources. Verify claims that seem
+    outdated against the live web — a version-specific `WebSearch` plus a `WebFetch` on the changelog settles most of
+    them.
 
     <recency-rules>
 
@@ -68,13 +75,13 @@ fixed set of documents.
     - **Prefer changelogs and "What's New" pages** over static documentation for understanding recent changes. These
       pages are authoritative and time-stamped.
     - **Cross-reference across tools** — ask NotebookLM "Is [claim] still accurate as of [current version]?" to check
-      against your curated sources. Use Perplexity to verify against the live web. When sources contradict each other,
-      the more recent official source wins.
+      against your curated sources. Verify against the live web with `WebSearch` and `WebFetch`. When sources contradict
+      each other, the more recent official source wins.
 
     </recency-rules>
 
 6.  **Query and refine.** Query the NotebookLM notebook to build understanding of the domain. This reveals gaps and
-    generates better questions. Use Perplexity to fill gaps that require live web data (recent releases, community
+    generates better questions. Use web search to fill gaps that require live web data (recent releases, community
     sentiment, emerging patterns), then add high-value discovered sources back to the notebook. Specifically ask
     recency-oriented questions: "What changed in the latest version?", "What was deprecated or removed?", "What new
     capabilities were added?"
@@ -137,9 +144,8 @@ fixed set of documents.
     - **Skip doc-repackaging guides** — walkthroughs that paraphrase official docs without first-hand experience go
       stale and add noise. The test is provenance, not format: a guide grounded in the author's own use is worth
       keeping; a polished tutorial that restates the manual is not.
-    - **Use Perplexity or web search** to discover sources you might not know about, but be selective — most results for
-      well-known ecosystems are obvious. The real value is for niche tools or discovering lesser-known official doc
-      pages.
+    - **Use web search** to discover sources you might not know about, but be selective — most results for well-known
+      ecosystems are obvious. The real value is for niche tools or discovering lesser-known official doc pages.
     - **10–15 sources per skill is typical.** More is fine if each source covers a distinct topic. Fewer is fine for
       narrow skills. </reference-inventory-guidance>
 

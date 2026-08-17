@@ -31,7 +31,8 @@ Each plugin has its own `CLAUDE.md` with plugin-specific context.
 ## Creating a New Skill
 
 Full workflow: [`.claude/guides/skill-creation-workflow.md`](.claude/guides/skill-creation-workflow.md) — 4-phase
-process (Research → Scaffold → Write → Ship) using Perplexity for discovery and NotebookLM for synthesis.
+process (Research → Scaffold → Write → Ship) using web search and deep-research for discovery and NotebookLM for
+synthesis.
 
 ## Conventions
 
