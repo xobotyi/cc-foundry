@@ -18,6 +18,7 @@ This plugin covers universal coding practices that apply across all languages:
 - Discovery → Plan → Implement → Verify workflow
 - Assumption interrupts (never assume API signatures, always verify)
 - Incremental implementation discipline
+- Comment and documentation policy (reader-driven: WHY-only comments, contract-only docs, history in neither)
 - Debugging discipline (build a red loop → minimize → hypothesize → bisect → explain)
 - Verification before completion; failing checks get fixed, never silenced
 - Context management and token efficiency
@@ -32,6 +33,17 @@ The `coding` skill runs before language-specific skills as a prerequisite.
 - The `software-engineer` output style enforces `coding` skill invocation before implementation
 - Language skills (go, typescript, etc.) run after `coding` in a skill queue
 - Example queue: `coding` → `golang` → verification
+
+**Comment and documentation policy:**
+
+- The `coding` skill owns comment policy for the marketplace — `the-writer` disclaims it, and the language skills
+  reference its "no comments" default without defining one
+- The reader is the test — a comment or doc line that hands them nothing the code already gives is waste, never
+  compliance with a "document this" rule
+- Comments carry the non-obvious WHY only; docs state the current contract only, at whatever length the caller needs
+- Neither carries history, changelogs, ticket references, or the change that produced them — git and the tracker hold
+  those
+- Language skills keep their own doc-comment placement rules (which symbols need docs); this policy governs the content
 
 **LSP-first:**
 

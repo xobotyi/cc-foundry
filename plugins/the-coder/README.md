@@ -38,6 +38,11 @@ complete. Includes debugging discipline (build a red feedback loop first, minimi
 hypotheses, bisect, never ship a fix you can't explain) and a hard rule against silencing failing checks — tests, lint,
 and type errors get fixed, not suppressed.
 
+It also carries the comment and documentation policy. The reader decides whether a line exists at all: comments explain
+only the WHY the code cannot show, and a doc on a public symbol states the current contract at whatever length the
+caller actually needs — one line when the signature already says the rest. Neither carries history. The change that
+produced the code belongs in git and the pull request, not in a comment that describes a state the codebase left behind.
+
 **Use when:** Starting any code task — writing, modifying, debugging, or refactoring. This skill is a prerequisite for
 implementation work and should run before language-specific skills engage.
 
@@ -53,6 +58,10 @@ multiple skills into a queue (e.g., `coding` → `golang` → verification). Pus
 concerns immediately, and prioritizes working code over clever abstractions. Plans vertically — phase 1 is a tracer
 bullet end-to-end, subsequent phases add depth in vertical passes; rejects horizontal "all DB, then all API, then all
 UI" decomposition.
+
+The style treats its own terseness rules as governing two channels, not one: what Claude says to you, and what it writes
+into files. Density applies to both, so a short answer attached to a padded diff doesn't count as terse. Rationale for a
+decision goes in the response, the commit message, or an ADR, never into a comment.
 
 A **Language Contract** section carries two absolute rules, held outside the style's own priority hierarchy so brevity
 can never trade them away: write to ASD-STE100 Simplified Technical English, and use ubiquitous language — one name per

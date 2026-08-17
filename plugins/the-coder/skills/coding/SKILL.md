@@ -173,19 +173,87 @@ Two rungs hold → take the higher one and move on. </reuse-ladder>
   inline it.
 </simplicity-rules>
 
+### Comment for the Reader, Not for the Rule
+
+Every comment is written for the next person who reads the code. That person is the only test. A line that tells them
+something the code cannot earns its place; a line that does not is waste — it spends their attention, it binds the
+maintainer to keep it true, and it goes stale on its own. Never write one to satisfy a convention: a rule that says
+"document this" is not a reader.
+
+So comment the WHY, never the WHAT. The reader sees what the code does. What they cannot see is the hidden constraint,
+the subtle invariant, the workaround for a specific bug, the behavior that would surprise them.
+
+Three cases read like a WHY and are not:
+
+<comment-rules>
+- **What the code does** — the identifiers already say it, so a comment restating the line below it hands the reader
+  nothing.
+- **How the code got here** — "previously a map", "changed from sync to async", "was O(n²) before the refactor". The
+  code states what it is; git states what it was. A comment describing a past state is wrong the moment the next change
+  lands, and no reader can tell whether it is stale or load-bearing.
+- **Which task or caller motivated it** — "added for the checkout flow", "fixes #431", "used by ReportBuilder". That
+  belongs in the commit message and the pull request; in the code it rots as callers come and go.
+</comment-rules>
+
+```go
+// BAD — restates the line, then records history no reader can verify
+// increment the retry counter (used to be reset here before v2)
+retries++
+
+// GOOD — the constraint is invisible in the code
+// The upstream API rate-limits per connection, not per token, so one shared
+// client would serialize every tenant behind a single bucket.
+client := newClientPerTenant(tenant)
+```
+
+### Document the Contract, Not Its Evolution
+
+Documentation on a public symbol is a contract, and its reader is a caller who will never open the implementation. They
+need what the signature does not tell them, so a doc here is expected rather than exceptional — and the rules on it are
+stricter, not looser.
+
+<documentation-rules>
+- **State the current contract** — what the symbol does, what it accepts, what it returns, how it fails, which
+  invariants and side effects bind the caller. Present tense, current behavior, nothing else.
+- **Length follows the contract, not the symbol** — the language convention decides which symbols get a doc; the caller
+  decides how long it runs. When the signature already tells them everything, one line is the finished doc. Padding it
+  to look thorough is how docs turn into poems.
+- **Carry no history** — "as of v2 this also accepts a slice", "used to return an error", "kept for compatibility with
+  the old loader". A doc narrating its own evolution is a changelog in the wrong file. A deprecation notice
+  (`@deprecated`, `#[deprecated]`) is not history: it states the contract that holds now — "this will be removed, call
+  X instead".
+- **Cut the padding** — no preamble ("This function is responsible for..."), no signature restated in prose, no
+  motivation essay, no closing summary. Lead with the verb.
+- **Rewrite in place on change** — when behavior or a signature changes, replace the doc in the same edit so it
+  describes the new contract. Never append the change to the old text.
+</documentation-rules>
+
+```go
+// BAD — preamble, signature restated in prose, history, ticket reference
+// ParseConfig is a function that is responsible for parsing configuration.
+// It takes an io.Reader and returns a pointer to a Config and an error.
+// It used to take a path string, but we changed it to a reader in v2 so the
+// report builder could pass a buffer (see #431).
+func ParseConfig(r io.Reader) (*Config, error)
+
+// GOOD — the contract as it stands, and only that
+// ParseConfig reads TOML from r and returns the resulting Config. Unknown keys
+// are rejected. The caller keeps ownership of r; ParseConfig never closes it.
+func ParseConfig(r io.Reader) (*Config, error)
+```
+
 ### Mark Deliberate Shortcuts
 
-A simplification you chose on purpose is intent; an unmarked one reads as ignorance. When you take a shortcut with a
-known ceiling — a global lock, an O(n²) scan, a naive heuristic — mark it with a `shortcut:` comment that names the
-ceiling and the upgrade trigger, so a deferral can't quietly become permanent.
+The narrow exception to the no-comment default, and it covers deliberate ceilings only — a global lock, an O(n²) scan, a
+naive heuristic. A simplification the reader would never mistake for a bug needs no comment. When you do take a ceiling,
+mark it with a `shortcut:` comment naming the ceiling and the upgrade trigger, so a deferral cannot quietly become
+permanent: an unmarked shortcut reads as ignorance, and a marker without a trigger rots into permanence.
 
 <shortcut-marker>
 - `// shortcut: global lock — switch to per-account locks if throughput matters`
 - `# shortcut: O(n²) scan, fine under ~1k rows — index if the set grows`
 
-A marker that names no trigger is the kind that rots into permanent. Grep them with `rg -n 'shortcut:'` to review
-deferred work before it's forgotten. Mark only deliberate ceilings, not every simplification — a shortcut the reader
-would never mistake for a bug needs no comment. </shortcut-marker>
+Grep them with `rg -n 'shortcut:'` to review deferred work before it is forgotten. </shortcut-marker>
 
 ### Handle Errors Deliberately
 
@@ -326,6 +394,7 @@ weakening the check.
 
 4. **Review your own diff** — Read it as if reviewing someone else's code. Look for:
    - Leftover debug code or TODO comments
+   - Comments that narrate the code, record history, or name the task; docs still describing the old contract
    - Missing error handling
    - Hardcoded values that should be configurable
    - Edge cases not covered
@@ -384,6 +453,22 @@ problem.
 - Write clear commit messages that explain WHY, not just WHAT
 
 </context-rules>
+
+## Application
+
+- Apply these disciplines silently — don't narrate the protocol, announce which step you are on, or report a check that
+  found nothing. The user sees the result, not the process.
+- Write with the same economy everywhere. Terseness that stops at the chat window and leaves a graphomaniac diff behind
+  is not terseness: code, comments, docs, tests, and commit messages carry no filler either.
+- If the codebase contradicts a rule here, follow the codebase and flag the divergence once.
+
+## Application
+
+- Apply these disciplines silently. Don't narrate the protocol, announce the step you are on, or report a check that
+  found nothing — the user sees the result, not the process.
+- The economy you apply to a response applies to everything you write into a file. Terseness that stops at the chat
+  window and leaves a padded diff behind is not terseness.
+- If the codebase contradicts a rule here, follow the codebase and flag the divergence once.
 
 ## Integration
 
