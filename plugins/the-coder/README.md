@@ -14,6 +14,10 @@ is broken code — the cause is declaring "done" before actually verifying the w
 **Abstractions multiply without justification.** Every task becomes an opportunity to add layers, extract interfaces,
 and invent patterns the codebase doesn't need. The result is code bloat that makes future changes harder, not easier.
 
+**Changes arrive in one enormous batch.** An agent works for an hour, never commits, and hands over a few thousand
+uncommitted lines. Nobody can review that honestly, `git bisect` has nothing to work with, and a single bad decision
+early on is now welded to everything built after it.
+
 ## The Solution
 
 This plugin enforces a discovery-first workflow and provides an implementation-focused output style. The `coding` skill
@@ -37,6 +41,12 @@ mistakes. Requires reading actual API signatures instead of guessing them. Deman
 complete. Includes debugging discipline (build a red feedback loop first, minimize the repro, rank falsifiable
 hypotheses, bisect, never ship a fix you can't explain) and a hard rule against silencing failing checks — tests, lint,
 and type errors get fixed, not suppressed.
+
+It sizes the work as it goes. Crossing roughly 400 to 500 lines of production code means stop, commit what is coherent,
+and build the next change on top of it — a checkpoint that triggers a commit rather than a quota to fill, so a 30-line
+commit is finished work. Tests sit outside the budget and ship with the code they cover, which keeps a small feature
+with a wide test surface as one honest commit. Atomicity wins where the two conflict: a rename across sixty files stays
+one commit at any size, because splitting it leaves a commit whose tree doesn't build.
 
 It also carries the comment and documentation policy. The reader decides whether a line exists at all: comments explain
 only the WHY the code cannot show, and a doc on a public symbol states the current contract at whatever length the

@@ -121,7 +121,8 @@ Before writing code, establish:
 
 ### Work Incrementally
 
-Don't one-shot complex features.
+Don't one-shot complex features. Build in committed steps: a small change, verified, committed, then the next change on
+top of it.
 
 <incremental-rules>
 - One logical change at a time
@@ -133,6 +134,29 @@ Don't one-shot complex features.
 - Leave the codebase in a clean, working state at every step
 - For multi-step tasks: track completed steps and remaining work
 </incremental-rules>
+
+### Commit as You Go
+
+An uncommitted working tree is the unit nobody can review and nobody can bisect. Commit at each verified step during the
+work, not once at the end. A large change is not one hard review — it is a review nobody does, and the defect that
+survives it costs more than the whole change saved.
+
+<commit-checkpoint>
+- **Checkpoint at ~400-500 lines of production code.** Crossing it means stop, commit what is coherent, continue on top.
+  This triggers a commit; it is not a quota to fill — a 30-line change is a finished commit, not an under-delivery.
+- **Tests don't count toward the budget.** They ship in the commit with the code they cover, however long they run. A
+  small feature with a wide test surface is one legitimate commit of a few thousand lines.
+- **Atomicity outranks the budget.** A mechanical rename across 60 files, or a signature change with all its callers, is
+  one commit at any size — splitting it leaves a commit whose tree does not build. Say why it is oversized instead of
+  splitting it badly.
+- **Never start a second change on an uncommitted first.** Both then land as one blob, and neither can be reverted
+  alone.
+- **A phase is not a commit.** A planned phase (~100-200 lines, one verification gate) usually lands as one to three
+  commits. Size the commit by this checkpoint, never by the phase boundary.
+</commit-checkpoint>
+
+The `git-commit` plugin's `commit` skill carries the pipeline for each checkpoint — unit boundaries, message,
+validation.
 
 ### Write Simple Code
 

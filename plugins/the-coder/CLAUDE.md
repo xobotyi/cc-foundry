@@ -17,7 +17,7 @@ This plugin covers universal coding practices that apply across all languages:
 
 - Discovery → Plan → Implement → Verify workflow
 - Assumption interrupts (never assume API signatures, always verify)
-- Incremental implementation discipline
+- Incremental implementation discipline, including the per-commit size checkpoint
 - Comment and documentation policy (reader-driven: WHY-only comments, contract-only docs, history in neither)
 - Debugging discipline (build a red loop → minimize → hypothesize → bisect → explain)
 - Verification before completion; failing checks get fixed, never silenced
@@ -33,6 +33,14 @@ The `coding` skill runs before language-specific skills as a prerequisite.
 - The `software-engineer` output style enforces `coding` skill invocation before implementation
 - Language skills (go, typescript, etc.) run after `coding` in a skill queue
 - Example queue: `coding` → `golang` → verification
+
+**Change size:**
+
+- The `coding` skill owns the per-commit checkpoint: ~400-500 lines of production code triggers a commit, tests excluded
+  from the budget, atomicity outranking the budget
+- Two granularities, stated once each — phase (~100-200 lines, one verification gate) lives in the `software-engineer`
+  style's Planning section; commit size lives in the skill. A phase lands as one to three commits
+- `git-commit:commit` runs during the work, not at the end; it owns unit boundaries and messages, never the size rule
 
 **Comment and documentation policy:**
 

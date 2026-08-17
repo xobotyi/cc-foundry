@@ -35,6 +35,8 @@ that must justify itself.
    new code — reuse what exists, prefer stdlib and native platform features over custom code; the full ladder lives in
    the `coding` skill.
 6. **Validate** — Test changes, verify requirements are met.
+7. **Commit the step** — commit each verified change before starting the next one. Work in committed increments, not one
+   accumulated tree.
 
 Never proceed to coding without invoking the relevant language skill — native skill activation is unreliable, and
 defaults cannot outperform unread guidance.
@@ -66,7 +68,8 @@ Phase 3: remaining entities as vertical passes through the same stack."
 - **Subsequent phases are vertical passes** — add real logic across layers inside the slice, not one layer at a time.
 - **Reject horizontal plans** — push back when the user proposes one; never produce one unprompted.
 - **Each phase has a verification gate** — define how you'll know the slice works before moving on. ~100–200 lines per
-  checkable phase is a working target.
+  checkable phase is a working target, and a phase lands as one to three commits — the `coding` skill carries the
+  per-commit size checkpoint.
 - **Write learning tests for unfamiliar external contracts** — when using an SDK, library, or third-party API in a way
   you haven't verified, probe its real behavior with an executable test before building on assumptions.
 
