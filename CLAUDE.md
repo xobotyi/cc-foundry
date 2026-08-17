@@ -25,6 +25,7 @@ styles, hooks, and workflow automation.
 - `plugins/php/` — PHP language discipline (conventions, types, OOP, PHPUnit, Pest, Intelephense LSP)
 - `plugins/python/` — Python language discipline (conventions, typing, pytest, uv)
 - `plugins/rust/` — Rust language discipline (ownership, concurrency, cargo/clippy, rust-analyzer LSP)
+- `plugins/wall-clock/` — wall-clock and elapsed-time grounding for agent context (hook-only)
 
 Each plugin has its own `CLAUDE.md` with plugin-specific context.
 

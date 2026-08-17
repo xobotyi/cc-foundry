@@ -1,0 +1,38 @@
+{
+  "description": "Injects wall-clock time and elapsed intervals into context at turn and tool-batch boundaries",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/wall-clock.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/wall-clock.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/wall-clock.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -127,6 +127,21 @@ conserve every claim, fix writing for readers and never for AI detectors.
 /plugin install the-writer
 ```
 
+---
+
+### wall-clock
+
+Claude Code tells the model today's date and nothing else about time: no clock, no timezone, no sense of elapsed time.
+So the agent resumes after your lunch break as though you never left, and finishes an hour of unattended work unable to
+say how long it took. This plugin injects the wall clock on every prompt (`away`, the gap since it last spoke) and once
+a minute during a turn (`turn`, elapsed since your prompt landed). Every figure is computed in the hook from the
+transcript Claude Code already writes, so the model never subtracts timestamps and no state file can go stale. Tick
+period is configurable.
+
+```
+/plugin install wall-clock
+```
+
 ## AI Artifact Plugins
 
 ### ai-helpers
