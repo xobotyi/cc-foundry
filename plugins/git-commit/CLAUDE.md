@@ -60,6 +60,16 @@ Project-specific commit guidance here.
   flag) gets cut — the audit is written out, not silent, so the user sees the verdicts
 - Trailers: structured metadata (Task, Fixes, Refs, etc.)
 
+**Unit definition:**
+
+- A unit is the smallest change that keeps the tree working, not the whole task — one task gives many units
+- The split test decides: if a part of the diff builds and passes alone, the diff holds more than one unit
+- A unit also does one kind of work. New code and its wiring are two units; a refactor and the feature it enables are
+  two units. The split test misses both, since each pair builds and passes together
+- The audience is the reviewer, not the merge — a unit is one question a reviewer answers
+- The mixing conditions alone miss a large homogeneous feature, which is why the size and work-kind boundaries sit
+  beside them
+
 **Commit timing:**
 
 - The pipeline is not an end-of-task activity — a tree holding many units at entry is a process fault to name, not just

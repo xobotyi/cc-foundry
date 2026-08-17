@@ -93,10 +93,12 @@ the staged changes again with `git diff --cached`.
 
 Run this pipeline during the work. Do not save it for the end of the task.
 
+- Plan the units before the work starts. This pipeline then takes one planned unit at a time.
 - Commit each verified step. The next step then builds on a committed base.
 - An uncommitted tree holds no unit. A reviewer cannot read it. `git bisect` cannot use it.
-- A tree with many units at entry shows a process fault. Split it into units now. Then commit earlier in the next task.
-- The `coding` skill of `the-coder` gives the size checkpoint that triggers a commit.
+- A tree with many units at entry shows a planning fault. Interleaved work splits badly. Split what separates cleanly.
+  Then plan the change list before the next task.
+- The `coding` skill of `the-coder` gives the change list and the size checkpoint.
 
 ## Pipeline
 
@@ -113,13 +115,25 @@ Neither command shows an untracked file. `git status --short` marks an untracked
 an explicit path. In a repo with no commits, all files are untracked.
 
 <atomic-commit-rule>
-**Make one commit for each logical change. One logical change is one unit.** These conditions show
-a boundary between two units:
+**Make one commit for each logical change. One logical change is one unit.** A unit is the smallest
+change that keeps the tree in a working state. A unit is not the whole task. One task gives many
+units.
+
+Apply the split test. Cut the change into two pieces. Does each piece build and pass its tests? Then the change holds
+more than one unit. Commit the first piece. Apply the test again to the rest.
+
+A unit also does one kind of work. A reviewer answers one question in each unit. New code and the wiring that integrates
+it are two units. A refactor and the feature it makes possible are two units. The split test alone does not find these
+two boundaries, because both pieces build and pass together.
+
+These conditions show a boundary between two units:
 
 - The files serve different purposes.
 - The diff mixes format changes with logic changes.
 - The diff mixes a refactor with new behavior.
 - The diff holds more than one unrelated bug fix.
+- The diff adds new code and also wires that code into its callers.
+- One part of the diff builds and passes its tests alone.
 
 </atomic-commit-rule>
 

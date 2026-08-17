@@ -17,16 +17,24 @@ all slip through. Manual review catches some, but not systematically.
 **Wrong commit order.** New behavior committed before the refactoring that enables it. Style changes mixed with logic
 changes. The commit sequence doesn't tell a coherent story, making git bisect and code review harder than necessary.
 
+**"Atomic" read as one commit per task.** Every boundary test in a commit workflow asks whether the diff mixes unrelated
+things, so a single large coherent feature passes all of them and arrives as one unit. The word gives an agent an
+honest-sounding reason to never split anything.
+
 **Committing left until the end.** An agent works for an hour and then reaches for git with a few thousand uncommitted
 lines in the tree. Splitting that afterwards recovers a readable history, but the work itself was never done against a
-committed base, so every decision along the way is welded to the ones after it.
+committed base, so every decision along the way is welded to the ones after it. Worse, the split usually can't be made
+cleanly at all — the pieces are interleaved across the same files by the time anyone asks.
 
 ## The Solution
 
 The `commit` skill enforces a staged pipeline that identifies logical units in your diff, plans their commit order,
-validates quality, and creates atomic commits with meaningful messages. The pipeline runs during the work at each
-verified step, not once at the end — and a tree arriving with many units in it is treated as a process fault worth
-naming, not merely a splitting exercise.
+validates quality, and creates atomic commits with meaningful messages. A unit is defined as the smallest change that
+keeps the tree working rather than the whole task, and a split test decides it: if part of the diff builds and passes on
+its own, the diff holds more than one unit. A unit also does one kind of work, since a reviewer answers one question per
+unit: new code and its wiring are separate units, as are a refactor and the feature it enables. The pipeline runs during
+the work at each verified step, not once at the end — and a tree arriving with many units in it is treated as a process
+fault worth naming, not merely a splitting exercise.
 
 Each commit message runs through automated validation before execution. Errors block the commit; warnings advise. The
 `commit-message` skill provides formatting conventions that match professional standards for open-source and team
