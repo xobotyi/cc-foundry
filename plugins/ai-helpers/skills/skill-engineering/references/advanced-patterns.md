@@ -452,14 +452,13 @@ disable-model-invocation: true
 
 Orchestrate a multi-agent code review of $ARGUMENTS:
 
-1. Create a team with TeamCreate
-2. Create specialized review tasks with TaskCreate:
+1. Create specialized review tasks with TaskCreate:
    - Security review: injection, auth, secrets exposure
    - Performance review: N+1 queries, unnecessary allocations
    - Test coverage: missing edge cases, brittle assertions
-3. Spawn agents with team_name so they join as teammates
-4. Wait for all tasks to complete
-5. Aggregate findings and produce a final report
+2. Spawn one agent per task with Agent, each carrying a `name` — the name makes it a teammate
+3. Wait for all tasks to complete and all findings to arrive by SendMessage
+4. Aggregate findings and produce a final report
 ```
 
 **When team coordination belongs in a skill:**
@@ -473,10 +472,14 @@ significantly each time — these don't benefit from the overhead of packaging.
 
 **Team workflow constraints:**
 
-- Always use `TeamCreate` → `TaskCreate` → spawn with `team_name` (never standalone subagents for user-requested
-  parallel work)
-- Standalone subagents pollute the caller's context; teammates communicate via `SendMessage` summaries
-- Tasks shared via task list; agents claim, update, and complete them
+- Spawn teammates with `Agent` + `name` for user-requested parallel work, never standalone subagents. There is no team
+  to create: the session owns one team, and `team_name` is ignored.
+- Standalone subagents pollute the caller's context; teammates communicate via `SendMessage` summaries. The trade-off: a
+  teammate's idle notification carries no output, so the skill must state that each teammate reports by `SendMessage`.
+- Tasks shared via task list; agents claim, update, and complete them. A session without the Task tools carries the work
+  item in the spawn prompt instead.
+- Teams need `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and an interactive session — a skill that depends on them must say
+  so and fail fast.
 
 ---
 

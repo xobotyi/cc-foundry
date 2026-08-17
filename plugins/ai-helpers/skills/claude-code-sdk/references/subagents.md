@@ -268,8 +268,8 @@ worktree is automatically cleaned up if the subagent makes no changes.
 ### Subagent Context Management
 
 **Resumption:** Each invocation creates a fresh instance. To continue a previous subagent's work, ask Claude to resume
-it. Claude uses `SendMessage` with the agent's ID to resume (requires agent teams enabled). A stopped subagent receiving
-a `SendMessage` auto-resumes in background.
+it. Claude uses `SendMessage` with the agent's ID, or with the name it assigned at spawn. Both addresses work with agent
+teams disabled. A stopped subagent receiving a `SendMessage` auto-resumes in background.
 
 **Transcripts:** Stored at `~/.claude/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl`. Persist
 independently of main conversation compaction. Cleaned up based on `cleanupPeriodDays` (default: 30 days).
@@ -286,62 +286,117 @@ and do not affect the main conversation.
 Agent teams coordinate multiple Claude Code instances working as a team. One session acts as team lead; teammates work
 independently in their own context windows and communicate directly with each other.
 
-**Experimental** — disabled by default. Enable via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in environment or
-`settings.json`. Requires Claude Code v2.1.32+.
+**Experimental** — disabled by default. Enable via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in the environment or
+`settings.json`. Without it, no team is set up at session start, no team directories are written, and Claude neither
+spawns nor proposes teammates.
+
+There is no setup step. The session owns exactly one team, created at session start and cleaned up when the session
+ends. `TeamCreate` and `TeamDelete` do not exist (removed in v2.1.178).
+
+### Spawning Teammates
+
+Claude launches a teammate by calling the `Agent` tool with a `name` while agent teams are enabled. Claude Code asks for
+no confirmation. Claude also names ordinary subagents on its own so it can message them later, so a team can form during
+delegation that was never framed as team work.
+
+- `team_name` on the `Agent` tool is accepted and ignored.
+- Spawning requires an interactive session. Under `-p` (headless, Agent SDK), a named subagent runs as an ordinary
+  subagent even with agent teams enabled.
+- Teammates cannot spawn teammates.
 
 ### When to Use
 
 Agent teams vs subagents:
 
-|                   | Subagents                                   | Agent teams                                         |
-| :---------------- | :------------------------------------------ | :-------------------------------------------------- |
-| **Context**       | Own window; results return to caller        | Own window; fully independent                       |
-| **Communication** | Report results back to main agent only      | Teammates message each other directly               |
-| **Coordination**  | Main agent manages all work                 | Shared task list with self-coordination             |
-| **Best for**      | Focused tasks where only the result matters | Complex work requiring discussion and collaboration |
-| **Token cost**    | Lower (results summarized back)             | Higher (each teammate is a separate instance)       |
+|                   | Subagents                                   | Agent teams                                              |
+| :---------------- | :------------------------------------------ | :------------------------------------------------------- |
+| **Context**       | Own window; results return to caller        | Own window; fully independent                            |
+| **Communication** | Report results back to main agent only      | Teammates message each other directly                    |
+| **Coordination**  | Main agent manages all work                 | Messages, plus a shared task list where Task tools exist |
+| **Best for**      | Focused tasks where only the result matters | Complex work requiring discussion and collaboration      |
+| **Token cost**    | Lower (results summarized back)             | Higher (each teammate is a separate instance)            |
 
 Strong use cases for teams: parallel research/review, new modules/features, debugging competing hypotheses, cross-layer
 coordination (frontend + backend + tests).
 
 ### Architecture
 
-- **Team lead** — main session that creates the team, spawns teammates, coordinates
+- **Team lead** — main session that spawns teammates and coordinates
 - **Teammates** — separate Claude Code instances working on assigned tasks
-- **Task list** — shared work items — pending, in progress, completed
-- **Mailbox** — messaging system for inter-agent communication
+- **Task list** — shared work items — pending, in progress, completed. Available to agents that have the Task tools;
+  agents without them coordinate by message.
+- **Mailbox** — per-agent JSON file carrying inter-agent messages
+
+The team name is session-derived: `session-` followed by the first eight characters of the session ID.
 
 Storage locations:
 
-- Team config: `~/.claude/teams/{team-name}/config.json`
-- Task list: `~/.claude/tasks/{team-name}/`
+- Team config: `~/.claude/teams/{team-name}/config.json` — removed when the session ends
+- Mailboxes: `~/.claude/teams/{team-name}/inboxes/{agent-name}.json`
+- Task list: `~/.claude/tasks/{team-name}/` — persists locally, never uploaded, so a resumed session keeps its tasks.
+  Retention follows `cleanupPeriodDays`.
 
-The team config contains a `members` array with each teammate's name, agent ID, and agent type. It holds runtime state
-(session IDs, tmux pane IDs) — do not edit by hand; changes are overwritten on state updates.
+The team config contains a `members` array with each member's name and agent ID. The lead's entry always carries the
+agent type `team-lead`; a teammate's entry carries the agent type the lead named at spawn, and omits the field when the
+lead named none. Teammates read this file to discover other members. It holds runtime state (session IDs, tmux pane IDs)
+— do not edit it by hand or pre-author it; changes are overwritten on the next state update.
 
 There is no project-level team config. A `.claude/teams/teams.json` in the project directory is not recognized.
 
+**Delivery guarantees:** a message counts as sent only when the write to the recipient's mailbox file succeeds — plain
+text and structured protocol messages (plan approval, shutdown request) alike. On write failure the sender gets an error
+and nothing is sent. Claude Code validates every mailbox entry on read: malformed entries are reported and removed, and
+the valid messages still arrive (v2.1.207+; earlier versions blocked the whole mailbox until the file was deleted).
+
 ### Display Modes
 
-- **in-process** — all teammates in main terminal; Shift+Down to cycle. Any terminal.
-- **split panes** — each teammate gets its own pane. Requires tmux or iTerm2.
-- **auto** (default) — split panes if inside tmux, in-process otherwise.
+- **in-process** (default) — all teammates run in the main terminal and appear in the agent panel below the prompt. Any
+  terminal, no extra setup.
+- **auto** — split panes when already inside tmux, or in iTerm2 with the `it2` CLI installed; in-process otherwise.
+- **tmux** — split panes, auto-detecting tmux or iTerm2 from the terminal.
+- **iterm2** (v2.1.186+) — iTerm2 native split panes. Requires the `it2` CLI.
 
-Configure in `~/.claude.json`:
+The default changed from `auto` to `in-process` in v2.1.179, so upgraded sessions that used to open split panes stay in
+one terminal until the mode is set explicitly.
+
+Configure in `~/.claude/settings.json`:
 
 ```json
-{ "teammateMode": "in-process" }
+{ "teammateMode": "auto" }
 ```
 
-Or per-session: `claude --teammate-mode in-process`
+Or per-session: `claude --teammate-mode auto` (experimental, absent from `claude --help`).
 
 Split panes not supported in: VS Code terminal, Windows Terminal, Ghostty.
 
 ### Teammate Interaction
 
-- **In-process mode:** Shift+Down to cycle teammates; type to message directly; Enter to view session; Escape to
-  interrupt; Ctrl+T to toggle task list
-- **Split-pane mode:** Click into a pane to interact directly
+- **In-process mode:** up/down arrows select a teammate in the agent panel; Enter opens its transcript and sends typed
+  text to it; Escape interrupts its current turn; `x` stops it; Ctrl+T toggles the task list.
+- **Split-pane mode:** click into a pane to interact directly.
+
+While viewing a teammate, plain text and skills go to that teammate, but built-in commands still run in the lead
+session. A teammate's model and fast mode are fixed at spawn, so `/model` and `/fast` apply to the lead (v2.1.199 shows
+a notice; earlier versions changed the lead silently). `/effort` applies to the viewed teammate's later turns.
+
+Idle rows hide 30 seconds after every agent in the panel goes idle, and reappear on the teammate's next turn — the
+teammate keeps running and stays addressable while hidden. When more than three teammates are idle, the surplus rows
+collapse into a single `N idle agents` row; Enter expands it, Esc collapses it again.
+
+### Models and Effort
+
+Teammates do not inherit the lead's `/model`. Set **Default teammate model** in `/config`; the **Default (leader's
+model)** option makes teammates follow the lead's current model.
+
+Every teammate model — requested in the prompt or taken from the setting — is checked against the organization's
+`availableModels` allowlist. When the allowlist blocks the value:
+
+- **Family alias (`opus`)** — on the Anthropic API and Claude Platform on AWS, the newest permitted version of that
+  family is used. On providers with provider-specific model IDs the alias falls back like any other blocked value.
+- **Any other blocked value** — the default teammate model is used; if that setting is itself blocked, the provider's
+  default Opus model; if that is blocked too, the lead's model.
+
+Teammates inherit the lead's effort level (split-pane teammates from v2.1.186).
 
 ### Task Coordination
 
@@ -355,10 +410,15 @@ Task claiming uses file locking to prevent race conditions. Dependencies unblock
 
 ### Teammate Messaging
 
-- **message** — send to one specific teammate by name
-- **broadcast** — send to all teammates simultaneously (costs scale with team size — use sparingly)
+`SendMessage` targets one recipient by name. There is no broadcast — to reach everyone, send one message per recipient.
+The lead assigns names at spawn time, so name teammates in the spawn instruction to get addresses you can reference
+later. Any teammate can message any other by name.
 
-The lead assigns names at spawn time. Any teammate can message any other by name.
+An incoming `SendMessage` is presented to the recipient as coming from another Claude session, not from the user. A
+teammate cannot approve a permission prompt or supply consent for another agent, and an agent denied an action cannot
+relay it to a teammate to bypass the check. The same holds for messages from other sessions outside the team. In auto
+mode the classifier treats a relayed approval claim as untrusted input and reviews every message — plain or protocol —
+before delivery; a blocked message never reaches the recipient.
 
 ### Using Subagent Definitions for Teammates
 
@@ -369,8 +429,8 @@ Spawn a teammate using the security-reviewer agent type to audit the auth module
 ```
 
 The teammate honors the definition's `tools` allowlist and `model`. The definition's body is appended to the teammate's
-system prompt as additional instructions (not replacing it). Team coordination tools (SendMessage, task management) are
-always available even when `tools` restricts other tools.
+system prompt as additional instructions (not replacing it). For an in-process teammate, Claude Code adds `SendMessage`
+to the allowlist, plus `TaskCreate`, `TaskGet`, `TaskList`, and `TaskUpdate` when the session has the Task tools.
 
 **Not applied for teammates:** The `skills` and `mcpServers` frontmatter fields from a subagent definition are ignored
 when running as a teammate. Teammates load skills and MCP servers from project/user settings.
@@ -378,16 +438,20 @@ when running as a teammate. Teammates load skills and MCP servers from project/u
 ### Permissions
 
 Teammates start with the lead's permission settings. If the lead uses `--dangerously-skip-permissions`, all teammates do
-too. Per-teammate modes can be changed after spawning but not at spawn time.
+too. Per-teammate modes can be changed after spawning but not at spawn time. Teammate permission prompts surface in the
+lead session and must be answered there; teammate plan approvals are the designed exception and the lead grants them
+without prompting the user.
 
 ### Context and Communication
 
 Each teammate loads the same project context as a regular session (CLAUDE.md, MCP servers, skills) plus the spawn
 prompt. The lead's conversation history does not carry over.
 
-- Messages are delivered automatically to recipients
-- Idle notifications are sent automatically to the lead
-- All agents can see task status and claim available work
+- Messages are delivered automatically to recipients — the lead does not poll
+- The idle notification tells the lead a teammate stopped and **carries none of its output**. A teammate shares results
+  by messaging the lead or updating the shared task list.
+- A teammate whose turn ends on an API error notifies the lead and includes the error text (v2.1.198+)
+- Agents with the Task tools can see task status and claim available work
 
 ### Plan Approval
 
@@ -399,13 +463,16 @@ Spawn an architect teammate to refactor the auth module.
 Require plan approval before they make any changes.
 ```
 
-On rejection, the teammate stays in plan mode, revises, and resubmits.
+On rejection, the teammate stays in plan mode, revises, and resubmits. The lead decides autonomously — put approval
+criteria in the prompt ("only approve plans that include test coverage") to steer it.
 
 ### Hooks for Teams
 
 - **`TeammateIdle`** (no matcher) — teammate is about to go idle. Exit code 2: sends feedback, keeps working.
 - **`TaskCreated`** (no matcher) — a task is being created. Exit code 2: prevents creation + feedback.
 - **`TaskCompleted`** (no matcher) — a task is being marked complete. Exit code 2: prevents completion + feedback.
+
+The `team_name` field in these payloads carries the session-derived name and is deprecated.
 
 ### Shutdown and Cleanup
 
@@ -417,22 +484,17 @@ Ask the researcher teammate to shut down
 
 The teammate can approve (exits gracefully) or reject with an explanation.
 
-**Cleanup the team:**
-
-```
-Clean up the team
-```
-
-Checks for active teammates and fails if any are still running — shut them down first. Always use the lead to clean up;
-teammates should not run cleanup.
+There is no cleanup step. The team's shared directories are removed when the session ends; the task list directory
+survives for resumed sessions.
 
 ### Limitations
 
 - No session resumption with in-process teammates (`/resume` and `/rewind` do not restore them)
 - Task status can lag — teammates sometimes fail to mark tasks completed
 - Shutdown can be slow (waits for current request/tool call)
-- One team per session — clean up before starting a new one
-- No nested teams — teammates cannot spawn their own teams
+- One team per session, scoped to that session — no additional named teams, no sharing a team across sessions
+- No nested teams — teammates cannot spawn their own teammates
+- No background subagents from in-process teammates — `run_in_background` and `background: true` both error
 - Lead is fixed — cannot promote a teammate or transfer leadership
 - Permissions set at spawn — all teammates start with lead's mode
 - Split panes require tmux or iTerm2
@@ -443,3 +505,14 @@ teammates should not run cleanup.
 - 5-6 tasks per teammate keeps productivity high without excessive context switching
 - Three focused teammates often outperform five scattered ones
 - Token costs scale linearly with active teammates
+
+### Named Subagents Launching as Teammates
+
+While agent teams are enabled, any subagent Claude names launches as a teammate — including delegation never framed as
+team work. The reporting contract differs: a subagent's result returns to the caller, while a teammate's idle
+notification carries no output, so an orchestration flow waiting on subagent results stalls.
+
+To make named subagents launch as subagents again, set `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `0`. No restart needed:
+settings-file `env` values are reapplied on save and the variable is reread at each spawn. A `0` in user settings
+overrides a shell export, but project settings, local settings, `--settings`, and managed settings all apply later and
+can re-enable teams.

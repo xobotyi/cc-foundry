@@ -84,8 +84,8 @@ the caller's context. Design each to return concise summaries, not raw file cont
 **When to use:** Independent investigations where research paths don't depend on each other.
 
 **When standalone subagents beat Agent Teams here:** For simple one-shot research with no cross-agent coordination,
-standalone parallel subagents are cheaper and simpler. Teams add overhead (team creation, task claiming) not justified
-for small fan-outs.
+standalone parallel subagents are cheaper and simpler. Teams add overhead (task claiming, message round-trips, results
+that arrive only when a teammate sends them) not justified for small fan-outs.
 
 ### Master-Clone (General-Purpose Delegation)
 
@@ -140,7 +140,7 @@ context), teammates communicate via short `SendMessage` summaries and share a ta
   sequencing.
 - Cross-task coordination — teammates can message each other directly without going through the lead.
 
-**Enable Agent Teams** (v2.1.32+):
+**Enable Agent Teams:**
 
 ```json
 {
@@ -150,28 +150,34 @@ context), teammates communicate via short `SendMessage` summaries and share a ta
 }
 ```
 
+The session owns exactly one team, set up at session start and cleaned up at exit. `TeamCreate` and `TeamDelete` were
+removed in v2.1.178; `team_name` on the `Agent` tool is accepted and ignored. Spawning teammates requires an interactive
+session — under `-p` a named subagent runs as an ordinary subagent.
+
 **Team lifecycle:**
 
 ```
-1. TeamCreate("team-name")
-2. TaskCreate(subject, description, team_name="team-name")
-   TaskCreate(subject, description, team_name="team-name", blockedBy=["task-1"])
-3. Agent(prompt, team_name="team-name")  — spawns teammate
-   Agent(prompt, team_name="team-name")  — spawns another
-4. Teammates claim tasks, work, SendMessage short summaries
-5. TeammateIdle fires when no unclaimed tasks remain
-6. TaskCompleted hooks can validate before marking done
+1. TaskCreate(subject, description)                      — sessions with the Task tools
+   TaskCreate(subject, description, blockedBy=["task-1"])
+2. Agent(prompt, name="researcher-auth")   — the name makes it a teammate
+   Agent(prompt, name="researcher-api")    — spawns another
+3. Teammates claim tasks, work, SendMessage short summaries
+4. TeammateIdle fires when no unclaimed tasks remain
+5. TaskCompleted hooks can validate before marking done
 ```
 
-**Navigation:** In the terminal, use `Shift+Down` to cycle through teammates. In tmux/iTerm2, each teammate can open in
-its own split pane.
+A session without the Task tools has no shared list: carry the work item in the spawn prompt and let teammates
+coordinate by message.
+
+**Navigation:** in-process teammates appear in the agent panel below the prompt — up/down arrows select, Enter opens the
+transcript and messages it, Escape interrupts, `x` stops, Ctrl+T toggles the task list. In tmux/iTerm2, each teammate
+can open in its own split pane.
 
 **Team patterns:**
 
 _Independent parallel work:_
 
 ```
-Team: "refactor-team"
 ├── Task: "Refactor auth middleware"        (no dependencies)
 ├── Task: "Refactor logging middleware"     (no dependencies)
 └── Task: "Refactor rate-limit middleware"  (no dependencies)
@@ -182,7 +188,6 @@ Team: "refactor-team"
 _Pipeline with dependencies:_
 
 ```
-Team: "feature-team"
 ├── Task 1: "Design API schema for /users endpoint"
 ├── Task 2: "Implement API handlers"         (blockedBy: ["1"])
 └── Task 3: "Write integration tests"        (blockedBy: ["2"])
@@ -193,7 +198,6 @@ Task 2 cannot start until Task 1 completes.
 _Research fan-out with synthesis:_
 
 ```
-Team: "research-team"
 ├── Task 1: "Analyze authentication patterns"
 ├── Task 2: "Analyze authorization patterns"
 ├── Task 3: "Analyze session management patterns"

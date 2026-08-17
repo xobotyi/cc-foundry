@@ -490,7 +490,8 @@ Fires when a subagent finishes. Matches on agent type. Uses same decision contro
 
 Fires when a task is created via TaskCreate. No matcher support.
 
-**Input fields:** `task_id`, `task_subject`, optional `task_description`, `teammate_name`, `team_name`.
+**Input fields:** `task_id`, `task_subject`, optional `task_description`, `teammate_name`, `team_name` (session-derived,
+deprecated).
 
 **Decision control:** Exit 2 rolls back creation (stderr as feedback). JSON `continue: false` stops teammate entirely.
 
@@ -498,7 +499,8 @@ Fires when a task is created via TaskCreate. No matcher support.
 
 Fires when a task is marked completed. No matcher support. Also fires when a teammate finishes with in-progress tasks.
 
-**Input fields:** `task_id`, `task_subject`, optional `task_description`, `teammate_name`, `team_name`.
+**Input fields:** `task_id`, `task_subject`, optional `task_description`, `teammate_name`, `team_name` (session-derived,
+deprecated).
 
 **Decision control:** Exit 2 prevents completion (stderr as feedback). JSON `continue: false` stops teammate entirely.
 
@@ -531,7 +533,7 @@ Error types: `rate_limit`, `authentication_failed`, `billing_error`, `invalid_re
 
 Fires when an agent team teammate is about to go idle. No matcher support.
 
-**Input fields:** `teammate_name`, `team_name`.
+**Input fields:** `teammate_name`, `team_name` (session-derived, deprecated).
 
 **Decision control:** Exit 2 continues teammate with stderr feedback. JSON `continue: false` stops teammate entirely.
 

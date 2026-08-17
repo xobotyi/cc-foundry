@@ -201,12 +201,17 @@ You are a [role] specializing in [domain].
 
 ## Agent Teams
 
-Agent Teams scale subagents into coordinated crews with a shared task list and peer messaging:
+Agent Teams scale subagents into coordinated crews with peer messaging and, where the session has the Task tools, a
+shared task list. The session owns one team from start to exit — nothing creates it and nothing tears it down.
 
-- **Team lead** creates the team with `TeamCreate`, creates tasks with `TaskCreate`, spawns teammates with `team_name`
-- **Teammates** claim tasks, work independently, communicate via `SendMessage`, mark tasks completed
-- **Shared task list** — all agents can read, update, and create tasks. Dependencies via `blockedBy`.
-- **Idle notification** — teammates automatically notify the lead when idle. This is normal, not an error.
+- **Team lead** — the main session. Spawns a teammate by calling `Agent` with a `name`; `team_name` is ignored. Creates
+  tasks with `TaskCreate` when the session has the Task tools.
+- **Teammates** claim tasks, work independently, communicate via `SendMessage`, mark tasks completed. A teammate cannot
+  spawn teammates.
+- **Shared task list** — agents holding the Task tools read, update, and create tasks. Dependencies via `blockedBy`.
+  Agents without those tools coordinate by message alone.
+- **Idle notification** — a teammate notifies the lead when it stops. The notification carries **no output**; results
+  reach the lead only by `SendMessage` or the task list.
 
 **When to use teams vs standalone subagents:**
 

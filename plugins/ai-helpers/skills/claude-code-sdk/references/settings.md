@@ -63,7 +63,7 @@ network access to `api.anthropic.com`. Most settings can be set in either manage
 
 Global config (`~/.claude.json`) stores preferences, OAuth, MCP servers, and per-project state. These keys go there, not
 in `settings.json`: `autoConnectIde`, `autoInstallIdeExtension`, `editorMode`, `showTurnDuration`,
-`terminalProgressBarEnabled`, `teammateMode`.
+`terminalProgressBarEnabled`.
 
 ### Schema Validation
 
@@ -107,6 +107,8 @@ inline validation in editors.
 - **`feedbackSurveyRate`** (number) — probability 0-1 for session quality survey (set `0` to suppress)
 - **`companyAnnouncements`** (string[]) — messages shown at startup (random if multiple)
 - **`defaultShell`** (string) — shell for `!` commands: `"bash"` (default) or `"powershell"`
+- **`teammateMode`** (string) — agent team display: `"in-process"` (default), `"auto"`, `"tmux"`, `"iterm2"`.
+  Per-session override: `--teammate-mode`.
 
 ### Authentication Settings
 

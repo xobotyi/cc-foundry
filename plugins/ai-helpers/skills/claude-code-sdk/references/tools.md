@@ -30,14 +30,13 @@ Complete catalog of tools available to Claude Code. Tool names are the exact str
 ### Agent and Team Tools
 
 - `Agent` — Spawns a subagent with its own context window. Built-in types: Explore (haiku, read-only), Plan (inherited
-  model, read-only), general-purpose (inherited model, all tools). Custom agents from `.claude/agents/`. No permission
-  required.
-- `TeamCreate` — Creates an agent team with multiple teammates. Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. No
+  model, read-only), general-purpose (inherited model, all tools). Custom agents from `.claude/agents/`. Passing a
+  `name` spawns the agent as a teammate while `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and the session is interactive;
+  `team_name` is accepted and ignored. No permission required.
+- `SendMessage` — Sends a message to a teammate or a named subagent, or resumes a stopped subagent by agent ID. No
   permission required.
-- `TeamDelete` — Disbands an agent team and cleans up teammate processes. Requires
-  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. No permission required.
-- `SendMessage` — Sends a message to an agent team teammate by name, or resumes a stopped subagent by agent ID. Requires
-  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. No permission required.
+
+`TeamCreate` and `TeamDelete` were removed in v2.1.178. The session's team needs no creation and no teardown.
 
 ### Task Management Tools
 
@@ -95,8 +94,7 @@ Complete catalog of tools available to Claude Code. Tool names are the exact str
 
 **No permission required:** `Agent`, `AskUserQuestion`, `CronCreate`, `CronDelete`, `CronList`, `EnterPlanMode`,
 `EnterWorktree`, `ExitWorktree`, `Glob`, `Grep`, `ListMcpResourcesTool`, `LSP`, `Read`, `ReadMcpResourceTool`,
-`SendMessage`, `TaskCreate`, `TaskGet`, `TaskList`, `TaskOutput`, `TaskStop`, `TaskUpdate`, `TeamCreate`, `TeamDelete`,
-`TodoWrite`, `ToolSearch`
+`SendMessage`, `TaskCreate`, `TaskGet`, `TaskList`, `TaskOutput`, `TaskStop`, `TaskUpdate`, `TodoWrite`, `ToolSearch`
 
 Tools requiring permission are subject to permission rules configured via `/permissions` or in settings. Permission
 evaluation order: deny > ask > allow (first match wins).

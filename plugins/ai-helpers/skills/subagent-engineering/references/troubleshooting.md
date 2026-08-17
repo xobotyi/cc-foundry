@@ -13,7 +13,9 @@ background agents, worktree isolation, and the Agent SDK.
 - **Permission / tool error** → [Tool Permissions](#tool-permissions)
 - **Output wrong format** → [Output Format](#output-format)
 - **Agent returns early** → [Task Incompletion](#task-incompletion)
+- **Subagent result never returns** → [Agent Teams](#agent-teams)
 - **Teammate not receiving messages** → [Agent Teams](#agent-teams)
+- **Teammate row disappeared** → [Agent Teams](#agent-teams)
 - **Task coordination failure** → [Agent Teams](#agent-teams)
 - **Background agent status unknown** → [Background Agents](#background-agents)
 - **Worktree branch conflict** → [Worktree Isolation](#worktree-isolation)
@@ -158,6 +160,29 @@ Fix:
 
 ## Agent Teams
 
+### Subagent launched as a teammate, orchestration stalls
+
+Symptoms: a delegation that was never framed as team work produces a teammate; the caller waits for a result that never
+arrives.
+
+Cause: while agent teams are enabled, any subagent Claude names launches as a teammate. A subagent returns its result to
+the caller; a teammate's idle notification carries no output.
+
+Fix:
+
+- Spawn without a `name` when the caller needs the result back.
+- Or set `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `0`. No restart needed — settings-file `env` values reapply on save
+  and the variable is reread at each spawn. A `0` in user settings loses to project settings, local settings,
+  `--settings`, and managed settings, which all apply later.
+
+### Teammate row vanished from the agent panel
+
+Cause: idle rows hide 30 seconds after every agent in the panel goes idle. The teammate is still running and
+addressable.
+
+Fix: send it a message by name to bring the row back. When more than three teammates are idle, the surplus collapses
+into one `N idle agents` row — press Enter to expand it.
+
 ### Teammate not receiving messages
 
 Cause: `SendMessage` not in sender's `tools`, or message sent with wrong recipient name.
@@ -165,14 +190,19 @@ Cause: `SendMessage` not in sender's `tools`, or message sent with wrong recipie
 Diagnosis:
 
 - Confirm `SendMessage` is in the sending agent's `tools` list.
-- Confirm `to:` uses the teammate's name exactly as defined in `TeamCreate` — not a UUID, not a display name variant.
+- Confirm `to:` uses the name the lead assigned at spawn — not a UUID, not a display name variant. Read
+  `~/.claude/teams/{team-name}/config.json` to list members.
 - Plain text output is NOT visible to teammates. `SendMessage` is the only inter-agent communication channel.
+- A send that failed to write to the recipient's mailbox returns an error and delivers nothing — check the error rather
+  than assuming the message arrived.
 
 Fix:
 
-- Add `SendMessage` to `tools` in the sender's frontmatter.
+- Add `SendMessage` to `tools` in the sender's frontmatter — Claude Code adds it for in-process teammates, but a
+  standalone subagent with a restrictive allowlist does not get it.
 - Verify recipient name matches the team member name exactly.
-- Use `to: "*"` sparingly — it scales linearly with team size.
+- There is no broadcast recipient. To reach everyone, send one message per teammate — and keep the fan-out small, since
+  cost scales with team size.
 
 ### Task coordination failures
 

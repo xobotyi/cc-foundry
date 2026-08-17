@@ -128,10 +128,13 @@ Custom agents in `.claude/agents/` with frontmatter for tools, model, MCP scopin
 @-mention, `--agent` flag (session-wide). Subagents cannot spawn other subagents. Supports persistent memory, worktree
 isolation, scoped MCP servers.
 
-**Agent Teams** — Multi-agent orchestration with shared task lists and inter-agent messaging. Lead creates team, spawns
-teammates, coordinates work. Tasks have states (pending/in_progress/completed), dependencies, and ownership. Teammates
-go idle between turns and wake on message. Team-specific hooks: `TeammateIdle`, `TaskCreated`, `TaskCompleted`.
-Experimental: requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.
+**Agent Teams** — Multi-agent orchestration with inter-agent messaging and, where the session has the Task tools, a
+shared task list. The session owns exactly one team, created at session start and cleaned up at session end — there is
+no setup step and no `TeamCreate`/`TeamDelete` (removed in v2.1.178). The lead spawns a teammate by calling `Agent` with
+a `name`, so any named subagent becomes a teammate while teams are enabled. Tasks have states
+(pending/in_progress/completed), dependencies, and ownership. Teammates go idle between turns and wake on message; the
+idle notification carries no output. Team-specific hooks: `TeammateIdle`, `TaskCreated`, `TaskCompleted`. Experimental:
+requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and an interactive session.
 
 **Channels** — Push external events into a running session via MCP servers spawned over stdio. One-way (alerts/webhooks)
 or two-way (chat with reply tools). Sender gating required to prevent prompt injection. Permission relay enables remote
@@ -267,7 +270,7 @@ nothing to filter). To get path-scoped auto-only behavior, set `user-invocable: 
 - **Specialized role** — custom agent in `.claude/agents/` with own prompt and tool restrictions
 - **Skill in isolation** — skill with `context: fork` + `agent` field
 - **Session-wide mode** — `claude --agent <name>` or `agent` in settings
-- **Parallel coordination** — agent teams via `TeamCreate`
+- **Parallel coordination** — agent teams: spawn teammates with `Agent` + `name`
 
 ### Hook Type Selection
 

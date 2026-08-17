@@ -62,8 +62,10 @@ When Claude spawns a subagent programmatically via the `Agent` tool (previously 
 - **`model`** — Model override for this invocation. Takes precedence over frontmatter `model`, unless
   `CLAUDE_CODE_SUBAGENT_MODEL` is set.
 - **`mode`** — Invocation mode. Not the same as `permissionMode`.
-- **`name`** — A unique name for this subagent instance; used to target it with `SendMessage` for resumption.
-- **`team_name`** — If set, the spawned subagent joins this team as a teammate. Required for agent teams.
+- **`name`** — A unique name for this subagent instance; used to target it with `SendMessage` for resumption. While
+  agent teams are enabled in an interactive session, a named subagent launches as a teammate.
+- **`team_name`** — Accepted and ignored (v2.1.178+). The session's team needs no name; teammates join it by being
+  spawned with a `name`.
 - **`run_in_background`** — `true` to run concurrently, allowing the main agent to continue. Background subagents
   pre-approve permissions before starting; auto-deny anything not pre-approved at launch.
 - **`isolation`** — `worktree` for an isolated git worktree. Can be set per-invocation even without frontmatter.
