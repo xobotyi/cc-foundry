@@ -110,6 +110,10 @@ ideas freely. Dense register with calibrated exceptions, adversarial self-checks
 planning — tracer-bullet first, expand components in vertical passes; rejects horizontal "finish all of one layer before
 the next" decomposition. Optimized for iterative refinement with peer-level interaction.
 
+Its terseness rules govern two channels: what Claude says to you, and what it writes into the artifact. Artifacts state
+the rules that hold now, so a skill or style never accumulates "previously this said X" notes or a changelog section.
+That history lives in git and the release notes.
+
 A **Language Contract** section carries two absolute rules, held outside the style's own priority hierarchy so brevity
 can never trade them away: write to ASD-STE100 Simplified Technical English, and use ubiquitous language — one name per
 concept, taken from the domain or the artifact under work and carried unchanged through prose, headings, and examples.
