@@ -31,12 +31,13 @@ that must justify itself.
 3. **Run discovery** — Invoke `coding` skill (prerequisite); it carries the discovery protocol.
 4. **Check skills** — Review available skills. Invoke matching skills after `coding`. Multiple skills form a queue,
    e.g.: `coding` → `golang` → `templ`.
-5. **Implement minimally** — Smallest change that fully satisfies requirements. Climb the reuse ladder before writing
-   new code — reuse what exists, prefer stdlib and native platform features over custom code; the full ladder lives in
-   the `coding` skill.
-6. **Validate** — Test changes, verify requirements are met.
-7. **Commit the step** — commit each verified change before starting the next one. Work in committed increments, not one
-   accumulated tree.
+5. **Plan the changes** — before writing code, list the changes in order, one commit each, one kind of work each. A
+   refactor that clears the way is its own first change.
+6. **Implement one change** — smallest change that fully satisfies that entry. Climb the reuse ladder before writing new
+   code — reuse what exists, prefer stdlib and native platform features over custom code; the full ladder lives in the
+   `coding` skill.
+7. **Validate and commit it** — test, verify, commit. Only then start the next entry; never write it on top of an
+   uncommitted change.
 
 Never proceed to coding without invoking the relevant language skill — native skill activation is unreliable, and
 defaults cannot outperform unread guidance.
@@ -55,8 +56,9 @@ by default.
 </bad>
 <good>
 "Phase 1 (tracer): one migration, one handler, one UI call — hardcoded happy path, end-to-end.
-Phase 2: real validation and error paths across the slice.
-Phase 3: remaining entities as vertical passes through the same stack."
+Phase 2: real storage for one entity, with its validation and error paths, standalone.
+Phase 3: the handler that calls it, then the UI above it.
+Phase 4: remaining entities as vertical passes through the same stack."
 </good>
 </example>
 </examples>
@@ -65,7 +67,11 @@ Phase 3: remaining entities as vertical passes through the same stack."
 
 - **Phase 1 is a tracer bullet** — a thin end-to-end slice through every affected layer with placeholder logic. Proves
   integration before depth.
-- **Subsequent phases are vertical passes** — add real logic across layers inside the slice, not one layer at a time.
+- **Subsequent phases fill the slice bottom-up** — one capability at a time, in dependency order. The storage change
+  lands standalone and verified, then the handler that calls it, then the surface above it. Each piece is committable on
+  its own and leaves the tree working.
+- **Horizontal means one layer across every feature** — all migrations, then all handlers, then all UI. That is what to
+  reject. Building one feature's storage before that feature's handler is dependency order, and it is correct.
 - **Reject horizontal plans** — push back when the user proposes one; never produce one unprompted.
 - **Each phase has a verification gate** — define how you'll know the slice works before moving on. ~100–200 lines per
   checkable phase is a working target, and a phase lands as one to three commits — the `coding` skill carries the
@@ -163,7 +169,8 @@ JWT. Existing tests pass, added 3 new tests covering expired/invalid/missing tok
 - Surface concerns immediately — don't wait, don't soften
 - When reporting completion, disclose what wasn't verified — "done" with silent gaps is worse than "done, except X"
 - Don't delegate coding work to subagents — they don't inherit this style or the skill queue; execute directly
-- Don't refactor unrelated code without asking
+- Don't refactor unrelated code without asking — comments and docs in the code you touch are the exception, and the
+  `coding` skill has you repair those on sight
 - Fix root cause, not symptom — a bug in a shared function gets fixed once at the function, not patched per caller; grep
   the callers first
 - Drop the dense register for — security warnings, irreversible-action confirmations (data loss, force-push, schema

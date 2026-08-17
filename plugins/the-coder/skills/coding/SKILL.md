@@ -110,6 +110,23 @@ Before writing code, establish:
 - **Scope** — What files change? What stays untouched? Explicitly bound the change. Don't "helpfully improve" adjacent
   code.
 
+- **Decomposition** — Before writing any code, write down the ordered list of changes you will make, one commit each.
+  **This is where the work gets split.** Splitting at commit time means untangling a diff that was never built to come
+  apart, and that rarely succeeds — the pieces are already interleaved across the same files and lines.
+
+  Name each entry by its kind of work, because a change carries only one kind: refactor, new code, integration, fix,
+  formatting, docs. Two sources feed the list:
+  - **The task statement**, before you read any code. "Implement and integrate X" is already two entries: the new code
+    standalone, then the wiring that puts it to use.
+  - **Discovery**, once you have read the code. If the existing code needs a refactor to make room, that refactor is
+    entry one, committed on its own, before any new code exists.
+
+  Then work the list one entry at a time. Never write code for the next entry until the current one is committed. That
+  rule is what makes the plan binding — without it the list is a note you abandon at the first opportunity.
+
+  A dummy layer that integrates end to end and does nothing is usually entry one or two; after it, one capability at a
+  time in dependency order — storage standalone and verified, then the handler that calls it, then the surface above.
+
 - **Risks** — What could break? If modifying shared code, trace all callers first.
 
 - **Verification strategy** — How will you prove it works? Tests > manual check > "it looks right". Define this BEFORE
@@ -125,7 +142,7 @@ Don't one-shot complex features. Build in committed steps: a small change, verif
 top of it.
 
 <incremental-rules>
-- One logical change at a time
+- One logical change at a time, sized by the split test below — never "the task is one change"
 - Wear one hat at a time — never mix refactoring and behavior change in the same step. Refactor
   first with behavior identical, verify, then change behavior; a diff that does both can't be
   reviewed or bisected
@@ -141,14 +158,47 @@ An uncommitted working tree is the unit nobody can review and nobody can bisect.
 work, not once at the end. A large change is not one hard review — it is a review nobody does, and the defect that
 survives it costs more than the whole change saved.
 
+**Atomic is a code boundary, not a task boundary.** An atomic change is the smallest change that leaves the tree
+working: it builds, its tests pass, nothing is half-wired. It is not the smallest change that satisfies the request. One
+task is normally many atomic changes.
+
+<split-test>
+Run this before calling a change atomic: can it be cut into two pieces that each build and pass? If yes, it is not
+atomic — cut it, commit the first piece, and repeat until the answer is no.
+
+"The whole task is one logical change" is not the test. It is the reasoning that produces a 3000-line diff, and it is
+wrong for a reason worth naming: a task being coherent says nothing about whether its parts can ship separately.
+</split-test>
+
+**A change is a review target, and it does one kind of work.** You do not split the work to make merging tidy. You split
+it so a reviewer holds one question at a time. Both tests must pass:
+
+<atomicity-tests>
+- **Deliverable alone** — cut it in two: does each piece build and pass? If yes, it was not one change.
+- **One kind of work** — does the diff carry implementation and refactoring? Formatting and logic? New code and the
+  wiring that integrates it? If yes, it was not one change, even when every line serves the same feature.
+</atomicity-tests>
+
+The second test catches what the first cannot see. A refactor and the feature it enables build and pass together, so
+deliverability alone keeps them in one diff — and the reviewer then separates "what moved" from "what is new" by hand,
+which is the review that silently does not happen.
+
+At equal correctness, smaller wins. Given two valid splits, take the finer one.
+
+**Both tests belong to planning.** They decide the change list before code exists; here they only confirm the list held.
+Applying them for the first time to a finished diff is already the failure — the pieces are interleaved by then, and
+what comes out is a worse split than planning would have produced. If it happens, say so, salvage what separates
+cleanly, and start the next task from a change list.
+
 <commit-checkpoint>
 - **Checkpoint at ~400-500 lines of production code.** Crossing it means stop, commit what is coherent, continue on top.
   This triggers a commit; it is not a quota to fill — a 30-line change is a finished commit, not an under-delivery.
 - **Tests don't count toward the budget.** They ship in the commit with the code they cover, however long they run. A
   small feature with a wide test surface is one legitimate commit of a few thousand lines.
-- **Atomicity outranks the budget.** A mechanical rename across 60 files, or a signature change with all its callers, is
-  one commit at any size — splitting it leaves a commit whose tree does not build. Say why it is oversized instead of
-  splitting it badly.
+- **Atomicity outranks the budget only after the split test fails.** A mechanical rename across 60 files, or a signature
+  change with all its callers, cannot be cut without leaving a broken tree, so it ships whole at any size. Run the test
+  before invoking this. An oversized commit that could have been cut does not qualify, and this is not a licence to keep
+  a feature whole because it feels like one thing.
 - **Never start a second change on an uncommitted first.** Both then land as one blob, and neither can be reverted
   alone.
 - **A phase is not a commit.** A planned phase (~100-200 lines, one verification gate) usually lands as one to three
@@ -265,6 +315,23 @@ func ParseConfig(r io.Reader) (*Config, error)
 // are rejected. The caller keeps ownership of r; ParseConfig never closes it.
 func ParseConfig(r io.Reader) (*Config, error)
 ```
+
+### Repair What You Read
+
+A comment or doc that breaks these rules is a defect, and you fix a defect you meet without being asked. Leaving one you
+just read is a decision to keep something you know is wrong.
+
+<proactive-repair>
+- **Scope is what you touch** — the files you edit and the symbols you read to make the change. Not the package, not a
+  sweep of the repo. A comment you never had reason to open stays where it is.
+- **Delete narration, history, and task references on sight.** They cost nothing to lose, and the diff records the
+  removal.
+- **Rewrite a doc that no longer matches its symbol.** A stale contract is worse than a missing one, because callers
+  believe it.
+- **Report the repair in one line** so a reviewer knows the extra hunks are deliberate, not accidental scope creep.
+- **Ask first when the repair is large or contested** — a doc that is wrong because the code is wrong, or a convention
+  the codebase applies on purpose. Surface it; don't silently reverse it.
+</proactive-repair>
 
 ### Mark Deliberate Shortcuts
 
