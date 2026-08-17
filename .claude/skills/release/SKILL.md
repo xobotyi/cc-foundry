@@ -34,7 +34,10 @@ Every plugin version bump that lands on master ships with a GitHub release. The 
 
 - **Tag** — `<plugin>-v<X.Y.Z>`, e.g. `the-coder-v1.5.0`
 - **Title** — `<plugin> v<X.Y.Z>`, e.g. `the-coder v1.5.0`
-- **Target** — the pushed commit that landed the version bump
+- **Target** — the pushed commit that landed the version bump, as its **full 40-character SHA**. GitHub rejects an
+  abbreviated SHA with `HTTP 422 Validation Failed` and the misleading trio `tag_name is not a valid tag`,
+  `Release.target_commitish is invalid`, `Published releases must have a valid tag`. Resolve it with
+  `git rev-parse <short-sha>`; a branch name also works.
 - Never run `git tag` — `gh release create` creates the tag on the remote at publish time.
 
 ## Release Notes
