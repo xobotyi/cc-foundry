@@ -5,7 +5,7 @@ Structured git commit workflow with atomic commits, message validation, and conv
 ## Skills
 
 - **`commit`** — commit pipeline: survey changes → plan units → quality gate → commit loop (stage → draft → self-review
-  with body audit → validate → commit) → verify
+  with body audit → validate → commit) → verify. Runs during the work at each verified step, not once at the end
 - **`commit-message`** — Message formatting conventions and structure rules
 
 ## Scripts
@@ -59,6 +59,13 @@ Project-specific commit guidance here.
   line inside a paragraph. A paragraph that reports the procedure (function, call order, empty case, fallback, gating
   flag) gets cut — the audit is written out, not silent, so the user sees the verdicts
 - Trailers: structured metadata (Task, Fixes, Refs, etc.)
+
+**Commit timing:**
+
+- The pipeline is not an end-of-task activity — a tree holding many units at entry is a process fault to name, not just
+  to split
+- Change size is not this plugin's rule. `the-coder`'s `coding` skill owns the size checkpoint that triggers a commit;
+  this plugin owns unit boundaries, messages, and validation
 
 **Scope usage:**
 

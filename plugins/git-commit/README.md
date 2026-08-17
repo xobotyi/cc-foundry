@@ -17,10 +17,16 @@ all slip through. Manual review catches some, but not systematically.
 **Wrong commit order.** New behavior committed before the refactoring that enables it. Style changes mixed with logic
 changes. The commit sequence doesn't tell a coherent story, making git bisect and code review harder than necessary.
 
+**Committing left until the end.** An agent works for an hour and then reaches for git with a few thousand uncommitted
+lines in the tree. Splitting that afterwards recovers a readable history, but the work itself was never done against a
+committed base, so every decision along the way is welded to the ones after it.
+
 ## The Solution
 
 The `commit` skill enforces a staged pipeline that identifies logical units in your diff, plans their commit order,
-validates quality, and creates atomic commits with meaningful messages.
+validates quality, and creates atomic commits with meaningful messages. The pipeline runs during the work at each
+verified step, not once at the end — and a tree arriving with many units in it is treated as a process fault worth
+naming, not merely a splitting exercise.
 
 Each commit message runs through automated validation before execution. Errors block the commit; warnings advise. The
 `commit-message` skill provides formatting conventions that match professional standards for open-source and team

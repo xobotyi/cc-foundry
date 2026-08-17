@@ -89,6 +89,15 @@ the staged changes again with `git diff --cached`.
 
 </pipeline-awareness>
 
+## When to Commit
+
+Run this pipeline during the work. Do not save it for the end of the task.
+
+- Commit each verified step. The next step then builds on a committed base.
+- An uncommitted tree holds no unit. A reviewer cannot read it. `git bisect` cannot use it.
+- A tree with many units at entry shows a process fault. Split it into units now. Then commit earlier in the next task.
+- The `coding` skill of `the-coder` gives the size checkpoint that triggers a commit.
+
 ## Pipeline
 
 ### 1. Survey Changes
