@@ -277,6 +277,10 @@ tools: Read, Edit, Write, Bash
 - Experimental changes that may be discarded
 - Large-scale refactors where mid-process state would be messy
 - Two subagents modifying overlapping files in parallel (give each its own worktree)
+- **Any agent whose method mutates sources**, however briefly — a test auditor running negative controls, a migration
+  prover, anything that edits and reverts to prove a point. The hazard here is not collision but abandonment: a crash
+  mid-control strands the mutation in a tree the caller believes is clean. Pair the isolation with a restore-and-verify
+  rule in the agent's prompt
 
 Worktree isolation is per-subagent, not per-team. For team-level isolation, include `isolation: worktree` in the
 subagent definition used as the teammate template.
@@ -502,6 +506,15 @@ Output format:
 ## Suggestions (consider)
 
 Include specific examples of how to fix each issue.
+
+Calibration:
+- A clean review that names what it checked is a useful result. Do not manufacture findings to
+  fill the sections.
+- Do not scale findings to diff size. Report every real violation; report no invented one.
+- Claims of absence ("no test covers this", "nothing calls it") carry the command run and what it
+  returned.
+- A finding you could not settle is reported as unverified, naming what would settle it. Never
+  dropped, never promoted to confirmed.
 ```
 
 ### Debugger (Read + Write)
@@ -564,6 +577,15 @@ For each vulnerability:
 - Description: what the vulnerability is
 - Impact: what could happen
 - Remediation: specific fix with code example
+
+Calibration:
+- A clean review that names what it checked is a useful result. Do not manufacture findings to
+  fill the sections.
+- Do not scale findings to diff size. Report every real violation; report no invented one.
+- Claims of absence ("no test covers this", "nothing calls it") carry the command run and what it
+  returned.
+- A finding you could not settle is reported as unverified, naming what would settle it. Never
+  dropped, never promoted to confirmed.
 ```
 
 ### Database Query Validator (Hook-Gated)

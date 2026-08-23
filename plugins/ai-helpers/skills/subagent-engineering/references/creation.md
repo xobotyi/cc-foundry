@@ -272,6 +272,12 @@ Output format:
 ## Summary
 
 [1-2 sentence overall assessment]
+
+Calibration:
+- A clean review that names what it checked is a useful result. Do not manufacture findings.
+- Do not scale findings to diff size. Every real issue is reported; no invented one is.
+- A claim of absence carries the command run and what it returned.
+- An issue you could not settle is reported as unverified, naming what would settle it.
 ```
 
 **Debugging specialist** (errors, test failures):

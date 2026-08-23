@@ -8,7 +8,7 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
 - **`skill-engineering`** — design and iterate Claude Code skills: SKILL.md structure, description formulas, content
   architecture, quality evaluation
 - **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
-  evaluation, troubleshooting
+  evaluation, troubleshooting; false-positive calibration for reviewing agents and the mutating-agent isolation rule
 - **`output-style-engineering`** — design output styles injected into the system prompt: role and voice framing,
   intent-carrying rules, voice in rules instead of examples, non-coding domains, evaluation framework
 - **`prompt-terser`** — adherence-driven terseness audit for iteratively-edited prompts: same-thought-fewer-words cuts

@@ -189,6 +189,46 @@ You are a [role] specializing in [domain].
 - **Keep single responsibility.** If listing multiple unrelated capabilities, split into separate agents.
 - **Add efficiency instructions.** "Use Grep to locate relevant code BEFORE reading entire files. Return concise
   summaries, not raw data."
+- **Say who fans out.** An agent that can read its own scope will widen it. State the boundary in the prompt itself —
+  "the orchestrator fans out, this agent does not; audit only what the prompt assigned you, never re-derive the scope."
+- **Name the verdict vocabulary.** An agent reporting in free prose reports inconsistently. Give it a closed set of
+  verdicts and require one per item, so the caller can act on the output mechanically.
+
+### Calibration for Reviewing and Auditing Agents
+
+An agent that finds problems will find problems. Left uncalibrated it treats an empty report as a failed run and
+manufactures findings to look diligent — which costs more than the review saves, because every false finding buys a
+human ruling. State the control explicitly in the prompt:
+
+- **Name the empty result as a success.** "A clean audit that names what it checked is a useful result." Without this
+  the agent infers the opposite.
+- **Do not scale findings to input size.** A 25-line document audited to two findings is a correct report, not a lazy
+  one. This bounds invention, never suppression: a diff with forty real violations reports forty. Volume is a failure
+  only when the findings were manufactured to produce it.
+- **Split the burden of proof by finding type.** On bright-line rules, flag every violation — a dismissed finding is
+  cheaper than a missed one. On judgment calls, the burden is on the finding: when the agent cannot argue it, the
+  verdict is OK and nothing is reported.
+- **Require evidence for claims of absence.** "No caller", "no test", "not used anywhere" carry the exact command run
+  and what it returned. An absence with no sweep behind it is not reported.
+- **Separate "not worth reporting" from "could not check".** OK closes a judgment call the agent weighed and rejected.
+  Unverified is for a claim it could not settle — the test would not run, the platform was unavailable, the evidence was
+  out of scope — and it names what would settle it. A finding is never silently dropped for lack of evidence, and never
+  promoted to confirmed without it.
+
+### Mutating Agents Run Isolated
+
+An agent whose _method_ mutates the tree — a test auditor that breaks code to prove a test catches it, a migration
+prover, anything running a negative control — needs `isolation: worktree`, not merely permission to edit. This is
+distinct from the parallel-conflict case: the risk is not two agents colliding but one agent crashing mid-mutation and
+stranding a broken tree that its caller believes is clean.
+
+Three rules belong in any such agent's prompt:
+
+- **Never end a run with a mutation in place.** If a tool error or timeout interrupts a control, restoring the tree is
+  the first action before anything else.
+- **Restore and verify.** Reverse the edit, then confirm with `git diff` that the file is back to its pre-mutation
+  state. An unverified restore is an unrestored file.
+- **Mutate the subject, never the instrument.** A test auditor changes the code under test, never the test.
 
 ## Built-in Subagents
 

@@ -63,6 +63,13 @@ quality.
 Claude Code subagent lifecycle: creation, configuration, evaluation, and troubleshooting. Covers agent teams, worktree
 isolation, background execution, Agent SDK integration, subagent-scoped hooks, and persistent memory.
 
+Two failure modes get explicit treatment. Reviewing and auditing agents drift toward manufacturing findings, because an
+empty report reads to them like a failed run — so the skill carries the calibration that reverses it: name the clean
+audit as a success, don't scale findings to input size, split the burden of proof between bright-line rules and judgment
+calls, and carry evidence for any claim of absence. Separately, an agent whose method mutates the tree — a test auditor
+running negative controls, anything that edits and reverts to prove a point — needs its own worktree and a
+restore-and-verify rule, because a crash mid-mutation strands a broken tree the caller believes is clean.
+
 **Use when:** Creating custom agents, designing agent teams, debugging agent behavior, or deciding if a subagent is the
 right solution for a task.
 
