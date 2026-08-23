@@ -188,7 +188,7 @@
 		{
 			"name": "python",
 			"description": "Python language discipline: conventions, modern idioms, type system, packaging, testing, and LSP-powered code intelligence",
-			"version": "1.2.4",
+			"version": "1.2.5",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"

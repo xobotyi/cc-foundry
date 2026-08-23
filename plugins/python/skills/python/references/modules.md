@@ -228,7 +228,8 @@ if HAS_NUMPY:
 Some imports execute code at module time. Rules:
 
 - Minimize module-level side effects — move initialization into functions
-- Side-effect imports (`import mypackage.setup`) must be documented with a comment
+- Side-effect imports (`import mypackage.setup`) need the effect visible at the import: give the module a name that
+  states it, or call an explicit `setup()` instead of relying on import order
 - Never rely on import order for correctness — fragile and hard to debug
 - Use `if __name__ == "__main__":` to guard script execution from import
 
