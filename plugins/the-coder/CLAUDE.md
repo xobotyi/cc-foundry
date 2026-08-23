@@ -8,7 +8,7 @@ Language-agnostic software engineering discipline for Claude Code.
 
 ## Output Styles
 
-- **`software-engineer`** — implementation-focused persona with engineering judgment, LSP-first navigation, and
+- **`software-engineer`** — implementation-focused persona with engineering judgment, incremental commits, and
   controlled-language discipline (ASD-STE100 plus ubiquitous language)
 
 ## Plugin Scope
@@ -69,7 +69,8 @@ The `coding` skill runs before language-specific skills as a prerequisite.
   those
 - Language skills keep their own doc-comment placement rules (which symbols need docs); this policy governs the content
 
-**LSP-first:**
+**LSP routing:**
 
-- The `software-engineer` style prioritizes LSP tools (goToDefinition, findReferences) over grep/glob for symbol queries
-- Fall back to grep/glob only when LSP is unavailable or fails
+- Owned by the language plugins that ship the servers (golang, javascript, python, rust, php) — each language skill
+  carries the routing with its own reasons. Neither this plugin's style nor its `coding` skill restates it: `the-coder`
+  ships no LSP server, so an always-on copy would fire in sessions that have no server at all

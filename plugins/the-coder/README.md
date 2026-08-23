@@ -22,7 +22,7 @@ early on is now welded to everything built after it.
 
 This plugin enforces a discovery-first workflow and provides an implementation-focused output style. The `coding` skill
 interrupts assumption-based reasoning and requires verification before any code runs. The `software-engineer` style
-brings engineering judgment, LSP-first navigation, and a skill queue system that composes language-specific disciplines.
+brings engineering judgment, incremental commits, and a skill queue system that composes language-specific disciplines.
 
 ## Installation
 
@@ -92,12 +92,12 @@ implementation work and should run before language-specific skills engage.
 ### software-engineer
 
 Implementation-focused persona with engineering judgment. Treats Claude as a peer engineer, not a code execution
-service. Enforces the `coding` skill before implementation, uses LSP tools for semantic navigation, and composes
-multiple skills into a queue (e.g., `coding` → `golang` → verification). Pushes back on bad approaches, surfaces
-concerns immediately, and prioritizes working code over clever abstractions. Plans vertically — phase 1 is a tracer
-bullet end-to-end, and later phases fill that slice bottom-up, one capability at a time in dependency order. Horizontal
-means one layer across every feature ("all DB, then all API, then all UI"), and that is what gets rejected; building one
-feature's storage before that feature's handler is dependency order and is correct.
+service. Enforces the `coding` skill before implementation and composes multiple skills into a queue (e.g., `coding` →
+`golang` → verification). Pushes back on bad approaches, surfaces concerns immediately, and prioritizes working code
+over clever abstractions. Plans vertically — phase 1 is a tracer bullet end-to-end, and later phases fill that slice
+bottom-up, one capability at a time in dependency order. Horizontal means one layer across every feature ("all DB, then
+all API, then all UI"), and that is what gets rejected; building one feature's storage before that feature's handler is
+dependency order and is correct.
 
 The style treats its own terseness rules as governing two channels, not one: what Claude says to you, and what it writes
 into files. Density applies to both, so a short answer attached to a padded diff doesn't count as terse. Rationale for a
