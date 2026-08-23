@@ -14,7 +14,8 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
 - **`prompt-terser`** — adherence-driven terseness audit for iteratively-edited prompts: same-thought-fewer-words cuts
   with U-curve discipline, narrative-vs-structural distinction, three-check falsification gate (verbosity-type →
   terseness → behavior preservation), and a bracketing preservation inventory that verifies load-bearing literals
-  survive the cuts
+  survive the cuts. Surviving narrative is rewritten rather than kept; borderline cuts go by default onto a restore list
+  the caller draws from
 - **`claude-code-sdk`** — Claude Code extensibility reference: plugins, hooks, skills, subagents, agent teams, MCP,
   output styles, settings, Agent SDK
 

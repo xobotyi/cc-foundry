@@ -96,6 +96,13 @@ synonyms, superseding corrections, and concrete lists from "safe-looking" merges
 rationale stacking, duplicated constraints, and ambiguity-zone paragraphs (~20-40 word narrative blocks at the
 worst-case length for adherence).
 
+Two defaults keep the audit from turning into line editing. Narrative content that passes the gate is rewritten at
+roughly half length or fused into a denser home rather than kept as written, truth-conditions preserved exactly — and
+structural content is exempt, since compressing a rubric row is how a decision table becomes an ambiguity-zone
+paragraph. And a borderline narrative cut goes, onto a restore list the caller draws from, because keeping "to be safe"
+is the drift the skill exists to reverse. Calibration is measured against the narrative portion alone: a third or more
+comes out, and under 20% means sentences were edited where paragraphs should have been questioned.
+
 **Use when:** Auditing or tightening an existing prompt that has accumulated bloat through many edits, or when adherence
 to prompt rules feels unreliable and verbose wording may be competing for attention — skills, system prompts, output
 styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead).
