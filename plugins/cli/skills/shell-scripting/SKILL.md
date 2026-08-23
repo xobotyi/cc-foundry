@@ -46,7 +46,8 @@ set -euo pipefail
 - **`set -o pipefail`:** Pipeline returns the rightmost failing command's exit code, not the last command's.
 - **For POSIX sh scripts:** Use `#!/bin/sh`. Drop `pipefail` (not POSIX). Use `set -eu` with caution — `set -e` behavior
   varies across sh implementations.
-- **File header comment:** After the shebang, add a brief description of what the script does.
+- **File header:** A script's purpose goes in its name and its `--help` text, not a header comment. Add one only when
+  the name cannot carry it and the script has no `--help`.
 
 ```bash
 #!/usr/bin/env bash

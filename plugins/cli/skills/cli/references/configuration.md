@@ -99,11 +99,13 @@ Accept secrets via:
 
 ### Config File Design
 
-1. Document every config option with comments in the default config file.
+1. Document every config option in the shipped default config file. That file is reference material for a human
+   operator, not source, so its annotations are documentation rather than code comments.
 2. Support generating a default config: `myapp config init`.
 3. Validate config on load, report all errors at once (not one at a time).
 4. Show the resolved config: `myapp config show` (with merged values from all sources).
-5. When modifying system config files that aren't yours, use dated comments to mark your additions.
+5. When modifying system config files that aren't yours, mark your additions with a delimited block naming the tool that
+   owns them, so a later run can find and replace exactly what it wrote.
 
 ## Config Precedence Transparency
 
