@@ -202,8 +202,8 @@ Write tool. A file gives git the multi-line message, the quotes, and the backtic
 them.
 
 Write the reason first, in one paragraph. Then cut: delete each sentence that the diff shows, and each paragraph that
-walks the reader through the new procedure. Keep a fact that the next maintainer needs in a code comment, not in the
-message.
+walks the reader through the new procedure. A fact the next maintainer needs lives in the artifact -- a name, a test, a
+doc comment, or a project document -- not in the message.
 
 #### 4c. Self-Review
 
@@ -242,7 +242,7 @@ paragraph line by line, as `P3.1` and `P3.2` above. A line that names a file, a 
 diff. Cut it.
 
 A paragraph gets `cut` when it names a function, a call order, an empty case, a fallback, or a flag that gates the new
-code. Such a paragraph reports the procedure, and the staged diff shows the procedure. Move the fact into a code comment
+code. Such a paragraph reports the procedure, and the staged diff shows the procedure. Move the fact into the artifact
 when the next maintainer needs it. Then delete the paragraph.
 
 The number of paragraphs follows the number of reasons, never the size of the diff. Write the message file again after

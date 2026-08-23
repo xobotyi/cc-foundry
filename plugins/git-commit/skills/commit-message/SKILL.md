@@ -170,8 +170,9 @@ diff and the docs cannot show:
 - A behavior change that the subject cannot predict, such as the new meaning of an absent value.
 - A one-line note about the work that follows in the chain.
 
-A paragraph that walks the reader through the new procedure earns nothing. Delete it. Keep the fact in a code comment,
-where the next maintainer meets it.
+A paragraph that walks the reader through the new procedure earns nothing. Delete it. A fact the next maintainer needs
+lives in the artifact -- a name, a test, a doc comment, or the project's own rule or architecture document. The diff
+then carries it into the history.
 
 **More than one behavior change.** One unit can change several behaviors. Give one line to each change, in one list. Do
 not give a paragraph to each change:
@@ -188,7 +189,7 @@ a function, or a test is an inventory of the diff. Delete such a line.
 
 The list does not license a longer body. Several behavior changes under one reason stay in one commit, and the reason
 keeps its paragraph. Two independent reasons are two commits, whatever the number of behavior changes. A rationale for
-one of the changes belongs in a code comment beside that code.
+one of the changes belongs with that code, in whichever destination the coding skill's routing ladder picks.
 
 **The length follows the number of reasons, not the size of the diff.** A refactor of 2000 lines with one reason gets
 one paragraph. A migration with 6 steps gets the 6 steps. A body of 20 lines is correct only when 20 lines of reasons,
@@ -205,7 +206,7 @@ two independent reasons remain, split the commit.
 <record-not-documentation>
 The body records why this change happened. It does not document the result. The changed files
 document the result. Keep a rationale, an invariant, or a behavior description in the artifact: a
-code comment, a design doc, or the README. The diff then carries it into the history.
+name, a test, a doc comment, a design doc, or the README. The diff then carries it into the history.
 
 These signs show that a body became documentation:
 
@@ -558,7 +559,7 @@ The surfaces that read the threads back follow as separate changes.
 ```
 
 **Why the fix works:** The body keeps the reason and the one behavior change that the subject cannot predict. The staged
-write, the empty-thread case, and the `DryRun` condition became code comments, where the next maintainer meets them.
+write, the empty-thread case, and the `DryRun` condition moved into the tests that cover them.
 
 ---
 
@@ -639,7 +640,7 @@ Commits must look like regular developer commits.
 - **Explain the cause** — for a bug fix, say why the code was defective
 - **Body is essential** — a message of one line is rarely acceptable. The default body is one paragraph
 - **No walkthrough** — the body never narrates the new procedure: the call order, the empty case, the fallback, the flag
-  that gates it. A code comment keeps such a fact
+  that gates it. The artifact keeps such a fact
 - **Length follows the reasons** — not the size of the diff. Each paragraph after the first earns its lines, or it goes.
   Two independent reasons usually mean two commits
 - **Terse register** — the diff carries the what, the message carries the why. No "this commit", "I", or "we". The tense
