@@ -27,8 +27,8 @@ behavior overrides, just project rules — it should not be a style.
 
 ## Evaluation Dimensions
 
-Six dimensions, each scored 1-10. Three are weighted 2x (role & voice, rule intent, exemplars) because they directly
-drive compliance. The other three are supporting elements.
+Six dimensions, each scored 1-10. Two are weighted 2x (role & voice, rule intent) because they directly drive
+compliance. The other four are supporting elements.
 
 ### 1. Role & Voice Clarity (Weight: 2x)
 
@@ -66,21 +66,22 @@ Do rules state desired outcomes the model can generalize, rather than compensati
 - Does each "never" rule correspond to a failure you have actually observed with the current model?
 - Is there any MUST/CRITICAL/"always" emphasis that a plain condition would serve?
 
-### 3. Exemplar Quality (Weight: 2x)
+### 3. Exemplar Discipline (Weight: 1x, inverse)
 
-Do tone exemplars calibrate the register without constraining behavior?
+Does the style carry its voice in rules, keeping examples to the ones an observed failure earned? An example is a second
+specification of something a rule already states, and the model anchors to the sample over the rule.
 
-- **1-3** — No exemplars. The register is left to inference.
-- **4-6** — Exemplars present but only in-style samples, or they demonstrate workflows/tool behavior instead of tone.
-- **7-8** — Contrast pairs (in-style vs default register) for the key interaction types.
-- **9-10** — Contrast pairs cover the interactions most likely to pull toward the default register (emotional pressure,
-  disagreement, error reporting) — and nothing else; no behavior demos.
+- **1-3** — Behavior demos: worked tool use, workflows, step sequences. These narrow exploration to the demonstrated
+  path.
+- **4-6** — Tone examples with no observed failure behind them, or in-style samples with no contrast.
+- **7-8** — One or two tone contrast pairs, each traceable to an interaction where the register actually failed.
+- **9-10** — No examples. The voice description and the rules carry the register.
 
 **Checks:**
 
-- Do exemplars show the same input answered in-style and in the generic default?
-- Do they cover default-pulling interactions, not just the happy path?
-- Are exemplars limited to tone and format — no worked tool-use or workflow demonstrations?
+- Would deleting each example change the output? If not, it is scaffolding.
+- Can you name the session where the register failed for this interaction?
+- Does any example demonstrate behavior rather than tone?
 
 ### 4. Output Format Clarity (Weight: 1x)
 
@@ -136,8 +137,8 @@ Is the style focused and correctly bounded?
 Calculate weighted score:
 
 ```
-Score = (RoleVoice x 2 + RuleIntent x 2 + Exemplars x 2 +
-         Format x 1 + ScaffoldingDebt x 1 + Scope x 1) / 9
+Score = (RoleVoice x 2 + RuleIntent x 2 + Format x 1 +
+         Exemplars x 1 + ScaffoldingDebt x 1 + Scope x 1) / 8
 ```
 
 - **8-10** — Deploy. Style is robust and will hold across sessions.
@@ -203,7 +204,7 @@ Go/no-go criteria for shipping a style:
 **No-go (any one blocks deployment):**
 
 - Injection canary fails — nothing else is measurable
-- Weighted score < 4 on any 2x dimension (role & voice, rule intent, exemplars)
+- Weighted score < 4 on any 2x dimension (role & voice, rule intent)
 - Style reverts to defaults within 5 turns, or over-applies its rules on the overtriggering test
 - Any red flag present
 - Style works identically without being a style (should be CLAUDE.md instead)

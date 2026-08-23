@@ -17,8 +17,8 @@ their mandate) or bail too early (leaving work incomplete). Tool restrictions an
 design.
 
 **Output styles revert to defaults.** You want a specific persona, but Claude falls back to base behavior under
-pressure. The style instructions compete with the system prompt instead of replacing it cleanly, or tone examples are
-missing.
+pressure. The style instructions compete with the system prompt instead of claiming precedence over it, or the voice is
+described too loosely to hold.
 
 ## The Solution
 
@@ -70,9 +70,9 @@ right solution for a task.
 
 Design output styles for Claude Code — the only file-based mechanism that removes parts of the default system prompt and
 gets harness-reinforced adherence. Covers frontier-era authoring (role as outcome instead of persona theater,
-intent-carrying rules, tone exemplars, subtraction over scaffolding), non-coding domain patterns (business analysis,
-content strategy, research), an evaluation framework with dimensional scoring including scaffolding debt, and iteration
-diagnostics from silent non-injection to overtriggering.
+intent-carrying rules, voice in rules instead of examples, subtraction over scaffolding), non-coding domain patterns
+(business analysis, content strategy, research), an evaluation framework with dimensional scoring including scaffolding
+debt, and iteration diagnostics from silent non-injection to overtriggering.
 
 **Use when:** Building styles, customizing voice and tone, creating domain-specific response patterns, evaluating style
 quality, migrating styles to a new model generation, or debugging styles that misfire or silently fail to load.

@@ -13,11 +13,10 @@ When a style isn't working, two pre-checks come before any body edit.
 
 ## Pre-Check 1: Is the Body Actually Injected?
 
-The loader matches frontmatter `name` against the filename case-sensitively and silently drops the body on mismatch —
-the picker and statusline still show the style as active (open bug, anthropics/claude-code#47482). Run the injection
-canary: add a temporary marker rule ("Prepend CANARY_ALIVE to your first response"), run `claude -p "say ok"`, check for
-the marker, remove it. If the canary fails, fix filename/`name` parity (identical, lowercase) — no body edit can help
-until it passes.
+A style can load into the picker and statusline without its body reaching the system prompt
+(anthropics/claude-code#47482). Run the injection canary: add a temporary marker rule ("Prepend CANARY_ALIVE to your
+first response"), run `claude -p "say ok"`, check for the marker, remove it. Until the canary passes, no body edit can
+help — the body being edited is not in the prompt.
 
 ## Pre-Check 2: Is the Right Mechanism in Use?
 
@@ -86,7 +85,8 @@ Symptom → Root cause → Fix pattern:
   request length explicitly (current models produce longer outputs unless asked)
 - **Too terse** — over-aggressive brevity rules → relax constraints, add a depth floor for complex topics
 - **Ignores format** — format buried in prose → move to a dedicated section with a response template
-- **Wrong tone in edge cases** — exemplars don't cover the scenario → add a contrast pair for the failing case
+- **Wrong tone in edge cases** — the voice description doesn't reach the scenario → sharpen it first; add a contrast
+  pair only if that fails in session
 - **Ignores some rules** — rule saturation → consolidate overlapping rules, delete rules that don't change output
 - **SE assumptions leak into non-coding style** — `keep-coding-instructions` not `false`, or body doesn't supply domain
   context → set the flag and define the domain role. On lean-prompt models (Opus 4.8, Opus 5, Fable 5) the flag changes
@@ -229,8 +229,9 @@ eval regression.
 
 ### Strengthen via Contrast
 
-Show what NOT to do alongside what TO do — for tone. Contrast pairs make the register delta explicit instead of leaving
-"be direct" to inference:
+The last resort, reached after a sharper voice description failed to hold the register in a real session. Show what NOT
+to do alongside what TO do — for tone only. A contrast pair makes the register delta explicit where "be direct" was left
+to inference:
 
 ```markdown
 ## Tone Contrast
@@ -242,8 +243,8 @@ Show what NOT to do alongside what TO do — for tone. Contrast pairs make the r
 "Here's how it works: [explanation]"
 ```
 
-Reserve contrast for tone and format. Worked demonstrations of behavior — tool sequences, workflows — constrain the
-model's exploration; encode behavior in rules instead.
+Reserve contrast for tone. A format contract is a rule, not a register, so it needs no pair; worked demonstrations of
+behavior — tool sequences, workflows — constrain the model's exploration. Encode both in rules instead.
 
 ### Strengthen via Intent
 

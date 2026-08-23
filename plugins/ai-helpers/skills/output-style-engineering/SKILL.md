@@ -61,7 +61,9 @@ Skip only for trivial edits (typos, formatting).
 **Preserved regardless of style:**
 
 - `# Tone and style` — including "responses should be short and concise" and the no-emoji rule. Not removable by any
-  style; override it in the style body if you need different behavior
+  style. To override it, claim precedence explicitly in the body: the built-in `Concise` closes with a clause giving its
+  own rules priority over the general communication and formatting guidance, and that clause is the only reason its
+  formatting beats the defaults
 - `# Executing actions with care` — destructive-action caution and confirmation defaults
 - `# System` and `# Using your tools` — output rendering, permission modes, prompt-injection warning, tool selection
 - All tools (Read, Write, Bash, Grep, etc.)
@@ -121,10 +123,11 @@ closest to the working directory wins (v2.1.178+). Plugin styles can auto-apply 
 `/config` → **Output style**, or the `outputStyle` setting — the standalone `/output-style` command was removed in
 v2.1.91.
 
-**Loader bug (open as of v2.1.205, issue #47482):** the frontmatter `name` is matched against the filename
-case-sensitively; on mismatch the body is silently dropped while the UI still shows the style active. Keep the filename
-and `name` identical and lowercase. Verify injection with a canary: add a marker rule, run `claude -p "say ok"`, confirm
-the marker fires.
+**Injection can fail silently (issue #47482):** on v2.1.104 a user-level style selected through the `outputStyle`
+setting dropped its body whenever frontmatter was present — `name` alone was enough — while the picker still showed the
+style active. Not reproducible for plugin-shipped styles on current builds: both styles in this marketplace carry
+`name`, `description`, and `keep-coding-instructions` and inject correctly. The failure is silent either way, so verify
+with a canary: add a marker rule, run `claude -p "say ok"`, confirm the marker fires.
 
 Full format details, frontmatter fields, activation methods, Agent SDK integration: see
 [`${CLAUDE_SKILL_DIR}/references/spec.md`].
@@ -160,12 +163,15 @@ paragraph."
 Reserve "never X" for a demonstrated failure mode the model cannot reason its way out of. Dial back aggressive language:
 "CRITICAL: You MUST..." causes overtriggering on current models — "Do X when Y" is enough.
 
-### 3. Use Tone Exemplars, Not Behavior Demos
+### 3. Carry the Voice in Rules, Not Examples
 
-Contrast pairs still calibrate voice — show the same input answered in-style and in the generic default register, and
-cover the interaction most likely to pull toward the default (emotional pressure, disagreement). Worked examples of
-_behavior_ — tool use, workflows, step sequences — constrain exploration on current models; encode behavior in rules and
-interfaces instead.
+Describe the register and let the rules hold it. Three of the four built-in styles ship no examples at all, and current
+models follow a described voice literally — an example is a second, competing specification of the same thing, and the
+model anchors to the sample over the rule. Worked examples of _behavior_ — tool use, workflows, step sequences — are
+worse still: they narrow exploration to the demonstrated path. Encode behavior in rules and interfaces.
+
+Add a tone contrast pair only after the register has demonstrably failed in a real session, for that interaction, and
+delete it once a rule covers the case. An exemplar is a remedy, not a component.
 
 ### 4. Specify Output Format
 
@@ -204,20 +210,20 @@ Full templates for each pattern: see [`${CLAUDE_SKILL_DIR}/references/creation.m
 CLAUDE.md, not `--append-system-prompt`, not a skill. If the style body could work identically as CLAUDE.md content, it
 should not be a style.
 
-Six dimensions, three weighted 2x (high-leverage):
+Six dimensions, two weighted 2x (high-leverage):
 
 - **Role & Voice Clarity (2x)** — is the role framed as outcome and perspective? Does a voice description with contrasts
   pin the register?
 - **Rule Intent (2x)** — does each rule state the desired outcome (with rationale where non-obvious)? Are "never" rules
   backed by demonstrated failure modes?
-- **Exemplar Quality (2x)** — do tone contrast pairs cover the interactions most likely to pull toward the default
-  register?
+- **Exemplar Discipline (1x, inverse)** — every example present lowers the score unless an observed register failure
+  justifies it, and a behavior demo lowers it further. Zero examples scores full marks
 - **Output Format (1x)** — would Claude know how to structure each response type?
 - **Scaffolding Debt (1x, inverse)** — persistence blocks, repeated rules, verification directives, MUST/CRITICAL
   language: each present item lowers the score
 - **Scope (1x)** — is `keep-coding-instructions` set right? Does the style know what it's for?
 
-**Must have:** role framed, rules carry intent, at least one tone contrast pair, output format specified, injection
+**Must have:** role framed, voice described with contrasts, rules carry intent, output format specified, injection
 verified (canary).
 
 Detailed per-dimension scoring rubrics and testing protocol: see [`${CLAUDE_SKILL_DIR}/references/evaluation.md`].
@@ -240,9 +246,9 @@ influence over turns and cannot remove default behaviors; iteration cannot fix a
 
 ### Common Issues and Fixes
 
-- **Style not applied at all** — body never injected. Run the canary; fix filename/`name` case parity.
-- **Reverts to default register** — voice underspecified. Add a contrast-based voice description and a tone exemplar for
-  the failing interaction — not repetition.
+- **Style not applied at all** — body never injected. Run the canary first; no body edit helps until it passes.
+- **Reverts to default register** — voice underspecified. Sharpen the contrast-based voice description first; add a tone
+  contrast pair for the failing interaction only if the description alone will not hold it. Not repetition.
 - **Rule followed too literally / over-applied** — aggressive language (MUST, CRITICAL, "always") overtriggers. Dial
   back to plain conditions.
 - **Over-verification, stalling, self-checking loops** — legacy verification or thoroughness directives. Delete them;
@@ -270,7 +276,7 @@ Detailed fix patterns with before/after: see [`${CLAUDE_SKILL_DIR}/references/it
 mkdir -p ~/.claude/output-styles
 ```
 
-Create `style-name.md` (keep filename and `name` identical and lowercase):
+Create `style-name.md`:
 
 ```markdown
 ---
@@ -291,10 +297,6 @@ keep-coding-instructions: true
 
 - [Outcome-stating rules, each with intent]
 
-## Tone Examples
-
-[One contrast pair: in-style vs default register]
-
 ## Response Format
 
 [Shape per response type]
@@ -310,12 +312,11 @@ Before deploying:
 - [ ] Role framed as outcome and perspective (no invented credentials)
 - [ ] Voice described with adjective contrasts
 - [ ] Every rule states intent; "never" rules backed by observed failures
-- [ ] At least one tone contrast pair covering a default-pulling interaction
+- [ ] No examples, or each one justified by an observed register failure — never a behavior demo
 - [ ] Output format specified per response type
 - [ ] No persistence blocks, repeated rules, or MUST/CRITICAL language
 - [ ] Deletion test passed — every instruction changes output
 - [ ] `keep-coding-instructions` set explicitly
-- [ ] Filename and frontmatter `name` identical (case-sensitive loader)
 - [ ] Injection verified with a canary; tested with varied prompts (simple, complex, emotional)
 
 ## Related Skills

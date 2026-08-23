@@ -35,10 +35,12 @@ You are an interactive CLI tool that helps users with software engineering tasks
   enabled, without the user selecting it. Overrides the user's `outputStyle` setting; if multiple enabled plugins set
   it, the first one loaded wins. Default: `false`.
 
-**Loader case-sensitivity bug (open as of v2.1.205, anthropics/claude-code#47482):** the frontmatter `name` is matched
-against the filename case-sensitively. On mismatch (`name: Technical Reviewer` in `technical-reviewer.md`) the body is
-silently dropped from the system prompt while the picker and statusline still show the style as active. Keep the
-filename and `name` identical and lowercase; verify injection with a canary rule and `claude -p "say ok"`.
+**Silent injection failure (anthropics/claude-code#47482):** on v2.1.104 a user-level style selected through the
+`outputStyle` setting dropped its body from the system prompt whenever frontmatter was present, while the picker and
+statusline still showed the style as active. The reporter's matrix: no frontmatter injects, `name` alone does not,
+`name` plus `description` does not, `keep-coding-instructions` does not. The issue names no filename or case mechanism,
+and plugin-shipped styles with a display-name `name` inject correctly on current builds. Treat the mode as live and
+unexplained: verify injection with a canary rule and `claude -p "say ok"`.
 
 ## What Output Styles Remove vs. Preserve
 

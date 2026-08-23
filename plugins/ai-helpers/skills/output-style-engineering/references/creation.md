@@ -89,9 +89,9 @@ below.
 ### Step 3: Draft
 
 Write the file manually (see Creation Methods) and apply the pattern's structural requirements. Draft lean: role as
-outcome and perspective, a voice description built on adjective contrasts, intent-carrying rules, one or two tone
-contrast pairs, response formats. Do not draft persistence sections, repeated rules, or MUST/CRITICAL emphasis — the
-harness reminders and the model's instruction adherence make them counterproductive.
+outcome and perspective, a voice description built on adjective contrasts, intent-carrying rules, response formats. Do
+not draft tone examples, persistence sections, repeated rules, or MUST/CRITICAL emphasis — the harness reminders and the
+model's instruction adherence make them counterproductive.
 
 ### Step 4: Activate and test
 
@@ -228,9 +228,8 @@ Comparison.
 
 ## Common Failure Modes
 
-**Style silently not applied** — the loader matches frontmatter `name` against the filename case-sensitively and drops
-the body on mismatch while the UI shows the style active. Fix: keep filename and `name` identical and lowercase; verify
-with a canary rule before iterating on content.
+**Style silently not applied** — the body can be missing from the system prompt while the picker shows the style active
+(anthropics/claude-code#47482). Fix: verify with a canary rule before iterating on content.
 
 **Style over-applied** — aggressive emphasis (MUST, CRITICAL, "always/never" without a real failure mode behind it)
 overtriggers on current models: unusably curt answers, refusing depth where depth is wanted. Fix: dial the language back

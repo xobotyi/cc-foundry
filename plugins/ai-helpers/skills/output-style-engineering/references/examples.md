@@ -40,13 +40,12 @@ You are a professional technical collaborator. Respond with precision and brevit
 
 - **Role & voice clarity** — high: unambiguous behavior contract
 - **Rule intent** — high: bans exact phrases and pairs them with positive opener/structure rules
-- **Exemplar quality** — low: no tone contrast pair yet
+- **Exemplar discipline** — high: no examples; the phrase bans and structure rules carry the register
 - **Scaffolding debt** — none: no persistence sections or repeated rules; the harness reminders carry adherence
 
-**Improvement notes:** Add a contrast example showing the default register vs. this style for the same input — exemplars
-are the most reliable way to communicate tone. The style has no guidance for error reporting or delivering bad news,
-which is where the register slips first. The depth-scaling rule guards against over-application — without it, a terse
-style produces unusably curt walkthroughs.
+**Improvement notes:** The style has no guidance for error reporting or delivering bad news, which is where the register
+slips first — cover it with a rule, and reach for a contrast pair only if the rule fails in session. The depth-scaling
+rule guards against over-application — without it, a terse style produces unusably curt walkthroughs.
 
 ## 2. Domain Specialist — SaaS Business Analyst
 
@@ -110,14 +109,14 @@ you'd want a different perspective."
 
 - **Role & voice clarity** — high: business analyst identity is specific and the non-engineering framing is explicit
 - **Rule intent** — high: structured analysis format with named metrics, vocabulary register defined
-- **Exemplar quality** — low: no contrast pair showing business analysis vs default engineering framing
+- **Exemplar discipline** — high: no examples; the analysis format and the vocabulary register carry the voice
 - **Scaffolding debt** — none: `keep-coding-instructions: false` strips engineering defaults; scope boundary scripts
   carry the domain without persistence language
 
-**Improvement notes:** The style could benefit from a contrast example showing how a default Claude response to CSV data
-differs from this style's response — default Claude would likely suggest pandas code, while this style should produce
-business analysis. Consider adding guidance for when the user provides incomplete data — the "Questions for the user"
-step partially addresses this, but explicit handling of insufficient data would strengthen it.
+**Improvement notes:** Default Claude answers CSV data with pandas code where this style must produce business analysis
+— state that as a rule about what the output is, not as a contrast example. Consider adding guidance for when the user
+provides incomplete data — the "Questions for the user" step partially addresses this, but explicit handling of
+insufficient data would strengthen it.
 
 ## 3. Pair Programmer (Interaction Mode)
 
@@ -175,7 +174,7 @@ If the user asks you to just implement it, do so without comment — respect the
 
 - **Role & voice clarity** — high: navigator/driver metaphor is precise
 - **Rule intent** — high: turn structure and review format are explicit and testable
-- **Exemplar quality** — medium: review format doubles as a format exemplar; no tone contrast pair
+- **Exemplar discipline** — high: the review format is a format contract, not a tone demo, and nothing else is shown
 - **Scaffolding debt** — none: the turn structure is genuine interaction design, not persistence scaffolding
 
 **Improvement notes:** The 10-30 line heuristic is an anchor but needs calibration per project type — infrastructure
@@ -255,7 +254,7 @@ code-review mode.
 - **Role & voice clarity** — high: tutor identity is specific, anchored to the voice-first constraint
 - **Rule intent** — high: question types, pacing, feedback language, and session flow all explicit; the voice-first
   constraint carries its own rationale (dictation)
-- **Exemplar quality** — medium: feedback language doubles as micro-exemplars; no full contrast pair
+- **Exemplar discipline** — high: the feedback-language list is a phrase ban, not a worked example
 - **Scaffolding debt** — none: the typed-code edge case is genuine interaction design, stated once where it belongs
 
 **Improvement notes:** The feedback language section blocks the most common sycophancy words but could be extended —
@@ -336,14 +335,14 @@ should inform the design: [content-first guidance]."
 - **Role & voice clarity** — high: editorial/voice specialist identity is unambiguous; voice standards use contrasts
   ("conversational but authoritative — informed, not lectured")
 - **Rule intent** — high: concrete blocklists paired with positive voice standards, channel-specific tone calibration
-- **Exemplar quality** — low: blocklists define what to avoid, but no before/after pair demonstrates the target voice
+- **Exemplar discipline** — high: blocklists paired with positive voice standards, no examples
 - **Scaffolding debt** — none: `keep-coding-instructions: false` strips engineering defaults; scope boundary scripts
   handle off-domain requests without persistence language
 
-**Improvement notes:** The style needs before/after examples showing the same message in "corporate default" vs. brand
-voice — the blocklists define what to avoid but examples demonstrate what to produce. The channel calibration section is
-strong but could include example openings for each channel type. Consider adding guidance for when the brand voice
-conflicts with clarity (e.g., a technical product where jargon is necessary).
+**Improvement notes:** The blocklists define what to avoid; the positive side needs equal weight as prose — sharpen the
+voice standards rather than adding before/after examples. The channel calibration section is strong but could name the
+register per channel more concretely. Consider adding guidance for when the brand voice conflicts with clarity (e.g., a
+technical product where jargon is necessary).
 
 ## Pattern Summary
 
