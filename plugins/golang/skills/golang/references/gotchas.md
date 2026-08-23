@@ -202,11 +202,12 @@ var count int = 200
 
 ## Signal Boosting
 
-When code does the opposite of what's common, add a comment to draw attention:
+When code does the opposite of what's common, name the condition so the branch reads as deliberate:
 
 ```go
-// Uncommon — checking err == nil (no error), not err != nil
-if err := doSomething(); err == nil { // if NO error
+if succeeded := doSomething() == nil; succeeded {
     // ...
 }
 ```
+
+A bound name is read at the branch and cannot drift from the code. A comment claiming the inversion is intentional can.

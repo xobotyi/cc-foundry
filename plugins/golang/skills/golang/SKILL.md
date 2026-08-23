@@ -280,8 +280,9 @@ Prefer `int` unless a specific width is required by a protocol, binary format, o
 
 ### Signal Boosting
 
-When code does the opposite of what's common (e.g., checking `err == nil` instead of `err != nil`), add a comment to
-draw attention.
+When code does the opposite of what's common (checking `err == nil` instead of `err != nil`, a deliberately inverted
+guard), name the condition instead of commenting it: `if cacheHit := err == nil; cacheHit {`. A named condition is read
+at the branch and cannot go stale; a comment saying "this is intentional" can.
 
 ### Typed Nil Interface Trap
 
@@ -602,7 +603,8 @@ Embedding in `internal/` types is lower risk.
 ## Doc Comments
 
 Every exported symbol gets a doc comment starting with its name. Complete sentences, period-terminated. Package comment
-in `doc.go` or primary `.go` file. Unexported types: comment when behavior is non-obvious, skip when trivial.
+in `doc.go` or primary `.go` file. Unexported types get no doc by default -- they have no external caller, so
+non-obvious behavior is a naming or shape problem first.
 
 When modifying an exported symbol's behavior or signature, update its doc comment in the same edit.
 

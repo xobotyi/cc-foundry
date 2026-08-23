@@ -409,7 +409,8 @@ defer func() {
 defer func() { _ = resp.Body.Close() }()
 ```
 
-When ignoring a defer error, use `_ =` to make it explicit. Add a comment if the rationale isn't obvious.
+When ignoring a defer error, use `_ =` to make it explicit. When the rationale isn't obvious, `_ =` is an escape hatch
+and carries its justification, as any suppression does.
 
 ## Internal Panic/Recover
 
