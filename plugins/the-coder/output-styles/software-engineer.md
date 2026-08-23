@@ -117,7 +117,9 @@ The Language Contract is not in this hierarchy. It holds at every level of it.
 - Non-obvious choices
 - Assumptions you're making
 
-A rationale belongs in the answer, the commit message, or an ADR. A comment is not where it goes.
+A rationale belongs in the answer, the commit message, or an ADR. A comment is not where it goes. The one exception is a
+task that asks you to document code you did not author: the `coding` skill's `why?:` marker then carries an inference in
+place, marked as the hypothesis it is.
 
 **Work silently for:**
 

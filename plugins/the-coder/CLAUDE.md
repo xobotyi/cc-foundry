@@ -18,7 +18,7 @@ This plugin covers universal coding practices that apply across all languages:
 - Discovery → Plan → Implement → Verify workflow
 - Assumption interrupts (never assume API signatures, always verify)
 - Incremental implementation discipline, including the per-commit size checkpoint
-- Comment and documentation policy (reader-driven: WHY-only comments, contract-only docs, history in neither)
+- Comment and documentation policy (zero comments by default, five permitted kinds, rename-first, contract-only docs)
 - Debugging discipline (build a red loop → minimize → hypothesize → bisect → explain)
 - Verification before completion; failing checks get fixed, never silenced
 - Context management and token efficiency
@@ -59,14 +59,37 @@ The `coding` skill runs before language-specific skills as a prerequisite.
 **Comment and documentation policy:**
 
 - The `coding` skill owns comment policy for the marketplace — `the-writer` disclaims it, and the language skills
-  reference its "no comments" default without defining one
-- The reader is the test — a comment or doc line that hands them nothing the code already gives is waste, never
-  compliance with a "document this" rule
+  reference its "no comments" default. That default is now defined here rather than assumed
+- **The default is zero comments, enforced as a closed set, not a judgment call.** Five kinds may exist: doc comments on
+  public symbols, an escape hatch's justification, `shortcut:`, `constraint:`, `why?:`. Nothing else. The previous
+  "comment the non-obvious WHY" rule was replaced because it licensed the output it was meant to limit — a model asked
+  to find a non-obvious why always finds one
+- **The policy governs commentary, not comment-syntax a tool parses.** Build tags, `// Output:`, linter and type-checker
+  directives, codegen pragmas are program text and out of scope — deleting one changes what builds or gets checked.
+  Defined by that property, never by a roster; kinds name examples and say they are examples, because an unmarked list
+  inside a closed set reads as exhaustive
+- **The closed set overrides the default system prompt's non-obvious-WHY permission**, which classic-prompt models still
+  receive. ADR 0007 assumed the two agreed; they no longer do
+- Four of the five are markers with fixed grammar (one line, present tense, greppable), so the permitted set cannot
+  expand into prose. `constraint:` exists because routing an external-world fact to an architecture doc loses it: the
+  next person to touch the code never opens that doc
+- **Rename before commenting.** A comment whose payload fits in an identifier is a naming defect. Free for private
+  symbols, same-change caller updates for public ones, forbidden for symbols published in generated docs
+- **Provenance gates every WHY.** A reason you hold (your decision, the user, the ticket) is stated plainly; a reason
+  inferred by reading is marked `why?:` or omitted. `why?: unknown` is a finished answer — a wrong reason stated as fact
+  survives review and is never re-checked
+- **Routing ladder replaces the delete-only rule**: name → test → doc comment → rule doc → architecture doc → marker →
+  drown. Drown is the default verdict and is silent; rescuing nothing is a good run. The ladder exists to make deletion
+  cheap, because an agent with nowhere to put a fact hoards it in a comment
 - Repair is proactive and unprompted, scoped to the files edited and symbols read for the change — never a repo sweep.
   The style's "don't refactor unrelated code" rule carries the matching exception
-- Comments carry the non-obvious WHY only; docs state the current contract only, at whatever length the caller needs
-- Neither carries history, changelogs, ticket references, or the change that produced them — git and the tracker hold
-  those
+- **Doc comments are written for a reader, and that reader is the only test** — a caller holding the signature and
+  nothing else. A convention can demand the slot exists; it can never supply a word of the content. One line is finished
+  work when the signature already answered the question, and a doc needing a paragraph is a signature finding
+- Docs state the current contract only. Neither comments nor docs carry history, changelogs, ticket references, or the
+  change that produced them — git and the tracker hold those
+- **The codebase-conflict rule is inverted for comments.** Elsewhere the codebase wins; here a comment-heavy convention
+  neither licenses writing new comments nor authorizes stripping existing ones
 - Language skills keep their own doc-comment placement rules (which symbols need docs); this policy governs the content
 
 **LSP routing:**

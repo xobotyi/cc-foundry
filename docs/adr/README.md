@@ -29,4 +29,5 @@ neither re-litigate it nor cargo-cult it.
 - [0005 — Per-plugin GitHub releases as the changelog](0005-per-plugin-github-releases-as-changelog.md) — accepted
 - [0006 — Prior art: steal methodology, not authoring craft](0006-prior-art-steal-methodology-not-craft.md) — accepted
 - [0007 — The `coding` skill owns comment and documentation policy, stated in full](0007-coding-skill-owns-comment-policy.md)
-  — accepted
+  — accepted (WHY clause superseded by 0008)
+- [0008 — Comments are a closed set of five kinds, not a judgment call](0008-comments-as-a-closed-set.md) — accepted

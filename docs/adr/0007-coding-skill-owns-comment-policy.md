@@ -1,6 +1,7 @@
 # 0007 — The `coding` skill owns comment and documentation policy, stated in full
 
-- **Status:** accepted
+- **Status:** accepted; the "comments carry the non-obvious WHY" clause is superseded by
+  [0008](0008-comments-as-a-closed-set.md)
 - **Date:** 2026-08-17
 
 ## Context
@@ -32,7 +33,8 @@ default prompt.
 - **The reader is the test.** A comment or doc line that hands the next reader nothing the code already gives is waste.
   A convention demanding a doc is not a reader, so compliance never justifies a line.
 - **Comments carry the non-obvious WHY.** What the code does, how it got here, and which task or caller motivated it all
-  read like a WHY and are not.
+  read like a WHY and are not. **Superseded by [0008](0008-comments-as-a-closed-set.md)** — the filter did not hold, and
+  a closed set of five permitted kinds replaced it.
 - **Docs state the current contract**, at the length the caller needs — one line when the signature says the rest. No
   history, no changelog. A deprecation notice is not history: it states the contract that holds now.
 - **The output styles carry no copy of these rules.** They scope density to both channels (what the agent says, and what
@@ -43,7 +45,9 @@ default prompt.
 
 - On lean-prompt models the skill is the only source of comment policy, which is the case that motivated this.
 - On classic-prompt models two rules overlap the built-in section. Accepted: the wording agrees, and correctness on the
-  model in use beats saving two bullets on the other.
+  model in use beats saving two bullets on the other. **No longer true under [0008](0008-comments-as-a-closed-set.md)**
+  -- the closed set forbids the free-form non-obvious-WHY comment the built-in permits, so the skill states an explicit
+  override instead of relying on agreement.
 - `the-writer`'s out-of-scope pointer and the JS/TS references to a "no comments default" now resolve to something real.
 - The policy is pinned to a behavior of Anthropic's default prompt that can change without notice. When
   `coding-instructions.md` is re-derived against a newer version, check whether the overlap still agrees.

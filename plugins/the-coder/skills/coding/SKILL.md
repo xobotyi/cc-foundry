@@ -93,6 +93,22 @@ Before planning or implementing, map the territory.
 - What tests cover this code?
 - What might break?
 
+### 5. Read the Scars
+
+Intent leaves no trace in code, but change does. These shapes are worth noticing, and each one is a question, never a
+conclusion — the provenance rule below binds here too, so nothing read off code shape is a fact until a witness outside
+the code confirms it:
+
+- **An exported symbol nobody calls** — possibly a fossil of whatever replaced it. Look for the successor.
+- **Armor bolted on** — a guard, a retry, a sanitizing pass, a defensive copy around code that would not obviously need
+  one. Something may have failed here.
+- **A hack where a clean path exists** — serializing an object to text and parsing it back where a copy function would
+  do. Ask what blocked the clean path.
+- **Redundant repairs** — two layers fixing the same thing. One of them may be dead.
+
+Chase each with git history, the tracker, or the person who owns the code. A confirmed answer narrows what your change
+must not break; an unconfirmed one stays a question and constrains nothing.
+
 </discovery-protocol>
 
 Discovery is cheap. Debugging wrong assumptions is expensive.
@@ -247,60 +263,163 @@ Two rungs hold → take the higher one and move on. </reuse-ladder>
   inline it.
 </simplicity-rules>
 
-### Comment for the Reader, Not for the Rule
+### Write No Comments
 
-Every comment is written for the next person who reads the code. That person is the only test. A line that tells them
-something the code cannot earns its place; a line that does not is waste — it spends their attention, it binds the
-maintainer to keep it true, and it goes stale on its own. Never write one to satisfy a convention: a rule that says
-"document this" is not a reader.
+Code states what it does, so a comment restating it hands the reader nothing. Worse, a comment cannot be verified by
+anything: names, types, and tests fail loudly when they drift, while a comment describing code that no longer does that
+goes on being read as true. The reader has no way to tell a load-bearing comment from a stale one.
 
-So comment the WHY, never the WHAT. The reader sees what the code does. What they cannot see is the hidden constraint,
-the subtle invariant, the workaround for a specific bug, the behavior that would surprise them.
+**This governs commentary — prose addressed to a human reader.** Comment-syntax that a tool parses is not commentary and
+is out of scope entirely. The test is the property, not a list: **if deleting it changes what builds, what runs, what a
+checker reports, or what a generator emits, it is program text wearing comment clothing** — the way a shebang is. Every
+language has these and no roster here could be complete; `//go:build`, `// Output:` in a Go example,
+`# shellcheck disable=SC2086`, `# type: ignore`, JSDoc `@type` on a plain-JS symbol, and codegen or editor pragmas are
+illustrations of the class, not its boundary. When you meet a directive you do not recognise, assume it is load-bearing
+until you have checked. Write them exactly as the tool requires, and never remove one during repair.
 
-Three cases read like a WHY and are not:
+For commentary, the default is none, and the default is not a judgment call. You do not weigh whether a comment is good
+enough to write — five kinds may exist, and nothing outside this list does.
 
-<comment-rules>
-- **What the code does** — the identifiers already say it, so a comment restating the line below it hands the reader
-  nothing.
-- **How the code got here** — "previously a map", "changed from sync to async", "was O(n²) before the refactor". The
-  code states what it is; git states what it was. A comment describing a past state is wrong the moment the next change
-  lands, and no reader can tell whether it is stale or load-bearing.
-- **Which task or caller motivated it** — "added for the checkout flow", "fixes #431", "used by ReportBuilder". That
-  belongs in the commit message and the pull request; in the code it rots as callers come and go.
-</comment-rules>
+<comment-kinds>
+1. **Doc comments on public symbols** (`///`, `/** */`, godoc) — a contract for a caller who will
+   never open the body. A different artifact with a different reader; the language skill decides
+   which symbols get one, and "Document the Contract" below governs what goes in it. The
+   no-comment default does not reach them.
+2. **The justification on an escape hatch** — any construct that suppresses a check or steps
+   outside the language's guarantees, in whatever syntax that language uses to carry a reason. The
+   rule is general: **an escape hatch states its justification or it is not allowed to exist.**
+   `// SAFETY:`, `//nolint:<linter> — <why>`, `# noqa: E501 — <why>`, `@ts-expect-error <why>`, a
+   reason beside an ignored error, a force-cast, or a disabled assertion are examples of the shape,
+   not the permitted set — a language this skill never names has its own, and the rule reaches it.
+   The directive itself is out of scope above; the reason attached to it is this kind.
+3. **`shortcut: <ceiling> — <upgrade trigger>`** — a deliberate ceiling you chose, so a deferral
+   cannot quietly become permanent.
+4. **`constraint: <fact>`** — a fact outside this file that the code cannot express and no name can
+   carry: an upstream API's behavior, a coupling to a value in another file, a wire format the
+   remote end fixes.
+5. **`why?: <hypothesis>`** — an inference about code you did not author, and only when the task
+   is to document that code in place. Never on your own work: your reasoning belongs in the
+   response, never in the file, and you know your own reasons anyway.
+   </comment-kinds>
+
+Free-form prose is not on the list. There is no sixth kind, and no "this one is genuinely useful" exception — that
+judgment is exactly what produces the commentary this rule exists to prevent. What you wanted to say routes somewhere
+else.
+
+**This list overrides any standing permission to write a comment when the WHY is non-obvious**, including the one in the
+default system prompt's task instructions, which some models still receive. Where the two disagree, the closed set wins:
+a non-obvious WHY is a reason to rename, to write a test, or to file the fact in a document, and only the five kinds
+above may appear in the code.
+
+**The markers carry grammar, not prose.** One line, present tense, greppable:
 
 ```go
-// BAD — restates the line, then records history no reader can verify
-// increment the retry counter (used to be reset here before v2)
-retries++
-
-// GOOD — the constraint is invisible in the code
-// The upstream API rate-limits per connection, not per token, so one shared
-// client would serialize every tenant behind a single bucket.
+// constraint: upstream rate-limits per connection, not per token — one shared client serializes all tenants
 client := newClientPerTenant(tenant)
+
+// shortcut: global lock — switch to per-account locks if throughput matters
+// nolint:errcheck — Close on a read-only handle cannot fail in a way the caller can act on
+// why?: possible defect — or deliberate, so a rock parked on the wall isn't stuck forever
 ```
+
+Review deferred work and recorded couplings with `rg -n 'shortcut:|constraint:|why\?:'`.
+
+### Route It Instead of Writing It
+
+Knowledge worth keeping is almost never best kept in a comment. Before writing one — and before deleting one — climb
+this ladder and stop at the first rung that holds.
+
+<comment-routing>
+1. **A better name.** First choice, always. See below.
+2. **A test.** An invariant asserted by a test is checked on every run; the same invariant in a
+   comment is checked by nobody.
+3. **A doc comment**, when the reader who needs it is a caller rather than a maintainer.
+4. **A rule for the reviewer** — an ordering constraint, a "never call X before Y", a
+   weakening-is-a-defect invariant — goes to the project's rule document (`CLAUDE.md` or whatever
+   the repo uses). If a lint could enforce it instead, propose the lint; a rule a machine checks
+   beats a rule a human remembers.
+5. **Design rationale** a maintainer cannot recover from the code — why this algorithm and not the
+   obvious one, a protocol shape, an invariant spanning files, a measured performance cliff — goes
+   to the architecture doc or an ADR.
+6. **One of the five markers**, when the fact must sit at the code to be found in time.
+7. **Drown it.** The default verdict, silently. Do not list what you dropped, argue for it, or
+   count it.
+   </comment-routing>
+
+Most candidates drown, and that is the system working. A change that rescues nothing is a good run — volume here is
+failure, not thoroughness. The ladder exists so that deleting is cheap: an agent with nowhere to put a fact hoards it in
+a comment.
+
+#### The First Rescue Is a Rename
+
+When a comment's whole payload fits in an identifier, the fix is a rename, not a better comment.
+`// index of the last fused token` above `idx` is `lastFusedToken`, and then there is nothing left to say. A name is
+read at every use site; a comment is read once, by whoever scrolls past it.
+
+Applies to variables, fields, functions, types, and enum members alike. A comment compensating for a vague name is a
+naming defect wearing a comment — rename first, then see what survives.
+
+<rename-limits>
+- **Private symbol** — free. Rename it in the same change.
+- **Public symbol** — the name is API surface. Rename it with its callers in the same change when
+  the blast radius is small; otherwise it is a change of its own kind and does not ride along with
+  unrelated work.
+- **Published in generated documentation** — frozen. Verify before proposing (grep the docs tree);
+  for a frozen symbol the rescue falls back to a doc comment or drowns.
+  </rename-limits>
+
+#### A WHY You Inferred Is Not a WHY You Know
+
+Code shows mechanism and hides intent. "This list is sorted" is visible in the source; "this list is sorted so it
+renders stably on the debug camera" is not, and cannot be recovered by reading. So provenance decides whether you may
+state a reason at all:
+
+<why-provenance>
+- **A reason you hold** — your own design decision, something the user told you, a fact from the
+  ticket or the upstream docs. State it plainly, in whichever destination the routing ladder picks.
+- **A reason you inferred by reading** — do not state it as fact. Either leave it out, or, when you
+  were asked to document code you did not author, mark it `why?:` and let it stand as the
+  hypothesis it is.
+  </why-provenance>
+
+Mark it even when you are confident: confidence is not knowledge, and a wrong reason stated as fact is the worst thing
+you can write into a codebase — it survives review, it is never re-checked, and it makes the next maintainer defend a
+constraint nobody imposed. When no hypothesis is plausible, `why?: unknown` is a finished answer. An honest gap outranks
+a plausible invention.
 
 ### Document the Contract, Not Its Evolution
 
-Documentation on a public symbol is a contract, and its reader is a caller who will never open the implementation. They
-need what the signature does not tell them, so a doc here is expected rather than exceptional — and the rules on it are
-stricter, not looser.
+**A doc comment is written for a reader, and that reader is the only test.** Specifically: a caller who will never open
+the implementation, has only the signature, and must get this right without asking you. Everything they cannot see, they
+need. Everything they can already see is noise you are charging them for.
+
+Never write one to satisfy a rule. A convention that says "document every exported symbol" is not a reader — it can tell
+you a doc must exist, it cannot tell you a word of what goes in it. When the convention demands a slot and the signature
+has already answered the caller's question, the honest doc is one line, and that line is finished work rather than an
+under-delivery.
+
+This is the same test as the no-comment default, not an exception to it. Docs survive where comments do not because
+their reader is real and identifiable, so the rules on them are stricter, not looser.
 
 <documentation-rules>
-- **State the current contract** — what the symbol does, what it accepts, what it returns, how it fails, which
-  invariants and side effects bind the caller. Present tense, current behavior, nothing else.
-- **Length follows the contract, not the symbol** — the language convention decides which symbols get a doc; the caller
-  decides how long it runs. When the signature already tells them everything, one line is the finished doc. Padding it
-  to look thorough is how docs turn into poems.
-- **Carry no history** — "as of v2 this also accepts a slice", "used to return an error", "kept for compatibility with
-  the old loader". A doc narrating its own evolution is a changelog in the wrong file. A deprecation notice
-  (`@deprecated`, `#[deprecated]`) is not history: it states the contract that holds now — "this will be removed, call
-  X instead".
-- **Cut the padding** — no preamble ("This function is responsible for..."), no signature restated in prose, no
-  motivation essay, no closing summary. Lead with the verb.
-- **Rewrite in place on change** — when behavior or a signature changes, replace the doc in the same edit so it
-  describes the new contract. Never append the change to the old text.
-</documentation-rules>
+- **State the current contract** — what the symbol does, what it accepts, what it returns, how it
+  fails, which invariants and side effects bind the caller. Present tense, current behavior,
+  nothing else.
+- **Length follows the reader, not the symbol** — the language convention decides which symbols get
+  a doc; the caller decides how long it runs. When the signature already tells them everything, one
+  line is the finished doc. Padding it to look thorough is how docs turn into poems.
+- **A doc compensating for the signature is a design finding** — if the caller needs a paragraph to
+  use a function safely, the parameters, types, or return shape are doing too little. Fix the
+  signature and watch the doc shrink, exactly as a rename shrinks a comment.
+- **Carry no history** — "as of v2 this also accepts a slice", "used to return an error", "kept for
+  compatibility with the old loader". A doc narrating its own evolution is a changelog in the wrong
+  file. A deprecation notice (`@deprecated`, `#[deprecated]`) is not history: it states the
+  contract that holds now — "this will be removed, call X instead".
+- **Cut the padding** — no preamble ("This function is responsible for..."), no signature restated
+  in prose, no motivation essay, no closing summary. Lead with the verb.
+- **Rewrite in place on change** — when behavior or a signature changes, replace the doc in the
+  same edit so it describes the new contract. Never append the change to the old text.
+  </documentation-rules>
 
 ```go
 // BAD — preamble, signature restated in prose, history, ticket reference
@@ -318,33 +437,23 @@ func ParseConfig(r io.Reader) (*Config, error)
 
 ### Repair What You Read
 
-A comment or doc that breaks these rules is a defect, and you fix a defect you meet without being asked. Leaving one you
-just read is a decision to keep something you know is wrong.
+A comment outside the five kinds, or a doc that no longer matches its symbol, is a defect — and you fix a defect you
+meet without being asked. Run it through the routing ladder first: delete is the common outcome, but a comment carrying
+a real constraint gets rescued before it goes.
 
 <proactive-repair>
-- **Scope is what you touch** — the files you edit and the symbols you read to make the change. Not the package, not a
-  sweep of the repo. A comment you never had reason to open stays where it is.
-- **Delete narration, history, and task references on sight.** They cost nothing to lose, and the diff records the
-  removal.
-- **Rewrite a doc that no longer matches its symbol.** A stale contract is worse than a missing one, because callers
-  believe it.
-- **Report the repair in one line** so a reviewer knows the extra hunks are deliberate, not accidental scope creep.
-- **Ask first when the repair is large or contested** — a doc that is wrong because the code is wrong, or a convention
-  the codebase applies on purpose. Surface it; don't silently reverse it.
-</proactive-repair>
-
-### Mark Deliberate Shortcuts
-
-The narrow exception to the no-comment default, and it covers deliberate ceilings only — a global lock, an O(n²) scan, a
-naive heuristic. A simplification the reader would never mistake for a bug needs no comment. When you do take a ceiling,
-mark it with a `shortcut:` comment naming the ceiling and the upgrade trigger, so a deferral cannot quietly become
-permanent: an unmarked shortcut reads as ignorance, and a marker without a trigger rots into permanence.
-
-<shortcut-marker>
-- `// shortcut: global lock — switch to per-account locks if throughput matters`
-- `# shortcut: O(n²) scan, fine under ~1k rows — index if the set grows`
-
-Grep them with `rg -n 'shortcut:'` to review deferred work before it is forgotten. </shortcut-marker>
+- **Scope is what you touch** — the files you edit and the symbols you read to make the change. Not
+  the package, not a sweep of the repo. A comment you never had reason to open stays where it is.
+  The default governs what you write; it is not a licence to strip a codebase.
+- **Delete narration, history, and task references on sight.** They cost nothing to lose, and the
+  diff records the removal.
+- **Rewrite a doc that no longer matches its symbol.** A stale contract is worse than a missing
+  one, because callers believe it.
+- **Report the repair in one line** so a reviewer knows the extra hunks are deliberate, not
+  accidental scope creep. Report what you rescued and where it went; never itemize what drowned.
+- **Ask first when the repair is large or contested** — a doc that is wrong because the code is
+  wrong, or a convention the codebase applies on purpose. Surface it; don't silently reverse it.
+  </proactive-repair>
 
 ### Handle Errors Deliberately
 
@@ -485,7 +594,8 @@ weakening the check.
 
 4. **Review your own diff** — Read it as if reviewing someone else's code. Look for:
    - Leftover debug code or TODO comments
-   - Comments that narrate the code, record history, or name the task; docs still describing the old contract
+   - Any added comment outside the five permitted kinds; docs still describing the old contract
+   - A comment that survived where a rename would have removed it
    - Missing error handling
    - Hardcoded values that should be configurable
    - Edge cases not covered
@@ -496,7 +606,11 @@ weakening the check.
 6. **Show evidence, not assertions** — Report the actual output of the check: the test summary line, the exit code, the
    screenshot. "Tests pass" is a claim; the output is proof the user can act on without re-running anything.
 
-7. **Disclose gaps** — If you skipped anything, couldn't verify an edge case, or are uncertain about a behavior, state
+7. **Carry evidence for claims of absence** — "nothing calls this", "no test covers it", "it isn't used anywhere" are
+   the claims most often asserted and least often checked. State the search that settles it — the exact command, run
+   over the whole tree, and what it returned. An absence you cannot show a sweep for is an absence you do not claim.
+
+8. **Disclose gaps** — If you skipped anything, couldn't verify an edge case, or are uncertain about a behavior, state
    it explicitly. "Done" means fully verified. "Done, but I didn't verify X" is better than a silent gap.
 
 </verification-protocol>
@@ -551,15 +665,10 @@ problem.
   found nothing. The user sees the result, not the process.
 - Write with the same economy everywhere. Terseness that stops at the chat window and leaves a graphomaniac diff behind
   is not terseness: code, comments, docs, tests, and commit messages carry no filler either.
-- If the codebase contradicts a rule here, follow the codebase and flag the divergence once.
-
-## Application
-
-- Apply these disciplines silently. Don't narrate the protocol, announce the step you are on, or report a check that
-  found nothing — the user sees the result, not the process.
-- The economy you apply to a response applies to everything you write into a file. Terseness that stops at the chat
-  window and leaves a padded diff behind is not terseness.
-- If the codebase contradicts a rule here, follow the codebase and flag the divergence once.
+- If the codebase contradicts a rule here, follow the codebase and flag the divergence once. **The comment default is
+  the exception**: a commented-out-everything codebase is a convention you neither match nor sweep. You do not write a
+  new comment to fit in, and you do not strip comments you had no reason to open. Match the code's patterns, not its
+  prose.
 
 ## Integration
 

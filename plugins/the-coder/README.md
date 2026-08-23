@@ -72,15 +72,38 @@ commit is finished work. Tests sit outside the budget and ship with the code the
 with a wide test surface as one honest commit. Atomicity wins where the two conflict: a rename across sixty files stays
 one commit at any size, because splitting it leaves a commit whose tree doesn't build.
 
-Repairs happen without being asked. A comment that narrates the code, records history, or names a ticket gets deleted
-when Claude meets it, and a doc that no longer matches its symbol gets rewritten, both reported in a line so the extra
-hunks read as deliberate. The scope is what the change already touches — the files edited and the symbols read to make
-it — never a sweep of the repository, and anything large or contested gets raised instead of quietly reversed.
+It also carries the comment and documentation policy, and that policy starts from zero. Code already says what it does,
+and unlike a name or a test, a comment never fails loudly when it drifts — the reader has no way to tell a load-bearing
+comment from one describing code that changed three refactors ago. So the skill does not ask Claude to judge whether a
+comment is worth writing. It names five kinds that may exist — doc comments on public symbols, `SAFETY:` and `nolint:`
+justifications, `shortcut:`, `constraint:`, and `why?:` — and nothing outside that list is written. Four of the five are
+one-line markers with fixed grammar, which is what keeps the permitted set from growing back into prose.
 
-It also carries the comment and documentation policy. The reader decides whether a line exists at all: comments explain
-only the WHY the code cannot show, and a doc on a public symbol states the current contract at whatever length the
-caller actually needs — one line when the signature already says the rest. Neither carries history. The change that
-produced the code belongs in git and the pull request, not in a comment that describes a state the codebase left behind.
+The rule it replaces was "comment the non-obvious WHY," and it was replaced because it did not work: a model asked to
+find a non-obvious why will find one in every function. A closed set gives it nothing to negotiate with.
+
+What would have been a comment goes somewhere that survives better. The first move is almost always a rename — a comment
+whose whole meaning fits in an identifier is a naming problem, and a name is read at every use site while a comment is
+read once. After that: a test, a doc comment, a rule in the project's own rule document, a design note in the
+architecture doc. Failing all of those, it is dropped, silently, which is the common and correct outcome.
+
+Doc comments are the one thing that survives all of this intact, because they have a real reader — a caller holding the
+signature and nothing else, who has to get it right without asking. That reader is the whole test. A convention that
+says "document every exported symbol" can demand the slot exists, but it can't supply a single word of what goes in it,
+so a doc written to satisfy the linter rather than the caller is the same waste as a comment written to satisfy a rule.
+When the signature already answers the question, one line is the finished doc. When the caller would need a paragraph to
+call the function safely, that's a finding about the signature, not a cue to write more prose.
+
+Claude also stops inventing reasons. Code shows mechanism and hides intent, so a "why" recovered by reading code is a
+guess — and a confident wrong reason is worse than none, because it survives review and nobody re-checks it. A reason
+Claude actually holds gets stated plainly; a reason it inferred is either left out or marked `why?:` as the hypothesis
+it is. "Unknown" is an acceptable answer.
+
+Repairs happen without being asked. A doc that no longer matches its symbol gets rewritten and a comment outside the
+five kinds gets removed, both reported in a line so the extra hunks read as deliberate. The scope is what the change
+already touches — the files edited and the symbols read to make it — never a sweep of the repository. In a comment-heavy
+codebase this cuts both ways: Claude won't add comments to match the local convention, and it won't strip comments it
+had no reason to open.
 
 **Use when:** Starting any code task — writing, modifying, debugging, or refactoring. This skill is a prerequisite for
 implementation work and should run before language-specific skills engage.
