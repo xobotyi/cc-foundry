@@ -353,8 +353,8 @@ Keep the branding mechanism consistent across the project. The `unique symbol` p
 
 - **Value from external source (API, JSON.parse, user input)** → `unknown`
 - **Function accepts anything, passes through without touching** → `unknown`
-- **Migrating JS to TS incrementally** → `any` (temporary, with comment)
-- **Test mock that intentionally bypasses type checking** → `any` (with comment)
+- **Migrating JS to TS incrementally** → `any` (temporary, with its justification)
+- **Test mock that intentionally bypasses type checking** → `any` (with its justification)
 - **Too lazy to type it properly** → Fix the types
 
 ### Using `unknown` Safely

@@ -35,8 +35,8 @@ obvious. Never fight the type system — if you need `as` or `any`, the types ar
   other critical checks.
 - **`unknown` over `any`.** Use `unknown` and narrow with type guards. `any` disables type checking entirely. Reserve
   `any` for migration or test mocks only — document why.
-- **No non-null assertions (`!`) without justification.** Prefer narrowing. If `!` is truly needed, add a comment
-  explaining why the value cannot be null.
+- **No non-null assertions (`!`) without justification.** Prefer narrowing. If `!` is truly needed, annotate it with the
+  reason the value cannot be null.
 - **No type assertions (`as`) for object literals.** Use type annotations (`: Foo`) instead — assertions hide
   missing/extra property errors.
 
@@ -44,8 +44,8 @@ obvious. Never fight the type system — if you need `as` or `any`, the types ar
 
 - **Value from external source (API, JSON.parse, user input)** → `unknown`
 - **Function accepts anything, passes through without touching** → `unknown`
-- **Migrating JS to TS incrementally** → `any` (temporary, with comment)
-- **Test mock that intentionally bypasses type checking** → `any` (with comment)
+- **Migrating JS to TS incrementally** → `any` (temporary, with its justification)
+- **Test mock that intentionally bypasses type checking** → `any` (with its justification)
 
 ### The `{}` Type
 
@@ -217,7 +217,8 @@ When modifying an exported symbol's behavior or signature, update its doc commen
 - **Module resolution:** `module: "NodeNext"` when transpiling with tsc; `module: "preserve"` with external bundlers
   (Vite, esbuild, Bun). Use `verbatimModuleSyntax: true` in both cases.
 - **Target:** `es2022` (stable). Set `lib` to include `dom` for browser projects.
-- **Never `@ts-ignore`.** Use `@ts-expect-error` in tests only, with a comment. Never `@ts-nocheck` in production.
+- **Never `@ts-ignore`.** Use `@ts-expect-error` in tests only, with its justification. Never `@ts-nocheck` in
+  production.
 - **Keep `tsconfig.json` minimal.** Use `extends` for shared configs. Separate `tsconfig.build.json` for builds
   (excludes tests, scripts).
 

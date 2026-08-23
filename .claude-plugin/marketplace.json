@@ -124,7 +124,7 @@
 		{
 			"name": "javascript",
 			"description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-			"version": "1.2.7",
+			"version": "1.2.8",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"

@@ -167,13 +167,12 @@ line has no error, so it won't silently mask changes.
 // @ts-ignore
 const x: string = 42;
 
-// Acceptable in tests: documents expected failure
 // @ts-expect-error — testing invalid input handling
 const result = processString(42);
 ```
 
-**Prefer narrowing or explicit casts** over suppression. If you must suppress, use `@ts-expect-error` with a comment
-explaining why.
+**Prefer narrowing or explicit casts** over suppression. If you must suppress, use `@ts-expect-error` and carry the
+reason on the directive itself, as any escape hatch does.
 
 ### `@ts-nocheck`
 
