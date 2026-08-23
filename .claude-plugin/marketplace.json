@@ -204,7 +204,7 @@
 		{
 			"name": "php",
 			"description": "PHP language discipline: conventions, modern idioms, type system, OOP, testing, and LSP-powered code intelligence",
-			"version": "1.1.0",
+			"version": "1.1.1",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"

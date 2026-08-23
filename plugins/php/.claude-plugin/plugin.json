@@ -1,7 +1,8 @@
 {
   "name": "php",
-  "version": "1.1.0",
-  "description": "PHP language discipline: conventions, modern idioms, type system, OOP, and testing",
+  "version": "1.1.1",
+  "description": "PHP language discipline: conventions, modern idioms, type system, OOP, testing, and LSP-powered code intelligence",
+  "lspServers": "./.lsp.json",
   "author": {
     "name": "xobotyi",
     "email": "xog3@yandex.ru",
