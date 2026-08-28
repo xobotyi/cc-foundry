@@ -31,3 +31,5 @@ neither re-litigate it nor cargo-cult it.
 - [0007 — The `coding` skill owns comment and documentation policy, stated in full](0007-coding-skill-owns-comment-policy.md)
   — accepted (WHY clause superseded by 0008)
 - [0008 — Comments are a closed set of five kinds, not a judgment call](0008-comments-as-a-closed-set.md) — accepted
+- [0009 — Instruction artifacts are written in the timeless present](0009-timeless-present-for-instruction-artifacts.md)
+  — accepted
