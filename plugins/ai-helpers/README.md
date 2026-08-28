@@ -43,12 +43,17 @@ minimal filler, iterative refinement focus.
 
 ### prompt-engineering
 
-Prompt design techniques for LLMs: structure, examples, reasoning patterns, optimization strategies. Covers zero-shot,
-few-shot, chain-of-thought, Claude-specific features (adaptive thinking, effort, prompt caching, system prompts), and
-per-model behavioral prompting (Claude Fable 5 / Opus 4.8 / Sonnet 5, GPT-5.x).
+Writing the instruction text a model reads. Organized by surface — a one-shot request, standing context loaded on every
+turn, a tool description, or a prompt written for another model instance — because the same sentence behaves differently
+on each.
 
-**Use when:** Crafting any AI instructions, debugging unexpected behavior, improving response quality, or working with
-prompts in any context.
+Covers the instruction budget a context can hold, sentence-level wording and durability rules, when to reach for a
+key-value list rather than a table, and the two behaviors that make reasonable instructions fail: a model follows them
+literally, and an instruction stacks on top of a default rather than replacing it. Starts by routing away the problems
+prompt text cannot fix.
+
+**Use when:** Writing or debugging any AI instructions — prompts, skills, agent definitions, output styles, tool
+descriptions, or instruction files.
 
 ### skill-engineering
 

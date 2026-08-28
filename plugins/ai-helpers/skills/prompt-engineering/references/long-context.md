@@ -1,230 +1,119 @@
-# Long Context Prompting
+# Long Context
 
-High-volume context prompting (documents, codebases, transcripts) requires deliberate curation and structure. The
-challenge is not fitting content into the window — it is keeping the model's attention focused on the right tokens.
+Depth on arranging large inputs. Everything here is about text you write; the boundary where it stops being a prompt
+problem is stated at the end.
 
----
+## Nominal context is not usable context
 
-## Core Principle: Context as a Finite Attention Budget
+A stated window size is a true claim about what the API accepts and a misleading shorthand for what the model can use.
+Effective capacity runs well below the advertised number, and degradation is not graceful — quality holds, then falls
+off rather than sloping down.
 
-LLMs use transformer attention: every token attends to every other token (O(n²) relationships). As context grows,
-pairwise attention is stretched thin across more tokens. This is not a cliff — it is a gradient of degrading precision
-called **context rot**: recall and long-range reasoning degrade steadily as token count rises.
+Two consequences that change how you write:
 
-Treat context as a scarce resource with diminishing marginal returns. The goal is the **smallest set of high-signal
-tokens** that maximizes the likelihood of the desired output — not the largest set of potentially relevant tokens.
+- **Fitting is not the bar.** "It fits in the window" says nothing about whether the model will use the part that
+  matters.
+- **The failure is silent.** Nothing errors. The model answers from whatever it attended to, with the same confidence it
+  would have had reading a well-arranged prompt.
 
----
+**The measured shape of the problem**: holding task and checks fixed, a coding agent passed 8/10 runs at ~11k characters
+of clean context and 3/10 at ~299k — with the same drop whether the added material was topically relevant or irrelevant.
+Two-sided Fisher `p = 0.0698`, so treat this as a strong trend rather than a settled law. The directional finding is the
+usable part: **volume itself carries a cost that relevance does not offset.**
 
-## Document Organization Patterns
+## Document organization
 
-### KV Label Pattern
-
-Assign a short, unique identifier to each document before it enters context. Reference it in the task instruction.
-
-```xml
-<document id="policy-v3">
-  [content]
-</document>
-
-<document id="policy-v4">
-  [content]
-</document>
-
-Task: Compare the liability clauses in policy-v3 and policy-v4.
-```
-
-- Identifier enables precise citation in model output
-- Prevents the model conflating overlapping documents
-- Works at any scale (2–50+ documents)
-
-### Ordered Relevance Pattern
-
-Place the most task-relevant documents first, least relevant last. Models attend more precisely to early context; the
-primacy effect is well-documented at long context lengths.
-
-- If relevance is unknown, use recency as a proxy (newer = more relevant)
-- For symmetric relevance, interleave related documents rather than grouping by source
-
-### Metadata Header Pattern
-
-Prefix each document with structured metadata before the content:
-
-```xml
-<document id="report-q4" source="finance" date="2025-12-31" pages="42">
-  [content]
-</document>
-```
-
-- Date metadata enables the model to reason about recency without reading full content
-- Source metadata helps when documents have overlapping terminology with different meanings
-- Page count signals depth; the model can adjust extraction strategy accordingly
-
----
-
-## XML Structuring for Multi-Document Context
-
-XML tags outperform markdown for large multi-document prompts because:
-
-- Nesting is unambiguous (no heading level ambiguity)
-- Tags survive line wrapping and copy-paste damage
-- Models trained on Claude's constitution recognize XML as semantic structure
-
-### Standard Multi-Document Template
+### The standard multi-document arrangement
 
 ```xml
 <documents>
-  <document id="1" title="Q3 Earnings Report" type="financial">
-    <summary>Optional 2-3 sentence abstract for very long docs</summary>
-    <content>
-      [full document text]
-    </content>
+  <document index="1" source="policy-handbook.pdf" type="policy" date="2026-03-14">
+    ...content...
   </document>
-
-  <document id="2" title="Analyst Note" type="commentary">
-    <content>
-      [full document text]
-    </content>
+  <document index="2" source="ticket-4417" type="support-thread" date="2026-08-02">
+    ...content...
   </document>
 </documents>
 
-<task>
-  [instructions referencing document IDs]
-</task>
+<instructions>
+Using only the documents above, answer the question. Before answering, quote the
+passages you rely on inside <evidence> tags, each tagged with its document index.
+If the documents do not contain the answer, say so rather than inferring.
+</instructions>
+
+<question>
+...the actual question, last...
+</question>
 ```
 
-### Inline Citation Prompt
+Four properties make this work, and dropping any one degrades it:
 
-Append to the task section when citations are required:
+- **Material first, instruction after, question last.** The instruction should be readable as operating on something the
+  model has already seen.
+- **Every document individually wrapped and labeled.** An index alone is enough to enable citation; source, type, and
+  date make a wrong retrieval visible.
+- **An explicit no-answer path.** Without it the model infers rather than declining, and inference from adjacent
+  documents is the dominant long-context error.
+- **Evidence before conclusion.** Ordering matters — quotes requested _after_ the answer become post-hoc justification.
 
-```
-When citing evidence, use the format [doc-id, paragraph N]. Do not summarize without a citation.
-```
+### Ordered relevance
 
----
+When you have a relevance signal from retrieval, order documents by it — but place the **most** relevant nearest the
+question, not first. The end of the prompt is the second strong attention zone and it is the one adjacent to the task.
 
-## Query Patterns
+### Metadata that earns its place
 
-**Extraction queries** — ask for specific facts, not summaries. Specific targets reduce hallucination risk because the
-model searches rather than paraphrases.
+Include what the model would need to disambiguate two documents that say different things: source, date, version,
+authority. Omit what it cannot act on — internal ids nobody will resolve, storage paths, ingestion timestamps.
 
-- Weak: "Summarize the contract."
-- Strong: "List every termination clause in the contract that applies within the first 90 days."
+## Quote-grounding
 
-**Comparative queries** — name both documents explicitly in the question.
+The single highest-leverage pattern for large inputs, because it converts an invisible failure into a visible one.
 
-- Weak: "How do the policies differ?"
-- Strong: "List every claim condition present in policy-v4 but absent in policy-v3."
-
-**Grounded queries** — instruct the model to quote before analyzing.
-
-```
-For each finding, first quote the relevant passage verbatim, then explain its significance.
-```
-
-**Negative-space queries** — useful for gap analysis.
-
-```
-List topics covered in document-A that are not addressed in document-B.
+```text
+Before answering, extract the passages that bear on the question into <evidence>
+tags, each labelled with its document index. Then answer using only those passages.
+If the evidence is insufficient, say so instead of filling the gap.
 ```
 
----
+What this buys: a wrong answer arrives with its wrong source attached. Without grounding, a model that attended to the
+wrong document produces a fluent answer with no signal that anything went astray — the most expensive failure mode in
+this file, because it survives review.
 
-## Chunking Strategies
+## Chunking
 
-When a single document exceeds ~50k tokens, chunking is required. Two primary approaches:
+When the material does not fit, or fits but degrades:
 
-### Map-Reduce
+- **Map-reduce** — process each chunk independently against the same question, then synthesize the per-chunk answers in
+  a second pass. Correct when chunks are genuinely independent. Loses cross-chunk relationships entirely, so it is wrong
+  for anything requiring a comparison the chunks do not each contain.
+- **Sliding window with overlap** — sequential chunks sharing a boundary region, for material where local continuity
+  matters (transcripts, narratives, logs). The overlap costs tokens and buys the ability to resolve references that
+  straddle a cut.
+- **Logical chunking** — split on the document's own structure rather than a token count. A chunk that ends mid-clause
+  produces an answer that reflects the cut.
 
-1. Split document into chunks (by section, page count, or token budget)
-2. Run extraction query independently on each chunk → collect partial results
-3. Run synthesis query on the aggregated partial results
+Chunk on meaning where the material has structure; chunk on size only when it does not.
 
-SPL research (arXiv:2602.21257) demonstrates this reduces attention cost from O(N²) to O(N²/k) for k chunks, enabling
-parallel execution on cloud or sequential execution locally with identical logic.
+## Long-running agents
 
-Best for: extraction, classification, QA over uniform content (transcripts, legal documents, code files of similar
-structure).
+A standing context that has grown is the same problem arriving by a different route.
 
-### Sliding Window with Overlap
+- **Maintain state as an object, not as a transcript.** Re-deriving the current state from an accumulating history each
+  turn is how agents drift; the derivation compounds its own errors.
+- **A skill loaded into 50k tokens of surrounding context is not the skill you tested in isolation.** Its rules compete
+  with everything else present. This is the reason the deletion test matters more in persistent context than anywhere
+  else.
+- **Cut before you add.** When a long-running agent answers wrong, the reflex is to add clarifying context. Removing
+  present-but-not-load-bearing material is the higher-yield move and the one nobody tries first.
 
-1. Define window size (e.g., 8k tokens) and overlap (e.g., 1k tokens)
-2. Each window includes the tail of the previous chunk
-3. Run query on each window; deduplicate results by content similarity
+## Where this stops being a prompt problem
 
-Best for: continuous narrative content where chunk boundaries would split logical units (novels, meeting transcripts
-with speaker turns, log files with correlated events).
+Arranging text is prompting. These are not, and reaching for words here is the wasted motion:
 
-### Logical Chunking via CTE Syntax (SPL pattern)
+- **The conversation itself is the volume** → compaction and reasoning persistence, at the harness.
+- **The right documents are not in the prompt** → retrieval. No arrangement rescues an absent source.
+- **The material is deterministic and machine-queryable** → let the model call code against it instead of reading it.
+- **State must survive across sessions** → a memory surface, not a longer prompt.
 
-For structured pipelines, use named intermediate results:
-
-```
-Step 1: Extract all action items from transcript → store as action_items
-Step 2: Extract all decisions from transcript → store as decisions
-Step 3: Cross-reference action_items against decisions → identify conflicts
-```
-
-This mirrors SQL's Common Table Expression pattern — each named step has a clear output, and later steps reference
-earlier outputs by name. Avoids re-reading the full document for each sub-query.
-
----
-
-## Context Rot Mitigation
-
-**Compaction** — when a long conversation approaches the window limit, summarize and restart. Preserve:
-
-- Decisions made
-- Open questions / unresolved bugs
-- Structural constraints (schema, API contracts)
-- The 5 most recently accessed files/documents
-
-Discard: raw tool outputs, redundant retrieval results, superseded working notes.
-
-**Tool-result clearing** — once a tool call's output has been processed, strip it from history. The agent has already
-incorporated the result; the raw output adds tokens without adding signal.
-
-**Structured note-taking** — agent maintains a `NOTES.md` or equivalent that is small and selective. Notes get pulled
-into context at the start of each new turn. The note file replaces, not supplements, the raw history.
-
-**Just-in-time retrieval** — instead of loading all potentially relevant documents up front, load lightweight
-identifiers (file paths, IDs, URLs) and retrieve content on demand via tools. This mirrors human cognition: we maintain
-references, not full copies, in working memory.
-
----
-
-## Sub-Agent Architecture for Context Isolation
-
-When a task requires exploring more content than fits in one focused context:
-
-- Parent agent holds high-level plan + synthesized results only
-- Sub-agents handle deep-dive tasks in isolated clean contexts
-- Sub-agents return condensed summaries (1,000–2,000 tokens) not raw results
-
-Detailed search context stays within sub-agents; the lead agent stays focused on coordination and synthesis. See
-`references/agent-patterns.md` for implementation patterns.
-
----
-
-## Positioning Rules
-
-- **Instructions** → top of system prompt and/or end of user turn (primacy + recency)
-- **Documents** → middle of context, between system prompt and final instructions
-- **Examples** → immediately before the task, after documents, to prime output format
-- **Task** → always last in the user turn; never bury it under documents
-
-Rationale: models exhibit stronger recall at the beginning and end of context (primacy-recency effect). Critical
-instructions placed only in the middle of a long document block are at highest risk of being under-attended.
-
----
-
-## Token Efficiency Checklist
-
-- [ ] Every document in context is directly needed for this specific task
-- [ ] Documents have `id` attributes for precise citation
-- [ ] Most relevant documents appear first
-- [ ] Redundant or superseded documents are removed
-- [ ] Tool results from previous turns are cleared after processing
-- [ ] The task instruction explicitly names which documents to use
-- [ ] Chunking is used if any single document exceeds ~50k tokens
-- [ ] Notes/memory file is selective, not a full transcript
+The tell is whether better arrangement of what you already have could plausibly fix it. If not, stop writing.

@@ -4,7 +4,10 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
 
 ## Skills
 
-- **`prompt-engineering`** — prompt design techniques for LLMs: structure, examples, reasoning patterns, optimization
+- **`prompt-engineering`** — writing instruction text models read, organized by the surface it lands on: one-shot
+  requests, persistent context, tool and schema descriptions, delegated prompts. Covers the instruction budget, wording
+  and timelessness rules, formatting choice, and the two behaviors that make reasonable instructions fail — literal
+  following and instructions compounding with defaults
 - **`skill-engineering`** — design and iterate Claude Code skills: SKILL.md structure, description formulas, content
   architecture, quality evaluation
 - **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
