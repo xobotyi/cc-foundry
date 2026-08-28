@@ -1,20 +1,15 @@
 {
-  "name": "golang",
-  "version": "1.4.1",
-  "description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
-  "lspServers": "./.lsp.json",
-  "author": {
-    "name": "xobotyi",
-    "email": "xog3@yandex.ru",
-    "url": "https://github.com/xobotyi"
-  },
-  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/golang",
-  "repository": "https://github.com/xobotyi/cc-foundry",
-  "license": "MIT",
-  "keywords": [
-    "go",
-    "golang",
-    "conventions",
-    "idioms"
-  ]
+	"name": "golang",
+	"version": "1.4.1",
+	"description": "Go language discipline: conventions, idioms, toolchain, and LSP-powered code intelligence",
+	"lspServers": "./.lsp.json",
+	"author": {
+		"name": "xobotyi",
+		"email": "xog3@yandex.ru",
+		"url": "https://github.com/xobotyi"
+	},
+	"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/golang",
+	"repository": "https://github.com/xobotyi/cc-foundry",
+	"license": "MIT",
+	"keywords": ["go", "golang", "conventions", "idioms"]
 }
