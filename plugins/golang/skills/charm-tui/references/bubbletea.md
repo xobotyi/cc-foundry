@@ -1,7 +1,7 @@
 # Bubble Tea v2 — Core Framework Reference
 
-Full API catalog for `charm.land/bubbletea/v2` (v2.0.x). Working-resolution rules live in SKILL.md — this reference
-holds the complete View/option/command/message catalogs and lifecycle details.
+Full API catalog for `charm.land/bubbletea/v2` (v2.0.x): the View, option, command, and message catalogs plus the
+lifecycle details.
 
 ## Model Interface and Program Lifecycle
 
@@ -15,6 +15,54 @@ type Model interface {
 
 `tea.Msg` is a type alias for `uv.Event` — bubbletea v2 is built on `github.com/charmbracelet/ultraviolet`; key and
 mouse types are re-exports.
+
+A whole program in its smallest complete form:
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+
+    tea "charm.land/bubbletea/v2"
+)
+
+type model struct{ count int }
+
+func (m model) Init() tea.Cmd { return nil }
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+    switch msg := msg.(type) {
+    case tea.KeyPressMsg:
+        switch msg.String() {
+        case "q", "ctrl+c":
+            return m, tea.Quit
+        case "space":
+            m.count++
+        }
+    case tea.MouseClickMsg:
+        if msg.Button == tea.MouseLeft {
+            m.count++
+        }
+    }
+    return m, nil
+}
+
+func (m model) View() tea.View {
+    v := tea.NewView(fmt.Sprintf("Count: %d\n\nspace/click to increment · q to quit\n", m.count))
+    v.AltScreen = true
+    v.MouseMode = tea.MouseModeCellMotion
+    return v
+}
+
+func main() {
+    if _, err := tea.NewProgram(model{}).Run(); err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1)
+    }
+}
+```
 
 ```go
 p := tea.NewProgram(initialModel(), opts...)
@@ -71,7 +119,7 @@ not program options — options configure the program runtime only:
 - **`tea.WithoutSignalHandler()` / `tea.WithoutSignals()`** — signal handling control
 - **`tea.WithoutCatchPanics()`** — disable built-in panic recovery
 
-When stdin isn't a terminal, the program opens the TTY for input automatically — no option needed. Output optimization
+When stdin is not a terminal, the program opens the TTY for input automatically — no option needed. Output optimization
 is handled by the renderer automatically.
 
 ## Commands and Messages

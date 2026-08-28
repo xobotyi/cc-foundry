@@ -29,8 +29,8 @@ out := base.Render("hello")
 ## Color System
 
 - `lipgloss.Color(s)` is a **function** returning stdlib `image/color.Color`: `"#RRGGBB"`/`"#RGB"` hex, `"0"`–`"15"`
-  basic ANSI, `"16"`–`"255"` indexed. Invalid input silently yields `NoColor{}`; a numeric string > 255 is reinterpreted
-  as a 24-bit RGB integer (`Color("999")` is near-black, not ANSI).
+  basic ANSI, `"16"`–`"255"` indexed. Invalid input silently yields `NoColor{}`; a numeric string of 256 or more is
+  reinterpreted as a 24-bit RGB integer (`Color("999")` renders as RGB(0, 3, 231), not as ANSI 999).
 - Named constants: `lipgloss.Black…White`, `lipgloss.BrightBlack…BrightWhite`.
 - All style methods accept `color.Color` — any stdlib color works.
 - **Adaptive colors are explicit.** Build a picker from a known background:
@@ -74,8 +74,8 @@ page := lipgloss.JoinVertical(lipgloss.Left, header, cols, footer)
 out := lipgloss.Place(termW, termH, lipgloss.Center, lipgloss.Center, page)
 ```
 
-- `JoinHorizontal` pads shorter blocks with **unstyled** spaces — size blocks with `Width`/`Height` first if you need
-  styled fill (background continuity).
+- `JoinHorizontal` pads shorter blocks with **unstyled** spaces — size blocks with `Width`/`Height` first where a styled
+  fill is needed (background continuity).
 - `Place`/`PlaceHorizontal`/`PlaceVertical` **never truncate** — if content exceeds the box they are no-ops; clamp with
   `MaxWidth`/`MaxHeight` first.
 - Whitespace styling: `lipgloss.WithWhitespaceStyle(style)`, `WithWhitespaceChars(s)`.
@@ -151,8 +151,8 @@ t := table.New().
 ## Text Utilities
 
 - **`lipgloss.Wrap(s, width, breakpoints)`** — word-wrap preserving ANSI styles and hyperlinks across lines
-- **`lipgloss.StyleRanges(s, lipgloss.NewRange(start, end, style)...)`** — style substrings of already-styled text (e.g.
-  search-match highlighting)
+- **`lipgloss.StyleRanges(s, ranges ...lipgloss.Range)`** — style substrings of already-styled text (search-match
+  highlighting); build each range with `lipgloss.NewRange(start, end, style)`
 
 ## Standalone (non-TUI) Output
 

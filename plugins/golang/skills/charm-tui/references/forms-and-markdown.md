@@ -28,7 +28,8 @@ if err := form.Run(); err != nil {
   read after `StateCompleted`.
 - `Run()` errors: `huh.ErrUserAborted` (ctrl+c), `huh.ErrTimeout` (`WithTimeout`), `ErrTimeoutUnsupported` (timeout +
   accessible mode).
-- Standalone forms render to **stderr** by default (accessible mode uses stdout) — piping stdout won't capture the TUI.
+- Standalone forms render to **stderr** by default (accessible mode uses stdout) — piping stdout does not capture the
+  TUI.
 - Single quick prompt: every field has `.Run()` — `huh.NewInput().Title("Name?").Value(&name).Run()`.
 
 ## Huh — Field Types
@@ -36,17 +37,23 @@ if err := form.Run(); err != nil {
 - **`NewInput()`** — single line; `Prompt`, `Placeholder/PlaceholderFunc`, `Suggestions/SuggestionsFunc`, `CharLimit`,
   `EchoMode(huh.EchoModePassword/EchoModeNone)`, `Inline(bool)`
 - **`NewText()`** — multiline; `Lines(int)`, `ShowLineNumbers`, `ExternalEditor`/`Editor(...)` (ctrl+e opens $EDITOR)
-- **`NewSelect[T comparable]()`** — `Options(...)/OptionsFunc(fn, binding)`, `Height(int)`, `Inline(bool)`,
-  `Filtering(bool)` — filtering is on by default (`/` key)
-- **`NewMultiSelect[T comparable]()`** — `Limit(int)`, `Filterable(bool)`, x/space toggles, ctrl+a select-all
-- **`NewConfirm()`** — `Affirmative`/`Negative` labels, y/n keys, `WithButtonAlignment(lipgloss.Position)`;
-  `.Negative("")` removes the No button and disables toggling
-- **`NewNote()`** — display-only; skipped in navigation unless `.Next(true)`
-- **`NewFilePicker()`** — `CurrentDirectory`, `AllowedTypes`, `FileAllowed`/`DirAllowed`, `ShowHidden`
+- **`NewSelect[T comparable]()`** — `Options(...)/OptionsFunc(fn, binding)`, `Height(int)`, `Inline(bool)`. Filtering is
+  always available through the `/` key and cannot be switched off. `Filtering(bool)` is **not** an enable switch — it
+  sets the live filtering state and focuses the filter input, so `.Filtering(true)` starts the field with the filter box
+  already open.
+- **`NewMultiSelect[T comparable]()`** — `Limit(int)`, x/space toggles, ctrl+a select-all. `Filterable(bool)` is the
+  enable switch here and defaults to true; `Filtering(bool)` sets the live state exactly as on `Select`.
+- **`NewConfirm()`** — `Affirmative`/`Negative` labels, `y`/`n` accept and reject keys, `h`/`l`/`left`/`right` toggle,
+  `WithButtonAlignment(lipgloss.Position)`; `.Negative("")` removes the No button and makes the toggle key a no-op
+- **`NewNote()`** — display-only. A note is skipped in navigation unless it is the **only** field in its group;
+  `.Next(true)` renders a Next button (label via `.NextLabel`) and does not affect skipping.
+- **`NewFilePicker()`** — `CurrentDirectory`, `AllowedTypes`, `FileAllowed`/`DirAllowed`, `ShowHidden`, `ShowSize`,
+  `ShowPermissions`, `Height`
 
-Common builders (all chainable, returning the concrete type): `Value(*T)`, `Key(string)`, `Title/TitleFunc`,
-`Description/DescriptionFunc`, `Validate(func(T) error)`. Options: `huh.NewOption(key, value)`,
-`huh.NewOptions(values...)` (key = `fmt.Sprint(value)`), `.Selected(true)` to pre-select.
+Builders are chainable and return the concrete type. `Title`, `Description`, and their `*Func` variants exist on every
+input field; `Value(*T)`, `Key(string)`, `Accessor`, and `Validate(func(T) error)` exist on every field except `Note`,
+which carries no value; `FilePicker` has `Title`/`Description` but no `TitleFunc`/`DescriptionFunc`. Options:
+`huh.NewOption(key, value)`, `huh.NewOptions(values...)` (key = `fmt.Sprint(value)`), `.Selected(true)` to pre-select.
 
 Validation runs on field submit and blur; a failing `Validate` blocks progression and renders via the theme's error
 styles; `form.Errors()` returns the current group's errors.
@@ -79,15 +86,17 @@ huh.NewSelect[string]().
 form.WithTheme(huh.ThemeFunc(huh.ThemeCharm)) // compile-safe form
 ```
 
-The in-repo upgrade guide shows `WithTheme(huh.ThemeCharm(isDark))` — that passes `*Styles`, which does not implement
+huh's own upgrade guide shows `WithTheme(huh.ThemeCharm(isDark))` — that passes `*Styles`, which does not implement
 `Theme`; use the `ThemeFunc` form. `isDark` is auto-detected from `tea.BackgroundColorMsg` while the form runs. Custom
 themes: start from `huh.ThemeBase(isDark)`, override fields, wrap in `ThemeFunc`.
 
 - Accessible mode is form-level only: `form.WithAccessible(os.Getenv("ACCESSIBLE") != "")` — swaps the TUI for
   sequential stdin/stdout prompts. `TERM=dumb` auto-enables it. Screen-reader users depend on this — wire the gate in
   real applications.
-- Layouts: `WithLayout(huh.LayoutDefault | huh.LayoutStack | huh.LayoutColumns(n) | huh.LayoutGrid(rows, cols))`.
-- `huh/spinner`: `spinner.New().Title("Loading…").ActionWithErr(fn).Run()` — blocking spinner around a task.
+- Layouts: `WithLayout(l)` takes one `huh.Layout` — `huh.LayoutDefault` (one group at a time), `huh.LayoutStack`,
+  `huh.LayoutColumns(n)`, or `huh.LayoutGrid(rows, cols)`.
+- `huh/spinner`: `spinner.New().Title("Loading…").ActionWithErr(func(ctx context.Context) error { ... }).Run()` — a
+  blocking spinner around a task. `Action(func())` is the error-free form.
 
 ## Huh — Embedding in Bubble Tea
 

@@ -1,249 +1,228 @@
 ---
 name: charm-tui
 description: >-
-  Charmbracelet v2 TUI stack for Go: Bubble Tea (Elm architecture), Bubbles components, Lip Gloss styling and layout,
-  Huh forms, Glamour markdown, fang CLI wrapper, testing with golden files and teatest. Invoke whenever task involves
-  any interaction with terminal UIs in Go — building, reviewing, debugging, or testing TUI applications, bubbletea
-  programs, terminal styling, keybindings, forms, or interactive terminal output.
+  Write and review Charmbracelet v2 terminal UIs in Go: Bubble Tea programs, Bubbles components, Lip Gloss styling and
+  layout, Huh forms, Glamour markdown, fang CLI entry, and TUI testing.
+when_to_use: >-
+  Invoke whenever a Go terminal UI is touched at all — writing, reviewing, refactoring, or debugging a Bubble Tea
+  program, a Bubbles component, Lip Gloss styling, a Huh form, or a fang command. Also invoke on the symptoms: a model
+  with `View() string` does not satisfy `tea.Model`, an import resolves to v1, a key case never matches, a component
+  ignores every keystroke, colors come out wrong on a light terminal, a layout overflows by the border width, or a
+  spinner freezes after one frame. Covers the Charm v2 stack; Go language conventions belong to the golang skill, and
+  language-agnostic workflow to the coding skill.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# charm-tui
+The Charm v2 stack is a different library from v1 behind the same names. Three biases decide most calls:
 
-Terminal UIs in Go with the Charmbracelet v2 stack: Bubble Tea (Elm-architecture framework), Bubbles (components), Lip
-Gloss (styling/layout), Huh (forms), Glamour (markdown), fang (CLI entry), log. This skill documents **v2 only** — model
-training data is saturated with v1 code, and v1 idioms either fail to compile or silently misbehave against v2. When in
-doubt, this skill and the local `go.mod` win over remembered API shapes.
+- **The module source outranks a remembered API shape.** Training data is saturated with v1, and a v1 idiom either fails
+  to compile against v2 or misbehaves silently. Read `go.mod`, then the module itself, before reaching for a signature.
+- **The View declares the terminal.** Every terminal feature is a field set on every render, never a program option and
+  never a command.
+- **`Update` is the only place state changes.** A command does its work on another goroutine and returns a message;
+  `Update` applies it.
 
-<critical-constraints>
+## Modules
 
-- **Import paths**: `charm.land/bubbletea/v2`, `charm.land/bubbles/v2/...`, `charm.land/lipgloss/v2`,
-  `charm.land/huh/v2`, `charm.land/glamour/v2`, `charm.land/fang/v2`, `charm.land/log/v2`. Exceptions on GitHub paths:
-  `github.com/charmbracelet/ultraviolet`, `github.com/charmbracelet/x/...`, `github.com/charmbracelet/colorprofile`.
-  `github.com/charmbracelet/bubbletea` and friends resolve to v1 — never import them.
-- **`View()` returns `tea.View`**, a struct — not a string. Wrap content with `tea.NewView(s)`.
-- **Terminal features are declarative View fields** set on every render (`v.AltScreen`, `v.MouseMode`, `v.Cursor`,
-  `v.WindowTitle`, …). There are no `tea.WithAltScreen()` options or `tea.EnterAltScreen` commands.
-- **Key presses arrive as `tea.KeyPressMsg`** (`tea.KeyMsg` is an interface that also matches releases). The space bar
-  is `"space"` in `msg.String()`, not `" "`.
-- **`Update` is pure**: no I/O or expensive work — do it in a `tea.Cmd`. Commands run on other goroutines and must never
-  mutate the model — they return a message; `Update` applies it.
+- **`charm.land/<name>/v2`** — bubbletea, bubbles, lipgloss, huh, glamour, fang, log, wish.
+- **`github.com/charmbracelet/...`** — ultraviolet, colorprofile, and every `x/...` package (`x/ansi`, `x/term`,
+  `x/editor`, `x/exp/golden`, `x/exp/teatest/v2`, `x/exp/charmtone`).
+- **`github.com/charmbracelet/bubbletea` and its siblings resolve to v1** — never import them. `charm.land/x/ansi` and
+  `charm.land/ultraviolet` do not resolve at all.
+- **The build error `module declares its path as charm.land/... but was required as github.com/charmbracelet/...` names
+  a stale import.** Fix the import, then run `go mod tidy`.
 
-</critical-constraints>
+## The Program
 
-## References
+- **`View()` returns `tea.View`, a struct.** Build it with `tea.NewView(content)`. The interface is `Init() Cmd`,
+  `Update(Msg) (Model, Cmd)`, `View() View`.
+- **Terminal features are `tea.View` fields** — `AltScreen`, `MouseMode`, `Cursor`, `WindowTitle`, `ReportFocus`,
+  `DisableBracketedPasteMode`, `BackgroundColor`, `ForegroundColor`, `ProgressBar`, `KeyboardEnhancements`, `OnMouse`.
+  No `tea.WithAltScreen()` option and no `tea.EnterAltScreen` command exists.
+- **Set every field on every return path of `View()`.** An early return that omits `v.AltScreen = true` leaves the
+  alternate screen for that frame.
+- **Doc comments inside the v2.0.x source still show the beta signature `Init() (Model, Cmd)`** — that form does not
+  compile. `Init` returns one value.
+- **`View()` runs after every `Update` and on the frame ticker.** Keep it free of I/O.
+- **Handle ctrl+c explicitly.** Raw mode delivers it as an ordinary key press, and nothing quits the program without a
+  `tea.Quit`.
 
-- **Bubble Tea core** — `${CLAUDE_SKILL_DIR}/references/bubbletea.md` — full tea.View field catalog, program options,
-  command/message catalogs, keyboard (Kitty enhancements) and mouse details, exec/suspend, errors/panics, framework
-  gotchas
-- **Bubbles components** — `${CLAUDE_SKILL_DIR}/references/bubbles.md` — per-component APIs (textinput, textarea,
-  viewport, table, list, spinner, progress, timer, filepicker, paginator, help, key), real-cursor wiring, component
-  gotchas
-- **Lip Gloss styling** — `${CLAUDE_SKILL_DIR}/references/lipgloss.md` — Style API, color system, measurement,
-  join/place layout, borders, layer compositing (overlays, hit-testing), table/tree/list sub-packages, standalone output
-  writers
-- **Huh forms + Glamour markdown** — `${CLAUDE_SKILL_DIR}/references/forms-and-markdown.md` — field types, validation,
-  dynamic forms, themes, accessibility, bubbletea embedding; glamour styles, options, viewport integration
-- **Architecture at scale** — `${CLAUDE_SKILL_DIR}/references/architecture.md` — the crush patterns: single-model
-  architecture, imperative children, ultraviolet hybrid rendering, dialog overlay stack, virtualized lists with render
-  caching, async/streaming integration
-- **Ecosystem and testing** — `${CLAUDE_SKILL_DIR}/references/ecosystem-and-testing.md` — fang, log, ultraviolet
-  positioning, x/ packages, golden View tests, teatest v2, tmux-driven verification
-
-## The Core Model
-
-Every Bubble Tea program is three methods on a model:
-
-```go
-package main
-
-import (
-    "fmt"
-    "os"
-
-    tea "charm.land/bubbletea/v2"
-)
-
-type model struct {
-    count int
-}
-
-func (m model) Init() tea.Cmd { return nil }
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    switch msg := msg.(type) {
-    case tea.KeyPressMsg:
-        switch msg.String() {
-        case "q", "ctrl+c":
-            return m, tea.Quit
-        case "space":
-            m.count++
-        }
-    case tea.MouseClickMsg:
-        if msg.Button == tea.MouseLeft {
-            m.count++
-        }
-    }
-    return m, nil
-}
-
-func (m model) View() tea.View {
-    v := tea.NewView(fmt.Sprintf("Count: %d\n\nspace/click to increment · q to quit\n", m.count))
-    v.AltScreen = true
-    v.MouseMode = tea.MouseModeCellMotion
-    return v
-}
-
-func main() {
-    if _, err := tea.NewProgram(model{}).Run(); err != nil {
-        fmt.Fprintln(os.Stderr, err)
-        os.Exit(1)
-    }
-}
-```
-
-- `Init() tea.Cmd` returns the first command (`nil` is fine). Some stale doc comments show a two-value `Init` signature
-  — it does not compile; the interface is `Init() Cmd`.
-- Set View fields on **every** return path of `View()` — a forgotten `v.AltScreen = true` on an early return exits the
-  alt screen for that frame.
-- ctrl+c is **not** handled automatically — raw mode delivers it as a key press; always handle it or users cannot
-  interrupt.
+Read [`${CLAUDE_SKILL_DIR}/references/bubbletea.md`] when a program option, a terminal query, an external process, or a
+Kitty keyboard feature is needed — it carries the full View field catalog, the program-option set, every
+request/response message pair, the exec and suspend API, and the panic and error contract.
 
 ## Commands and Messages
 
-- A `tea.Cmd` is `func() tea.Msg`. Do I/O inside, return a custom message type, mutate state in `Update` when it
-  arrives. Prefer named model methods over inline closures for commands.
-- Message-returning functions are passed **uninvoked**: `return m, tea.Quit` — not `tea.Quit()`. Same for `tea.Suspend`,
-  `tea.RequestWindowSize`, `tea.RequestBackgroundColor`, `tea.ClearScreen`.
-- `tea.Batch(cmds...)` runs concurrently with **no ordering guarantee**; `tea.Sequence(cmds...)` runs in order. Use
-  Sequence when order matters.
-- `tea.Tick`/`tea.Every` fire **once** — re-return the command from `Update` on each tick to keep a timer alive.
-- Inject external events with `p.Send(msg)` from any goroutine (pubsub bridges, servers, watchers).
-- `tea.Println`/`tea.Printf` output is invisible while AltScreen is active — debug with `tea.LogToFile` instead.
+- **Never mutate the model from a `tea.Cmd`.** A command runs on its own goroutine — do the I/O there, return a typed
+  message, and apply it in `Update`.
+- **Pass a message-returning function uninvoked**: `return m, tea.Quit`, never `tea.Quit()`. The same holds for
+  `tea.Suspend`, `tea.Interrupt`, `tea.ClearScreen`, `tea.RequestWindowSize`, and `tea.RequestBackgroundColor`.
+  Constructors that take arguments are called: `tea.Tick(d, fn)`, `tea.Println(s)`, `tea.ExecProcess(cmd, fn)`.
+- **`tea.Batch` runs its commands concurrently with no ordering guarantee; `tea.Sequence` runs them in order.**
+- **`tea.Tick` and `tea.Every` fire once.** Re-return the command from `Update` on every tick to keep a timer alive.
+  Both start their timer when the command is constructed, not when it runs.
+- **Inject an external event with `p.Send(msg)`** from any goroutine.
+- **`tea.Println` and `tea.Printf` produce nothing visible while `AltScreen` is set.** Debug through
+  `tea.LogToFile(path, prefix)`.
 
-## Input Handling
+## Input
 
-Match `tea.KeyPressMsg` and switch on `msg.String()` (`"enter"`, `"ctrl+c"`, `"space"`, `"up"`); field matching
-(`msg.Code == 'c' && msg.Mod == tea.ModCtrl`) is the foolproof alternative. For real applications, define a keymap of
-`key.Binding`s (`charm.land/bubbles/v2/key`) so bindings are declared once and the help view renders itself:
-
-```go
-keys := struct{ Up, Quit key.Binding }{
-    Up:   key.NewBinding(key.WithKeys("up", "k"), key.WithHelp("↑/k", "up")),
-    Quit: key.NewBinding(key.WithKeys("q", "ctrl+c"), key.WithHelp("q", "quit")),
-}
-// Update: case tea.KeyPressMsg: switch { case key.Matches(msg, keys.Up): ... }
-```
-
-Mouse: enable via `v.MouseMode`, match `tea.MouseClickMsg`/`MouseWheelMsg`/`MouseMotionMsg`. Paste arrives as
-`tea.PasteMsg`, never as a key message.
+- **Match `tea.KeyPressMsg`.** `tea.KeyMsg` is an interface covering presses and releases, so a `case tea.KeyMsg` runs
+  the handler twice per keystroke on a Kitty-protocol terminal.
+- **`msg.String()` names the space bar `"space"`.** `case " ":` compiles and never matches.
+- **`Key.Text` is empty for `enter`, `tab`, the function keys, and every modifier combination.** Match on `msg.String()`
+  or on `msg.Code`.
+- **Declare bindings as `key.Binding` values** from `charm.land/bubbles/v2/key` and match with `key.Matches(msg, b)`,
+  which is generic over `fmt.Stringer` and accepts a `tea.KeyPressMsg` directly. A binding's key names must equal the
+  `String()` names exactly: `"space"`, `"pgup"`, `"ctrl+left"`.
+- **Gate every Kitty feature on `tea.KeyboardEnhancementsMsg`** — `tea.KeyReleaseMsg`, `Key.IsRepeat`, and
+  `Key.ShiftedCode` arrive only where the terminal reports support.
+- **Enable the mouse through `v.MouseMode` and match the concrete message types** — `tea.MouseClickMsg`,
+  `tea.MouseWheelMsg`, `tea.MouseMotionMsg`. A `case tea.MouseMsg` placed ahead of them shadows all three.
+- **Paste arrives as `tea.PasteMsg`**, never as a key message.
 
 ## Styling
 
-- Lip Gloss `Style` is an immutable value — every setter returns a copy; build once, store, derive variants by
-  assignment. Under Bubble Tea, just return styled strings from `View()`; downsampling is automatic.
-- **Measure with `lipgloss.Width/Height(str)`** (ANSI- and wide-char-aware); **constrain with `Style.Width/Height(n)`**.
-  Never `len()` on styled strings; for cutting/truncating styled text use `github.com/charmbracelet/x/ansi`
-  (`ansi.Truncate`, `ansi.Cut`, `ansi.StringWidth`) — byte slicing corrupts escape sequences.
-- Compose layouts with `lipgloss.JoinHorizontal/JoinVertical(pos, blocks...)` and
-  `lipgloss.Place(w, h, hPos, vPos, content)`.
-- **Colors are explicit in v2** — there is no automatic light/dark adaptation and no `AdaptiveColor`. Bootstrap theme
-  detection through the event loop:
+- **`lipgloss.Style` is a value and every setter returns a copy.** Build a style once and derive variants by assignment.
+- **v2 has no `AdaptiveColor` and performs no light/dark detection.** Return `tea.RequestBackgroundColor` from `Init`,
+  read `msg.IsDark()` off `tea.BackgroundColorMsg`, and build every color through `lipgloss.LightDark(isDark)`.
+- **Hold every style in one semantic struct built from `isDark`** and thread it to the components. A color literal in
+  render code is a defect.
+- **`lipgloss.Color` never reports an error.** A malformed string yields `NoColor{}`, and an integer of 256 or more is
+  reinterpreted as a 24-bit RGB value — `lipgloss.Color("999")` renders as RGB(0, 3, 231).
+- **Measure with `lipgloss.Width` and `lipgloss.Height`; constrain with `Style.Width` and `Style.Height`.** `len()` over
+  styled text counts escape bytes.
+- **Cut styled text with `ansi.Truncate`, `ansi.Cut`, and `ansi.StringWidth`** from `github.com/charmbracelet/x/ansi`.
+  Byte slicing corrupts escape sequences.
+- **Never reach for the `compat` sub-package.** Its `AdaptiveColor` and `CompleteColor` query the terminal at import
+  time through package-level variables, which competes with Bubble Tea for stdin and fails over SSH.
 
-```go
-func (m model) Init() tea.Cmd { return tea.RequestBackgroundColor }
+Read [`${CLAUDE_SKILL_DIR}/references/lipgloss.md`] when compositing layers, hit-testing a click, building a gradient,
+or rendering a static table, tree, or list — it carries the Style API, the color system, the border set, the layer
+compositor, the sub-packages, and the standalone output writers.
 
-// Update:
-case tea.BackgroundColorMsg:
-    m.styles = newStyles(msg.IsDark()) // build all styles once from isDark
+## Layout
 
-func newStyles(isDark bool) styles {
-    lightDark := lipgloss.LightDark(isDark)
-    title := lipgloss.NewStyle().Foreground(lightDark(lipgloss.Color("#333"), lipgloss.Color("#eee")))
-    // ...
-}
-```
+- **Subtract the frame before rendering content**: `contentW := termW - style.GetHorizontalFrameSize()`. A bordered
+  panel costs two cells per axis.
+- **Size children from `tea.WindowSizeMsg`**, which arrives at startup and on every resize. Windows delivers no resize
+  event — re-query with `tea.RequestWindowSize` after an event that may have changed the size.
+- **`lipgloss.Place` never truncates.** Content larger than the box makes the call a no-op, so clamp with `MaxWidth` or
+  `MaxHeight` first.
+- **`lipgloss.JoinHorizontal` pads shorter blocks with unstyled spaces.** Set `Width` and `Height` on each block first
+  where the background must stay continuous.
+- **Size panels as a proportion of the terminal**, never as fixed cell counts.
+- **Truncate explicitly rather than relying on wrapping inside a fixed-size panel.** Emoji and some CJK glyphs occupy
+  one or two cells depending on the terminal, so keep variation-selector emoji out of width-critical chrome.
 
-- Centralize styles in one semantic struct built from `isDark`, threaded to components — no color literals scattered
-  through render code.
+## Components
 
-## Layout Discipline
+- **Every bubble is a value-type model — reassign the result**: `m.table, cmd = m.table.Update(msg)`. `Update` returns
+  the concrete type, so no assertion is needed.
+- **Never drop the `tea.Cmd` a component returns.** `Focus()` on textinput and textarea, `SetItems` on list,
+  `SetPercent` on progress, and `Tick` on spinner each return the command that starts blinking, filtering, animation, or
+  ticking.
+- **`table.Focus()` and `table.Blur()` return nothing.** Focus a table with `table.WithFocused(true)` or `Focus()` — an
+  unfocused table and an unfocused textinput ignore every message, which is what a dead component almost always is.
+- **Construct through `New()`, never as a struct literal.** spinner, timer, stopwatch, and progress messages carry an
+  instance ID, and a zero ID collides.
+- **Every `New()` hardcodes dark styles.** Apply `DefaultStyles(isDark)` after background detection — help, list,
+  textarea, and textinput take `isDark`; `table.DefaultStyles()` and `filepicker.DefaultStyles()` take no argument.
+- **Constructor shapes differ.** `viewport.New(viewport.WithWidth(w), viewport.WithHeight(h))` takes options and renders
+  nothing at zero size; `list.New(items, delegate, width, height)` takes its size positionally.
+- **`table.Column.Width` is a fixed int.** Compute column widths from the terminal width.
 
-- Subtract frame sizes **before** rendering content: `contentW := termW - style.GetHorizontalFrameSize()`. A bordered
-  panel consumes 2 cells per axis; forgetting this breaks every layout.
-- Track terminal size from `tea.WindowSizeMsg` (sent at startup and on resize) and size children from it. There are no
-  resize events on Windows.
-- Truncate explicitly (`ansi.Truncate`) instead of relying on wrap inside fixed-size panels.
-- Size panels with proportional weights from the terminal size, not fixed cell counts.
-- Emoji and some CJK render 1 or 2 cells depending on the terminal — avoid variation-selector emoji in width-critical
-  chrome.
-
-## Components (Bubbles)
-
-Value-type models: `New(...)` → forward messages with `m.child, cmd = m.child.Update(msg)` (returns the concrete type —
-reassign!) → compose `View()` strings. Interactive components need `Focus()` (returns a `tea.Cmd` — dispatch it) and
-silently ignore input when unfocused.
-
-- **textinput / textarea** — single/multiline input; styles set via `SetStyles(DefaultStyles(isDark))`
-- **viewport** — scrollable content window; zero-value size renders nothing — set dimensions before first render
-- **table** — navigable rows; needs `WithFocused(true)`; fixed column widths
-- **list** — filterable item list with batteries (pagination, spinner, help)
-- **spinner / progress / timer / stopwatch** — animated; keep re-returning their tick/frame commands
-- **help** — renders keymaps implementing `ShortHelp/FullHelp`
-- **filepicker / paginator / cursor** — file selection, page math, cursor primitive
-
-Every component defaults to **dark** styles — apply `DefaultStyles(isDark)` after background detection or light
-terminals render wrong. Full APIs and per-component gotchas: see the bubbles reference.
+Read [`${CLAUDE_SKILL_DIR}/references/bubbles.md`] when wiring a specific component — it carries the per-component API
+for textinput, textarea, viewport, table, list, spinner, progress, timer, stopwatch, filepicker, paginator, help, and
+key, plus the real-terminal-cursor wiring.
 
 ## Forms and Markdown
 
-- **Huh** for any form/prompt flow — standalone (`form.Run()`) or embedded in a bubbletea app (type-assert
-  `form.(*huh.Form)` after Update, wrap `form.View()` in `tea.NewView`, watch `form.State == huh.StateCompleted`). Bind
-  values with `.Value(&v)`. Themes: `WithTheme(huh.ThemeFunc(huh.ThemeCharm))`.
-- **Glamour** for markdown → styled terminal output:
-  `glamour.NewTermRenderer(glamour.WithStylePath("dark"), glamour.WithWordWrap(width))`. No auto style — pick
-  `"light"`/`"dark"` from detected background; match word wrap to the viewport width and re-render on resize.
+- **Reach for Huh for any prompt or form flow** rather than hand-building fields. Bind each result with `.Value(&v)`,
+  and read a keyed value only after `form.State == huh.StateCompleted`.
+- **Set a theme with `form.WithTheme(huh.ThemeFunc(huh.ThemeCharm))`.** `huh.ThemeCharm(isDark)` returns `*huh.Styles`,
+  which does not satisfy `huh.Theme` — huh's own upgrade guide shows that call, and it does not compile.
+- **Embedding a form takes two adaptations**: `form.Update` returns `(huh.Model, tea.Cmd)`, so type-assert back to
+  `*huh.Form`; `form.View()` returns a `string`, so wrap it in `tea.NewView`.
+- **A standalone form writes to stderr.** `WithProgramOptions` replaces the whole option slice and drops that default.
+- **Wire `form.WithAccessible(...)` in every real application.** Accessible mode is the only path for screen-reader
+  users, and `TERM=dumb` enables it on its own.
+- **`huh.ErrUserAborted` is the ctrl+c error from `form.Run()`.** Exit 130 on that error.
+- **Glamour v2 detects nothing.** Pass the style name explicitly and derive `"light"` or `"dark"` from
+  `tea.BackgroundColorMsg.IsDark()`.
+- **Match `glamour.WithWordWrap(n)` to the content width and rebuild the renderer on every `tea.WindowSizeMsg`.** A
+  renderer does not react to a resize.
+- **`glamour.WithStylePath` resolves a builtin style name first and falls back to reading the argument as a JSON file**,
+  so a misspelled style name surfaces as a file-read error.
+
+Read [`${CLAUDE_SKILL_DIR}/references/forms-and-markdown.md`] when building a form or rendering markdown — it carries
+every Huh field type with its builders, the dynamic-form binding rules, themes, layouts, accessible mode, and the
+Glamour option set.
 
 ## Architecture
 
-- **Small app (a screen, a few components)** — standard Elm composition: root model owns bubbles models, forwards
-  messages, concatenates views with lipgloss joins.
-- **Large app (screens, dialogs, streaming, long lists)** — the stack authors' production pattern (crush): exactly **one
-  `tea.Model`**; sub-components are plain structs with imperative methods (`Render(width) string`, mutators returning
-  `tea.Cmd`) that the root calls; do not nest models. One `switch msg.(type)` routes everything; focus state decides key
-  routing; dialogs are a stack drawn last and intercept input first.
-- Either way: create files to separate logic; keep it simple. Full at-scale patterns (ultraviolet buffers, overlay
-  stack, virtualized lists, streaming): see the architecture reference.
+- **One screen and a few components — compose in the standard Elm shape.** The root model owns the bubbles models,
+  forwards messages to them, and joins their view strings.
+- **Multiple screens, dialogs, streaming, or long scrollback — keep exactly one `tea.Model`.** Sub-components become
+  plain structs with imperative methods that the root calls: `Render(width int) string` and mutators returning
+  `tea.Cmd`. Never nest models; community tutorials teaching nested-model trees contradict the stack authors' own
+  production practice.
+- **One `switch msg.(type)` routes everything.** Focus state decides key routing, and dialogs draw last and take input
+  first.
+
+Read [`${CLAUDE_SKILL_DIR}/references/architecture.md`] when the application outgrows a handful of components — it
+carries the single-model contract, hybrid rendering into ultraviolet buffers, the dialog overlay stack, virtualized
+lists with render caching, and the async and streaming patterns.
+
+## CLI Entry and Logging
+
+- **`fang.Execute(ctx, rootCmd, opts...)` wraps a cobra root** with styled help and errors, `--version`, a hidden `man`
+  command, completions, and signal handling. It prints the styled error itself — exit on the returned error without
+  printing it again.
+- **Never write a log line to the terminal a running TUI owns.** Route logs to a file.
+- **`log.Fatal` calls `os.Exit(1)`**, so no deferred cleanup runs and the terminal is never restored. Keep it out of TUI
+  code paths.
+
+Read [`${CLAUDE_SKILL_DIR}/references/cli-and-logging.md`] when wiring a CLI entry point, configuring the logger, or
+drawing into an ultraviolet buffer — it carries the fang option set and its limits, the log API and its slog bridge, and
+the ultraviolet and `x/` package inventory.
 
 ## Testing
 
-- **Primary idiom — golden View tests**: render the component directly, compare with
-  `golden.RequireEqual(t, []byte(ansi.Strip(m.View())))` (`github.com/charmbracelet/x/exp/golden`); regenerate with
-  `go test -update ./...`. No `tea.Program` needed.
-- **Integration — teatest v2** (`github.com/charmbracelet/x/exp/teatest/v2`): drive a real program with
-  `tm.Type(...)`/`tm.Send(tea.KeyPressMsg{Code: tea.KeyEnter})`. Always pin `tea.WithColorProfile(colorprofile.Ascii)`
-  and `teatest.WithInitialTermSize(w, h)` for deterministic output.
-- To watch it live, run the binary in tmux and `tmux capture-pane -p` the rendered frames.
+- **Default to golden View tests.** Render the component and compare with `golden.RequireEqual(t, ansi.Strip(m.View()))`
+  from `github.com/charmbracelet/x/exp/golden`; regenerate with `go test -update ./...` and commit the result. A bubbles
+  component's `View()` returns a `string`; a `tea.Model`'s returns a `tea.View`, so pass `m.View().Content`.
+- **The golden path derives from `tb.Name()`.** Use one `t.Run` subtest per golden file, and expect a rename to orphan
+  its golden.
+- **Reserve `github.com/charmbracelet/x/exp/teatest/v2` for flows that need the event loop.** The non-`/v2` teatest does
+  not compile against bubbletea v2.
+- **Pin `tea.WithColorProfile(colorprofile.ASCII)` and `teatest.WithInitialTermSize(w, h)` in every teatest run.** The
+  renderer emits escape sequences into a non-TTY buffer otherwise, which breaks substring assertions.
+
+Read [`${CLAUDE_SKILL_DIR}/references/testing.md`] when writing the first test for a component or a program — it carries
+the golden-test harness, the teatest driving API, and the tmux capture loop for watching a TUI run.
 
 ## Application
 
-When **writing** charm TUI code:
+When **writing** Charm TUI code, apply these conventions silently — do not narrate a rule while following it. Read
+`go.mod` for the pinned versions and confirm an uncertain signature against the module source rather than memory. Where
+existing code contradicts a convention, follow the codebase and flag the divergence once.
 
-- Apply all conventions silently — don't narrate rules being followed
-- Check `go.mod` for the actual pinned versions before reaching for an API; verify uncertain signatures against the
-  vendored module or `pkg.go.dev/charm.land/...` rather than memory
-- If an existing codebase contradicts a convention, follow the codebase and flag the divergence once
+When **reviewing** Charm TUI code, cite the violation and show the fix inline. Do not lecture. Treat every v1 idiom as a
+defect, including the ones that look right.
 
-When **reviewing** charm TUI code:
-
-- Cite the specific violation and show the fix inline; don't lecture
-- Treat v1 idioms (`View() string`, `tea.KeyMsg` switches, `github.com/charmbracelet/bubbletea` imports,
-  `tea.WithAltScreen()`) as defects even when they "look right"
+```
+Bad:  "In v2 the terminal features moved onto the View struct, so the alt screen is..."
+Good: tea.NewProgram(m, tea.WithAltScreen()) -> v.AltScreen = true on every View() return
+```
 
 ## Integration
 
-The **golang** skill governs Go implementation (errors, naming, structure, toolchain); this skill governs the charm TUI
-stack. The lipgloss `table`/`tree`/`list` sub-packages render static output for plain CLIs too — reach for them before
-hand-formatting aligned terminal output.
+The **golang** skill governs every Go decision outside the Charm API — naming, error handling, testing conventions, and
+the toolchain — and wins on any question of how the Go code reads. This skill governs the Charm v2 stack. The **coding**
+skill governs workflow. All are active at once.
 
-**The renderer owns the terminal: state flows in as messages, the view is a pure declaration — code that fights either
-direction is wrong before it runs.**
+The lipgloss `table`, `tree`, and `list` sub-packages render static output with no Bubble Tea program — reach for them
+before hand-aligning terminal output in a plain CLI.
+
+**The terminal belongs to the renderer: state arrives as messages, and the view declares what should be on screen.**

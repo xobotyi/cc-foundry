@@ -6,7 +6,7 @@ Per-component API catalog for `charm.land/bubbles/v2` (v2.1.x). Requires `charm.
 ## Universal Component Lifecycle
 
 Every component is a value-type `Model` with `New(...)`, `Update(tea.Msg) (Model, tea.Cmd)` returning the **concrete
-type** (no type assertion needed), and `View() string`. Interactive components add `Focus() tea.Cmd` / `Blur()`.
+type** (no type assertion needed), and `View() string`.
 
 ```go
 var cmd tea.Cmd
@@ -14,13 +14,33 @@ m.table, cmd = m.table.Update(msg) // reassign — value semantics
 return m, cmd
 ```
 
+- Focus methods differ by component: `textinput.Focus()` and `textarea.Focus()` return a `tea.Cmd` (the blink command —
+  dispatch it), `table.Focus()` returns nothing, and `Blur()` returns nothing anywhere.
 - Size via methods: `SetWidth(w)`/`Width()`, `SetHeight(h)`/`Height()` (filepicker, help, progress, table, textinput,
   viewport; viewport also `SetYOffset()`/`YOffset()`).
 - `DefaultKeyMap()` is a function returning a fresh keymap (paginator, textarea, textinput).
-- **Every `New()` hardcodes dark styles.** Apply `DefaultStyles(isDark)` after background detection (see SKILL.md
-  theme-bootstrap pattern) — help, list (`NewDefaultItemStyles(isDark)` too), textarea, textinput take `isDark`;
-  `table.DefaultStyles()` takes no argument.
+- **Every `New()` hardcodes dark styles.** Apply `DefaultStyles(isDark)` after background detection — help, list
+  (`NewDefaultItemStyles(isDark)` too), textarea, textinput take `isDark`; `table.DefaultStyles()` and
+  `filepicker.DefaultStyles()` take no argument.
 - `runeutil` and `memoization` are internal packages — not importable.
+
+Theme bootstrap — detect the background once, build every style from the result, and pass the struct down:
+
+```go
+func (m model) Init() tea.Cmd { return tea.RequestBackgroundColor }
+
+// Update:
+case tea.BackgroundColorMsg:
+    m.styles = newStyles(msg.IsDark())
+    m.input.SetStyles(textinput.DefaultStyles(msg.IsDark()))
+
+func newStyles(isDark bool) styles {
+    lightDark := lipgloss.LightDark(isDark)
+    return styles{
+        Title: lipgloss.NewStyle().Foreground(lightDark(lipgloss.Color("#333"), lipgloss.Color("#eee"))),
+    }
+}
+```
 
 ## key — Bindings and Matching
 
@@ -47,7 +67,7 @@ case tea.KeyPressMsg:
 ## help
 
 - `help.New()`, then `help.Model.View(k help.KeyMap)` — the only bubble whose `View` takes an argument.
-- Your keymap satisfies `help.KeyMap` by implementing `ShortHelp() []key.Binding` and `FullHelp() [][]key.Binding`.
+- A keymap satisfies `help.KeyMap` by implementing `ShortHelp() []key.Binding` and `FullHelp() [][]key.Binding`.
 - `Model.ShowAll` toggles single-line vs full grid. Only `ShortHelpView` respects width — `FullHelpView` never
   truncates.
 - Styles: `DefaultStyles(isDark)` / `DefaultDarkStyles()` / `DefaultLightStyles()`.
@@ -55,7 +75,7 @@ case tea.KeyPressMsg:
 ## textinput
 
 - `textinput.New()` — prompt `"> "`, virtual cursor on, dark styles.
-- `Focus()` returns a `tea.Cmd` that starts cursor blink — **dispatch it, don't drop it**. `Blur()` returns nothing.
+- `Focus()` returns a `tea.Cmd` that starts the cursor blink — **dispatch it, never drop it**. `Blur()` returns nothing.
 - Styles are unexported: `s := textinput.DefaultStyles(isDark)`, mutate
   `s.Focused.Prompt/.Text/.Placeholder/ .Suggestion` (`Styles{Focused, Blurred StyleState; Cursor CursorStyle}`), then
   `ti.SetStyles(s)`.
@@ -95,7 +115,7 @@ case tea.KeyPressMsg:
 - **Unfocused tables ignore all messages** — a dead table is a missing `WithFocused(true)`/`Focus()`.
 - `SelectedRow()`, `Cursor()`/`SetCursor(n)`.
 - `SetStyles(Styles{Header, Cell, Selected})`; `DefaultStyles()` takes no `isDark`.
-- Column widths are fixed ints — no auto-sizing; compute from the terminal width yourself.
+- Column widths are fixed ints — no auto-sizing; compute them from the terminal width.
 - `KeyMap` satisfies `help.KeyMap`; `HelpView()` renders it.
 
 ## list
@@ -167,7 +187,7 @@ if didSelect, path := m.fp.DidSelectFile(msg); didSelect { m.chosen = path }
 
 - `paginator.New(paginator.WithTotalPages(n), paginator.WithPerPage(k))`; `Type`: `paginator.Dots` or
   `paginator.Arabic`.
-- Manual-list idiom: `p.SetTotalPages(len(items)); start, end := p.GetSliceBounds(len(items))` → slice your items.
+- Manual-list idiom: `p.SetTotalPages(len(items)); start, end := p.GetSliceBounds(len(items))` → slice the items.
 - `ActiveDot`/`InactiveDot` strings style the dots.
 
 ## Real Terminal Cursor
@@ -191,9 +211,9 @@ return v
 
 ## Gotchas
 
-- Dark styles are the universal default — light-terminal users see wrong colors until you apply `DefaultStyles(isDark)`
+- Dark styles are the universal default — light-terminal users see wrong colors until `DefaultStyles(isDark)` is applied
   after background detection.
-- Unfocused textinput/table silently ignore all messages — "component doesn't react" is almost always a focus bug.
+- Unfocused textinput/table silently ignore all messages — a component that does not react is almost always a focus bug.
 - Constructing component models as struct literals instead of `New()` breaks message routing — spinner/timer/
   stopwatch/progress messages carry instance IDs; a zero ID collides.
 - `list.New` takes positional width/height unlike the option-style constructors elsewhere.

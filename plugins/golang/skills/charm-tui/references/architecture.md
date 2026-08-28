@@ -1,18 +1,7 @@
 # TUI Architecture at Scale — the Crush Patterns
 
-How the stack's authors structure a large production TUI (crush, ~4300-line root model). Source of truth:
-`crush/internal/ui` and its `AGENTS.md`. Use these patterns when an app outgrows a handful of components — multiple
-screens, dialogs, streaming content, large scrollback.
-
-## Choosing an Architecture
-
-- **Small/medium app (one screen, a few bubbles)** — standard Elm composition: root model owns bubbles component models,
-  forwards messages via `m.child, cmd = m.child.Update(msg)`, concatenates `View()` strings with lipgloss. This is what
-  bubbletea's tutorials and examples teach; it scales fine to a page or two.
-- **Large app (screens, overlays, virtualized lists, streaming)** — the crush architecture: **exactly one `tea.Model`**.
-  Sub-components are plain stateful structs driven by imperative method calls; they do not participate in the Elm
-  message loop. Community tutorials teaching nested-model trees contradict upstream's production practice — prefer the
-  single-model pattern when scaling.
+How the stack's authors structure a large production TUI, drawn from crush. Use these patterns when an application
+outgrows a handful of components — multiple screens, dialogs, streaming content, large scrollback.
 
 ## Single-Model Architecture
 
@@ -27,8 +16,8 @@ Sub-components follow this contract:
 - Render via `Render(width int) string` or `Draw(scr uv.Screen, area uv.Rectangle)`.
 - Optionally use consumed-guard updates for input-hungry widgets:
   `func (c *Completions) Update(msg tea.KeyPressMsg) (tea.Msg, bool)` — the bool tells the root the key was consumed.
-- The root `Update` decides when and how to call into each component. Never use commands to send messages when you can
-  directly mutate children or state.
+- The root `Update` decides when and how to call into each component. Never use a command to send a message where a
+  direct mutation of a child or of state does the same job.
 
 Update-loop shape:
 
@@ -103,8 +92,8 @@ For long scrollback (chat logs, results), render only visible items and cache ag
   only for visible items.
 - List-level memo keyed by (item pointer, width, version). Items implement
   `{ Render(width int) string; Version() uint64; Finished() bool }`: embed a shared version counter and **`Bump()` on
-  every output-affecting mutation** — a forgotten Bump freezes a stale render until resize ("item won't update until
-  resize" is this bug). `Finished() == true` items are frozen and emitted verbatim.
+  every output-affecting mutation** — a forgotten Bump freezes a stale render until the next resize.
+  `Finished() == true` items are frozen and emitted verbatim.
 - Mutators early-return when the new state equals the old — preserves cache hits:
   `if f.focused == focused { return }; f.focused = focused; f.version.Bump()`.
 - Items additionally cache their own expensive renders keyed by width (two cache layers compose).
