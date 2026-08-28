@@ -1,13 +1,16 @@
 ---
 name: prompt-engineering
 description: >-
-  Writing instruction text that models read: one-shot requests, persistent context such as system prompts and CLAUDE.md
-  and skills, tool and schema descriptions, and prompts written for other model instances. Invoke whenever task involves
-  any interaction with AI instructions — writing, debugging, auditing, or improving prompts, skills, agent definitions,
-  output styles, or system configurations.
+  Write and debug instruction text on any surface: requests, standing context such as CLAUDE.md, tool and schema
+  descriptions, and prompts written for other model instances.
+when_to_use: >-
+  Invoke whenever instruction text is touched at all — writing, editing, reviewing, auditing, or debugging a prompt,
+  a system prompt, CLAUDE.md, a skill body, a tool or schema description, or a brief for another model instance.
+  Also invoke on the symptoms: a stated rule gets ignored, output is the wrong shape, a prompt grew too long, a tool
+  is called wrongly, an instruction went stale. Covers the instruction text itself; packaging an artifact belongs to
+  the engineering skills.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
-
-# Prompt Engineering
 
 **A model that reasons natively does not need to be taught how to think. It needs to be told what done looks like, and
 left alone.** Instruction text that explains, encourages, or supervises costs more than it buys — the model already does
@@ -104,8 +107,8 @@ every request for months — and because it is always present, you stop seeing i
 - **Deleting is not automatically safe.** Cutting a standing rule is the default move, but confirm the behavior it
   prevented does not return. A rule that earns its place survives this check; most do not.
 
-Why standing rules behave this way — U-shaped attention, instruction drift, constraint overload, and the
-declarative-over-procedural split: [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`].
+Read [`${CLAUDE_SKILL_DIR}/references/persistent-context.md`] when a standing rule is being added, cut, or defended — it
+carries U-shaped attention, instruction drift, constraint overload, and the declarative-over-procedural split.
 
 ### 3. Tool and schema text
 
@@ -132,9 +135,10 @@ Text you write for another model instance — a subagent, a pipeline stage, a ge
 - **Include a concrete output example**, not a description of one.
 - **Sanitize anything user-supplied** before it enters a generated prompt.
 
-Contract-first workflow, failure modes, trust boundaries for untrusted content, verifier delegation, and the
-self-containment check: [`${CLAUDE_SKILL_DIR}/references/delegated-prompts.md`]. This covers the text; whether to
-delegate at all, and how to scope the isolation, is a separate decision.
+Read [`${CLAUDE_SKILL_DIR}/references/delegated-prompts.md`] before writing a prompt another model instance will execute
+— it carries the contract-first workflow, the failure modes, trust boundaries for untrusted content, verifier
+delegation, and the self-containment check. It covers the text; whether to delegate at all, and how to scope the
+isolation, is a separate decision.
 
 ## The instruction budget
 
@@ -177,8 +181,9 @@ context to fix a wrong answer is the wrong reflex.
 - **Cut before you add.** When an answer is wrong at high volume, the reflex to add clarifying context is backwards; the
   first move is removing material that is present but not load-bearing.
 
-Document templates, chunking strategies, quote-grounding patterns, and the point where this stops being a prompt
-problem: [`${CLAUDE_SKILL_DIR}/references/long-context.md`].
+Read [`${CLAUDE_SKILL_DIR}/references/long-context.md`] when a prompt carries documents, or when answers degrade as the
+prompt grows — it carries document templates, chunking strategies, quote-grounding patterns, and the point where this
+stops being a prompt problem.
 
 ## Wording
 
@@ -241,8 +246,8 @@ system-authority source and complies. **A stale instruction is not ignored — i
 **This buys durability, not compliance.** Tense has no measured effect on instruction-following. Write timeless to keep
 the artifact true, not to make the model obey harder.
 
-Deictic-vs-domain table, both-direction failure modes, and the evidence:
-[`${CLAUDE_SKILL_DIR}/references/timelessness.md`].
+Read [`${CLAUDE_SKILL_DIR}/references/timelessness.md`] when a temporal word is ambiguous between a moving referent and
+domain time — it carries the deictic-vs-domain table, both-direction failure modes, and the evidence.
 
 ## Formatting
 
@@ -260,8 +265,9 @@ as one thing or several.
 - **Ordered procedure → numbered list.** Only where sequence changes the outcome.
 - **Everything else → bullets.** If items reorder without changing meaning, they are bullets.
 
-Misusing a table for independent entries is the most common formatting defect and the cheapest to fix. Selection depth,
-and why a rigid output schema costs reasoning quality: [`${CLAUDE_SKILL_DIR}/references/structured-data-formats.md`].
+Misusing a table for independent entries is the most common formatting defect and the cheapest to fix. Read
+[`${CLAUDE_SKILL_DIR}/references/structured-data-formats.md`] when the shape choice is contested, or when an output
+schema is being imposed — it carries selection depth and why a rigid schema costs reasoning quality.
 
 ### Marking regions with tags
 
@@ -294,9 +300,9 @@ result overshoots — and the overshoot is invisible, because the output looks l
   for another recommends explicit interval checks with fresh-context verifier subagents on long-horizon runs. Both hold;
   the split is by task horizon.
 
-Whether a named technique is worth reaching for at all — CoT, few-shot, self-consistency, Tree-of-Thoughts, ReAct, PAL,
-Reflexion, personas, chaining, meta-prompting, APE, DSPy, XML tags, prefilling:
-[`${CLAUDE_SKILL_DIR}/references/superseded-techniques.md`].
+Read [`${CLAUDE_SKILL_DIR}/references/superseded-techniques.md`] before adopting a named technique — CoT, few-shot,
+self-consistency, Tree-of-Thoughts, ReAct, PAL, Reflexion, personas, chaining, meta-prompting, APE, DSPy, XML tags,
+prefilling — it says which are still worth reaching for.
 
 ## Instructions are followed exactly
 
