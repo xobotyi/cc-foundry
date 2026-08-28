@@ -115,7 +115,8 @@ comes out, and under 20% means sentences were edited where paragraphs should hav
 
 **Use when:** Auditing or tightening an existing prompt that has accumulated bloat through many edits, or when adherence
 to prompt rules feels unreliable and verbose wording may be competing for attention — skills, system prompts, output
-styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead).
+styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead). Run it explicitly —
+the skill is user-invoked, so Claude does not reach for it on its own.
 
 ## Output Styles
 

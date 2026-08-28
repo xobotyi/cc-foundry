@@ -24,7 +24,8 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   with U-curve discipline, narrative-vs-structural distinction, three-check falsification gate (verbosity-type →
   terseness → behavior preservation), and a bracketing preservation inventory that verifies load-bearing literals
   survive the cuts. Surviving narrative is rewritten rather than kept; borderline cuts go by default onto a restore list
-  the caller draws from
+  the caller draws from. User-invoked only (`disable-model-invocation`) — its triggers sit inside
+  `prompt-engineering`'s, so leaving it in the routing pool only produced a contest it could not win
 
 ## Output Styles
 
