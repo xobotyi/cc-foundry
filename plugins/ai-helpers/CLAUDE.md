@@ -14,8 +14,10 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   compaction limits, and the supply-chain rules for publishing or installing a skill
 - **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
   evaluation, troubleshooting; false-positive calibration for reviewing agents and the mutating-agent isolation rule
-- **`output-style-engineering`** — design output styles injected into the system prompt: role and voice framing,
-  intent-carrying rules, voice in rules instead of examples, non-coding domains, evaluation framework
+- **`output-style-engineering`** — design output styles injected into the system prompt: choosing the style mechanism
+  over CLAUDE.md or a hook, setting `keep-coding-instructions`, verifying injection with a canary, role framed as
+  outcome instead of credentials, intent-carrying rules, and voice in rules instead of examples. Carries the file spec
+  and built-in catalog, the creation patterns, the scoring dimensions, and the iteration diagnostics
 - **`prompt-terser`** — adherence-driven terseness audit for iteratively-edited prompts: same-thought-fewer-words cuts
   with U-curve discipline, narrative-vs-structural distinction, three-check falsification gate (verbosity-type →
   terseness → behavior preservation), and a bracketing preservation inventory that verifies load-bearing literals

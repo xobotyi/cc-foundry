@@ -1,326 +1,137 @@
 ---
 name: output-style-engineering
-description: "Design Claude Code output styles: role, voice, and behavioral rules injected into the system prompt. Invoke whenever task involves any interaction with output styles — creating, editing, evaluating, or changing how Claude communicates."
+description: >-
+  Design and maintain Claude Code output styles: choosing the mechanism, setting the frontmatter, and writing the role,
+  voice, and rules the style installs in the system prompt.
+when_to_use: >-
+  Invoke whenever an output style is touched at all — creating, editing, auditing, reviewing, or debugging one, or
+  deciding whether a behavior change belongs in a style. Also invoke on the symptoms: a style has no effect, the
+  register reverts to the default, one rule over-applies, or software-engineering assumptions leak into a non-coding
+  domain. Covers the output-style artifact; the wording of its instructions belongs to prompt-engineering, and the
+  skill artifact belongs to skill-engineering.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Output Style Engineering
-
-Output styles modify Claude Code's system prompt. A custom style removes the default software engineering section
-(unless `keep-coding-instructions: true`), then appends its own instructions to the end of the prompt. Styles hold two
-powers no alternative has: they turn part of the default prompt off, and the harness reinforces them with adherence
-reminders during the conversation.
+**An output style modifies the system prompt.** It holds two powers no alternative has: it turns part of the default
+prompt off, and the harness reinforces it with adherence reminders through the conversation. Every other file-based
+mechanism only adds text, and then competes with the default it could not remove.
 
 <prerequisite>
-**Output styles are system prompts.** Before creating or improving
-an output style, invoke `prompt-engineering` to load instruction design techniques.
-
-```
-Skill(ai-helpers:prompt-engineering)
-```
-
-Skip only for trivial edits (typos, formatting).
-
+An output style is a system prompt. Invoke `prompt-engineering` for the wording, instruction budget, and timelessness
+rules that govern every line written here. This skill covers only what is specific to the output-style artifact — the
+mechanism choice, the frontmatter, and the register the style installs.
 </prerequisite>
 
-## Route to Reference
-
-- **File format, frontmatter, storage, activation** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] Frontmatter fields
-  (incl. `force-for-plugin`), remove-vs-preserve semantics, storage paths and nested resolution, activation methods,
-  scope priority, session timing, adherence reminders, compaction behavior, token impact, built-in styles catalog,
-  feature comparison table, Agent SDK system prompt approaches (4 methods)
-- **Creating a style from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Why styles beat additive
-  mechanisms, creation methods (manual, SDK), creation workflow with subtraction discipline, style pattern templates
-  (direct professional, domain specialist with non-coding use cases, interaction mode, learning/educational with
-  voice-first design), per-model calibration, token impact, common failure modes
-- **Evaluating style quality** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Scope appropriateness pre-check,
-  per-dimension scoring rubrics (1-10) incl. scaffolding debt, weighted scoring formula, injection canary, testing
-  protocol, deployment readiness go/no-go, red flags
-- **Style not working, needs refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Injection and mechanism
-  checks, diagnostic symptom→fix mapping (overtriggering, over-verification, contradiction instability, drift),
-  refinement techniques (contrast, consolidation, subtraction), migration discipline, rewrite vs iterate criteria
-- **Real-world examples with analysis** — [`${CLAUDE_SKILL_DIR}/references/examples.md`] 5 complete styles with
-  dimensional scoring and improvement notes — includes non-coding examples (SaaS analyst, content strategist)
-- **Exactly what `keep-coding-instructions` removes** — [`${CLAUDE_SKILL_DIR}/references/coding-instructions.md`]
-  Verbatim `# Doing tasks` section extracted from the binary (v2.1.233), the sections the flag cannot touch, the
-  classic-vs-lean prompt split and the model list where the flag is inert, re-derivation procedure for newer versions
-
-## What Output Styles Change
-
-**Removed from the system prompt:**
-
-- The `# Doing tasks` section (SE task framing, scope discipline, comment policy, UI verification) — removed by custom
-  styles unless `keep-coding-instructions: true`. This is the only removal, and it does not happen at all on lean-prompt
-  models (Opus 4.8, Opus 5, Fable 5) — see `references/coding-instructions.md`
-
-**Added:**
-
-- The style body, appended to the end of the system prompt
-- Harness-injected adherence reminders during the conversation — delivery varies by model (Sonnet 5 sessions stopped
-  using the mid-conversation `system` role in v2.1.201)
-
-**Preserved regardless of style:**
-
-- `# Tone and style` — including "responses should be short and concise" and the no-emoji rule. Not removable by any
-  style. To override it, claim precedence explicitly in the body: the built-in `Concise` closes with a clause giving its
-  own rules priority over the general communication and formatting guidance, and that clause is the only reason its
-  formatting beats the defaults
-- `# Executing actions with care` — destructive-action caution and confirmation defaults
-- `# System` and `# Using your tools` — output rendering, permission modes, prompt-injection warning, tool selection
-- All tools (Read, Write, Bash, Grep, etc.)
-- CLAUDE.md project context system
-- Subagent delegation and skills
-- MCP integrations
-- Environment context (working directory, git status)
-
-**Scope and lifetime:**
-
-- Main conversation only — a subagent runs its own system prompt; a fork inherits the parent's full prompt, style
-  included
-- Fixed at session start for prompt-cache prefix stability; changes take effect after `/clear` or a new session
-- Immune to compaction — the style lives in the system prompt, unlike skill instructions in conversation history
-
-**Key distinction from other features:**
-
-- **Output style** — modifies the system prompt: removes default sections, appends instructions; harness reinforces
-  adherence
-- **CLAUDE.md** — added as a user message after the system prompt; cannot remove default behaviors
-- **`--append-system-prompt`** — appends without removing anything
-- **Agents (subagents)** — separate system prompt, model, and tools for a scoped task
-- **Skills** — task-scoped instructions loaded on demand; subject to compaction
-
-Output styles are the only file-based way to remove parts of the default system prompt.
-
-## `keep-coding-instructions`
-
-Controls one section of the default prompt: `# Doing tasks` — SE task framing, scope discipline, comment policy, UI
-verification. Verbatim text: [`${CLAUDE_SKILL_DIR}/references/coding-instructions.md`].
-
-- `false` (default) — removes that section. Use for non-coding domains (research, content, UX design)
-- `true` — keeps it. Use when the style changes how Claude communicates but it still codes
-
-**Rule:** if the style is for someone who writes code, set `true`. If the style replaces coding with another domain, set
-`false`.
-
-**It does not remove safety or tone guidance** — destructive-action caution and the conciseness rules live in sections
-no style can touch.
-
-**It is inert on lean-prompt models** — Opus 4.8, Opus 5, and Fable 5 never receive `# Doing tasks`, so neither value
-changes their prompt. Sonnet 5 and Haiku still get the classic prompt, so the flag is live there. A non-coding style
-must carry its own domain switch in the body rather than relying on removal.
-
-## File Structure
-
-```
-~/.claude/output-styles/           # User-level (all projects)
-.claude/output-styles/             # Project-level (nested dirs load too)
-<managed settings dir>/.claude/output-styles/  # Managed policy
-<plugin>/output-styles/            # Plugin-shipped
-```
-
-Filename becomes the style identifier (without `.md`) unless frontmatter `name` overrides it. Every
-`.claude/output-styles/` between the working directory and the repository root loads; on a name conflict the directory
-closest to the working directory wins (v2.1.178+). Plugin styles can auto-apply via `force-for-plugin`. Activate via
-`/config` → **Output style**, or the `outputStyle` setting — the standalone `/output-style` command was removed in
-v2.1.91.
-
-**Injection can fail silently (issue #47482):** on v2.1.104 a user-level style selected through the `outputStyle`
-setting dropped its body whenever frontmatter was present — `name` alone was enough — while the picker still showed the
-style active. Not reproducible for plugin-shipped styles on current builds: both styles in this marketplace carry
-`name`, `description`, and `keep-coding-instructions` and inject correctly. The failure is silent either way, so verify
-with a canary: add a marker rule, run `claude -p "say ok"`, confirm the marker fires.
-
-Full format details, frontmatter fields, activation methods, Agent SDK integration: see
-[`${CLAUDE_SKILL_DIR}/references/spec.md`].
-
-## Writing Style Instructions
-
-An output style body is a system prompt for a frontier model. Current models follow the system prompt closely and
-literally — every instruction executes with precision, including stale ones, and contradictions produce instability, not
-averaging. The craft is subtraction and clarity, not scaffolding.
-
-### 1. Frame the Role as Outcome and Perspective
-
-Skip persona theater — invented credentials add nothing and can over-constrain. State what Claude is doing, for whom,
-and from what perspective.
-
-**Persona theater (cut):** "You are a world-class senior architect with 12+ years of experience."
-
-**Outcome and perspective (works):** "You review designs for operational risk. The reader is the on-call engineer;
-optimize for what they must know before deploying."
-
-For voice, describe it in 5–7 sentences of adjective contrasts — they beat trait lists: "Sharp and warm, not chirpy.
-Direct without being curt. Uses contractions. Never opens with an apology."
-
-### 2. Write Rules That Carry Intent
-
-State the outcome you want and why — intent survives model upgrades; compensations for old failure modes don't.
-
-**Compensation (ages badly):** "Never write multi-paragraph explanations. One short line max."
-
-**Intent (holds):** "Match explanation depth to what the reader needs to act — a lookup gets a line, a tradeoff gets a
-paragraph."
-
-Reserve "never X" for a demonstrated failure mode the model cannot reason its way out of. Dial back aggressive language:
-"CRITICAL: You MUST..." causes overtriggering on current models — "Do X when Y" is enough.
-
-### 3. Carry the Voice in Rules, Not Examples
-
-Describe the register and let the rules hold it. Three of the four built-in styles ship no examples at all, and current
-models follow a described voice literally — an example is a second, competing specification of the same thing, and the
-model anchors to the sample over the rule. Worked examples of _behavior_ — tool use, workflows, step sequences — are
-worse still: they narrow exploration to the demonstrated path. Encode behavior in rules and interfaces.
-
-Add a tone contrast pair only after the register has demonstrably failed in a real session, for that interaction, and
-delete it once a rule covers the case. An exemplar is a remedy, not a component.
-
-### 4. Specify Output Format
-
-Define the response shape per response type. Format contracts are followed literally — specify only what you want
-applied everywhere, and state scope explicitly ("every section, not just the first").
-
-### 5. State Each Rule Once, Where It Belongs
-
-The harness reminds Claude to adhere to the style — persistence blocks, "maintain throughout" clauses, and rules
-repeated across sections duplicate that mechanism and cause overtriggering or contradiction. Add a priority hierarchy
-only when rules genuinely conflict; prefer removing the conflict. Rules that must never break (no emoji in output,
-banned commands) belong in hooks — deterministic enforcement, not prose.
-
-### Subtract Before Adding
-
-Apply the deletion test to every instruction: if removing it doesn't change output, remove it. Legacy scaffolding —
-persistence blocks, thoroughness nudges, verification directives, anti-laziness modifiers — actively harms current
-models: over-verification, overtriggering, stilted output. Keep the body lean; a style under ~200 lines outperforms a
-manual. Calibrate to the target model: each release ships a prompting guide documenting its defaults (verbosity, tool
-eagerness); check it before tuning.
-
-## Common Style Patterns
-
-- **Direct Professional** — remove sycophancy, focus on substance. Set `keep-coding-instructions: true`.
-- **Domain Specialist** — replace coding expertise with domain knowledge. Set `keep-coding-instructions: false`.
-- **Interaction Mode** — change engagement style (voice-first, quiz, pair programming). Set `keep-coding-instructions`
-  based on whether the mode involves coding.
-- **Learning/Educational** — collaborative mentoring with guided exercises. Set `keep-coding-instructions: true`.
-
-Full templates for each pattern: see [`${CLAUDE_SKILL_DIR}/references/creation.md`]. Scored examples: see
-[`${CLAUDE_SKILL_DIR}/references/examples.md`].
-
-## Evaluating Style Quality
-
-**First: verify scope appropriateness.** Before scoring dimensions, confirm the style needs to be an output style — not
-CLAUDE.md, not `--append-system-prompt`, not a skill. If the style body could work identically as CLAUDE.md content, it
-should not be a style.
-
-Six dimensions, two weighted 2x (high-leverage):
-
-- **Role & Voice Clarity (2x)** — is the role framed as outcome and perspective? Does a voice description with contrasts
-  pin the register?
-- **Rule Intent (2x)** — does each rule state the desired outcome (with rationale where non-obvious)? Are "never" rules
-  backed by demonstrated failure modes?
-- **Exemplar Discipline (1x, inverse)** — every example present lowers the score unless an observed register failure
-  justifies it, and a behavior demo lowers it further. Zero examples scores full marks
-- **Output Format (1x)** — would Claude know how to structure each response type?
-- **Scaffolding Debt (1x, inverse)** — persistence blocks, repeated rules, verification directives, MUST/CRITICAL
-  language: each present item lowers the score
-- **Scope (1x)** — is `keep-coding-instructions` set right? Does the style know what it's for?
-
-**Must have:** role framed, voice described with contrasts, rules carry intent, output format specified, injection
-verified (canary).
-
-Detailed per-dimension scoring rubrics and testing protocol: see [`${CLAUDE_SKILL_DIR}/references/evaluation.md`].
-
-## Iterating on Styles
-
-### Iteration Cycle
-
-```
-Observe → Diagnose → Hypothesize → Modify (ONE change) → Test → Repeat
-```
-
-Make ONE targeted change per iteration. Multiple changes make debugging impossible.
-
-### First: Verify Injection and Mechanism
-
-Before touching the body: confirm the style actually loads (canary test — the loader silently drops the body on a
-filename/`name` case mismatch), and confirm the right mechanism is in use — instructions in CLAUDE.md or a hook lose
-influence over turns and cannot remove default behaviors; iteration cannot fix a mechanism mismatch.
-
-### Common Issues and Fixes
-
-- **Style not applied at all** — body never injected. Run the canary first; no body edit helps until it passes.
-- **Reverts to default register** — voice underspecified. Sharpen the contrast-based voice description first; add a tone
-  contrast pair for the failing interaction only if the description alone will not hold it. Not repetition.
-- **Rule followed too literally / over-applied** — aggressive language (MUST, CRITICAL, "always") overtriggers. Dial
-  back to plain conditions.
-- **Over-verification, stalling, self-checking loops** — legacy verification or thoroughness directives. Delete them;
-  the model verifies by default.
-- **Contradictory behavior** — duplicated or conflicting rules. Remove the duplicate rather than adding a hierarchy;
-  hierarchy only for genuine tradeoffs.
-- **Too verbose / dense jargon** — describe the target register positively (audience, depth per response type) rather
-  than stacking "don't" rules; request length explicitly.
-- **Ignores format** — format buried in prose. Move to a dedicated section with a response template.
-- **SE assumptions leak** — `keep-coding-instructions` not set to `false` for a non-coding style.
-
-Detailed fix patterns with before/after: see [`${CLAUDE_SKILL_DIR}/references/iteration.md`].
-
-## Built-in Styles
-
-- **Default** — standard Claude Code system prompt. Software engineering focus. Active when no style selected.
-- **Proactive** — executes immediately, assumes instead of pausing on routine decisions, prefers action over planning.
-  Works without changing the permission mode.
-- **Explanatory** — inserts educational "Insight" blocks alongside task completion. Explains implementation choices.
-- **Learning** — collaborative learn-by-doing mode. Adds `TODO(human)` markers for hands-on practice.
-
-## Quick Start
-
-```bash
-mkdir -p ~/.claude/output-styles
-```
-
-Create `style-name.md`:
-
-```markdown
----
-name: style-name
-description: Brief description for the /config picker
-keep-coding-instructions: true
----
-
-# Style Name
-
-[What Claude is doing, for whom, from what perspective]
-
-## Voice
-
-[5–7 sentences of adjective contrasts]
-
-## Rules
-
-- [Outcome-stating rules, each with intent]
-
-## Response Format
-
-[Shape per response type]
-```
-
-Activate: `/config` → **Output style** → pick the style (or set `outputStyle` in settings). Verify injection with a
-canary before iterating on content.
-
-## Quick Checks
-
-Before deploying:
-
-- [ ] Role framed as outcome and perspective (no invented credentials)
-- [ ] Voice described with adjective contrasts
-- [ ] Every rule states intent; "never" rules backed by observed failures
-- [ ] No examples, or each one justified by an observed register failure — never a behavior demo
-- [ ] Output format specified per response type
-- [ ] No persistence blocks, repeated rules, or MUST/CRITICAL language
-- [ ] Deletion test passed — every instruction changes output
-- [ ] `keep-coding-instructions` set explicitly
-- [ ] Injection verified with a canary; tested with varied prompts (simple, complex, emotional)
-
-## Related Skills
-
-- `prompt-engineering` — load first for instruction design techniques (output styles are system prompts)
-- `skill-engineering` — skills and output styles complement each other; skills load on demand, styles are always-on
-- `subagent-engineering` — subagents have their own system prompts; output styles govern the main agent only
+## Choose the mechanism first
+
+- **Use a style when the role or the register must change and hold for a whole session.** The body lives in the system
+  prompt, so it survives compaction, and the harness reminders carry adherence without persistence prose in the body.
+- **Additive mechanisms stay additive.** CLAUDE.md arrives as a user message after the system prompt, and
+  `--append-system-prompt` appends for one session; neither removes the default the body is arguing with. A body that
+  would work identically as CLAUDE.md content is not a style.
+- **Route the rest away.** A rule that must never break belongs in a hook — prose steers, the lifecycle mechanism
+  enforces. A procedure a user invokes belongs in a skill. Work that needs an isolated context belongs in a subagent: a
+  style governs the main conversation only, and a subagent runs its own system prompt, while a fork inherits the
+  parent's prompt with the style included.
+- **A style shapes Claude's prose, not tool output.** Bash output, file contents, and MCP results reach the user
+  unchanged, so a format complaint about them is never a style defect.
+- **`# Tone and style` is never removable** — the conciseness rule and the no-emoji rule included. A style that must
+  beat those defaults claims precedence explicitly in the body, in a clause giving its own rules priority over the
+  general communication and formatting guidance. Without that clause the defaults win.
+
+File format, frontmatter fields including `force-for-plugin`, storage paths and nested resolution, activation methods,
+scope priority, the built-in catalog, the comparison against related features, and Agent SDK integration:
+[`${CLAUDE_SKILL_DIR}/references/spec.md`]. Read it when writing the file, deciding where it lives, or loading a style
+through the SDK.
+
+## Set `keep-coding-instructions` deliberately
+
+- **It gates exactly one section, `# Doing tasks`** — software-engineering task framing, scope discipline, comment
+  policy, UI verification. Nothing else in the prompt responds to it.
+- **Set `true` when the style changes how Claude communicates and it still codes, `false` when the style replaces coding
+  with another domain.** The default is `false`, so a tone-only style that omits the field drops the coding discipline
+  without meaning to.
+- **It removes no safety or tone guidance.** Destructive-action caution and the conciseness rules sit in sections no
+  style touches, so `false` is never the way to reach them.
+- **It is inert on lean-prompt models.** Opus 4.8, Opus 5, and Fable 5 never receive `# Doing tasks`, while Sonnet 5 and
+  Haiku still get the classic prompt. A non-coding style must carry its own domain switch in the body rather than rely
+  on removal, and stays unverified until it is tested on both paths.
+- **Under `true`, the body states deltas only.** A body that restates scope discipline or comment policy duplicates the
+  section it just kept. Own those rules under `false`, or state nothing about them under `true`.
+
+The verbatim gated text, the sections the flag cannot touch, the model roster for each prompt path, and the
+re-derivation procedure for a newer build: [`${CLAUDE_SKILL_DIR}/references/coding-instructions.md`]. Read it when the
+body may duplicate the gated section, or when the flag's effect on a specific model is in question.
+
+## Verify injection before editing the body
+
+- **Injection can fail silently while the picker still shows the style active.** Add a marker rule, run
+  `claude -p "say ok"` — a fresh session, because the style is fixed at session start — confirm the marker fires, then
+  remove it. Until the canary passes, the body being edited is not in the prompt and no behavioral result means
+  anything.
+
+The file skeleton, the creation workflow, and the four style patterns — direct professional, domain specialist,
+interaction mode, learning — with the `keep-coding-instructions` value each one needs:
+[`${CLAUDE_SKILL_DIR}/references/creation.md`]. Read it before drafting, because the pattern decides the structure.
+
+## Frame the role and the voice
+
+- **State the role as outcome and perspective, never as credentials.** "You review designs for operational risk; the
+  reader is the on-call engineer" tells the model what to optimize for. "World-class architect with 12+ years" adds
+  nothing and over-constrains.
+- **Pin the register with five to seven sentences of adjective contrast** — "Sharp and warm, not chirpy. Direct without
+  being curt. Uses contractions." Bare adjectives leave the register to inference, and two readers of "professional"
+  imagine different behavior.
+- **Carry the voice in rules, not examples.** Three of the four built-in styles ship no examples at all; a current model
+  follows a described voice literally, and an example is a second specification of the same thing that the model anchors
+  to over the rule.
+- **A behavior example is worse than a tone example.** Worked tool use, workflows, and step sequences narrow exploration
+  to the demonstrated path. Reach for a tone contrast pair only after the description failed on a real interaction, and
+  delete it once a rule covers the case.
+
+## Write rules that state intent
+
+- **State the outcome wanted, not the failure being compensated for.** "Match explanation depth to what the reader needs
+  to act" survives a model upgrade; "never write multi-paragraph explanations" executes with precision on a model that
+  never had the flaw.
+- **Reserve "never X" for a failure mode observed on the current model** that it cannot reason its way out of.
+- **Drop MUST and CRITICAL.** Aggressive emphasis overtriggers — unusably curt answers, depth refused where depth was
+  asked for. "Do X when Y" is enough.
+- **Pair every blocklist with the positive register that replaces it.** A prohibition-only rule set produces curt,
+  stilted output, because the model executes the prohibitions literally and has nothing to execute in their place.
+- **State each rule once, in the section that owns it.** The harness already injects adherence reminders, so persistence
+  blocks, "maintain throughout" clauses, and rules repeated across sections duplicate that mechanism and cause
+  overtriggering or contradiction.
+- **Remove a contradiction instead of arbitrating it.** The model treats the body as a contract and tries to satisfy
+  both clauses, failing unpredictably rather than averaging. Add a priority hierarchy only where both sides are
+  load-bearing.
+- **Specify the response shape per response type, and state the contract's scope.** Format contracts are followed
+  literally, so "every section, not just the first" decides whether the format applies once or everywhere.
+- **Apply the deletion test to every line.** An instruction whose removal does not change output is removed. Legacy
+  scaffolding — persistence blocks, thoroughness nudges, verification directives, anti-laziness modifiers — actively
+  harms current models.
+- **Keep the body under roughly 200 lines.** A style is a register layer, not a manual; length past that signals content
+  that belongs in CLAUDE.md, a skill, or a hook.
+
+Five complete styles with dimensional scores and improvement notes, non-coding domains included:
+[`${CLAUDE_SKILL_DIR}/references/examples.md`]. Read it when a scored style for the chosen pattern is wanted as a
+baseline for a draft.
+
+The scope pre-check, the six weighted scoring dimensions, the testing protocol, deployment go/no-go, and the red flags:
+[`${CLAUDE_SKILL_DIR}/references/evaluation.md`]. Read it when scoring a style, or before other people depend on one.
+
+## Iterate by subtraction
+
+- **Ask what to delete before asking what to add.** A misbehaving style more often carries an instruction that is
+  present — stale, duplicated, over-emphasized — than one that is missing.
+- **Make one change per cycle.** Several changes at once make the result undiagnosable. Re-run the failing prompt first,
+  then the full protocol to catch regressions.
+- **Recalibrate on a model migration.** Compensations for an older model's failure modes execute with precision on a
+  newer one and distort output. Subtract them before adding anything, and check the target model's own prompting guide
+  for its defaults.
+- **Rewrite instead of iterating when subtracting the scaffolding would leave no style**, when the role is wrong for the
+  use case, or when the style was built for the wrong mechanism.
+
+The symptom-to-cause-to-fix map, the refinement patterns, migration to a new model generation, and the
+rewrite-versus-iterate criteria: [`${CLAUDE_SKILL_DIR}/references/iteration.md`]. Read it when a deployed style
+misbehaves.
