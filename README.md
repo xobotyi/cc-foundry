@@ -103,11 +103,13 @@ agent directory changes.
 ### the-workflow
 
 Agentic workflow mechanics — the foundational skills that make working with Claude Code effective across sessions and
-teams. The `claude-md` skill applies prompt engineering principles to CLAUDE.md files: what belongs where, writing
-instructions Claude actually follows, diagnosing why rules get ignored (buried, vague, stale, contradictory), and
-systematic improvement. The `handoff` skill produces structured transfer documents for the moments when work crosses a
-context boundary: a session restart, a teammate delegation, an async resumption. Each document carries the decisions,
-constraints, and remaining work in 500-2000 tokens and drops the noise.
+teams. The `claude-md` skill owns the CLAUDE.md and `.claude/rules/` artifacts, starting from the loading model that
+most advice about them gets wrong: which files reach the session at launch, which wait for a file to be read, what
+survives compaction, and which split actually reclaims context. From there it covers layer routing, what belongs in the
+file, trimming, and an ordered diagnosis for a rule that is written down and still ignored. The `handoff` skill produces
+structured transfer documents for the moments when work crosses a context boundary: a session restart, a teammate
+delegation, an async resumption. Each document carries the decisions, constraints, and remaining work in 500-2000 tokens
+and drops the noise.
 
 ```
 /plugin install the-workflow
