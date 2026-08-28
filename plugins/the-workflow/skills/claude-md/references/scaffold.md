@@ -131,10 +131,20 @@ When creating a CLAUDE.md from scratch:
 For monorepos, the root CLAUDE.md provides project-wide orientation and shared conventions. Package-specific details go
 in either:
 
-- **Nested CLAUDE.md** (`packages/api/CLAUDE.md`) — always loads when Claude works in that subtree. Good for team-owned
-  conventions colocated with code. No conditional loading.
-- **`.claude/rules/`** with glob-scoped frontmatter — loads on-demand when Claude reads matching files. Centralized at
-  project root. Good for cross-cutting conventions scoped by file type.
+- **Nested CLAUDE.md** (`packages/api/CLAUDE.md`) — loads at launch when Claude starts in that directory, and on demand
+  when Claude reads a file there from a session started higher up. Good for team-owned conventions colocated with code,
+  and versioned with it.
+- **`.claude/rules/`** with glob-scoped frontmatter — loads when Claude reads a file matching the rule's `paths`. Good
+  for cross-cutting conventions scoped by file type, or one rule that applies to many scattered paths.
+
+Rules directories are not confined to the repository root: every `.md` under a `.claude/rules/` directory is discovered
+recursively, subdirectories such as `frontend/` and `backend/` are a supported layout, and a nested
+`packages/api/.claude/rules/` loads on demand. Centralizing every rule at the root is a governance choice — it makes one
+team the owner of every convention — not a constraint the tool imposes. Choose per-package rules when the package team
+owns its own conventions, and a central root when one platform team owns them all.
+
+Neither mechanism reaches a session before the trigger fires. A rule that must hold from the first turn belongs in the
+root CLAUDE.md.
 
 ```markdown
 # my-monorepo

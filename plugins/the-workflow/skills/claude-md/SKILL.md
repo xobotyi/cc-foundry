@@ -1,328 +1,222 @@
 ---
 name: claude-md
 description: >-
-  CLAUDE.md instruction quality: writing effective project instructions, diagnosing why Claude ignores rules,
-  routing content to the right layer, progressive disclosure, and systematic improvement. Invoke whenever task
-  involves any interaction with CLAUDE.md files — creating, writing, reviewing, auditing, improving, optimizing,
-  or debugging instruction compliance.
+  Write and maintain CLAUDE.md and `.claude/rules/` files: which layer loads when, what content belongs in each, and
+  why a stated rule gets ignored.
+when_to_use: >-
+  Invoke whenever a CLAUDE.md or a `.claude/rules/` file is touched at all — creating, editing, auditing, trimming, or
+  choosing which layer a rule belongs in. Also invoke on the symptoms: a rule in the file gets ignored, Claude cites a
+  path that does not exist, behavior differs between sessions, an instruction disappears after `/compact`, or a rule
+  never loads inside a monorepo package.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# CLAUDE.md Instruction Quality
+**CLAUDE.md is delivered as a user message after the system prompt, not as configuration.** It is read and weighed,
+never enforced — which is why a rule that must hold every time belongs in a hook or a permission, and why the goal here
+is compliance, not completeness. A short file that gets followed beats a full one that gets ignored.
 
-**CLAUDE.md is a prompt that persists across every session.** All prompt engineering principles apply, but the failure
-modes are specific: instructions exist but get ignored, content drifts from reality, and the file grows until nothing
-gets followed. The goal is not completeness — it's compliance. A short CLAUDE.md that Claude follows beats a full one it
-ignores.
+<prerequisite>
+A CLAUDE.md is instruction text. Invoke `prompt-engineering` for the wording, the instruction budget, and the
+timelessness rules that govern every line written here. This skill covers only what is specific to the CLAUDE.md and
+`.claude/rules/` artifacts — what loads when, which layer owns which content, and why a stated rule gets ignored.
+</prerequisite>
 
-## Route to Reference
+## What Loads, and When
 
-- **Scaffold, section ordering, creation workflow** — [`${CLAUDE_SKILL_DIR}/references/scaffold.md`] Canonical section
-  order with examples (identity → capability map → stack → conventions → verification → constraints),
-  creation-from-scratch workflow, monorepo scaffold patterns
+Routing and trimming decisions are wrong whenever the loading model is wrong. Establish this first.
 
-## What Belongs in CLAUDE.md
+- **CLAUDE.md and CLAUDE.local.md load at launch from the working directory and every directory above it.** Content is
+  ordered from the filesystem root down, so the file closest to the launch directory is read last. Within one directory,
+  `CLAUDE.local.md` is appended after `CLAUDE.md`.
+- **Files in subdirectories below the working directory do not load at launch.** They load when Claude reads a file in
+  that directory. A rule that must hold from the first turn cannot live in a nested CLAUDE.md.
+- **Layer scope, broadest to narrowest** — managed policy (`/Library/Application Support/ClaudeCode/CLAUDE.md` on macOS,
+  `/etc/claude-code/CLAUDE.md` on Linux and WSL, `C:\Program Files\ClaudeCode\CLAUDE.md` on Windows) → `~/.claude/` →
+  the project (`./CLAUDE.md` or `./.claude/CLAUDE.md`) → `./CLAUDE.local.md`. Managed policy cannot be excluded.
+- **Load order is not precedence.** Every discovered file is concatenated; when two layers contradict, Claude may follow
+  either. Reconcile the conflict rather than relying on "later wins".
+- **`@path` imports expand at launch**, up to four hops deep. Splitting a large CLAUDE.md into imports buys organization
+  and never buys context. A path inside backticks stays literal instead of importing.
+- **A CLAUDE.md over 4 MiB is skipped entirely** — no warning in the file itself.
+- **Block-level HTML comments are stripped before injection.** Notes for human maintainers cost no tokens.
+- **`claudeMdExcludes` skips files by absolute-path glob**, set at any settings layer, with arrays merging across
+  layers. It is the monorepo tool for another team's files, and it excludes their rules along with their CLAUDE.md.
+- **Verify what actually loaded with `/context`**, under **Memory files**. The `InstructionsLoaded` hook logs each file
+  as it loads, which is how a lazily-loaded rule is debugged.
 
-CLAUDE.md is for **project-specific instructions that change Claude's default behavior**. Two tests, both mandatory: if
-removing an instruction wouldn't change output quality, it doesn't belong; if Claude can infer it by reading the
-codebase, it doesn't belong either.
+### Rules Files
 
-**Include:**
+- **Every `.md` under `.claude/rules/` is discovered recursively.** Subdirectories such as `frontend/` and `backend/`
+  are a supported layout, and nested `.claude/rules/` directories deeper in the tree load on demand. Centralizing every
+  rule at the repository root is a governance choice, never a requirement.
+- **A rule without `paths` loads at launch at the same priority as `.claude/CLAUDE.md`.** It costs exactly what a
+  CLAUDE.md line costs.
+- **A rule with `paths` triggers when Claude reads a matching file**, not on every tool use. This is the one mechanism
+  that genuinely reduces baseline context.
+- **`~/.claude/rules/` loads before project rules**, so a project rule outranks a personal one on the same topic.
+- **Plugins cannot ship rules.** The plugin component set has no rules entry, and a CLAUDE.md at a plugin root is not
+  loaded as project context. Conventions that must reach every install go in a skill; a rule is written by hand in the
+  consuming project.
 
-- Capability map — which module owns which functionality ("auth lives in `internal/auth`, billing in
-  `services/billing`"), where new code of each kind goes. An ownership map, not a directory tree — trees are inferable
-  from the filesystem
-- Tech stack and tooling — frameworks, test runners, package managers, build tools
-- Coding conventions that differ from language defaults — naming, import style, error handling patterns
-- Decisions as present-tense rules — "IDs are UUIDs — prevents enumeration, enables offline generation." One causal
-  clause of why; chronology never
-- Verification workflows — how to run tests, lint, build; what commands to use
-- Critical constraints — "never modify X", "always do Y before Z"
-- Non-obvious gotchas — things Claude would get wrong without being told
+### After Compaction
 
-**Exclude:**
+- **The project-root CLAUDE.md survives** — it is re-read from disk and re-injected.
+- **Nested CLAUDE.md files and `paths`-scoped rules do not.** They reload when Claude next reads a file they apply to.
+- **An instruction given only in conversation is gone.** Write it into CLAUDE.md to make it persist.
 
-- Generic best practices Claude already knows ("write clean code", "use meaningful names", "follow SOLID")
-- Language fundamentals ("use strict mode in TypeScript") — these belong in language skills
-- Procedural workflows with strict ordering — these belong in skills
-- Domain expertise — skills are the right artifact for behavioral rules tied to a specific domain
-- Ephemeral state — current sprint goals, in-progress migrations, temporary flags (use memory or tasks)
-- Project history — changelogs, session logs, past-work records, migration narratives, abandoned approaches. History
-  lives in `git log`, the tracker, and ADRs; a described abandoned approach reads as a current option and gets
-  resurrected
-- Directory trees and file listings — anything reproducible with `ls`; state ownership and boundaries, not structure
-- Automated behaviors — "whenever X happens, do Y" requires hooks in settings.json, not instructions
+## Routing Content to a Layer
 
-### The Layer Routing Decision
+- **CLAUDE.md** — project identity, capability map, conventions, constraints. Applies to every task regardless of
+  domain.
+- **`.claude/rules/`** — conventions scoped to a file type or a path, via glob `paths`. Lighter than a skill, no
+  SKILL.md ceremony.
+- **Skills** — procedural workflows and domain expertise for one type of work. Loaded on demand.
+- **Hooks** — anything that must happen without Claude's judgment. Execute at fixed lifecycle events.
+- **Settings** — permissions, environment variables, model configuration. Structural, not instructional.
+- **Auto memory** — user preferences and cross-session context Claude writes for itself.
 
-Content belongs in the layer where it's most effective:
+**The test:** universal rule → CLAUDE.md. Scoped to file types or paths → `.claude/rules/`. Scoped to a kind of work →
+skill. Must happen automatically → hook.
 
-- **CLAUDE.md** — project identity, structure, conventions, constraints. Read at session start, shapes all work.
-- **`.claude/rules/`** — file-type-specific or path-scoped conventions. Lighter than skills (no SKILL.md ceremony),
-  conditionally loaded via glob `paths` frontmatter. Rules without `paths` load unconditionally like CLAUDE.md; rules
-  with `paths` load on-demand when Claude reads matching files. All rule files must live at the project root — no
-  per-package directories in monorepos. Use for conventions that apply to specific file types or directories but don't
-  warrant a full skill.
-- **Skills** — domain expertise, procedural workflows, behavioral rules for specific task types. Loaded on demand.
-- **Hooks** — automated enforcement, validation gates, triggered actions. Execute without Claude deciding.
-- **Settings** — permissions, env vars, model config. Structural, not instructional.
-- **Memory** — user preferences, cross-session context, project state. Recalled when relevant.
+**Prefer the path fence.** When one glob covers exactly the files a rule governs, put the rule in `.claude/rules/` with
+`paths` — not once CLAUDE.md grows too long, but on the way in, while it is still short. A scoped rule is the only layer
+that costs nothing until it is relevant, and it arrives in context beside the file it applies to instead of competing
+for attention with every unrelated rule from the first turn.
 
-**The test:** If it's a rule Claude must follow in every task regardless of domain → CLAUDE.md. If it's a rule scoped to
-specific file types or paths → `.claude/rules/`. If it's a rule for a specific type of work → skill. If it must happen
-automatically without Claude's judgment → hook.
+**Keep the rule in CLAUDE.md when the fence leaks** — the glob matches files the rule does not govern, or misses files
+it does — or when the rule must hold before Claude reads any file. A fence that needs a growing list of patterns to stay
+accurate is leaking; state the rule once at the root instead.
 
 **Instructions are not enforcement.** Models route around soft constraints stated as prose — working from a different
 directory to dodge a path restriction, rephrasing to dodge a wording rule. Anything that must never happen goes in
-permissions, sandbox config, or hooks; CLAUDE.md states working defaults.
+permissions, sandbox configuration, or a hook. CLAUDE.md states working defaults.
 
-**Where the record goes instead.** The urge to write "what we did" into CLAUDE.md routes elsewhere: past work → commit
-messages and the tracker; a lesson from a single incident → memory, promoted to a CLAUDE.md rule only on recurrence; a
-decision → one present-tense rule here, with any why longer than a clause → an ADR the rule links to.
+**Where the record goes instead.** Past work → commit messages and the tracker. A lesson from one incident → memory,
+promoted to a CLAUDE.md rule only on recurrence. A decision → one present-tense rule here, with any why longer than a
+clause moved to an ADR the rule links to.
 
-## Writing Effective Instructions
+## What Belongs in CLAUDE.md
 
-### Concrete Over Abstract
+Two tests, both mandatory. If removing an instruction would not change output quality, cut it. If Claude can infer it by
+reading the codebase, cut it.
 
-Every instruction must be specific enough that Claude can verify compliance.
+**Include:**
 
-- **Good:** `Use Vitest for all tests. Test files live in __tests__/ adjacent to source.`
-- **Bad:** `Write comprehensive tests for all changes.`
-- **Good:** `Run yarn lint && yarn test before committing. Fix all errors.`
-- **Bad:** `Ensure code quality before committing.`
-- **Good:** `API routes use kebab-case: /api/user-settings, not /api/userSettings.`
-- **Bad:** `Follow consistent naming conventions.`
+- Capability map — which module owns which functionality, and where new code of each kind goes. An ownership map, never
+  a directory tree
+- Stack and tooling — frameworks, test runners, package managers, build tools
+- Conventions that differ from language defaults — naming, import style, error handling
+- Decisions as present-tense rules, with at most a one-clause causal why
+- Verification workflow — the exact commands for test, lint, and build
+- Critical constraints — the "never modify X", "always do Y before Z" rules
+- Gotchas Claude gets wrong without being told
 
-The test: could two different agents reading this instruction produce different behavior? If yes, it's too vague.
+**Exclude:**
 
-### Observable Over Aspirational
+- Generic best practices and language fundamentals — these are defaults, or they belong in a language skill
+- Procedural workflows with strict ordering — these belong in a skill
+- Ephemeral state — sprint goals, in-flight migrations, temporary flags. These belong in the tracker
+- Project history — changelogs, session logs, migration narratives, abandoned approaches. A described abandoned approach
+  reads as an available option and gets resurrected
+- Directory trees and file listings — anything reproducible with `ls`
+- Automated behaviors — "whenever X happens, do Y" is a hook, not an instruction
 
-Instructions must describe behaviors Claude can actually perform, not qualities it should aspire to.
+## Writing the File
 
-- **Observable:** `Every public function has a JSDoc comment with @param and @returns.`
-- **Aspirational:** `Write thorough documentation.`
-- **Observable:** `Prefer composition over inheritance. No class hierarchies deeper than 2.`
-- **Aspirational:** `Use good object-oriented design.`
+- **Every instruction must be concrete enough that two agents cannot diverge on it.** Exact paths, exact command names,
+  exact patterns. An instruction that resists being made concrete does not belong.
+- **Present tense only.** A CLAUDE.md states what is true, never how the project got here: "we migrated from REST to
+  gRPC" becomes "services communicate over gRPC".
+- **Temporal markers rot silently** — "recently", "new", "now uses", "as of March". Delete the marker or the whole line.
+- **Prose only in the identity block**, the top 10–15% of the file. Everything operational is bullets; a critical rule
+  cannot hide inside a paragraph, and prose-wrapped rules that conflict produce a compromise instead of either rule.
+- **A contestable decision carries one causal clause** — "IDs are UUIDs — prevents enumeration, enables offline
+  generation". It stops the model from "fixing" the decision. A mechanical rule carries none; explaining `yarn lint`
+  doubles its cost and changes nothing.
+- **Lists over tables.** Commands, conventions, and capability maps are independent entries. A table earns its place
+  only when rows are compared across columns. Numbered lists only where order is the content.
+- **Placement follows the U-shaped attention curve** — identity and capability map at the top, conventions in the
+  middle, verification and critical constraints at the bottom. State a truly critical rule at both ends, worded
+  differently each time.
+- **State each rule once, in the section that owns the topic.** A nested CLAUDE.md carries only what differs from the
+  root; restating a root rule produces contradictory signals, not emphasis.
 
-### Present Tense Only
+## Size and Trimming
 
-CLAUDE.md describes the current state of the project — it never narrates how the project got here. Decisions enter as
-present-tense rules; the path to them stays in `git log` and ADRs.
+Target under 200 lines per file — past that, adherence measurably drops. Treat 200 as the trigger for a classification
+pass, never as a cap to cut to: a file that stays above it because every block survived the pass is correct.
 
-- Past-tense narration is a defect: "we migrated from REST to gRPC" → "services communicate over gRPC"
-- Temporal markers rot silently: "recently", "new", "now uses", "as of March" — delete the marker or the whole line
-- A described abandoned approach reads as an available option — name only what is true now
+`/doctor` proposes trims for a checked-in CLAUDE.md (v2.1.206 and later): it cuts what Claude can derive from the
+codebase — directory layouts, dependency lists, architecture overviews — and keeps pitfalls, rationale, and conventions
+that differ from tool defaults.
 
-### Brevity = Compliance
+Classify each block when trimming by hand:
 
-Every token in CLAUDE.md competes for attention. Shorter CLAUDE.md files produce higher instruction adherence.
+- **Keep** — used in most sessions, safety-critical, easy to violate, or security-sensitive
+- **Move to `.claude/rules/`** — a path- or filetype-scoped convention. With `paths` frontmatter it stops costing
+  baseline context
+- **Extract to a skill** — a "when doing X, follow these steps" block
+- **Remove** — stale content, rules Claude follows by default, one rule restated in different words, rationale that
+  changes no behavior
 
-- State each rule once, in the section where it's contextually relevant
-- Prefer bullet lists over prose paragraphs — they're faster to scan and harder to miss
-- If a section exceeds 15-20 bullet points, it's likely mixing concerns — split by topic or move depth to a skill
-- Delete rules that pass the deletion test (removing them doesn't change behavior)
+**Three exceptions stay regardless of how rarely they apply:** safety-critical content (violating it loses data,
+breaches security, or breaks production), easy-to-violate content (Claude gets it wrong without the reminder), and
+security-sensitive content (authentication, authorization, secrets, data exposure). The goal is working efficiency, not
+a line count — moving a critical rule into a rarely-loaded file is a regression.
 
-### Prose vs Bullet Lists
+**Trim when** the file passes 200 lines, Claude ignores rules that are present, unrelated domains share one file, or a
+human cannot skim it in under 60 seconds.
 
-**Prose (1-3 paragraphs) for project identity only.** A brief "what is this project and why does it exist" section at
-the top orients Claude for edge cases where rules don't cover the situation. This is the one place where explaining
-_why_ earns its tokens — understanding project intent helps the model make correct judgment calls.
+## Diagnosing an Ignored Rule
 
-**Bullet lists for all operational rules.** Conventions, constraints, commands, verification workflows — everything
-Claude must _do_ goes in bullet lists. Research consistently shows:
+Work down this list. The first two causes are mechanical and account for most reports.
 
-- Bullet lists increase signal density — critical rules can't hide inside paragraphs
-- Prose introduces rhetorical padding that competes for attention without changing behavior
-- Rationale padding on mechanical rules is waste — "run `yarn lint` before committing" needs no justification, and
-  explaining it doubles the rule's token cost
-- When the model encounters conflicting prose-wrapped rules, it produces mediocre compromises instead of following
-  either rule strictly
-
-**The split:** Top 10-15% of the file can be explanatory prose (project context). The remaining 85-90% should be
-structured bullet lists organized by topic.
-
-**Decisions carry a one-clause why.** For contestable choices — "IDs are UUIDs — prevents enumeration, enables offline
-generation" — the causal clause improves the model's judgment between equivalent approaches and stops it from "fixing"
-the decision. One clause, present tense, causal not chronological. A why that needs more than a clause goes to an ADR
-the rule links to.
-
-**Lists over tables.** Commands, conventions, and capability maps are independent entries — KV bullet lists, not tables.
-A table earns its place only when rows are compared across columns, which CLAUDE.md content almost never needs. Numbered
-lists only where order is the content.
-
-### Placement Matters
-
-Models follow a U-shaped attention curve: beginning and end are followed most reliably, middle content degrades.
-
-- **Top:** Project identity, structure, tech stack — the "what is this" framing
-- **Middle:** Conventions, detailed rules by topic
-- **Bottom:** Critical constraints, verification workflow — the "don't forget" reinforcement
-
-For rules that must be followed, state them early AND reinforce at the end with different phrasing.
-
-## The Multi-Layer Hierarchy
-
-CLAUDE.md files concatenate into one context: user global, then project root, then subdirectory. Load order is not
-precedence — when layers conflict, Claude may follow either rule. Reconcile conflicts across layers instead of relying
-on "later wins."
-
-- **Global (`~/.claude/CLAUDE.md`)** — personal defaults: communication preferences, tool preferences, workflow habits
-  that apply across all projects
-- **Project root (`./CLAUDE.md`)** — repo-specific: structure, stack, conventions, constraints. This is the primary
-  file. Checked into version control, shared by the team.
-- **Subdirectory (`./packages/api/CLAUDE.md`)** — module-specific overrides. Use sparingly — only when a module has
-  conventions that genuinely differ from the project root (e.g., a Python service in a mostly-TypeScript monorepo).
-
-**Don't repeat.** If the project root says "use Vitest", don't restate it in every subdirectory. Subdirectory files
-should contain only what differs from or adds to the root.
-
-## Progressive Disclosure
-
-When a CLAUDE.md exceeds ~500 lines, instruction compliance degrades — the model can't attend to everything equally.
-Progressive disclosure moves depth out of CLAUDE.md while preserving access to it.
-
-### The 4-Bucket Classification
-
-For each section or block in the file, classify:
-
-- **Keep** — stays in CLAUDE.md. Content that is high-frequency (used in most sessions), safety-critical (omission
-  causes harm), easy-to-violate (Claude routinely gets wrong without the reminder), or security-sensitive (access
-  control, data handling, secret management).
-- **Move to `.claude/rules/`** — useful but not needed every session. Path-scoped conventions, file-type-specific
-  patterns, module-specific rules. Offloading to rules with glob `paths` frontmatter means they load only when relevant,
-  reducing baseline context cost.
-- **Extract to skill** — reusable behavioral patterns, procedural workflows, domain expertise that activates for
-  specific task types. If a block describes "when doing X, follow these steps" — it's a skill candidate.
-- **Remove** — outdated content, rules Claude follows by default, duplicated instructions restated in different words,
-  rationale paragraphs that don't change behavior.
-
-### Exception Criteria
-
-Even infrequently used content stays in CLAUDE.md if it meets any exception:
-
-- **Safety-critical** — violating it causes data loss, security breach, or broken production
-- **Easy-to-violate** — Claude consistently gets it wrong without the instruction, regardless of frequency
-- **Security-sensitive** — governs authentication, authorization, secret handling, or data exposure
-
-The goal is to maximize LLM working efficiency, not minimize line count. A 600-line file where every instruction earns
-its place outperforms a 200-line file that moved critical rules to rarely-loaded references.
-
-### When to Apply
-
-- CLAUDE.md exceeds ~500 lines
-- Claude ignores rules that exist in the file (attention overload signal)
-- Multiple unrelated domains share a single file (mixing concerns)
-- A human can't skim the file in under 60 seconds
+- **Never loaded** — the rule lives in a nested CLAUDE.md or a `paths`-scoped rule that has not matched a file, in a
+  directory outside the launch path, or in a file over 4 MiB. It may also be excluded by `claudeMdExcludes`. Confirm
+  with `/context` under **Memory files**, or the `InstructionsLoaded` hook. Fix by moving the rule to a layer that loads
+  when it is needed.
+- **Vanished mid-session** — compaction dropped a nested CLAUDE.md, a `paths`-scoped rule, or an instruction that only
+  ever existed in conversation. Fix by writing it into the project-root CLAUDE.md, which is re-read from disk.
+- **Buried in noise** — the file is too long and the rule sits in the middle. The signal is a file a human cannot skim
+  in 60 seconds, critical rules inside prose, and several sections restating one thing. Fix by pruning, then promoting
+  the rule to the top or the bottom.
+- **Too vague** — plausible but wrong output: right style, wrong location; idiomatic patterns, wrong framework. The
+  signal is abstract language and architecture named as a slogan with no paths. Fix by replacing every abstraction with
+  a path, a command, or a pattern.
+- **Stale** — Claude cites files that do not exist or tooling the team dropped. Past-tense narration and temporal
+  markers are the early warning. Fix by auditing against the codebase, then updating the file in the same change as the
+  architecture, never as a separate task.
+- **Contradictory** — behavior varies between sessions because two layers disagree, or a hook or CI script carries a
+  shadow instruction. Fix by establishing one canonical rule per concern across all layers.
+- **Wrong artifact** — a rule shaped "when writing tests, always…" competes for attention across every task while
+  mattering in few. Fix by moving it to a skill, a hook, or a rules file.
 
 ## Creating a CLAUDE.md
 
-When building a CLAUDE.md from scratch, follow the canonical section ordering: project identity (prose) → capability map
-→ stack and tooling → conventions (bullets) → verification workflow → critical constraints. This ordering exploits the
-U-shaped attention curve — identity anchors the top, constraints anchor the bottom.
+Start at 50–100 lines and iterate from observed failures. A file written from static analysis is a starting point; the
+real content comes from where Claude gets things wrong during work.
 
-Start minimal (50-100 lines) and iterate from actual usage. A CLAUDE.md created from static analysis is a starting point
-— the real improvements come from observing where Claude gets things wrong during work.
+Detect the stack from config files (`package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`, `Makefile`, CI and linter
+configs). Map capabilities to locations. Identify the conventions that differ from language defaults — those are the
+only ones worth writing. Apply the deletion test before delivering.
 
-**Key principles for initial creation:**
+`/init` generates a starting file, and suggests improvements rather than overwriting when one already exists.
 
-- Detect project signals from config files (`package.json`, `go.mod`, `Makefile`, CI configs, linter configs)
-- Map capabilities to locations — which module owns what and where new code goes, not a directory tree
-- Identify conventions that differ from language defaults — these are what Claude needs to be told
-- Apply the deletion test before delivering — remove everything Claude does correctly without instruction
-- For monorepos, shared conventions go in root CLAUDE.md; package-specific rules go in nested CLAUDE.md files or
-  glob-scoped `.claude/rules/`
+Read [`${CLAUDE_SKILL_DIR}/references/scaffold.md`] when creating a file from scratch or restructuring an existing one —
+it carries the canonical section order with worked examples, the creation workflow, and the monorepo layouts.
 
-Full section ordering with examples, creation workflow, and monorepo scaffold patterns: see
-[`${CLAUDE_SKILL_DIR}/references/scaffold.md`].
+## Application
 
-## Diagnosing Instruction Failures
+When **writing or editing** a CLAUDE.md:
 
-When Claude ignores CLAUDE.md rules, the cause is almost always one of these:
+- Edit surgically. Add a rule into the section that already owns its topic; wholesale rewrites and section reshuffles of
+  a working file are defects, not cleanups
+- Never delete or reword a rule without first verifying against the code that it is stale
+- Apply the conventions silently — do not narrate each rule as it is applied
 
-### Buried in Noise
+When **auditing** a CLAUDE.md:
 
-The instruction exists but Claude doesn't follow it. The file is too long, the rule is buried in the middle after
-hundreds of tokens of context, and attention has decayed.
-
-**Diagnosis:** The file is painful for a human to skim in under 60 seconds. Critical rules sit inside prose paragraphs
-rather than standalone bullets. Multiple sections restate the same thing in different words.
-
-**Fix:** Ruthlessly prune. Move anything Claude already knows by default. Promote buried rules to the top or bottom.
-Convert prose to bullet lists.
-
-### Too Vague
-
-Claude produces plausible but wrong output — right code style, wrong location; idiomatic patterns, wrong framework.
-
-**Diagnosis:** Instructions use abstract language ("clean code", "good tests", "consistent naming") without
-repo-specific specifics. Architecture descriptions are slogans ("hexagonal architecture") without file paths.
-
-**Fix:** Replace every abstract instruction with a concrete, verifiable directive. Add file paths, command names, and
-specific patterns.
-
-### Stale
-
-Claude references files that don't exist, suggests deprecated patterns, or proposes tooling the team abandoned.
-
-**Diagnosis:** CLAUDE.md mentions old frameworks, directory names, or commands. Major architecture shifts never made it
-into the file. No one updates it alongside code changes. Past-tense narration and temporal markers ("recently", "now
-uses") are the early warning.
-
-**Fix:** Audit against the actual codebase. Remove dead references. Add a convention: update CLAUDE.md alongside
-architecture changes, not as a separate task.
-
-### Contradictory
-
-Claude's behavior varies between sessions — sometimes adds tests, sometimes doesn't; sometimes uses one tool, sometimes
-another.
-
-**Diagnosis:** Different sections disagree. Copy-paste over months introduced conflicting rules. CI scripts embed
-instructions that override CLAUDE.md.
-
-**Fix:** Search for opposing directives on the same topic. Establish one canonical rule per concern. Audit hooks and CI
-for shadow instructions.
-
-### Wrong Artifact
-
-An instruction is in CLAUDE.md but should be in a skill, hook, or settings. Claude follows it inconsistently because
-CLAUDE.md rules compete for attention across all tasks, while the rule only matters for specific work.
-
-**Diagnosis:** Rules like "when writing tests, always..." or "when reviewing PRs, follow this checklist..." — these are
-domain-specific behavioral rules that belong in skills, where they load only when relevant.
-
-**Fix:** Move domain-specific instructions to skills. Move automated behaviors to hooks. Keep only universal project
-rules in CLAUDE.md.
-
-## Improvement Workflow
-
-When improving a CLAUDE.md, follow this sequence:
-
-1. **Read the file and the codebase it describes.** Verify that every instruction matches reality — file paths exist,
-   commands work, tools are current.
-2. **Apply the deletion test.** For each instruction, ask: "If I remove this, would Claude's output quality change?" If
-   not, delete it. Pay special attention to generic advice Claude already follows by default.
-3. **Check for contradictions.** Search for opposing rules on the same topic. Search hooks and CI configs for shadow
-   instructions that conflict.
-4. **Assess specificity.** Replace abstract instructions with concrete, verifiable directives. If an instruction can't
-   be made concrete, it probably doesn't belong.
-5. **Route misplaced content.** Move domain-specific rules to skills, automated behaviors to hooks, ephemeral state to
-   memory.
-6. **Restructure for attention.** Put project identity at the top. Put critical constraints and verification at the
-   bottom. Use bullet lists, not prose.
-7. **Verify the result.** The improved file should be skimmable in under 60 seconds and every instruction should be
-   something Claude would get wrong without it.
-
-## Critical Rules
-
-- **Deletion test is mandatory.** Every instruction must measurably change Claude's behavior. Generic advice that
-  restates defaults wastes tokens and reduces compliance with rules that actually matter.
-- **Concrete and verifiable.** If two agents could interpret an instruction differently, it's too vague. Add file paths,
-  command names, and specific patterns.
-- **Right layer for the content.** Domain expertise → skills. Path-scoped conventions → `.claude/rules/`. Automated
-  behaviors → hooks. Hard boundaries → permissions and hooks, never instructions. Project-universal rules → CLAUDE.md.
-  Misplaced content degrades everything.
-- **Present tense, no history.** CLAUDE.md states what is true now. Changelogs, session logs, migration narratives, and
-  abandoned approaches go to `git log`, the tracker, or ADRs — never here.
-- **Progressive disclosure over monolithic growth.** When CLAUDE.md exceeds ~500 lines, classify content into
-  keep/move/extract/remove buckets. Safety-critical and easy-to-violate content stays regardless of frequency.
-- **Maintain alongside code.** CLAUDE.md that drifts from reality is worse than no CLAUDE.md — it produces confidently
-  wrong output. Update it when architecture, tooling, or conventions change.
+- Read the file end to end before judging it. A premise is carried by sentences no search term predicts, and an audit
+  assembled from grep hits reports clean on every line it never opened
+- Verify each instruction against the codebase: paths exist, commands run, tools are the ones in use
+- Cite the specific line and give the replacement inline. Do not lecture
