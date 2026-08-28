@@ -12,8 +12,10 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   body content over worked examples, splitting by load condition, and evaluation against a no-skill baseline. Carries
   the archetypes, the portable-versus-Claude-Code frontmatter split, host behavior including the listing budget and
   compaction limits, and the supply-chain rules for publishing or installing a skill
-- **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
-  evaluation, troubleshooting; false-positive calibration for reviewing agents and the mutating-agent isolation rule
+- **`subagent-engineering`** — design and maintain subagents: when isolation pays over the main conversation, the
+  description that decides delegation, the frontmatter fields that govern a run, and the system prompt the agent wakes
+  up with. Carries the false-positive calibration for reviewing agents, the mutating-agent isolation rule, the
+  orchestration patterns, and the evaluation and troubleshooting depth
 - **`output-style-engineering`** — design output styles injected into the system prompt: choosing the style mechanism
   over CLAUDE.md or a hook, setting `keep-coding-instructions`, verifying injection with a canary, role framed as
   outcome instead of credentials, intent-carrying rules, and voice in rules instead of examples. Carries the file spec

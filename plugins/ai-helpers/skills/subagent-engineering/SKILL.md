@@ -1,200 +1,105 @@
 ---
 name: subagent-engineering
-description: "Claude Code subagent lifecycle: creation, configuration, evaluation, and troubleshooting. Invoke whenever task involves any interaction with Claude Code subagents — designing, debugging, iterating, or deciding when to delegate work to isolated agent contexts."
+description: >-
+  Design and maintain Claude Code subagents: the delegation decision, the frontmatter that governs a run, and the
+  system prompt the agent wakes up with.
+when_to_use: >-
+  Invoke whenever a subagent is touched at all — writing, editing, auditing, or debugging an agent definition, or
+  deciding whether work should run in an isolated context. Also invoke on the symptoms: an agent never fires, the
+  wrong one fires, the result never comes back, the output arrives in a shape the caller cannot use, or a run leaves
+  the tree modified. Covers the subagent artifact; the wording of its instructions belongs to prompt-engineering, the
+  skill artifact to skill-engineering, and the main agent's system prompt to output-style-engineering.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Subagent Engineering
-
-Manage the full lifecycle of Claude Code subagents: creation, evaluation, iteration, and troubleshooting.
+**A subagent is a separate context with its own system prompt.** It inherits none of the caller's conversation, and
+everything it reads is discarded when it stops — only what it returns survives. Isolation is the reason to pay for one,
+and the return value is the entire product.
 
 <prerequisite>
-**Subagent prompts are system prompts.** Before creating or improving
-a subagent, invoke `prompt-engineering` to load instruction design techniques.
-
-```
-Skill(ai-helpers:prompt-engineering)
-```
-
-Skip only for trivial edits (typos, formatting).
-
+A subagent definition is a system prompt. Invoke `prompt-engineering` for the wording, instruction budget, and
+timelessness rules that govern every line written here. This skill covers only what is specific to the subagent
+artifact — the delegation decision, the frontmatter, and the prompt the agent wakes up with.
 </prerequisite>
 
-## Route to Reference
+## Delegate only where the isolation pays
 
-- **Full frontmatter field reference** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] All fields with constraints, Agent
-  tool parameters, built-in agents, permission modes and inheritance, hooks schema, storage locations, SDK
-  `settingSources` requirement
-- **Step-by-step creation walkthrough** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Decision matrix (subagent vs
-  skill vs team), frontmatter reference, description writing, tool sets, model selection, system prompt structure, 4
-  agent type templates, validation checklist
-- **Quality scoring and testing** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] 5-dimension scoring rubric with
-  weights, testing protocol (5 levels), benchmarking methodology, continuous monitoring
-- **Improving an existing subagent** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Prompt refinement techniques, A/B
-  testing, version control, redesign criteria, description optimization
-- **Diagnosing failures** — [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] Diagnostic steps, Agent Teams issues,
-  background agent debugging, worktree cleanup, SDK failures, hooks errors
-- **Architecture and examples** — [`${CLAUDE_SKILL_DIR}/references/patterns.md`] Pipeline, parallel, orchestrator
-  patterns, Agent Teams, worktree isolation, background execution, Agent SDK, 6 full agent examples
+- **Delegate work whose output is far larger than its conclusion** — a wide search, a long file, a verbose test run. The
+  caller pays for the summary instead of the transcript.
+- **Delegate to restrict, too.** A tool allowlist or a cheaper model binds the whole run, which no instruction inside
+  the main conversation achieves.
+- **Keep the work in the main conversation when it needs back-and-forth**, when several phases share the same context,
+  or when the change is small and targeted. A subagent starts cold: it pays in startup latency and in rediscovering what
+  the caller already knows.
+- **Write a skill instead when the artifact wanted is reusable instruction text** that runs in the caller's own context.
+  A skill carries procedure; a subagent carries a context boundary.
+- **A subagent runs its own system prompt; an output style modifies the main agent's.** A style appends its body to the
+  session prompt and, under `keep-coding-instructions: false`, drops the `# Doing tasks` section — it never gives the
+  work a context of its own.
+- **Check the built-ins before writing a definition** — `Explore` for read-only search on Haiku, `Plan` for read-only
+  research, and `general-purpose`, which is what an `Agent` call gets when it names no type.
+- **A subagent cannot spawn a subagent.** Every fan-out is decided by the caller, so an agent that discovers more work
+  reports it rather than delegating it.
 
-Read the relevant reference for extended depth. Rules below are sufficient for correct work without loading references.
+## Write the description as routing code
 
-## When to Use Subagents
+- **Claude sees only `name` and `description` when it decides to delegate.** The body loads after that decision, so no
+  line in it rescues a description that never fires.
+- **State what the agent does, then when to invoke it.** A description that names only a domain gives the model nothing
+  to fire on.
+- **Discriminate against the neighboring agents** by naming the exclusion — "not for general code review, use
+  `code-reviewer`". A concrete exclusion beats abstract precision.
+- **Keep execution steps out.** The description is read to decide whether to delegate, never how to execute, and steps
+  there widen the trigger while changing nothing about the run.
+- **Reach for "use proactively" only where unprompted delegation is wanted.** It buys automatic routing and pays in
+  precision; an agent that fires on the wrong requests costs more than one that waits to be asked.
 
-**Use subagents when:**
+Description tuning against observed misfires, the constraint block that stops scope creep, the efficiency and
+return-length caps that stop context bloat, A/B comparison between versions, the fan-out iteration loop and the
+parallel-session bias it carries, and the criteria separating a fix from a split from a rebuild:
+[`${CLAUDE_SKILL_DIR}/references/iteration.md`]. Read it when a working agent fires on the wrong requests, never fires,
+underperforms on part of its scope, or is being tuned across a fan-out.
 
-- Task produces verbose output you don't need in main context
-- You want to enforce specific tool restrictions
-- Work is self-contained and can return a summary
-- You need to parallelize independent research
+## Set the fields that govern the run
 
-**Use main conversation when:**
+- **`name` takes lowercase letters, numbers, and hyphens, caps at 64 characters, matches the filename stem, and must not
+  contain "anthropic" or "claude".** `claude-code-guide` ships as a built-in, so an author copying that naming style
+  writes a name the loader rejects. `description` caps at 1024 characters; neither field accepts `<` or `>`.
+- **Grant the narrowest `tools` set the task needs.** An omitted `tools` field inherits everything the parent holds. The
+  allowlist is the enforcement; a prose constraint in the body is not.
+- **Name every skill the agent needs in `skills`.** A subagent inherits none from the parent, and the field injects the
+  full skill text rather than making it invocable.
+- **`permissionMode` restricts and never escalates.** A parent running `auto` makes the field inert, and a parent's
+  `bypassPermissions` is inherited and cannot be revoked from the definition.
+- **Match `model` to the work, not to the caller.** `inherit` is the default, so a cheap high-volume agent pays the
+  caller's price until the field says otherwise. A per-invocation `model` and `CLAUDE_CODE_SUBAGENT_MODEL` both outrank
+  it.
+- **The `Agent` tool's `name` parameter makes the spawn a teammate while agent teams are enabled**, and a teammate's
+  idle notification carries no output. Spawn without a name when the caller needs the result back.
+- **`hooks`, `mcpServers`, and `permissionMode` are ignored without warning in a plugin-bundled agent.** Copy the file
+  into `.claude/agents/` to use them.
 
-- Task needs frequent back-and-forth
-- Multiple phases share significant context
-- Making quick, targeted changes
-- Latency matters (subagents start fresh)
+The full field list, the `Agent` tool parameters, permission-mode semantics, storage and scope priority, the hooks
+schema, and the SDK `settingSources` requirement: [`${CLAUDE_SKILL_DIR}/references/spec.md`]. Read it when setting a
+field this section does not cover, or when deciding where the definition file lives.
 
-**Use skills instead when:**
+## Write the prompt the agent wakes up with
 
-- You want reusable prompts in main conversation context
-- Task benefits from full conversation history
+- **The body is the whole system prompt.** The agent receives it plus basic environment details and nothing else — no
+  conversation history, no caller reasoning. Whatever the task depends on is restated here or passed at invocation.
+- **Say who fans out.** An agent able to read its own scope will widen it: "the caller fans out, this agent does not —
+  audit what the prompt assigned, never re-derive the scope."
+- **Specify the output format and name the verdict vocabulary.** The caller acts on the return mechanically, so give a
+  closed set of verdicts and require one per item. An agent reporting in free prose reports inconsistently.
+- **State what done looks like.** Without a completion criterion the agent returns early on the first ambiguity, or
+  works past the point the caller needed.
+- **Say that the summary is the product.** Locate with Grep before reading whole files, and return findings rather than
+  the material they came from.
 
-**Use Agent Teams when:**
+Creation methods, tool sets by agent type, model selection and resolution order, the prompt skeleton, and four
+agent-type templates: [`${CLAUDE_SKILL_DIR}/references/creation.md`]. Read it before writing a new definition file.
 
-- Multiple agents need to coordinate via shared task list
-- Work requires lead/worker structure with peer messaging
-- Tasks have dependencies needing synchronized handoffs
-
-## Subagent File Format
-
-```
-.claude/agents/my-agent.md    # Project-level
-~/.claude/agents/my-agent.md  # User-level
-```
-
-```markdown
----
-name: my-agent
-description: What it does. When to use it.
-tools: Read, Grep, Glob
-model: sonnet
----
-
-You are a [role]. When invoked:
-1. [First step]
-2. [Second step]
-3. [Final output format]
-```
-
-### Scope Priority (highest to lowest)
-
-- Managed settings (organization-wide)
-- `--agents` CLI flag (session only)
-- `.claude/agents/` (project)
-- `~/.claude/agents/` (user)
-- Plugin agents (lowest)
-
-When names collide, higher priority wins.
-
-## Required Frontmatter Fields
-
-### `name`
-
-- Lowercase letters, numbers, hyphens only
-- Max 64 characters, no `<` or `>` characters
-- Cannot contain "anthropic" or "claude"
-- Must match filename (minus `.md`)
-
-### `description`
-
-Claude sees ONLY `name` and `description` when deciding to delegate. The body loads AFTER delegation — making the
-description the highest-leverage field.
-
-**Formula:** `[What it does in 1 sentence]. [When to use it — specific trigger context].`
-
-**Rules:**
-
-- Lead with what the agent does, not a slogan or tagline
-- State when to use it — specific contexts and trigger conditions
-- Include "use proactively" to encourage automatic delegation
-- Keep execution instructions out of the description — those belong in the body
-- Max 1024 characters, no `<` or `>` characters
-
-**Good:**
-
-```yaml
-description: "Expert code review specialist. Use proactively after writing or modifying code."
-
-description: "PostgreSQL expert for query optimization and schema design. Use when working
-  with .sql files or database performance issues."
-```
-
-**Bad:**
-
-```yaml
-description: "Helps with code"                    # Too vague
-description: "Review code. Steps: 1. Read 2..."   # Execution details
-```
-
-## Key Optional Fields
-
-- **`tools`** — allowlist of tools the subagent can use. Inherits ALL parent tools if omitted. Principle: grant minimum
-  necessary permissions.
-- **`model`** — `haiku` (quick searches, cheap), `sonnet` (everyday coding), `opus` (complex reasoning), `inherit`
-  (default)
-- **`permissionMode`** — `default`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`, `plan`. Subagents inherit
-  parent permissions and can restrict further, but cannot escalate.
-- **`skills`** — skills to inject into subagent context. Subagents don't inherit skills from parent.
-- **`hooks`** — lifecycle hooks scoped to this subagent (PreToolUse, PostToolUse, Stop → SubagentStop)
-- **`memory`** — `user`, `project`, or `local` for persistent cross-session storage
-- **`isolation`** — `worktree` runs the subagent in a temporary git worktree (safe experimentation)
-- **`background`** — `true` to always run as a background task (main agent continues working)
-- **`effort`** — `low`, `medium`, `high`, `max` (Opus 4.6 only). Overrides session effort.
-
-Full field reference with constraints: see [`${CLAUDE_SKILL_DIR}/references/spec.md`].
-
-## Writing the System Prompt
-
-Everything after the frontmatter becomes the subagent's system prompt. Subagents receive ONLY this prompt plus basic
-environment details — not the full Claude Code system prompt.
-
-### Structure Template
-
-```markdown
-You are a [role] specializing in [domain].
-
-## When Invoked
-1. [First action]
-2. [Second action]
-3. [Continue until complete]
-
-## Guidelines
-- [Guideline 1]
-- [Guideline 2]
-
-## Constraints
-- [Boundary 1 — what NOT to do]
-
-## Output Format
-[Specify exact structure with example]
-```
-
-### System Prompt Rules
-
-- **Start with role definition.** "You are a [role] specializing in [domain]."
-- **Use numbered steps for workflow.** Explicit ordering prevents skipped steps.
-- **Specify output format explicitly.** Include a concrete example of the expected structure.
-- **Add constraints to prevent scope creep.** "DO NOT modify files", "ONLY report findings."
-- **Add completion criteria.** "Your task is COMPLETE when: [criteria]." Prevents both early termination and over-work.
-- **Keep single responsibility.** If listing multiple unrelated capabilities, split into separate agents.
-- **Add efficiency instructions.** "Use Grep to locate relevant code BEFORE reading entire files. Return concise
-  summaries, not raw data."
-- **Say who fans out.** An agent that can read its own scope will widen it. State the boundary in the prompt itself —
-  "the orchestrator fans out, this agent does not; audit only what the prompt assigned you, never re-derive the scope."
-- **Name the verdict vocabulary.** An agent reporting in free prose reports inconsistently. Give it a closed set of
-  verdicts and require one per item, so the caller can act on the output mechanically.
-
-### Calibration for Reviewing and Auditing Agents
+## Calibrate reviewing and auditing agents
 
 An agent that finds problems will find problems. Left uncalibrated it treats an empty report as a failed run and
 manufactures findings to look diligent — which costs more than the review saves, because every false finding buys a
@@ -206,7 +111,7 @@ human ruling. State the control explicitly in the prompt:
   one. This bounds invention, never suppression: a diff with forty real violations reports forty. Volume is a failure
   only when the findings were manufactured to produce it.
 - **Split the burden of proof by finding type.** On bright-line rules, flag every violation — a dismissed finding is
-  cheaper than a missed one. On judgment calls, the burden is on the finding: when the agent cannot argue it, the
+  cheaper than a missed one. On judgment calls the burden is on the finding: where the agent cannot argue it, the
   verdict is OK and nothing is reported.
 - **Require evidence for claims of absence.** "No caller", "no test", "not used anywhere" carry the exact command run
   and what it returned. An absence with no sweep behind it is not reported.
@@ -215,99 +120,42 @@ human ruling. State the control explicitly in the prompt:
   out of scope — and it names what would settle it. A finding is never silently dropped for lack of evidence, and never
   promoted to confirmed without it.
 
-### Mutating Agents Run Isolated
+## Run mutating agents isolated
 
 An agent whose _method_ mutates the tree — a test auditor that breaks code to prove a test catches it, a migration
-prover, anything running a negative control — needs `isolation: worktree`, not merely permission to edit. This is
-distinct from the parallel-conflict case: the risk is not two agents colliding but one agent crashing mid-mutation and
-stranding a broken tree that its caller believes is clean.
+prover, anything running a negative control — needs `isolation: worktree`, not merely permission to edit. The risk is
+not two agents colliding but one agent crashing mid-mutation and stranding a broken tree that its caller believes is
+clean.
 
-Three rules belong in any such agent's prompt:
-
-- **Never end a run with a mutation in place.** If a tool error or timeout interrupts a control, restoring the tree is
+- **Never end a run with a mutation in place.** If a tool error or a timeout interrupts a control, restoring the tree is
   the first action before anything else.
 - **Restore and verify.** Reverse the edit, then confirm with `git diff` that the file is back to its pre-mutation
   state. An unverified restore is an unrestored file.
 - **Mutate the subject, never the instrument.** A test auditor changes the code under test, never the test.
 
-## Built-in Subagents
+## Coordinate several agents through the return path
 
-- **Explore** — fast, read-only codebase search. Model: Haiku. Tools: read-only. Invoked with thoroughness level:
-  `quick`, `medium`, or `very thorough`.
-- **Plan** — read-only research for plan mode. Model: inherits. Cannot spawn subagents.
-- **general-purpose** — complex multi-step tasks. Model: inherits. Tools: all. Default when no type specified.
-- **Bash** — command execution in separate context. Model: inherits.
-- **claude-code-guide** — questions about Claude Code features. Model: Haiku.
+- **A standalone subagent injects its full output into the caller's context; a teammate returns only what it sends.**
+  Three verbose standalone agents can exhaust the caller, which is what makes a team cheaper past a small fan-out.
+- **Use a team where the work shares findings or has ordering**, and carry the ordering as `blockedBy` on a shared task
+  list. Independent one-shot work stays cheaper as standalone spawns.
+- **Every task description stands alone.** Teammates share no conversation history, so file paths, identifiers, and
+  acceptance criteria live in the description itself.
 
-## Agent Teams
+Pipeline, parallel fan-out, orchestrator-workers, agent teams end to end, worktree isolation, background execution, the
+Agent SDK, and six complete agent definitions: [`${CLAUDE_SKILL_DIR}/references/patterns.md`]. Read it when more than
+one agent is involved, or when the run is backgrounded or driven from the SDK.
 
-Agent Teams scale subagents into coordinated crews with peer messaging and, where the session has the Task tools, a
-shared task list. The session owns one team from start to exit — nothing creates it and nothing tears it down.
+## Measure before other people depend on it
 
-- **Team lead** — the main session. Spawns a teammate by calling `Agent` with a `name`; `team_name` is ignored. Creates
-  tasks with `TaskCreate` when the session has the Task tools.
-- **Teammates** claim tasks, work independently, communicate via `SendMessage`, mark tasks completed. A teammate cannot
-  spawn teammates.
-- **Shared task list** — agents holding the Task tools read, update, and create tasks. Dependencies via `blockedBy`.
-  Agents without those tools coordinate by message alone.
-- **Idle notification** — a teammate notifies the lead when it stops. The notification carries **no output**; results
-  reach the lead only by `SendMessage` or the task list.
+**Score trigger accuracy separately from output quality.** They break for different reasons and take different fixes — a
+wrong description misroutes, a wrong body misreports — and a single overall impression hides which one failed. The
+requests that should route elsewhere are where a description fails, and they are the cases nobody runs by accident.
 
-**When to use teams vs standalone subagents:**
+The five weighted scoring dimensions with their score guides, the quality thresholds, the five-level testing protocol,
+and regression benchmarking: [`${CLAUDE_SKILL_DIR}/references/evaluation.md`]. Read it when scoring an agent, or before
+other people depend on one.
 
-- Standalone: tasks are fully independent, no coordination needed
-- Teams: tasks share findings, have dependencies, or need lead/worker structure
-
-Standalone subagents pollute the caller's context (TaskOutput injects full output). Teammates communicate via short
-SendMessage summaries — much more context-efficient.
-
-Architecture patterns and team examples: see [`${CLAUDE_SKILL_DIR}/references/patterns.md`].
-
-## Evaluation Criteria
-
-When evaluating a subagent, assess five dimensions:
-
-- **Task Completion (30%)** — follows workflow, produces expected output
-- **Trigger Accuracy (25%)** — delegates at the right times, not at wrong times
-- **Output Quality (25%)** — clear, complete, actionable, format-compliant
-- **Context Efficiency (10%)** — concise returns, no unnecessary tool calls
-- **Tool Usage (10%)** — uses only granted tools, handles errors gracefully
-
-Scoring: 4.5+ excellent, 3.5-4.4 good, 2.5-3.4 needs revision, <2.5 redesign.
-
-Full rubric with testing protocol: see [`${CLAUDE_SKILL_DIR}/references/evaluation.md`].
-
-## Common Issues and Fixes
-
-- **Doesn't trigger** — description too narrow. Broaden description, add "use proactively", verify file loads with
-  `/agents`.
-- **Over-triggers** — description too vague or overlaps. Narrow scope, add explicit boundaries.
-- **Wrong output format** — no format spec. Add `## Output Format` section with concrete example.
-- **Incomplete execution** — workflow isn't explicit. Add numbered steps with completion criteria.
-- **Scope creep** — tools too permissive. Restrict `tools` list and add `## Constraints` section.
-- **Poor context efficiency** — no efficiency guidance. Add: "Use Grep before Read. Return concise summary (max 500
-  words)."
-
-Detailed diagnostics: see [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`].
-
-## Validation Checklist
-
-Before deploying a subagent:
-
-- [ ] `name` is lowercase with hyphens, no "anthropic" or "claude"
-- [ ] `description` explains what AND when (under 1024 chars)
-- [ ] `description` has no execution instructions
-- [ ] `tools` is minimal (only what's needed)
-- [ ] `model` matches task complexity
-- [ ] System prompt starts with role definition
-- [ ] System prompt has numbered workflow steps
-- [ ] Output format is explicitly specified with example
-- [ ] Constraints section prevents scope creep
-- [ ] Completion criteria are defined
-- [ ] Tested with representative tasks
-
-## Related Skills
-
-- `prompt-engineering` — load first for instruction design techniques (subagent prompts are system prompts)
-- `skill-engineering` — skills and subagents complement each other; skills run in main context, subagents in isolation
-- `output-style-engineering` — output styles replace the system prompt; subagents extend it
+Symptom-to-cause-to-fix for discovery failures, tool permissions, stalled teammates, background agents, worktree
+cleanup, hooks, and the SDK: [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`]. Read it when an agent fails outright
+rather than underperforms.
