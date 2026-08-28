@@ -19,10 +19,6 @@ sheet says. This document examines whether that folk wisdom is correct (mostly y
 reasons that have not been solved), and what actually works when you need a model to use distant context (re-quoting,
 compaction, and matching indexes — not vague positional references).
 
-The findings synthesize 38 sources — academic benchmarks (RULER, NoLiMa, HELMET, LongBench v2), vendor documentation
-(Anthropic's context-engineering articles), independent industry analyses (Chroma's "Context Rot" study, LindleyLabs,
-TokenMix), and the architectural literature on positional encodings and KV cache compression.
-
 ## The Short Answer
 
 **You cannot reliably redirect a frontier LLM's attention to a specific deep region through prompting alone.**
@@ -578,8 +574,7 @@ compaction over context maximalism.
 
 ## Sources
 
-Synthesized from a NotebookLM corpus of 38 sources covering academic benchmarks, mechanism papers, vendor documentation,
-and independent industry analyses. Notable primary sources, organized by what they tell you:
+Organized by what they tell you:
 
 **Effective context measurement**
 
@@ -624,6 +619,3 @@ and independent industry analyses. Notable primary sources, organized by what th
 - Anthropic Claude Docs, Long context prompting tips:
   https://anthropic.mintlify.app/en/docs/build-with-claude/prompt-engineering/long-context-tips
 - Scale AI, Long-context instruction following: https://scale.com/blog/long-context-instruction-following
-
-The full NotebookLM working set (with structured Perplexity synthesis as the primary text source plus 37 web sources) is
-maintained at: https://notebooklm.google.com/notebook/2edbe872-e496-41f3-9da7-0925e947def7
