@@ -1,5 +1,7 @@
 # Styling Reference
 
+Every class and style attribute form, CSS components, and the CSS middleware.
+
 ## Class Attribute
 
 ### Static Classes
@@ -198,7 +200,7 @@ Output:
 
 **Key behaviors:**
 
-- Class names are auto-generated (hash-based) — don't rely on them being stable.
+- Class names are auto-generated and hash-suffixed — never treat one as stable.
 - CSS is rendered as `<style>` tags, once per HTTP request per unique class.
 - Dynamic values inside `css` blocks use `{ expr }` syntax.
 
@@ -246,7 +248,7 @@ templ page() {
 }
 ```
 
-Use CSS components instead if you need once-per-request deduplication.
+A CSS component deduplicates per request; a raw `<style>` element does not.
 
 ## CSS Middleware
 
@@ -257,17 +259,6 @@ c1 := primaryButton()
 handler := templ.NewCSSMiddleware(httpRoutes, c1)
 ```
 
-This adds a `/styles/templ.css` route. Include via `<link rel="stylesheet" href="/styles/templ.css">` in your HTML.
+This adds a `/styles/templ.css` route. Link it with `<link rel="stylesheet" href="/styles/templ.css">`.
 
 Saves bandwidth by serving CSS once instead of per-request `<style>` tags.
-
-## Pattern Summary
-
-- Static string — simple, unchanging classes/styles
-- `templ.KV` — conditional toggling of single class/style
-- `map[string]bool` — multiple conditional classes
-- Raw Go `{{ }}` block — complex class logic with intermediate variables
-- Conditional attribute — replacing full attribute value based on condition
-- `map[string]string` — computed style sets
-- `css` blocks — component-scoped CSS with deduplication
-- `templ.SafeCSS` — trusted dynamic CSS bypassing sanitization

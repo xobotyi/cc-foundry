@@ -1,5 +1,7 @@
 # JavaScript Reference
 
+The rendered output of each data-passing API, the once-handle behavior pattern, and bundling.
+
 ## Script Tags
 
 Standard `<script>` tags for client-side JavaScript:
@@ -15,8 +17,7 @@ templ page() {
 }
 ```
 
-To render a `<script>` tag only once per response, use `templ.OnceHandle` (see components reference for render-once
-details).
+Wrap a `<script>` tag in a package-level `templ.OnceHandle` to render it once per response.
 
 ## Passing Go Data to JavaScript
 
@@ -202,12 +203,3 @@ templ head() {
 ```
 
 For TypeScript/NPM projects, use `esbuild` to bundle into a single JS file, then reference via `<script src="...">`.
-
-## Method Summary
-
-- `templ.JSFuncCall` — call JS function with Go data; args are JSON-encoded
-- `templ.JSExpression` — raw JS expression (event, this); no encoding — raw output
-- `templ.JSONString` — Go data → JSON string for attributes; JSON + HTML-encoded
-- `templ.JSONScript` — Go data → `<script type="application/json">`; JSON-encoded
-- `{{ value }}` in scripts — inline interpolation; context-dependent encoding
-- `templ.JSUnsafeFuncCall` — bypass function name sanitization; no encoding — **security risk**

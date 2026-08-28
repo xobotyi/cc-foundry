@@ -1,5 +1,7 @@
 # Syntax Reference
 
+File layout, expressions, control flow, raw Go blocks, and comments, with rendered output.
+
 ## File Structure
 
 templ files use `.templ` extension. They start with a package name and imports, like Go.

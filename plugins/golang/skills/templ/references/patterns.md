@@ -1,8 +1,11 @@
 # Patterns Reference
 
+View models, layout composition, context-carried data, and `html/template` interop.
+
 ## View Models
 
-Separate display data from domain models. Keep template logic minimal:
+A view model is the finished data a template renders. Build it in Go, name the type after the template plus `Props`, and
+give the template nothing left to decide:
 
 ```go
 // Go file — data transformation
@@ -37,11 +40,8 @@ templ Card(props CardProps) {
 }
 ```
 
-Benefits:
-
-- Template logic stays minimal — no database calls or complex transformations
-- Easy to test — just test `NewCardProps` in pure Go
-- Props struct documents what the template needs
+The constructor is the unit under test — no rendering is needed to verify it. The view model type is also the template's
+contract: adding a field to it names exactly what the template gained.
 
 ## Layout Pattern
 
@@ -155,27 +155,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 ### Context Guidelines
 
-- **Prefer prop drilling** for direct parent-child data — it's simpler and type-safe.
-- **Use context** for cross-cutting concerns (auth, theme, locale) that many components need.
-- **Always use type-safe getters** — direct `ctx.Value(key).(Type)` panics on missing keys.
-- **Private key types** — use `type contextKey string` to avoid collisions.
-- Context is not strongly typed; errors only show at runtime, not compile time.
-
-## Conditional Classes
-
-See [styling.md](styling.md) for all class toggling approaches: `templ.KV`, maps, raw Go blocks, and conditional
-attributes.
-
-## Passing Data to JavaScript
-
-Three approaches, ordered by preference:
-
-1. **Data attributes** — `data-config={ templ.JSONString(data) }`. Preferred for component-scoped data.
-2. **Script elements** — `@templ.JSONScript("id", data)`. Best for page-level configuration.
-3. **Inline interpolation** — `{{ value }}` inside `<script>`. Least preferred — mixing data and code is harder to
-   maintain.
-
-See [javascript.md](javascript.md) for API details and examples.
+- **Prop-drill direct parent-child data.** A parameter fails at compile time; a context value fails at render time.
+- **Reserve the context for cross-cutting values** that most components need — the authenticated user, the theme, the
+  locale.
+- **Read through a getter returning `(T, bool)`.** A bare `ctx.Value(key).(Type)` panics when the value is absent.
+- **Key the value with an unexported named type**, never with a bare string.
 
 ## Interop with `html/template`
 
@@ -207,8 +191,3 @@ err = goTemplate.Execute(os.Stdout, html)
 ```
 
 Useful for gradual migration from `html/template` to templ.
-
-## Method Components Pattern
-
-Use method components when a component has many configuration options — struct fields are self-documenting and can have
-defaults. See [components.md](components.md) for definition syntax and examples.

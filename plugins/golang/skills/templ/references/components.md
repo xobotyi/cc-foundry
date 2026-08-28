@@ -1,5 +1,7 @@
 # Components Reference
 
+Composition forms, children, method and code-only components, render-once handles, and fragments.
+
 ## Component Definition
 
 Components compile to Go functions returning `templ.Component`:
@@ -12,13 +14,7 @@ templ headerTemplate(name string) {
 }
 ```
 
-Generated Go:
-
-```go
-func headerTemplate(name string) templ.Component {
-    // Generated contents
-}
-```
+`templ generate` emits `func headerTemplate(name string) templ.Component`.
 
 ## The `templ.Component` Interface
 
@@ -27,9 +23,6 @@ type Component interface {
     Render(ctx context.Context, w io.Writer) error
 }
 ```
-
-Components follow Go visibility rules: uppercase name = exported (public), lowercase = unexported (private). Share
-components across packages by exporting them.
 
 **Partial output warning**: A component may write partial output to `io.Writer` before returning an error. To guarantee
 all-or-nothing, render to a buffer first.
@@ -147,37 +140,8 @@ func button(text string) templ.Component {
 }
 ```
 
-**Warning**: In code-only components, you must escape HTML yourself using `templ.EscapeString`. The automatic escaping
-only applies to `.templ` files.
-
-## Sharing Components
-
-Components follow Go package rules:
-
-- **Same package**: all components in the same directory are accessible to each other.
-- **Cross-package**: export by capitalizing name, then import the package.
-
-```templ
-// components/header.templ — exported
-package components
-
-templ Header() {
-    <header>Header</header>
-}
-```
-
-```templ
-// pages/home.templ — importing
-package pages
-
-import "myapp/components"
-
-templ Home() {
-    @components.Header()
-}
-```
-
-Cross-module: `go get <module>` first, then import.
+**Warning**: A code-only component escapes nothing. Wrap every interpolated value in `templ.EscapeString`; automatic
+escaping applies to `.templ` source only.
 
 ## Render-Once
 

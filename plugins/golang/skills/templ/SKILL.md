@@ -1,443 +1,174 @@
 ---
 name: templ
 description: >-
-  templ templating: syntax, components, attributes, styling, and JavaScript integration.
-  Invoke when task involves any interaction with templ — writing .templ files, creating
-  components, composing templates, testing rendered output, or understanding templ syntax.
+  Write and review templ templates: syntax, components, attributes, styling, JavaScript data passing, escaping and
+  sanitization, code generation, and testing.
+when_to_use: >-
+  Invoke whenever a `.templ` file is touched at all — writing, reviewing, refactoring, or debugging a template, a
+  component, or a layout, and whenever Go code renders one. Also invoke on the symptoms: `templ generate` reports a
+  parse error, markup arrives escaped in the browser, a class disappears when a condition flips, a `<script>` tag
+  repeats per item, a URL renders as `about:invalid`, or an edited template renders its previous output. Covers
+  `.templ` source and the templ runtime API; Go language conventions belong to the golang skill, and language-agnostic
+  workflow to the coding skill.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# templ
+A templ template is a rendering function, not a program. Three biases decide most calls:
 
-Type-safe Go HTML templating. Components defined in `.templ` files compile to Go functions returning `templ.Component`
-via `templ generate`. Outside `templ` blocks = ordinary Go. Inside = templ syntax.
-
-## References
-
-Extended examples and detailed patterns for the rules below:
-
-- `${CLAUDE_SKILL_DIR}/references/syntax.md` — Template syntax, expressions, control flow, raw Go blocks: file
-  structure, expression types, error propagation, auto-escaping, control flow examples
-- `${CLAUDE_SKILL_DIR}/references/components.md` — Component definition, composition, children, fragments: component
-  interface, `@` composition, children context API, render-once, fragment rendering
-- `${CLAUDE_SKILL_DIR}/references/attributes.md` — Boolean, conditional, spread attributes, key expressions: attribute
-  types with code examples, spread value behavior, URL/JS/JSON attribute patterns
-- `${CLAUDE_SKILL_DIR}/references/patterns.md` — View models, layouts, context, html/template interop: props struct
-  pattern, nested layouts, context helpers with middleware, Go template interop
-- `${CLAUDE_SKILL_DIR}/references/javascript.md` — Script/style tags, inline events, data passing to JS:
-  JSFuncCall/JSExpression/JSONString/JSONScript API, IIFE pattern, method summary
-- `${CLAUDE_SKILL_DIR}/references/styling.md` — Class patterns, CSS components, style attributes: class toggling
-  approaches (KV, maps, raw Go), CSS component scoping, style sanitization
+- **Compute in Go, render in templ.** Every transformation, validation, and I/O call belongs in a Go function that hands
+  the template a finished value.
+- **Escaping is automatic inside `.templ` source and nowhere else.** Every bypass carries a named API, and reaching for
+  one is a decision to emit unchecked output.
+- **`.templ` source and the generated `*_templ.go` are one artifact.** Neither is correct without the other.
 
 ## Syntax
 
-### Expressions `{ }`
+- **`{ }` writes a value; `{{ }}` runs Go statements.** `html/template` gives `{{ }}` the opposite job, and that habit
+  carries over silently.
+- **`{ }` accepts `string`, the numeric types, `bool`, and any type defined on them.** Convert anything else with
+  `fmt.Sprintf` first.
+- **An expression returning `(T, error)` propagates its error out of `Render`**, with the source location attached.
+- **Close every tag in the source, void elements included** — `<br/>`, `<img src="x"/>`. templ strips the `/` from void
+  elements in the output, so the source form and the rendered form differ by design.
+- **Text starting with `if`, `for`, or `switch` parses as a statement.** Wrap it as an expression — `{ "if you must" }`
+  — or capitalize the keyword.
+- **A comment inside a `templ` block is an HTML comment and reaches the output.** `//` and `/* */` work only outside a
+  `templ` block, and HTML comments do not nest.
+- **Bind an expensive call to a `{{ }}` variable** rather than repeating it across two `{ }` expressions.
 
-Output Go values inside templ blocks. Content is automatically HTML-escaped for XSS safety.
-
-Supported types: `string`, numbers (`int`, `uint`, `float32`, `complex64`, etc.), booleans, and any type based on these
-(e.g. `type Name string`).
-
-Use variables, field access, and function calls: `{ name }`, `{ p.Name }`, `{ strings.ToUpper(name) }`,
-`{ fmt.Sprintf("%d items", count) }`.
-
-Functions returning `(T, error)` propagate errors to `Render()` with source location info.
-
-### Elements
-
-All tags must close. Write `<br/>` not `<br>`. templ is aware of void elements and strips `/` in output HTML, but source
-must always include it.
-
-templ automatically minifies HTML output.
-
-### Control Flow
-
-Use bare Go keywords — `if`/`else`, `switch`/`case`, `for`/`range`. No special syntax.
-
-Text starting with `if`, `for`, or `switch` triggers the parser. Two solutions:
-
-- Wrap as expression: `{ "if you need this text" }`
-- Capitalize the keyword: `If you need this text`
-
-### Raw Go `{{ }}`
-
-Scoped Go statements inside templ blocks for intermediate variables.
-
-```templ
-{{ total := calculateTotal(items) }}
-<p>Total: { fmt.Sprintf("%d", total) }</p>
-```
-
-Use `{{ }}` to avoid calling expensive functions twice — cache results in a variable.
-
-### Comments
-
-- **Inside templ blocks**: use HTML comments `<!-- -->` (rendered to output). No nesting.
-- **Outside templ blocks**: use Go comments `//` (not rendered).
-
-### Implicit Variables
-
-Every component has two implicit variables:
-
-- **`ctx`** — `context.Context` from the `Render` call. Available in all components.
-- **`children`** — content passed via `@component() { ... }`. Access with `{ children... }`.
+Read [`${CLAUDE_SKILL_DIR}/references/syntax.md`] when `templ generate` reports a parse error, or when writing the first
+template in a package — it carries the file layout, every control-flow form, and the escaping behavior with rendered
+output.
 
 ## Components
 
-### Definition and Visibility
+- **A component can write part of its output before it returns an error.** Render into a `bytes.Buffer` and copy on
+  success where the response must be all-or-nothing.
+- **A code-only component escapes nothing on its own.** Wrap every interpolated value in `templ.EscapeString`, because
+  `templ.ComponentFunc` writes exactly the bytes handed to it.
+- **Declare every `templ.NewOnceHandle()` at package level.** `@templ.NewOnceHandle().Once()` written inline builds a
+  fresh handle per call, so the guarded content renders every time.
+- **Wrap a once-guarded asset shared across packages in an exported component.** The handle is package state and cannot
+  be shared any other way.
+- **A fragment suppresses output, not work.** `templ.WithFragments` and `templ.RenderFragments` execute the whole
+  template and write only the named fragment.
+- **`{ children... }` renders the block a caller passed as `@component() { ... }`.** A code-only component reads the
+  same block from the context with `templ.GetChildren`.
 
-Components compile to Go functions returning `templ.Component`. Follow Go visibility rules: uppercase name = exported,
-lowercase = unexported.
-
-The `templ.Component` interface: `Render(ctx context.Context, w io.Writer) error`.
-
-**Partial output warning**: a component may write partial output to `io.Writer` before returning an error. To guarantee
-all-or-nothing, render to a buffer first.
-
-### Composition
-
-Call components with `@` prefix: `@header()`, `@components.Header()`, `@nav.Item("Home", "/")`.
-
-### Children
-
-Pass content to a component with `@layout() { <p>children</p> }`. Receive with `{ children... }` in the component body.
-
-In code-only components, manage children via context: `templ.WithChildren`, `templ.GetChildren`, `templ.ClearChildren`.
-
-### Components as Parameters
-
-Pass components as values via `templ.Component` type parameters, render with `@param`.
-
-### Joining Components
-
-Aggregate multiple components into one with `@templ.Join(header(), nav(), footer())`.
-
-### Method Components
-
-Attach components to types when a component has many configuration options — struct fields are self-documenting and can
-have defaults. Call inline: `@Button{Text: "Submit", Variant: "primary"}.Render()`.
-
-### Code-Only Components
-
-Implement `templ.Component` in pure Go using `templ.ComponentFunc`:
-
-```go
-func button(text string) templ.Component {
-    return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-        _, err := io.WriteString(w, "<button>"+templ.EscapeString(text)+"</button>")
-        return err
-    })
-}
-```
-
-**In code-only components, you must escape HTML yourself** with `templ.EscapeString`. Auto- escaping only applies inside
-`.templ` files.
-
-### Render-Once
-
-Ensure content renders once per HTTP response (or per context). Common use: shared `<script>`, `<style>`, or `<link>`
-tags.
-
-1. Declare handles at **package level**: `var h = templ.NewOnceHandle()`.
-2. Use in component: `@h.Once() { <script src="..."></script> }`.
-3. **Never inline** `@templ.NewOnceHandle().Once()` — creates a new handle each call, content renders every time,
-   defeating the purpose.
-
-For cross-package shared dependencies, export render-once components — wrap the handle and `Once()` call in an exported
-templ function, then call from any package.
-
-### Fragments
-
-Render subsections of templates, discarding all other output. The full template still executes (all logic runs), but
-only the fragment's output is written.
-
-- Define: `@templ.Fragment("content") { <div>fragment</div> }`
-- Render via HTTP: `templ.Handler(Page(), templ.WithFragments("content"))`
-- Render without HTTP: `templ.RenderFragments(ctx, w, Page(), "content")`
-
-**Custom fragment keys**: use typed keys (`type contentKey struct{}`) to avoid name clashes.
-
-**Nested fragments**: selecting outer includes inner. Useful for partial page updates (e.g. with htmx).
+Read [`${CLAUDE_SKILL_DIR}/references/components.md`] when composing components, passing one as a parameter, or
+rendering a fragment — it carries the composition forms, the method-component and code-only shapes, the children context
+API, and the fragment API.
 
 ## Attributes
 
-### Constant Attributes
+- **A conditional attribute replaces the earlier attribute of the same name.** Values do not merge, so every branch
+  repeats the base value.
+- **`?=` renders a boolean attribute from a Go `bool`**: `<input disabled?={ locked }/>` emits the attribute or omits
+  it.
+- **Spread a `templ.Attributes` map with `{ attrs... }`.** A `bool` value renders the bare name or nothing, and
+  `templ.KeyValue[string, bool]` renders `name="value"` only when the bool is true.
+- **An attribute whose key comes from an expression is handled as a plain string.** An `href` or an `on*` handler built
+  that way gets no URL sanitization and no JavaScript handling.
+- **Never mutate a package-level `templ.Attributes` value.** It is one map shared by every concurrent render. Build a
+  fresh `templ.Attributes{}` per call, or copy the package-level one with `maps.Clone` before changing it.
 
-Standard HTML attributes with double quotes: `<p class="container" data-testid="p">`.
+Read [`${CLAUDE_SKILL_DIR}/references/attributes.md`] when an attribute value or key is computed, or when a spread map
+renders in an unexpected shape — it carries every attribute form with its rendered output.
 
-### Dynamic String Attributes
+## Escaping and Sanitization
 
-Set to Go expressions with `{ }`: `<div class={ className }>`, `<div data-id={ fmt.Sprintf("item-%d", id) }>`.
-
-String values are automatically HTML-attribute-encoded. Functions returning `(string, error)` propagate errors to
-`Render()`.
-
-### Boolean Attributes `?=`
-
-Presence/absence based on Go boolean: `<input disabled?={ isDisabled }/>`, `<button hidden?={ !showButton }/>`. Static
-booleans: `<hr noshade/>`.
-
-### Conditional Attributes
-
-Use `if` inside element open tags to conditionally add attributes. The conditional attribute **replaces** the earlier
-one of the same name — include base classes in both branches.
-
-### Attribute Key Expressions
-
-Dynamically set the attribute key: `<p { "data-" + suffix }="value">`.
-
-**Warning**: key expressions don't get type-specific handling. URL attributes (`href`) and event handlers (`on*`)
-defined via key expressions are treated as plain strings without special sanitization.
-
-### Spread Attributes
-
-Append a dynamic map with `{ attrs... }` where `attrs` is `templ.Attributes` (`map[string]any`).
-
-Value rendering by type:
-
-- `string` → `name="value"`
-- `bool` → `name` (if true) or omitted (if false)
-- `templ.KeyValue[string, bool]` → `name="value"` if bool is true
-- `templ.KeyValue[bool, bool]` → `name` if both bools are true
-
-Spread attributes can be conditional using `if` inside element open tags.
-
-**Never mutate a global `templ.Attributes` var** — create fresh `templ.Attributes{}` per render call.
-
-## Security
-
-### HTML Auto-Escaping
-
-All expressions `{ }` are HTML-escaped. Use `@templ.Raw()` **only** for trusted content.
-
-### URL Sanitization
-
-`href`, `src`, `action` auto-sanitize dynamic values — `javascript:` schemes become
-`about:invalid#TemplFailedSanitizationURL`. Bypass with `templ.SafeURL()` for trusted URLs.
-
-**Constant URL values are NOT sanitized**: `<a href="javascript:...">` renders as-is.
-
-For non-standard URL attributes (e.g. htmx `hx-get`), use `templ.URL()` which sanitizes without the special
-`href`/`src`/`action` behavior.
-
-### CSS Sanitization
-
-Dynamic CSS values are sanitized by default. Unsafe property names become `zTemplUnsafeCSSPropertyName`, unsafe values
-become `zTemplUnsafeCSSPropertyValue`. Bypass with `templ.SafeCSS` (full declaration) or `templ.SafeCSSProperty` (single
-value).
-
-### JS Sanitization
-
-Function names in `templ.JSFuncCall` are sanitized — invalid names become `__templ_invalid_function_name`.
-`templ.JSExpression` bypasses encoding entirely — only use with trusted compile-time constants like `"event"` or
-`"this"`. `templ.JSUnsafeFuncCall` skips function name sanitization — **never** use with user-provided input.
+- **`{ }` HTML-escapes its value; `@templ.Raw()` does not.** Pass `templ.Raw` only markup the program itself produced.
+- **Only `href`, `src`, and `action` sanitize a dynamic URL.** Wrap a URL bound to any other attribute — an htmx
+  `hx-get`, for example — in `templ.URL()`.
+- **A constant URL is never sanitized.** `<a href="javascript:alert(1)">` written literally reaches the output
+  unchanged.
+- **`templ.SafeURL`, `templ.SafeCSS`, `templ.SafeCSSProperty`, and `templ.JSExpression` each switch a sanitizer off.**
+  Pass them a compile-time constant, or a value the program built from data it owns.
+- **`templ.JSUnsafeFuncCall` skips function-name sanitization.** Never build its function name from request data.
+- **A sanitizer substitutes a fixed marker instead of failing.** `about:invalid#TemplFailedSanitizationURL` for a URL,
+  `zTemplUnsafeCSSPropertyName` and `zTemplUnsafeCSSPropertyValue` for CSS, `__templ_invalid_function_name` for a
+  JavaScript function name. A marker in the output names the sanitizer that fired.
 
 ## Styling
 
-### Class Attribute
+- **`class` takes a list of values**: `class={ "btn", templ.KV("btn-active", active) }`. `templ.KV` contributes its
+  class when the bool is true.
+- **Compute a class string in a `{{ }}` block only where the logic exceeds a set of independent toggles.**
+- **A `css` block generates a hash-suffixed class name.** Pass the function result — `class={ primaryButton() }` — and
+  never write the generated name into a stylesheet, a test selector, or client JavaScript.
+- **A `css` block renders its `<style>` tag once per unique class per request; a raw `<style>` element renders every
+  time.**
+- **A `css` block taking arguments generates one class per distinct argument set.** Never call one with a value drawn
+  from an unbounded range.
 
-Multiple approaches for conditional classes, ordered by simplicity:
+Read [`${CLAUDE_SKILL_DIR}/references/styling.md`] when a conditional class needs a form other than `templ.KV`, when the
+`style` attribute takes a computed value, or when serving templ CSS as one stylesheet — it carries every class and style
+value type, the CSS-component argument forms, and the `templ.NewCSSMiddleware` setup.
 
-- Static string — `class="button primary"`: unchanging classes
-- Dynamic expression — `class={ className }`: single dynamic class
-- Multiple values — `class={ "button", className }`: combining static + dynamic
-- `templ.KV` — `class={ "btn", templ.KV("active", isActive) }`: conditional single class
-- `map[string]bool` — `class={ map[string]bool{"tab": true, "active": isActive} }`: multiple conditional
-- Raw Go `{{ }}` — compute class string in `{{ }}`, use in `class={ computed }`: complex logic
-- Conditional attribute — `if cond { class="full-set" }` in open tag: replacing full value
+## JavaScript
 
-CSS component functions (from `css` blocks) can be used in class expressions:
-`class={ "button", templ.KV(primaryButton(), isPrimary) }`.
+- **Pass data as an attribute or a JSON script, never as interpolated code.** `data-config={ templ.JSONString(cfg) }`
+  carries component-scoped data; `@templ.JSONScript("id", cfg)` carries page-level data.
+- **`templ.JSFuncCall("fn", args...)` JSON-encodes its arguments.** It renders as an `on*` attribute value, or as a
+  standalone `<script>` element when called with `@`.
+- **`templ.JSExpression` passes `event` or `this` into `templ.JSFuncCall`** and emits its string verbatim.
+- **Load a shared function once through a package-level `templ.OnceHandle`, bind per-instance data through `data-*`
+  attributes, and wrap the setup in an IIFE** that finds its own element through `document.currentScript`.
 
-### Style Attribute
+Read [`${CLAUDE_SKILL_DIR}/references/javascript.md`] when wiring client behavior to a component — it carries the
+rendered output of each API, the once-handle plus `data-*` plus IIFE pattern in full, and the bundling route for
+TypeScript.
 
-Dynamic styles accept multiple values combined in output: `style={ style1, style2 }`.
+## View Models and Context
 
-Supported value types:
+- **Give each template a view model built by a constructor in Go.** The template reads fields and ranges over slices; it
+  opens no database, calls no service, and formats nothing Go could have formatted.
+- **Test the constructor as ordinary Go.** A view model needs no rendering to be verified.
+- **`ctx` is implicit in every component** and carries whatever the `Render` call carried.
+- **Reserve the context for cross-cutting values** — the authenticated user, the locale, the theme — set by HTTP
+  middleware and read through a getter returning `(T, bool)`. Pass everything else as a parameter, because a missing
+  context value fails at render time and a missing parameter fails at compile time.
 
-- `string` — e.g. `"background-color: red"`
-- `templ.SafeCSS` — bypasses sanitization
-- `map[string]string` — e.g. `map[string]string{"color": "red"}`
-- `map[string]templ.SafeCSSProperty` — map with unsanitized values
-- `templ.KeyValue[string, bool]` — conditional: include CSS string if true
-- `templ.KeyValue[templ.SafeCSS, bool]` — conditional unsanitized CSS
-- Functions returning any above — single function may return `(T, error)`
-
-Use `templ.KV("border-color: red", hasError)` for conditional style toggling.
-
-Use `map[string]string` for computed style sets from Go functions.
-
-### CSS Components
-
-Define scoped CSS with auto-generated hash-based class names:
-
-```templ
-css primaryButton() {
-    background-color: #ffffff;
-    color: { red };
-}
-```
-
-Key behaviors:
-
-- Class names are auto-generated (hash-based) — don't rely on them being stable
-- CSS is rendered as `<style>` tags, once per HTTP request per unique class
-- Dynamic values inside `css` blocks use `{ expr }` syntax
-- CSS components accept arguments — each unique argument combination generates a separate class
-- Dynamic property names/values are sanitized; bypass with `templ.SafeCSSProperty`
-
-### Raw `<style>` Elements
-
-Raw `<style>` tags render without modification. Use CSS components instead if you need once-per-request deduplication.
-
-### CSS Middleware
-
-`templ.NewCSSMiddleware` serves a global stylesheet instead of inline `<style>` tags. See
-`${CLAUDE_SKILL_DIR}/references/styling.md`.
-
-## JavaScript Integration
-
-### Script Tags
-
-Standard `<script>` tags for client-side JavaScript. Use `templ.OnceHandle` to render a script only once per response.
-
-### Passing Data: Go to JavaScript
-
-Three approaches, ordered by preference:
-
-1. Data attributes — `data-config={ templ.JSONString(data) }`: component-scoped data
-2. Script elements — `@templ.JSONScript("id", data)`: page-level configuration
-3. Inline interpolation — `{{ value }}` in `<script>`: least preferred — mixing data/code
-
-### `templ.JSFuncCall`
-
-Call a client-side function with server-side data. Arguments are JSON-encoded.
-
-Use in attributes: `<button onclick={ templ.JSFuncCall("alert", msg) }>`. Use as standalone script:
-`@templ.JSFuncCall("initApp", config.Name)` renders `<script>initApp("MyApp");</script>`.
-
-### `templ.JSExpression`
-
-Bypass JSON encoding for raw JS expressions: `templ.JSExpression("event")`, `templ.JSExpression("this")`. **Only use
-with trusted compile-time constants** — output goes directly to HTML without encoding.
-
-### `templ.JSONString`
-
-Encode Go data as JSON string for HTML attributes: `<div x-data={ templ.JSONString(data) }>`. Client reads with
-`JSON.parse(el.getAttribute('attr'))`.
-
-### `templ.JSONScript`
-
-Create `<script type="application/json">` element: `@templ.JSONScript("id", data)`. Client reads with
-`JSON.parse(document.getElementById('id').textContent)`.
-
-### Inline `{{ }}` Interpolation in Scripts
-
-Inside JS strings: value is string-escaped. Outside JS strings: value is JSON-encoded. templ auto-escapes both. **Prefer
-`templ.JSONString` or `templ.JSONScript`** over inline interpolation — separating data from code is easier to maintain.
-
-### `templ.JSUnsafeFuncCall`
-
-Identical to `templ.JSFuncCall` but skips function name sanitization. Arguments still JSON-encoded. **Never use with
-user-provided input.**
-
-### IIFE Pattern
-
-Prevent variable leaking into global scope by wrapping in `(() => { ... })()`. Use `document.currentScript` for DOM
-traversal relative to the script element.
-
-### Best Practice: Avoiding Inline Event Handlers
-
-Separate behavior from markup: load shared functions via `templ.OnceHandle`, pass data via `data-*` attributes, isolate
-in IIFEs. See `${CLAUDE_SKILL_DIR}/references/javascript.md`.
-
-### External Scripts
-
-Import via `<script src="...">`. For TypeScript/NPM projects, bundle with `esbuild` into a single JS file, then
-reference via script tag.
-
-## Patterns
-
-### View Models
-
-Create a props struct with a `NewProps(domain)` constructor in Go. Templates receive only pre-transformed data — no I/O,
-no complex logic. Test view models as pure Go functions.
-
-### Layout Pattern
-
-Use children for content injection: define a layout component that renders `{ children... }`, then wrap page content
-with `@BaseLayout("title") { ... }`. Compose by nesting layouts.
-
-For multiple content slots, pass `templ.Component` as parameters alongside children:
-`templ TwoColumnLayout(sidebar templ.Component)` uses `@sidebar` and `{ children... }`.
-
-### Context for Cross-Cutting Data
-
-For auth, theme, locale — use Go `context` with private key types and type-safe `With*(ctx, value)` /
-`Get*(ctx) (T, bool)` helpers. Set in HTTP middleware, access via implicit `ctx` in templates. Prefer prop drilling for
-direct parent-child data. Always use type-safe getters — direct `ctx.Value(key).(Type)` panics on missing keys.
-
-### Interop with `html/template`
-
-`@templ.FromGoHTML(goTemplate, data)` embeds Go templates in templ. `templ.ToGoHTML(ctx, component)` embeds templ in Go
-templates. Useful for gradual migration.
+Read [`${CLAUDE_SKILL_DIR}/references/patterns.md`] when building a layout, wiring a context value through middleware,
+or embedding `html/template` output — it carries the view-model, nested-layout, multi-slot, context-helper, and interop
+shapes.
 
 ## Toolchain
 
-```bash
-templ generate                # compile all .templ -> Go
-templ generate -f file.templ  # single file
-templ generate -watch         # watch mode (dev only, not optimized for production)
-templ fmt .                   # format all .templ files
-```
-
-The `-watch` flag regenerates on file change. Combine with `-cmd` and `-proxy` for live-reload during development.
-
-Run `templ generate` after every `.templ` change. Generated `*_templ.go` files must be committed.
+- **Run `templ generate` after every `.templ` edit, before building, testing, or linting.** A stale `*_templ.go`
+  compiles cleanly and renders the previous markup.
+- **Commit every generated `*_templ.go`.** The Go build reads it and never runs templ.
+- **`templ fmt` formats `.templ` files.** `gofmt` and `golangci-lint fmt` do not read them.
+- **`templ generate -watch` is a development loop.** Run a plain `templ generate` before building a release artifact.
 
 ## Testing
 
-### Expectation Testing
+- **Parse the rendered HTML; never assert on the string.** templ minifies its output, so whitespace and attribute order
+  are not a contract.
+- **Select with `data-testid`**, never with a class name or the document structure.
+- **Compare a whole page with `htmldiff.Diff`** against an embedded fixture rather than with string equality.
+- **Test a page for the presence of its child components**, and test each component's own rendering in its own test.
 
-Render to pipe, parse with `goquery`, assert with CSS selectors:
-
-```go
-r, w := io.Pipe()
-go func() {
-    _ = myComponent(data).Render(context.Background(), w)
-    _ = w.Close()
-}()
-doc, err := goquery.NewDocumentFromReader(r)
-// Assert with doc.Find(`[data-testid="myComponent"]`)
-```
-
-Use `data-testid` attributes for reliable test selectors.
-
-### Snapshot Testing
-
-Compare rendered output against expected HTML using `//go:embed expected.html` and `htmldiff.Diff(component, expected)`.
-
-### Testing Principles
-
-- **Component-level tests**: verify data renders correctly using `data-testid` selectors
-- **Page-level tests**: verify components are present (by `data-testid`), don't re-test component internals
-- **Test view models in pure Go** — no rendering needed for data transformation logic
+Read [`${CLAUDE_SKILL_DIR}/references/testing.md`] when writing the first test for a component or a page — it carries
+the render-and-parse harness, the `htmldiff` snapshot form, and how to render a fragment under test.
 
 ## Application
 
-When **writing** templ code:
+When **writing** templ, apply these conventions silently — do not narrate a rule while following it. Where existing code
+contradicts one, follow the codebase and flag the divergence once. Run `templ generate` before reporting that the change
+builds.
 
-- Apply all conventions silently — don't narrate each rule being followed
-- If an existing codebase contradicts a convention, follow the codebase and flag the divergence once
-- Keep templates focused on rendering. Move data transformation, validation, and business logic to Go code
-- Run `templ generate` after every `.templ` change before attempting to build or test
+When **reviewing** templ, cite the violation and show the fix inline. Do not lecture.
 
-When **reviewing** templ code:
-
-- Cite the specific violation and show the fix inline
-- Don't lecture or quote the rule — state what's wrong and how to fix it
+```
+Bad:  "templ only sanitizes href, src, and action, so htmx attributes should be wrapped..."
+Good: hx-get={ path } -> hx-get={ templ.URL(path) }
+```
 
 ## Integration
 
-The **golang** skill governs Go implementation; this skill governs `.templ` file authoring.
+The **golang** skill governs every line outside a `templ` block — naming, error handling, testing conventions, and the
+Go toolchain — and wins on any question of how the Go code reads. This skill governs `.templ` source and the templ
+runtime API. The **coding** skill governs workflow. All are active at once.
 
-**Templates are renderers, not processors. When in doubt, move logic to Go.**
+**When a template needs to decide something, move the decision into Go.**

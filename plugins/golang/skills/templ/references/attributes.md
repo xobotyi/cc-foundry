@@ -1,5 +1,7 @@
 # Attributes Reference
 
+Every attribute form — constant, dynamic, boolean, conditional, key expression, spread — with its rendered output.
+
 ## Constant Attributes
 
 Standard HTML attributes with double quotes:
@@ -17,8 +19,8 @@ Set attributes to Go expressions using `{ }`:
 <div data-id={ fmt.Sprintf("item-%d", id) }></div>
 ```
 
-String values are automatically HTML-attribute-encoded (`<`, `>`, `&`, quotes become HTML entities). This doesn't affect
-behavior.
+String values are automatically HTML-attribute-encoded — `<`, `>`, `&`, and quotes become HTML entities. The encoding
+changes the bytes, not the parsed attribute value.
 
 Functions returning `(string, error)` propagate errors to `Render()`:
 
@@ -63,8 +65,8 @@ Dynamically set the attribute key:
 <p { "data-" + suffix }="value">Text</p>
 ```
 
-**Warning**: Key expressions don't get type-specific handling. URL attributes (`href`) and event handlers (`on*`)
-defined via key expressions are treated as plain strings without special sanitization.
+**Warning**: A key expression disables type-specific handling. An `href` or an `on*` handler defined through a key
+expression is a plain string attribute and receives no sanitization.
 
 ## Spread Attributes
 
