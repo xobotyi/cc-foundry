@@ -34,9 +34,14 @@ for ignored instructions, and the canonical scaffold. Subagents briefed to touch
 
 ## Routing
 
-- Project-universal rule → CLAUDE.md.
-- Path- or filetype-scoped convention → `.claude/rules/` with glob `paths` (this directory, repo root only).
-- Procedural workflow or domain expertise → a skill.
+- Project-universal rule → CLAUDE.md. Universal means the fence leaks otherwise — a glob would match files the rule does
+  not govern, or miss files it does — or the rule must hold before any file is read. Everything else that one glob
+  fences cleanly goes to `.claude/rules/` on the way in, not once the file grows too long.
+- Path- or filetype-scoped convention → `.claude/rules/` with glob `paths`. Every `.md` under a rules directory is
+  discovered recursively, and nested `packages/*/.claude/rules/` directories load on demand — cc-foundry keeps all rules
+  at the repo root by choice, not by constraint.
+- Procedural workflow or domain expertise → a skill. Plugins cannot ship rules; conventions that must reach an install
+  go in a skill.
 - Must-never-happen → hooks and permissions. Prose is not enforcement; models route around soft constraints.
 - Ephemeral state (sprint goals, in-flight migrations) → the tracker.
 
@@ -46,11 +51,13 @@ for ignored instructions, and the canonical scaffold. Subagents briefed to touch
   verification and critical constraints at the bottom. Restate a truly critical rule at both ends, worded differently.
 - The capability map is an ownership map — which module owns what, where new code of each kind goes — never a directory
   tree.
-- Past ~500 lines compliance degrades: classify each block keep / move-to-`.claude/rules/` / extract-to-skill / remove.
+- Past 200 lines compliance degrades: classify each block keep / move-to-`.claude/rules/` / extract-to-skill / remove.
   Safety-critical, security-sensitive, and easy-to-violate content stays regardless of how rarely it applies.
+- Only a `paths`-scoped rule reduces baseline context. A rule without `paths` loads at launch at the same priority as
+  `.claude/CLAUDE.md`, and `@path` imports expand at launch — splitting a file into imports buys organization, not
+  context.
 
 ## Formatting
 
-- After editing - format the file using
-  `vp dlx prettier --write --use-tabs --print-width 120 --parser markdown --prose-wrap always --bracket-same-line --html-whitespace-sensitivity strict <file-path>`
-  command.
+- After editing, format the file with `yarn dlx prettier --write <file>`. The repo config picks the parser — never pass
+  `--parser`, which forces the wrong one for CLAUDE.md and SKILL.md.
