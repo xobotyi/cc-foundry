@@ -161,9 +161,10 @@ prompt-engineering fundamentals. Includes an `ai-engineer` output style for coll
 
 Go's idioms differ from what other languages teach, and the common pitfalls follow: premature abstraction, incorrect
 error handling, interface misuse, concurrency bugs. This plugin provides a `golang` skill covering conventions, error
-handling, interfaces, concurrency, testing, and project structure, plus library skills: `templ` for type-safe HTML
-templating, `charm-tui` for terminal UIs with the Charmbracelet v2 stack (Bubble Tea, Bubbles, Lip Gloss, Huh, Glamour),
-and `zog` for schema validation.
+handling, interfaces, generics, concurrency, testing, and project structure, with per-version references so it writes
+code the module's `go` directive permits, plus library skills: `templ` for type-safe HTML templating, `charm-tui` for
+terminal UIs with the Charmbracelet v2 stack (Bubble Tea, Bubbles, Lip Gloss, Huh, Glamour), and `zog` for schema
+validation.
 
 ```
 /plugin install golang

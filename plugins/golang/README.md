@@ -43,18 +43,25 @@ Make sure `$GOPATH/bin` (or `$HOME/go/bin`) is in your PATH.
 
 ### golang
 
-Enforces Go language conventions and idioms across all Go code. Covers naming (MixedCaps, initialisms, receivers), error
-handling (always check, wrap with context, use errors.Is/As), interfaces (consumer-side, accept interfaces/return
-structs), concurrency (goroutines, channels, context cancellation, errgroup), testing (table tests, subtests, test
-doubles), and project structure (package organization, imports, breaking changes). Includes anti-pattern reference for
-quick lookups and detailed topic guides for errors, concurrency, testing, idioms, gotchas, and structure.
+Enforces the Go conventions a model gets wrong on its own, and leaves out the ones it already follows. Covers the traps
+(shadowed `err`, deferred argument evaluation, `append` aliasing, typed nil interfaces, copied mutexes), error
+discipline (handle once — log or return, never both; wrap without a "failed to" prefix; `%w` versus `%v`), goroutine
+lifecycles (every goroutine joined, channel buffers of zero or one, the `fmt.Errorf` deadlock), and the project
+conventions that diverge from vanilla Go — kebab-case file names, `give`/`want` table fields, `Test_TypeName`, test
+doubles in a `<subject>test` package. Topic guides for errors, concurrency, testing, idioms, gotchas, and structure live
+under `references/conventions/` and load only when the situation calls for one.
 
 The skill also enforces LSP-first navigation: use `goToDefinition` instead of grepping for function names,
 `findReferences` instead of text-searching for usages, `goToImplementation` instead of pattern-matching interface types,
 and `workspaceSymbol` instead of globbing for symbols. Grep/Glob remain appropriate for non-semantic searches (comments,
 string literals, config values).
 
-**Use when:** writing, reviewing, refactoring, debugging, or exploring any Go code.
+The skill teaches idioms without version gates and keeps a floor-version index for the features that have one, so it
+writes code the module's `go` directive actually permits. Per-version references under `references/versions/` (`go1.21`
+through `go1.27`) cover what each release added, which behavior changes its `go` directive gates, and the traps it
+introduced.
+
+**Use when:** writing, reviewing, refactoring, debugging, or exploring any Go code, or raising a module's Go version.
 
 ### templ
 
