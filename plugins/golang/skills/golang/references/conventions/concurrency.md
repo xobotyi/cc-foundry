@@ -348,8 +348,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-`context.WithoutCancel` (Go 1.21+) creates a context that inherits values but not cancellation. Use it for
-fire-and-forget background work.
+`context.WithoutCancel` creates a context that inherits values but not cancellation. Use it for fire-and-forget
+background work.
 
 ## Synchronization
 

@@ -476,7 +476,7 @@ func (w *Worker) Start(ctx context.Context) {
 
 ### `any` Over `interface{}`
 
-Prefer the `any` alias (Go 1.18+) over `interface{}`:
+Prefer the `any` alias over `interface{}`:
 
 ```go
 // Good

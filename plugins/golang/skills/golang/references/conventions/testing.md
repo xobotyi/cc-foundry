@@ -98,8 +98,7 @@ func TestDatabase(t *testing.T) {
 for _, tt := range tests {
     t.Run(tt.name, func(t *testing.T) {
         t.Parallel()
-        // test body — tt is safe in Go 1.22+
-        // for Go < 1.22, shadow: tt := tt
+        // test body — each iteration has its own tt
     })
 }
 ```
@@ -446,10 +445,11 @@ func BenchmarkFoo(b *testing.B) {
 
 Key rules:
 
-- Use `b.Loop()` (Go 1.24+) or `for i := 0; i < b.N; i++` for the benchmark loop
+- Use `for b.Loop() { ... }` for the benchmark loop — the body runs once per `-count`, so setup and cleanup outside it
+  execute once, and call parameters and results stay alive
 - Use `b.ResetTimer()` after expensive setup
 - Use `b.ReportAllocs()` to track allocations
-- Ensure the result is used (assign to package-level var) to prevent compiler optimization from eliminating the call
+- With a legacy `b.N` loop, assign the result to a package-level var to stop the compiler eliminating the call
 - Run with `-benchtime=5s` or use `benchstat` for stable micro-benchmarks
 
 ## Test Naming
