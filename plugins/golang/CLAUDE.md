@@ -7,13 +7,13 @@ code intelligence via `gopls`.
 
 - **`golang`** — Go language conventions, idioms, error handling, concurrency patterns, generics, project structure,
   testing, toolchain (go mod, golangci-lint, go fix, go vet), language-version gating, and LSP navigation rules
-- **`templ`** — templ (a-h/templ) type-safe HTML templating: syntax, components, attributes, styling, CSS/JS
-  integration, and testing
+- **`templ`** — templ (a-h/templ) type-safe HTML templating: syntax, components, attributes, escaping and sanitization,
+  styling, JavaScript data passing, code generation, and testing
 - **`charm-tui`** — Charmbracelet v2 TUI stack (`charm.land/*/v2`): Bubble Tea Elm architecture, Bubbles components, Lip
   Gloss styling/layout, Huh forms, Glamour markdown, fang/log, at-scale architecture (crush patterns), golden-file and
   teatest testing
-- **`zog`** — Zog schema validation library: schema definition, parsing, validation, error handling, HTTP/JSON/env
-  integration, custom tests, and transforms
+- **`zog`** — Zog schema validation library: schema shape, Parse against Validate, required and default semantics, tests
+  and transforms, issue handling, and the zhttp/zjson/zenv adapters
 
 ## LSP Integration
 
@@ -28,9 +28,12 @@ search tools remain appropriate for non-semantic searches (comments, string lite
 
 ## Skill Dependencies
 
-The `golang` skill provides language-specific conventions. The `templ` skill extends those conventions to `.templ` files
-and references `golang` error handling and naming rules. The `zog` and `charm-tui` skills are standalone — they cover
-their library stacks (Zog validation; Charmbracelet v2 TUI), deferring to `golang` for general Go conventions.
+The `golang` skill provides language-specific conventions and wins on any question of how Go code reads. The `templ`,
+`zog`, and `charm-tui` skills each own one library stack and defer to `golang` for language conventions. Each states
+that boundary in its own Integration section, and each ships a `references/` directory loaded on demand.
+
+One boundary inverts: the `zog` key-naming rule outranks Go naming inside a `z.Shape`, because a shape key names a
+struct field rather than reading as Go code.
 
 All skills assume the `the-coder` plugin for language-agnostic coding discipline (discovery, planning, verification).
 
@@ -58,8 +61,14 @@ practices (discovery, planning, verification) are provided by the `the-coder` pl
 - Error handling is mandatory — never discard errors with `_`
 - Interfaces are defined consumer-side, not producer-side
 - LSP tools are required for code navigation — Grep/Glob only for non-semantic text search
+- Every skill in this plugin splits its references by load condition, and every pointer states the condition that loads
+  it at the point of need. A catalog block listing the reference set is the anti-pattern
+- A reference is one hop from SKILL.md — a reference never routes to another reference, nor back to SKILL.md
 - `golang` skill references split by kind: `references/conventions/` for topic depth, `references/versions/` for
-  per-release notes. Both are linked directly from SKILL.md — a reference never routes to another reference
+  per-release notes
+- Library API claims are verified against the module source in the Go module cache, never against memory or upstream
+  prose. A module missing from the cache is resolved through `proxy.golang.org` — absence from the cache is not evidence
+  it does not exist
 - The `go` directive in `go.mod`, not the installed toolchain, decides which language features and stdlib symbols apply
 - All `.templ` files must be compiled with `templ generate` before building
 - Generated `*_templ.go` files must be committed to version control

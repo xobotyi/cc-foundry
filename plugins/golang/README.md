@@ -65,12 +65,17 @@ introduced.
 
 ### templ
 
-Enforces templ templating conventions for type-safe HTML rendering. Covers syntax (expressions, control flow, element
-closing), attributes (constant, dynamic, boolean, spread), component patterns (definition, composition, children,
-render-once), styling (class/style expressions, CSS components), JavaScript integration (script tags, data passing), and
-testing (expectation vs snapshot). Includes anti-pattern reference and detailed topic guides for syntax, attributes,
-components, styling, JavaScript, and patterns. **Use when:** writing or reviewing `.templ` files, creating components,
-composing templates, or testing rendered output.
+Enforces templ conventions for type-safe HTML rendering, concentrating on the places templ diverges from what a model
+would assume. `{ }` writes a value while `{{ }}` runs Go statements — the opposite of `html/template`, and the most
+likely habit to carry over wrongly. Void elements must close in source. Text starting with `if` or `for` parses as a
+statement. A conditional attribute replaces rather than merges, so a flipped condition silently drops the base classes.
+Only `href`, `src`, and `action` sanitize a dynamic URL, which is why an htmx attribute needs an explicit `templ.URL()`.
+Sanitizers substitute a fixed marker instead of failing, so the skill lists the markers as the diagnostic.
+
+Topic guides for syntax, components, attributes, styling, JavaScript, patterns, and testing load only when the situation
+calls for one.
+
+**Use when:** writing or reviewing `.templ` files, creating components, composing templates, or testing rendered output.
 
 ### charm-tui
 
@@ -80,17 +85,30 @@ v2-focused (`charm.land/*/v2` imports): it encodes the declarative `tea.View` mo
 explicit light/dark color handling, component lifecycle rules, the stack authors' own production architecture patterns
 (from crush), and testing with golden files and teatest.
 
+The v2 focus is the point. Model training data is saturated with v1 code, so a remembered idiom either fails to compile
+or misbehaves silently — `View()` returns a struct rather than a string, terminal features are View fields rather than
+program options, `tea.KeyMsg` became an interface that also matches key releases, and `AdaptiveColor` is gone. Every API
+claim in the skill is verified against the module source rather than recalled.
+
 **Use when:** building, reviewing, debugging, or testing terminal UIs, bubbletea programs, terminal styling,
 keybindings, forms, or interactive terminal output in Go.
 
 ### zog
 
-Covers the Zog schema validation library — a Zod-inspired declarative schema builder for Go. The skill provides the
-complete API reference inline: all schema types (String, Int, Float, Bool, Time, Struct, Slice, Ptr, Boxed), generic
-methods (Required, Default, Catch, Transform, Test), Parse vs Validate semantics, error handling (ZogIssueList,
-formatting strategies), HTTP/JSON/env integration packages (zhttp, zjson, zenv), custom tests, transforms,
-preprocessing, i18n, and global configuration. Includes common patterns for HTTP handlers, struct validation methods,
-and environment config parsing.
+Covers the Zog schema validation library — a Zod-inspired declarative schema builder for Go. Zog wears a Zod-shaped API
+over Go semantics, and the two disagree in ways that still compile, so the skill leads with those disagreements. Fields
+are optional by default. A `z.Shape` key names a Go struct field rather than an input key, which is the library's most
+commonly reported panic.
+
+The sharpest divergence is what "missing" means. `Parse` treats only a nil input as missing, so `.Required()` accepts an
+empty form field, an empty query parameter, and a JSON `""`. `Validate` treats every Go zero value as missing, and a
+missing value skips every test on the chain — `z.Bool().True()` accepts `false` and `z.Int().GT(10)` accepts `0`. The
+skill states each of these as a rule, along with chain position deciding execution order, issue paths tracking the input
+key rather than the schema key, zhttp falling through to query parsing on an unrecognized Content-Type, and the global
+message map that silently ignores reassignment.
+
+Topic guides for the schema catalog, input adapters, issue handling, messages and i18n, and custom schemas load only
+when the situation calls for one.
 
 **Use when:** writing schemas, parsing HTTP/JSON/env input, validating structs, handling Zog errors, or integrating Zog
 into Go services.
