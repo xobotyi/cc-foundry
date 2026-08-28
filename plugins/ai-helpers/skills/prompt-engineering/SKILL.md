@@ -154,7 +154,7 @@ calibrated against one model generation and moves with capability; the shape of 
 - **Count before adding, not after.** The cost of an instruction is paid on every turn; the benefit only on turns where
   it applies. A rule that matters one time in twenty is a bad trade at any length.
 - **Over budget: delete, do not compress.** A rule shortened from three lines to one still occupies a slot. Compression
-  saves tokens and saves no attention. Only removal returns budget.
+  buys back tokens, never a slot; only removal returns budget.
 - **Load conditionally what applies conditionally.** Rules needed in one phase belong in a file read at that phase. A
   rule present on every turn should be one that matters on most of them.
 

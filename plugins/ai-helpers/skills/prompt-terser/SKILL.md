@@ -89,8 +89,9 @@ Apply these substitutions to the entire prompt body. Rewrite rules, not judgment
 
 ### Emphasis exception
 
-- **Keep emphasis** in critical-rule blocks at the top 20% or bottom 20% of the prompt — the primacy and recency
-  positions — and in safety guardrails, e.g. **"You must NEVER X"** rather than **"Never X"**
+- **Keep the emphasis you find** in critical-rule blocks at the top 20% or bottom 20% of the prompt — the primacy and
+  recency positions — and on safety guardrails. This pass never flattens emphasis, and never adds or escalates it;
+  whether emphasis earns its place is a prompt-engineering judgement
 - **Keep emphasis** on rule-prefix bolds in bullet lists (`- **Lead with function.** ...`) and KV-list labels — these
   function as keys, not prose emphasis, regardless of position
 - **Strip emphasis** from descriptive prose, rationale paragraphs, and anything between those positions
