@@ -1,476 +1,185 @@
 ---
 name: zog
 description: >-
-  Zog schema validation library: schema definition, parsing, validation, error handling, HTTP/JSON/env
-  integration, custom tests, and transforms. Invoke whenever task involves any interaction with Zog — writing schemas,
-  parsing input, validating structs, handling errors, or integrating with HTTP handlers.
+  Write and review Zog schema validation in Go: schema shape, Parse against Validate, required and default semantics,
+  tests and transforms, issue handling, and the zhttp, zjson, and zenv adapters.
+when_to_use: >-
+  Invoke whenever a Zog schema is touched at all — writing, reviewing, refactoring, or debugging a schema, a Parse or
+  Validate call, a custom test, or a validation error response. Also invoke on the symptoms: Zog panics with "Struct is
+  missing expected schema key", `Required()` accepts an empty form field, a test never runs on a zero value, an issue
+  path does not match the JSON key, `Trim()` runs after the length check, or a global message override has no effect.
+  Covers the Zog API; Go language conventions belong to the golang skill, and language-agnostic workflow to the coding
+  skill.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Zog
+Zog is a Zod-shaped API over Go semantics, and the two disagree in ways that still compile. Import as
+`z "github.com/Oudwins/zog"`. Three biases decide most calls:
+
+- **A remembered Zod default is a defect until checked.** Fields are optional by default, `z.Enum` does not exist, and a
+  schema key names a Go struct field rather than an input key.
+- **`Parse` and `Validate` disagree about what missing means**, and that disagreement decides which tests in a chain run
+  at all.
+- **Zog panics on a schema its author built wrong, and never on input data.** A panic is a defect in the schema
+  definition, fixed there.
+
+## Schema Shape
+
+- **A `z.Shape` key names a Go struct field, never an input key.** The first letter is case-corrected, so `"name"` and
+  `"Name"` both bind to `Name`. A key matching no field panics with
+  `Struct Schema Definition Error ... missing expected schema key`.
+- **Struct tags map input keys and nothing else.** Resolution runs `json`, `form`, `query`, or `env` for the source in
+  use, then `zog`, then the schema key as written.
+- **`z.Struct(...).Required()` and `.Optional()` compile and do nothing.** An optional nested struct needs
+  `z.Ptr(z.Struct(...)).NotNil()`.
+- **Wrap the schema in `z.Ptr` wherever the destination field is a pointer.** A `z.Slice(...)` against a `*[]T` field
+  panics with a type-cast error.
+- **`z.Ptr` carries only `.NotNil()`.** Put `Required`, `Default`, `Catch`, `Test`, and `Transform` on the inner schema.
+- **Declare every schema once, at package level.** A schema rebuilt per call costs roughly twice the time and several
+  times the memory of a reused one, and the gap widens with the number of fields.
+- **`Pick`, `Omit`, `Extend`, and `Merge` return shallow copies and are not type-checked.** A key naming no struct field
+  panics at execution rather than failing to compile.
+
+Read [`${CLAUDE_SKILL_DIR}/references/schema-catalog.md`] when reaching for a constructor, a validator, a test option,
+or an issue code that is not already in the chain — it carries every schema type with its full method set and
+signatures, the three option families, and the issue-code and type constants.
+
+## Missing Values
+
+`Parse` and `Validate` implement "missing" differently, and every rule below follows from that split.
+
+- **`Parse` treats only a nil input as missing.** `z.String().Required().Parse("", &dest)` reports nothing, and an empty
+  form field, an empty query parameter, and a JSON `""` all arrive present. Add `.Min(1)` where an empty value must
+  fail.
+- **`Validate` treats every Go zero value as missing**, so a legitimate `0`, `""`, or `false` fails `.Required()`.
+- **A missing value skips every test on an optional schema.** Under `Validate` that means `z.Bool().True()` accepts
+  `false`, `z.Int().GT(10)` accepts `0`, `z.Slice(...).Min(1)` accepts an empty slice, and a custom `TestFunc` never
+  runs. Wrapping in `z.Ptr(...).NotNil()` does not change it, because the inner schema still short-circuits.
+- **To reject a zero value under `Validate`, use `.Required()` and set its message** —
+  `z.Bool().Required(z.Message("terms must be accepted"))`. No other test reaches the value.
+- **`.Required()` runs before every test and transform, whatever its position in the chain.**
+  `z.String().Trim().Required()` accepts `"   "` and then trims it to `""`.
+- **`.Default` outranks `.Required` and applies in both modes**, so `Validate` replaces an explicitly set zero value
+  with the default. Tests still run on the substituted value.
+- **`.Catch` swallows every issue** — coercion failure, required, and each test — writes its value, and stops the chain.
+  Keep it off anything whose failure must reach the caller.
+- **Structs support neither `.Default` nor `.Catch`; slices support `.Default` but not `.Catch`.**
+
+## Parse and Validate
+
+- **`Parse(data, &dest, opts...)` at an IO boundary, `Validate(&value, opts...)` on an already-typed value.** Parse
+  coerces the input; Validate does not, and allocates nothing on the success path.
+- **Both destinations are pointers.** A value destination panics rather than reporting an issue.
+- **`z.WithCoercer` is a `SchemaOption` and belongs on the constructor** — `z.String(z.WithCoercer(fn))`.
+  `z.WithCtxValue` and `z.WithIssueFormatter` are `ExecOption`s and belong on `Parse` or `Validate`.
+- **Read a per-execution value inside a test with `ctx.Get(key)`**, paired with `z.WithCtxValue(key, val)` at the call.
+
+## Tests and Transforms
+
+- **Chain position is execution order.** `z.String().Trim().Min(3)` measures the trimmed value; `.Min(3).Trim()`
+  measures the raw one.
+- **`.TestFunc(fn, opts...)` is Zod's `refine`; `.Test(z.Test[T]{Func: ...})` is `superRefine`**, and the latter adds
+  its own issues with `ctx.AddIssue(ctx.Issue().SetMessage(...))`.
+- **A primitive test receives a typed pointer; a struct, slice, or map test receives `any`** — assert it to the struct
+  pointer inside the function.
+- **The package-level `z.TestFunc(code, fn, opts...)` builds a reusable `z.Test[T]` for `.Test(...)`.** It takes an
+  issue code as its first argument; the method of the same name does not.
+- **`.Not()` negates only the next test** and prefixes that test's issue code with `not_`. The interface it returns
+  omits `Min`, `Max`, `Test`, `TestFunc`, and a second `Not`.
+- **A transform mutates through its pointer and returns an error to stop the chain.** `.Trim()` is a transform, so it
+  runs where it sits rather than before the tests.
+- **`z.Preprocess(fn, schema)` receives the raw input under `Parse` but a pointer to the value under `Validate`.** A
+  type mismatch there panics rather than reporting an issue.
+
+## Types Without a Built-In Schema
+
+- **A named type over a primitive needs the `Like` constructor** — `z.StringLike[Env]()`, `z.IntLike[Status]()`. A plain
+  `z.String()` against a `type Env string` field panics with a type-cast error.
+- **A type Zog does not know takes `z.CustomFunc(fn, opts...)`**, which validates through a typed pointer and performs
+  no coercion.
+- **A wrapper such as `sql.NullString` takes `z.Boxed(schema, unbox, box)`**, added in v0.21.10.
+
+Read [`${CLAUDE_SKILL_DIR}/references/custom-schemas.md`] when a value's Go type has no built-in schema, or its input
+shape does not match one — it carries the named-type, `CustomFunc`, `Boxed`, and fully custom `z.Use` forms with working
+code, the `Preprocess` contract, the coercion hooks, and the experimental map and recursive constructors.
+
+## Issues
+
+- **Every schema returns `z.ZogIssueList`, which is `[]*z.ZogIssue`; test it with `len(errs) > 0`.**
+- **An issue path segment is the input key, not the schema key.** One schema yields `first_name` through `zjson` and
+  `first-name` through `Validate`, because each source resolves the field through its own tag. Give a field a `zog` tag
+  equal to its `json` tag where the error keys must stay stable across both.
+- **A root issue carries a nil path** and flattens under `zconst.ISSUE_KEY_ROOT`, the string `"$root"`.
+- **`issue.Message` is the only field safe to return to a user.** `issue.Err` holds the underlying cause and belongs in
+  a log.
+- **Never read an issue after `z.Issues.Collect`** — it returns the struct to a pool the next parse draws from.
+
+Read [`${CLAUDE_SKILL_DIR}/references/issue-handling.md`] when a validation failure has to be shaped into a response
+body, a template, or a log line — it carries the `ZogIssue` fields, the path rules per input source, and the rendered
+output of `Flatten`, `GroupByFlattenedPath`, `Treeify`, and `Prettify`.
 
-Zod-inspired schema validation for Go. Declarative schema builder with runtime parsing and validation. Import as
-`z "github.com/Oudwins/zog"`.
+## Input Adapters
 
-<critical>
+- **`zhttp.Request(r)` routes on method first, then on Content-Type**, and **falls through to query parsing for any
+  unrecognized content type** — a JSON body sent as `text/plain` silently yields nothing.
+- **Multipart requires `r.ParseMultipartForm` in the handler first.** Without it the parser reports
+  `invalid_multipart_form` and the schema never runs.
+- **`zhttp` and `zjson` parse into a struct only.** A JSON array, a bare primitive, and `null` each produce one
+  `invalid_json` root issue.
+- **An adapter failure produces one root issue and stops** — `invalid_json`, `invalid_form`, `invalid_multipart_form`,
+  or `invalid_query`.
+- **`zenv` trims every value and treats an empty variable as absent**, so `PORT=` triggers `.Required()` and takes a
+  `.Default()`.
 
-- All fields are **optional by default** (opposite of Zod)
-- Schema keys in `z.Shape{}` must match **struct field names**, not input data keys — use struct tags (`json`, `form`,
-  `zog`) for input key mapping
-- All schemas return `ZogIssueList`
-- Check errors with `len(errs) > 0`, not `errs != nil`
-- Zog **panics on schema misconfiguration** (destination type mismatch, missing struct fields) but never on invalid
-  input data
-- Do not depend on test execution order — tests may run in parallel in future versions
+Read [`${CLAUDE_SKILL_DIR}/references/input-adapters.md`] when the input comes from an HTTP request, a JSON body, or the
+environment — it carries the handler and config shapes, the content-type routing table, the query and form value rules
+including repeated and `[]`-suffixed keys, and the parser override hook.
 
-</critical>
+## Messages
 
-## Parse vs Validate
+- **Set a message on the test that produces it** — `z.Message("...")`, or `z.MessageFunc` for one built from `e.Params`
+  and `e.Value`.
+- **Reassigning `conf.DefaultIssueMessageMap` or `conf.DefaultErrMsgMap` silently does nothing.** The formatter closes
+  over the map at package initialization. Mutate entries in place, or install a new formatter with
+  `conf.IssueFormatter = conf.NewDefaultFormatter(m)`.
 
-Two entry points, same schemas:
+Read [`${CLAUDE_SKILL_DIR}/references/messages-and-i18n.md`] when an issue message must be overridden or served in more
+than one language — it carries the four override layers with their precedence, the message template placeholders, and
+the `i18n` setup with its language-key and fallback rules.
 
-- `schema.Parse(data, &dest, ...opts)` — coerces untyped input into destination. Use at IO boundaries (HTTP, JSON, env)
-- `schema.Validate(&value, ...opts)` — validates existing Go values. No coercion. More efficient when data is already
-  typed
+## Panics
 
-**Key difference:** `Validate` treats zero values as missing when `Required()` is set. Use `z.Ptr()` + `.NotNil()` to
-distinguish "not provided" from "zero value":
+A panic always names a schema definition error, never bad input. Four causes account for every one:
 
-```go
-// Parse can distinguish 0 from missing
-z.Int().Required().Parse(0, &dest) // ok
+- a `z.Shape` key naming no struct field
+- a destination passed by value rather than by pointer
+- a schema whose type does not match the destination field
+- a coercer returning a value of the wrong Go type
 
-// Validate cannot — use pointer
-z.Ptr(z.Int()).NotNil().Validate(&valPtr) // nil = missing, *0 = valid
-```
-
-**Prefer `Validate` when data is already typed.** Use `Parse` when accepting external input that needs coercion.
-
-## Schema Types
-
-### Primitives
-
-All primitive `.Parse()` / `.Validate()` return `ZogIssueList`.
-
-**String:**
-
-- `z.String()` — base string schema
-- `.Trim()` — transform: trims whitespace
-- `.Min(n)`, `.Max(n)`, `.Len(n)` — length validators
-- `.Email()`, `.URL()`, `.UUID()`, `.IPv4()` — format validators
-- `.Match(regex)` — regex match
-- `.Contains(s)`, `.ContainsUpper()`, `.ContainsDigit()`, `.ContainsSpecial()` — content validators
-- `.HasPrefix(s)`, `.HasSuffix(s)` — prefix/suffix validators
-- `.OneOf([]string{...})` — enum-like validation (replaces Zod's `z.Enum()`)
-- `.Not()` — negates the next test
-
-**Numbers:**
-
-- `z.Int()`, `z.Int32()`, `z.Int64()`, `z.Float32()`, `z.Float64()` — numeric schemas
-- `.GT(n)`, `.GTE(n)`, `.LT(n)`, `.LTE(n)`, `.EQ(n)` — comparison validators
-- `.OneOf([]T{...})` — enum-like validation
-- `.Not()` — negates the next test
-
-**Bool:**
-
-- `z.Bool()` — boolean schema
-- `.True()`, `.False()`, `.EQ(v)` — value validators
-
-**Time:**
-
-- `z.Time()` — validates `time.Time`
-- `.After(t)`, `.Before(t)`, `.Is(t)` — temporal validators
-- `z.Time(z.Time.Format(layout))` — parse strings using layout (default: `time.RFC3339`). Coercion only works with
-  `Parse()`, not `Validate()`
-
-### Complex Types
-
-**Struct:**
-
-```go
-schema := z.Struct(z.Shape{
-    "name": z.String().Required(),
-    "age":  z.Int().GT(0),
-})
-```
-
-- `.Pick("key1", map[string]bool{"a": true})` — shallow copy with only specified fields
-- `.Omit("key1", map[string]bool{"a": true})` — shallow copy without specified fields
-- `.Extend(z.Shape{...})` — shallow copy with additional fields
-- `.Merge(other1, other2)` — merge schemas, last wins on conflict
-- Structs cannot be `Required()` or `Optional()` — use `z.Ptr(z.Struct(...))` for optional structs
-
-**Slice:**
-
-```go
-schema := z.Slice(z.String().Required())
-```
-
-- `.Min(n)`, `.Max(n)`, `.Length(n)` — size validators
-- `.Contains(val)` — element presence validator
-- `.Not()` — negates the next test
-
-**Pointer:**
-
-```go
-z.Ptr(z.String()) // pointer to string
-```
-
-- `.NotNil()` — equivalent to `Required()` for other types
-
-**Boxed:**
-
-```go
-z.Boxed[BoxType, InnerType](innerSchema, unboxFunc, boxFunc)
-```
-
-Wraps a schema with custom box/unbox logic for types like `sql.NullString`, `driver.Valuer`, or custom wrappers. The
-`unboxFunc` extracts the inner value; `boxFunc` creates the wrapper from validated value (can be `nil` if boxing not
-needed).
-
-### Custom Primitive Schemas
-
-For named types based on primitives:
-
-```go
-type Env string
-z.StringLike[Env]().OneOf([]Env{"prod", "dev"})
-```
-
-Available: `z.StringLike[T]()`, `z.IntLike[T]()`, `z.FloatLike[T]()`, `z.UintLike[T]()`, `z.BoolLike[T]()`
-
-### CustomFunc
-
-Quick validation for non-primitive types without defining a full schema:
-
-```go
-z.CustomFunc(func(valPtr *uuid.UUID, ctx z.Ctx) bool {
-    return valPtr.IsValid()
-}, z.Message("invalid uuid"))
-```
-
-Does not support coercion.
-
-## Generic Schema Methods
-
-Available on all schema types:
-
-- `.Required()` — field must be present and non-zero
-- `.Optional()` — field can be absent (default behavior)
-- `.Default(val)` / `.DefaultFunc(fn)` — use this value when input is zero. Takes priority over `Required()`. Tests
-  still run
-- `.Catch(val)` / `.CatchFunc(fn)` — on any error, set destination to this value and stop execution
-- `.Test(z.Test{...})` — complex custom test (like Zod's `superRefine`)
-- `.TestFunc(fn, ...opts)` — simple custom test (like Zod's `refine`)
-- `.Transform(func(valPtr *T, ctx z.Ctx) error)` — post-validation in-place mutation
-
-Execution order: nil check → default/required → coerce → validation loop (tests + transforms in order) → catch on error
-
-## Struct Tags
-
-Schema keys match struct field names by default. Use struct tags for input key mapping:
-
-- `json` — JSON input
-- `form` — form data
-- `query` — query params
-- `env` — environment variables
-- `zog` — catch-all, works for any input
-
-Priority: `json`/`form`/`query`/`env` → `zog` → schema field name
-
-```go
-type User struct {
-    Name     string `zog:"first-name"`
-    LastName string `query:"last_name" json:"last-name"`
-}
-```
-
-## Custom Tests
-
-**Simple (refine-like):** Return `bool` — Zog creates the issue:
-
-```go
-z.String().TestFunc(func(data *string, ctx z.Ctx) bool {
-    return *data == "expected"
-}, z.Message("must be expected"))
-```
-
-For structs/slices, the parameter is `any` — cast manually:
-
-```go
-z.Struct(z.Shape{...}).TestFunc(func(dataPtr any, ctx z.Ctx) bool {
-    user := dataPtr.(*User)
-    return user.Name != ""
-})
-```
-
-**Complex (superRefine-like):** Add issues manually via context:
-
-```go
-z.String().Test(z.Test{
-    Func: func(val any, ctx z.Ctx) {
-        s := val.(string)
-        if !isValid(s) {
-            ctx.AddIssue(ctx.Issue().SetMessage("invalid value"))
-        }
-    },
-})
-```
-
-**Reusable tests:** Wrap in functions returning `z.Test[T]`:
-
-```go
-func MinWords(n int, opts ...z.TestOption) z.Test[any] {
-    options := []z.TestOption{z.Message(fmt.Sprintf("must have at least %d words", n))}
-    options = append(options, opts...)
-    return z.TestFunc(func(val any, ctx z.Ctx) bool {
-        s := val.(*string)
-        return len(strings.Fields(*s)) >= n
-    }, options...)
-}
-```
-
-## Transforms
-
-Post-validation mutation via pointer. Runs in declaration order with tests:
-
-```go
-z.String().Min(3).Transform(func(valPtr *string, ctx z.Ctx) error {
-    *valPtr = strings.ToLower(*valPtr)
-    return nil
-})
-```
-
-Struct transforms receive `any` — cast to struct pointer:
-
-```go
-z.Struct(z.Shape{...}).Transform(func(dataPtr any, ctx z.Ctx) error {
-    user := dataPtr.(*User)
-    user.FullName = user.First + " " + user.Last
-    return nil
-})
-```
-
-Returning an error from a transform stops execution and produces an issue.
-
-## Preprocess
-
-Transform input **before** parsing. Pure function — creates a copy:
-
-```go
-z.Preprocess(func(data any, ctx z.Ctx) (any, error) {
-    s, ok := data.(string)
-    if !ok {
-        return nil, fmt.Errorf("expected string, got %T", data)
-    }
-    return strings.Split(s, ","), nil
-}, z.Slice(z.String().Email().Required()))
-```
-
-**Footgun:** With `Validate()`, the `data` argument is a pointer to the value, not the raw input.
-
-## Error Handling
-
-### ZogIssue
-
-```go
-type ZogIssue struct {
-    Code    zconst.ZogIssueCode // issue identifier (e.g., "required", "min", "email")
-    Path    []string            // location in data structure (nil for root primitives)
-    Value   any                 // input value that caused the issue
-    Dtype   string              // destination type
-    Params  map[string]any      // test parameters (may be nil)
-    Message string              // human-readable, user-safe message
-    Err     error               // underlying error or nil
-}
-```
-
-All schemas return `ZogIssueList = []*ZogIssue`. Each issue has a `Path` field:
-
-- Primitive root: `nil`
-- Struct field: `[]string{"name"}`
-- Nested: `[]string{"address", "streets", "[0]"}`
-- Path to string: `issue.PathString()` or `z.Issues.FlattenPath(issue.Path)`
-
-### Formatting Strategies
-
-- `z.Issues.Flatten(errs)` — `map[path][]messages`. Root issues under `"$root"` key (`zconst.ISSUE_KEY_ROOT`)
-- `z.Issues.Treeify(errs)` — nested tree mirroring data structure. Each node has `errors` array and `properties`/`items`
-- `z.Issues.Prettify(errs)` — human-readable string with `✖` prefix and `→ at path` lines
-
-### Issue Codes
-
-Common codes: `required`, `coerce`, `custom`, `min`, `max`, `len`, `email`, `uuid`, `url`, `match`, `gt`, `gte`, `lt`,
-`lte`, `eq`, `one_of_options`, `after`, `before`, `true`, `false`, `prefix`, `suffix`, `contains_upper`,
-`contains_digit`, `contains_special`, `contained`
-
-HTTP-specific: `invalid_json`, `invalid_form`, `invalid_query`
-
-### Custom Messages
-
-Per-test: `z.Message("text")`, `z.MessageFunc(fn)`, `z.IssueCode("code")`, `z.IssuePath("path")`
-
-```go
-z.String().Min(5, z.Message("must be at least 5 chars"))
-```
-
-Per-execution: `z.WithIssueFormatter(fn)` — overrides all messages for one `Parse`/`Validate` call
-
-Global: Override `conf.DefaultIssueMessageMap[zconst.TypeString][zconst.IssueCodeRequired]` or replace
-`conf.IssueFormatter`
-
-## Test Options
-
-Options passed to any test:
-
-- `z.Message("...")` — static issue message
-- `z.MessageFunc(func(e *ZogIssue, ctx z.Ctx))` — dynamic issue message
-- `z.IssueCode("...")` — override issue code
-- `z.IssuePath("...")` — override issue path
-
-## Execution Options
-
-Options passed to `Parse()` / `Validate()`:
-
-- `z.WithCoercer(fn)` — per-schema coercion override (Parse only)
-- `z.WithIssueFormatter(fn)` — override message formatting for this execution
-- `z.WithCtxValue(key, val)` — pass custom data to tests/transforms via `ctx.Get(key)`
-
-## Context
-
-`z.Ctx` interface available in tests, transforms, and preprocessors:
-
-- `ctx.Get(key)` — retrieve value set via `z.WithCtxValue()`
-- `ctx.AddIssue(issue)` — add a custom issue
-- `ctx.Issue()` — create a new issue pre-filled with current schema context (path, value, type)
-
-## HTTP Integration (zhttp)
-
-```go
-import "github.com/Oudwins/zog/zhttp"
-
-errs := userSchema.Parse(zhttp.Request(r), &user)
-```
-
-`zhttp.Request(r)` auto-detects content type (JSON, form, query params). Only supports parsing into structs.
-
-Invalid input produces a root issue with code `invalid_json`, `invalid_form`, or `invalid_query` — the schema does not
-run.
-
-## JSON Integration (zjson)
-
-```go
-import "github.com/Oudwins/zog/parsers/zjson"
-
-errs := userSchema.Parse(zjson.Decode(bytes.NewReader(jsonBytes)), &user)
-```
-
-Accepts `io.Reader` or `io.ReaderCloser`. Only supports structs.
-
-## Environment Variables (zenv)
-
-```go
-import "github.com/Oudwins/zog/zenv"
-
-errs := envSchema.Parse(zenv.NewDataProvider(), &cfg)
-```
-
-Use `env` or `zog` struct tags for key mapping. Coercion handles string-to-type conversion automatically.
-
-## i18n
-
-```go
-import (
-    "github.com/Oudwins/zog/i18n"
-    "github.com/Oudwins/zog/i18n/en"
-    "github.com/Oudwins/zog/i18n/es"
-)
-
-// Setup
-i18n.SetLanguagesErrsMap(map[string]i18n.LangMap{
-    "en": en.Map,
-    "es": es.Map,
-}, "en") // default language
-
-// Per-execution
-schema.Parse(data, &dest, z.WithCtxValue(i18n.LangKey, "es"))
-```
-
-Single language: set `conf.DefaultErrMsgMap = es.Map`.
-
-## Global Configuration
-
-Via `github.com/Oudwins/zog/conf`:
-
-- `conf.Coercers.Float64 = func(data any) (any, error) {...}` — override type coercion
-- `conf.DefaultCoercers.Float64(data)` — fallback to default coercer
-- `conf.DefaultIssueMessageMap` — override issue messages per type and code
-- `conf.IssueFormatter` — replace the global issue formatter
-
-## Patterns
-
-### Struct Validate Method
-
-```go
-var userSchema = z.Struct(z.Shape{
-    "ID":   z.Int().Required(),
-    "Name": z.String().Required().Min(2),
-})
-
-func (u *User) Validate() z.ZogIssueList {
-    return userSchema.Validate(u)
-}
-```
-
-### HTTP Handler
-
-```go
-func handleCreate(w http.ResponseWriter, r *http.Request) {
-    var user User
-    if errs := userSchema.Parse(zhttp.Request(r), &user); len(errs) > 0 {
-        w.WriteHeader(http.StatusBadRequest)
-        json.NewEncoder(w).Encode(z.Issues.Flatten(errs))
-        return
-    }
-    // user is valid and populated
-}
-```
-
-### Environment Config
-
-```go
-var envSchema = z.Struct(z.Shape{
-    "PORT": z.Int().GT(1000).LT(65535).Default(3000),
-    "DB_HOST": z.String().Default("localhost"),
-})
-
-var Env = func() Config {
-    var c Config
-    if errs := envSchema.Parse(zenv.NewDataProvider(), &c); len(errs) > 0 {
-        log.Fatal(z.Issues.Prettify(errs))
-    }
-    return c
-}()
-```
-
-## Limitations
-
-- No `z.Map()` schema
-- `zhttp` and `zjson` only parse into structs
-- Structs/slices do not support `Catch()`; structs do not support `Default()`
-- Deeply nested schemas incur reflection overhead
-- `Pick`, `Omit`, `Extend`, `Merge` are not type-safe
+Fix the schema. Never wrap a `Parse` or `Validate` call in `recover`.
 
 ## Application
 
-When **writing** code with Zog: apply all conventions silently — don't narrate each rule. Always check errors with
-`len(errs) > 0`. Define schemas as package-level `var`, not inside functions. If an existing codebase contradicts a
-convention, follow the codebase and flag the divergence once.
+When **writing** Zog, apply these conventions silently — do not narrate a rule while following it. Declare schemas as
+package-level variables and check every result with `len(errs) > 0`. Where existing code contradicts a convention,
+follow the codebase and flag the divergence once.
 
-When **reviewing** code with Zog: cite the specific violation and show the fix inline. Proactively flag: `errs != nil`
-checks (must be `len(errs) > 0`), missing `Required()` on mandatory fields, schema keys not matching struct field names,
-and missing struct tags for external input mapping.
+When **reviewing** Zog, cite the violation and show the fix inline. Do not lecture. Treat a `.Required()` on a value
+arriving from a form, a query string, or JSON as a defect until an emptiness test sits beside it.
+
+```
+Bad:  "Required only fires on a nil input, so an empty query parameter passes through..."
+Good: z.String().Required() -> z.String().Required().Min(1)
+```
 
 ## Integration
 
-The **golang** skill governs Go language conventions. This skill governs Zog-specific API and patterns. When both apply,
-Zog idioms (e.g., `z.Shape{}` key naming) take precedence over general Go naming rules within schema definitions.
+The **golang** skill governs every Go decision outside the Zog API — naming, error handling, testing conventions, and
+the toolchain — and wins on any question of how the Go code reads. This skill governs schema definition and the Zog
+runtime API, and its key-naming rule outranks Go naming inside a `z.Shape`. The **coding** skill governs workflow. All
+are active at once.
+
+Zog is pre-1.0 and breaks its API across minor versions. Read the version in `go.mod` before writing against anything
+this skill anchors to one.
+
+**A schema states what the data must be; the mode decides what missing means.**
