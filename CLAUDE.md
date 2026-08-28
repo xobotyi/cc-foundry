@@ -51,6 +51,13 @@ synthesis.
 - SKILL.md must be behaviorally self-sufficient; route only lookup-oriented depth to `references/`. No hard line cap —
   length is governed by the deletion test, not a line budget (see `docs/adr/0002`)
 
+**Auditing prompt text:**
+
+- Read a prompt, skill, or instruction file end to end before judging it — a premise is carried by sentences no search
+  term predicts.
+- Use grep only to locate a known literal or to count occurrences after that full read. An audit assembled from grep
+  hits reports clean on every line it never opened.
+
 **Development artifacts:**
 
 - `.dev/` directories contain build tooling and source materials
@@ -111,8 +118,7 @@ synthesis.
 **Licensing:**
 
 - Every plugin must contain a copy of the root `LICENSE` file in its directory
-- When adding a new plugin, copy `LICENSE` from the repository root into the plugin directory
-  </conventions>
+- When adding a new plugin, copy `LICENSE` from the repository root into the plugin directory </conventions>
 
 <git-commit-config>
 <extra-instructions>
