@@ -12,7 +12,14 @@
 		"Go 1.13 Error Wrapping": "https://go.dev/blog/go1.13-errors",
 		"Go Concurrency Patterns Pipelines": "https://go.dev/blog/pipelines",
 		"Go Modules Layout": "https://go.dev/doc/modules/layout",
-		"Go Subtests and Table-Driven Tests": "https://go.dev/blog/subtests"
+		"Go Subtests and Table-Driven Tests": "https://go.dev/blog/subtests",
+		"Go 1.21 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.21.md",
+		"Go 1.22 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.22.md",
+		"Go 1.23 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.23.md",
+		"Go 1.24 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.24.md",
+		"Go 1.25 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.25.md",
+		"Go 1.26 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.26.md",
+		"Go 1.27 Release Notes": "https://raw.githubusercontent.com/golang/website/master/_content/doc/go1.27.md"
 	},
-	"lastFetched": "2026-02-14T20:42:06.532Z"
+	"lastFetched": "2026-08-28T10:28:00.000Z"
 }
