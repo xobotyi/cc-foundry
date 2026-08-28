@@ -8,8 +8,10 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   requests, persistent context, tool and schema descriptions, delegated prompts. Covers the instruction budget, wording
   and timelessness rules, formatting choice, and the two behaviors that make reasonable instructions fail — literal
   following and instructions compounding with defaults
-- **`skill-engineering`** — design and iterate Claude Code skills: SKILL.md structure, description formulas, content
-  architecture, quality evaluation
+- **`skill-engineering`** — author and maintain Agent Skills: the routing metadata that decides activation, proscriptive
+  body content over worked examples, splitting by load condition, and evaluation against a no-skill baseline. Carries
+  the archetypes, the portable-versus-Claude-Code frontmatter split, host behavior including the listing budget and
+  compaction limits, and the supply-chain rules for publishing or installing a skill
 - **`subagent-engineering`** — Claude Code subagent lifecycle: creation, configuration, agent teams, worktree isolation,
   evaluation, troubleshooting; false-positive calibration for reviewing agents and the mutating-agent isolation rule
 - **`output-style-engineering`** — design output styles injected into the system prompt: role and voice framing,
@@ -56,4 +58,4 @@ It does not cover:
 - Skills reference `prompt-engineering` via `<prerequisite>` blocks because all AI artifacts are fundamentally prompts
 - Skills with external documentation dependencies maintain `.dev/reference-inventory.json` for doc fetching via CLI
   tools
-- For skill structure rules, description formulas, and content architecture — invoke `skill-engineering`
+- For skill structure, routing metadata, packaging, and evaluation — invoke `skill-engineering`

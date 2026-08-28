@@ -1,401 +1,137 @@
 ---
 name: skill-engineering
-description: "Design and iterate Claude Code skills: SKILL.md structure, description formulas, content architecture, and quality evaluation. Invoke whenever task involves any interaction with Claude Code skills — creating, reviewing, evaluating, debugging, or improving skills."
+description: >-
+  Author and maintain Agent Skills: routing metadata, body content, bundled references and scripts, evaluation, and
+  distribution.
+when_to_use: >-
+  Invoke whenever a skill is touched at all — creating, editing, auditing, reviewing, or debugging one, or deciding
+  whether one should exist. Also invoke on the symptoms: a skill never activates, fires on the wrong request, loads
+  but stops steering, or fails to survive compaction. Covers the skill artifact; the wording of the instructions
+  inside it belongs to prompt-engineering.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
-
-# Skill Engineering
-
-Skills are prompt templates that extend Claude with domain expertise. A skill lives in `skill-name/SKILL.md` with an
-optional `references/` directory for deepening material. SKILL.md must be **behaviorally self-sufficient** — an agent
-reading only SKILL.md, without loading any references, must be able to do the job correctly. References provide depth,
-not breadth. Description triggers activation; instructions shape behavior. Claude sees only `name` and `description` at
-startup, then loads full SKILL.md content when triggered.
 
 <prerequisite>
-**Skills are prompts.** Before writing or improving a skill, invoke
-`prompt-engineering` to load instruction design techniques.
-
-```
-Skill(ai-helpers:prompt-engineering)
-```
-
-Skip only for trivial edits (typos, formatting).
-
+A skill is instruction text. Invoke `prompt-engineering` for the wording, instruction budget, and timelessness rules
+that govern every line written here. This skill covers only what is specific to the skill artifact — routing metadata,
+packaging, progressive disclosure, and evaluation.
 </prerequisite>
 
-## Route to Reference
-
-- **SKILL.md format, frontmatter rules, directory layout** — [`${CLAUDE_SKILL_DIR}/references/spec.md`] All frontmatter
-  fields (open standard + Claude Code extensions), name rules, string substitutions, progressive disclosure mechanics
-  (1%/8K budget, 250-char cap), discovery/precedence, instruction budget, SDK behavior differences
-- **Creating a skill from scratch** — [`${CLAUDE_SKILL_DIR}/references/creation.md`] Step-by-step creation workflow,
-  scope sizing, description writing formula with examples, evaluation-driven development, archetype deep dives with
-  structural patterns, pre-delivery checklist
-- **Evaluating skill quality (review, audit)** — [`${CLAUDE_SKILL_DIR}/references/evaluation.md`] Scoring rubric (5
-  dimensions × 20pts), activation rate benchmarks, trigger keyword density, testing protocol, common issues by score
-  range
-- **Skill not triggering, wrong output, refinement** — [`${CLAUDE_SKILL_DIR}/references/iteration.md`] Activation
-  reliability research (20%→100%), commitment mechanisms, description optimization tiers, output fixes, restructuring
-  and splitting guidance
-- **Multi-file skills, scripts, subagents, hooks** — [`${CLAUDE_SKILL_DIR}/references/advanced-patterns.md`] Fork
-  pattern, workflow skills, composable skills, dynamic context injection, permission scoping, plugin packaging, Agent
-  SDK integration, agent teams, skill-scoped hooks, model/effort overrides
-- **Debugging activation failures, script errors** — [`${CLAUDE_SKILL_DIR}/references/troubleshooting.md`] Diagnostic
-  steps for structure, activation, output, script, reference, token budget, and plugin cache issues. YAML multiline bug
-  documentation.
-- **Writing persuasive instructions, reasoning** — [`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`] Instruction
-  budget research, prompt interference detection (Arbiter), CoT trade-offs in persistent context, instruction
-  strengthening escalation, format control, debugging instruction failures
-- **Skill security — authoring and vetting** — [`${CLAUDE_SKILL_DIR}/references/security.md`] Vulnerability taxonomy
-  (26.1% of skills affected), consent gap, enterprise vetting checklist, secure authoring rules, red flags quick
-  reference
-
-Read the relevant reference before proceeding.
-
-## Description Formula
-
-The description determines when Claude activates your skill — the highest-leverage field; poor descriptions cause missed
-activations.
-
-```
-[What it does] + [When to invoke — broad domain claim with trigger examples]
-```
-
-- **What it does** — functional description of the skill's purpose. State what the skill covers concretely, not a slogan
-  or tagline.
-- **When to invoke** — "Invoke whenever task involves any interaction with X." Claims the domain broadly, then lists
-  specific triggers as examples under the broad claim.
-
-**Good — functional description + broad claim:**
-
-```yaml
-description: >-
-  Go language conventions, idioms, and toolchain. Invoke when task
-  involves any interaction with Go code — writing, reviewing,
-  refactoring, debugging, or understanding Go projects.
-```
-
-**Bad — vague, no trigger surface:**
-
-```yaml
-description: Helps with documents
-```
-
-### Principles
-
-- **Lead with function, not slogans.** The first sentence must describe what the skill covers concretely. Slogans waste
-  description tokens on zero activation value.
-- **Claim broadly, then list specifics.** "Invoke whenever task involves any interaction with X — creating, editing,
-  debugging" beats "Invoke when creating, editing, or debugging X."
-- **Aggressive triggering, graceful de-escalation.** Better to trigger and de-escalate inside the skill than to miss
-  activations. Native activation is unreliable (20-50% without enforcement hooks). Design skills to be useful when
-  loaded, not to depend on perfect auto-activation.
-- **Skill dependencies belong in SKILL.md body, not descriptions.** Prerequisites like "load prompt-engineering first"
-  are handled by the skill body — putting them in descriptions wastes trigger space.
-- **Philosophy belongs in SKILL.md body.** Guiding principles shape behavior inside the skill — not in the description
-  where they have zero activation value.
-
-### Activation Reliability
-
-Native skill activation is unreliable. Measured rates across 250+ sandboxed evaluations:
-
-- No hook / simple instruction hook: ~20-50% activation
-- LLM pre-eval hook (API pre-screening): ~80% (can fail on multi-skill prompts)
-- Forced-eval hook (explicit YES/NO per skill): ~84-100% (most consistent, zero false positives)
-- Manual `/skill-name` invocation: 100%
-
-The forced-eval hook works via a **commitment mechanism**: Claude must evaluate each skill, state YES/NO with reason,
-then follow through. Simple passive suggestions are ignored. Description optimization alone cannot break the ~50%
-systemic ceiling — hooks are the path to consistent activation.
-
-Description optimization tiers, hook implementation details: see [`${CLAUDE_SKILL_DIR}/references/iteration.md`].
-
-## Content Architecture
-
-SKILL.md must be behaviorally self-sufficient. An agent reading only SKILL.md — without loading any references — must be
-able to do the job correctly. References provide depth, not breadth.
-
-### What Goes Where
-
-- **Behavioral rules** → SKILL.md body — agent must follow these during work; can't afford a missed reference read
-- **Catalog/lookup content** → references/ — agent reads on-demand for specific lookups
-- **Situational content** → references/ — only needed in specific phases
-- **Voluminous structural content** → references/ — too large to inline, inherently lookup-oriented
-
-If an agent skipping a reference would produce wrong output, that content is behavioral and belongs in SKILL.md.
-
-### Working-Resolution / High-Resolution
-
-When a reference contains both rules and depth, use a two-resolution split:
-
-- **SKILL.md** — working-resolution: the thesis, core rules, summary that enables correct behavior
-- **references/** — high-resolution: detailed rubrics, extended examples, full catalogs, edge case coverage
-
-The agent works correctly at working resolution. References let it zoom in.
-
-### Structured Data Formats
-
-Format choice affects LLM accuracy by up to 16pp on identical content. Apply these rules when creating or reviewing any
-skill content:
-
-**Use KV lists** for independent-entry data — route tables, tool references, scoring rubrics, configuration mappings,
-hook events, permission modes, model aliases. Each entry stands alone; no cross-row scanning is needed.
-
-**Use markdown tables** only for genuinely 2D comparisons where cross-criteria scanning IS the point — decision
-matrices, feature comparisons across two or more alternatives.
-
-**Use numbered lists** only for sequential steps where order matters — "1. Read input → 2. Validate → 3. Output."
-
-**Use bullet lists** for rules, directives, and conventions with no ordering — if items can be reordered without
-changing meaning, use bullets.
-
-**The table test:** if removing a column would lose comparative meaning → table. Otherwise → KV list.
-
-**Audit format choices** when creating or reviewing a skill. Converting misused tables to KV lists is a mechanical
-improvement with measurable accuracy gain (+8.8pp on lookup tasks).
-
-<example name="table-to-kv-conversion">
-
-**Before (wrong — independent entries in a table):**
-
-```markdown
-| Hook Event    | When It Fires          |
-|---------------|------------------------|
-| PreToolUse    | Before each tool call  |
-| PostToolUse   | After each tool call   |
-| UserPromptSubmit | On user message     |
-```
-
-**After (correct — KV list for independent entries):**
-
-```markdown
-- **PreToolUse** — fires before each tool call
-- **PostToolUse** — fires after each tool call
-- **UserPromptSubmit** — fires on user message submission
-```
-
-</example>
-
-<example name="legitimate-table">
-
-**Correct — genuine 2D comparison (removing either column loses meaning):**
-
-```markdown
-| Frontmatter                      | User invoke | Claude invoke |
-| :------------------------------- | :---------- | :------------ |
-| (default)                        | Yes         | Yes           |
-| `disable-model-invocation: true` | Yes         | No            |
-| `user-invocable: false`          | No          | Yes           |
-```
-
-</example>
-
-Full format benchmarks and selection rules: see [`${CLAUDE_SKILL_DIR}/references/spec.md`] and the `prompt-engineering`
-skill's structured-data-formats reference.
-
-### Route-to-Reference Lists
-
-When a skill has references, include a route list describing what depth each reference provides. Use
-`$\{CLAUDE_SKILL_DIR\}` for all reference paths — it resolves to the skill's absolute directory at load time.
-
-Each entry names the topic, provides the path, and describes the contents — enabling informed read decisions. Without
-content descriptions, agents either over-read (wasting context) or skip (missing depth).
-
-## Writing Instructions
-
-Skills are prompts. Apply prompt engineering fundamentals.
-
-### Degrees of Freedom
-
-Match instruction specificity to task fragility:
-
-- **High freedom** — multiple approaches are valid, decisions depend on context
-- **Medium freedom** — a preferred pattern exists but some variation is acceptable
-- **Low freedom** — operations are fragile, consistency is critical, exact sequence required
-
-### Declarative vs Procedural
-
-- **Declarative** (bullet-list rules, constraints) — for behavioral boundaries, conventions, safety guardrails. Models
-  use factual constraints more reliably across varied inputs. Use for the majority of skill content.
-- **Procedural** (numbered steps) — for tasks with strict ordering. Cap at ~10-15 steps; decompose beyond that into
-  sub-procedures (Hierarchical Task Networks).
-
-**Default to declarative.** Research shows declarative knowledge provides greater performance benefits than procedural
-in the majority of tasks.
-
-### Instruction Placement
-
-Models follow a U-shaped attention curve: instructions at the beginning and end are followed most reliably; middle
-content suffers from attention decay.
-
-- **Top 20% (primacy zone):** Identity, philosophy, critical constraints
-- **Middle:** Detailed rules by topic, route list, examples
-- **Bottom 20% (recency zone):** Reinforced critical rules, quality checks
-
-**Dual-placement strategy:** For rules that absolutely must be followed, state them near the top AND reinforce at the
-end. Use different phrasing — frame as a principle at the top, as a checklist item at the bottom.
-
-### Every Instruction Must Earn Its Place
-
-Research shows unnecessary requirements reduce task success even when the model can follow them. Every instruction
-competes for attention. Before adding a rule, verify the model's default behavior is insufficient — if deleting the rule
-doesn't change output quality, remove it.
-
-### State Rules as Positive Directives
-
-State rules as positive directives in the body section where they're contextually relevant: "Use `pipeline()` for stream
-composition" — not "Don't use `.pipe()`" in a separate anti-pattern table. Keep an anti-pattern table only when the
-"don't" side is genuinely non-obvious from the positive rule.
-
-Instruction strengthening patterns, interference detection, CoT trade-offs: see
-[`${CLAUDE_SKILL_DIR}/references/prompt-techniques.md`].
-
-## Skill Dependencies
-
-A skill often relies on another. How you express the dependency depends on whether the output is _wrong_ or merely _less
-sharp_ without it.
-
-- **Hard dependency** — skipping the other skill produces wrong output. Emit an explicit pointer in the body: a
-  `<prerequisite>` block (`invoke prompt-engineering before drafting`) or a load-bearing step. The reader must act on
-  it.
-- **Soft dependency** — the other skill only sharpens output; the skill still works without it. Name it in prose (a
-  Related Skills bullet) with no invoke pointer.
-
-Putting an explicit "run X first" pointer on a soft dependency is cargo-culting — it spends attention and tokens where
-nothing is load-bearing, and trains readers to ignore the pointer when it does matter. Reserve the explicit pointer for
-the hard case.
-
-## Skill Archetypes
-
-### Workflow Skill
-
-Sequential phases with clear inputs/outputs and checkpoints. SKILL.md contains the complete workflow; references provide
-detailed rubrics, templates, or extended checklists. Use `disable-model-invocation: true` for skills with side effects.
-
-### Knowledge Skill
-
-Complete specification for a tool, format, or API. Everything inline — the agent needs the full spec to do the work.
-References are rare; when present, they hold example collections. Knowledge skills often exceed 500 lines — acceptable
-when all content is behavioral.
-
-### Coding Discipline Skill
-
-Conventions and rules for a language, framework, or platform. Key patterns: philosophy bookends, declarative rules as
-bullet lists (8-17 rules typical), Application section (writing mode vs reviewing mode), Integration section
-(relationship to other skills, precedence rules).
-
-Extended structural patterns for all archetypes: see [`${CLAUDE_SKILL_DIR}/references/creation.md`].
-
-## Quick Templates
-
-**Simple skill (no references):**
-
-```markdown
----
-name: my-skill
-description: >-
-  [What it does]. Invoke whenever task involves any interaction
-  with [domain] — [specific triggers].
----
-
-# My Skill
-
-## Instructions
-
-[Clear, imperative steps or declarative rules]
-
-## Examples
-
-**Input:** [request]
-**Output:** [expected result]
-```
-
-**Skill with references:**
-
-```markdown
----
-name: my-skill
-description: >-
-  [What it does]. Invoke whenever task involves any interaction
-  with [domain] — [specific triggers].
----
-
-# My Skill
-
-[Philosophy or purpose statement]
-
-## References
-
-- **[topic]** — `$\{CLAUDE_SKILL_DIR\}/references/[file].md`
-  [type of depth: tables, examples, patterns]
-
-## [Topic Sections]
-
-[Working-resolution rules — complete behavioral spec]
-
-[Pointers to references for extended examples, lookup tables]
-```
-
-## Security
-
-Skills execute with system-prompt authority — Claude treats SKILL.md as trusted instructions. Research shows 26.1% of
-skills in the wild contain vulnerabilities (14 patterns across prompt injection, data exfiltration, privilege
-escalation, and supply chain categories).
-
-**When authoring skills:**
-
-- Never embed secrets in SKILL.md, references, or scripts
-- Set `allowed-tools` to the minimum required — don't claim `Bash` if `Read` suffices
-- Sanitize user-supplied content before interpolating into generated prompts or commands
-- Pin all dependencies with exact version constraints
-- Prefer instruction-only skills over script-bundled when possible (scripts are 2.12× more likely to contain
-  vulnerabilities)
-
-**When vetting third-party skills:** read all content including scripts, verify behavior in sandbox, check for
-adversarial instructions and exfiltration patterns.
-
-Full vulnerability taxonomy and enterprise vetting checklist: see [`${CLAUDE_SKILL_DIR}/references/security.md`].
-
-## Critical Rules
-
-- **Deletion test before adding.** Every rule competes for attention. Before adding a rule to a skill, verify the
-  model's default behavior is insufficient. If removing the rule doesn't change output quality, it shouldn't exist.
-- **References must not duplicate SKILL.md.** References provide genuinely different depth: detailed rubrics, extended
-  examples, full catalogs, comparison tables, edge case coverage. Not restated rules.
-- **Description is activation, not documentation.** Every token in the description must increase activation probability.
-  Slogans, philosophy, cross-skill dependencies, and filler verbs have zero activation value.
-- **Declarative by default.** Use numbered steps only for workflows with strict ordering. Bullet-list rules for
-  everything else.
-- **One skill, one purpose.** If scope creeps, split. Broad skills produce mediocre results because instructions compete
-  for attention.
-- **Check for interference.** New rules can conflict with existing harness directives or other loaded skills. Test in
-  fresh context; the executing model smooths over contradictions silently (Observer's Paradox).
-
-## Quick Checks
-
-Before deploying:
-
-- [ ] Description leads with what the skill does (not a slogan)
-- [ ] Description claims domain broadly ("whenever task involves")
-- [ ] Description lists specific trigger keywords as examples
-- [ ] SKILL.md is behaviorally self-sufficient — no critical rules only in references
-- [ ] References contain only deepening material (examples, catalogs, how-tos)
-- [ ] Route-to-Reference list describes each reference's contents (if references exist)
-- [ ] KV lists for lookups/routes, tables only for genuinely 2D comparisons
-- [ ] Degrees of freedom matched to task fragility (high/medium/low)
-- [ ] Declarative style for constraints/conventions, procedural only for ordered workflows
-- [ ] Instructions use imperative voice
-- [ ] Instructions structured (XML tags, numbered steps/rules)
-- [ ] At least one input/output example (few-shot) for generative skills
-- [ ] Critical rules in top 20% and/or bottom 20% (not only in middle)
-- [ ] Every instruction earns its place (deletion test: removing it changes output)
-- [ ] Dependencies expressed by tier — hard = explicit pointer (`<prerequisite>`), soft = prose mention only
-- [ ] No secrets in SKILL.md, references, or scripts
-- [ ] Under 500 lines (exceeding is acceptable when all content is behavioral)
-- [ ] Name matches directory (lowercase, hyphens)
-
-## Related Skills
-
-- `prompt-engineering` — load first for instruction design techniques (skills are prompts)
-- `subagent-engineering` — skills and subagents complement each other; skills run inline, subagents run in isolation
-- `output-style-engineering` — output styles replace the system prompt; skills extend it
+**A skill stabilizes a procedure the agent performs unreliably.** It is not a place for knowledge the model already has,
+and it is not documentation. Value concentrates in procedural anchoring — setup order, tool sequence, the check that
+catches a specific failure — not in explanation.
+
+## Decide whether the behavior belongs in a skill
+
+- **Write a skill only where the model fails the procedure without it.** Skills pay off where the model is weak and cost
+  where it is already competent: a skill on a task the model already handles adds tokens, adds an applicability judgment
+  it can get wrong, and narrows the recovery path it would otherwise have found.
+- **One skill per procedure a user would name in a single request.** If one request needs two of these skills, they are
+  one skill; if one skill answers two unrelated requests, it is two.
+- **Put a prohibition that must hold every time in a hook.** Prose steers; the host's lifecycle mechanism enforces.
+- **Put work that needs a clean context and returns a summary in a subagent**, and connection to an external system in a
+  tool or server. Skills carry procedure; tools carry capability.
+
+Archetype and scoping — the workflow, knowledge, and coding-discipline shapes with their structural templates, the
+scope-sizing tests, negative triggers, and skill composition: [`${CLAUDE_SKILL_DIR}/references/archetypes.md`]. Read it
+before writing the body, because the archetype decides the structure.
+
+## Write the description as routing code
+
+The description is the only part of a skill that is always in context, and it is where most skills fail: over half of
+public skills carry routing metadata that cannot route.
+
+- **Use the form `[Verb] [what]. Use when [trigger].`** A description that says only what the skill does gives the model
+  nothing to fire on.
+- **Discriminate against the neighbors.** Name the boundary that separates this skill from the sibling that matches the
+  same words. Selection precision collapses as the candidate pool grows — from roughly 30% at five candidates to a few
+  percent at a hundred — so a description competes, it does not merely describe.
+- **Front-load the use case and keep it under 250 characters.** Listings are budgeted and truncate.
+- **Write the triggers in the words a user would type**, including the case where the user never names the domain.
+- **Keep routing information out of the body and write it in third person.** The body is read after the routing decision
+  is made, and a mixed point of view degrades discovery.
+
+## Prefer proscriptive content
+
+Slice ablation on skills measured to help: anti-pattern rules are the only content type with a directionally reliable
+effect. Positive rules are neutral. Worked examples are the most expensive slice by token count.
+
+- **Write the gotcha, not the tutorial.** An environment-specific fact that defies a reasonable assumption is the
+  highest-value line in a skill — the field named one thing in one service and another in the next, the endpoint that
+  returns success while the work silently failed, the table that is append-only.
+- **Build the gotchas from observed failures.** Every correction made while the skill runs is a candidate line. This is
+  the most direct way to improve a skill.
+- **Encode knowledge local to a repository, framework, or service.** Content the model could generate on demand earns
+  nothing; the trait that separates high-quality public skills is knowledge it could not.
+- **Delete anything the model already does.** A rule that changes nothing costs the same as one that changes everything.
+- **Give one default with an escape hatch, never a menu**, and do not repeat the skill name as a heading.
+
+## Calibrate prescriptiveness against fragility
+
+Prescription buys consistency and pays in recoverability. After a first-attempt mistake, prescriptive content restricts
+the recovery path the model would otherwise have taken — which is why degradation concentrates on tasks the model was
+already going to pass.
+
+- **Prescribe where a wrong order or a wrong flag causes damage that is not automatically recoverable** — a migration
+  sequence, a destructive operation, a released artifact. State that the sequence is exact.
+- **Give constraints instead of steps everywhere else**, and let the model pick the path.
+- **Omit worked examples when the target is a frontier model.** In one ablation the same example slice moved mid-tier
+  models several points up and the strongest model fifteen points down, by suppressing its own better priors. An output
+  template is safe — it pins a shape without demonstrating an approach.
+
+## Split by load condition, not by topic
+
+The body loads on every activation and stays in context; bundled files cost nothing until read. Mandatory body text is
+where context cost concentrates — in one failure analysis, body bloat accounted for 43 of 46 context-overhead
+regressions while supplementary material accounted for 3.
+
+- **Keep in the body only what applies on every run.** Everything conditional belongs in a bundled file.
+- **State the condition that loads each file** at the point the condition arises. "Read the API-errors reference when
+  the API returns a non-200 status" works; "see `references/` for details" does not. Whether a reference is ever read is
+  unmeasured, so an unconditioned pointer is a guess.
+- **Keep references one level deep and name each file for its content.** Put templates and static resources in
+  `assets/`.
+- **Bundle a script for a deterministic operation, or for work that transcripts show being reinvented.** Script code
+  never enters context; only its output does.
+- **Make execution intent unmistakable.** "Run `scripts/x.py`" and "see `scripts/x.py` for the algorithm" must not be
+  confusable, because some hosts read a bundled script where others execute it.
+
+Packaging and cross-host limits — the six-field portable contract, the plugin package format, where extra frontmatter
+causes a hard error, distribution scopes: [`${CLAUDE_SKILL_DIR}/references/portability.md`]. Read it before shipping a
+skill to a host other than the one it was written on.
+
+Host behavior — the full frontmatter field set, the listing budget and its truncation order, content lifecycle and
+compaction limits, invocation control, per-turn permissions, substitutions, dynamic context injection, forked execution,
+precedence, version gates: [`${CLAUDE_SKILL_DIR}/references/claude-code.md`]. Read it when authoring for Claude Code or
+debugging why a skill does not activate.
+
+## Verify against a baseline
+
+- **Run the host's structural validator on every change.** It is cheap and catches the defects that stop a skill loading
+  at all. It does not predict whether the skill helps: measured against live effect, structural and judge scores both
+  correlate at approximately zero.
+- **Measure activation and behavior separately before other people depend on the skill**, each against a no-skill
+  baseline in a fresh session. Use the host's own eval tooling; where none is available, say the skill is unmeasured
+  rather than building a harness.
+- **Check the new rules against the rules already loaded.** The executing model resolves contradictions with judgment,
+  which is what stops it from reporting them — so its silence is not evidence of consistency. Test in a fresh context,
+  or with a different model than the one that will execute.
+- **Condition the verification a skill prescribes on task uncertainty, change size, and risk.** Mandatory verification
+  is the largest measured source of cost regression — skills turn optional checks into work performed every time. Where
+  correctness is machine-checkable, prescribe a validation loop whose errors name the offending value and the accepted
+  set.
+
+Trigger sets, near-miss negatives, assertion design, grading, the iteration loop, and the available tooling:
+[`${CLAUDE_SKILL_DIR}/references/evaluation.md`]. Read it when measuring or tuning a skill.
+
+## Maintain against the substrate
+
+- **Re-measure on a model or host upgrade.** A skill decays without being edited: as the baseline model improves, its
+  marginal value shrinks while absolute performance stays high. A skill can be well written and not worth loading.
+- **Treat utility as specific to one model.** Per-pair utility is near-uncorrelated across model backends, and most
+  skill-task pairs help on one model and hurt on another. A single ranking does not transfer.
+- **Delete a skill that stops earning its slot.** Every installed skill costs listing budget and competes for selection
+  against its neighbors.
+
+What not to ship, how to review a third-party skill, scanner blind spots, and the permission hazards a checked-in skill
+carries: [`${CLAUDE_SKILL_DIR}/references/security.md`]. Read it before publishing a skill or installing one.

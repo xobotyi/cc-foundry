@@ -55,11 +55,18 @@ descriptions, or instruction files.
 
 ### skill-engineering
 
-Design and iterate Claude Code skills. Covers SKILL.md format, description optimization, router pattern, reference
-organization, and activation debugging.
+Author and maintain Agent Skills. A skill stabilizes a procedure the agent performs unreliably — it is not a place for
+knowledge the model already has, and a skill attached to work the model already handles costs tokens while narrowing the
+recovery path it would otherwise have found. The skill is built around that: scope the artifact, write the description
+as routing code that discriminates against neighboring skills, prefer proscriptive rules to worked examples, and split
+content by the condition that loads it rather than by topic.
 
-**Use when:** Creating new skills, debugging activation failures, restructuring existing skills, or evaluating skill
-quality.
+Four references carry the depth: the archetypes and scoping tests, the portable Agent Skills contract against Claude
+Code's larger frontmatter, host behavior from the listing budget through compaction limits and permission scoping, and
+the supply-chain rules for publishing a skill or installing someone else's.
+
+**Use when:** Creating a skill, editing or auditing one, debugging why one never activates or fires on the wrong
+request, or deciding whether a behavior belongs in a skill rather than a hook or a subagent.
 
 ### subagent-engineering
 

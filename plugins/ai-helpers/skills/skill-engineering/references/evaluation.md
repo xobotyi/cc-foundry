@@ -1,368 +1,184 @@
-# Skill Quality Evaluation
+# Evaluating a skill
 
-Detailed scoring rubrics and evaluation procedures. For the quick deployment checklist, see "Quick Checks" in SKILL.md.
+A skill that loads is not a skill that works. Two questions need separate answers, and neither is answered by reading
+the file.
 
-## Contents
+1. **Activation** — does it fire on the prompts it should, and stay quiet on the ones a sibling skill owns?
+2. **Behavior** — does the output change in the intended direction when it does fire?
 
-- [Description Quality](#description-quality)
-- [Instruction Quality](#instruction-quality)
-- [Progressive Disclosure](#progressive-disclosure)
-- [Scope Assessment](#scope-assessment)
-- [Example Quality](#example-quality)
-- [Evaluation-Driven Development](#evaluation-driven-development)
-- [Testing Protocol](#testing-protocol)
-- [Scoring Rubric](#scoring-rubric)
-- [Common Issues by Score Range](#common-issues-by-score-range)
+Both need the same control: **a no-skill baseline, run in a fresh session.** A fresh session matters because context
+left over from authoring the skill masks the gaps in what the file actually says.
 
-## Description Quality
+## A quality score does not predict value
 
-The description is the **highest-leverage field** — the only signal Claude uses to decide whether to invoke a skill. No
-algorithmic routing, no intent classification; pure LLM reasoning against description text. Poor descriptions cause
-activation failures or false triggers.
+Measured on the same skill sets: the deterministic structural score and an LLM-judge score correlate with each other at
+Spearman ρ = 0.14, and each passes most skills individually — so the disagreement is real, not one scale being broken.
+Against **live skill lift**, structural score reaches ρ = −0.018 and the LLM-judge score ρ = −0.027. Both are
+statistically indistinguishable from zero.
 
-### Trigger Keyword Density
+Linting finds defects. It says nothing about whether the skill helps. Run both gates and do not let either stand in for
+the other.
 
-Keyword density directly correlates with activation rate. Claude matches descriptions against user intent using language
-understanding. A description with zero trigger verbs (e.g., "Helps with coding tasks") gives Claude nothing to match
-against. A description with 4-6 domain-specific trigger verbs gives Claude multiple match opportunities.
+## Testing activation
 
-**Baseline activation rates by description quality (Scott Spence, 200+ test runs, Haiku 4.5):**
+Build a labeled query set: roughly 20 prompts, 8–10 that should trigger and 8–10 that should not.
 
-- No hook, poor description: ~20% (coin flip)
-- No hook, optimized description: 20-50% (systemic ceiling, not just a description problem)
-- Forced-eval hook, any description: ~84%
-- Manual invocation: 100%
+**Should-trigger prompts** vary along four axes — phrasing (formal, casual, typos), explicitness (some name the domain,
+some only describe the need), detail (terse and context-heavy), and complexity (single-step and multi-step). The useful
+ones are where the skill would help but the connection is not obvious from the prompt; if the prompt already asks for
+exactly what the skill does, any description passes.
 
-**What "optimized description" means:** domain claim + action verbs + clear scope. Example:
+**Should-not-trigger prompts must be near-misses.** "Write a fibonacci function" tests nothing. A prompt that shares
+vocabulary but needs a different capability — one owned by a neighboring skill — is what actually measures precision.
 
-```
-# Low keyword density — activation unreliable
-description: Helps with Go code
+**Run each prompt several times** and compute a trigger rate; model behavior is not deterministic. Three runs is a
+reasonable start, with 0.5 as the pass threshold in both directions.
 
-# High keyword density — best achievable without a hook
-description: >-
-  Go language conventions, idioms, and toolchain.
-  Invoke whenever task involves any interaction with Go —
-  writing, reviewing, debugging, or understanding Go code.
-```
+**Split the set 60/40 into train and validation.** Optimize the description against the train half only, and select the
+best iteration by _validation_ pass rate — which is often not the last iteration produced. Stop at five iterations; if
+nothing improves, suspect the queries rather than the description.
 
-### Evaluation Criteria
+When a should-trigger prompt fails, do not paste its keywords into the description. That is overfitting. Find the
+category the prompt represents and address that.
 
-**Functional lead:**
+Detection is host-specific: the skill triggered if the host loaded `SKILL.md`. In Claude Code, a headless run with JSON
+output exposes the `Skill` tool call, which is the signal to count.
 
-- Good: "Go language conventions, idioms, and toolchain"
-- Bad: "Helps with coding"
+### Description work has a ceiling
 
-**Domain claim:**
+Autonomous activation is unreliable in a way description tuning cannot fix. Measured across 200-plus sandboxed runs on
+four skills and five prompt categories, on Haiku 4.5:
 
-- Good: "Invoke whenever task involves any interaction with X"
-- Bad: "Use when creating or editing X"
+- **No hook, or a simple instruction hook** — around 20%, with a baseline that varies by model and prompt specificity up
+  to roughly 55%. A hook that merely suggests using the skill performs no better than no hook.
+- **A native prompt-type hook** — same as no hook; it gets deprioritized.
+- **An LLM pre-screening hook** — around 80% overall: near-perfect on single-skill prompts, and it collapsed to 0% on
+  multi-skill prompts in that testing.
+- **A forced-evaluation hook** — around 84% overall, and the most consistent across prompt categories.
+- **Manual invocation by name** — 100%.
 
-**Trigger keywords:**
+The forced-evaluation result comes from a **commitment mechanism**, not from stronger wording: the model must evaluate
+each available skill, state yes or no with a reason, and only then proceed. Once it has written "yes — this applies", it
+is committed. Passive suggestions are read as background noise and skipped.
 
-- Good: "— creating, evaluating, debugging, or understanding"
-- Bad: (no trigger keywords listed)
+Description quality still matters below that ceiling: a clear trigger pattern with specific terms and file types reaches
+roughly 50%, and naming the skill from a project instruction file or workflow documentation reaches roughly 60-70%.
+Beyond that, only a hook moves the number. Design a skill to be useful when loaded rather than to depend on perfect
+autonomous activation.
 
-**Point of view:**
+Treat these figures as a direction rather than a constant — they are one model and one skill set, and the sample is a
+community measurement rather than a controlled ablation. The ordering has held up; the absolute values should be
+re-measured on the model actually in use.
 
-- Good: "Design and iterate..."
-- Bad: "I can help you..."
+> The source of these measurements also reports that aggressive wording in the hook prompt reinforces compliance. That
+> part is not carried over: emphasis scaffolding costs budget without earning it, and the commitment structure is what
+> the evidence attributes the gain to.
 
-### Red Flags
+## Testing behavior
 
-- Slogan instead of functional description (opens with tagline)
-- Narrow verb list instead of broad domain claim
-- Uses vague verbs: "helps", "assists", "handles"
-- Cross-skill dependencies that belong in SKILL.md body
-- Written in second person ("you can...")
-- Contradicts actual skill functionality
+A test case has three parts: a realistic prompt, a human-readable description of success, and any input files. The
+documented store is `evals/evals.json` in the skill directory:
 
-## Instruction Quality
-
-### Clarity Test
-
-Could a colleague follow these instructions without asking clarifying questions? If not, the instructions need work.
-
-### Evaluation Criteria
-
-**Voice:**
-
-- Good: Imperative: "Extract the data"
-- Bad: Passive: "Data should be extracted"
-
-**Steps:**
-
-- Good: Numbered, sequential
-- Bad: Prose paragraphs
-
-**Specificity:**
-
-- Good: "Format as JSON with keys: name, date"
-- Bad: "Format appropriately"
-
-**Completeness:**
-
-- Good: Covers happy path + edge cases
-- Bad: Only happy path
-
-**Structure:**
-
-- Good: XML tags, clear sections
-- Bad: Wall of text
-
-**Format spec:**
-
-- Good: Explicit output example
-- Bad: "Return results"
-
-**Critical rules:**
-
-- Good: At end of document (recency zone)
-- Bad: Buried in middle
-
-### Red Flags
-
-- Long paragraphs without structure
-- Ambiguous terms: "appropriately", "as needed", "correctly"
-- Missing error handling guidance
-- No examples for complex operations
-- No explicit output format specification
-- Critical constraints buried in prose
-- No XML tags for multi-part instructions
-
-## Progressive Disclosure
-
-### Evaluation Criteria
-
-**SKILL.md size:**
-
-- Good: < 500 lines
-- Bad: > 1000 lines
-
-**Reference depth:**
-
-- Good: One level from SKILL.md
-- Bad: Nested references
-
-**Content split:**
-
-- Good: Detailed docs in references
-- Bad: Everything in SKILL.md
-
-**File references:**
-
-- Good: Clear pointers with context
-- Bad: "See other files"
-
-### Structure Check
-
-```
-Good:
-SKILL.md → references/api.md    (one level)
-SKILL.md → references/guide.md  (one level)
-
-Bad:
-SKILL.md → references/main.md → references/details.md → ...
+```json
+{
+	"skill_name": "csv-analyzer",
+	"evals": [
+		{
+			"id": 1,
+			"prompt": "I have a CSV of monthly sales in data/sales_2025.csv. Find the top 3 months by revenue and make a bar chart.",
+			"expected_output": "A bar chart showing the top 3 months by revenue, with labeled axes and values.",
+			"files": ["evals/files/sales_2025.csv"],
+			"assertions": [
+				"The output includes a bar chart image file",
+				"The chart shows exactly 3 months",
+				"Both axes are labeled"
+			]
+		}
+	]
+}
 ```
 
-## Scope Assessment
-
-### Too Broad
-
-Signs:
-
-- Skill tries to handle multiple unrelated domains
-- Instructions are vague to cover all cases
-- Output quality varies significantly by input type
-
-Fix: Split into multiple focused skills.
-
-### Too Narrow
-
-Signs:
-
-- Skill handles only one very specific case
-- Rarely triggered
-- Could be a one-line instruction instead
-
-Fix: Generalize slightly or absorb into a broader skill.
-
-### Right Size
-
-Signs:
-
-- Clear, consistent purpose
-- Triggered appropriately
-- Output quality is predictable
-- Valuable enough to justify the overhead
-
-## Example Quality
-
-### Evaluation Criteria
-
-**Coverage:**
-
-- Good: Simple, complex, and edge cases
-- Bad: Only happy path
-
-**Format:**
-
-- Good: Clear input → output pairs
-- Bad: Prose descriptions
-
-**Realism:**
-
-- Good: Uses realistic data
-- Bad: Trivial "foo/bar" examples
-
-**Diversity:**
-
-- Good: Different scenarios represented
-- Bad: Same pattern repeated
-
-### Minimum Examples
-
-For most skills, include at least:
-
-- **Simple case** — Shows basic functionality
-- **Complex case** — Shows handling of real-world complexity
-- **Edge case** — Shows behavior at boundaries
-
-### Worked Examples Are Refinement Artifacts
-
-Complete input→output worked examples are high-value but rarely available during initial skill creation. They emerge
-from real usage: a problem is encountered, solved, and the solution documented as an example.
-
-Treat worked examples as a refinement goal, not an initial requirement. Populate them during iteration as you observe
-the skill in use.
-
-## Evaluation-Driven Development
-
-See [`${CLAUDE_SKILL_DIR}/references/creation.md`] Step 8 for the EDD workflow.
-
-## Testing Protocol
-
-### Activation Testing
-
-Run these prompts and verify behavior:
-
-- **Should trigger:** 3-5 prompts that should activate the skill
-- **Should not trigger:** 3-5 prompts that shouldn't activate it
-- **Borderline:** 2-3 ambiguous cases to understand boundaries
-
-Document expected behavior for each.
-
-**Activation rate benchmarks (Haiku 4.5, 200+ test runs):**
-
-- Simple instruction hook: ~20% — effectively no better than no hook at all
-- LLM-eval hook: ~80% — faster and cheaper, but can fail spectacularly on multi-skill prompts
-- Forced-eval hook: ~84% — most consistent; forces Claude to state YES/NO per skill before acting
-- Manual `/skill-name`: 100% — always reliable
-
-If auto-activation is below 50% after description optimization, the description is not the primary problem — the
-activation ceiling is systemic. Use a forced-eval hook or accept manual invocation.
-
-### Output Quality Testing
-
-For each test case:
-
-- Does output match expected format?
-- Is content accurate and complete?
-- Are edge cases handled correctly?
-- Is output consistent across multiple runs?
-
-### Regression Testing
-
-After any change:
-
-1. Re-run activation tests
-2. Re-run quality tests
-3. Verify no new issues introduced
-
-## Scoring Rubric
-
-### Description (20 points)
-
-- 20: Specific capabilities + clear triggers + right length; trigger keyword density ≥ 4 domain-specific verbs
-- 15: Mostly complete, minor improvements possible
-- 10: Vague on either capabilities or triggers; low keyword density
-- 5: Very vague, missing key information; no trigger verbs
-- 0: Missing or actively misleading
-
-### Instructions (20 points)
-
-- 20: Clear, imperative, structured (XML tags/steps), explicit format
-- 15: Mostly clear, minor ambiguities, format specified
-- 10: Understandable but verbose or missing structure
-- 5: Confusing structure, significant gaps, no format
-- 0: Unclear or contradictory
-
-### Examples (20 points)
-
-- 20: Comprehensive coverage, realistic, well-formatted
-- 15: Good coverage, minor gaps
-- 10: Basic coverage, missing edge cases
-- 5: Minimal examples, not representative
-- 0: No examples or misleading examples
-
-### Structure (20 points)
-
-- 20: Right scope, proper organization, appropriate length
-- 15: Minor structural issues
-- 10: Too long or too short, scope issues
-- 5: Poor organization, wrong scope
-- 0: Fundamentally broken structure
-
-### Content Placement (20 points)
-
-- 20: SKILL.md behaviorally self-sufficient; references contain only deepening material; route list describes each
-  reference's contents; KV lists for lookups, tables only for 2D comparisons; critical rules in primacy/recency zones
-- 15: Most behavioral rules inline; one or two rules only in references; mostly good placement
-- 10: Significant behavioral content only in references; critical rules buried in middle
-- 5: SKILL.md is mostly a router; critical rules live in references
-- 0: No references exist but SKILL.md is incomplete, or references duplicate SKILL.md body content
-
-**What to check:**
-
-- Can an agent produce correct output reading only SKILL.md?
-- Do references contain depth (examples, catalogs, rubrics) or breadth (rules, directives)?
-- Are anti-patterns stated as positive directives in the body, or duplicated in a separate table?
-- Does the route list describe each reference's contents?
-- Are KV lists used for lookups/routes, tables reserved for 2D comparisons?
-- Are critical rules placed in the top 20% or bottom 20% of SKILL.md (not only buried in the middle)?
-- Is instruction style appropriate — declarative for constraints/conventions, procedural only for ordered workflows?
-- Does every instruction earn its place (deletion test)?
-
-### Interpretation
-
-- **90-100:** Production-ready
-- **70-89:** Usable, improvements recommended
-- **50-69:** Needs significant work
-- **< 50:** Major revision required
-
-## Common Issues by Score Range
-
-### 70-89 (Minor Issues)
-
-- Description could be more specific; trigger keyword density < 4 verbs
-- Missing one edge case example
-- Instructions slightly verbose
-- One or two behavioral rules only in references
-- Route list missing content descriptions
-- Tables used for lookup data that should be KV lists
-
-### 50-69 (Moderate Issues)
-
-- Vague description causing activation problems; zero trigger keywords
-- Instructions missing key scenarios
-- No examples for edge cases
-- Wrong scope (too broad or too narrow)
-- Significant behavioral content only in references
-
-### < 50 (Major Issues)
-
-- Description doesn't match actual functionality
-- Instructions contradictory or unclear
-- No examples
-- Fundamentally wrong structure
-- SKILL.md is a router with no behavioral content
+- **Start with two or three cases.** Expand after the first round of results, not before.
+- **Add assertions after the first outputs exist**, not while designing. What good looks like is rarely clear until the
+  skill has run.
+- **A good assertion is verifiable, specific, and countable** — "the output file is valid JSON", "the report includes at
+  least 3 recommendations". A weak one is vague ("the output is good") or brittle ("uses exactly the phrase 'Total
+  Revenue: $X'"), where correct output with different wording fails.
+- **Not everything needs an assertion.** Style, visual design, and whether the result feels right resist pass/fail
+  decomposition; leave those to human review.
+- **Grade with evidence, not opinion** — record PASS or FAIL per assertion and quote the output that justifies it. Use a
+  script for anything mechanical (valid JSON, row counts, file existence); scripts beat LLM judgment on those and are
+  reusable across iterations.
+
+## Iterating
+
+Three signals, and the third is the one authors skip:
+
+- **Failed assertions** point at a specific gap — a missing step, an ambiguous instruction, an unhandled case.
+- **Human feedback** points at broader quality — wrong approach, poorly structured output, technically correct and
+  unhelpful.
+- **Execution transcripts** show _why_. Treat an ignored instruction as ambiguous before treating it as disobeyed, and
+  time spent on unproductive steps as instructions to simplify or delete.
+
+Rules for turning signals into edits:
+
+- **Generalize.** The skill runs on prompts outside the test set. Fix the underlying issue rather than patching the
+  example.
+- **Suspect over-constraint when pass rates plateau.** If adding rules stops helping, remove rules and check whether
+  results hold. Fewer, better instructions routinely beat exhaustive ones.
+- **Explain the why.** "Do X because Y causes Z" outperforms "ALWAYS do X, NEVER do Y".
+- **Bundle repeated work.** If every run independently reinvents the same helper, that is the signal to write it once
+  into `scripts/`.
+- **Cut instructions that transcripts show causing wasted work** — unnecessary validation, unneeded intermediate
+  outputs. Mandatory verification is the largest measured source of cost regression.
+
+Stop when feedback is consistently empty or iterations stop producing meaningful change.
+
+## Measure in the deployment, not in isolation
+
+The most favorable published numbers for skills come from isolation runs — one skill, no competing siblings, no routing
+pressure. In a realistic library the selection problem dominates: as the candidate pool grew from 5 to 100, actual-use
+precision fell from 29.6% to 3.3%, with agents inspecting several plausible candidates rather than the intended one.
+
+So evaluate the description with its neighbors present. A trigger set that never offers the model a competing skill
+measures a deployment nobody runs.
+
+## Check for interference before shipping
+
+A skill adds rules to a set that already exists. Rule accumulation produces predictable conflicts: the same constraint
+restated in several places with different wording, a mandate that contradicts a prohibition elsewhere, and parallel
+guidance that coexists with a sequential constraint. Each rule is correct alone; together they conflict.
+
+**The executing model is the worst validator of this.** It resolves contradictions with judgment, and resolving them is
+exactly what prevents it from reporting them. Silence is not evidence of consistency.
+
+- **Check the new rule against the host's own directives**, and against the other skills and instruction files that load
+  alongside it.
+- **Check whether the constraint is already stated elsewhere** in different words. If it is, consolidate or delete one.
+- **Check that the resolution order is explicit** wherever two rules can both apply.
+- **Test in a fresh context, or with a different model than the one that will execute**, so the validator is not the
+  party doing the smoothing.
+
+## Regression: four dimensions, not one
+
+Version the evaluation across **task, skill version, host version, and model**. Two findings force this:
+
+- **Utility does not transfer across models.** Per-pair effects are near-uncorrelated (Pearson −0.08 to +0.12); 74% of
+  pairs carry at least one positive and one negative model sign. One skill's content moved the strongest model +33pp
+  while two others each lost 22pp.
+- **A skill decays without being edited.** As the backend model improves, the baseline rises and measured lift shrinks
+  even when absolute performance stays high — the model no longer needs the procedure. The maintenance trigger is a
+  model or host upgrade, not a calendar interval.
+
+## Tooling
+
+- **`claude plugin validate <path>`** — validates a plugin or marketplace manifest, or the skills, agents, and commands
+  in a directory. `--strict` fails on warnings the runtime tolerates, which is the CI setting. Structural gate only.
+- **`skill-creator`** (`/plugin install skill-creator@claude-plugins-official`) — automates the loop: stores cases,
+  spawns a subagent per case for clean context, grades assertions with evidence, aggregates with-skill against
+  without-skill pass rate, runs a blind A/B between two skill versions, and generates should-trigger and
+  should-not-trigger prompts for description tuning.
+- **`claude plugin eval`** — a non-interactive harness with a with-without ablation arm exists in the CLI but is gated
+  behind early access, so it may report `plugin eval is currently in early access` instead of running.
+
+Before reaching for a custom harness, exhaust these. A hand-rolled probe duplicates them and has to be maintained.

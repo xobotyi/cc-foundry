@@ -1,0 +1,213 @@
+{
+	"window": {
+		"rule": "Field sources dated 2026-07-15 or later. Spec/living docs admitted at any first-publication date when the current revision documents present behavior; tagged SPEC.",
+		"start": "2026-07-15"
+	},
+	"sources": {
+		"Agent Skills Specification": {
+			"url": "https://agentskills.io/specification",
+			"tier": "SPEC",
+			"file": "agentskills-io-specification.md"
+		},
+		"Agent Skills — Best practices for skill creators": {
+			"url": "https://agentskills.io/skill-creation/best-practices",
+			"tier": "SPEC",
+			"file": "agentskills-best-practices.md"
+		},
+		"Agent Skills — Optimizing skill descriptions": {
+			"url": "https://agentskills.io/skill-creation/optimizing-descriptions",
+			"tier": "SPEC",
+			"file": "agentskills-optimizing-descriptions.md"
+		},
+		"Agent Skills — Evaluating skill output quality": {
+			"url": "https://agentskills.io/skill-creation/evaluating-skills",
+			"tier": "SPEC",
+			"file": "agentskills-evaluating-skills.md"
+		},
+		"Agent Skills — Using scripts in skills": {
+			"url": "https://agentskills.io/skill-creation/using-scripts",
+			"tier": "SPEC",
+			"file": "agentskills-using-scripts.md"
+		},
+		"Anthropic — Skill authoring best practices": {
+			"url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices",
+			"tier": "SPEC",
+			"file": "anthropic-skill-authoring-best-practices.md"
+		},
+		"Anthropic — Agent Skills overview": {
+			"url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+			"tier": "SPEC",
+			"file": "anthropic-agent-skills-overview.md"
+		},
+		"Claude Code — Extend Claude with skills": {
+			"url": "https://code.claude.com/docs/en/skills",
+			"tier": "SPEC",
+			"file": "cc-skills.md"
+		},
+		"Claude Code — Plugins": {
+			"url": "https://code.claude.com/docs/en/plugins",
+			"tier": "SPEC",
+			"file": "cc-plugins.md"
+		},
+		"Claude Code — Plugin marketplaces": {
+			"url": "https://code.claude.com/docs/en/plugin-marketplaces",
+			"tier": "SPEC",
+			"file": "cc-plugin-marketplaces.md"
+		},
+		"Claude Code — What's new, weeks 29-34 of 2026": {
+			"url": "https://code.claude.com/docs/en/whats-new/2026-w34",
+			"tier": "SPEC",
+			"date": "2026-08-24",
+			"file": "cc-whatsnew-w29.md, cc-whatsnew-w30.md, cc-whatsnew-w32.md, cc-whatsnew-w33.md, cc-whatsnew-w34.md"
+		},
+		"Signal or Noise? A Benchmark Study of Agent Skills in Web Development": {
+			"url": "https://arxiv.org/abs/2608.23067",
+			"tier": "FIELD",
+			"date": "2026-08-24",
+			"file": "full-signal-or-noise.txt"
+		},
+		"Evaluating Skills, Not Just Agents: Agentic Continuous Evaluation of Skills (ACES)": {
+			"url": "https://arxiv.org/abs/2608.20614",
+			"tier": "FIELD",
+			"date": "2026-08-20",
+			"file": "arx-continuous-eval.txt"
+		},
+		"Agent Skills Can Be Harmful: An Empirical Study of Skill-Induced Failures": {
+			"url": "https://arxiv.org/abs/2608.11888",
+			"tier": "FIELD",
+			"date": "2026-08-12",
+			"file": "full-skills-harmful.txt"
+		},
+		"What Keeps Agent Skills from Being Reusable? Evidence from 138K SKILL.md Files": {
+			"url": "https://arxiv.org/abs/2608.08453",
+			"tier": "FIELD",
+			"date": "2026-08-09",
+			"file": "full-reusable-138k.txt"
+		},
+		"Anthropic — Lessons from building Claude Code: How we use skills": {
+			"url": "https://claude.com/blog/lessons-from-building-claude-code-how-we-use-skills",
+			"tier": "FIELD",
+			"date": "2026-06-03",
+			"note": "Pre-window. Vendor-authored; retained for the nine-category taxonomy and the gotchas rule.",
+			"file": "anthropic-lessons-how-we-use-skills.txt"
+		},
+		"Agentman — The Agent Skills Ecosystem in 2026": {
+			"url": "https://agentman.ai/blog/agent-skills-ecosystem-report-2026",
+			"tier": "FIELD",
+			"date": "2026-06-25",
+			"note": "Pre-window. Ecosystem size figures only.",
+			"file": "agentman-ecosystem-2026.txt"
+		},
+		"Snyk — ToxicSkills: malicious AI agent skills on ClawHub": {
+			"url": "https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/",
+			"tier": "FIELD",
+			"date": "2026-02-05",
+			"note": "Pre-window. Supply-chain attack evidence; superseded in part by the 138K defect study.",
+			"file": "snyk-toxicskills.txt"
+		},
+		"Scott Spence — Measuring Claude Code skill activation with sandboxed evals": {
+			"url": "https://scottspence.com/posts/measuring-claude-code-skill-activation-with-sandboxed-evals",
+			"tier": "FIELD",
+			"date": "2026-02-08",
+			"note": "Pre-window. Eval-harness mechanics.",
+			"file": "ss-sandboxed-evals.txt"
+		},
+		"Deep research report — Engineering and Maintaining Agent Skills (2026-07-15 → 2026-08-28)": {
+			"url": "local",
+			"tier": "FIELD",
+			"date": "2026-08-28",
+			"note": "Dedicated research pass with its own S-numbered source table. Complementary to the local pass, not a superset.",
+			"file": "deep-research-report.md"
+		},
+		"Agent Plugins Specification 1.0.0": {
+			"url": "https://github.com/agentplugins/agent-plugins-spec/blob/main/spec/1.0.0.md",
+			"tier": "SPEC",
+			"date": "2026-08-06"
+		},
+		"AAIF — Agent Plugins 1.0: Portable Package Format for AI Skills": {
+			"url": "https://aaif.io/blog/from-skills-and-tools-to-portable-agent-plugins",
+			"tier": "FIELD",
+			"date": "2026-08-06"
+		},
+		"Demystifying Agent Skills: Why They Work — Until They Don't": {
+			"url": "https://arxiv.org/abs/2608.14036",
+			"tier": "FIELD",
+			"date": "2026-08-14"
+		},
+		"SkillCorpus: Consolidating and Evaluating the Open Skill Ecosystem, v5": {
+			"url": "https://arxiv.org/abs/2607.15557",
+			"tier": "FIELD",
+			"date": "2026-08-06"
+		},
+		"SkillsMetric: Detection Boundary of Static Analysis for Malicious Agent Skills": {
+			"url": "https://arxiv.org/abs/2608.08468",
+			"tier": "FIELD",
+			"date": "2026-08-09"
+		},
+		"ColluSkill: Adversarial Cross-Skill Composition for Evading Agent Skill Scanners": {
+			"url": "https://arxiv.org/abs/2608.09732",
+			"tier": "FIELD",
+			"date": "2026-08-10"
+		},
+		"SkillBloat: Token Amplification Attacks via Skill Injection in LLM Coding Agents": {
+			"url": "https://arxiv.org/abs/2608.21929",
+			"tier": "FIELD",
+			"date": "2026-08-22"
+		},
+		"GitSkills: A Dataset of Agent Skills on GitHub": {
+			"url": "https://arxiv.org/abs/2608.10906",
+			"tier": "FIELD",
+			"date": "2026-08-11"
+		},
+		"Zenity Labs — 1.7 million-install malicious skills campaign": {
+			"url": "https://www.businesswire.com/news/home/20260806707467/en/",
+			"tier": "FIELD",
+			"date": "2026-08-06"
+		},
+		"GitHub — Copilot code review: agent skills and MCP GA": {
+			"url": "https://github.blog/changelog/2026-07-29-copilot-code-review-agent-skills-and-mcp-now-generally-available/",
+			"tier": "FIELD",
+			"date": "2026-07-29"
+		},
+		"GitHub — Agent Plugins 1.0 in VS Code, Copilot CLI, Copilot app": {
+			"url": "https://github.blog/changelog/2026-08-12-agent-plugins-1-0-in-vs-code-copilot-cli-and-the-copilot-app/",
+			"tier": "FIELD",
+			"date": "2026-08-12"
+		},
+		"Cursor CLI changelog — 2026-08-11 release": {
+			"url": "https://cursor.com/docs/cli/changelog",
+			"tier": "SPEC",
+			"date": "2026-08-11"
+		},
+		"claude-code#82240 — context: fork dispatches with no task": {
+			"url": "https://github.com/anthropics/claude-code/issues/82240",
+			"tier": "FIELD",
+			"date": "2026-07-29"
+		},
+		"claude-code#79560 — skill-to-skill call blocked by disable-model-invocation": {
+			"url": "https://github.com/anthropics/claude-code/issues/79560",
+			"tier": "FIELD",
+			"date": "2026-07-20"
+		},
+		"openai/codex#36755 — skill loader mislabels EMFILE as invalid SKILL.md": {
+			"url": "https://github.com/openai/codex/issues/36755",
+			"tier": "FIELD",
+			"date": "2026-08-03"
+		},
+		"claude plugin eval / validate / details — CLI help output": {
+			"url": "local: claude plugin eval --help",
+			"tier": "SPEC",
+			"date": "2026-08-28",
+			"note": "Undocumented in public docs. Verified against the installed CLI."
+		}
+	},
+	"lastFetched": "2026-08-28T15:14:00.000Z",
+	"notebook": {
+		"id": "fbdb8013-767d-4737-86aa-bc748fe33a21",
+		"title": "agent-skill-engineering-2026-08-skill-research",
+		"url": "https://notebooklm.google.com/notebook/fbdb8013-767d-4737-86aa-bc748fe33a21",
+		"sources": 36,
+		"created": "2026-08-28",
+		"kind": "ephemeral"
+	}
+}

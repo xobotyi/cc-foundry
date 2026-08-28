@@ -13,3 +13,4 @@ Thumbs.db
 *.local.json
 
 **/.dev/reference/
+**/.dev/research/
