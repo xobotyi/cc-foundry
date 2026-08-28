@@ -321,8 +321,6 @@ Before deploying:
 
 ## Related Skills
 
-- `prompt-engineering` — load first for instruction design techniques (output styles are system prompts); its
-  model-behavior reference carries per-model steering patterns
+- `prompt-engineering` — load first for instruction design techniques (output styles are system prompts)
 - `skill-engineering` — skills and output styles complement each other; skills load on demand, styles are always-on
 - `subagent-engineering` — subagents have their own system prompts; output styles govern the main agent only
-- `claude-code-sdk` — consult for Agent SDK system prompt modification approaches

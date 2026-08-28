@@ -25,9 +25,7 @@ described too loosely to hold.
 This plugin encodes best practices for each AI artifact type. Each skill follows a router pattern: SKILL.md provides
 core instructions and routes to `references/` for detailed content.
 
-All skills build on `prompt-engineering` fundamentals — because every AI artifact is ultimately a prompt. The
-`claude-code-sdk` skill provides reference documentation for Claude Code's extensibility APIs (plugins, hooks, MCP,
-settings).
+All skills build on `prompt-engineering` fundamentals — because every AI artifact is ultimately a prompt.
 
 The `ai-engineer` output style provides a collaborative persona optimized for artifact work: direct communication,
 minimal filler, iterative refinement focus.
@@ -112,14 +110,6 @@ comes out, and under 20% means sentences were edited where paragraphs should hav
 to prompt rules feels unreliable and verbose wording may be competing for attention — skills, system prompts, output
 styles, or agent instructions. Not for newly authored content (use `prompt-engineering` instead).
 
-### claude-code-sdk
-
-Reference documentation for Claude Code extensibility: plugins, skills, hooks, MCP servers, output styles, settings,
-CLAUDE.md, and subagents.
-
-**Use when:** Building Claude Code extensions, understanding configuration hierarchy, debugging integration issues, or
-consulting API documentation.
-
 ## Output Styles
 
 ### ai-engineer
@@ -150,10 +140,6 @@ prompt-engineering (foundation)
     ├── subagent-engineering (agent prompts are system prompts)
     ├── output-style-engineering (styles are system prompts)
     └── prompt-terser (audits existing prompts for drift)
-
-claude-code-sdk (reference)
-    ↑
-    └── All engineering skills consult for implementation details
 ```
 
 ## License

@@ -311,4 +311,3 @@ Before deploying a subagent:
 - `prompt-engineering` — load first for instruction design techniques (subagent prompts are system prompts)
 - `skill-engineering` — skills and subagents complement each other; skills run in main context, subagents in isolation
 - `output-style-engineering` — output styles replace the system prompt; subagents extend it
-- `claude-code-sdk` — consult for API/configuration details

@@ -19,8 +19,6 @@ Skills and output styles for engineering AI artifacts: prompts, skills, agents, 
   terseness → behavior preservation), and a bracketing preservation inventory that verifies load-bearing literals
   survive the cuts. Surviving narrative is rewritten rather than kept; borderline cuts go by default onto a restore list
   the caller draws from
-- **`claude-code-sdk`** — Claude Code extensibility reference: plugins, hooks, skills, subagents, agent teams, MCP,
-  output styles, settings, Agent SDK
 
 ## Output Styles
 
@@ -36,14 +34,9 @@ prompt-engineering (foundation)
     ├── subagent-engineering (agent prompts are system prompts)
     ├── output-style-engineering (styles are system prompts)
     └── prompt-terser (audits existing prompts for drift)
-
-claude-code-sdk (reference)
-    ↑
-    └── All engineering skills consult SDK docs for implementation details
 ```
 
-When creating skills, subagents, or output styles, invoke `prompt-engineering` for instruction design and
-`claude-code-sdk` for API/configuration details.
+When creating skills, subagents, or output styles, invoke `prompt-engineering` for instruction design.
 
 ## Plugin Scope
 
@@ -51,7 +44,6 @@ This plugin covers AI artifact engineering within Claude Code:
 
 - Creating and improving prompts for any AI context
 - Building Claude Code skills, subagents, and output styles
-- Understanding Claude Code extensibility (plugins, hooks, MCP, settings)
 
 It does not cover:
 
