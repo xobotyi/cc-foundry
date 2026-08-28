@@ -280,7 +280,9 @@ tools: Read, Edit, Write, Bash
 - **Any agent whose method mutates sources**, however briefly — a test auditor running negative controls, a migration
   prover, anything that edits and reverts to prove a point. The hazard here is not collision but abandonment: a crash
   mid-control strands the mutation in a tree the caller believes is clean. Pair the isolation with a restore-and-verify
-  rule in the agent's prompt
+  rule in the agent's prompt: never end a run with a mutation in place, restoring the tree first when a tool error or a
+  timeout interrupts a control; reverse the edit and confirm with `git diff` that the file is back to its pre-mutation
+  state, because an unverified restore is an unrestored file; and mutate the subject, never the instrument
 
 Worktree isolation is per-subagent, not per-team. For team-level isolation, include `isolation: worktree` in the
 subagent definition used as the teammate template.

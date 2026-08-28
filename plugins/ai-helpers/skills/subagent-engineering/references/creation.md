@@ -118,7 +118,7 @@ Only `name` and `description` are required. Everything else is optional.
 
 **Required:**
 
-- `name` — lowercase letters and hyphens, unique identifier
+- `name` — lowercase letters, numbers, and hyphens; max 64 chars; cannot contain "anthropic" or "claude"
 - `description` — when Claude should delegate; this is the routing signal
 
 **Common optional fields:**

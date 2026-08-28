@@ -10,9 +10,11 @@ scopes, and hooks schema.
 Subagent files use YAML frontmatter followed by a Markdown system prompt body. Only `name` and `description` are
 required; all other fields are optional.
 
-- **`name`** — Unique identifier using lowercase letters and hyphens. Must be unique within its scope.
-- **`description`** — When Claude should delegate to this subagent. Claude uses this verbatim for routing decisions.
-  Include "use proactively" to encourage automatic delegation.
+- **`name`** — Unique identifier using lowercase letters, numbers, and hyphens, capped at 64 characters. Cannot contain
+  `<`, `>`, "anthropic", or "claude" — `claude-code-guide` ships as a built-in, so copying that naming style produces a
+  name the loader rejects. Must be unique within its scope.
+- **`description`** — When Claude should delegate to this subagent, capped at 1024 characters and accepting no `<` or
+  `>`. Claude uses this verbatim for routing decisions. Include "use proactively" to encourage automatic delegation.
 - **`tools`** — Allowlist of tools the subagent can use. Inherits all parent tools if omitted. Use
   `Agent(worker, researcher)` syntax to restrict which subagents it can spawn. Use `Agent` without parentheses to allow
   spawning any subagent.
