@@ -61,9 +61,10 @@ recovery path it would otherwise have found. The skill is built around that: sco
 as routing code that discriminates against neighboring skills, prefer proscriptive rules to worked examples, and split
 content by the condition that loads it rather than by topic.
 
-Four references carry the depth: the archetypes and scoping tests, the portable Agent Skills contract against Claude
-Code's larger frontmatter, host behavior from the listing budget through compaction limits and permission scoping, and
-the supply-chain rules for publishing a skill or installing someone else's.
+Five references carry the depth: the archetypes and scoping tests, the portable Agent Skills contract against Claude
+Code's larger frontmatter, host behavior from the listing budget through compaction limits and permission scoping,
+trigger sets and grading for measuring a skill against a no-skill baseline, and the supply-chain rules for publishing a
+skill or installing someone else's.
 
 **Use when:** Creating a skill, editing or auditing one, debugging why one never activates or fires on the wrong
 request, or deciding whether a behavior belongs in a skill rather than a hook or a subagent.
@@ -86,10 +87,11 @@ right solution for a task.
 ### output-style-engineering
 
 Design output styles for Claude Code — the only file-based mechanism that removes parts of the default system prompt and
-gets harness-reinforced adherence. Covers frontier-era authoring (role as outcome instead of persona theater,
-intent-carrying rules, voice in rules instead of examples, subtraction over scaffolding), non-coding domain patterns
-(business analysis, content strategy, research), an evaluation framework with dimensional scoring including scaffolding
-debt, and iteration diagnostics from silent non-injection to overtriggering.
+gets harness-reinforced adherence. Covers the authoring rules (role as outcome instead of persona theater,
+intent-carrying rules, voice in rules instead of examples, subtraction over scaffolding), the `keep-coding-instructions`
+decision and the models where it is inert, non-coding domain patterns (business analysis, content strategy, research),
+an evaluation framework with dimensional scoring including scaffolding debt, and iteration diagnostics starting from the
+canary that catches a style silently failing to inject.
 
 **Use when:** Building styles, customizing voice and tone, creating domain-specific response patterns, evaluating style
 quality, migrating styles to a new model generation, or debugging styles that misfire or silently fail to load.
