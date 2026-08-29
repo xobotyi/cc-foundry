@@ -80,8 +80,8 @@ model, queries, and commands), and `diagramming` (Excalidraw and Mermaid with vi
 
 Claude writes code before understanding what exists: guessing at APIs, skipping tests, multiplying abstractions. This
 plugin provides a `coding` skill that enforces a discovery-first workflow (Discover, Plan, Implement, Verify) and a
-`software-engineer` output style with LSP-first navigation and engineering judgment. Every language-specific skill runs
-on top of it.
+`software-engineer` output style that carries the peer-engineering register and the skill queue. Every language-specific
+skill runs on top of it.
 
 ```
 /plugin install the-coder
