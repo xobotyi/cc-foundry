@@ -36,8 +36,9 @@ mechanism choice, the frontmatter, and the register the style installs.
 - **A style shapes Claude's prose, not tool output.** Bash output, file contents, and MCP results reach the user
   unchanged, so a format complaint about them is never a style defect.
 - **`# Tone and style` is never removable** — the conciseness rule and the no-emoji rule included. A style that must
-  beat those defaults claims precedence explicitly in the body, in a clause giving its own rules priority over the
-  general communication and formatting guidance. Without that clause the defaults win.
+  beat those defaults states the behavior it wants, specifically enough that the more general default has nothing to
+  contest. Specificity is what wins; a blanket precedence clause is not — see
+  [Never claim precedence over the prompt](#never-claim-precedence-over-the-prompt).
 
 File format, frontmatter fields including `force-for-plugin`, storage paths and nested resolution, activation methods,
 scope priority, the built-in catalog, the comparison against related features, and Agent SDK integration:
@@ -95,16 +96,54 @@ interaction mode, learning — with the `keep-coding-instructions` value each on
   to act" survives a model upgrade; "never write multi-paragraph explanations" executes with precision on a model that
   never had the flaw.
 - **Reserve "never X" for a failure mode observed on the current model** that it cannot reason its way out of.
+- **A bullet whose bold lead-in is a concept name is a definition, not a rule.** "**Peer engineer, not code monkey** —
+  push back on bad approaches" names a stance and then states the rule underneath it; the name is unactionable and the
+  contrast half ("not code monkey") is a frame the model cannot execute. Delete the label and keep the instruction. The
+  test is mechanical: if the lead-in is a noun phrase rather than an imperative, the bullet is describing a value
+  instead of asking for a behavior.
+- **An aphorism hides the rule it stands for.** "Code is a liability" is agreed with and acted on by nobody — it states
+  no behavior and the model derives none. Write the operational form: what to look for first, what beats what, which
+  outcome is cheapest.
 - **Drop MUST and CRITICAL.** Aggressive emphasis overtriggers — unusably curt answers, depth refused where depth was
   asked for. "Do X when Y" is enough.
 - **Pair every blocklist with the positive register that replaces it.** A prohibition-only rule set produces curt,
   stilted output, because the model executes the prohibitions literally and has nothing to execute in their place.
+- **A permission rule states what it removes, or it reads as a speed instruction.** "Default to acting" grants autonomy
+  and is executed as haste — the model drops the investigation along with the confirmation round-trip, because the rule
+  named neither. Name both halves: what autonomy removes (the asking) and what it does not (the work that precedes the
+  act). This matters most in a style's opening sections, where attention is strongest.
 - **State each rule once, in the section that owns it.** The harness already injects adherence reminders, so persistence
   blocks, "maintain throughout" clauses, and rules repeated across sections duplicate that mechanism and cause
   overtriggering or contradiction.
+- **One concern, one section — and check that the section owning it is not three sections.** Voice, writing rules,
+  response shape, and language constraints all govern what the model emits; split across the body with other topics
+  between them, the register is only readable by reassembling it. Group them under one heading with subsections. Rules
+  that are genuinely separate concerns stay at top level; the asymmetry is the signal.
+- **Place by the attention curve, not by narrative order.** The top and the end are the strong positions. A rule that
+  must hold on every response — register, autonomy — goes there; a rule that fires only when its situation arises can
+  take the middle.
 - **Remove a contradiction instead of arbitrating it.** The model treats the body as a contract and tries to satisfy
   both clauses, failing unpredictably rather than averaging. Add a priority hierarchy only where both sides are
-  load-bearing.
+  load-bearing, and scope it to the style's own rules.
+
+### Never claim precedence over the prompt
+
+The body is appended to the system prompt, so a clause saying "these rules outrank the default system prompt" makes one
+part of a document disown another part of itself. Two failures follow, and neither reports itself.
+
+- **The scope is undecidable.** "Outranks the tone and formatting guidance" names no lines, so the model decides which
+  ones qualify — and the answer moves between turns.
+- **The license generalizes.** A passage granting permission to discount system-prompt content is read as a standing
+  permission, not one bounded by the sentence that granted it.
+
+**State the rule you want as a direct instruction, and never name what it displaces.** "Match the surrounding code's
+naming and idiom; do not match its comment density" beats "the default tells you to match comment density, and that does
+not hold here" — the first is a rule, the second is a rule plus an argument about a rule.
+
+Two conflict rules survive this, because both name an external actor rather than the prompt: a project's CLAUDE.md wins
+over the style, and a skill's output contract wins for the artifact that skill produces. Write those as plain
+instructions too.
+
 - **Specify the response shape per response type, and state the contract's scope.** Format contracts are followed
   literally, so "every section, not just the first" decides whether the format applies once or everywhere.
 - **Apply the deletion test to every line.** An instruction whose removal does not change output is removed. Legacy
