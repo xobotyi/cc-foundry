@@ -31,10 +31,12 @@ sends Claude back to the unread references of skills it already loaded.
 
 ### git-commit
 
-Messy commits — mixed changes, vague messages, wrong order. The `/commit` command enforces an 8-step pipeline: identify
-logical units in the diff, plan commit order (style to refactor to fix to feature), run quality gates, self-review,
-stage selectively, validate messages against conventions, commit, and verify. Each message runs through automated
-validation before execution.
+Messy commits — mixed changes, vague messages, wrong order. The `/git-commit:commit` skill runs a five-stage pipeline:
+identify logical units in the diff, plan commit order (style to refactor to fix to feature), run quality gates, then a
+per-unit loop of stage, draft, self-review, validate, commit — and finally verify. The distinguishing step is the body
+audit: before each commit the drafted message is checked paragraph by paragraph against the staged diff, with a visible
+`keep` or `cut` verdict, so a body that documents the code instead of recording the reason gets caught rather than
+committed.
 
 ```
 /plugin install git-commit

@@ -36,9 +36,9 @@ unit: new code and its wiring are separate units, as are a refactor and the feat
 the work at each verified step, not once at the end — and a tree arriving with many units in it is treated as a process
 fault worth naming, not merely a splitting exercise.
 
-Each commit message runs through automated validation before execution. Errors block the commit; warnings advise. The
-`commit-message` skill provides formatting conventions that match professional standards for open-source and team
-repositories.
+Each commit message runs through a validator before execution, and through a body audit before that — a visible
+`keep`/`cut` verdict on every paragraph, checked against the staged diff. The `commit-message` skill provides the
+formatting conventions the audit measures against.
 
 ## Installation
 
@@ -49,13 +49,16 @@ repositories.
 
 ## Usage
 
-Invoke the commit skill directly or use the `/commit` shorthand:
+Type the skill command, or let Claude reach for it on its own when work arrives at a committable state:
 
 ```
-/commit
+/git-commit:commit
 ```
 
 The skill walks through the complete pipeline automatically. No configuration required for basic usage.
+
+It is deliberately left model-invocable. A commit skill that only a human can trigger cannot govern the commits an agent
+makes while working unattended, which is most of them.
 
 ## The Pipeline
 
@@ -66,21 +69,25 @@ The skill walks through the complete pipeline automatically. No configuration re
    paragraph by paragraph, validate the message, commit
 5. **Verify** — confirm with `git log --stat` and `git status`
 
+The quality gate proves the tree, not each individual commit. The working tree holds every unit while the loop runs, so
+a check inside the loop still measures the whole tree — the promise that each unit builds on its own is a judgment the
+split test makes, not something the pipeline measures. The skill says so plainly and names the three cases that deserve
+a second look: a unit that removes code, changes a signature, or moves a symbol.
+
 ## Message Validation
 
-Before each commit, the message runs through `validate-commit-message.js`:
+Before each commit, the message runs through `validate-commit-message.js`. The script is advisory — it prints `ERROR:`
+and `WARN:` lines and always exits 0. What stops a bad commit is the pipeline, which refuses to run `git commit` while
+an error stands.
 
-- **Errors** block the commit and must be fixed
-- **Warnings** are recommendations to address if reasonable
-
-Validation checks subject length, scope format, body presence for non-trivial changes, trailer format, blank line
-separation, and more.
+It checks the subject length, a trailing period, two first-person and "this commit" filler patterns in the subject, the
+blank line after the subject, whether a body exists at all, and any trailers the project requires. It does not check the
+ASCII rule, the 72-character body wrap, the scope format, or the register — those stay prose rules the agent applies and
+the body audit enforces.
 
 ### Validator Flags
 
-| Flag                 | Purpose                              | Example                           |
-| -------------------- | ------------------------------------ | --------------------------------- |
-| `--require-trailers` | Require specific trailers in message | `--require-trailers "Task,Fixes"` |
+- **`--require-trailers`** — require specific trailers in the message — `--require-trailers "Task,Fixes"`
 
 ## Project Configuration
 
@@ -128,8 +135,10 @@ trailers
 **Body:**
 
 - Explains why change was needed
-- Describes how to verify the change
+- Describes how a future reader verifies it — steps they can repeat, never a log of the checks this session ran. "55 of
+  55 tests passing" is a fact about a terminal, not about the change
 - Records the change — documentation belongs in the artifact (code comments, design docs, README)
+- Wraps at 72 characters, which git's own tooling assumes
 - Default shape is one paragraph; length follows the number of reasons, not the size of the diff
 - Never walks the reader through the new code — the call order, the empty case, the fallback and the gating flag are
   what the diff shows and what code comments keep
