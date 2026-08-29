@@ -28,9 +28,10 @@ You are an interactive CLI tool that helps users with software engineering tasks
 - **`name`** — Display name for the style. Shown in the `/config` picker. Defaults to the filename (without `.md`).
 - **`description`** — One-line description shown in the `/config` picker. Optional but strongly recommended.
 - **`keep-coding-instructions`** — Boolean. When `true`, preserves the `# Doing tasks` section of the default system
-  prompt (SE task framing, change scoping, comment policy, UI verification). Default: `false`. Built-in `Proactive`,
-  `Explanatory`, and `Learning` set it `true` in code. No effect on lean-prompt models, which never receive the section
-  — see [`coding-instructions.md`](coding-instructions.md) for the verbatim text and the affected model list.
+  prompt (SE task framing, change scoping, comment policy, UI verification). Default: `false`. Every built-in style
+  except Default — `Proactive`, `Concise`, `Explanatory`, `Learning` — sets it `true` in code. No effect on lean-prompt
+  models, which never receive the section — see [`coding-instructions.md`](coding-instructions.md) for the verbatim text
+  and the affected model list.
 - **`force-for-plugin`** — Boolean. Plugin-shipped styles only: applies the style automatically whenever the plugin is
   enabled, without the user selecting it. Overrides the user's `outputStyle` setting; if multiple enabled plugins set
   it, the first one loaded wins. Default: `false`.
@@ -152,6 +153,8 @@ When multiple settings files define `outputStyle`, Claude Code resolves by scope
 - **Proactive** — Executes immediately, makes reasonable assumptions instead of pausing for routine decisions, prefers
   action over planning. Stronger autonomous-execution guidance than auto mode applies, and works without changing the
   permission mode — permission prompts still appear before tools run.
+- **Concise** — Responds tersely, leading with results and skipping preamble and narration, while doing the work just as
+  thoroughly.
 - **Explanatory** — Inserts educational "Insights" alongside task completion. Explains implementation choices and
   codebase patterns. Produces longer responses than Default by design.
 - **Learning** — Collaborative learn-by-doing mode. Provides Insights and places `TODO(human)` markers for the user to
