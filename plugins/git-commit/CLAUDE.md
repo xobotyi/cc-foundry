@@ -1,28 +1,38 @@
 # git-commit Plugin
 
-Structured git commit workflow with atomic commits, message validation, and conventions.
+Structured git commit workflow with atomic commits, message validation, and conventions. Ships standalone: it assumes no
+other cc-foundry plugin is installed.
 
 ## Skills
 
 - **`commit`** — commit pipeline: survey changes → plan units → quality gate → commit loop (stage → draft → self-review
   with body audit → validate → commit) → verify. Runs during the work at each verified step, not once at the end
-- **`commit-message`** — Message formatting conventions and structure rules
+- **`commit-message`** — message format conventions: structure, subject, scope, body shape, terse register, breaking
+  changes, trailers, amends. Model-invocable only (`user-invocable: false`)
 
 ## Scripts
 
-- **`validate-commit-message.js`** — Pre-commit message validation (errors block, warnings advise)
+- **`validate-commit-message.js`** — commit message checks, printed as `ERROR:` and `WARN:` lines
 
 ## Workflow
 
-1. `commit` skill loads `commit-message` skill first for formatting rules
-2. Pipeline identifies logical units in the diff and plans the commit order
-3. Quality gate checks pass before the commit loop
-4. Each message is drafted to a file, validated, then committed with `git commit -F`
-5. Final verification with `git log` and `git status`
+1. `commit` loads `commit-message` through its `<prerequisite>` block before the pipeline starts
+2. The pipeline identifies logical units in the diff and plans the commit order
+3. The quality gate passes before the commit loop
+4. Each message is drafted to a file, audited against the staged diff, validated, then committed with `git commit -F`
+5. Final verification with `git log --stat` and `git status`
 
-## Validator Flags
+## Validator Contract
 
-- **`--require-trailers`** — Comma-separated list of required trailers (e.g., `--require-trailers "Task,Fixes"`)
+- **The validator prescribes; it does not block.** It exits with status 0 even when it prints an `ERROR:` line, so the
+  exit status carries no verdict. The pipeline refuses to commit, not the script. Any doc that says errors "block the
+  commit" is wrong
+- **What it checks** — subject length (<10 and >72, both WARN), trailing period (ERROR), two subject filler-tic regexes
+  (WARN), blank line after the subject (ERROR), presence of a body (WARN), required trailers (ERROR)
+- **What it does not check** — the ASCII rule, the 72-character body wrap, the scope format, the register, AI
+  attribution. Those are prose rules the agent owns. Keep this list in sync with `commit/SKILL.md` step 4d
+- **`--require-trailers`** — comma-separated list of trailer names that must be present, e.g.
+  `--require-trailers "Task,Fixes"`
 
 ## Project Configuration
 
@@ -40,76 +50,63 @@ Project-specific commit guidance here.
 </git-commit-config>
 ```
 
-- **`<validator-args>`** — Flags passed to validator. Each `<flag name="X" value="Y"/>` becomes `--X "Y"`.
-- **`<extra-instructions>`** — Highest priority guidance during commit process. Overrides plugin defaults.
+- **`<validator-args>`** — flags passed to the validator. Each `<flag name="X" value="Y"/>` becomes `--X "Y"`
+- **`<extra-instructions>`** — highest priority guidance during the commit process. Overrides plugin defaults
+
+## Design Decisions
+
+- **`commit` stays model-invocable.** The workflow archetype defaults to `disable-model-invocation: true` for
+  side-effecting skills, and the Claude Code docs name `/commit` as the example. This plugin declines it: the pipeline's
+  thesis is that it runs during the work at each verified step, and that flag would leave only the user able to fire it.
+  A commit skill the agent cannot reach cannot govern autonomous work
+- **`commit-message` is `user-invocable: false`, not `disable-model-invocation`.** It is background knowledge, not a
+  user action — and `disable-model-invocation` would break the `Skill(git-commit:commit-message)` composition that
+  `commit` depends on
+- **`allowed-tools` is a per-turn grant.** It clears on the next user message even though the skill content stays in
+  context, so a pipeline that spans a user turn loses its git permissions. `commit/SKILL.md` states the symptom and the
+  recovery
+- **Both SKILL.md files stay under 5,000 tokens.** That is the per-skill compaction budget: past it, the tail of the
+  file is dropped on re-attach, and the tail is where the `<critical>` block sits. `commit-message` was cut from ~6,400
+  tokens for this reason
+- **No `references/` directory.** The plugin is delivered as a standing thing and each skill is behaviorally
+  self-sufficient. Content that would go to a reference is trimmed or rewritten instead
+- **No worked examples in either skill.** A filled specimen is read as a specification: the model reproduces its length,
+  paragraph count, register, and domain along with the rule it was supposed to carry, and stops using the range the rule
+  allows. The cost lands on every message written afterward, and it does not depend on the specimen being well chosen.
+  Three forms stay, because they pin a shape without demonstrating content — a placeholder template (`<format>`, the
+  behavior-change list, the body-audit verdict lines), a one-line substitution inside a rule
+  (`[parser] update parser code` becomes `[parser] handle empty input`), and the referent of a rule about syntax (the
+  trailer forms, the banned Unicode characters). A rule that needs a specimen to locate its boundary is not yet a rule:
+  state the detector instead, as `<record-not-documentation>` does
+
+## Boundaries
+
+- **Change size is not this plugin's rule.** `the-coder`'s `coding` skill owns the size checkpoint that triggers a
+  commit. This plugin owns unit boundaries, messages, and validation
+- **Splitting the work belongs to `commit`, not `commit-message`.** A message that reads "various improvements" is a
+  unit problem; the message skill states the message rule and routes the split to the pipeline
 
 ## Conventions
 
-**Commit message structure:**
-
-- Subject line: `[scope] verb description` (max 72 chars, factual, imperative mood)
-- Body: explains why the change was needed and how to verify it; records the change — documentation belongs in the
-  artifact (code comments, design docs, README)
-- Body shape: default is one paragraph; each further paragraph must earn its lines with a reason, a `BREAKING:`
-  declaration, a migration step, an unpredictable behavior change, or a one-line chain note. Length follows the number
-  of reasons, not the size of the diff
-- Several behavior changes under one reason: one line each in one list, never a paragraph each. A line naming a file, a
-  function, or a test is an inventory of the diff. Independent reasons split into separate commits instead
-- Body audit: step 4c of the pipeline writes one `keep`/`cut` line per paragraph against the staged diff, and per list
-  line inside a paragraph. A paragraph that reports the procedure (function, call order, empty case, fallback, gating
-  flag) gets cut — the audit is written out, not silent, so the user sees the verdicts
-- Trailers: structured metadata (Task, Fixes, Refs, etc.)
-
-**Unit definition:**
-
-- A unit is the smallest change that keeps the tree working, not the whole task — one task gives many units
-- The split test decides: if a part of the diff builds and passes alone, the diff holds more than one unit
-- A unit also does one kind of work. New code and its wiring are two units; a refactor and the feature it enables are
-  two units. The split test misses both, since each pair builds and passes together
-- The audience is the reviewer, not the merge — a unit is one question a reviewer answers
-- The mixing conditions alone miss a large homogeneous feature, which is why the size and work-kind boundaries sit
-  beside them
-
-**Commit timing:**
-
-- The pipeline is not an end-of-task activity — a tree holding many units at entry is a process fault to name, not just
-  to split
-- Change size is not this plugin's rule. `the-coder`'s `coding` skill owns the size checkpoint that triggers a commit;
-  this plugin owns unit boundaries, messages, and validation
-
-**Scope usage:**
-
-- Use for monorepos or multi-component repositories
-- Omit for single-purpose repositories
-- Determined from file paths, not contents
-
-**Breaking changes:**
-
-- Body starts with `BREAKING:` prefix
-- Explains what breaks and migration path
-
-**ASCII symbols only:**
-
-- No decorative Unicode (em dashes, arrows, fancy quotes, emoji, bullet symbols)
-- Use ASCII equivalents (`--`, `->`, `-`, straight quotes)
-- Non-English prose is fine; the restriction is on typographic Unicode
-
-**No AI attribution:**
-
-- No "Generated with Claude Code" or similar
-- No "Co-Authored-By: Claude" trailers
-- Commits appear as regular developer work
+**Commit message structure:** `commit-message/SKILL.md` is the single source. Do not restate its rules here — a second
+copy drifts.
 
 **Skill prose (both SKILL.md files):**
 
-- Written in ASD-STE100 Simplified Technical English — keep edits in that style
+- Written in ASD-STE100 Simplified Technical English — keep edits in that style. The plugin ships standalone, so it
+  carries its own register rather than inheriting the house style of the reworked cc-foundry skills
 - One instruction per sentence; 20 words max in a procedure, 25 in a description
 - Active voice, imperative mood, no gerunds: "stage the file", not "staging the file"
 - One term per concept: `unit` for one logical change, plus `subject`, `body`, `trailer`, `staged`, `unstaged`,
   `untracked`
 - Em dashes only as KV-list separators, never inside a sentence
 - Code fences carry a language label (` ```text `) — unlabeled fences get reflowed by the prettier MDX parser
-- Frontmatter `description` is exempt — it is an activation surface and follows the `skill-engineering` formula
+- Frontmatter `description` and `when_to_use` are exempt — they are activation surfaces and follow the
+  `skill-engineering` formula
+
+**Environment claims:** every claim about git or Claude Code behavior in either skill is verified before it ships —
+against the Claude Code docs for host behavior, against a probe repo for git behavior. A stale claim in a skill is
+obeyed rather than discounted.
 
 ## Extension Points
 
