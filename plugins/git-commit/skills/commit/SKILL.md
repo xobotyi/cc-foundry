@@ -2,10 +2,14 @@
 name: commit
 description: >-
   Git commit workflow pipeline: atomic unit identification, commit ordering, quality gates,
-  message validation, and post-commit verification. Invoke whenever task involves any interaction
-  with git commits — committing changes, staging work, splitting diffs into atomic units, or
-  preparing work for version control.
+  message validation, and post-commit verification.
+when_to_use: >-
+  Invoke when work reaches a committable state — a verified step finished, or the user asked to
+  commit, stage, or split a diff. Invoke during the work, before the tree grows past one unit, not
+  once at the end of the task. Also invoke on the symptoms: a tree holding several unrelated
+  changes, a commit that needs an amend, or a message the validator rejected.
 allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git restore:*), Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js:*)
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
 # Commit Pipeline
@@ -63,9 +67,21 @@ Read the project CLAUDE.md file before the pipeline starts. Then obey the two el
 <command-format>
 **Run one git command in each Bash call.** Each git call and each validator call is one command
 that starts with `git` or `node`. Do not join these commands with `&&`, `||`, or `;`. Do not send
-input into git through a pipe. This rule covers the git calls and the validator calls only. The
-Quality Gate uses the usual commands of the project.
+input into git through a pipe. A joined command and a piped command both fall outside the tool
+permissions of this skill. This rule covers the git calls and the validator calls only. The Quality
+Gate uses the usual commands of the project.
 </command-format>
+
+<permission-window>
+**The tool permissions of this skill last for one turn.** The `allowed-tools` list grants the git
+commands without a prompt, and the grant clears when the user sends the next message. The pipeline
+crosses that boundary often, because the Quality Gate can run for many turns.
+
+A permission prompt for `git add` or `git commit` in the middle of the pipeline shows that the grant expired. Invoke
+this skill again to restore it. The dynamic context of this skill changes between invocations, so the full skill content
+enters the context a second time.
+
+</permission-window>
 
 <no-commits-yet>
 **A repo can have no commits.** The status output then starts with `## No commits yet on <branch>`.
@@ -119,12 +135,13 @@ an explicit path. In a repo with no commits, all files are untracked.
 change that keeps the tree in a working state. A unit is not the whole task. One task gives many
 units.
 
-Apply the split test. Cut the change into two pieces. Does each piece build and pass its tests? Then the change holds
-more than one unit. Commit the first piece. Apply the test again to the rest.
+Two tests find the boundaries. Apply both:
 
-A unit also does one kind of work. A reviewer answers one question in each unit. New code and the wiring that integrates
-it are two units. A refactor and the feature it makes possible are two units. The split test alone does not find these
-two boundaries, because both pieces build and pass together.
+- **The split test.** Cut the change into two pieces. Does each piece build and pass its tests? Then the change holds
+  more than one unit. Commit the first piece. Apply the test again to the rest.
+- **The work-kind test.** A unit does one kind of work, because a reviewer answers one question in each unit. New code
+  and the wiring that integrates it are two units. A refactor and the feature it makes possible are two units. The split
+  test misses both boundaries, because both pieces build and pass together.
 
 These conditions show a boundary between two units:
 
@@ -171,6 +188,21 @@ Do not start the pipeline again. Do not skip a step.
 
 </quality-gate>
 
+<gate-scope>
+**The gate proves the tree, not each commit.** The checks run one time, on the full tree. The commit
+loop then makes several commits. The working tree holds every unit during the loop, so a check that
+runs inside the loop still tests the full tree, and not the staged unit.
+
+The split test asserts that each unit builds and passes alone. This pipeline does not measure that assertion, and a
+check inside the loop cannot measure it either. A wrong split leaves a broken commit in the middle of the history, and
+`git bisect` finds it much later.
+
+Two habits keep the risk low. Commit a unit before the unit that depends on it. Give more care to the split test when a
+unit removes code, changes a signature, or moves a symbol, because these three cases break the callers that a later unit
+corrects.
+
+</gate-scope>
+
 ### 4. Commit Loop
 
 Do the steps below for each unit, in the planned order.
@@ -181,8 +213,9 @@ Do the steps below for each unit, in the planned order.
 git add <files>
 ```
 
-Give an explicit path for each file. Do not use `git add -p`. Do not send input into an interactive command through a
-pipe. These two methods break the match against the tool permissions.
+Give an explicit path for each file. Do not use `git add -p`: it opens an interactive prompt, and the Bash tool has no
+terminal to answer it. Do not send input into an interactive command through a pipe, because a piped command falls
+outside the tool permissions of this skill.
 
 To unstage the wrong file:
 
@@ -239,7 +272,8 @@ A paragraph earns `keep` only when it records one of these facts:
 
 A paragraph can hold a list. One unit that changes several behaviors gives one line to each change. Audit such a
 paragraph line by line, as `P3.1` and `P3.2` above. A line that names a file, a function, or a test inventories the
-diff. Cut it.
+diff. Cut it. A line that states the old behavior beside the new one duplicates the diff. Cut the contrast and keep the
+new behavior, unless the old behavior is the cause of a fix or the thing that a `BREAKING:` change removes.
 
 A paragraph gets `cut` when it names a function, a call order, an empty case, a fallback, or a flag that gates the new
 code. Such a paragraph reports the procedure, and the staged diff shows the procedure. Move the fact into the artifact
@@ -260,9 +294,15 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js --file /tmp/commit
 ```
 
 - Add the flags from `<validator-args>` when the project config defines them.
+- Read the output. The validator prescribes; it does not block. It exits with status 0 even when it prints an ERROR, so
+  the exit status tells you nothing about the message.
 - Correct each ERROR before you continue.
 - A WARN is a recommendation. Correct it when the correction is reasonable.
 - Do not commit until the validator reports no error.
+
+The validator checks the subject length, the trailing period, the filler tics of the subject, the blank line after the
+subject, the presence of a body, and the required trailers. It does not check the ASCII rule, the 72-character body
+wrap, the scope format, or the register. You own those.
 
 </mandatory>
 
@@ -273,6 +313,12 @@ Show the full message to the user as a blockquote. Then commit:
 ```bash
 git commit -F /tmp/commit-msg.txt
 ```
+
+A project hook can stop the commit or change the files. Read the output. A hook that exits with an error stops the
+commit, and the message file stays for the next attempt. A hook that reformats a file does not stage that reformat: the
+commit holds the content that you staged, and the reformat stays in the working tree as an unstaged change. Run
+`git status` after the commit and amend the commit when the reformat belongs to the same unit. Do not pass
+`--no-verify`.
 
 ### 5. Verify
 
@@ -286,6 +332,9 @@ git log --stat -3    # -3 = the number of commits that you created
 git status
 ```
 
+Then show the new commits with their subjects, the state of the current branch, and the changes that are still not
+committed.
+
 ## Breaking Changes
 
 A commit that breaks backward compatibility starts its body with `BREAKING:`. The body gives the migration path. The
@@ -296,14 +345,6 @@ Prefer a migration series when you can stage the break:
 1. Add the new code. Keep the old code.
 2. Move the callers to the new code.
 3. Delete the old code in a later commit.
-
-## Output
-
-Show this data after the last commit:
-
-- The new commits with their subjects.
-- The status of the current branch.
-- The changes that are not committed.
 
 <critical>
 - One unit for each commit. Split the work. Do not bundle it.
