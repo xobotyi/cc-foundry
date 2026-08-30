@@ -224,9 +224,9 @@ body reads worse than it works, or improving existing code rather than changing 
 ## Naming
 
 A name is read at every use site; a comment is read once — so a vague name is the defect that forces the explanation
-above it. Read `references/naming.md` when naming a new symbol, when a comment's payload would fit in an identifier, or
-when a name in code you touch reads two ways. It carries the naming rules and the limits on renaming what already
-exists.
+above it. Read `references/naming.md` when naming a new symbol, when writing a diagnostic a user will read, when a
+comment's payload would fit in an identifier, or when a name in code you touch reads two ways. It carries the naming
+rules and the limits on renaming what already exists.
 
 ## Comments
 

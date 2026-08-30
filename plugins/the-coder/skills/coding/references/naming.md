@@ -31,9 +31,12 @@ spelling each one takes is the language's own convention.
 The limit on a rename is its blast radius, never how much better the new name is.
 
 <rename-limits>
-- **Private symbol** — free. Rename it in the same change.
-- **Public symbol** — the name is API surface. Rename it with its callers in the same change when the blast
-  radius is small; otherwise it is a change of its own kind and does not ride along with unrelated work.
+- **Private symbol** — free, inside the scope you already have. Rename it in the same change when it is a
+  symbol the change touches or that you read to make the change; a private name elsewhere in the codebase is
+  not yours to rename on the way past.
+- **Public symbol** — the name is API surface. Rename it with its callers in the same change when every
+  caller already sits in a file this change touches; grep them first, and if one lands outside, the rename is
+  a change of its own kind and does not ride along with unrelated work.
 - **Published in generated documentation** — frozen. Verify before proposing it (grep the docs tree); for a
   frozen symbol the rescue falls back to a doc comment, or drowns.
 </rename-limits>

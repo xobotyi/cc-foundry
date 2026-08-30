@@ -94,6 +94,10 @@ a comment.
 as a comment. Two copies are not redundancy — the one at the code is the copy nothing updates when the other changes,
 and it outlives its own truth. Route it or keep it, never both.
 
+**The doc comment is the exception, because its reader is a different person.** A test proves an invariant to whoever
+runs the suite; the caller holding only the signature never sees it. An invariant that binds the caller belongs in the
+doc comment whether or not a test also checks it — that is one fact reaching two readers, not one fact in two homes.
+
 ### The First Rescue Is a Rename
 
 When a comment's whole payload fits in an identifier, the fix is a rename, not a better comment.
@@ -103,8 +107,9 @@ wearing a comment — rename first, then see what survives.
 
 **Test this rung before the ones below it, not merely first in reading order.** A name that carries the fact leaves
 nothing for any other rung to file, so a rename ends the routing; every rung below presumes the name could not hold the
-fact. [`naming.md`](naming.md) carries what a better name looks like, and the blast-radius limits that decide whether
-the rename lands in this change or becomes one of its own.
+fact, or that the rename that would carry it cannot land in this change. [`naming.md`](naming.md) carries what a better
+name looks like, and the blast-radius limits that decide whether the rename lands in this change or becomes one of its
+own.
 
 ### A WHY You Inferred Is Not a WHY You Know
 
@@ -173,7 +178,9 @@ a real constraint gets rescued before it goes.
   diff records the removal.
 - **Delete a comment that restates what a document already carries.** The document is the home; the
   copy at the code is the one that goes stale unwitnessed. Name the surviving copy in the repair
-  line, so a reviewer can check the fact still exists somewhere.
+  line, so a reviewer can check the fact still exists somewhere. This does not reach the five kinds:
+  a `constraint:` exists precisely because the fact has to be found at the code, and the document
+  holding it too is the reason the marker was written, not a reason to delete it.
 - **Rewrite a doc that no longer matches its symbol.** A stale contract is worse than a missing
   one, because callers believe it.
 - **Report the repair in one line** so a reviewer knows the extra hunks are deliberate, not
