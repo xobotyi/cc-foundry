@@ -45,10 +45,14 @@ process (Research → Scaffold → Write → Ship).
 
 **Auditing prompt text:**
 
-- Read a prompt, skill, or instruction file end to end before judging it — a premise is carried by sentences no search
-  term predicts.
-- Use grep only to locate a known literal or to count occurrences after that full read. An audit assembled from grep
-  hits reports clean on every line it never opened.
+- **Grep cannot assess a prompt.** A prompt is prose, and prose carries its meaning in sentences, not in tokens a
+  pattern can match. Read the file end to end before judging it — a premise is carried by sentences no search term
+  predicts.
+- **Grep narrows the read surface; it is never the read.** Use it to find a known literal, or to count occurrences after
+  the full read. A grep result is never exhaustive evidence about text: the same meaning appears under different words,
+  and the same word carries different meanings a few lines apart, so a clean grep is not a clean file.
+- An audit assembled from grep hits reports clean on every line it never opened. If the conclusion would change had you
+  read the whole file, you have not audited it.
 
 **Development artifacts:**
 
