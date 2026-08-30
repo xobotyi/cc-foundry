@@ -35,18 +35,26 @@ reaching for a mock by default.
 
 ## Local Shape
 
-Four shapes a function's body takes when it grew by accretion. Each has one collapse, and the collapse is smaller than
-the shape it replaces — so this is a rewrite, not a comment explaining the shape.
+Four shapes a function's body takes when it grew by accretion. Each has a collapse that removes the shape instead of
+explaining it.
+
+**Two of these change behavior, so they are not behavior-identical refactors.** Collapsing a flag drops the work the old
+form did after the answer was known; moving a declaration changes when its computation runs. Both ship as a deliberate
+fix with the change stated, never inside a refactor commit that promises identical behavior.
 
 <shape-rules>
 - **A flag set and then returned is a return in disguise.** A boolean initialized false, set on failure
   paths, then consumed once by a single check that returns or raises — collapse it to a direct exit at each
-  set site. The flag form usually keeps working after the answer is known, and reports the same failure
-  more than once. Where the set site is inside a callback that cannot return through its caller, the
-  collapse is an abort instead: guard the callback's first line on the flag.
+  set site. The flag form usually keeps working after the answer is known and reports the same failure more
+  than once, and the collapse ends both: confirm the dropped work is disposable before you make it. Where
+  the set site is inside a callback that cannot return through its caller, return from the callback at the
+  set site and guard its first line on the flag, so later invocations do no work. That form keeps the flag
+  and buys the early stop rather than a smaller body.
 - **Declarations don't promise.** Declare at first use, not in an up-front batch. Values computed far above
   their consumers are promises the reader carries to the bottom of the function; where they already sit in
-  a structure in scope, read them at the use site rather than aliasing them at all.
+  a structure in scope, read them at the use site rather than aliasing them at all. Move a computation only
+  when nothing between the two positions can change its result, and it neither fails nor mutates on the
+  way — otherwise give it a better name and leave it where it is.
 - **Assembling a value field by field is a constructor you refused to write.** The same run of
   `x.a = …; x.b = …` at every call site belongs in a constructor, factory, or literal. Write it and the
   guards on "optional" fields usually die with it, because the type can finally state which fields are
