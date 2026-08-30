@@ -1,6 +1,6 @@
 {
 	"name": "the-writer",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"description": "Prose discipline for agent-authored text: humanize AI-written articles, docs, and communication",
 	"author": {
 		"name": "xobotyi",
