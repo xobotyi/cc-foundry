@@ -40,12 +40,13 @@ Implement → Verify. Contains assumption interrupt patterns that flag reasoning
 mistakes. Requires reading actual API signatures instead of guessing them. Demands test execution before declaring work
 complete, and refuses to silence a failing check — tests, lint, and type errors get fixed, not suppressed.
 
-The skill body holds what applies to every code task. Three reference files carry the depth and load when their
-situation arrives: the comment and documentation policy when a comment is being written or repaired, the debugging
-protocol when something fails, and error-handling, dependency-isolation, and refactor guidance when an error path, a
-seam, or a cleanup is on the table. The split is not organizational tidiness. Claude Code keeps only the first 5,000
-tokens of a skill when it re-attaches after compaction, and the body used to run past that — the debugging and
-verification sections were the part being dropped, in exactly the long sessions that need them most.
+The skill body holds what applies to every code task. Four reference files carry the depth and load when their situation
+arrives: the comment and documentation policy when a comment is being written or repaired, the naming rules when a
+symbol is being named or renamed, the debugging protocol when something fails, and error-handling, dependency-isolation,
+local-shape, and refactor guidance when an error path, a seam, a tangled function body, or a cleanup is on the table.
+The split is not organizational tidiness. Claude Code keeps only the first 5,000 tokens of a skill when it re-attaches
+after compaction, and the body used to run past that — the debugging and verification sections were the part being
+dropped, in exactly the long sessions that need them most.
 
 Debugging is a protocol rather than an instinct. Build a failing command before theorizing, tighten it, minimize it, and
 read the error literally. When the failure crosses component boundaries, instrument every boundary in one pass and let
@@ -102,8 +103,18 @@ find a non-obvious why will find one in every function. A closed set gives it no
 
 What would have been a comment goes somewhere that survives better. The first move is almost always a rename — a comment
 whose whole meaning fits in an identifier is a naming problem, and a name is read at every use site while a comment is
-read once. After that: a test, a doc comment, a rule in the project's own rule document, a design note in the
-architecture doc. Failing all of those, it is dropped, silently, which is the common and correct outcome.
+read once. That rung is tested before the ones below it rather than merely listed first: a name that carries the fact
+leaves nothing for anything else to file. After that: a test, a doc comment, a rule in the project's own rule document,
+a design note in the architecture doc. Failing all of those, it is dropped, silently, which is the common and correct
+outcome. Wherever it lands, it lands once — a fact routed to a document does not also stay behind as a comment, because
+the copy at the code is the one nothing updates.
+
+The naming reference is what makes that first rung usable, since "rename it" is advice only if Claude knows what a
+better name looks like. It names a predicate as the question it answers, writes a value's meanings as an enum or typed
+constants instead of a comment listing them, runs one word through one mechanism's whole family, names for the use site
+rather than the declaration, and makes a diagnostic name the concrete file, field, or value instead of a category. The
+same file bounds the rename itself: free for a private symbol, with its callers for a public one, and off the table for
+a name published in generated documentation.
 
 Doc comments are the one thing that survives all of this intact, because they have a real reader — a caller holding the
 signature and nothing else, who has to get it right without asking. That reader is the whole test. A convention that
