@@ -5,50 +5,30 @@ data visualization discipline.
 
 ## Skills
 
-- **`dashboards`** — Grafana dashboard authoring: JSON model (Classic + V2), panel types, standard options, variables,
-  transformations, annotations, links, library panels, surgical jq editing of dashboard files (map → mutate/splice →
-  validate; never whole-file reads or rewrites)
-- **`promql`** — PromQL query writing: selectors, operators, vector matching, functions, subqueries, recording/alerting
-  rules, native histograms, optimization
-- **`metricsql`** — VictoriaMetrics MetricsQL: PromQL superset extensions, behavioral diffs, rollup functions, WITH
-  templates, label manipulation, implicit conversions
-- **`logsql`** — VictoriaLogs LogsQL: filters, pipe operators, stats functions, field extraction, stream filtering,
-  performance patterns
-- **`alerting`** — Grafana unified alerting: rule types, evaluation lifecycle, notification policies, contact points,
-  silences, templates, recording rules
-- **`provisioning`** — Grafana provisioning: file YAML, HTTP API, gcx CLI, Terraform provider, observability-as-code
-  workflows
-- **`dataviz`** — Data visualization discipline: encoding hierarchy, chart-type selection, color theory, dashboard
-  layout, time-series conventions, observability frameworks (RED/USE/Golden Signals/SLO)
+- **`dashboards`** — dashboard JSON model (Classic + V2), panel configuration, variables, transformations, and jq-based
+  editing of dashboard files
+- **`promql`** — PromQL query writing: selectors, operators, vector matching, functions, recording and alerting rules
+- **`metricsql`** — VictoriaMetrics MetricsQL: the PromQL superset extensions and behavioral diffs
+- **`logsql`** — VictoriaLogs LogsQL: filters, pipe operators, stats functions, stream selection
+- **`alerting`** — Grafana unified alerting: rule types, evaluation lifecycle, routing, contact points, templates
+- **`provisioning`** — Grafana provisioning: file YAML, HTTP API, gcx CLI, Terraform, observability-as-code
+- **`dataviz`** — visualization design: encoding hierarchy, chart-type selection, color, layout, RED/USE/Golden
+  Signals/SLO
+
+## Skill Dependencies
+
+- `metricsql` documents only what PromQL does not — shared fundamentals stay in `promql`
+- `dashboards` owns panel mechanics; `dataviz` owns why a visualization works
+- `alerting` owns alert semantics; `provisioning` owns how alerting resources are delivered
 
 ## Plugin Scope
 
-This plugin covers the **observability consumption stack** — how to query, visualize, alert on, and manage telemetry
-data through Grafana and its query languages. The companion `backend` plugin covers the **production side** (emitting
-metrics, logs, traces via Prometheus, StatsD, OTel).
-
-Split: backend = produce telemetry, grafana = consume telemetry.
-
-## Skill Relationships
-
-```
-                    dataviz (design principles)
-                        ↓
-promql ←→ metricsql    dashboards ←→ alerting
-   ↘         ↓            ↓
-    → logsql           provisioning
-```
-
-- `promql` is the authoritative PromQL reference; `metricsql` covers the superset extensions and cross-references
-  `promql` for shared fundamentals
-- `dashboards` handles panel configuration; `dataviz` handles why a visualization works
-- `alerting` and `provisioning` share Grafana alerting YAML provisioning coverage from different angles
-- `backend/prometheus` covers instrumentation; `promql` covers querying the same metrics
+This plugin owns telemetry consumption — querying, visualizing, alerting on, and provisioning Grafana. The `backend`
+plugin owns the production side: backend produces telemetry, grafana consumes it. `backend/prometheus` covers
+instrumenting code; `grafana/promql` is the authoritative PromQL reference and owns querying.
 
 ## Conventions
 
-- Grafana docs use `latest` channel URLs (tracks current stable)
-- V2 dashboard schema references pin to `v12.1` (only channel with full sub-pages)
-- VictoriaMetrics docs at docs.victoriametrics.com (single-page with anchors per topic)
-- gcx is the current Grafana CLI tool; grafanactl is superseded
-- Grizzly is deprecated — mention only as historical context
+- Grafana doc sources use `latest` channel URLs — tracks the stable line without per-version edits
+- V2 dashboard schema sources pin to `v12.1`, the only channel carrying the full sub-page set
+- VictoriaMetrics sources are single pages on docs.victoriametrics.com with a per-topic anchor
