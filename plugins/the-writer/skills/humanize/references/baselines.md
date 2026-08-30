@@ -23,7 +23,8 @@ July 2026.
 
 A labeled bullet is a short label, then punctuation, then an explanatory sentence. Cohesion is the mean cosine
 similarity between spaCy word-vector means of adjacent sentences inside a paragraph; MiniLM sentence embeddings failed
-to separate the same groups, which is the negative control on the metric.
+to separate the same groups, which is the negative control on the metric. The AI cohesion range covers 9 of the 10 AI
+documents: the tenth crosses into the human range, and that is the crossover the threshold carries.
 
 The author's own caveat governs all five: "eighteen documents make a demonstration rather than a validated classifier."
 The AI half is one model's output in one genre, and the human half predates the LLM era, so post-2022 human writing on
@@ -51,10 +52,13 @@ output: GPT-4.1 10.62, Claude Opus 4.6 9.09, Claude Sonnet 4 8.29, DeepSeek V3 6
 prose-suppression instruction: GPT-4.1 9.10 (14% reduction), Claude Opus 4.6 0.19 (98% reduction). Source:
 `https://arxiv.org/abs/2603.27006`, February–March 2026, ~240,000 words across twelve models.
 
-Two consequences. A suppression instruction overshoots on some models — 0.19 per 1,000 sits as far below the human mean
-as 9.09 sits above it, and a text with no dashes at all is its own artifact. Headings, bullets, and bold went to zero
-under the same instruction while em dashes did not, because the dash is valid prose punctuation and a structural marker
-at once.
+Two consequences. A suppression instruction overshoots on some models: Claude Opus 4.6 lands at 0.19 per 1,000, below
+the low end of the essay range, so a suppressed draft is recognizable as suppressed. Headings, bullets, and bold went to
+zero under the same instruction while em dashes did not, because the dash is valid prose punctuation and a structural
+marker at once.
+
+The spread also rules the marker out as a discriminator. The human essay range of 0.33 to 17.12 covers every model rate
+measured here, so density serves as a drafting target and never as evidence of authorship.
 
 A second corpus reports human 0.0–4.7 per 1k against AI 0.0–61.3 (ai-smell), which is a wider AI range on landing-page
 text than the essay corpus shows.

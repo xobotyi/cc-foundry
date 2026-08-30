@@ -74,9 +74,10 @@ Rhetorical shapes that perform deliberation without committing to a claim.
   real clause.
 
   This is the most-measured single construction available: roughly 5× its pre-2023 rate across ~16,800 sampled posts,
-  where more than half of the articles that use it use it more than once and a quarter use it three or more times. It is
+  where more than half of the articles that use it use it more than once and a quarter use it three or more times. That
+  corpus has no authorship labels, so the rates describe published writing rather than model output. The construction is
   also common in human myth-busting and "common misconceptions" writing, so a single instance with a real contrast earns
-  its place. The second one in a text is the tell — keep the strongest, restate the rest without the foil.
+  its place, and a second is a reason to read the passage — keep the strongest, restate the rest without the foil.
 
 - **Hedging verbs as padding** — "ensures", "supports", "reflects", "highlights" gluing a subject to an unearned
   benefit. Say what the thing does, with evidence, or cut it.
@@ -94,11 +95,12 @@ Rhetorical shapes that perform deliberation without committing to a claim.
 ## 4. Markdown in prose
 
 Structural conventions learned from markdown-saturated training, and formatting preferences reinforced by preference
-data, leak into text that is not a chat reply. Baselines and thresholds: `references/baselines.md`.
+data, leak into text that is not a chat reply. Baselines and thresholds: `${CLAUDE_SKILL_DIR}/references/baselines.md`.
 
-- **Em-dash density** above the human band. The target is the band (mean 3.23 per 1,000 words), not zero — a suppression
-  instruction drives some models to 0.19 per 1,000, which is its own artifact. Where a dash goes, prefer a period,
-  comma, colon, or parentheses, and keep the ones doing work a comma cannot.
+- **Em-dash density** far above the human mean of 3.23 per 1,000 words. This is a drafting target and never a mark: the
+  human range spans 0.33 to 17.12 and overlaps every model measured. Aim at the mean rather than at zero, because a
+  suppression instruction drives some models to 0.19 per 1,000 and that reads as suppressed. Where a dash goes, prefer a
+  period, comma, colon, or parentheses, and keep the ones doing work a comma cannot.
 - **Labeled bullets** — `**Label:** explanatory sentence` as the shape of every item. Above roughly 30% of all bullets
   this separates generated from human documents. Merge into prose, or give the items real headings if they earn them.
 - **Lists where prose belongs** — three related sentences broken into bullets. Write the paragraph.
@@ -140,9 +142,11 @@ only wording leaves the global gap open.
 Artifacts of the pipeline. No judgment: remove.
 
 - **Citation tokens** — `oaicite`, `citeturn0search0`, `contentReference`, `oai_citation`, `attributableIndex`,
-  `[cite: 1]`, `grok_render_citation_card_json`, stray lenticular brackets (【】), `:::writing`, `attached_file`,
-  `ppl-ai-file-upload`.
-- **Placeholders** — `[Your Name]`, `[INSERT SOURCE URL]`, `2025-XX-XX`, `PASTE_URL_HERE`. Fill, or flag to the author.
+  `[cite: 1]`, `[span_1](start_span)`, `grok_card`, `grok_render_citation_card_json`, stray lenticular brackets (【】),
+  stray dagger symbols (†, ‡), `:::writing`, `attached_file`, `ppl-ai-file-upload`. The set is open: a bracketed token
+  carrying a provider name, a span id, or a search index belongs here whatever it is called.
+- **Placeholders** — `[Your Name]`, `[INSERT SOURCE URL]`, `[Specific Topic]`, `SOURCE_PUBLISHER`, `2025-XX-XX`,
+  `PASTE_URL_HERE`. Fill, or flag to the author.
 - **Tracking parameters** — `utm_source=chatgpt.com|openai|copilot|perplexity`, `referrer=grok.com`. Strip.
 - **Invisible characters** — zero-width space and joiner (U+200B, U+200D), soft hyphen (U+00AD), byte-order mark,
   homoglyphs. Normalize.
@@ -157,7 +161,7 @@ Overuse never transfers to a synonym. `underscore` being a tell says nothing abo
 sense is the tell — an underscore in a filename is a filename.
 
 The lists turn over by model era, so they date faster than the mechanisms. Current era lists, with sources:
-`references/baselines.md`.
+`${CLAUDE_SKILL_DIR}/references/baselines.md`.
 
 ## What the mechanisms do not cover
 

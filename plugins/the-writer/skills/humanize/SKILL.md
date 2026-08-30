@@ -32,7 +32,11 @@ Read the whole text first. Nothing below is decidable from a search, because eve
 twin a few lines away.
 
 Then judge the draft as a whole against three questions: does it hold one argument, do its paragraphs depend on each
-other, does it carry specifics that would be hard to fabricate? A draft that answers yes to all three is strong.
+other, does it carry specifics that resist fabrication? Three clear yeses make a draft strong. A clear no to any one
+makes it weak. A question you cannot answer leaves it uncertain.
+
+The three questions are an inference, not a result. The measurement behind the gate split scientific abstracts by a
+rubric score, and nothing in it maps that split onto an article, a README, or a release note.
 
 - **Strong draft — review, do not rewrite.** Mark the passages, name the mechanism behind each, propose the targeted
   edits, and leave everything unmarked untouched. Rewriting is the operation measured to cost coherence and framing
@@ -86,16 +90,23 @@ shape of its fix, or before adding a pattern to the catalog.
 Every pattern above appears in clean human writing. One em dash means nothing. Em dashes plus forced triads plus
 "vibrant tapestry" plus a Conclusion section is a confession. Mark passages, never words.
 
-Five measurements are strong enough to decide a mark, and each is a reason to read the passage, not a verdict: labeled
+Four measurements are strong enough to decide a mark, and each is a reason to read the passage, not a verdict: labeled
 bullets above 30% of all bullets, three-item enumerations above 3 per 1,000 words, adjacent-sentence cohesion below
-0.80, em-dash density outside the human band of roughly 3.23 per 1,000 words, and a second negative parallelism in one
-text. The corpus behind the first three holds eighteen documents in one genre.
+0.80, and a second negative parallelism in one text. The corpus behind the first three holds eighteen documents in one
+genre.
+
+The first three are ratios, and a text too small to hold the denominator defeats them: one labeled bullet out of one
+bullet is 100%, and a single triad in 300 words clears 3 per 1,000. Apply them from a few hundred words upward. Em-dash
+density is a drafting target and never a mark, because the human range runs 0.33 to 17.12 per 1,000 words and overlaps
+every model measured.
 
 **Negative parallelism carries the widest evidence of any single construction.** It appears as "not just X, but Y", as
 "not X, but Y", as the dash realization "not X — Y", and reversed as "X rather than Y". Across ~16,800 sampled posts the
 construction reached roughly 5× its pre-2023 rate, and among the articles that use it, more than half use it more than
-once and a quarter use it three or more times. Human writers reach for it too, in myth-busting and common-misconception
-writing, so one instance with a real contrast is ordinary. The repetition is the tell.
+once and a quarter use it three or more times. That corpus carries no authorship labels, so the rates describe what
+published writing does rather than what a model does. Human writers reach for the shape too, in myth-busting and
+common-misconception writing, so one instance with a real contrast is ordinary and a second is a reason to read the
+passage.
 
 Vocabulary carries signal by density, and the lists turn over by model era — the words that convicted a 2023 draft are
 not the words that convict a current one. Overuse never transfers to a synonym.
@@ -129,16 +140,19 @@ era-bound references, genuine asides and self-corrections, and variety the autho
 Work in this order. Structure first is what the measurements support: local substitution leaves the global weakness in
 place.
 
-1. **Structure** — section order and necessity, heading forms, list morphology, symmetry between sections. Cut sections
-   that exist because the shape expected them.
+1. **Structure** — section order and necessity, heading forms, list morphology, symmetry between sections. Cut a section
+   that exists because the shape expected one. Where it carries a claim, the claim moves; it does not go.
 2. **Cohesion** — paragraph by paragraph, does each sentence build on the one before, and each paragraph on the one
    before? Rebuild around one claim; cut what does not serve it.
 3. **Wording** — mechanisms 1 through 3, on marked passages only.
-4. **Formatting density** — dashes, bold, triads, labeled bullets, against the bands rather than to zero. A text with no
-   dashes at all is its own artifact.
-5. **Residue** — search for the literal artifacts listed in `references/patterns.md`. A citation token skims past a
-   careful read and an invisible character has nothing to see, so these surface in a search and nowhere else.
-6. **Verify** — the substance inventory survived, the anchors are intact, the voice is the author's.
+4. **Formatting density** — dashes, bold, triads, labeled bullets, toward the human ranges rather than to zero. A draft
+   run through dash suppression reads as suppressed, which is its own artifact; a text that never reached for a dash
+   does not.
+5. **Residue** — search for the literal artifacts listed in `${CLAUDE_SKILL_DIR}/references/patterns.md`. A citation
+   token skims past a careful read and an invisible character has nothing to see, so these surface in a search and
+   nowhere else.
+6. **Verify** — read the original beside the rewrite, claim by claim, and confirm each one survived. Check the dates,
+   numbers, citations, and proper names against the source. Check that the voice is still the author's.
 
 Then deliver the text with a short account of what changed, what you left and why, and anything you could not fill.
 Report a placeholder you cannot fill; never invent its content.
