@@ -68,8 +68,8 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   - `LC_ALL=C awk '{n+=length($0)+1; if(n>20000){print NR; exit}}' plugins/the-coder/skills/coding/SKILL.md` — prints
     the line the cutoff falls on, empty when the body fits. `LC_ALL=C` is load-bearing: without it `length` counts
     characters, and the body's multibyte punctuation then reads shorter than `wc -c` reports
-- The margin runs in the low hundreds of bytes, so a sentence can spend it. New depth goes to a reference behind a
-  pointer, and a pointer that outgrows its sentence pays for itself out of another one
+- New depth goes to a reference behind a pointer, and a pointer that outgrows its sentence pays for itself out of
+  another one
 - This sharpens ADR 0002 rather than overturning it: behavioral self-sufficiency has to hold inside the durable window,
   not only on first load
 - **One home per fact, including this plugin's own documents.** The rename limits live in `naming.md` alone; the routing
