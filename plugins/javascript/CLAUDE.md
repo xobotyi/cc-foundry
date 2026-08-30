@@ -5,34 +5,24 @@ LSP-powered code intelligence via `typescript-language-server`.
 
 ## Skills
 
-- **`javascript`** — core JavaScript language conventions, idioms, modern practices (ESM, async/await, closures, JSDoc),
-  and LSP navigation rules
-- **`typescript`** — TypeScript type system, strict mode, and TS-specific patterns (extends `javascript`)
-- **`nodejs`** — Node.js runtime conventions, APIs, and ecosystem practices (event loop, streams, modules)
-- **`bun`** — Bun runtime conventions, APIs, and toolchain (native APIs, HTTP server, file I/O, testing)
-- **`vitest`** — Vitest testing framework conventions and practices (mocking, assertions, configuration)
+- **`javascript`** — core JavaScript conventions, idioms, modern practices (ESM, async/await, closures, JSDoc), and the
+  LSP navigation rules
+- **`typescript`** — TypeScript type system, strict mode, TS-specific patterns
+- **`nodejs`** — Node.js runtime conventions, APIs, ecosystem practices (event loop, streams, modules)
+- **`bun`** — Bun runtime conventions, APIs, toolchain (native APIs, HTTP server, file I/O, testing)
+- **`vitest`** — Vitest conventions (mocking, assertions, configuration)
 
 ## LSP Integration
 
-This plugin ships a `typescript-language-server` LSP configuration (`.lsp.json`). When installed, Claude Code
-automatically connects to the TypeScript language server for all JS/TS file types (`.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`,
-`.cjs`, `.mts`, `.cts`), enabling LSP tools (`goToDefinition`, `findReferences`, `hover`, `workspaceSymbol`, etc.).
-
-The `javascript` skill enforces LSP-first navigation: agents must use LSP tools for semantic code navigation (finding
-definitions, references, implementations, call hierarchies) instead of falling back to Grep/Glob pattern matching. Text
-search tools remain appropriate for non-semantic searches (comments, string literals, config values).
-
-**Prerequisite:** Users must have `typescript-language-server` installed and available in PATH.
+The plugin ships `.lsp.json`, binding `typescript-language-server` to every JS/TS extension. The LSP-first navigation
+rules live in the `javascript` skill, not here.
 
 ## Skill Dependencies
 
-**`typescript` extends `javascript`** — both must be active when working with TypeScript code. The `javascript` skill
-provides language fundamentals and LSP navigation rules; `typescript` adds type system conventions. For pure JavaScript
-projects, activate only `javascript`.
+`typescript` is a hard prerequisite on `javascript` — fundamentals stated in `javascript` are not duplicated in
+`typescript`.
 
 ## Plugin Scope
 
-This plugin covers JavaScript and TypeScript language specifics plus their runtimes (Node.js, Bun), testing frameworks
-(Vitest), and LSP-powered code intelligence. Language-agnostic coding practices (discovery, planning, verification) are
-provided by `the-coder` plugin. Platform-specific concerns (frontend, backend, CLI) are provided by their respective
-platform plugins.
+Language and runtime specifics only. Language-agnostic coding practice belongs to `the-coder`; platform concerns belong
+to `frontend`, `backend`, and `cli`.
