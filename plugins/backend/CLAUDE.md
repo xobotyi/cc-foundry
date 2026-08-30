@@ -15,4 +15,6 @@ Backend platform discipline: observability, metrics instrumentation, and distrib
 This plugin covers backend platform concerns — what's specific to building observable services, operators, workers, and
 daemons. The `observability` skill provides high-level guidance across all three pillars; technology-specific skills
 (`prometheus`, `statsd`, `otel-tracing`) cover tooling conventions. Language-specific skills (Go, TypeScript) are
-provided by their respective language plugins.
+provided by their respective language plugins. Telemetry consumption — Grafana dashboards, query authoring, unified
+alerting — belongs to the `grafana` plugin: backend produces telemetry, grafana consumes it. `grafana/promql` is the
+authoritative PromQL reference.
