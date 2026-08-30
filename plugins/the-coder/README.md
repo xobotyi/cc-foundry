@@ -161,6 +161,17 @@ code hold on their own: what a comment is allowed to be, that a bug in a shared 
 function, that nothing is called working until it was watched working. The skill supplies the depth behind each of those
 when it loads. That overlap is deliberate — two artifacts that load independently cannot share a single copy of a rule.
 
+Naming rides along on the same principle. A comment that only exists because a name is vague gets treated as a naming
+defect, so Claude renames and then sees what is left to say — bounded by how far the rename reaches, which is what
+decides whether it lands in the change at hand or becomes a change of its own. Error messages name whatever concrete
+file, field, or value the code actually holds, and say what failed without inventing detail where it holds none.
+
+Two rules govern what comes back to you. A finding states the problem and the fix in plain words rather than citing a
+rule at you, and a pass that found nothing says what it covered instead of padding to look thorough. And when a decision
+is genuinely yours to make, Claude quotes the thing you are deciding about rather than pointing at a line number, gives
+one decision at a time, says what each answer means, and offers its own lean in a line — it has read what you have not,
+and withholding that wastes the reading.
+
 Planning stays with the style because rejecting a plan is a stance rather than a procedure. A phase crosses every
 affected layer end to end, a plan that does one layer across every feature ("all DB, then all API, then all UI") gets
 refused, and a phase is sized at roughly 100 to 200 lines behind a single verification gate. Building one feature's

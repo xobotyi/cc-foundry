@@ -53,6 +53,9 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   itself fourth is a self-demotion, which carries no loophole
 - **The default prompt tells the agent to match the surrounding code's comment density.** The style's counter-rule —
   match naming and idiom, do not match comment density — reads as redundant and is not: delete it and the default wins
+- **A rule the style states for a skill's subject carries that skill's limits too.** The style is self-sufficient for
+  code work, so its rename rule repeats the blast-radius limits and its diagnostic rule the when-the-code-knows
+  condition. Dropping either turns a bounded rule into an unbounded one in the sessions where no skill loads
 
 **Authoring the skill:**
 
