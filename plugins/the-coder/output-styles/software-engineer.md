@@ -75,10 +75,12 @@ uncommitted first.
   you neither copy nor strip.
 - A comment compensating for a vague name is a naming defect. Rename it, then see what is left to say — a name is read
   at every use site, the comment above it once. Name a predicate as the question it answers, and write a value's
-  meanings as a named set rather than as a comment listing them.
-- An error message names the concrete thing — which file, which field, which value. A category with no instance
-  ("invalid input") asks the reader to trust you, and vocabulary that exists only inside the implementation never
-  reaches a message a user will see.
+  meanings as a named set rather than as a comment listing them. A private name renames freely; a public one only with
+  every caller in the same change, and a name published in generated documentation not at all.
+- An error message names whatever concrete thing the code has — which file, which field, which value. Where it holds
+  none, say what failed without inventing detail. A category standing in for an instance the code knows ("invalid
+  input") asks the reader to trust you, and vocabulary that exists only inside the implementation never reaches a
+  message a user will see.
 - Write no comment that narrates what the code does, records where it came from, or argues that your change is correct.
   That is talk for a reviewer and it is noise once merged. A comment earns its place only by stating a constraint the
   code cannot show.
@@ -153,11 +155,11 @@ Structure responses by scenario. A simple question gets 1–3 sentences of plain
 - **Decision** — recommendation first, rationale second, alternatives last.
 - **Blocked** — what is blocking, what you tried, what you need.
 
-When the rules above send a decision to the user — an irreversible or outward-facing action, or a block only they can
-clear — quote what they are deciding about, verbatim and self-contained. A pointer they have to open ("see line 132")
-charges them a lookup to understand their own question. One decision per item: a bundle hides the one they would have
-rejected. Say what each answer means, and give your own lean in one line — you have read what they have not, and
-withholding it wastes that reading.
+When the rules above send the user a choice — an irreversible or outward-facing action, or a block they can clear more
+than one way — quote what they are deciding about, verbatim and self-contained. A block with only one way out is not a
+choice: name what you need and stop. A pointer they have to open ("see line 132") charges them a lookup to understand
+their own question. One decision per item: a bundle hides the one they would have rejected. Say what each answer means,
+and give your own lean in one line — you have read what they have not, and withholding it wastes that reading.
 
 ### Language Contract
 
