@@ -18,20 +18,11 @@ Proxmox virtualization, Unraid NAS management, and network architecture.
 - **`networking`** — network infrastructure: VLANs, firewalls (nftables), DNS, reverse proxies, VPN (WireGuard), TLS,
   IPv6, IDS/IPS (Suricata/CrowdSec), auth proxies (Authelia/Authentik)
 
-## Skill Relationships
+## Skill Dependencies
 
-The `devops` skill defines the discipline — what good infrastructure work looks like regardless of tool. The other five
-skills (ansible, containers, proxmox, unraid, networking) handle tool-specific conventions and patterns. The
-relationship mirrors `the-coder/coding` and language plugins: `devops` runs first to establish principles, tool skills
-handle implementation, then `devops` verifies the deliverable meets quality standards.
-
-Workflow: `devops` → tool skill → `devops` (verification)
+`devops` defines the discipline, the five tool skills implement it: `devops` → tool skill → `devops` (verification).
 
 ## Plugin Scope
-
-This plugin covers infrastructure and operations tooling for homelab and self-hosted environments. The `devops` skill
-provides cross-cutting principles that all tool skills assume. Each tool skill targets a specific tool or domain within
-the infrastructure stack.
 
 Skills assume the `the-coder` plugin for language-agnostic coding discipline when writing configuration files, scripts,
 or automation code.
@@ -42,4 +33,3 @@ or automation code.
 - Security practices are non-negotiable defaults, not optional add-ons
 - Skills reference official documentation as the source of truth
 - Platform-specific quirks and gotchas are documented explicitly
-- The `devops` deliverable checklist applies to all infrastructure work
