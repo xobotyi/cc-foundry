@@ -10,12 +10,6 @@ humans.
 
 ## Plugin Scope
 
-This plugin covers universal prose quality for human readers:
-
-- Detecting and fixing AI-writing tells by generative mechanism, not flat pattern lists
-- Write-time discipline (avoid producing slop) and edit-time cleanup (fix existing text)
-- Reviewing text suspected of being AI-generated
-
 Out of scope: detector evasion (the skill fixes writing for readers, never for detectors), code comments and commit
 messages (covered by the-coder and git-commit), CLAUDE.md quality (covered by the-workflow).
 
