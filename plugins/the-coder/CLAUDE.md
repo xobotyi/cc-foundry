@@ -58,11 +58,15 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
 
 - **The `coding` SKILL.md body must fit the 5,000-token compaction window.** Past it Claude Code re-attaches only the
   first 5,000 tokens, so the tail is dropped in exactly the long sessions that need it
-- Measured at 19,769 bytes against the 20,000-byte cutoff, leaving ~230 bytes. **The margin is spent** — new depth goes
-  to a reference behind a pointer, and a pointer that outgrows its sentence pays for itself out of another one. Measure
-  before and after every body edit, however small:
-  - `c=$(wc -c < FILE); echo $((c/4))`
-  - `awk '{n+=length($0)+1; if(n>20000){print NR; exit}}' FILE` — empty output means the body fits
+- **The gate is 20,000 bytes, a proxy for that window.** No tokenizer runs here, so bytes stand in at roughly four per
+  token. Derive the current size and margin when an edit starts rather than reading them here — a recorded number is
+  stale by the next commit. Run both before and after every body edit, however small:
+  - `wc -c < plugins/the-coder/skills/coding/SKILL.md`
+  - `LC_ALL=C awk '{n+=length($0)+1; if(n>20000){print NR; exit}}' plugins/the-coder/skills/coding/SKILL.md` — prints
+    the line the cutoff falls on, empty when the body fits. `LC_ALL=C` is load-bearing: without it `length` counts
+    characters, and the body's multibyte punctuation then reads shorter than `wc -c` reports
+- The margin runs in the low hundreds of bytes, so a sentence can spend it. New depth goes to a reference behind a
+  pointer, and a pointer that outgrows its sentence pays for itself out of another one
 - This sharpens ADR 0002 rather than overturning it: behavioral self-sufficiency has to hold inside the durable window,
   not only on first load
 - **One home per fact, including this plugin's own documents.** The rename limits live in `naming.md` alone; the routing
