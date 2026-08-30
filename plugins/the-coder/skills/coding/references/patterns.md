@@ -1,7 +1,7 @@
 # Error Handling, Dependency Isolation, Local Shape, and Refactor Targets
 
-How error paths behave, how a dependency is isolated for a test, the four local shapes that collapse to something
-smaller, and the named smells with the move each one takes.
+How error paths behave, how a dependency is isolated for a test, the four local shapes and what each one collapses to,
+and the named smells with the move each one takes.
 
 ## Handle Errors Deliberately
 
@@ -35,8 +35,8 @@ reaching for a mock by default.
 
 ## Local Shape
 
-Four shapes a function's body takes when it grew by accretion. Each has a collapse that removes the shape instead of
-explaining it.
+Four shapes a function's body takes when it grew by accretion, and the rewrite each one takes. Three of them remove the
+shape; the callback case below keeps it and buys an early exit instead, which is the whole of what it offers.
 
 **Two of these change behavior, so they are not behavior-identical refactors.** Collapsing a flag drops the work the old
 form did after the answer was known; moving a declaration changes when its computation runs. Both ship as a deliberate
