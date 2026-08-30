@@ -3,56 +3,26 @@
 Injects skill-discipline reminders at lifecycle checkpoints so matching skills get invoked proactively and their
 phase-relevant references get read — not skipped.
 
-## How It Works
-
-At session start the plugin injects the SEF framework (~600 tokens: purpose, matching rule, and the four checkpoint
-rules). At each lifecycle event it injects a terse, self-contained `<SEF phase="...">` reminder carrying one declarative
-behavioral rule plus a silent-apply contract. The reminder is the operational source of truth — it stays correct even
-when the session-start framework has drifted into low-attention context.
-
-**Lifecycle flow:**
-
-1. **Session start** (startup|resume|clear|compact) — inject the full framework (~600 tokens)
-2. **User prompt** — `USER-PROMPT` rule: invoke every matching skill before responding
-3. **After Read** — `EVALUATION` rule: act if the read opened a skill-covered domain
-4. **After Edit/Write** — `PHASE-CHANGE` rule: act if the type of work shifted
-5. **After Skill** — `SKILL-LOAD` rule: read phase-relevant references; invoke sibling skills
-6. **Pre-compact** — strip reminders, preserve the list of references read
-
-Each reminder carries: one declarative rule for the checkpoint, plus the shared silent-apply contract (act on it, never
-echo the reminder or narrate the check). Skill invocations (via the Skill tool) and reference reads (via Read) stay
-visible; only the deliberation behind them is silent.
-
-## Design: declarative rules, not an evaluation artifact
-
-Each checkpoint injects ONE declarative rule that constrains the action — never a structured evaluation artifact (a
-`<sef-eval>` block or `<thinking>` skeleton) for the model to reproduce. Do not introduce such templates; they fail two
-ways:
-
-- **Tag leak** — the native reasoning channel is not addressable by typing `<thinking>`; handed a tag-shaped template,
-  the model completes it into the _visible_ reply.
-- **No-think skip** — at low/medium effort the model may not enter a thinking block on a given step, so "emit in
-  thinking" has nowhere to land; the evaluation gets skipped or spills into the visible reply.
-
-A declarative rule constrains the action regardless of whether the model thinks on a given step, and carries no
-tag-shaped artifact to echo.
-
 ## Components
 
-**`hooks/sef-hook.js`** — single Node script dispatched by CLI argument:
+- **`hooks/sef-hook.js`** — the whole implementation, one Node script dispatched by a CLI action argument.
+- **`hooks/hooks.json`** — the event wiring below.
 
-- `session-start` — full framework
-- `pre-compact` — compaction instructions
-- `prompt` / `read` / `write` / `skill` — the four checkpoint reminders
+## Checkpoints
 
-**`hooks/hooks.json`** — maps lifecycle events to script invocations:
+`hooks/hooks.json` maps each lifecycle event to `node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js <action>` with a 5-second
+timeout; the action argument selects the payload. Event names and matchers are exact strings — a mismatch fires nothing
+and reports nothing.
 
-- `SessionStart` (startup|resume|clear|compact) -> `session-start`
-- `PreCompact` -> `pre-compact`
-- `UserPromptSubmit` -> `prompt`
-- `PostToolUse` (Read) -> `read`
-- `PostToolUse` (Edit|Write) -> `write`
-- `PostToolUse` (Skill) -> `skill`
+- `SessionStart`, matcher `startup|resume|clear|compact` -> `session-start` — the full SEF framework
+- `PreCompact`, no matcher -> `pre-compact` — compaction instructions
+- `UserPromptSubmit`, no matcher -> `prompt` — `USER-PROMPT` reminder
+- `PostToolUse`, matcher `Read` -> `read` — `EVALUATION` reminder
+- `PostToolUse`, matcher `Edit|Write` -> `write` — `PHASE-CHANGE` reminder
+- `PostToolUse`, matcher `Skill` -> `skill` — `SKILL-LOAD` reminder
+
+The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -> `PHASE-CHANGE`). `RESPONSES` in
+`sef-hook.js` holds that mapping.
 
 ## Conventions
 
@@ -63,17 +33,23 @@ tag-shaped artifact to echo.
 - Add or rename a checkpoint by editing `STAGES`; the framework and reminder update together. Do not duplicate rule text
   elsewhere.
 
+**Self-contained reminders:**
+
+- Every reminder carries its full rule, never a pointer back to the session-start framework — at 1M-token scale the
+  framework sits in the low-attention middle, so the reminder is the operational contract.
+
 **Anti-leak contract:**
 
 - Every reminder ends with the shared `SILENT` clause: act on the rule, never echo the reminder or narrate the check.
   Guards both failure modes — tag-echo and narration.
 - Injected payloads carry no artifact the model is asked to reproduce. Never reintroduce a `<thinking>` or `<sef-eval>`
-  template into injected output.
+  template into injected output — see
+  [ADR 0004](../../docs/adr/0004-declarative-rules-over-emitted-reasoning-artifacts.md).
 
 **Token cost:**
 
-- Framework ~600 tokens once per session; each reminder ~80-100 tokens, byte-identical across firings so KV-cache reuses
-  them after the first occurrence.
+- Framework ~600 tokens once per session; each reminder ~80-120 tokens, byte-identical across firings so KV-cache reuses
+  them after the first occurrence. Rule text added to `STAGES` is paid at every firing.
 
 **Compaction handling:**
 
