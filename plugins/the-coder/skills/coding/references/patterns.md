@@ -1,7 +1,7 @@
-# Error Handling, Dependency Isolation, and Refactor Targets
+# Error Handling, Dependency Isolation, Local Shape, and Refactor Targets
 
-Read this when writing error paths, introducing a seam for testability, or improving existing code rather than changing
-its behavior.
+How error paths behave, how a dependency is isolated for a test, the four local shapes that collapse to something
+smaller, and the named smells with the move each one takes.
 
 ## Handle Errors Deliberately
 
@@ -32,6 +32,29 @@ reaching for a mock by default.
 - **Third-party or external** — inject it behind your own narrow interface and mock that interface, not
   the vendor SDK.
 </dependency-rules>
+
+## Local Shape
+
+Four shapes a function's body takes when it grew by accretion. Each has one collapse, and the collapse is smaller than
+the shape it replaces — so this is a rewrite, not a comment explaining the shape.
+
+<shape-rules>
+- **A flag set and then returned is a return in disguise.** A boolean initialized false, set on failure
+  paths, then consumed once by a single check that returns or raises — collapse it to a direct exit at each
+  set site. The flag form usually keeps working after the answer is known, and reports the same failure
+  more than once. Where the set site is inside a callback that cannot return through its caller, the
+  collapse is an abort instead: guard the callback's first line on the flag.
+- **Declarations don't promise.** Declare at first use, not in an up-front batch. Values computed far above
+  their consumers are promises the reader carries to the bottom of the function; where they already sit in
+  a structure in scope, read them at the use site rather than aliasing them at all.
+- **Assembling a value field by field is a constructor you refused to write.** The same run of
+  `x.a = …; x.b = …` at every call site belongs in a constructor, factory, or literal. Write it and the
+  guards on "optional" fields usually die with it, because the type can finally state which fields are
+  required.
+- **One guard style per function.** Early-outs are one-liners or they are blocks — don't mix the two forms
+  gratuitously in one body. A guard whose message needs a local to build it stays expanded, and that is not
+  a mix.
+</shape-rules>
 
 ## Refactor Targets
 

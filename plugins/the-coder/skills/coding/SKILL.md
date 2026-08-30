@@ -218,8 +218,8 @@ adjacent tests, and the naming conventions. Read CLAUDE.md and the lint config f
 patterns contradict, pick one (more recent, more tested), explain the choice, and flag the other for cleanup — never
 blend them into an average. If you think an existing convention is harmful, surface it; don't fork it silently.
 
-Read `references/patterns.md` when writing error paths, introducing a seam for testability, or improving existing code
-rather than changing its behavior.
+Read `references/patterns.md` when writing error paths, introducing a seam for testability, reshaping a function whose
+body reads worse than it works, or improving existing code rather than changing its behavior.
 
 ## Naming
 
