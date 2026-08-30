@@ -53,8 +53,9 @@ an escape hatch carries its justification, which reaches a language this marketp
 
 Three rules support the set:
 
-- **Rename before commenting.** A comment whose payload fits in an identifier is a naming defect. Free for private
-  symbols, same-change caller updates for public ones, forbidden for symbols published in generated docs.
+- **Rename before commenting.** A comment whose payload fits in an identifier is a naming defect. The blast-radius
+  limits that decide whether the rename lands in the change at hand live in the `coding` skill's `references/naming.md`,
+  which is their one home; restating them here is what leaves a decision record contradicting the rule it supports.
 - **Provenance gates every WHY.** A reason the agent holds is stated plainly; a reason inferred by reading is marked
   `why?:` or omitted.
 - **A routing ladder replaces delete-only** — name, test, doc comment, rule document, architecture doc, marker, drown.

@@ -76,8 +76,9 @@ uncommitted first.
 - A comment compensating for a vague name is a naming defect. Rename it, then see what is left to say — a name is read
   at every use site, the comment above it once. Name a predicate as the question it answers, and write a value's
   meanings as a named set rather than as a comment listing them. Rename a private name when the change already touches
-  or reads it, and a public one only when every caller sits in a file the change already touches — grep them first;
-  otherwise the rename is its own change. A name published in generated documentation does not get renamed.
+  or reads it, and a public one only when every reference to it — call sites, use sites, both — already sits in a file
+  the change touches; find them first, and if one lands outside, the rename is its own change. A name consumed outside
+  this repository or published in generated documentation is frozen.
 - An error message names whatever concrete thing the code has — which file, which field, which value. Where it holds
   none, say what failed without inventing detail. A category standing in for an instance the code knows ("invalid
   input") asks the reader to trust you, and vocabulary that exists only inside the implementation never reaches a

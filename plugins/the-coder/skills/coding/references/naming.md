@@ -34,12 +34,17 @@ The limit on a rename is its blast radius, never how much better the new name is
 - **Private symbol** — free, inside the scope you already have. Rename it in the same change when it is a
   symbol the change touches or that you read to make the change; a private name elsewhere in the codebase is
   not yours to rename on the way past.
-- **Public symbol** — the name is API surface. Rename it with its callers in the same change when every
-  caller already sits in a file this change touches; grep them first, and if one lands outside, the rename is
-  a change of its own kind and does not ride along with unrelated work.
-- **Published in generated documentation** — frozen. Verify before proposing it (grep the docs tree); for a
-  frozen symbol the rescue falls back to a doc comment, or drowns.
+- **Public symbol** — the name is API surface. Find every reference first, by whatever navigation the
+  language skill prescribes; a variable, field, type, or enum member has use sites rather than callers, and
+  all of them count. Rename it in the same change when every reference already sits in a file this change
+  touches. If one lands outside, the rename is a change of its own kind and does not ride along with
+  unrelated work.
+- **Consumed outside this repository** — frozen, whatever the reference sweep finds. A sweep reaches this
+  repository only, so a name a published package or a downstream service depends on is beyond what it can
+  clear.
+- **Published in generated documentation** — frozen. Verify before proposing it (sweep the docs tree).
 </rename-limits>
 
-A rename that cannot land is not the end of the road: the fact it would have carried re-enters the routing ladder in
-[`comments.md`](comments.md), one rung down.
+A rename that cannot land yet is not the end of the road: the fact it would have carried re-enters the routing ladder in
+[`comments.md`](comments.md), one rung down. A **frozen** name is different — nothing later unfreezes it, so its fact
+goes to a doc comment or drowns, and it never re-enters the ladder.
