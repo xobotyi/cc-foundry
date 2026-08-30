@@ -1,8 +1,8 @@
 ---
 name: coding
 description: >-
-  Language-agnostic coding workflow: discovery, change decomposition, commit sizing, comment policy, and completion
-  evidence.
+  Language-agnostic coding workflow: discovery, change decomposition, commit sizing, comment and naming policy, and
+  completion evidence.
 when_to_use: >-
   Invoke whenever code is touched at all — writing, modifying, debugging, refactoring, or reading a codebase to
   understand it — and before the language skill rather than after it. Also invoke on the symptoms: a signature recalled
@@ -221,6 +221,13 @@ blend them into an average. If you think an existing convention is harmful, surf
 Read `references/patterns.md` when writing error paths, introducing a seam for testability, or improving existing code
 rather than changing its behavior.
 
+## Naming
+
+A name is read at every use site; a comment is read once — so a vague name is the defect that forces the explanation
+above it. Read `references/naming.md` when naming a new symbol, when a comment's payload would fit in an identifier, or
+when a name in code you touch reads two ways. It carries the naming rules and the limits on renaming what already
+exists.
+
 ## Comments
 
 The default is zero comments, and it is not a judgment call. Five kinds may exist and nothing outside the list does: a
@@ -232,8 +239,7 @@ comment, a rule in the project's rule document, a design note in the architectur
 it. Drown is the default verdict and it is silent.
 
 Read `references/comments.md` before writing, repairing, or reviewing any comment or doc comment. It carries the full
-closed set, the marker grammar, the rename limits, the provenance rule for a WHY, the doc-comment contract, and the
-repair scope.
+closed set, the marker grammar, the provenance rule for a WHY, the doc-comment contract, and the repair scope.
 
 ## Debugging
 

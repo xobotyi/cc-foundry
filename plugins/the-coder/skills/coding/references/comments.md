@@ -90,23 +90,21 @@ Most candidates drown, and that is the system working. A change that rescues not
 failure, not thoroughness. The ladder exists so that deleting is cheap: an agent with nowhere to put a fact hoards it in
 a comment.
 
+**The rungs are exclusive: one home per fact.** A fact you route to a name, a test, or a document does not also survive
+as a comment. Two copies are not redundancy — the one at the code is the copy nothing updates when the other changes,
+and it outlives its own truth. Route it or keep it, never both.
+
 ### The First Rescue Is a Rename
 
 When a comment's whole payload fits in an identifier, the fix is a rename, not a better comment.
-`// index of the last fused token` above `idx` is `lastFusedToken`, and then there is nothing left to say. A name is
-read at every use site; a comment is read once, by whoever scrolls past it.
+`// index of the last fused token` above `idx` is `lastFusedToken`, and then there is nothing left to say. Applies to
+variables, fields, functions, types, and enum members alike. A comment compensating for a vague name is a naming defect
+wearing a comment — rename first, then see what survives.
 
-Applies to variables, fields, functions, types, and enum members alike. A comment compensating for a vague name is a
-naming defect wearing a comment — rename first, then see what survives.
-
-<rename-limits>
-- **Private symbol** — free. Rename it in the same change.
-- **Public symbol** — the name is API surface. Rename it with its callers in the same change when
-  the blast radius is small; otherwise it is a change of its own kind and does not ride along with
-  unrelated work.
-- **Published in generated documentation** — frozen. Verify before proposing (grep the docs tree);
-  for a frozen symbol the rescue falls back to a doc comment or drowns.
-  </rename-limits>
+**Test this rung before the ones below it, not merely first in reading order.** A name that carries the fact leaves
+nothing for any other rung to file, so a rename ends the routing; every rung below presumes the name could not hold the
+fact. [`naming.md`](naming.md) carries what a better name looks like, and the blast-radius limits that decide whether
+the rename lands in this change or becomes one of its own.
 
 ### A WHY You Inferred Is Not a WHY You Know
 
@@ -173,6 +171,9 @@ a real constraint gets rescued before it goes.
   The default governs what you write; it is not a licence to strip a codebase.
 - **Delete narration, history, and task references on sight.** They cost nothing to lose, and the
   diff records the removal.
+- **Delete a comment that restates what a document already carries.** The document is the home; the
+  copy at the code is the one that goes stale unwitnessed. Name the surviving copy in the repair
+  line, so a reviewer can check the fact still exists somewhere.
 - **Rewrite a doc that no longer matches its symbol.** A stale contract is worse than a missing
   one, because callers believe it.
 - **Report the repair in one line** so a reviewer knows the extra hunks are deliberate, not
