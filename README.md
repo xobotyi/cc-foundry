@@ -123,8 +123,9 @@ and drops the noise.
 
 Agent-written prose carries fingerprints: inflated significance, hedged comparisons, participle padding, chat-register
 leaks, leftover citation tokens. Readers notice them and discount the substance along with the style. The `humanize`
-skill sorts these tells into six generative mechanism families, so the agent catches variants no flat list would name
-and knows when to leave text alone (clusters convict; single tells don't). Hard constraints: never fabricate specifics,
+skill traces these tells to the six post-training pressures that produce them, so the agent catches variants no flat
+list would name — and decides whether to edit before deciding what to edit, because model editing measurably improves
+weak drafts and damages strong ones. Hard constraints: never fabricate specifics, never inject voice the source lacked,
 conserve every claim, fix writing for readers and never for AI detectors.
 
 ```

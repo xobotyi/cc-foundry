@@ -5,20 +5,25 @@ humans.
 
 ## Skills
 
-- **`humanize`** — remove AI-writing tells from prose (and prevent them when drafting) while preserving substance and
-  voice
+- **`humanize`** — remove AI-writing tells from prose, and prevent them while drafting, without flattening the author
 
 ## Plugin Scope
 
-Out of scope: detector evasion (the skill fixes writing for readers, never for detectors), code comments and commit
-messages (covered by the-coder and git-commit), CLAUDE.md quality (covered by the-workflow).
+Out of scope: detector evasion (the skill fixes writing for readers, never for detectors), instruction text (covered by
+ai-helpers:prompt-engineering), code comments and commit messages (covered by the-coder and git-commit), CLAUDE.md
+quality (covered by the-workflow).
 
 ## Conventions
 
-- `humanize` organizes tells into six mechanism families (inflated importance, performed deliberation, leaked context,
-  uniform texture, default formatting, machine residue) — new patterns join a family rather than extending a numbered
-  list
-- Vocabulary tiers in the skill decay as models change; re-verify against current corpus data before editing tier
-  assignments (source notes in `skills/humanize/references/patterns.md`)
-- When editing the skill, never weaken its Hard Constraints block (never fabricate, conserve substance, match voice,
-  house style wins) — every edit path in the skill depends on it
+- `humanize` groups tells by the post-training pressure that produces them — performed helpfulness, unearned
+  significance, hedged commitment, markdown in prose, assembly over composition, machine residue. A new pattern joins a
+  mechanism; a tell with no mechanism behind it ships in neither the skill nor the catalog
+- Every threshold the skill states traces to a measurement in `skills/humanize/references/baselines.md`, with its corpus
+  size and the author's own caveat. A number with no source does not go in, and a marker that failed to replicate is
+  recorded as failed rather than dropped
+- Vocabulary lists are scoped to model eras and decay fastest of anything here; re-verify against current corpus data
+  before editing them
+- When editing the skill, never weaken the Hard Constraints block (never fabricate, never inject, conserve substance,
+  match voice, house style wins, secondhand text immune) — every edit path depends on it
+- Re-ground the references by refreshing `skills/humanize/.dev/reference-inventory.json` and running
+  `cd .dev && yarn cli docs-fetch ../plugins/the-writer/skills/humanize/.dev/reference-inventory.json`
