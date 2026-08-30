@@ -72,8 +72,10 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   another one
 - This sharpens ADR 0002 rather than overturning it: behavioral self-sufficiency has to hold inside the durable window,
   not only on first load
-- **One home per fact, including this plugin's own documents.** The rename limits live in `naming.md` alone; the routing
-  ladder in `comments.md` keeps the rung and points at the file
+- **One home per fact among the skill's own files.** The rename limits live in `naming.md` alone; the routing ladder in
+  `comments.md` keeps the rung and points at the file. The style is outside that set and carries its own copy by the
+  self-sufficiency rule above — so a change to those limits edits `naming.md` and the style's `## Code` bullet in the
+  same commit, and neither ships without the other
 - **Rules are distinctions, never spellings.** `can`/`is`/`has` is a distinction every language has; `IsEmpty`,
   `is_empty`, and `empty?` are three spellings of it. A rule that fixes a spelling is a language rule in a
   language-agnostic plugin
