@@ -57,6 +57,27 @@ for ignored instructions, and the canonical scaffold. Subagents briefed to touch
   `.claude/CLAUDE.md`, and `@path` imports expand at launch — splitting a file into imports buys organization, not
   context.
 
+## A Plugin's CLAUDE.md
+
+- A plugin CLAUDE.md opens with a 1-3 sentence prose statement of what the plugin does, then goes structured: skill KV
+  lists, dependency diagrams, bullet-list conventions.
+- **Section order is fixed**, so a reader who knows one plugin's file can navigate every other:
+  1. Component rosters — `## Skills`, then `## Agents`, `## Output Styles`, `## Scripts` as the plugin ships them. A
+     plugin that ships no skills uses `## Components`.
+  2. Plugin-specific sections where they earn a place — `## LSP Integration`, `## Validator Contract`,
+     `## Known Limits`.
+  3. `## Skill Dependencies` — relationships _inside_ this plugin: which skill is a prerequisite of which, which owns a
+     shared concern, which defers to another.
+  4. `## Plugin Scope` — what belongs to _other_ plugins, and what is deliberately out of scope.
+  5. `## Conventions` — the rules for editing this plugin's artifacts.
+  6. `## Critical Constraints` — the bottom reinforcement zone, only where something genuinely critical needs it.
+- **Use those exact headings.** `Skill Relationships`, `Cross-Skill Contracts`, `Boundaries`, and `Scope` are the same
+  two concepts under four more names; one name per concept applies to headings as much as to identifiers.
+- It governs edits to the plugin's artifacts; it never re-teaches them. An agent editing a plugin reads its SKILL.md
+  files too, so a conventions block paraphrasing a skill is a second, lower-fidelity copy that drifts.
+- Keep what an editor cannot get from those artifacts: cross-plugin ownership boundaries, a term another plugin cites by
+  name, measured budgets, and non-obvious Claude Code behavior.
+
 ## Formatting
 
 - After editing, format the file with `yarn dlx prettier --write <file>`. The repo config picks the parser — never pass
