@@ -13,13 +13,10 @@ Frontend platform discipline: CSS, accessibility, framework conventions, and bro
 
 ## Skill Dependencies
 
-The `tailwindcss` skill has `css` as a hard prerequisite — it requires CSS fundamentals (specificity, box model, layout)
-to be loaded before Tailwind-specific conventions apply. The skill enforces this via a `<prerequisite>` block that
-invokes `frontend:css`.
+- `tailwindcss` → `css` — hard prerequisite, enforced by a `<prerequisite>` block that invokes `frontend:css`
 
 ## Plugin Scope
 
-This plugin covers frontend platform concerns specific to building for the browser. Language-specific skills
-(JavaScript/TypeScript) are provided by the `javascript` plugin. Framework skills (React, Vue, Svelte) cover
-framework-specific conventions; the `css`, `tailwindcss`, and `accessibility` skills are framework-agnostic and apply
-across all frontend work. The `tailwindcss` skill bridges CSS fundamentals and framework-specific class binding.
+- Language discipline (JavaScript/TypeScript) belongs to the `javascript` plugin, never to a skill here
+- `css`, `tailwindcss`, and `accessibility` apply across all frontend work; `react`, `vue`, and `svelte` carry
+  framework-specific conventions
