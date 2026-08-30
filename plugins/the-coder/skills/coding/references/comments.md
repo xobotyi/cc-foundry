@@ -94,9 +94,12 @@ a comment.
 as a comment. Two copies are not redundancy — the one at the code is the copy nothing updates when the other changes,
 and it outlives its own truth. Route it or keep it, never both.
 
-**The doc comment is the exception, because its reader is a different person.** A test proves an invariant to whoever
-runs the suite; the caller holding only the signature never sees it. An invariant that binds the caller belongs in the
-doc comment whether or not a test also checks it — that is one fact reaching two readers, not one fact in two homes.
+**Two rungs are exempt.** A doc comment is one, because its reader is a different person: a test proves an invariant to
+whoever runs the suite, and the caller holding only the signature never sees it. An invariant that binds the caller
+belongs in the doc comment whether or not a test also checks it, so the test rung does not end the climb for a
+caller-facing fact — that is one fact reaching two readers, not one fact in two homes. A `constraint:` is the other: it
+exists because the next person to touch the code never opens the document that also records the fact, so the document
+holding it is the marker's reason to exist rather than a reason to drop it.
 
 ### The First Rescue Is a Rename
 
@@ -178,9 +181,8 @@ a real constraint gets rescued before it goes.
   diff records the removal.
 - **Delete a comment that restates what a document already carries.** The document is the home; the
   copy at the code is the one that goes stale unwitnessed. Name the surviving copy in the repair
-  line, so a reviewer can check the fact still exists somewhere. This does not reach the five kinds:
-  a `constraint:` exists precisely because the fact has to be found at the code, and the document
-  holding it too is the reason the marker was written, not a reason to delete it.
+  line, so a reviewer can check the fact still exists somewhere. This does not reach a `constraint:`,
+  which is written precisely because the fact has to be found at the code.
 - **Rewrite a doc that no longer matches its symbol.** A stale contract is worse than a missing
   one, because callers believe it.
 - **Report the repair in one line** so a reviewer knows the extra hunks are deliberate, not
