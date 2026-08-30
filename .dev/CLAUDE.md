@@ -1,7 +1,5 @@
 # .dev — Development Tools
 
-Internal CLI tools for cc-foundry plugin development.
-
 ## Running Commands
 
 ```bash
@@ -13,33 +11,22 @@ yarn cli <command> [options]
 
 ### docs-fetch
 
-Fetch documentation from URLs listed in a skill's
-`reference-inventory.json` and save as markdown files.
+Fetch the URLs listed in a skill's `reference-inventory.json` into a `reference/` directory beside that inventory file.
 
 ```bash
 yarn cli docs-fetch <inventory-path> [--dirty]
+
+# e.g. yarn cli docs-fetch ../plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json
 ```
 
 **Arguments:**
+
 - `inventory-path` — Path to `reference-inventory.json` file
 
 **Flags:**
-- `--dirty` — Keep existing reference files (skip cleanup).
-  By default, the `reference/` folder is deleted before fetching
-  to remove orphaned files when sources are removed from inventory.
 
-**Example:**
-
-```bash
-# Fetch prompt-engineering skill references (clean rebuild)
-yarn cli docs-fetch \
-  ../plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json
-
-# Incremental fetch (keep existing files)
-yarn cli docs-fetch \
-  ../plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json \
-  --dirty
-```
+- `--dirty` — Keep existing reference files. Without it the `reference/` directory is deleted before fetching — that is
+  what drops files whose sources were removed from the inventory.
 
 **Inventory format:**
 
@@ -51,13 +38,10 @@ yarn cli docs-fetch \
 }
 ```
 
-The command:
-1. If URL ends with `.md` or `.mdx` — treats as raw markdown
-2. Otherwise — fetches HTML, extracts with Readability, converts to markdown
-3. Adds YAML frontmatter with source URL and fetch timestamp
-4. Updates `lastFetched` in inventory file
+**Behavior:**
 
----
-
-**Maintenance:** Update this document when adding commands or
-changing existing behavior.
+- URL ending in `.md` or `.mdx` — saved as raw markdown
+- Any other URL — HTML fetched, extracted with Readability, converted to markdown; if extraction fails the page is saved
+  as `.html` instead
+- Every saved file gets YAML frontmatter with `url` and `fetchedAt`
+- `lastFetched` in the inventory file is rewritten after the run
