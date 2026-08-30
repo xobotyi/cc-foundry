@@ -2,36 +2,19 @@
 
 Auto-syncing status line for Claude Code sessions with context window usage, cost tracking, and model information.
 
-## How It Works
-
-On every session start, the `sync-statusline.js` hook:
-
-1. Copies `statusline.js` to `~/.claude/statusline.js`
-2. Reads `~/.claude/settings.json` and patches the `statusLine` configuration if `type` or `command` differ from
-   expected values
-3. Preserves existing user preferences (e.g., `padding`) via object spread
-
-The status line script receives session data via stdin and renders three rows:
-
-- **Row 1** — Output style, model name, session cost (USD), API time
-- **Row 2** — Context window remaining (%), input/output token ratio, cache hit rate
-- **Row 3** — Current working directory (relative to project root, collapsed if too long)
-
-Color urgency increases as context approaches limits: gray → yellow → orange → red.
-
 ## Components
 
-- **Hook** — `hooks/sync-statusline.js`: SessionStart hook that syncs script and settings
-- **Script** — `statusline.js`: status line renderer (installed to `~/.claude/`)
-- **Config** — `hooks/hooks.json`: hook registration
+- **`hooks/sync-statusline.js`** — SessionStart hook; copies the renderer to `~/.claude/statusline.js` and patches
+  `statusLine` in `~/.claude/settings.json`
+- **`hooks/hooks.json`** — hook registration
+- **`statusline.js`** — the renderer; Claude Code runs the installed copy under `~/.claude/` and feeds it session data
+  as JSON on stdin
 
-## Why User-Level Installation
+## Conventions
 
-Project-level status line configurations use relative script paths that break when agents change working directory
-during multi-agent sessions. Installing to `~/.claude/` with an absolute path ensures the status line persists
-regardless of cwd changes.
-
-## Extension
-
-To modify the status line display, edit `statusline.js` in this plugin directory and bump the version in
-`.claude-plugin/plugin.json`. The hook propagates changes on the next session start.
+- **Patch `~/.claude/settings.json` by spreading the existing object** — the hook rewrites the whole file, so any key
+  not spread through is erased from the user's global config, including `padding` under `statusLine`
+- **The status line installs at user level with an absolute command path** — a project-level `statusLine` carries a
+  relative script path that breaks when an agent changes working directory mid-session
+- **An edit to `statusline.js` reaches the user on the next session start**, when the hook re-copies it — a change is
+  not observable in the session that made it
