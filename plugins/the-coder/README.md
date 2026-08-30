@@ -107,14 +107,17 @@ read once. That rung is tested before the ones below it rather than merely liste
 leaves nothing for anything else to file. After that: a test, a doc comment, a rule in the project's own rule document,
 a design note in the architecture doc. Failing all of those, it is dropped, silently, which is the common and correct
 outcome. Wherever it lands, it lands once — a fact routed to a document does not also stay behind as a comment, because
-the copy at the code is the one nothing updates.
+the copy at the code is the one nothing updates. Two things are exempt, for the same reason in both cases: the reader
+differs. A doc comment carries an invariant to the caller who never opens the body even when a test also checks it, and
+a `constraint:` stays at the code because the next person to touch it never opens the document.
 
 The naming reference is what makes that first rung usable, since "rename it" is advice only if Claude knows what a
 better name looks like. It names a predicate as the question it answers, writes a value's meanings as an enum or typed
 constants instead of a comment listing them, runs one word through one mechanism's whole family, names for the use site
-rather than the declaration, and makes a diagnostic name the concrete file, field, or value instead of a category. The
-same file bounds the rename itself: free for a private symbol, with its callers for a public one, and off the table for
-a name published in generated documentation.
+rather than the declaration, and makes a diagnostic name the concrete file, field, or value instead of a category — so
+it loads for diagnostic work as well as for naming. The same file bounds the rename itself, by how far the name reaches:
+whether every reference already sits inside the change decides if the rename lands with it or becomes a change of its
+own, and a name consumed beyond this repository is frozen.
 
 Doc comments are the one thing that survives all of this intact, because they have a real reader — a caller holding the
 signature and nothing else, who has to get it right without asking. That reader is the whole test. A convention that
