@@ -125,6 +125,20 @@ Two rules travel with the lists. A word's overuse never transfers to its synonym
 nothing about `emphasize`, and the figurative use is the tell while the literal one is not. Density carries the signal —
 one or two of these words is coincidence, many of them many times is the strongest lexical evidence available.
 
+## Floors this skill chooses
+
+The corpora normalize per 1,000 words and report shares over whole documents, and neither publishes a minimum sample.
+The floors in the skill are therefore choices:
+
+- **Ten bullets** for a labeled-bullet share. The source reports no bullet counts at all, so this only guards a share
+  against a denominator too small to report.
+- **500 words** for a triad density. The ten AI documents average roughly 485 words each and all eighteen average about
+  1,121, so 500 sits at the low end of the corpus rather than at a measured threshold.
+- **A paragraph of two sentences** for cohesion, which is the smallest text that yields an adjacent pair at all.
+
+Each guards a ratio against being computed over nothing. The skill states the values that apply, and nothing here is
+evidence of authorship.
+
 ## Markers with no usable measurement
 
 Claimed in tell-lists and unmeasured as a density target: paragraph-length variance, bold-span frequency, list-to-prose
