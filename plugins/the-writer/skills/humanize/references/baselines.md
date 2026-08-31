@@ -133,8 +133,10 @@ The floors in the skill are therefore choices:
 - **Ten bullets** for a labeled-bullet share. The source reports no bullet counts at all, so this only guards a share
   against a denominator too small to report.
 - **500 words** for a triad density. The ten AI documents average roughly 485 words each and all eighteen average about
-  1,121, so 500 sits at the low end of the corpus rather than at a measured threshold.
-- **A paragraph of two sentences** for cohesion, which is the smallest text that yields an adjacent pair at all.
+  1,121. The source publishes totals rather than per-document lengths, so 500 tracks the AI-document mean and fixes no
+  minimum anyone measured.
+- **A paragraph of at least two sentences** for cohesion, which is the smallest text that yields an adjacent pair at
+  all.
 
 Each guards a ratio against being computed over nothing. The skill states the values that apply, and nothing here is
 evidence of authorship.

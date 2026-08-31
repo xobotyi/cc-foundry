@@ -97,8 +97,8 @@ negative parallelism in one text. The corpus behind the first three holds eighte
 
 The first three are ratios, so each needs a denominator worth reporting. One labeled bullet out of one bullet is 100%,
 and a single triad in 300 words clears 3 per 1,000. Take a labeled-bullet share from ten bullets upward, a triad density
-from 500 words upward, and a cohesion mean only where a paragraph holds two sentences. Below a floor the ratio yields no
-mark, and the passage stands or falls on everything else here. The floors are chosen rather than measured, and
+from 500 words upward, and a cohesion mean only where a paragraph holds at least two sentences. Below a floor the ratio
+yields no mark, and the passage stands or falls on everything else here. The floors are chosen rather than measured, and
 `${CLAUDE_SKILL_DIR}/references/baselines.md` says where each one comes from.
 
 Em-dash density is a drafting target and never a mark. Human rates run from 0.0 to 17.12 per 1,000 words across the two

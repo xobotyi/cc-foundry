@@ -48,8 +48,9 @@ Removes AI-writing tells from prose, prevents them while drafting, and reviews s
 - **Sweep in order** — structure, then cohesion, then wording, then formatting density, then residue. Local word swaps
   leave the measured gap open; structural edits close it
 - **Mark against thresholds** — labeled-bullet share, three-item density, adjacent-sentence cohesion, and a repeated
-  negative parallelism. Em-dash density calibrates drafting instead, since human rates are wide enough to swallow most
-  model rates measured
+  negative parallelism. Each ratio needs a denominator first — ten bullets, 500 words, a paragraph of at least two
+  sentences — and yields no mark below it. Em-dash density calibrates drafting instead, since human rates are wide
+  enough to swallow most model rates measured
 - **Acquit deliberately** — perfect grammar, formal vocabulary, contraction density, and even sentence lengths are not
   evidence, and the skill says so with the measurements behind it
 
