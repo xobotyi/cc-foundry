@@ -101,7 +101,8 @@ density from 500 words upward, the length the corpus documents average. Below ei
 treat one of anything as an observation.
 
 Em-dash density is a drafting target and never a mark. Human rates run from 0.0 to 17.12 per 1,000 words across the two
-corpora, and every model rate measured falls inside them.
+corpora, and the essay study's model rates sit inside that span, so a density within it says nothing about who wrote the
+text.
 
 **Negative parallelism carries the widest evidence of any single construction.** It appears as "not just X, but Y", as
 "not X, but Y", as the dash realization "not X — Y", and reversed as "X rather than Y". Across ~16,800 sampled posts the

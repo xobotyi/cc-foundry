@@ -98,10 +98,10 @@ Structural conventions learned from markdown-saturated training, and formatting 
 data, leak into text that is not a chat reply. Baselines and thresholds: `${CLAUDE_SKILL_DIR}/references/baselines.md`.
 
 - **Em-dash density** far above the human mean of 3.23 per 1,000 words. This is a drafting target and never a mark:
-  human rates run from 0.0 to 17.12 per 1,000 words across the two corpora, and every model rate measured falls inside
-  them. Aim at the mean rather than at zero, because a suppression instruction drives some models to 0.19 per 1,000 and
-  that reads as suppressed. Where a dash goes, prefer a period, comma, colon, or parentheses, and keep the ones doing
-  work a comma cannot.
+  human rates run from 0.0 to 17.12 per 1,000 words across the two corpora, and the essay study's model rates sit inside
+  that span. Aim at the mean rather than at zero, because a suppression instruction drives some models to 0.19 per 1,000
+  and that reads as suppressed. Where a dash goes, prefer a period, comma, colon, or parentheses, and keep the ones
+  doing work a comma cannot.
 - **Labeled bullets** — `**Label:** explanatory sentence` as the shape of every item. Above roughly 30% of all bullets
   this separates generated from human documents. Merge into prose, or give the items real headings if they earn them.
 - **Lists where prose belongs** — three related sentences broken into bullets. Write the paragraph.

@@ -57,12 +57,14 @@ the low end of the essay range, so a suppressed draft is recognizable as suppres
 zero under the same instruction while em dashes did not, because the dash is valid prose punctuation and a structural
 marker at once.
 
-The spread also rules the marker out as a discriminator. Human rates run from 0.0 to 17.12 per 1,000 words across the
-essay and landing-page corpora, and every model rate above falls inside that span, so density serves as a drafting
-target and never as evidence of authorship.
+The spread rules the marker out for anything inside it. Human rates run from 0.0 to 17.12 per 1,000 words across the
+essay and landing-page corpora, and the essay study's model rates of 0.00 to 10.62 sit inside that span, so a density
+within it carries no evidence of authorship.
 
-A second corpus reports human 0.0–4.7 per 1k against AI 0.0–61.3 (ai-smell), which is a wider AI range on landing-page
-text than the essay corpus shows.
+Rates above the span exist. The landing-page corpus reports human 0.0–4.7 per 1,000 words against AI 0.0–61.3
+(ai-smell), and 61.3 is roughly thirteen times the top of the human range there. A rate that far out is a drafting
+defect, measured on one genre and one model's output. It still marks no passage, because density points at no passage to
+read.
 
 ## Cost of editing a draft that is already good
 
