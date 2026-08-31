@@ -33,7 +33,8 @@ twin a few lines away.
 
 Then judge the draft as a whole against three questions: does it hold one argument, do its paragraphs depend on each
 other, does it carry specifics that resist fabrication? Three clear yeses make a draft strong. A clear no to any one
-makes it weak. A question you cannot answer leaves it uncertain.
+makes it weak. A question you cannot answer leaves it uncertain, and uncertain outranks weak: asking costs less than a
+rewrite that was never warranted.
 
 The three questions are an inference, not a result. The measurement behind the gate split scientific abstracts by a
 rubric score, and nothing in it maps that split onto an article, a README, or a release note.
@@ -90,23 +91,24 @@ shape of its fix, or before adding a pattern to the catalog.
 Every pattern above appears in clean human writing. One em dash means nothing. Em dashes plus forced triads plus
 "vibrant tapestry" plus a Conclusion section is a confession. Mark passages, never words.
 
-Four measurements are strong enough to decide a mark, and each is a reason to read the passage, not a verdict: labeled
-bullets above 30% of all bullets, three-item enumerations above 3 per 1,000 words, adjacent-sentence cohesion below
-0.80, and a second negative parallelism in one text. The corpus behind the first three holds eighteen documents in one
-genre.
+Four measurements mark a passage. A mark sends you to read it and never stands as a verdict: labeled bullets above 30%
+of all bullets, three-item enumerations above 3 per 1,000 words, adjacent-sentence cohesion below 0.80, and a second
+negative parallelism in one text. The corpus behind the first three holds eighteen documents in one genre.
 
-The first three are ratios, and a text too small to hold the denominator defeats them: one labeled bullet out of one
-bullet is 100%, and a single triad in 300 words clears 3 per 1,000. Apply them from a few hundred words upward. Em-dash
-density is a drafting target and never a mark, because the human range runs 0.33 to 17.12 per 1,000 words and overlaps
-every model measured.
+The first three are ratios, so each needs a denominator worth reporting. One labeled bullet out of one bullet is 100%,
+and a single triad in 300 words clears 3 per 1,000. Take a labeled-bullet share from ten bullets upward and a triad
+density from 500 words upward, the length the corpus documents average. Below either floor, count the instances and
+treat one of anything as an observation.
+
+Em-dash density is a drafting target and never a mark. Human rates run from 0.0 to 17.12 per 1,000 words across the two
+corpora, and every model rate measured falls inside them.
 
 **Negative parallelism carries the widest evidence of any single construction.** It appears as "not just X, but Y", as
 "not X, but Y", as the dash realization "not X — Y", and reversed as "X rather than Y". Across ~16,800 sampled posts the
 construction reached roughly 5× its pre-2023 rate, and among the articles that use it, more than half use it more than
 once and a quarter use it three or more times. That corpus carries no authorship labels, so the rates describe what
 published writing does rather than what a model does. Human writers reach for the shape too, in myth-busting and
-common-misconception writing, so one instance with a real contrast is ordinary and a second is a reason to read the
-passage.
+common-misconception writing, so one instance with a real contrast is ordinary and a second marks the passage.
 
 Vocabulary carries signal by density, and the lists turn over by model era — the words that convicted a 2023 draft are
 not the words that convict a current one. Overuse never transfers to a synonym.

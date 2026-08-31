@@ -57,8 +57,9 @@ the low end of the essay range, so a suppressed draft is recognizable as suppres
 zero under the same instruction while em dashes did not, because the dash is valid prose punctuation and a structural
 marker at once.
 
-The spread also rules the marker out as a discriminator. The human essay range of 0.33 to 17.12 covers every model rate
-measured here, so density serves as a drafting target and never as evidence of authorship.
+The spread also rules the marker out as a discriminator. Human rates run from 0.0 to 17.12 per 1,000 words across the
+essay and landing-page corpora, and every model rate above falls inside that span, so density serves as a drafting
+target and never as evidence of authorship.
 
 A second corpus reports human 0.0–4.7 per 1k against AI 0.0–61.3 (ai-smell), which is a wider AI range on landing-page
 text than the essay corpus shows.
@@ -141,7 +142,7 @@ Across ~16,800 Substack posts sampled from 31 categories, the "not X, but Y" con
 pre-generative-AI rate by 2026. Among 500–3,000-word articles that use it, more than half use it more than once and 25%
 use it three or more times (`https://wonderingaboutai.substack.com/p/i-analyzed-16000-articles-to-find`, June 2026). The
 corpus has no authorship ground truth, so this measures a population-level shift in published writing, not a per-model
-rate. Repetition inside one text is the part that discriminates.
+rate. Repetition inside one text is the part worth reading; nothing here discriminates authorship.
 
 ## No fingerprint exists for the current Claude models
 
