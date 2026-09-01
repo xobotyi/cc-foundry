@@ -279,7 +279,7 @@
 		{
 			"name": "open-source",
 			"description": "Open-source contribution discipline: issue writing, pull request creation, and contribution etiquette",
-			"version": "1.0.1",
+			"version": "2.0.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
