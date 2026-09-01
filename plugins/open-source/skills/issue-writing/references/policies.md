@@ -85,8 +85,9 @@ Name the tool actually used. Naming a different one is the measured disclosure f
 
 ## Security routing
 
-**Never open a public issue for a suspected vulnerability.** Publication is the harm, and it cannot be undone by
-deleting the issue.
+**Never describe a suspected vulnerability in public.** Publication is the harm, and deleting the issue does not undo
+it. A public issue asking only which private channel to use carries no vulnerability detail and is the documented
+fallback below.
 
 Establish the route from the project's current files, in this order:
 

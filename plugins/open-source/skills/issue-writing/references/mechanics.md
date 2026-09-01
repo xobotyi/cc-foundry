@@ -76,7 +76,9 @@ preferred security contact. Do not describe the vulnerability in that issue.
 
 ```bash
 gh issue view <number> --repo OWNER/REPO --comments   # after filing, to follow up
-gh api repos/OWNER/REPO/contents/.github --jq '.[].name'   # what policy files exist
+gh api repos/OWNER/REPO/contents/.github --jq '.[].name'   # policy files under .github
+gh api repos/OWNER/REPO/contents --jq '.[].name'           # root: CONTRIBUTING, SECURITY, AI_POLICY, AGENTS
+gh api repos/OWNER/REPO/contents/docs --jq '.[].name'      # docs/, where some projects keep the policy
 ```
 
 Read `CONTRIBUTING.md`, `SECURITY.md`, and any `AI_POLICY.md` from the repository rather than from memory of the

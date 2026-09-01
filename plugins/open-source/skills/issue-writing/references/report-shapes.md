@@ -76,7 +76,8 @@ Goes to the private channel, never the public tracker. Expect a higher bar than 
 
 - The affected version, tested against the latest release.
 - A minimal reproducer.
-- Evidence of actual exploitation rather than a scanner or static-analysis finding.
+- Evidence that the finding is real, at whatever bar the project sets. Some demand proof of exploitation and reject
+  scanner or AI output without it; that is their stated policy rather than a universal prerequisite.
 - Impact stated in terms of what an attacker gains, without a severity score the project did not ask for.
 - One finding per report.
 - Plain text in the body; attachments delay triage in projects that say anything about it.
