@@ -46,13 +46,13 @@ committed.
 
 ### open-source
 
-Contributing to a project you don't maintain means following rules that live outside the code: CONTRIBUTING.md
-conventions, duplicate searches, and the higher bar maintainers now apply to agent-generated submissions. Two skills
-handle the artifacts maintainers actually see: `issue-writing` (bug reports and feature requests, anti-slop
-verification, `gh` CLI usage) and `pr-contribution` (PR titles and descriptions, fork workflow, contribution
-compliance). Both put preparation before output, so the work starts by reading the project's guidelines, searching for
-duplicates, and verifying every claim. Neither touches implementation or commit messages, which stay with `the-coder`
-and `git-commit`.
+Contributing to a project you don't maintain means following rules that live outside the code, and agents mostly don't
+find them — measured across four frontier models, agents opened a repository's AI policy file in 3.5% of unaided runs.
+Two skills handle the artifacts maintainers see: `issue-writing` (routing a report to the right channel, the evidence
+bar, bug and feature and vulnerability shapes) and `pr-contribution` (finding and obeying the project's rules, earning a
+reviewer, titles and descriptions, fork mechanics). Both start from the project's own files and draft for a human to
+submit. Neither treats machine authorship as a defect to hide, and neither touches implementation or commit messages,
+which stay with `the-coder` and `git-commit`.
 
 ```
 /plugin install open-source

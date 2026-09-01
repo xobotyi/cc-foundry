@@ -5,20 +5,21 @@ projects.
 
 ## The Problem
 
-Agent-generated issues and pull requests are consistently low quality. Maintainers call it "slop" — vague descriptions,
-missing reproduction steps, generic prose that could apply to any project, references to functions that don't exist.
-Projects like curl have shut down bug bounties entirely because of it. LLVM, Selenium, and Django have implemented
-explicit AI contribution policies. The bar for agent contributions is higher than for humans, not lower.
+Agent contributions fail on process, not on code. In 562 categorized rejections of agent-authored pull requests, the
+largest cause was reviewer abandonment at 38%, followed by duplicate submissions at 23% and CI failures at 17% —
+incorrect implementations accounted for 3%. Meanwhile projects have written rules to defend themselves, and agents do
+not read them: measured across four frontier models, agents opened a repository's AI policy file in 3.5% of unaided
+runs, and in repositories that ban AI contributions outright they refused 0% of the time.
 
-The failure isn't in the code — it's in the communication. Agents produce output that compiles but submit it wrapped in
-descriptions that waste maintainer time, violate project norms, and erode trust for all future AI contributions.
+The failure isn't in the code — it's in everything around it. Agents produce output that compiles, then submit it into
+projects whose rules they never found, duplicating work that already exists, to reviewers nobody arranged.
 
 ## The Solution
 
-Two skills that cover the full contribution communication surface — one for issues, one for pull requests. Both enforce
-a preparation-first workflow: read the project's guidelines, search for duplicates, verify every claim, then create the
-deliverable. Both include anti-slop verification gates that catch the patterns maintainers use to detect AI-generated
-content.
+Two skills covering the artifacts maintainers see — one for issues, one for pull requests. Both put the project's own
+rules first: find them, classify what they demand, and satisfy it before writing anything. Both draft for a human to
+submit, and neither asks an agent to sound human. The objection maintainers actually raise is to unreviewed output, so
+the gates check evidence — was it reproduced, was it searched for, was the claim run — rather than writing style.
 
 ## Installation
 
@@ -31,45 +32,46 @@ content.
 
 ### issue-writing
 
-Issue creation discipline for external repositories. Covers bug reports (title formulas, reproduction steps, expected vs
-actual, MRE construction, environment info) and feature requests (problem-first framing, proposed solution,
-alternatives, scope awareness).
+Issue creation discipline for external repositories. It routes before it drafts — a suspected vulnerability never
+reaches a public tracker, and the security channel gets looked up per report rather than remembered, because one project
+moved its route four times in a year.
 
-The preparation pipeline runs before any issue is written: read CONTRIBUTING.md and issue templates, search for
-duplicates in both open and closed issues, verify the problem exists on the latest version, gather concrete evidence.
-The verification gate checks factual accuracy (every reference verified against current source), completeness (template
-compliance, specific titles), and anti-slop markers (no generic descriptions, no unverified speculation, no AI-typical
-prose patterns).
+From there it works what the evidence supports. Developers rank reproduction steps, stack traces, and test cases most
+useful and reporters find them hardest to supply, which is the gap an agent can actually close by running the
+reproduction and capturing the trace. The skill covers bug, feature, and vulnerability shapes, duplicate search,
+disclosure wording, intermittent defects that will not reproduce on demand, and the GitHub CLI defect that silently
+skips YAML issue forms.
 
-**Use when:** filing bugs, proposing features, or preparing issue content for any external open-source project.
+**Use when:** filing bugs, proposing features, reporting a suspected vulnerability, or preparing issue content for any
+external open-source project.
 
-| References                     | Contents                                                                              |
-| ------------------------------ | ------------------------------------------------------------------------------------- |
-| `bug-report-structure.md`      | Full body template, title formulas, MRE construction, regression info, evidence rules |
-| `feature-request-structure.md` | Research-backed engagement factors, body template, what gets requests closed          |
-| `anti-slop.md`                 | How maintainers detect AI slop, stylistic/structural markers, project policies        |
+References:
+
+- **`evidence.md`** — the measured record: report elements, closure and duplicate rates, the slop crisis and its end
+- **`policies.md`** — the four demands projects make, disclosure wording, canary instructions, security routing
+- **`mechanics.md`** — templates versus YAML forms, the CLI limitation, duplicate search, private reporting
+- **`report-shapes.md`** — titles and bodies for bug, feature, and vulnerability reports
 
 ### pr-contribution
 
-Pull request submission discipline for external repositories. Covers PR descriptions (required and conditional elements,
-anti-patterns, scaling to change size), titles (imperative mood, conventional commits, calibration examples), fork
-workflow (setup, branch discipline, upstream sync, pre-submission cleanup), and contribution compliance (CLAs, DCOs, AI
-transparency).
+Pull request submission discipline for external repositories. The skill starts where the measurements say the failures
+start: finding the project's AI-contribution rules before any code is written, classifying them as refuse, disclose,
+verify, or handoff, and taking the one correct action for each. A ban ends the work and gets reported to the user.
 
-The preparation pipeline mirrors issue-writing: read CONTRIBUTING.md and PR templates, search for duplicate PRs and
-related issues, read recent merged PRs to learn project conventions, verify legal requirements, scope the change to one
-logical unit. The agent-specific discipline section addresses the seven failure modes unique to agent-generated PRs
-identified in recent research.
+From there it works the causes in order of measured weight — search for the duplicate, get a human to expect the change,
+size it to the reviewer, clear the project's gates — then covers titles and descriptions, disclosure trailers, DCO and
+CLA handling, fork mechanics, and the review response. Every threshold it states carries the corpus behind it, and the
+rules that acquit are named as explicitly as the ones that convict.
 
 **Use when:** submitting code changes, opening PRs from forks, writing PR descriptions, or preparing changes for
 upstream submission to any external open-source project.
 
-| References                   | Contents                                                                              |
-| ---------------------------- | ------------------------------------------------------------------------------------- |
-| `pr-descriptions.md`         | Full description anatomy, templates, anti-patterns, scaling depth to change size      |
-| `agent-pr-quality.md`        | Why agent PRs get rejected: seven failure modes, quality gaps, trust-building signals |
-| `fork-workflow.md`           | Fork setup, branch discipline, upstream sync, pre-submission cleanup, review response |
-| `contribution-compliance.md` | CLAs, DCOs, project guideline discovery, AI contribution transparency                 |
+References:
+
+- **`policies.md`** — the four rule types, where rules live, trailer syntax, DCO and CLA mechanics, named examples
+- **`evidence.md`** — measured rejection taxonomy, acceptance rates, compliance rates, with corpora and caveats
+- **`mechanics.md`** — fork setup, upstream sync, `gh` invocation, maintainer edits, review response
+- **`descriptions.md`** — title and description anatomy, templates, scaling, anti-patterns
 
 ## Skill Dependencies
 
