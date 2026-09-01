@@ -75,9 +75,9 @@ References:
 
 ## Skill Dependencies
 
-The two skills are complementary but independent. `issue-writing` covers filing issues; `pr-contribution` covers
-submitting code changes. Both include their own preparation pipeline. When filing an issue and then submitting a fix,
-invoke both skills sequentially — file the issue first, then reference it in the PR.
+The two skills are complementary but independent. `issue-writing` covers reports; `pr-contribution` covers code changes.
+Each reads the target project's rules for itself, and each hands its draft to the user rather than submitting. When
+reporting a defect and then fixing it, invoke both in turn — the report first, then reference it from the PR.
 
 Neither skill covers the actual implementation work — that comes from `the-coder` and language-specific plugins. Neither
 skill covers commit message formatting — that comes from `git-commit`.
