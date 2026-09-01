@@ -1,18 +1,29 @@
 {
-  "sources": {
-    "GitHub Docs: Creating an issue": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue",
-    "GitHub Docs: Configuring issue templates for your repository": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository",
-    "GitHub Docs: Syntax for issue forms": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms",
-    "GitHub Docs: Syntax for GitHub's form schema": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema",
-    "GitHub Docs: Setting guidelines for repository contributors": "https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors",
-    "Mozilla Bug Writing Guidelines": "https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html",
-    "Chromium Bug Reporting Guidelines": "https://www.chromium.org/for-testers/bug-reporting-guidelines/",
-    "web.dev: How to file a good browser bug": "https://web.dev/articles/how-to-file-a-good-bug",
-    "Daniel Stenberg: Death by a thousand slops": "https://daniel.haxx.se/blog/2025/07/14/death-by-a-thousand-slops/",
-    "GitHub Community: Exploring Solutions to Tackle Low-Quality Contributions": "https://github.com/orgs/community/discussions/185387",
-    "OpenSSF: AI-SLOP best practices for OSS maintainers": "https://github.com/ossf/wg-vulnerability-disclosures/issues/178",
-    "Developer Engagement with Feature Requests in Open Source (arXiv)": "https://arxiv.org/html/2507.13553v1",
-    "opensource.guide: How to Contribute to Open Source": "https://opensource.guide/how-to-contribute/"
-  },
-  "lastFetched": "2026-03-29T12:59:46.564Z"
+	"sources": {
+		"What Makes a Good Bug Report? (Bettenburg et al.)": "https://www.st.cs.uni-saarland.de/publications/details/bettenburg-tr-2008/",
+		"GitBugs: Bug Reports for Duplicate Detection, Triage, and More": "https://arxiv.org/html/2504.09651v4",
+		"Won't We Fix this Issue? Qualitative Study of WONTFIX": "https://arxiv.org/html/1904.02414v3",
+		"Deciphering WONTFIX: Why GitHub Issues Get Rejected": "https://arxiv.org/html/2510.01514v1",
+		"What Drives Issue Resolution Speed?": "https://arxiv.org/html/2512.18852v1",
+		"Developer Engagement with Feature Requests in Open Source": "https://arxiv.org/html/2507.13553v1",
+		"LLM-Guided Issue Generation from Uncovered Code (IssueSpecter)": "https://arxiv.org/html/2604.26118v1",
+		"VS Code: Submitting Bugs and Suggestions": "https://github.com/microsoft/vscode/wiki/Submitting-Bugs-and-Suggestions",
+		"VS Code: Issue Tracking and verification workflow": "https://github.com/microsoft/vscode/wiki/Issue-Tracking",
+		"Ghostty: AI Usage Policy": "https://raw.githubusercontent.com/ghostty-org/ghostty/main/AI_POLICY.md",
+		"Open edX: AI Policy": "https://raw.githubusercontent.com/openedx/.github/master/AI_POLICY.md",
+		"Keycloak: Security policy and AI-assisted reports": "https://raw.githubusercontent.com/keycloak/keycloak/main/SECURITY.md",
+		"FastAPI: Security policy and Human Effort DoS": "https://raw.githubusercontent.com/fastapi/.github/main/SECURITY.md",
+		"Daniel Stenberg: Death by a thousand slops": "https://daniel.haxx.se/blog/2025/07/14/death-by-a-thousand-slops/",
+		"Daniel Stenberg: The end of the curl bug-bounty": "https://daniel.haxx.se/blog/2026/01/26/the-end-of-the-curl-bug-bounty/",
+		"Daniel Stenberg: curl security moves again": "https://daniel.haxx.se/blog/2026/02/25/curl-security-moves-again/",
+		"Daniel Stenberg: High quality chaos": "https://daniel.haxx.se/blog/2026/04/22/high-quality-chaos/",
+		"curl: Vulnerability disclosure policy": "https://curl.se/dev/vuln-disclosure.html",
+		"GitHub Docs: Syntax for GitHub's form schema": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema",
+		"GitHub Docs: Configuring issue templates for your repository": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository",
+		"GitHub Docs: Privately reporting a security vulnerability": "https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/report-privately",
+		"GitHub Docs: Triaging an issue with AI": "https://docs.github.com/en/issues/tracking-your-work-with-issues/administering-issues/triaging-an-issue-with-ai",
+		"GitHub Docs: Issues REST API": "https://docs.github.com/en/rest/issues/issues",
+		"GitHub CLI manual: gh issue create": "https://cli.github.com/manual/gh_issue_create"
+	},
+	"lastFetched": "2026-09-01T15:51:05.309Z"
 }
