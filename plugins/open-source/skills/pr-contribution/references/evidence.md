@@ -44,7 +44,8 @@ Source: `https://arxiv.org/html/2601.15195v1` (MSR '26), AIDev-pop: 33,596 agent
 GitHub projects with 100+ stars. 600 rejected PRs sampled stratified across agents for manual coding; 38 were deleted or
 archived, leaving 562 categorized. Two annotators, final Cohen's κ 0.91.
 
-Rejection patterns, as share of the 562:
+Rejection patterns. The percentages are the paper's own, computed against the 600 sampled rather than the 562
+categorized, so they and the counts do not divide evenly:
 
 - **Abandoned / not reviewed — 228 (38%).** Closed with no meaningful human interaction; only bots acted, if anything
   did.
