@@ -1,188 +1,328 @@
 ---
 name: vitest
 description: >-
-  Vitest testing framework conventions and practices. Invoke whenever task involves any
-  interaction with Vitest — writing tests, configuring vitest.config.ts, mocking modules,
-  debugging test failures, snapshots, coverage, or migrating from Jest.
+  Write and review Vitest tests: structure, assertions, fixtures and lifecycle, the mocking surface and its hoisting
+  rules, snapshots, configuration and projects, pools and isolation, coverage, type tests, and migration from Jest.
+when_to_use: >-
+  Invoke whenever Vitest is touched at all — writing or reviewing a test, editing a vitest config, mocking a module,
+  adding a fixture, running a suite, or reading a failure. Also invoke on the symptoms: a mock leaks between tests, a
+  `vi.mock` factory cannot see a variable, an async assertion passes when it should not, a snapshot will not settle,
+  coverage reports the wrong files, a suite is slow or flaky, or a config key from an older major is rejected. Covers
+  Vitest; the test runners bundled with Node and Bun belong to the nodejs and bun skills, JavaScript semantics to
+  javascript, the type system to typescript, and what is worth testing to the coding skill.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Vitest
+A test earns its place by failing when the behavior breaks, and at no other time. Three biases decide most calls:
 
-**Test behavior, not implementation. Mock boundaries, not internals.**
+- **Mock the boundary, never the unit under test.** Every mock asserts that the real thing cannot run here. Most such
+  assertions are false, and each false one buys a test that keeps passing after the code is wrong.
+- **Prefer a fixture to a hook.** `test.extend` initializes on demand, tears down in its own scope, and declares its
+  dependencies in the signature. A `beforeEach` runs for every test in scope whether that test needs it or not.
+- **The installed major decides what may be written**, not the shape recalled from an older one.
 
-Vitest is a Vite-native test framework with Jest-compatible APIs. It shares your app's Vite config (aliases, plugins,
-transforms) so tests run against the same code you ship.
+## Version and Toolchain
 
-## References
+Vitest 4 is the target. Read the installed version out of the lockfile before touching a config file — the configuration
+surface moved across every recent major, and a key from the wrong one is silently ignored or loudly rejected.
 
-- **Mocking** — [`${CLAUDE_SKILL_DIR}/references/mocking.md`]: Full mocking rules, module mocking patterns, cleanup
-  strategy
-- **Assertions** — [`${CLAUDE_SKILL_DIR}/references/assertions.md`]: Matcher tables, asymmetric matchers, soft
-  assertions
-- **Lifecycle** — [`${CLAUDE_SKILL_DIR}/references/lifecycle.md`]: Hook execution order, test context, setup files,
-  global setup
-- **Configuration** — [`${CLAUDE_SKILL_DIR}/references/configuration.md`]: Config file options, projects, pools,
-  sharding, env vars
-- **Coverage** — [`${CLAUDE_SKILL_DIR}/references/coverage.md`]: Coverage providers, thresholds, ignore comments,
-  performance
-- **Jest migration** — [`${CLAUDE_SKILL_DIR}/references/jest-migration.md`]: Jest API translation, key behavioral
-  differences, Mocha/Sinon
+Vitest 4.1 requires Node `^20 || ^22 || >=24` and Vite `^6 || ^7 || ^8`. Vitest 4.0 shipped requiring Vite 6 and Node
+20; 4.1 added Vite 8 and uses the installed `vite` rather than a bundled copy.
+
+What moved, by version. Anything on the left fails under Vitest 4.
+
+- **3.2** — `workspace` deprecated in favor of `projects`; fixture scopes (`test`, `file`, `worker`) added; AST-aware v8
+  coverage remapping added behind `coverage.experimentalAstAwareRemapping`
+- **4.0** — `workspace` removed; `poolOptions.*` flattened to top level; `maxThreads`/`maxForks` became `maxWorkers`;
+  `singleThread`/`singleFork` became `maxWorkers: 1, isolate: false`; `minWorkers` removed; `coverage.all` and
+  `coverage.extensions` removed; `environmentMatchGlobs` and `poolMatchGlobs` removed; `deps.external`/`deps.inline`
+  moved under `server.deps`; browser providers became separate packages taking a factory; the `basic` reporter and the
+  pre-3.0 reporter hooks removed; the third-argument options object on `test` and `describe` removed
+- **4.1** — `aroundEach` and `aroundAll` hooks; the `test.extend` builder pattern with type inference; `test.override`;
+  test tags with `--tags-filter`; `--detect-async-leaks`; `vi.defineHelper`; `vi.setTimerTickMode`;
+  `experimental.viteModuleRunner`
+
+Read [`${CLAUDE_SKILL_DIR}/references/configuration.md`] when creating or editing a config file, setting up projects, or
+reconciling a config written against an older major — it carries the full rename inventory, the defaults, the pool and
+isolation trade, and the CLI surface.
 
 ## Test Structure
 
-- **Import explicitly.** `import { describe, it, expect, vi } from 'vitest'` — do not rely on globals unless the project
-  has `globals: true` configured.
-- **One concept per test.** Name tests by behavior: `'returns empty array when input is null'`, not `'test case 1'`.
-- **Use `describe` for grouping.** Group by unit (function, class, component), not by test type.
-- **Prefer `it` over `test`.** Both work, but `it` reads better inside `describe`:
-  `describe('parseUrl', () => { it('extracts hostname', ...) })`.
-- **Use `it.each` / `describe.each`** for parametrized tests. Supports array form and template literal form with `$key`
-  interpolation.
-- **Test modifiers:** `it.skip`, `it.only`, `it.todo`, `it.fails`, `it.skipIf(cond)`, `it.runIf(cond)`.
-- **Retry:** `it('name', { retry: 3 }, fn)`. **Repeat:** `it('name', { repeats: 100 }, fn)`.
-- **Concurrent tests:** `describe.concurrent(...)` — use `expect` from test context (destructured parameter) for correct
-  snapshot/assertion tracking.
-
-## Mocking
-
-### Function Mocks
-
-- **`vi.fn()`** creates a standalone trackable mock. Optionally accepts implementation.
-- **`vi.spyOn(obj, 'method')`** wraps existing method while preserving original. Also supports
-  `vi.spyOn(obj, 'prop', 'get')` for getters/setters.
-- **Prefer `vi.spyOn` over `vi.mock`** when you only need to observe or override a single export.
-
-### Module Mocking
-
-- **`vi.mock()` is hoisted.** It moves to top of file regardless of where you write it. Always runs before imports.
-- **Factory must return an object** with explicit exports. ESM requires explicit `default` key:
-  `vi.mock('./mod', () => ({ default: val, namedExport: vi.fn() }))`.
-- **Partial mocking with `importOriginal`:**
-  `vi.mock(import('./api'), async (importOriginal) => ({ ...await importOriginal(), fetchUser: vi.fn() }))`.
-- **`vi.doMock()`** is not hoisted — runs at position. Only affects subsequent dynamic `import()` calls. Use when you
-  need per-test mock behavior.
-- **`vi.mock` cannot intercept internal calls.** If `foo()` calls `bar()` in the same file, mocking `bar` externally
-  does not affect `foo`. Refactor to separate modules or use dependency injection.
-
-### Cleanup & Timers
-
-- **Always restore mocks.** Use `restoreMocks: true` in config (recommended) or `afterEach(() => vi.restoreAllMocks())`.
-- **Pair `vi.useFakeTimers()` with `vi.useRealTimers()`** — in `beforeEach`/`afterEach` or use `fakeTimers` config
-  option.
-- **`vi.mocked(fn)`** narrows TypeScript types to mock types without runtime changes.
-
-Full mocking rules (auto-mocking, spy mode, `vi.hoisted`, `__mocks__` directory, env/globals stubbing, async helpers):
-see `${CLAUDE_SKILL_DIR}/references/mocking.md`.
+- **Import from `vitest` explicitly.** `globals` defaults to `false`. Add ambient globals only where the project already
+  sets `globals: true`, which also needs `"types": ["vitest/globals"]` in `tsconfig.json`.
+- **Name a test after the behavior it pins, in a phrase that scans.** `'returns an empty array for a null input'`, not
+  `'should correctly return an empty array when the provided input value is null or undefined'`. A long name is read in
+  a list of forty.
+- **One `describe` per unit under test**, grouping by function, class or component — never by test kind.
+- **Pass options as the second argument**: `test('name', { retry: 2 }, fn)`. The third-argument form was removed in
+  Vitest 4. A bare timeout number as the last argument still works, and excludes the options object.
+- **`test.for` over `test.each` when a case needs the test context.** `each` spreads an array row into positional
+  parameters; `for` passes the row as one value and gives the test context as the second parameter, which is what a
+  concurrent snapshot needs.
+- **Never leave `.only` in a commit.** `allowOnly` defaults to `!process.env.CI`, so CI fails the run rather than
+  quietly testing one case.
+- **`it.fails` asserts that a test fails**; it is not a way to park a broken test. `test.todo` is.
 
 ## Assertions
 
-### Value Matchers
+- **`toBe` for primitives and identity, `toEqual` for structure, `toStrictEqual` when `undefined` keys, sparse array
+  holes and class identity are part of the contract.** `toEqual` ignores `undefined` properties, so it passes on a field
+  that should not exist.
+- **Always `await` `.resolves` and `.rejects`.** Vitest 4 fails a test whose async assertion was never awaited; Vitest 3
+  only warned. Unawaited, the assertion never runs and the test passes unconditionally.
+- **Wrap a throwing call in a function**: `expect(() => parse(bad)).toThrow(/unexpected/)`. After `.rejects` the wrapper
+  is wrong — the promise is already unwrapped.
+- **Assert a volatile field with an asymmetric matcher, never by deleting the assertion.** `expect.any(String)`,
+  `expect.objectContaining`, `expect.arrayContaining`, `expect.stringMatching`, and `expect.schemaMatching(schema)`
+  (Vitest 4) for a Standard Schema validator. All of them negate through `expect.not.*`.
+- **`expect.poll(() => value, { timeout, interval })` over a hand-written retry loop.** It retries the assertion, must
+  be awaited, and does not work with snapshot matchers, `.resolves`/`.rejects`, or `toThrow`.
+- **`expect.soft` where several independent properties of one result are checked** and the first mismatch should not
+  hide the rest.
+- **`expect.assertions(n)` or `expect.hasAssertions()` whenever an assertion sits inside a callback** that might never
+  fire.
+- **`toHaveBeenCalledExactlyOnceWith(...)` over the `toHaveBeenCalledTimes(1)` plus `toHaveBeenCalledWith(...)` pair.**
 
-- **`toBe(val)`** — primitives or same reference (`Object.is`)
-- **`toEqual(val)`** — deep structural equality (ignores `undefined` in expected)
-- **`toStrictEqual(val)`** — deep equality + checks `undefined` keys, sparse arrays, class types
-- **`toMatchObject(subset)`** — object contains at least these properties
+Read [`${CLAUDE_SKILL_DIR}/references/matchers.md`] when reaching for a matcher whose exact semantics matter, or when
+writing a custom matcher — it carries the Vitest-only matcher set, the spy and async matcher families, and the
+`expect.extend` contract with its TypeScript declaration.
 
-### Core Rules
+## Test Context and Fixtures
 
-- **Sync errors:** wrap in function: `expect(() => throwingFn()).toThrow('message')`.
-- **Async errors:** `await expect(asyncFn()).rejects.toThrow('message')`.
-- **Always `await` async assertions.** `await expect(promise).resolves.toEqual(...)` — an un-awaited assertion silently
-  passes.
-- **`expect.poll(() => value, { timeout, interval })`** — retries assertion until pass or timeout. Prefer over manual
-  `waitFor` loops.
-- **`expect.soft(val)`** continues after failure, reports all errors at end.
-- **Asymmetric matchers** inside `toEqual`, `toHaveBeenCalledWith`: `expect.any(Number)`,
-  `expect.arrayContaining([...])`, `expect.objectContaining({})`, `expect.stringMatching(/regex/)`. Negate with
-  `expect.not.*`.
-- **`expect.assertions(n)`** — exactly n assertions must run. **`expect.hasAssertions()`** — at least one. Guard against
-  missing assertions in async code.
+- **Destructure the context.** The fixture system reads the destructuring pattern to decide what to initialize;
+  `(ctx) => ctx.db` leaves `db` uninitialized.
+- **Use the context `expect` inside `concurrent` tests.** The global `expect` cannot attribute snapshots or
+  `expect.assertions` to overlapping tests.
+- **Build fixtures with the builder pattern** (Vitest 4.1), which infers each type from the factory's return value:
+  `test.extend('db', async ({}, { onCleanup }) => { ... })`. The Playwright-style object syntax with `use()` stays
+  correct and needs the types declared by hand.
+- **`onCleanup` may be called once per fixture.** Two resources is two fixtures — which makes the teardown order
+  explicit anyway.
+- **Declare `scope` on anything a longer-lived fixture depends on.** A fixture with no scope is `test`-scoped, and a
+  `file`- or `worker`-scoped fixture cannot reach it. Only `test` fixtures see `task`, `expect` and `skip`.
+- **Suite-level hooks must be called on the extended `test`** — `test.beforeAll(({ db }) => ...)`. The global
+  `beforeAll` receives no fixtures. Asking a suite-level hook for a `test`-scoped fixture throws.
+- **`test.override` (Vitest 4.1) replaces a fixture for a suite**; it cannot introduce one and cannot change `scope` or
+  `auto`. `test.scoped` is its deprecated predecessor.
+- **Pass values from `globalSetup` with `provide`/`inject`, never a module-level variable.** Global setup runs in the
+  main process with its own global scope; keys must be strings and values structured-cloneable.
 
-Truthiness, number, string/array/object matchers, type checks, spy assertions, custom error messages,
-`expect.unreachable`: see `${CLAUDE_SKILL_DIR}/references/assertions.md`.
+## Lifecycle Hooks
+
+- **Never let a hook body return a value by accident.** A function returned from `beforeAll` or `beforeEach` is run as
+  teardown. Write `beforeEach(() => { setup() })`, not `beforeEach(() => setup())`.
+- **`afterEach` runs in reverse registration order** under the default `sequence.hooks: 'stack'`. `'list'` gives Jest's
+  order; `'parallel'` runs a group at once, bounded by `maxConcurrency`.
+- **`onTestFinished` for cleanup registered inside a test** — it runs on pass and on fail, always in reverse order,
+  regardless of `sequence.hooks`. `onTestFailed` for diagnostics only.
+- **Reach for `aroundEach`/`aroundAll` (Vitest 4.1) only when the test must run _inside_ a call** — a database
+  transaction, an `AsyncLocalStorage` run, a tracing span. The callback must call `runTest()` or `runSuite()`, or the
+  test fails and the suite is skipped. A `beforeEach` returning a teardown function covers everything else more cheaply.
+- **`setupFiles` run in the worker before each test file; `globalSetup` runs once in the main process** before any
+  worker exists. Expensive shared state belongs in `globalSetup`; hook and matcher registration belongs in `setupFiles`.
+- **`concurrent` buys nothing for synchronous tests.** No extra worker is created, so the gain is only on tests that
+  wait. Avoid `clearMocks`, `mockReset` and `restoreMocks` alongside it — each reaches across overlapping tests.
+
+Read [`${CLAUDE_SKILL_DIR}/references/fixtures-and-lifecycle.md`] when designing shared setup, choosing a fixture scope,
+or explaining an unexpected hook order — it carries the built-in context, both `extend` syntaxes, the scope access
+table, and the exact nested execution order.
+
+## Mocking
+
+- **`vi.spyOn(obj, 'method')` before `vi.mock`.** Replacing one export is recoverable; replacing a module is a standing
+  claim about every export it has, including the ones added later.
+- **A `vi.mock` factory closes over nothing.** The call is hoisted above every import, so any variable it names is still
+  uninitialized: `Cannot access '__vi_import_0__' before initialization`. Put the value in `vi.hoisted` and reference
+  that.
+- **`vi` must be imported from `vitest` in the same file.** The hoisting pass is a static scan; a `vi` re-exported
+  through a project helper is not recognized and the call stays where it was written.
+- **Write the module specifier as `import('./mod.js')`, not a string.** `vi.mock(import('./mod.js'), ...)` types
+  `importOriginal`, constrains the factory's return to the real module's exports, and updates when the file moves.
+- **A factory returns the whole namespace, with `default` as an explicit key.** An omitted export throws when the code
+  reaches it.
+- **`vi.mock(path, { spy: true })` when the question is "was it called correctly".** It tracks every export while
+  keeping the real implementation, and is the only way to observe module exports in browser mode.
+- **`vi.mock` cannot intercept a call between two functions in one file.** `foobar()` calling `foo()` in the same module
+  holds a direct reference. This is intended and will not change — split the module or inject the dependency.
+- **`vi.doMock` where the mock must vary per test.** It is not hoisted, so it closes over file-scope variables, and it
+  affects only the next dynamic `import()` — never a static import written below it.
+- **Know which reset you mean.** `mockClear` empties history. `mockReset` also restores the original implementation —
+  `vi.fn(impl)` returns to `impl`, which is the opposite of Jest. `mockRestore` also detaches a `vi.spyOn` spy.
+  `vi.restoreAllMocks` detaches spies **without** clearing history or resetting implementations, and leaves automocks
+  alone in Vitest 4.
+- **Enable `restoreMocks: true` in the config rather than restoring by hand in every file.** All three switches
+  (`clearMocks`, `mockReset`, `restoreMocks`) default to `false` and run before each test.
+- **Mock a class implementation with `function` or `class`, never an arrow function.** Vitest 4 constructs mocks called
+  with `new`; an arrow function raises `<anonymous> is not a constructor`.
+- **Intercept HTTP below the code under test with Mock Service Worker**, configured in a setup file with
+  `onUnhandledRequest: 'error'`. Stubbing `fetch` tests the stub.
+- **A `__mocks__` file is never loaded unless `vi.mock()` names the module.** Jest's always-on behavior means calling
+  `vi.mock` per module in a setup file.
+
+Read [`${CLAUDE_SKILL_DIR}/references/mocking.md`] when a mock does not take effect, leaks between tests, or has to work
+in browser mode — it carries the hoisting transform, the automocking algorithm, the reset matrix, virtual modules, and
+the per-environment differences.
+
+## Fake Timers
+
+- **Pair `vi.useFakeTimers()` with `vi.useRealTimers()`** in `beforeEach`/`afterEach`, or configure `fakeTimers`
+  globally. A leaked fake clock breaks every later file in a non-isolated worker.
+- **`process.nextTick` and `queueMicrotask` are not faked by default.** Add them through
+  `vi.useFakeTimers({ toFake: [...] })` — and not under `pool: 'forks'`, where faking `nextTick` hangs the process.
+- **Advance deliberately.** `vi.advanceTimersToNextTimer()` fires one timer; `vi.runOnlyPendingTimers()` fires what is
+  queued without following the chain; `vi.runAllTimers()` drains everything and throws after 10 000 iterations on an
+  endless interval.
+- **Use the `*Async` variants when the code under test awaits between timers** — they flush the microtask queue in
+  between.
+- **`vi.setSystemTime(date)` to fix the clock** without advancing any timer.
 
 ## Snapshots
 
-- **File snapshots:** `expect(val).toMatchSnapshot()` — writes to `.snap` file.
-- **Inline snapshots:** `expect(val).toMatchInlineSnapshot(\`"expected"\`)` — Vitest auto-updates the string argument.
-- **Property matchers for volatile data:** `toMatchSnapshot({ id: expect.any(String) })`. Never snapshot timestamps,
-  random IDs, or other volatile data without matchers.
-- **Prefer inline snapshots** for small values — easier to review.
-- **Avoid large snapshots** — they become rubber-stamp reviews.
-- **Commit snapshot files.** Review them in PRs like any other code.
-- **Update with `vitest -u`** or press `u` in watch mode.
+- **Prefer `toMatchInlineSnapshot` for a small value.** It is reviewed in the same diff as the code that changed it.
+- **Give every volatile field a property matcher**: `toMatchSnapshot({ id: expect.any(String) })`. A snapshot holding a
+  timestamp trains everyone to run `-u`.
+- **Never run `-u` on a red suite without reading the diff.** Updating is how a regression becomes the expected value.
+- **Commit `.snap` files and review them.** A snapshot too large to read is a rubber stamp, not a test — assert the
+  handful of properties that matter instead.
+- **In CI, a missing or obsolete snapshot fails the run**, not only a mismatch. An obsolete entry is one whose test was
+  renamed or deleted; delete the entry in the same change.
 
-## Lifecycle
-
-### Core Rules
-
-- **`beforeAll`/`afterAll`** run once per `describe` block (or per file at top level).
-- **`beforeEach`/`afterEach`** run before/after every test in current scope.
-- **Teardown via return value:** if `beforeAll` or `beforeEach` returns a function, it runs as teardown.
-  **Vitest-specific, not in Jest.** Be careful not to accidentally return values — wrap in braces:
-  `beforeEach(() => { setupFn() })`.
-- **`onTestFinished(fn)`** — register cleanup inside a test. Always runs regardless of pass/fail.
-- **`onTestFailed(fn)`** — runs only on failure. Useful for diagnostics.
-
-### Setup Files
-
-- **`setupFiles: ['./test/setup.ts']`** — runs before each test file in the same process. Use for global hooks, custom
-  matchers, shared setup.
-- **`globalSetup: ['./test/global-setup.ts']`** — runs once before any test workers. Use for expensive one-time setup
-  (database seeding, server startup). Return a function for teardown.
-
-Hook execution order, test context, hook order config, `provide`/`inject`, and global vs setup file comparison: see
-`${CLAUDE_SKILL_DIR}/references/lifecycle.md`.
+Read [`${CLAUDE_SKILL_DIR}/references/snapshots.md`] when writing a serializer, a custom snapshot matcher, or
+reconciling snapshot output that differs from Jest — it carries the four snapshot forms, the serializer contract, and
+the Jest output divergences.
 
 ## Configuration
 
-- **Prefer `vitest.config.ts`** with `defineConfig` from `'vitest/config'`. Inherits Vite plugins and aliases
-  automatically.
-- **If using `vite.config.ts`**, add `/// <reference types="vitest/config" />` directive.
-- **Use `projects`** (v3.2+, replaces deprecated `workspace`) for multi-environment setups. Every project must have a
-  unique `name`.
+- **`vitest.config.ts` overrides `vite.config.ts` entirely.** It is not merged. Where the app config must be shared,
+  either put `test` inside `vite.config.ts` with `/// <reference types="vitest/config" />`, or `mergeConfig` the two
+  deliberately.
+- **Vite options sit at the top level**, never under `test`: `plugins`, `resolve.alias`, `define`, `server`.
+- **Extend a default array rather than replacing it**: `exclude: [...configDefaults.exclude, ...]`.
+- **Since Vitest 4, `exclude` covers only `node_modules` and `.git`.** `dist`, `cypress`, `.cache`, `.output` and the
+  common `*.config.js` files are collected unless excluded. Narrow the search with `dir` instead — it limits where
+  Vitest looks rather than filtering what it found.
 
-Config file merging, key options table, pools and parallelism, environment variables, in-source testing, and sharding:
-see `${CLAUDE_SKILL_DIR}/references/configuration.md`.
+## Projects
+
+- **`projects` for anything that needs a second environment, pool, alias set or isolation setting.** It replaced
+  `workspace` (deprecated 3.2, removed 4.0) and both `environmentMatchGlobs` and `poolMatchGlobs` (removed 4.0).
+- **Every project needs a unique `name`.**
+- **A project inherits nothing by default.** Add `extends: true` to take the root config, or compose with `mergeConfig`.
+  Use `defineProject` rather than `defineConfig` in a project file for the narrower type.
+- **`coverage`, `reporters` and `resolveSnapshotPath` are root-only** and silently ignored in a project config.
+- **The root config is not itself a project** unless it is listed among them.
+
+## Pools and Isolation
+
+- **Leave `pool: 'forks'` alone unless a measurement says otherwise.** It is the Vitest 4 default and the compatible
+  one: `process.chdir` works and native modules do not segfault.
+- **`Segmentation fault`, `Abort trap: 6` or `thread '<unnamed>' panicked` means switch off `threads`.** A native addon
+  in a worker thread is the cause.
+- **`vmThreads` and `vmForks` leak by construction** — ES modules are cached with no API to clear them, and native
+  module globals differ, so `err instanceof Error` can be `false` across the boundary. `isolate` has no effect there.
+- **`isolate: false` is the largest speed lever and the largest correctness cost.** Module registry, `globalThis`
+  mutations and module-level singletons persist across files in the same worker. Scope it to a project holding the files
+  that hold no state, never to the whole run.
+- **`fileParallelism: false` for a shared external resource**, not for a leak between files — it forces `maxWorkers`
+  to 1.
+- **`maxWorkers` replaced `maxThreads` and `maxForks` in Vitest 4**, and `VITEST_MAX_WORKERS` replaced the two matching
+  environment variables. It accepts a percentage string.
 
 ## Coverage
 
-Set `coverage.include` to catch uncovered files. Use `v8` provider (default, recommended). Set thresholds in config. Run
-coverage only in CI, not in watch mode.
+- **Set `coverage.include` explicitly.** Vitest 4 removed `coverage.all`, so without it the report holds only files some
+  test imported — an untested file simply vanishes and the percentage rises.
+- **`v8` is the default and the right default.** Vitest 4 remaps its results through AST analysis — introduced behind a
+  flag in 3.2, the only mode since 4.0 — which matches Istanbul's accuracy at lower cost. Choose `istanbul` for a non-V8
+  runtime, or when the module count makes v8 slower.
+- **Neither provider ships with Vitest**: `@vitest/coverage-v8` or `@vitest/coverage-istanbul`.
+- **An ignore hint needs `-- @preserve`.** esbuild strips comments during transpilation, so `/* v8 ignore if */`
+  disappears before the provider sees it; `/* v8 ignore if -- @preserve */` survives.
+- **A negative threshold is a maximum count of uncovered items**, which ratchets a legacy codebase where a percentage
+  cannot.
+- **Run coverage in CI, not in watch mode.** Instrumentation and report generation cost time on every rerun.
 
-Provider comparison, reporters, ignore comments, and performance tips: see `${CLAUDE_SKILL_DIR}/references/coverage.md`.
+Read [`${CLAUDE_SKILL_DIR}/references/coverage.md`] when tuning what appears in a report, setting thresholds, or merging
+coverage across shards — it carries the provider trade-offs, the include/exclude semantics, and the full ignore-hint
+syntax.
 
-## Extending Matchers
+## Type Testing
 
-Define via `expect.extend({ matcherName(received, ...args) {} })`. Return `{ pass, message }`. Add TypeScript
-declarations via `interface Matchers<T>` in `vitest.d.ts`.
+- **Type tests are not executed.** Vitest runs `tsc` over `*.test-d.ts` and parses the diagnostics, so a name built by
+  `test.each` is never evaluated.
+- **`toEqualTypeOf<T>()` by default; `toMatchObjectType<T>()` for a strict object subset.** `toExtend` is the loose
+  form, and `toMatchTypeOf` is deprecated in its favor.
+- **Assert `.not.toBeAny()` on anything crossing a generic or library boundary.** `any` satisfies every other assertion,
+  so a degraded type passes the whole file.
 
-Matcher context, TypeScript setup, and diff output: see `${CLAUDE_SKILL_DIR}/references/assertions.md`.
+Read [`${CLAUDE_SKILL_DIR}/references/type-testing.md`] when writing type tests or decoding an `expectTypeOf` error — it
+carries the matcher set, the navigation chain, and the `typecheck` options.
 
-## Jest Migration
+## Benchmarks
 
-Replace `jest.*` with `vi.*`. Key differences: mock factory must return object with explicit exports, `mockReset`
-restores original impl, auto-mocking requires explicit `vi.mock()` call, hook return values are teardown functions.
+- **`vitest bench` collects `*.bench.*` and `*.benchmark.*` files.** Benchmarking is experimental and outside SemVer —
+  pin the version before depending on the output shape.
+- **Compare against a stored baseline, never against a number in a commit message**:
+  `vitest bench --outputJson main.json` on the base branch, `--compare main.json` on the change.
+- **Options come from tinybench** — `time` (500 ms), `iterations` (10), `warmupTime` (100 ms), `warmupIterations` (5),
+  plus `setup` and `teardown` per cycle.
 
-Full API translation table, behavioral differences, and Mocha/Sinon migration: see
-`${CLAUDE_SKILL_DIR}/references/jest-migration.md`.
+## Browser Mode
+
+- **Browser mode is stable as of Vitest 4** and is the honest way to test anything that depends on layout, focus, or
+  real pointer events. `jsdom` and `happy-dom` remain right for code that only touches the DOM API.
+- **The provider is a factory from its own package**, not a string: `provider: playwright()` from
+  `@vitest/browser-playwright`. Vitest 4 dropped `@vitest/browser` and moved the context imports to `vitest/browser`.
+- **`vi.spyOn` on a module namespace throws in the browser.** Native ESM seals it. Use `vi.mock(path, { spy: true })`.
+- **Put browser tests in their own project** so the Node suite does not pay for a browser it does not use.
+
+Read [`${CLAUDE_SKILL_DIR}/references/browser-mode.md`] when setting up browser mode, writing locator queries, or adding
+visual regression tests — it carries the provider packages, the locator surface, and the screenshot stability
+constraints.
+
+## Running Vitest
+
+- **Always `vitest run` from a script, a CI job, or an agent.** Bare `vitest` watches whenever stdin is a TTY and `CI`
+  is unset; that detection is fragile, and a watching process never exits.
+- **Filter narrowly rather than rerunning everything**: a path substring, `-t <regex>` against the full name including
+  `describe` titles, or `file.test.ts:42` to run the test containing a line.
+- **`--changed [ref]` while iterating**, defaulting to uncommitted work and accepting a commit or branch.
+- **`--shard=i/n` with `--reporter=blob`, then one `vitest --merge-reports`.** Sharding splits files, never cases.
+- **`--detect-async-leaks` (Vitest 4.1) when a suite hangs or flakes** — it names the leaked handles and their source
+  locations, at a runtime cost that makes it a debugging tool rather than a default.
+
+## Migrating from Jest
+
+Three behavioral differences catch a mechanical `jest.` → `vi.` rename:
+
+- **`mockReset` restores the original implementation** rather than replacing it with a stub returning `undefined`.
+- **A `vi.mock` factory returns the module namespace**, with `default` as an explicit key, not the default export
+  itself.
+- **A function returned from `beforeEach` is teardown**, so a concise arrow body changes meaning.
+
+Read [`${CLAUDE_SKILL_DIR}/references/jest-migration.md`] when porting a suite from Jest, or from Mocha, Chai and Sinon
+— it carries the full API translation, the globals and auto-mocking differences, and the snapshot output divergences.
 
 ## Application
 
-When **writing** tests:
+When **writing** tests, apply these conventions silently — do not narrate a rule while following it. Where the existing
+suite contradicts one, follow the suite and flag the divergence once.
 
-- Apply all conventions silently — don't narrate each rule being followed.
-- Match the project's existing test style (naming, structure, assertion library).
-- If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.
+When **reviewing** tests, cite the violation and show the fix inline. Do not lecture.
 
-When **reviewing** tests:
-
-- Cite the specific issue and show the fix inline.
-- Don't lecture — state what's wrong and how to fix it.
+```
+Bad:  "Vitest best practice suggests awaiting async assertions..."
+Good: expect(fetchUser(1)).rejects.toThrow()  ->  await expect(fetchUser(1)).rejects.toThrow()
+```
 
 ## Integration
 
-The **javascript** skill governs language choices; this skill governs Vitest testing decisions. Activate the relevant
-runtime skill (**nodejs** or **bun**) for runtime-specific behavior.
+The **coding** skill decides what is worth testing and when; this skill decides how a Vitest test is written. Both are
+active at once.
 
-**Test behavior, not implementation. When in doubt, mock less.**
+This skill covers Vitest and nothing else. `node:test` belongs to the **nodejs** skill and `bun:test` to the **bun**
+skill, because each ships with its runtime. `expectTypeOf` and the `typecheck` options are this skill's, being its own
+API and its own config keys; the type system they exercise is the **typescript** skill's, and the language under test is
+the **javascript** skill's.
+
+**When in doubt, mock less.**
