@@ -75,5 +75,9 @@ written: which style guides are frozen, in `javascript`, and which compiler API 
 - API claims are verified against a primary source fetched in the session, never against memory. Where the runtime or
   the compiler is installed, a behavioral claim is verified by running it, and the measurement carries the version it
   was taken on. A documented contract outranks an observed behavior the documentation does not promise
+- Where the documentation and the runtime contradict each other outright, the runtime wins alongside the more recent
+  source, and the skill states the resolution rather than picking one silently. A reader who checks the stale page needs
+  the correction in front of them. This is narrower than the rule above, which governs behavior the documentation is
+  merely silent on
 - `vitest` sources from the `v4` branch of `vitest-dev/vitest`, never `main`. `main` carries the next major and
   documents an option surface the shipped release does not have. Repoint the inventory when the target major changes
