@@ -23,7 +23,7 @@ Consequences that decide how code is written:
 - **`Intl.RelativeTimeFormat`** — "yesterday", "in 2 days". `{ numeric: "auto" }` enables the special phrases.
 - **`Intl.ListFormat`** — joining a list. `arr.join(", ")` is wrong in most languages and wrong in English, which needs
   a conjunction and has a serial-comma convention.
-- **`Intl.DurationFormat`** — "3 hours, 4 minutes, and 5 seconds", from a `Temporal.Duration` or a plain object with the
+- **`Intl.DurationFormat`** — "3 hours, 4 minutes, 5 seconds", from a `Temporal.Duration` or a plain object with the
   same properties.
 - **`Intl.PluralRules`** — selects the plural category (`one`, `few`, `other`, …) for a number. It does not pluralize a
   word; it tells you which of your forms to use. `n === 1 ? "apple" : "apples"` does not generalize past English.
@@ -40,9 +40,7 @@ the formatter out of a loop or a render path and reuse it; the constructor is th
 
 ## Other built-in globals
 
-- **`structuredClone`** for a deep copy of data. It handles `Map`, `Set`, `Date`, `RegExp`, typed arrays, and cycles; it
-  throws `DataCloneError` on functions, symbols, and DOM nodes; and it discards the prototype, so a class instance
-  becomes a plain object.
+- **`structuredClone`** for a deep copy of data.
 - **`Object.groupBy` and `Map.groupBy`** over a hand-written `reduce` into an accumulator.
 - **`URL` and `URLSearchParams`** for anything resembling a URL. String concatenation and regular expressions both get
   encoding wrong.

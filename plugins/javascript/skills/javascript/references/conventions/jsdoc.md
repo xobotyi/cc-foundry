@@ -21,7 +21,7 @@ those the annotations are decoration.
 - **`@this {T}`** — for a function whose receiver is not inferable.
 - **`@readonly`, `@private`, `@protected`, `@public`, `@override`, `@extends`, `@implements`** — class modifiers,
   enforced by the checker.
-- **`@deprecated`** — surfaces as a strikethrough in the editor and is the only tag with a UI effect.
+- **`@deprecated`** — surfaces as a strikethrough in the editor.
 
 ## Syntax that does not work
 

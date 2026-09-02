@@ -22,12 +22,12 @@ one:
 - **`forEach(async …)`** — `forEach` ignores the returned promise entirely, so the loop finishes before any callback
   body does.
 - **A `for await` whose first element rejects** — the loop throws and the remaining promises are never awaited.
-- **`Promise.all` after the first rejection** — `all` attaches handlers to every input, so later rejections are
-  observed, but the operations keep running and their results are discarded.
-- **`Promise.race`** — the losers keep running to completion. Pair a race with an `AbortController` when the loser holds
-  a resource.
 
 Attach a handler to anything deliberately not awaited: `send().catch(reportError)`.
+
+`Promise.all` and `Promise.race` attach a handler to every input, so nothing floats there. What leaks is the work: both
+settle while the losing operations keep running, and their results are discarded. Pair a race with an `AbortController`
+when a loser holds a resource.
 
 ## Choosing a combinator
 

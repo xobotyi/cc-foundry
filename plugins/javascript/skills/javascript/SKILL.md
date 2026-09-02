@@ -29,8 +29,8 @@ point it can be seen. Three biases decide most calls:
 
 Read the project's engine baseline before writing code: `engines` in `package.json`, `browserslist`, `target` and `lib`
 in `tsconfig.json` or `jsconfig.json`, `.nvmrc`, and the CI matrix. Where a transpiler stands between source and
-runtime, its target governs the output and the source may run ahead; where none does, the oldest engine in the baseline
-governs the source.
+runtime, its target governs the output and the source may run ahead; where none does, the engine baseline's oldest
+engine governs the source.
 
 **An edition number is not an availability claim.** Engines ship features years before ratification and lag on others,
 and the gap runs both ways inside a single edition: `Array.fromAsync` and `Math.sumPrecise` are both ES2026, yet the
@@ -50,10 +50,10 @@ project can realistically target.
   `String.prototype.isWellFormed`
 - **ES2025** — iterator helpers, `Set` methods (`union`, `intersection`, `difference`, …), `Promise.try`,
   `RegExp.escape`, RegExp modifiers `(?i:)`, duplicate named capture groups, import attributes, JSON modules
-- **ES2026** — `Map.prototype.getOrInsert`, `Iterator.concat`, `Array.fromAsync`, `Error.isError`, `Math.sumPrecise`,
-  `Uint8Array` base64 and hex, `JSON.rawJSON`
+- **ES2026** — `Map.prototype.getOrInsert` and `getOrInsertComputed`, `Iterator.concat`, `Array.fromAsync`,
+  `Error.isError`, `Math.sumPrecise`, `Uint8Array` base64 and hex, `JSON.rawJSON`
 - **Stage 4, unratified** — `using` and `await using` with `Symbol.dispose` and `DisposableStack`; `Temporal`;
-  `Iterator.zip`. No Safari 26.x release implements any of them, so none is safe for a browser baseline that includes
+  `Iterator.zip`. No Safari 26.x release implements any of them, so none is safe for an engine baseline that includes
   Safari 26. `using` requires Chrome 134, Firefox 141, or Node.js 24; `Temporal` requires Chrome 144, Firefox 139, or
   Node.js 26. `Atomics.pause` is the exception, reaching Chrome 133, Firefox 137, and Safari 18.4.
 - **Not shippable** — decorators are Stage 2.7 and no engine implements them. A project using them runs TypeScript or
@@ -61,14 +61,11 @@ project can realistically target.
 
 Read [`${CLAUDE_SKILL_DIR}/references/versions/es20NN.md`] — one file per ratified edition, `es2020.md` through
 `es2026.md`, plus [`${CLAUDE_SKILL_DIR}/references/versions/stage4-queue.md`] for the unratified set — when writing
-against a feature near the baseline, and whenever raising the baseline. Each carries what its edition added, what
-behavior it changed, and the traps it introduced.
+against a feature near the engine baseline, and whenever raising it. Each carries what its edition added, what behavior
+it changed, and the traps it introduced.
 
 ## Naming
 
-- **camelCase** for variables and functions, **PascalCase** for classes and constructors, **SCREAMING_SNAKE_CASE** only
-  for a value fixed at authoring time. A constant holding a computed result is camelCase.
-- **Booleans read as a predicate** — `isValid`, `hasAccess`, `canRetry`, `shouldRetry`.
 - **One word per concept across the codebase.** `getUser` everywhere, never `getUser` beside `fetchUserInfo` and
   `loadCustomerRecord`.
 - **`url`, `id`, `err`, `ctx`, `req`, `res`, `db`, `fn` are the accepted abbreviations.** Spell out everything else.
@@ -79,8 +76,8 @@ behavior it changed, and the traps it introduced.
 
 ## Declarations and Scope
 
-- **`const` by default, `let` where reassignment is real, never `var`.** `var` is function-scoped and hoists to
-  `undefined`, which is why it survives only in code that predates block scoping.
+- **Never `var`.** It is function-scoped and hoists to `undefined`, which is why it survives only in code that predates
+  block scoping.
 - **`const` freezes the binding, not the value.** A `const` object is still mutable.
 - **One declaration per statement.** `const a = 1, b = 2` breaks under a debugger and under `git blame`.
 - **Declare at first use, not at the top of the function.** The distance between declaration and use is the variable's
@@ -93,8 +90,8 @@ behavior it changed, and the traps it introduced.
   alternative is longer without being clearer.
 - **`??` for defaults, `||` only when `0`, `""`, and `false` genuinely mean "absent".** Every configuration default is
   `??`.
-- **`?.` where the absence is expected, never to silence a bug.** Data that must be present should throw at the access
-  rather than surface as `undefined` three frames later. `obj?.method()` still throws when `method` is missing; write
+- **`?.` where the absence is expected, never to silence a bug.** Data that must be present throws at the access rather
+  than surfacing as `undefined` three frames later. `obj?.method()` still throws when `method` is missing; write
   `obj?.method?.()` when both are optional.
 - **`??` cannot be mixed with `||` or `&&` without parentheses** — it is a `SyntaxError`.
 - **The falsy set is `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined`, `NaN`.** `[]`, `{}`, and `"0"` are truthy.
@@ -125,13 +122,11 @@ prototype-pollution boundary.
 - **Rest parameters, never `arguments`** — `arguments` is array-like, absent in arrow functions, and defeats
   optimization.
 - **Return an object when returning several values.** A tuple binds callers to positional order.
-- **One job per function.** A name containing "and" is the tell.
 - **A closure keeps the whole scope alive, not the values it reads.** A callback that captures one field of a large
   object retains the object.
 
 ## Objects and Copying
 
-- **Literal syntax and shorthand.** `{}` and `[]`, `{ name, age }`, `greet() {}` rather than `greet: function () {}`.
 - **Spread over `Object.assign` for a copy**, because it does not fire setters on the target. Both are shallow and both
   drop the prototype.
 - **`structuredClone` for a deep copy of data.** It throws `DataCloneError` on functions and symbols, and discards the
@@ -145,12 +140,12 @@ prototype-pollution boundary.
 ## Arrays and Iteration
 
 - **`for...of` for side effects, array methods for transformation, `for` only when the index is used.** `forEach` cannot
-  `break` and does not await, so it earns a loop only over a named function.
+  `break` and does not await; reach for it only when the callback is already a named function.
 - **Never `for...in` on an array**, and rarely on an object — it walks inherited enumerable keys.
 - **Always pass a comparator to `sort` for numbers.** The default is lexicographic: `[1, 5, 10, 2].sort()` is
   `[1, 10, 2, 5]`. The comparator must return a number; `(a, b) => a > b` returns booleans, which makes the order
   implementation-defined and the bug engine-dependent.
-- **`sort` and `reverse` mutate.** Prefer `toSorted` and `toReversed` where the baseline allows.
+- **`sort` and `reverse` mutate.** Prefer `toSorted` and `toReversed` where the engine baseline allows.
 - **Never `delete` an array element.** It leaves a hole and does not change `length`. Use `splice` or `filter`.
 - **Build a dense array with `Array.from({ length: n })` or `[...Array(n)]`.** `Array(n).map(f)` calls `f` zero times,
   because array methods skip holes while spread and `for...of` treat them as `undefined`.
@@ -188,10 +183,8 @@ semantics, and the prototype-pollution rules.
 
 ## Async
 
-- **`async`/`await` over `.then` chains.** Reserve `.then` for attaching a handler to a promise that is deliberately not
-  awaited.
-- **Every promise is awaited or has a handler.** `send().catch(reportError)` for fire-and-forget. A floating promise is
-  a failure nobody will see.
+- **Every promise is awaited or has a handler.** `send().catch(reportError)` for fire-and-forget, which is the one place
+  a `.then` belongs. A floating promise is a failure nobody will see.
 - **`.map(async …)` needs a `Promise.all` around it, and `forEach(async …)` is always wrong** — `forEach` discards the
   returned promise and finishes before any callback body does.
 - **Start independent work together, await together**: `const [a, b] = await Promise.all([f(), g()])`. Two sequential
@@ -207,8 +200,8 @@ semantics, and the prototype-pollution rules.
 - **`new Promise(...)` only to wrap a callback API.** Where a resolver must escape, `Promise.withResolvers()` returns
   `{ promise, resolve, reject }`.
 - **Sequential `await` in a loop is correct when each step depends on the last** and a defect otherwise.
-- **`using` and `await using` release a resource on every exit path** where the baseline allows them; `try`/`finally`
-  with one nested block per resource is the equivalent elsewhere.
+- **`using` and `await using` release a resource on every exit path** where the engine baseline allows them;
+  `try`/`finally` with one nested block per resource is the equivalent elsewhere.
 
 Read [`${CLAUDE_SKILL_DIR}/references/conventions/async.md`] when ordering between promises and timers matters, when a
 rejection surfaces in the wrong place, or when cancellation has to propagate — it carries microtask ordering, the tick
@@ -216,7 +209,6 @@ cost of `await`, the floating-promise catalog, and the abort-reason semantics.
 
 ## Modules
 
-- **ES modules for all new code.** Reach for CommonJS only where the runtime forces it.
 - **An import is a live read-only binding, not a copy.** The importer sees a reassignment by the exporter and cannot
   write to the binding itself. Code ported from `require` often depends on the copy without knowing it.
 - **Never export a mutable `let`.** Export a function that returns the value.
@@ -241,15 +233,14 @@ namespace object, evaluation order, and cycle resolution.
 
 ## Errors
 
-- **Throw `Error` instances**, never a string or a plain object — anything else loses the stack.
 - **Handle an error once: recover from it, or let it propagate.** A `catch` that logs and rethrows reports one failure
   at every frame.
 - **Add context the underlying error does not carry, with `cause`**: `new Error("load config", { cause: err })`. Never
   concatenate the inner message into the outer one.
 - **Subclass `Error` and set `this.name` when a caller must branch on the failure.** Match on the class, never on the
   message text.
-- **`Error.isError(v)` over `v instanceof Error`** where the baseline allows: `instanceof` is `false` across realms and
-  `true` for a forged prototype.
+- **`Error.isError(v)` over `v instanceof Error`** where the engine baseline allows: `instanceof` is `false` across
+  realms and `true` for a forged prototype.
 - **An empty `catch` and a `catch` that only logs are the same defect.**
 - **Let a programmer error crash.** A `TypeError` from a bug is not something to recover from at the call site.
 
