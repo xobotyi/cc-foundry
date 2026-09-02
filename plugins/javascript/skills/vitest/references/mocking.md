@@ -1,276 +1,204 @@
-# Vitest Mocking
+# Mocking
 
-Functions, modules, timers, environment variables, and globals.
+Depth on the mocking surface: how hoisting is implemented, what automocking produces, how the reset family differs, and
+the environment-specific rules.
 
-## Mock Functions
+## What hoisting actually does
 
-### `vi.fn()` — Standalone Mock
+Vitest does not evaluate `vi.mock` where it is written. A plugin scans each test file for `vi.mock` and rewrites it:
+every static import becomes a dynamic one, and the `vi.mock` call moves above them.
 
-Creates a trackable function. Optionally accepts an implementation:
+```js
+// written
+import { answer } from './answer.js'
+vi.mock(import('./answer.js'))
+console.log(answer())
 
-```ts
-const fn = vi.fn()                      // returns undefined
-const fn = vi.fn((x: number) => x + 1)  // with implementation
+// executed
+vi.mock('./answer.js')
+const __vitest_module_0__ = await __handle_mock__(() => import('./answer.js'))
+console.log(__vitest_module_0__.answer())
 ```
 
-### `vi.spyOn()` — Spy on Existing Method
+Three consequences follow from the rewrite, and each is a distinct failure:
 
-Wraps an existing method while preserving the original. Returns a mock:
+- **The factory closes over nothing.** It runs before every module-level binding in the file exists. A variable
+  referenced there throws `Cannot access '__vi_import_0__' before initialization`.
+- **`vi` must be imported from `vitest` in the same file.** The scan is static. A `vi` re-exported through a project
+  helper module is not recognized, and the call is left where it was written. Enabling `globals` also satisfies the
+  scan.
+- **The rewrite is per file.** `vi.mock` inside a setup file does not affect a test file's imports, because the setup
+  file's own imports are already cached by the time the test file runs. Call `vi.resetModules()` inside `vi.hoisted` to
+  clear the caches first.
 
-```ts
-const spy = vi.spyOn(console, 'log')
-// or spy on getter/setter:
-const spy = vi.spyOn(obj, 'prop', 'get')
+`vi.hoisted(factory)` runs its callback in the hoisted region and returns the value, which is the supported way to give
+a factory something to close over.
+
+```js
+const mocks = vi.hoisted(() => ({ send: vi.fn() }))
+vi.mock('./mailer.js', () => ({ send: mocks.send }))
 ```
 
-### Mock Methods (shared by `vi.fn` and `vi.spyOn`)
+Imports are unavailable inside `vi.hoisted` for the same reason. Reach a module from there with a dynamic `import()`, or
+move the side effect into the imported module.
 
-- **`.mockReturnValue(val)`** — always return `val`
-- **`.mockReturnValueOnce(val)`** — return `val` on next call only
-- **`.mockImplementation(fn)`** — replace implementation
-- **`.mockImplementationOnce(fn)`** — replace for next call only
-- **`.mockResolvedValue(val)`** — return `Promise.resolve(val)`
-- **`.mockRejectedValue(err)`** — return `Promise.reject(err)`
-- **`.mockClear()`** — clear call history, keep implementation
-- **`.mockReset()`** — clear history + reset to original implementation
-- **`.mockRestore()`** — reset + restore original object descriptor (spyOn only)
+## The automocking algorithm
 
-### Mock State
+`vi.mock(path)` with no factory and no `__mocks__` file imports the original module and replaces it recursively:
 
-```ts
-fn.mock.calls        // array of argument arrays
-fn.mock.results       // array of { type: 'return'|'throw', value }
-fn.mock.lastCall      // arguments of last call
-fn.mock.instances     // array of `this` contexts when called with `new`
+- arrays become empty
+- primitives stay untouched
+- getters return `undefined`
+- methods return `undefined`
+- objects are deeply cloned
+- class instances and their prototypes are cloned
+
+`vi.mock(path, { spy: true })` produces the same shape but keeps every original implementation, so calls run for real
+and are still tracked. This is the form to reach for when the assertion is "was it called correctly", not "what does it
+return".
+
+Automocked classes share state between instance and prototype: each instance's method is its own mock with its own call
+history, and `Class.prototype.method` accumulates every instance's calls. Setting an implementation on the prototype
+reaches instances that have none of their own. `.mockReset()` on an instance method does not break that inheritance.
+
+## `__mocks__` directories
+
+`vi.mock('axios')` with no factory looks for `__mocks__/axios.js` at the project root; `vi.mock('../increment.js')`
+looks for `src/__mocks__/increment.js` beside the source. `deps.moduleDirectories` moves where dependency lookups
+search.
+
+The file is never loaded unless `vi.mock` is called for it. To get the always-on behavior, call `vi.mock` for each
+module inside a setup file.
+
+## The reset family
+
+Four operations with four distinct effects. Choosing the wrong one produces either a leaked implementation or a spy that
+cannot be reconfigured.
+
+- **`mockClear()`** — empties `mock.calls`, `mock.results`, `mock.instances`. Implementation untouched.
+- **`mockReset()`** — clears history and resets the implementation. `vi.fn(impl)` returns to `impl`; a bare `vi.fn()`
+  becomes a function returning `undefined`. Also drops every queued `*Once` implementation. The object stays spied.
+- **`mockRestore()`** — does `mockReset()` and restores the original property descriptor of a `vi.spyOn` target. On a
+  `vi.fn()` mock it is identical to `mockReset()`.
+- **`vi.restoreAllMocks()`** — restores `vi.spyOn` spies only. Unlike `mockRestore`, it does not clear history and does
+  not reset implementations. Automocks are unaffected in Vitest 4.
+
+The config switches `clearMocks`, `mockReset`, and `restoreMocks` each call the matching `vi.*AllMocks` function
+**before** every test, and all three default to `false`. All three are hazardous with `concurrent` tests: one test
+finishing resets mocks that overlapping tests are still using.
+
+After `restoreMocks` runs, the original descriptor is back, so a retained spy reference no longer intercepts:
+
+```js
+const spy = vi.spyOn(cart, 'getApples').mockReturnValue(10)
+cart.getApples() // 10
+vi.restoreAllMocks()
+cart.getApples() // 42
+spy.mockReturnValue(10)
+cart.getApples() // still 42 — the spy is detached
 ```
 
-### Cleanup Strategy
+## Constructors and classes
 
-Set in config (recommended) or call manually:
+Vitest 4 constructs the instance when a mock is called with `new`, instead of calling `mock.apply`. A mock
+implementation for a class therefore has to be written with `function` or `class`; an arrow function raises
+`<anonymous> is not a constructor` at call time.
 
-```ts
-// Config approach (preferred):
-test: { restoreMocks: true }
-
-// Manual approach:
-afterEach(() => { vi.restoreAllMocks() })
-```
-
-- **`clearMocks`** → `vi.clearAllMocks()` — clear history only
-- **`mockReset`** → `vi.resetAllMocks()` — clear history + reset impl
-- **`restoreMocks`** → `vi.restoreAllMocks()` — above + restore spied originals
-
-## Module Mocking
-
-### `vi.mock()` — Replace an Entire Module
-
-**Hoisted to the top of the file.** Always runs before imports, regardless of where you write it:
-
-```ts
-import { fetchUser } from './api'
-
-// This executes BEFORE the import above
-vi.mock('./api', () => ({
-  fetchUser: vi.fn(),
-}))
-```
-
-#### With `importOriginal` — Partial Mock
-
-```ts
-vi.mock(import('./api'), async (importOriginal) => {
-  const mod = await importOriginal()
-  return {
-    ...mod,
-    fetchUser: vi.fn(),  // override only this export
-  }
+```js
+vi.spyOn(cart, 'Apples').mockImplementation(function () {
+  this.getApples = () => 0
 })
-```
 
-#### Type-safe module promise syntax
-
-Use `import()` instead of a string for better IDE support and type inference:
-
-```ts
-vi.mock(import('./api'), async (importOriginal) => {
-  const mod = await importOriginal()  // type is inferred
-  return { ...mod, fetchUser: vi.fn() }
-})
-```
-
-#### Auto-mocking
-
-Call `vi.mock` without a factory to auto-mock all exports:
-
-```ts
-vi.mock('./api')  // all methods return undefined, arrays are empty
-```
-
-#### Spy mode — Track Without Replacing
-
-```ts
-vi.mock('./api', { spy: true })
-// All exports keep original implementations but are wrapped in vi.fn()
-```
-
-### `vi.doMock()` — Non-Hoisted Mock
-
-Not hoisted — runs at its position. Only affects **subsequent dynamic imports**:
-
-```ts
-vi.doMock('./config', () => ({ env: 'test' }))
-const { env } = await import('./config')  // mocked
-```
-
-### `vi.hoisted()` — Define Variables Before Imports
-
-Moves code to the top of the file, before `vi.mock`. Use to define mock references:
-
-```ts
-const mocks = vi.hoisted(() => ({
-  fetchUser: vi.fn(),
-}))
-
-vi.mock('./api', () => ({
-  fetchUser: mocks.fetchUser,
-}))
-
-// Now you can configure the mock before tests:
-mocks.fetchUser.mockResolvedValue({ name: 'Alice' })
-```
-
-### Default Export Caveat
-
-ESM requires explicit `default` key:
-
-```ts
-vi.mock('./mod', () => ({
-  default: { myMethod: vi.fn() },  // required for default export
-  namedExport: vi.fn(),
-}))
-```
-
-### `__mocks__` Directory
-
-If `__mocks__/module.js` exists alongside the module (or at project root for node_modules), `vi.mock('./module')`
-without a factory uses it automatically.
-
-### Module Mock Pitfall: Internal Calls
-
-```ts
-// foobar.ts
-export function foo() { return 'foo' }
-export function foobar() { return `${foo()}bar` }
-```
-
-Mocking `foo` externally does NOT affect `foobar` because `foobar` references `foo` directly within the same module.
-This is by design. Solutions:
-
-- Refactor into separate modules
-- Use dependency injection
-- Accept that internal calls are not mockable
-
-## `vi.spyOn` on Module Exports
-
-Import as namespace and spy on individual exports:
-
-```ts
-import * as api from './api'
-
-const spy = vi.spyOn(api, 'fetchUser').mockResolvedValue({ name: 'Bob' })
-```
-
-This does NOT work in Browser Mode (native ESM is sealed). Use `vi.mock('./api', { spy: true })` instead.
-
-## Fake Timers
-
-### Setup and Teardown
-
-```ts
-beforeEach(() => { vi.useFakeTimers() })
-afterEach(() => { vi.useRealTimers() })
-```
-
-### Controlling Time
-
-```ts
-vi.advanceTimersByTime(1000)       // advance by 1s
-vi.advanceTimersToNextTimer()      // run next scheduled timer
-vi.runAllTimers()                  // run all pending timers
-vi.runOnlyPendingTimers()          // run currently pending, not new ones
-
-// For async timers (setTimeout with promises):
-await vi.advanceTimersByTimeAsync(1000)
-await vi.runAllTimersAsync()
-```
-
-### Mock System Time
-
-```ts
-vi.useFakeTimers()
-vi.setSystemTime(new Date(2024, 0, 1))
-expect(new Date().getFullYear()).toBe(2024)
-vi.useRealTimers()
-```
-
-`vi.setSystemTime` works even without `vi.useFakeTimers()` — it will only mock `Date.*` calls in that case.
-
-### Config Defaults
-
-```ts
-test: {
-  fakeTimers: {
-    toFake: ['setTimeout', 'setInterval', 'Date', ...],  // default: all except nextTick
-    loopLimit: 10_000,  // max timers in runAllTimers
+vi.spyOn(cart, 'Apples').mockImplementation(
+  class MockApples {
+    getApples() {
+      return 0
+    }
   },
-}
-```
-
-`nextTick` is not faked by default. Enable explicitly if needed: `vi.useFakeTimers({ toFake: ['nextTick'] })`.
-
-## Environment Variables
-
-```ts
-vi.stubEnv('NODE_ENV', 'production')  // stub process.env + import.meta.env
-vi.unstubAllEnvs()                     // restore all
-
-// Or set unstubEnvs: true in config for automatic cleanup
-```
-
-## Global Variables
-
-```ts
-vi.stubGlobal('__VERSION__', '1.0.0')
-vi.unstubAllGlobals()
-
-// Or set unstubGlobals: true in config
-```
-
-## `vi.mocked()` — Type Helper
-
-Narrows TypeScript types to mock types. Does not change runtime behavior:
-
-```ts
-import { fetchUser } from './api'
-vi.mock('./api')
-
-vi.mocked(fetchUser).mockResolvedValue({ name: 'Alice' })
-// With deep mocking:
-vi.mocked(obj, { deep: true })
-```
-
-## `vi.waitFor()` and `vi.waitUntil()`
-
-Retry a callback until it succeeds or times out:
-
-```ts
-await vi.waitFor(() => {
-  if (!server.isReady) throw new Error('not ready')
-}, { timeout: 5000, interval: 50 })
-
-// waitUntil — fails immediately on throw, retries on falsy
-const el = await vi.waitUntil(
-  () => document.querySelector('.element'),
-  { timeout: 500 }
 )
 ```
+
+## Mock naming and call order
+
+Vitest 4 changed two observable defaults. `vi.fn().getMockName()` returns `vi.fn()` rather than `spy`, so snapshots
+containing mocks print `[MockFunction]` instead of `[MockFunction spy]`; spies from `vi.spyOn` keep the original method
+name. `mock.invocationCallOrder` starts at `1`, matching Jest, instead of `0`.
+
+`mock.settledResults` is populated at invocation with an `'incomplete'` entry and rewritten when the promise settles.
+
+## Virtual modules
+
+A module that the code imports but the file system does not hold — an editor API, a platform global — fails
+transformation before `vi.mock` can run. Resolve it first, then mock it.
+
+```ts
+// vitest.config.ts — redirect to a real file
+export default defineConfig({
+  test: { alias: { vscode: resolve(import.meta.dirname, './mock/vscode.js') } },
+})
+```
+
+Or return the id unchanged from a plugin's `resolveId` hook, which marks it resolved without a file behind it, and
+supply every export from the `vi.mock` factory.
+
+## Environment differences
+
+The mechanism differs by where tests run, and each mechanism has its own limit.
+
+- **Node, jsdom, happy-dom** — Vite's module runner evaluates modules, so Vitest can substitute a mocked module and
+  `vi.spyOn` works on an imported namespace object. This bends the ESM immutability rule deliberately.
+- **`experimental.viteModuleRunner: false`** (Vitest 4.1) — native `import` with a Node loader hook (Node 22.15 and
+  later). `vi.mock` and `vi.hoisted` still work; `vi.spyOn` on an ES module namespace does not, because the native
+  loader enforces the seal. A `mock` query appears in stack traces.
+- **Browser mode** — native ESM. The namespace object is sealed, so `vi.spyOn(module, 'name')` throws. Use
+  `vi.mock('./module.js', { spy: true })` and reach the export through `vi.mocked`.
+
+Mocking an exported `let` is impossible everywhere; export a function that mutates the internal value.
+
+## `vi.doMock`
+
+`vi.doMock` is not hoisted, so its factory closes over file-scope variables normally. It affects the next dynamic
+`import()` of the module and nothing already imported — including static imports written below it, which ESM hoists
+above it regardless.
+
+```js
+beforeEach(() => {
+  vi.doMock('./increment.js', () => ({ increment: () => ++counter }))
+})
+
+test('uses the mock', async () => {
+  const { increment } = await import('./increment.js')
+})
+```
+
+It returns a `Disposable`: `using _ = vi.doMock('my-module')` calls `vi.doUnmock` when the block exits, where the
+runtime supports explicit resource management. `vi.spyOn` returns one too.
+
+## Fake timers
+
+`vi.useFakeTimers()` replaces `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`, `setImmediate`,
+`clearImmediate` and `Date`, using `@sinonjs/fake-timers`.
+
+- `process.nextTick` and `queueMicrotask` are **not** faked by default. Add them through
+  `vi.useFakeTimers({ toFake: ['nextTick', 'queueMicrotask'] })`.
+- Faking `nextTick` hangs under `pool: 'forks'`, because `node:child_process` uses it internally. It works under
+  `pool: 'threads'`.
+- `vi.useRealTimers()` discards every timer scheduled while timers were fake.
+- `vi.setSystemTime(date)` moves the clock without advancing timers.
+
+`vi.setTimerTickMode` (Vitest 4.1) chooses how time moves: `'manual'` (the default — only `vi.advanceTimers*` moves it),
+`'nextTimerAsync'` (jumps to the next timer after each macrotask), or `'interval'` with a millisecond step.
+
+Advance deliberately rather than by a large number: `vi.advanceTimersToNextTimer()` fires exactly one,
+`vi.runAllTimers()` drains the queue including timers scheduled during the drain, and `vi.runOnlyPendingTimers()` fires
+what is already queued without following the chain. An endless interval makes `vi.runAllTimers()` throw after 10 000
+iterations, tunable with `fakeTimers.loopLimit`. The `*Async` variants flush the microtask queue between timers, which
+is what asynchronous code under test needs.
+
+## Network and globals
+
+Requests are not a Vitest concern — intercept them below the code under test with Mock Service Worker, configured in a
+setup file with `onUnhandledRequest: 'error'` so an unrouted request fails loudly rather than reaching the network.
+
+`vi.stubGlobal(name, value)` writes onto `globalThis`. Stubs persist across tests unless `unstubGlobals: true` is set or
+`vi.unstubAllGlobals()` is called. `vi.stubEnv` behaves the same way against `unstubEnvs`.

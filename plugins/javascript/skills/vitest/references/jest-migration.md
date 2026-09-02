@@ -1,188 +1,123 @@
-# Jest to Vitest Migration
+# Migrating from Jest
 
-Key differences, API mapping, and common gotchas.
+A translation surface for a reader arriving from Jest or from Mocha, Chai and Sinon. The API is deliberately
+Jest-shaped; the entries below are the places where a mechanical rename is not enough.
 
-## Quick API Translation
+## The mechanical part
 
-- **`jest.fn()`** → `vi.fn()` — same API surface
-- **`jest.spyOn(obj, 'method')`** → `vi.spyOn(obj, 'method')` — same API
-- **`jest.mock('./mod')`** → `vi.mock('./mod')` — factory return differs (see below)
-- **`jest.requireActual('./mod')`** → `await vi.importActual('./mod')` — always async
-- **`jest.useFakeTimers()`** → `vi.useFakeTimers()` — same `@sinonjs/fake-timers` internally
-- **`jest.setTimeout(n)`** → `vi.setConfig({ testTimeout: n })` — different API
-- **`jest.clearAllMocks()`** → `vi.clearAllMocks()` — same behavior
-- **`jest.resetAllMocks()`** → `vi.resetAllMocks()` — see `mockReset` difference below
-- **`jest.restoreAllMocks()`** → `vi.restoreAllMocks()` — same concept
+`jest.*` becomes `vi.*`, imported from `vitest`. `jest.requireActual` becomes `await vi.importActual`.
+`jest.setTimeout(5000)` becomes `vi.setConfig({ testTimeout: 5000 })`.
 
-### Type Changes
+There is no `jest` type namespace. Import the types: `import type { Mock } from 'vitest'`, and
+`let fn: Mock<(name: string) => number>`.
 
-```ts
-// Jest
-let fn: jest.Mock<(name: string) => number>
+## Globals are off
 
-// Vitest
-import type { Mock } from 'vitest'
-let fn: Mock<(name: string) => number>
+`globals` defaults to `false`, so `describe`, `it` and `expect` are imports. Either add the imports or set
+`globals: true` in the config plus `"types": ["vitest/globals"]` in `tsconfig.json`.
+
+Keeping globals off has one consequence worth planning for: libraries that register cleanup through the ambient hooks —
+Testing Library's auto DOM cleanup among them — do nothing without them. Register the cleanup explicitly in a setup file
+instead.
+
+## Module mocks return an object
+
+A Jest factory returns the default export. A Vitest factory returns the whole module namespace, with `default` as an
+explicit key.
+
+```js
+jest.mock('./some-path', () => 'hello')
+
+vi.mock('./some-path', () => ({ default: 'hello' }))
 ```
 
-## Key Differences
+An export the factory omits throws a clear error when the code reaches it, rather than being `undefined`.
 
-### 1. Globals Are Not Default
+## Auto-mocking is opt-in
 
-Jest provides `describe`, `it`, `expect` globally. Vitest requires explicit imports:
+A `__mocks__` file is never loaded unless `vi.mock()` names the module. Jest's always-on behavior is reproduced by
+calling `vi.mock` for each module inside a setup file.
 
-```ts
-import { describe, it, expect, vi } from 'vitest'
+A module mock does not reach a third-party library that imports the same module, because that library is externalized.
+Add it to `server.deps.inline` to bring it into the transformed graph.
+
+## `mockReset` differs
+
+Jest's `mockReset` replaces the implementation with a function returning `undefined`. **Vitest's `mockReset` restores
+the original implementation** — `vi.fn(impl).mockReset()` goes back to `impl`, and a spy goes back to spying on the real
+method.
+
+The mock state object is also persistent. Jest recreates `mock` on `mockClear`, so it must be re-read; Vitest keeps the
+same reference, so `const state = mock.mock` stays valid across a clear.
+
+## Hooks may return a teardown function
+
+`beforeAll` and `beforeEach` treat a returned function as teardown. A concise arrow body that happens to return
+something is therefore reinterpreted:
+
+```js
+beforeEach(() => setActivePinia(createTestingPinia())) // return value read as teardown
+beforeEach(() => {
+  setActivePinia(createTestingPinia())
+}) // correct
 ```
 
-Or enable `globals: true` in config and add `"types": ["vitest/globals"]` to `tsconfig.json`.
+Hook ordering also differs. Jest runs hooks as a list; Vitest defaults to `sequence.hooks: 'stack'`, which reverses the
+`after` hooks. `sequence: { hooks: 'list' }` restores Jest's order.
 
-### 2. Module Mock Factory Returns an Object
+## No done callback
 
-In Jest, the factory return value IS the default export. In Vitest, you must return an object with explicit exports:
+Vitest does not support the callback style. Rewrite to `async`/`await`, or wrap the callback API in a promise the test
+awaits.
 
-```ts
-// Jest
-jest.mock('./mod', () => 'hello')
+## Unawaited async assertions fail
 
-// Vitest
-vi.mock('./mod', () => ({
-  default: 'hello',
-}))
-```
+Vitest 4 fails a test whose `.resolves` or `.rejects` assertion was never awaited. Under Jest such an assertion passes
+silently, so a migrated suite can surface failures that were always there.
 
-### 3. `mockReset` Behavior Differs
+## Names, environment variables and timers
 
-- **Jest:** `mockReset` replaces implementation with empty function returning `undefined`.
-- **Vitest:** `mockReset` restores the original implementation passed to `vi.fn(impl)`.
+- Test names join with `>`, not a space. `expect.getState().currentTestName` returns `suite > test`.
+- `JEST_WORKER_ID` becomes `VITEST_POOL_ID`, always at most `maxWorkers`. `VITEST_WORKER_ID` is a distinct value: a
+  unique per-worker counter unaffected by `maxWorkers`.
+- `NODE_ENV` is set to `test` when unset, as in Jest.
+- Jest's legacy timers are unsupported; the modern `@sinonjs/fake-timers` behavior is the only one.
+- `jest.replaceProperty` has no direct equivalent — `vi.stubEnv` or `vi.spyOn` covers the cases.
 
-```ts
-const fn = vi.fn(() => 42)
-fn.mockReset()
-fn()  // returns 42 in Vitest, undefined in Jest
-```
+## Snapshots
 
-### 4. `mock.mock` State Is Persistent
+Snapshot output differs from Jest in four ways that all show up as diff noise on the first run. The header comment, the
+`printBasicPrototype: false` default, the `>` hint separator, and the full-error rendering of
+`toThrowErrorMatchingSnapshot`. Vue projects that used a jest-cli preset need `jest-serializer-vue` in
+`snapshotSerializers`.
 
-Jest recreates mock state on `.mockClear()`. Vitest holds a persistent reference:
+## Custom snapshot matchers
 
-```ts
-const mock = vi.fn()
-const state = mock.mock
-mock.mockClear()
-state === mock.mock  // true in Vitest, false in Jest
-```
-
-### 5. Auto-Mocking Is Not Automatic
-
-Jest auto-mocks `__mocks__` directories. Vitest requires explicit `vi.mock()` calls. To replicate Jest behavior, call
-`vi.mock` in `setupFiles`:
+Composables come from `Snapshots` exported by `vitest`, not from `jest-snapshot` (experimental, Vitest 4.1.3).
 
 ```ts
-// test/setup.ts
-vi.mock('axios')  // uses __mocks__/axios.js if it exists
+import { Snapshots } from 'vitest'
+const { toMatchSnapshot } = Snapshots
 ```
 
-### 6. Hook Return Values
+## From Mocha, Chai and Sinon
 
-`beforeAll`/`beforeEach` return values are treated as teardown functions in Vitest:
+The suite structure is unchanged: `describe`, `it`, and hooks named `beforeAll`/`afterAll` instead of Mocha's
+`before`/`after`.
 
-```ts
-// WRONG — accidentally returns a value that Vitest treats as teardown
-beforeEach(() => setActivePinia(createTestingPinia()))
+Chai assertions work as written, because Vitest ships Chai. Sinon's spy assertions work too — Vitest supports the
+sinon-chai property style (`expect(spy).to.have.been.calledOnceWith('a')`) alongside the Jest style, so the assertions
+need no rewrite.
 
-// CORRECT — explicit void
-beforeEach(() => { setActivePinia(createTestingPinia()) })
-```
+The creation calls do change:
 
-### 7. Hook Execution Order
+- `sinon.spy()` → `vi.fn()`
+- `sinon.stub(obj, 'method')` → `vi.spyOn(obj, 'method')`
+- `sinon.mock(obj)` → no equivalent; use spies
+- `stub.returns(v)` → `mockReturnValue(v)`; `onFirstCall().returns(v)` → `mockReturnValueOnce(v)`
+- `stub.callsFake(fn)` → `mockImplementation(fn)`
+- `spy.restore()` → `mockRestore()`; `sinon.restore()` → `vi.restoreAllMocks()`
+- `sinon.useFakeTimers()` / `clock.tick(n)` → `vi.useFakeTimers()` / `vi.advanceTimersByTime(n)`
 
-Jest runs hooks sequentially (list order). Vitest uses **stack order** by default (reverse for teardown). To match Jest
-behavior:
-
-```ts
-test: {
-  sequence: { hooks: 'list' },
-}
-```
-
-### 8. Test Name Separator
-
-Jest: `"describe title test title"` (space) Vitest: `"describe title > test title"` (chevron)
-
-### 9. Snapshot Differences
-
-- Header: `// Vitest Snapshot v1` vs `// Jest Snapshot v1`
-- `printBasicPrototype` defaults to `false` (cleaner output)
-- `toThrowErrorMatchingSnapshot` prints `[Error: msg]` not just `"msg"`
-
-### 10. Environment
-
-Jest defaults to `jsdom`. Vitest defaults to `node`. Set explicitly:
-
-```ts
-test: { environment: 'jsdom' }
-```
-
-## Migration Checklist
-
-1. Replace `jest.*` calls with `vi.*` equivalents
-2. Replace `jest.requireActual` with `await vi.importActual`
-3. Update mock factories to return objects with explicit exports
-4. Add explicit imports or enable `globals: true`
-5. Wrap `beforeEach` return values in braces if not void
-6. Install `vitest` and remove `jest`, `ts-jest`, `babel-jest`
-7. Move `jest.config.js` options to `vitest.config.ts`
-8. Update `tsconfig.json` types if using globals
-9. Update snapshot files (`vitest -u`)
-10. Set `environment: 'jsdom'` if tests need DOM APIs
-
-## Mocha + Chai + Sinon Migration
-
-### Test Structure
-
-Mocha's `before`/`after` map to Vitest's `beforeAll`/`afterAll`:
-
-```ts
-// Mocha                         // Vitest
-before(() => {})                 beforeAll(() => {})
-after(() => {})                  afterAll(() => {})
-beforeEach(() => {})             beforeEach(() => {})  // same
-afterEach(() => {})              afterEach(() => {})    // same
-```
-
-### Chai Assertions
-
-Work directly — Vitest includes Chai:
-
-```ts
-import { expect } from 'vitest'
-expect(value).to.equal(42)         // Chai-style works
-expect(value).toBe(42)             // Jest-style also works
-```
-
-### Sinon Replacements
-
-```ts
-// Sinon                           // Vitest
-sinon.spy()                        vi.fn()
-sinon.spy(obj, 'method')           vi.spyOn(obj, 'method')
-stub.returns(42)                   mock.mockReturnValue(42)
-stub.callsFake(fn)                 mock.mockImplementation(fn)
-sinon.useFakeTimers()              vi.useFakeTimers()
-clock.tick(1000)                   vi.advanceTimersByTime(1000)
-sinon.restore()                    vi.restoreAllMocks()
-```
-
-### Sinon-Chai Assertions
-
-Vitest (4.1+) supports Chai-style spy assertions natively:
-
-```ts
-expect(spy).to.have.been.called
-expect(spy).to.have.been.calledOnce
-expect(spy).to.have.been.calledWith('arg')
-expect(spy).to.have.been.calledBefore(otherSpy)
-```
-
-No need for `sinon-chai` plugin.
+Both use `@sinonjs/fake-timers` underneath, so timer semantics carry over. The behavioral difference to plan for is
+parallelism: Mocha runs files sequentially, Vitest runs them in parallel workers by default.

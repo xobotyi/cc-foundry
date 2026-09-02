@@ -1,142 +1,107 @@
-# Vitest Coverage
+# Coverage
 
-Providers, configuration, including/excluding files, and ignoring code.
+Depth on the two providers, what `coverage.include` actually controls, thresholds, and the ignore-hint syntax that
+survives transpilation.
 
 ## Providers
 
-- **`v8` (default)** — `@vitest/coverage-v8`; V8 engine's native coverage; recommended — fast, accurate since v3.2
-- **`istanbul`** — `@vitest/coverage-istanbul`; Babel instrumentation; use when not on V8 (Firefox, Bun)
+Both are separate packages and neither is installed with Vitest. `provider: 'v8'` is the default and needs
+`@vitest/coverage-v8`; `provider: 'istanbul'` needs `@vitest/coverage-istanbul`. Vitest offers to install the missing
+one; `VITEST_SKIP_INSTALL_CHECKS=1` suppresses that.
 
-Install the provider package:
+**`v8`** collects coverage at runtime through `node:inspector` and the Chrome DevTools Protocol, with no
+pre-instrumentation. Results are remapped to source with AST analysis rather than `v8-to-istanbul`, so the reports match
+Istanbul's accuracy. Vitest 3.2 added that remapping behind `coverage.experimentalAstAwareRemapping`; Vitest 4.0 removed
+the flag and made it the only mode. Faster and lighter than Istanbul, and the default for that reason. It cannot limit
+collection to specific modules, so a run that loads very many modules can be slower than Istanbul. It requires a V8
+runtime — not Firefox, not Bun, and not Cloudflare Workers, which do not expose V8 coverage through the profiler.
 
-```bash
-npm i -D @vitest/coverage-v8
-# or
-npm i -D @vitest/coverage-istanbul
-```
+**`istanbul`** rewrites source files with counter statements before running them. It works on any JavaScript runtime, it
+can instrument a chosen subset of files, and it has thirteen years of production use behind it. It pays for that in a
+transpile step, slower execution, larger files and higher memory.
 
-## Basic Setup
+Choose `v8` unless the runtime is not V8, or unless a measurement shows the module count is hurting.
 
-```ts
-// vitest.config.ts
-export default defineConfig({
-  test: {
-    coverage: {
-      provider: 'v8',  // default
-      enabled: true,    // or use --coverage CLI flag
-    },
-  },
-})
-```
+## What appears in the report
 
-```json
-// package.json
-{
-  "scripts": {
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
-  }
-}
-```
+Vitest 4 removed `coverage.all`. The report contains **only files loaded during the run** unless `coverage.include` says
+otherwise.
 
-## Including and Excluding Files
-
-**Critical:** Without `coverage.include`, only files loaded during tests appear in the report. Set it to catch uncovered
-files:
+This is the single most common coverage surprise on a Vitest 4 upgrade: a source file no test imports vanishes from the
+report entirely, and the percentage rises.
 
 ```ts
 coverage: {
-  include: ['src/**/*.{ts,tsx}'],
-  exclude: ['**/types/**', '**/*.d.ts'],
+  include: ['src/**/*.{ts,tsx}'], // uncovered files under src appear at 0%
+  exclude: ['**/generated/**'],   // applied to what include matched
 }
 ```
 
-Vitest automatically excludes test files (matching `test.include` patterns) from coverage.
+`exclude` filters the set `include` produced; without `include` it filters the loaded files. `coverage.extensions` was
+removed in 4.0 along with `all` — the glob carries the extensions now.
 
-## Reporters
-
-```ts
-coverage: {
-  reporter: ['text', 'html', 'lcov'],  // multiple reporters
-}
-```
-
-Common reporters: `text` (terminal), `html` (browser), `lcov` (CI integration), `json`, `clover`.
-
-The `html` reporter integrates with Vitest UI — open the Coverage tab to browse results.
+Related switches: `allowExternal` admits files outside the project root, `excludeAfterRemap` re-applies `exclude` after
+source-map remapping, `skipFull` hides fully covered files, `coverage.changed` (Vitest 4.1) limits the report to changed
+files while still running every test — unlike `--changed`, which narrows the run itself — and `reportOnFailure` writes a
+report even when tests fail.
 
 ## Thresholds
 
-Enforce minimum coverage levels:
+`coverage.thresholds` takes `lines`, `functions`, `branches` and `statements`. A positive number is a minimum
+percentage; a **negative number is a maximum count of uncovered items**, which is the form that ratchets a legacy
+codebase without breaking whenever the file count changes.
 
 ```ts
-coverage: {
-  thresholds: {
-    lines: 80,
-    branches: 80,
-    functions: 80,
-    statements: 80,
-  },
+thresholds: {
+  functions: 90,   // at least 90% of functions
+  lines: -10,      // at most 10 uncovered lines
+  perFile: true,   // applied per file rather than to the total
 }
 ```
 
-The test run fails if any threshold is not met.
+`autoUpdate: true` rewrites the thresholds into the config file whenever coverage improves, which keeps a ratchet
+without manual edits. It rewrites a checked-in file, so it belongs in local runs rather than CI.
 
-## Ignoring Code
+## Ignore hints
 
-Both providers support ignore comments. In TypeScript, add `@preserve` to prevent esbuild from stripping the comment:
+Each provider has its own comment prefix — `/* v8 ignore ... */` and `/* istanbul ignore ... */` — with `if`, `else`,
+`next`, `file`, and `start`/`stop` forms. Vitest 4.0 dropped the `start`/`stop` pair; Vitest 4.1 reimplemented it for
+both providers.
 
-### V8 Ignore Hints
+TypeScript is transpiled by esbuild, which **strips every comment that is not a legal comment**. An ignore hint written
+plainly disappears before the provider sees it. Add `-- @preserve` so it survives:
 
 ```ts
-/* v8 ignore next -- @preserve */
-function debugOnly() { /* ignored */ }
+/* v8 ignore if -- @preserve */
+if (unreachableInTests) {
+}
 
 /* v8 ignore start -- @preserve */
-if (process.env.DEBUG) {
-  console.log('debug info')
-}
+// ...
 /* v8 ignore stop -- @preserve */
-
-/* v8 ignore file -- @preserve */
-// Entire file excluded
 ```
 
-### Istanbul Ignore Hints
+The preserved comment can also reach the production bundle. `coverage.ignoreClassMethods` names methods to skip without
+a comment at all, and Vitest 4 made it work for the v8 provider too.
 
-```ts
-/* istanbul ignore next -- @preserve */
-if (process.env.DEBUG) { /* ignored */ }
+## Running coverage
 
-/* istanbul ignore start -- @preserve */
-// ... ignored block ...
-/* istanbul ignore stop -- @preserve */
-```
+`--coverage` on the CLI, or `coverage.enabled: true`. Coverage is a root-only option — a project config cannot set it,
+because collection spans the whole process.
 
-## V8 vs Istanbul Comparison
+Keep it out of watch mode: instrumentation and report generation cost time on every rerun and answer a question nobody
+asks mid-edit.
 
-| Factor        | V8                                     | Istanbul                      |
-| ------------- | -------------------------------------- | ----------------------------- |
-| Speed         | Faster (no instrumentation)            | Slower (Babel transform step) |
-| Memory        | Lower                                  | Higher                        |
-| Accuracy      | Identical to Istanbul since v3.2       | Battle-tested since 2012      |
-| Runtime       | V8-based only (Node, Chrome)           | Any JS runtime                |
-| File limiting | Cannot limit — instruments all modules | Can limit to specific files   |
+Reporters (`coverage.reporter`) default to a set including `text` and `html`. `coverage.htmlDir` points the HTML output
+elsewhere; `lcov` is the format most external services ingest.
 
-**Default to V8** unless targeting a non-V8 runtime.
+When Vitest detects it is running inside an AI coding agent it trims the `text` reporter automatically: `skipFull: true`
+hides fully covered files and `text-summary` is appended so totals stay visible. Explicitly configured reporters are
+never removed.
 
-## Performance Tips
+## Sharded runs
 
-- Set `coverage.include` to limit the scope — avoids processing unrelated files.
-- Use `v8` provider — no pre-instrumentation step.
-- Run coverage only in CI, not in watch mode:
-  ```json
-  { "scripts": { "coverage": "vitest run --coverage" } }
-  ```
-- For very large projects, consider sharding with merged coverage:
-  ```bash
-  vitest run --shard=1/3 --coverage
-  vitest run --shard=2/3 --coverage
-  vitest run --shard=3/3 --coverage
-  vitest run --merge-reports --coverage
-  ```
+A shard covers only the files it ran, so a per-shard report is never the project's coverage. Run each shard with
+`--reporter=blob --shard=i/n`, collect `.vitest-reports` from every machine, and produce the report once with
+`vitest --merge-reports --reporter=<name>`. Blob output omits file-based attachments; copy `attachmentsDir` alongside it
+when tests write any.
