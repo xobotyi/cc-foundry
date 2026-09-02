@@ -1,15 +1,24 @@
 {
-  "sources": {
-    "Node.js Best Practices (goldbergyoni)": "https://raw.githubusercontent.com/goldbergyoni/nodebestpractices/master/README.md",
-    "Node.js Packages and Exports": "https://raw.githubusercontent.com/nodejs/node/main/doc/api/packages.md",
-    "Node.js ESM Documentation": "https://raw.githubusercontent.com/nodejs/node/main/doc/api/esm.md",
-    "Node.js Errors API": "https://raw.githubusercontent.com/nodejs/node/main/doc/api/errors.md",
-    "Node.js Security Best Practices": "https://raw.githubusercontent.com/nodejs/nodejs.org/main/apps/site/pages/en/learn/getting-started/security-best-practices.md",
-    "Node.js Don't Block the Event Loop": "https://raw.githubusercontent.com/nodejs/nodejs.org/main/apps/site/pages/en/learn/asynchronous-work/dont-block-the-event-loop.md",
-    "Node.js Event Loop Timers and nextTick": "https://raw.githubusercontent.com/nodejs/nodejs.org/main/apps/site/pages/en/learn/asynchronous-work/event-loop-timers-and-nexttick.md",
-    "Node.js How to Use Streams": "https://raw.githubusercontent.com/nodejs/nodejs.org/main/apps/site/pages/en/learn/modules/how-to-use-streams.md",
-    "Node.js Backpressuring in Streams": "https://raw.githubusercontent.com/nodejs/nodejs.org/main/apps/site/pages/en/learn/modules/backpressuring-in-streams.md",
-    "OWASP Node.js Security Cheat Sheet": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/Nodejs_Security_Cheat_Sheet.md"
-  },
-  "lastFetched": "2026-02-16T13:19:39.688Z"
+	"sources": {
+		"Node.js Release Working Group Schedule": "https://raw.githubusercontent.com/nodejs/Release/main/README.md",
+		"Node.js 20 Changelog": "https://raw.githubusercontent.com/nodejs/node/main/doc/changelogs/CHANGELOG_V20.md",
+		"Node.js 22 Changelog": "https://raw.githubusercontent.com/nodejs/node/main/doc/changelogs/CHANGELOG_V22.md",
+		"Node.js 24 Changelog": "https://raw.githubusercontent.com/nodejs/node/main/doc/changelogs/CHANGELOG_V24.md",
+		"Node.js 26 Changelog": "https://raw.githubusercontent.com/nodejs/node/main/doc/changelogs/CHANGELOG_V26.md",
+		"Node.js API: Modules TypeScript": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/typescript.md",
+		"Node.js API: Permissions": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/permissions.md",
+		"Node.js API: Modules Packages": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/packages.md",
+		"Node.js API: Modules ECMAScript": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/esm.md",
+		"Node.js API: node module": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/module.md",
+		"Node.js API: Async Context Tracking": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/async_context.md",
+		"Node.js API: Diagnostics Channel": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/diagnostics_channel.md",
+		"Node.js API: Command-Line Options": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/cli.md",
+		"Node.js API: Deprecated APIs": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/deprecations.md",
+		"Node.js API: Stream": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/stream.md",
+		"Node.js API: Test Runner": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/test.md",
+		"npm CLI Changelog": "https://raw.githubusercontent.com/npm/cli/latest/CHANGELOG.md",
+		"npm Trusted Publishers": "https://raw.githubusercontent.com/npm/documentation/main/content/packages-and-modules/securing-your-code/trusted-publishers.mdx",
+		"undici README": "https://raw.githubusercontent.com/nodejs/undici/main/README.md"
+	},
+	"lastFetched": "2026-09-02T09:17:03.988Z"
 }
