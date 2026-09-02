@@ -25,9 +25,12 @@
 ## Configuration file
 
 `--experimental-config-file[=path]` (22.16.0 and 23.10.0; Release candidate from 26.7.0) reads `node.config.json` and
-applies its `nodeOptions` and `permission` sections. `--experimental-default-config-file` is the no-argument alias. The
-space-separated `--experimental-config-file path` form is rejected — only `=` works. A `permission` section turns on
-`--permission` implicitly.
+applies its `nodeOptions` and `permission` sections. `--experimental-default-config-file` is the no-argument alias. A
+`permission` section turns on `--permission` implicitly.
+
+**Only the `=` form passes a path, and the space-separated form fails without saying so.** Measured on 26.2.0,
+`node --experimental-config-file cfg.json app.js` does not reject the flag — it takes `cfg.json` as the entry point and
+runs it in place of `app.js`, which surfaces as an unrelated error from inside the config file.
 
 ## Watch mode
 
@@ -40,9 +43,14 @@ file argument Node exits with status 9.
 
 ## `NODE_OPTIONS`
 
-A space-separated flag list applied before command-line flags, so a command-line flag overrides it. Node refuses to
-start when it contains a flag that is not permitted in the environment — `-p`, `-e`, or a script path. Quote a value
+A space-separated flag list applied before command-line flags, so a command-line flag overrides it. Quote a value
 containing a space: `NODE_OPTIONS='--require "./my path/file.js"'`.
+
+- **A disallowed flag stops the process.** `-e` and `-p` exit with `-e is not allowed in NODE_OPTIONS` rather than being
+  ignored.
+- **A bare script path is dropped silently.** Measured on 26.2.0, `NODE_OPTIONS='./side.js' node -e '…'` starts
+  normally, runs the `-e` program, and never executes `side.js` — no error and no warning. Load code from the variable
+  with `--require` or `--import`, which do run.
 
 ## Test runner surface
 

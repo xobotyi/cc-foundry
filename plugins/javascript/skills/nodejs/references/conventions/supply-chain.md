@@ -18,7 +18,7 @@ The registry and the install step. Node's own hardening flags and its Permission
   unit is days, not minutes: npm desugars the value to `before = Date.now() - 86400000 * n`, so it is the relative form
   of `--before`. **When no version of a dependency clears the window, the command errors** rather than falling back.
 - **`min-release-age-exclude` needs npm 12.0.0** — package names or minimatch globs exempted from the window, usually
-  the organization's own packages. No Node line bundles npm 12 (Node 26 ships npm 11.19.0), so it requires an explicit
+  the organization's own packages. No Node line bundles npm 12 (26.2.0 ships npm 11.13.0), so it requires an explicit
   npm upgrade. The same release adds the warning npm prints when the window blocks an `npm audit fix`; on npm 11 there
   is no such warning, and a blocked fix is silent.
 - **`npm audit signatures`** verifies registry signatures and provenance attestations for the installed tree, which is a

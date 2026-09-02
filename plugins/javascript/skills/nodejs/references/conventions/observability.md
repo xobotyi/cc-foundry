@@ -10,12 +10,12 @@ through user-implemented thenables and through code that reached into `async_hoo
 
 ### Which entry point to use
 
-- **`als.run(store, callback)`** — the default. The store is visible inside `callback` and everything it schedules, and
-  nowhere else. It is the only entry point that is Stability 2.
-- **`als.getStore()`** — reads the current store, `undefined` outside any scope.
-- **`AsyncLocalStorage.snapshot()`** — captures the current context as a function wrapper, for handing work to a
-  scheduler that would otherwise lose it.
-- **`AsyncLocalStorage.bind(fn)`** — binds one function to the current context.
+- **`als.run(store, callback)`** — the default, and the only Stability 2 way to **enter** a store. The store is visible
+  inside `callback` and everything it schedules, and nowhere else.
+- **`als.getStore()`** — reads the current store, `undefined` outside any scope. Stability 2.
+- **`AsyncLocalStorage.snapshot()`** and **`AsyncLocalStorage.bind(fn)`** — Stability 2 from 22.15.0 and 23.11.0.
+  `snapshot` captures the current context as a function wrapper, for handing work to a scheduler that would otherwise
+  lose it; `bind` does the same for a single function.
 - **`als.enterWith(store)`** — Stability 1. It changes the store for the **rest of the current synchronous execution**,
   not for a scope. Called inside one event handler, it leaks into every handler that runs after it on the same emit.
   Prefer `run`.
@@ -45,7 +45,8 @@ while no subscriber is attached, so instrumentation can ship in production code.
   publisher see.
 - **`channel.bindStore`, `unbindStore`, `runStores`, and `withStoreScope` are Stability 1** — the bridge between a
   channel and an `AsyncLocalStorage` is not committed.
-- **`boundedChannel`** (26.1.0, Stability 1) limits how much a subscriber can cost.
+- **`boundedChannel(nameOrChannels)`** (26.1.0, Stability 1) is a `TracingChannel` for synchronous work only — `start`
+  and `end`, with no `asyncStart`, `asyncEnd`, or `error`. It bounds the traced operation, not the subscriber.
 
 ### TracingChannel
 
