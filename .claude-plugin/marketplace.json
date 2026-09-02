@@ -123,8 +123,8 @@
 		},
 		{
 			"name": "javascript",
-			"description": "JavaScript and TypeScript language discipline: conventions, patterns, ecosystem practices, and LSP-powered code intelligence",
-			"version": "1.2.8",
+			"description": "JavaScript and TypeScript discipline: the language, the type system, the Node and Bun runtimes, Vitest, and LSP-powered code intelligence",
+			"version": "2.0.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
@@ -134,7 +134,7 @@
 			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/javascript",
 			"repository": "https://github.com/xobotyi/cc-foundry",
 			"license": "MIT",
-			"keywords": ["javascript", "typescript", "conventions", "patterns"],
+			"keywords": ["javascript", "typescript", "nodejs", "bun", "vitest"],
 			"tags": ["language", "javascript", "typescript", "coding"]
 		},
 		{
