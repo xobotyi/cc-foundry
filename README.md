@@ -179,10 +179,13 @@ validation.
 
 ### javascript
 
-Claude knows JS/TS syntax but defaults to outdated patterns, mixes module systems, and ignores runtime-specific APIs.
-Five skills correct that: `javascript` (core language conventions), `typescript` (type system and strict mode), `nodejs`
-(Node.js runtime APIs), `bun` (Bun runtime APIs), and `vitest` (testing framework practices). Skills activate
-automatically based on file context.
+Claude writes JavaScript from twenty years of the language at once, and the wrong choice rarely fails loudly — the value
+coerces, the runtime warns, the test passes. Five skills fix a baseline instead: `javascript` (the language, gated on
+the engine baseline a project declares), `typescript` (the type system, `tsconfig`, and the compiler), `nodejs` (the
+runtime, gated on `engines.node`, with the stability index of every API it names), `bun` (the runtime and its
+toolchain), and `vitest` (Vitest, carrying the configuration renames across majors). Ships a
+`typescript-language-server` config and the LSP-first navigation rules that use it. Skills activate automatically based
+on file context.
 
 ```
 /plugin install javascript
