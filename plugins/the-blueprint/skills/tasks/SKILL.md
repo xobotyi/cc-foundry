@@ -2,7 +2,7 @@
 name: tasks
 description: >-
   Work item decomposition — break implementation phases into sized,
-  dependency-mapped tasks with acceptance criteria. Invoke whenever task
+  dependency-mapped tasks, each producing a verifiable artifact. Invoke whenever task
   involves the T stage of the DRAFT pipeline, decomposing phases into
   tasks, or creating a task breakdown.
 ---
@@ -10,8 +10,8 @@ description: >-
 # Tasks
 
 Decompose frame phases into work items an implementer can pick up without asking questions. Each frame phase becomes a
-group of tasks; each task is sized, dependency-mapped, and described as a plan for future work. The task breakdown feeds
-`task-creation` for tracker mechanics — this skill handles the decomposition intelligence, not tracker operations.
+group of tasks; each task is sized, dependency-mapped, and given a verifiable artifact. The breakdown feeds
+`task-creation`, which owns what a written work item contains — this skill owns how the work is cut up.
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ Locate the inputs:
 2. For each phase, identify the individual work items within it. A phase may produce 1–7 tasks. If a phase needs more
    than 7, it's likely too coarse — reconsider splitting the phase in the frame.
 3. For each task, write:
-   - Title (imperative verb + object: "Add compound index on tenant_id")
+   - Title (`task-creation` owns what a title looks like)
    - Estimate (hours — enough to validate sizing, not a commitment)
    - Dependencies (other tasks that must complete first)
    - Artifact (expected output: file path, passing test, endpoint, or other verifiable result)
@@ -54,33 +54,11 @@ gap.
 
 ### Phase 3 — Write Descriptions
 
-For each approved task, write a description. Four rules agents violate constantly:
+For each approved task, write a description. `task-creation` owns what a description contains — the elements it carries,
+their shape, and the verification standing behind every claim in it. Invoke it here rather than restating those rules.
 
-**Descriptions are plans, not reports.** Write as if the work has not started — because from the implementer's
-perspective, it hasn't. "Add a compound index" — not "Added a compound index."
-
-**Descriptions contain no implementation.** Describe WHAT should change and what "done" looks like. No production code,
-no prescriptions of new functions or classes to create. Pseudocode acceptable for complex logic; configuration samples
-acceptable when config is the deliverable.
-
-**Descriptions survive the wait.** A task may sit in the tracker for weeks while the codebase moves under it. Anchor to
-what survives refactors — existing types, interfaces, behavioral contracts ("`SkillConfig` gains an optional `schedule`
-field") — never to file paths or line numbers, which go stale between writing and pickup.
-
-**But specific enough to act on.** Agents don't ask clarifying questions — they fill gaps with plausible defaults.
-Unspecified constraints produce confidently wrong code. If an implementer would need to ask a question before starting,
-the description is underspecified.
-
-Structure each description:
-
-- **Context** — why this task exists. One sentence connecting it to the frame phase. Link to the frame document.
-- **What to do** — specific work items. Concrete enough to act on, abstract enough to leave implementation judgment.
-- **Acceptance criteria** — observable conditions proving the task is done. Prefer verifiable statements with measurable
-  thresholds over vague "works correctly."
-- **Artifact** — the expected output: specific file, passing test suite, working endpoint. Every task must produce a
-  verifiable artifact that can be checked and rolled back if wrong.
-- **References** — links to alignment, frame, or other design docs. Never code paths — they go stale in the tracker.
-  Never other tasks — inter-task dependencies use native tracker links created by `task-creation`.
+The decomposition supplies two things no description can be written without: the frame phase the task belongs to, and
+the artifact the task produces.
 
 Ask the user for approval of descriptions before proceeding.
 
@@ -139,21 +117,7 @@ Use `design-docs/NN-name.tasks.md`.
 
 ### Task 1: [Title]
 
-**Context:** [One sentence, link to frame phase]
-
-**What to do:**
-
-- [Specific work items]
-
-**Acceptance criteria:**
-
-- [ ] [Verifiable condition]
-
-**Artifact:** [Expected output — file, test, endpoint]
-
-**References:**
-
-- [Links to frame, alignment, design docs — never code paths or other tasks]
+**Description:** [written per `task-creation`]
 
 ## Phase 2: {phase name}
 
@@ -176,10 +140,8 @@ Use `design-docs/NN-name.tasks.md`.
   judgment (QA, alignment, taste decisions) are HITL. The classification informs execution strategy.
 - **Keep dependencies real and minimal.** Artificial serialization blocks parallelism — verify every dependency is
   genuine, not accidental.
-- **Plans, not reports.** Every description uses imperative mood and reads as future work. Past tense is a violation.
-- **No implementation in descriptions.** Describe what changes and what "done" looks like. The implementer decides how.
-- **Durable anchors only.** Name existing types, interfaces, and behavioral contracts; never file paths or line numbers
-  — descriptions must survive refactors that happen while the task waits.
+- **Description content belongs to `task-creation`.** It owns what a description says and how each claim in it is
+  checked. A rule about description content stated here would be a second, drifting copy.
 - **Optional file persistence.** The tracked tasks in the issue tracker become source of truth after creation. The
   tasks.md document is a persistent external record for cross-session continuity — it survives context rot when agents
   start fresh sessions.
