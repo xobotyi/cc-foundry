@@ -42,11 +42,8 @@ fallback.
 
 ### Store path length
 
-A store directory is named `<pkg>@<resolution>`, and for a git, tarball, or folder dependency the resolution is derived
-from the URL or path. Bun writes at most 80 bytes of it, cutting longer ones to 63 bytes plus `+` and 16 hex digits. The
-path of a package inside the store runs up to `34 + 2 × <name length> + 80` characters past the project directory, and
-17 more when the package has peer dependencies. On Windows a path over 260 characters works for Bun but not as the
-working directory of that package's lifecycle scripts.
+On Windows a store path over 260 characters works for Bun but not as the working directory of that package's lifecycle
+scripts, so a deep dependency with a long git or tarball resolution can fail its `postinstall` there and nowhere else.
 
 ## Lifecycle scripts
 

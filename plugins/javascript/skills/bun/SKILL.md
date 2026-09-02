@@ -2,8 +2,7 @@
 name: bun
 description: >-
   Write and review Bun: the Bun-native API surface against its `node:` equivalents, the HTTP and WebSocket server, file
-  and process I/O, the shell, the bundled data clients, `bun:test`, the bundler and single-file executables, the package
-  manager, and `bunfig.toml`.
+  and process I/O, the shell, the data clients, `bun:test`, the bundler and compiled binaries, and the package manager.
 when_to_use: >-
   Invoke whenever Bun code or a Bun project is touched at all — writing, reviewing, refactoring, debugging, or
   configuring one, or deciding whether a `Bun.*` API replaces a dependency. Also invoke on the symptoms: a request dies
@@ -15,13 +14,12 @@ when_to_use: >-
 compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-Bun's value is that the runtime, the toolchain, and the batteries are one binary. Three biases decide most calls:
+Bun's value is that the runtime, the toolchain, and the batteries are one binary. Two biases decide most calls:
 
 - **Reach for what already ships.** A dependency earns its place by doing what `Bun.*`, `bun:*`, and the bundled
   toolchain do not. Adding one that duplicates a built-in is a defect.
 - **Write `node:` only where Bun has no native equivalent, or where the code must also run under Node.** Portability is
   a requirement to state, not a habit to keep.
-- **Bun's defaults favor the fast path, and several fail silently.** Read the default before depending on it.
 
 ## Release Version
 
@@ -32,23 +30,26 @@ the release a feature needs in the sentence that uses it. Never write "the lates
 The rules below assume 1.3.0 or later unless a version anchor says otherwise. Floors for the features these rules
 reference:
 
-- **1.2.3** — the `routes` object in `Bun.serve`
 - **1.3.0** — `Bun.sql` for MySQL, MariaDB, and SQLite; `Bun.redis`; `Bun.secrets`; `Bun.YAML`; catalogs;
-  `test.concurrent` and `test.serial`; `--randomize`; `expectTypeOf`
+  `test.concurrent`, `test.serial`, and `--concurrent`; `--randomize`; `expectTypeOf`
 - **1.3.2** — the isolated linker as the default for new monorepos; `nativeDependencies`; `ignoreScripts`
-- **1.3.3** — `test(..., { retry })`; `Bun.JSON5`, `Bun.JSONL`, `Bun.JSONC`, `Bun.XML`, `Bun.Archive`, `URLPattern`
-- **1.3.4** — `jest.useFakeTimers()`; `--compile` stops auto-loading `tsconfig.json` and `package.json`
-- **1.3.5** — `Bun.Terminal`; `bun:bundle` feature flags; `trustedDependencies` limited to npm sources
-- **1.3.6** — `Bun.build({ files })`; `metafile: true`
+- **1.3.3** — `test(..., { retry })`
+- **1.3.4** — `jest.useFakeTimers()`; `URLPattern`; `--compile` stops auto-loading `tsconfig.json` and `package.json`
+- **1.3.5** — `Bun.Terminal`; `Bun.stringWidth`; `bun:bundle` feature flags; `trustedDependencies` limited to npm
+  sources
+- **1.3.6** — `Bun.JSONC`; `Bun.Archive`; `Bun.build({ files })`; `metafile: true`
+- **1.3.7** — `Bun.JSON5`; `Bun.JSONL`; `Bun.wrapAnsi`
 - **1.3.8** — `Bun.markdown`; `--metafile-md`
 - **1.3.9** — `bun run --parallel`; bytecode for ES modules
 - **1.3.10** — `optimizeImports`; standard TC39 decorators; `--compile --target=browser` for a single HTML file
-- **1.3.11** — `Bun.cron()`
+- **1.3.11** — `Bun.cron()`; `Bun.sliceAnsi`
+- **1.3.12** — `Bun.WebView`
 - **1.3.13** — `bun test --parallel`, `--isolate`, `--shard`, `--changed`; `Range` and conditional requests in
   `Bun.serve`
 - **1.3.14** — `Bun.Image`; the global virtual store; HTTP/3 in `Bun.serve`; HTTP/2 and HTTP/3 in `fetch()`
-- **1.4.0** — Node 26 compatibility; directory routes; `bun audit fix`, `bun dedupe`, `bun prune`, `bun pm diff`,
-  `bun pm licenses`; `bun test --timings`; `--asset`; `lockfileVersion: 2`
+- **1.4.0** — Node 26 compatibility; `Bun.XML`; `Bun.isStandaloneExecutable`; `Bun.spawn({ cgroup })`; directory routes;
+  `bun audit fix`, `bun dedupe`, `bun prune`, `bun pm diff`, `bun pm licenses`; `bun test --timings`; `--asset`;
+  `lockfileVersion: 2`
 
 ## Prefer the Built-in
 
@@ -73,13 +74,13 @@ Reach for the built-in, and drop the package it replaces from `package.json`.
 - **Markdown** — `Bun.markdown` over `marked` (1.3.8)
 - **Scheduling** — `Bun.cron()` over `node-cron` (1.3.11)
 - **Running scripts concurrently** — `bun run --parallel` over `npm-run-all` and `concurrently` (1.3.9)
-- **Config formats** — `Bun.TOML`, `Bun.YAML`, `Bun.JSON5`, `Bun.JSONC`, `Bun.XML` over `@iarna/toml`, `js-yaml`,
-  `json5`, `jsonc-parser`, and `fast-xml-parser`
-- **Newline-delimited JSON** — `Bun.JSONL` over `ndjson`
-- **Tarballs** — `Bun.Archive` over `tar`
-- **Terminal string width** — `Bun.stringWidth`, `Bun.sliceAnsi`, `Bun.wrapAnsi` over `string-width`, `slice-ansi`,
-  `wrap-ansi`, and `cli-truncate`
-- **Route patterns** — `URLPattern` over `path-to-regexp`
+- **Config formats** — `Bun.TOML`, `Bun.YAML`, `Bun.JSON5` (1.3.7), `Bun.JSONC` (1.3.6), `Bun.XML` (1.4.0) over
+  `@iarna/toml`, `js-yaml`, `json5`, `jsonc-parser`, and `fast-xml-parser`
+- **Newline-delimited JSON** — `Bun.JSONL` over `ndjson` (1.3.7)
+- **Tarballs** — `Bun.Archive` over `tar` (1.3.6)
+- **Terminal string width** — `Bun.stringWidth` (1.3.5), `Bun.wrapAnsi` (1.3.7), `Bun.sliceAnsi` (1.3.11) over
+  `string-width`, `wrap-ansi`, `slice-ansi`, and `cli-truncate`
+- **Route patterns** — `URLPattern` over `path-to-regexp` (1.3.4)
 - **Credential storage** — `Bun.secrets` over a plaintext dotfile, for local development tools
 - **Sleeping, hashing, comparison, compression** — `Bun.sleep`, `Bun.hash`, `Bun.CryptoHasher`, `Bun.deepEquals`,
   `Bun.gzipSync`, `Bun.zstdCompressSync`
@@ -91,8 +92,8 @@ replacement for it.
 
 ## HTTP Server
 
-- **Declare routes in the `routes` object** (1.2.3), and keep `fetch` for genuinely unmatched requests. Precedence is
-  exact, then parameterized, then wildcard, then the global catch-all — not source order.
+- **Declare routes in the `routes` object**, and keep `fetch` for genuinely unmatched requests. Precedence is exact,
+  then parameterized, then wildcard, then the global catch-all — not source order.
 - **Never deploy without either an `error` handler or an explicit `development: false`.** `development` defaults to
   `process.env.NODE_ENV !== "production"`, so a server whose environment does not set `NODE_ENV=production` renders
   Bun's contextual error page to any client that can trigger a throw. On 1.3.14 that page is a ~67 KB HTML overlay
@@ -125,13 +126,11 @@ caching and `404` behavior, the directory-route path rules, the full `websocket`
 
 - **`Bun.file(path)` is lazy.** Constructing it touches no disk; `size` is `0` and `exists()` is `false` for a missing
   path rather than throwing.
-- **Read through the `Blob` interface** — `.text()`, `.json()`, `.bytes()`, `.arrayBuffer()`, `.stream()`.
 - **`Bun.write(dest, data)` takes anything**: string, `Blob`, `BunFile`, `ArrayBuffer`, `TypedArray`, or `Response`. It
   picks the fastest syscall for the pair, so copying a file is `Bun.write(Bun.file(dst), Bun.file(src))`, not a manual
   read-then-write.
-- **`file.writer()` returns a `FileSink` for incremental writes**, and the process stays alive until you call `.end()`.
+- **`file.writer()` returns a `FileSink` for incremental writes**, and the process stays alive until `.end()` is called.
   `.unref()` opts out.
-- **Use `node:fs` for directories.** `mkdir` and `readdir` have no `Bun.*` equivalent.
 - **`Bun.stdin`, `Bun.stdout`, and `Bun.stderr` are `BunFile`s**, so streaming a file to stdout is one `Bun.write` call.
 
 ## Shell and Processes
@@ -150,7 +149,6 @@ caching and `404` behavior, the directory-route path rules, the full `websocket`
   open.
 - **Set `serialization: "json"` for IPC with a Node process.** The default `"advanced"` is JavaScriptCore's format and
   Node cannot read it.
-- **`Bun.spawnSync` for a CLI tool, `Bun.spawn` for a server.**
 
 Read [`${CLAUDE_SKILL_DIR}/references/shell-and-processes.md`] when redirecting shell I/O into JavaScript objects,
 driving an interactive program through a PTY, applying cgroup limits, or spawning a `Worker` — it carries the
@@ -169,12 +167,13 @@ options.
   spied originals and undoes no `mock.module()` override.
 - **`expectTypeOf` is a no-op at runtime.** A green `bun test` proves nothing about types — run `bunx tsc --noEmit`
   separately.
-- **`bun test` sets `NODE_ENV=test` and `TZ=Etc/UTC`** unless either is already set. Do not re-set them in a preload.
+- **`bun test` sets `NODE_ENV=test` unless it is already set, and runs in UTC.** `process.env.TZ` stays unset — the
+  runtime zone is UTC, not an environment variable a preload can read.
 - **An unhandled rejection between tests fails the run.** When it happens while a file loads, none of that file's tests
   run at all.
 - **Three concurrency knobs are independent**: `--parallel` spreads files across processes, `--concurrent` and
-  `test.concurrent` overlap async tests inside one file, `--shard=i/n` splits files across machines (all 1.3.13).
-  `--parallel` implies `--isolate`.
+  `test.concurrent` overlap async tests inside one file, `--shard=i/n` splits files across machines (`--parallel` and
+  `--shard` from 1.3.13). `--parallel` implies `--isolate`.
 - **Reach for `--parallel --no-isolate` on a suite of many small files sharing a large import graph.** Isolation
   re-evaluates every import per file, and on that shape plain `bun test` beats isolated workers.
 - **Key per-worker resources off `BUN_TEST_WORKER_ID`** (or `JEST_WORKER_ID`) so parallel workers do not share a
@@ -200,10 +199,8 @@ patterns, the matcher inventory, the mock-reset semantics in full, the `--timing
   `node_modules/.bun/node_modules` from being created.
 - **Run `bun ci` in CI, not `bun install`.** Bun does not turn on the frozen lockfile automatically; `bun ci` is
   `bun install --frozen-lockfile`.
-- **Commit `bun.lock`.** It is the text lockfile and the default from 1.2.
 - **`--production` implies `--frozen-lockfile` and skips `devDependencies`, but removes nothing already installed.**
   `bun prune --production` (1.4.0) is what shrinks a build image.
-- **Use `bunx` to run a package binary** rather than installing it.
 
 Read [`${CLAUDE_SKILL_DIR}/references/package-manager.md`] when configuring a monorepo, choosing a linker, hardening a
 supply chain, or diagnosing an install that differs between machines — it carries the `configVersion` table, the
@@ -221,8 +218,8 @@ scanner, and the `bunfig.toml` install keys.
 - **A compiled binary does not auto-load `tsconfig.json` or `package.json`** (1.3.4), but it does auto-load `.env` and
   `bunfig.toml`. Pass `--no-compile-autoload-dotenv` and `--no-compile-autoload-bunfig` where a deployment must not read
   files from its working directory.
-- **Cross-compile with `--target bun-<os>-<arch>[-musl]`.** From 1.4.0 x64 ships one binary that selects AVX paths at
-  runtime, so there is no `-baseline` or `-modern` choice to make.
+- **Cross-compile with `--target bun-<os>-<arch>[-musl]`.** From 1.4.0 x64 ships only the baseline build and the
+  `-march=haswell` build is gone, so `-baseline` and `-modern` resolve to the same binary and neither is a choice.
 - **A macro's return value must be serializable and its arguments statically known.** Code inside `node_modules` cannot
   invoke a macro, though your own code may import one from a package.
 - **`Bun.markdown.html()` does not sanitize.** Raw HTML, event-handler attributes, and `javascript:` hrefs pass through
@@ -270,9 +267,9 @@ building dynamic SQL, or configuring pooling and TLS — it carries the `bun:sql
 
 ## Node Compatibility
 
-Bun targets Node 26 and most packages run unchanged. Reach for a `node:` module deliberately in these cases:
+From 1.4.0 Bun targets Node 26 and reports itself as such; 1.3.x reports Node 24. Most packages run unchanged. Reach for
+a `node:` module deliberately in these cases:
 
-- **Directory operations** — `node:fs`. No Bun equivalent exists.
 - **`node:sea`** — not implemented. `bun build --compile` is the replacement and a different API.
 - **`node:test`** — partial. Write `bun:test`.
 - **`node:crypto` beyond BoringSSL** — no `ed448`, `x448`, `rsa-pss`, `dsa`, `dh`, `secp256k1`, or the CCM, OCB, XTS,
@@ -285,13 +282,13 @@ Bun targets Node 26 and most packages run unchanged. Reach for a `node:` module 
 - **Loader hooks** — `module.register` is a no-op. Use `Bun.plugin`.
 
 Read [`${CLAUDE_SKILL_DIR}/references/node-compat.md`] when porting a Node codebase, when a `node:` API behaves
-differently under Bun, or when a package that works under Node fails — it carries the per-module gap list, the Node 26
-changes that landed in 1.4.0, and the `fetch`, Web API, and module-resolution behavior changes that break working code.
+differently under Bun, or when a package that works under Node fails — it carries the per-module gap list and the
+`fetch`, Web API, and module-resolution behavior changes in 1.4.0 that break working code.
 
 ## Application
 
 When **writing** Bun, apply these conventions silently — do not narrate a rule while following it. Where existing code
-uses a `node:` API that has a Bun-native equivalent, follow the codebase and flag the alternative once.
+uses a `node:` API that has a Bun-native equivalent, follow the codebase. Flag the alternative once.
 
 When **reviewing** Bun, cite the violation and show the fix inline. Do not lecture.
 
@@ -308,5 +305,3 @@ implementation is absent, partial, or behaves differently, and never teaches Nod
 
 `bun:test` and `bun install` are this skill's, and the **vitest** skill owns Vitest. Which of them a project adopts is a
 project decision, not a rule either skill states. The **coding** skill governs workflow.
-
-**When in doubt, check whether Bun already ships it.**

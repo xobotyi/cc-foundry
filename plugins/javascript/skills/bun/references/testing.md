@@ -116,11 +116,9 @@ original must never run.
 
 ## Concurrency: three independent knobs
 
-| Flag                               | Unit                   | Effect                                                        |
-| ---------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| `--parallel[=N]`                   | files, in processes    | Spreads files across N worker processes. Implies `--isolate`. |
-| `--concurrent` / `test.concurrent` | tests, in one file     | Lets async tests in a file overlap while one awaits.          |
-| `--shard=i/n`                      | files, across machines | Runs the i-th deterministic slice of the suite.               |
+- **`--parallel[=N]`** — files, in processes. Spreads files across N worker processes. Implies `--isolate`.
+- **`--concurrent` / `test.concurrent`** — tests, in one file. Lets async tests in a file overlap while one awaits.
+- **`--shard=i/n`** — files, across machines. Runs the i-th deterministic slice of the suite.
 
 They compose: `bun test --shard=2/4 --parallel` with `test.concurrent` inside a file is valid.
 
@@ -175,7 +173,8 @@ files or the shards do not add up.
 ## Runtime environment
 
 - **`NODE_ENV` is `"test"`** unless already set in the environment or a `.env` file.
-- **`TZ` is `Etc/UTC`** unless overridden, so date behavior is stable across machines.
+- **The runtime zone is UTC**, so date behavior is stable across machines. `process.env.TZ` stays unset, so a preload
+  that branches on it reads `undefined`; set `TZ` in the environment to override the zone.
 - **Per-test timeout is 5000 ms**; `--timeout` changes it, and a third argument to `test()` sets it per test.
 - **An unhandled rejection or error between tests fails the run.** When it happens while the file is loading, none of
   that file's tests run at all and the process exits non-zero.
@@ -197,9 +196,9 @@ files or the shards do not add up.
 ## Fake timers
 
 `jest.useFakeTimers()` takes over `setTimeout`, `setInterval`, and `Date`; `jest.advanceTimersByTime(ms)` moves them;
-`jest.setSystemTime()` sets the clock; `jest.useRealTimers()` restores. `@testing-library/react`'s `waitFor` detects
-fake timers and advances them instead of waiting. `Bun.cron` schedules can be driven by the fake clock (from 1.4.0).
-Under `--isolate`, fake timers a file leaves installed no longer leak into the next file (fixed in 1.4.0).
+`jest.setSystemTime()` sets the clock; `jest.useRealTimers()` restores. `Bun.cron` schedules can be driven by the fake
+clock (from 1.4.0). Under `--isolate`, fake timers a file leaves installed no longer leak into the next file (fixed in
+1.4.0).
 
 ## `bunfig.toml` test keys
 

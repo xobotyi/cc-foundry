@@ -1,7 +1,7 @@
 # Node Compatibility Boundary
 
-Where `node:` code stops behaving as it does under Node. Bun targets Node 26 and reports itself as such; this file
-carries only the modules with a gap that changes what you write.
+Where `node:` code stops behaving as it does under Node. From 1.4.0 Bun targets Node 26 and reports itself as such;
+1.3.x reports Node 24. This file carries only the modules with a gap that changes what gets written.
 
 ## No Bun implementation
 
@@ -128,22 +128,15 @@ carries only the modules with a gap that changes what you write.
 - **`DOMException`** — instances are not native errors, so `Error.isError()` returns `false`.
 - **`WebAssembly`** — Memory64 is off by default; `BUN_JSC_useWasmMemory64=1` enables it.
 
-## Node 26 changes that land in Bun 1.4.0
+## Node 26 semantics in Bun 1.4.0
+
+Bun 1.4.0 adopts Node 26's own behavior changes; the **nodejs** skill carries what they are. Two of them are Bun facts
+rather than Node ones:
 
 - `process.versions.modules` is `147`. A package selecting a prebuilt native addon by `NODE_MODULE_VERSION` needs a
   build for `147`.
-- `res.writeHeader()` in `node:http` is removed; call `res.writeHead()`.
-- In paused mode, `readable.read()` with no size returns one buffered chunk rather than the whole buffer. Loop until it
-  returns `null`. `setEncoding()` keeps the old behavior.
-- N-API status codes on validation paths match Node 26: `napi_wrap()` on a non-object returns `napi_invalid_arg`,
-  `napi_reference_ref()` returns `0` once the referent is collected, `napi_get_buffer_info()` rejects a bare
-  `ArrayBuffer`.
-- `assert.deepStrictEqual()` and `util.isDeepStrictEqual()` compare prototypes. `Bun.deepEquals()` and `expect()` do
-  not.
-- `util.styleText()` returns plain text when the target stream is not a TTY; `{ validateStream: false }` forces escape
-  codes.
-- Warnings print as `(node:PID) [CODE] Name: message`, and adding a `'warning'` listener no longer replaces the default
-  printer. Silence with `process.removeAllListeners("warning")` or `--no-warnings`.
+- `assert.deepStrictEqual()` and `util.isDeepStrictEqual()` compare prototypes, while `Bun.deepEquals()` and `expect()`
+  do not. The same comparison therefore gives two answers depending on which one is called.
 
 ## Fetch and Web API changes in 1.4.0 that break working code
 

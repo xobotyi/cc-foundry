@@ -4,13 +4,9 @@ Depth on the data clients Bun bundles: `bun:sqlite`, `Bun.sql`, `Bun.redis`, and
 
 ## `bun:sqlite`
 
-```ts
-import { Database } from "bun:sqlite";
-const db = new Database("app.db", { create: true, strict: true });
-```
-
-Constructor options: `readonly`, `create`, `strict`, `safeIntegers`. `":memory:"`, `""`, and no argument all open an
-in-memory database. `import db from "./app.db" with { type: "sqlite" }` is equivalent to `new Database("./app.db")`.
+`new Database(path, options)` from `bun:sqlite`. Constructor options: `readonly`, `create`, `strict`, `safeIntegers`.
+`":memory:"`, `""`, and no argument all open an in-memory database. `import db from "./app.db" with { type: "sqlite" }`
+is equivalent to `new Database("./app.db")`.
 
 ### `strict` changes parameter binding, and silence is the default
 
@@ -44,14 +40,7 @@ anything past 53 bits. `new Database(path, { safeIntegers: true })` returns `big
 
 ### Transactions
 
-```ts
-const insert = db.prepare("INSERT INTO cats (name) VALUES ($name)");
-const insertMany = db.transaction(cats => {
-  for (const cat of cats) insert.run(cat);
-});
-```
-
-The returned function runs the body inside a transaction and rolls back on a throw.
+`db.transaction(fn)` returns a function that runs `fn` inside a transaction and rolls back on a throw.
 
 ### Closing
 
@@ -119,8 +108,8 @@ await sql`SELECT * ${cond ? sql`AND age > ${min}` : sql``}`; // conditional frag
 - **`sql.file(path, params?)`** — runs a query from a file. With no parameters the file may hold several commands.
 - **`sql.unsafe(string, params?)`** — raw SQL with no escaping. With no parameters it accepts several commands.
 
-Under the SQLite adapter, `sql.file` and `sql.unsafe` also take an object of named parameters using `:name`, `$name`, or
-`@name`. Keys keep their prefix (`{ ":id": 1 }`) unless the connection sets `strict: true`.
+From 1.4.0, under the SQLite adapter, `sql.file` and `sql.unsafe` also take an object of named parameters using `:name`,
+`$name`, or `@name`. Keys keep their prefix (`{ ":id": 1 }`) unless the connection sets `strict: true`.
 
 ### Laziness and cancellation
 

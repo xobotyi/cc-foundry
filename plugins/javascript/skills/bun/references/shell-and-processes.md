@@ -60,11 +60,10 @@ await $`cat < ${new Response("body")} | wc -w`;
 
 ### stdio defaults are asymmetric
 
-| Stream   | Default     | Other values                                                                                                                                     |
-| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `stdin`  | `null`      | `"pipe"` (a `FileSink`), `"inherit"`, `Bun.file()`, `TypedArray`, `DataView`, `Response`, `Request`, `ReadableStream`, `Blob`, a file descriptor |
-| `stdout` | `"pipe"`    | `"inherit"`, `"ignore"`, `Bun.file()`, a file descriptor                                                                                         |
-| `stderr` | `"inherit"` | `"pipe"`, `"ignore"`, `Bun.file()`, a file descriptor                                                                                            |
+- **`stdin`** — defaults to `null`. Also `"pipe"` (a `FileSink`), `"inherit"`, `Bun.file()`, `TypedArray`, `DataView`,
+  `Response`, `Request`, `ReadableStream`, `Blob`, or a file descriptor.
+- **`stdout`** — defaults to `"pipe"`. Also `"inherit"`, `"ignore"`, `Bun.file()`, or a file descriptor.
+- **`stderr`** — defaults to `"inherit"`. Also `"pipe"`, `"ignore"`, `Bun.file()`, or a file descriptor.
 
 `proc.stderr` is `undefined` until you pass `stderr: "pipe"`. With `stdin: "pipe"`, `proc.stdin` is a `FileSink`:
 `write()`, `flush()`, `end()`.
@@ -93,7 +92,7 @@ then killed it, and `Bun.spawnSync` ran it to completion. A NUL byte in `argv0` 
 `maxBuffer` (on `Bun.spawnSync`) kills the process once it emits that many bytes. Output can exceed the limit by at most
 the single read that crossed it, matching Node.
 
-### Linux cgroups
+### Linux cgroups (from 1.4.0)
 
 `cgroup: "/sys/fs/cgroup/build-jobs"` (or an open directory descriptor) puts the child in a control group **before it
 begins executing**, so memory, pid, and CPU limits apply from the first instruction and to everything the child spawns
@@ -114,19 +113,12 @@ the two engines have different wire formats.
 ### `Bun.spawnSync`
 
 Same options. Returns a `SyncSubprocess`: `success` (a zero exit code), `stdout` and `stderr` as `Buffer`, and no
-`stdin`. Reach for it in CLI tools and for `Bun.spawn` in servers.
+`stdin`.
 
 ## `Bun.Terminal` (PTY)
 
 Pass `terminal` to `Bun.spawn` and the child sees a real TTY — colors, cursor movement, interactive prompts — with no
-`node-pty` addon.
-
-```ts
-const proc = Bun.spawn(["bash"], {
-  terminal: { cols: 80, rows: 24, data(term, data) { process.stdout.write(data); } },
-});
-proc.terminal.write("echo hello\n");
-```
+`node-pty` addon. Write to the child through `proc.terminal.write()`.
 
 With `terminal` set, `proc.stdin`, `proc.stdout`, and `proc.stderr` are all `null` — the terminal replaces them.
 
@@ -165,8 +157,8 @@ you call `close()`, not when each subprocess ends, and `await using` disposes it
 
 ## Workers
 
-`new Worker("./worker.ts")` is the Web Workers API with server-side extensions. The API is still experimental,
-particularly termination.
+`new Worker("./worker.ts")` is the Web Workers API with server-side extensions. From 1.4.0 `await worker.terminate()`
+resolves only once the thread and every worker it spawned are gone, so a teardown that awaits it is deterministic.
 
 - **No `{ type: "module" }` needed** — ES modules, CommonJS, TypeScript, JSX, and TSX all run with no build step.
 - **The specifier resolves relative to the project root**, as if typed after `bun`.
@@ -175,6 +167,3 @@ particularly termination.
   OpenTelemetry, Sentry, or Datadog initialization.
 - **`blob:` URLs** create a worker from an in-memory source.
 - In the worker file, `declare var self: Worker;` keeps TypeScript quiet about `self.onmessage`.
-
-`AsyncLocalStorage` context does not propagate into a worker, a `MessagePort`, or a `BroadcastChannel`, so a
-request-scoped store does not survive the hop.
