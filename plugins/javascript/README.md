@@ -1,29 +1,35 @@
 # javascript
 
-JavaScript and TypeScript language discipline plugin for Claude Code with built-in `typescript-language-server` LSP
-support.
+JavaScript and TypeScript discipline for Claude Code, with a bundled `typescript-language-server` configuration.
 
 ## The Problem
 
-Claude knows JavaScript and TypeScript syntax, but without explicit guidance it may use outdated patterns (`var`, `==`,
-prototype chains), mix module systems (CJS vs ESM), ignore runtime-specific APIs (Bun vs Node.js), or write tests that
-fight the test framework's idioms. Each project ends up teaching the same conventions from scratch.
+A model writes JavaScript from everything it has read, and that spans twenty years of the language. Without a stated
+baseline it reaches for a pattern that was right in 2019, a runtime API that has since moved, or a compiler option whose
+default changed two releases ago. None of it fails loudly — JavaScript coerces, Node warns, and the test passes.
 
-Beyond conventions, Claude Code's default approach to code navigation — Grep and Glob — misses JS/TS semantic structure.
-Text search can't resolve module re-exports, distinguish shadowed names, understand type inference, or trace call
-hierarchies across files. Without LSP-powered navigation, exploration is imprecise and error-prone.
+The toolchain moves faster than the language. Node's support windows shift twice a year and its APIs carry a stability
+index that decides whether they can appear in a published package at all. Bun adds APIs continuously. Vitest has renamed
+configuration across majors, so a key recalled from an older one is silently ignored. TypeScript's compiler was
+rewritten in Go, and the release that ships it exposes no programmatic API, which breaks every tool that embeds it.
+
+Code navigation has a separate gap. Grep and Glob cannot resolve a re-export, distinguish a shadowed name, or follow a
+call across files, so text search is imprecise on any project large enough to need it.
 
 ## The Solution
 
-This plugin provides discipline-specific skills, a `typescript-language-server` LSP configuration, and explicit
-navigation rules. The `javascript` skill covers core conventions and enforces LSP-first code navigation — agents must
-use `goToDefinition`, `findReferences`, `hover`, and other LSP tools instead of text search for semantic navigation
-tasks. The `typescript` skill extends those conventions with type system patterns. Runtime skills (`nodejs`, `bun`) and
-testing (`vitest`) cover their respective domains. Skills activate automatically when Claude works with JS/TS code.
+Five skills, each gated on the version axis that actually decides what a project may write — the ECMAScript edition, the
+pinned TypeScript release, the Node major named by `engines.node` — plus an LSP configuration and the navigation rules
+that use it.
+
+The rules are proscriptive rather than tutorial: the gotcha that defies a reasonable assumption, the default that fails
+silently, the API that reads as committed and is not. Each skill states its version floors inline and routes to a
+per-version reference for detail. Each ships the source list it was written from in `.dev/reference-inventory.json`, so
+the corpus behind it can be refetched and rechecked.
 
 ## Prerequisites
 
-Install `typescript-language-server` and ensure it's available in PATH:
+Install `typescript-language-server` and make sure it is on `PATH`:
 
 ```bash
 npm install -g typescript-language-server typescript
@@ -40,71 +46,84 @@ npm install -g typescript-language-server typescript
 
 ### javascript
 
-Core JavaScript language conventions and idioms. Enforces modern syntax (`const`/`let`, `===`, arrow functions,
-`async`/`await`, ES modules), functional array methods, proper error handling, and JSDoc typing for pure JS projects.
+The language itself: declarations and scope, equality and coercion, functions and closures, objects and copying, arrays
+and iteration, classes, async and promise semantics, ES module syntax, errors, regular expressions, `Intl` and the
+built-in globals, and JSDoc typing for plain-JS projects. Gates every feature on the project's declared engine baseline
+rather than on the edition a feature belongs to, because engines ship features before ratification and lag on others.
 
-The skill also enforces LSP-first navigation: use `goToDefinition` instead of grepping for function names,
-`findReferences` instead of text-searching for usages, `goToImplementation` instead of pattern-matching interface types,
-and `workspaceSymbol` instead of globbing for symbols. Grep/Glob remain appropriate for non-semantic searches (comments,
-string literals, config values).
+Also carries the LSP-first navigation rules for every JS and TS extension.
 
-**Use when:** working with any `.js` or `.jsx` files.
+**Use when:** touching any JavaScript, and alongside `typescript` on any TypeScript.
 
 ### typescript
 
-TypeScript type system conventions. Enforces strict mode, `unknown` over `any`, interface vs type patterns,
-discriminated unions, exhaustive narrowing, and inference-first annotations. Extends the `javascript` skill. **Use
-when:** working with `.ts` or `.tsx` files — activate both `javascript` and `typescript`.
+The type system and everything downstream of it: strictness configuration, narrowing and control-flow analysis,
+generics, conditional and mapped types, branded types, declaration files and emit, module resolution and `tsconfig`, and
+the erasable-syntax constraint that runtime type-stripping imposes. Covers the compiler releases including the native
+port, whose defaults changed in ways that break silently on upgrade.
+
+Extends `javascript` and does not restate it.
+
+**Use when:** touching `.ts` or `.tsx`, designing types, or editing a `tsconfig.json`.
 
 ### nodejs
 
-Node.js runtime conventions. Enforces ESM with `node:` prefix imports, async-first patterns, stream pipelines, graceful
-shutdown, structured logging, and proper error handling (operational vs programmer errors). **Use when:** writing
-Node.js server code, CLI tools, or scripts.
+The Node runtime: module resolution, the `package.json` fields Node itself reads, native TypeScript execution, blocking
+and the event loop, streams, errors and process lifecycle, `AsyncLocalStorage` and diagnostics channels, the built-in
+HTTP client, workers, the permission model, `node:test`, npm and supply-chain hardening, and the CLI. Every rule carries
+the major it applies from and the stability index of the API behind it.
+
+**Use when:** writing a server, a CLI, a script, or a `package.json`.
 
 ### bun
 
-Bun runtime conventions. Enforces Bun-native APIs (`Bun.serve`, `Bun.file`, `Bun.$`, `bun:sqlite`, `bun:test`) over
-Node.js equivalents, declarative HTTP routing, and zero-copy I/O patterns. **Use when:** writing code that runs on Bun
-runtime.
+The Bun runtime and its toolchain: which `Bun.*` API replaces which dependency and from which release, the HTTP and
+WebSocket server, file and process I/O, the shell, `bun:test`, the package manager and its linker behavior, the bundler
+and single-file executables, the bundled SQLite, SQL, Redis and S3 clients, and the concrete edges of Node
+compatibility.
+
+**Use when:** writing or configuring anything that runs on Bun.
 
 ### vitest
 
-Vitest testing framework conventions. Enforces explicit imports, boundary mocking (not internals), `vi.mock` hoisting
-rules, async assertion patterns, and proper configuration (coverage includes, multi-project setups). **Use when:**
-writing or reviewing Vitest tests.
+Vitest: test structure, assertions, test context and fixtures, lifecycle and hook ordering, the mocking surface and its
+hoisting rules, fake timers, snapshots, configuration and projects, pools and isolation, coverage, type testing, browser
+mode, and migration from Jest. Carries the cross-major rename inventory, so a config written against an older major can
+be reconciled rather than guessed at.
+
+**Use when:** writing, running, or debugging a Vitest suite.
 
 ## LSP Integration
 
-This plugin bundles a `typescript-language-server` LSP configuration. Once installed, Claude Code automatically starts
-the language server for all JS/TS file types, enabling precise code intelligence:
+The bundled `typescript-language-server` configuration starts automatically for every supported file type.
 
-| LSP Operation        | What It Does                          |
-| -------------------- | ------------------------------------- |
-| `goToDefinition`     | Jump to where a symbol is defined     |
-| `findReferences`     | Find all usages of a symbol           |
-| `hover`              | Get type signature and documentation  |
-| `documentSymbol`     | List all symbols in a file            |
-| `workspaceSymbol`    | Search for symbols across the project |
-| `goToImplementation` | Find types implementing an interface  |
-| `incomingCalls`      | Find what calls a function            |
-| `outgoingCalls`      | Find what a function calls            |
+- `goToDefinition` — where a symbol is defined
+- `findReferences` — every use of a symbol
+- `hover` — type, signature, and documentation
+- `documentSymbol` — symbols in one file
+- `workspaceSymbol` — symbols across the project
+- `goToImplementation` — types implementing an interface
+- `incomingCalls` and `outgoingCalls` — the call graph in either direction
 
-### Supported File Types
+Supported extensions: `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts`, `.cts`.
 
-`.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts`, `.cts`
+Grep and Glob stay correct for comments, string literals, log messages, environment variable names, config values, and
+file-name patterns.
 
 ## Skill Dependencies
 
-The `typescript` skill extends `javascript` — both must be active when working with TypeScript code. All other skills
-are independent and activate based on runtime or testing context.
+`typescript` requires `javascript` — activate both on TypeScript code.
+
+The rest divide by ownership. `javascript` wins on how the language reads; the runtime skills own their own APIs and
+resolution behavior; `vitest` owns Vitest. Each runtime skill owns the test runner it ships, so `node:test` belongs to
+`nodejs` and `bun:test` to `bun`.
 
 ## Related Plugins
 
-- **the-coder** — Language-agnostic coding discipline (discovery, planning, verification)
-- **frontend** — Frontend platform concerns (CSS, accessibility, performance)
-- **backend** — Backend platform concerns (observability, API design, security)
-- **cli** — CLI platform concerns (argument parsing, terminal output)
+- **the-coder** — language-agnostic coding discipline: discovery, decomposition, verification
+- **frontend** — CSS, accessibility, and the browser frameworks
+- **backend** — observability and service concerns
+- **cli** — CLI design and shell scripting
 
 ## License
 
