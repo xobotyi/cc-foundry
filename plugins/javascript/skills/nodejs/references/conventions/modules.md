@@ -24,16 +24,16 @@ costs startup time on each one, and the fallback masks a real syntax error as a 
 
 ## ES module specifier rules
 
-- **File extensions are mandatory** in `import` and `import()` for relative and absolute specifiers, directory indexes
-  included: `import './startup/index.js'`, never `import './startup'`.
+- **The resolver performs no extension search and no directory-index lookup.** It loads the specifier as written, in
+  `import` and `import()` alike, which is why a bundler resolves `./startup` and Node throws `ERR_MODULE_NOT_FOUND`. The
+  CommonJS resolver reports the same miss as `MODULE_NOT_FOUND`, with no `ERR_` prefix.
 - **Specifiers are URLs.** `#` and `?` must be percent-encoded. A different query or fragment makes a different module
   instance, so `./x.mjs?v=1` and `./x.mjs?v=2` are loaded and evaluated twice.
 - **`file:`, `node:`, and `data:` schemes resolve.** `https:` does not without a loader hook.
 - **`data:` URLs cannot resolve relative specifiers**, because `data:` is not a special scheme. They resolve bare
   builtin specifiers and absolute specifiers only.
-- **Import attributes are `with`, not `assert`.** `import data from './x.json' with { type: 'json' }`. The `assert` form
-  was removed in 22.0.0 and throws.
-- **A JSON module exposes only a default export**, and the attribute is mandatory.
+- **The `assert` import-attribute form was removed in 22.0.0 and throws a `SyntaxError`.** Only `with { type: 'json' }`
+  parses.
 - **`import.meta.dirname` and `import.meta.filename` exist only on `file:` modules.** Neither is defined for a `data:`
   or `https:` module, and neither exists in CommonJS.
 
@@ -56,7 +56,6 @@ Unflagged from 20.19.0 and 22.12.0.
 - **Every target must be a relative URL starting with `./`.** Absolute paths, `file:` URLs, and `../` targets are
   rejected. Segments of `.`, `..`, and `node_modules` are rejected anywhere in a target or in the substituted part of a
   pattern.
-- **Condition order in the object is the match order.** Earlier keys win. Write most specific first; `"default"` last.
 - **Node's own conditions**, most specific first: `"node-addons"`, `"node"`, `"import"`, `"require"`, `"module-sync"`,
   `"default"`. `"types"` is not Node's — it belongs to type systems and is conventionally written first.
 - **`"import"` and `"require"` are mutually exclusive** and describe the calling syntax, not the target's format. A

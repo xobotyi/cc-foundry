@@ -17,6 +17,10 @@ The related globals — `Headers`, `Request`, `Response`, `FormData`, `File`, `B
   body chunks, not elapsed time, so a response that drips one byte inside every window never times out. `headersTimeout`
   is 300000 ms and `connectTimeout` is 10000 ms. Bound the whole call yourself with `signal: AbortSignal.timeout(ms)`,
   combined with the caller's signal through `AbortSignal.any([callerSignal, AbortSignal.timeout(ms)])`.
+- **That deadline rejects with `TimeoutError`, not `AbortError`.** Measured on 26.2.0, through `AbortSignal.any` as
+  well: the rejection is a `DOMException` named `TimeoutError` with `code` `23`, while the same call aborted from a
+  controller is named `AbortError` with `code` `20`. A handler matching only `'AbortError'` swallows the timeout it was
+  written to catch.
 - **A response body is a web `ReadableStream`.** Cross to a Node stream with `Readable.fromWeb(res.body)`, or read it
   with `for await`.
 - **Redirects are followed by default**, including across origins, up to the fetch specification's limit. Pass

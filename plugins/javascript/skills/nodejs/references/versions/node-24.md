@@ -11,15 +11,17 @@ The default floor for a service that must stay on an LTS line through 2028.
   `Symbol.dispose`, `Symbol.asyncDispose`), `RegExp.escape`, `Error.isError`, WebAssembly Memory64.
 - **`URLPattern` global** (24.0.0, Experimental) — no import needed.
 - **`asyncLocalStorage.name`** (24.0.0) — labels an instance for diagnostics.
-- **`import.meta.main`** (24.2.0, Early development) — true when the module is the process entry point. The stable
-  equivalent for CommonJS is `require.main === module`.
+- **`import.meta.main`** (24.2.0, backported to 22.18.0; Early development) — true when the module is the process entry
+  point. The stable equivalent for CommonJS is `require.main === module`.
 - **`--watch-kill-signal`** (24.4.0, Active development) — the signal watch mode sends on restart, `SIGTERM` by default.
 - **`--permission-audit`** (24.20.0) — runs every permission check and publishes each violation to a
   `node:permission-model:*` diagnostics channel without denying access.
 - **`portable` option on `module.enableCompileCache()`** (24.12.0) — keeps the cache valid when the project directory
   moves.
 - **`Buffer.poolSize` default raised from 8192 to 65536** (24.18.0) — the pooling threshold (`Buffer.poolSize >>> 1`)
-  moves from 4 KiB to 32 KiB, so a retained slice of a small `Buffer.allocUnsafe` result pins 64 KiB.
+  moves from 4 KiB to 32 KiB, so a retained slice of a small `Buffer.allocUnsafe` result pins 64 KiB. The change landed
+  on the 26 line first (26.3.0) and was backported here, so 26.0 through 26.2 pool at the old 8192 — measured 8192 on
+  26.2.0. A `>=24.18` floor gets the larger pool on the older runtime and the smaller one on the newer.
 - **`#/`-prefixed subpath imports** (24.14.0) — `"#/lib/x.js"` in the `"imports"` field.
 
 ## Behavior changes
@@ -49,6 +51,5 @@ The default floor for a service that must stay on an LTS line through 2028.
   registry, or pin the package manager another way.
 - **`--build-sea` does not exist on this major.** Single-executable builds go through `--experimental-sea-config` plus a
   separate injection step (`postject`). The one-flag path arrived in 25.5.0.
-- **Explicit resource management changes `using` semantics under transpilation.** V8 13.6 implements it natively, so a
-  TypeScript build that downlevels `using` produces different disposal ordering from the runtime's. Set the compiler
-  target high enough that the syntax is left alone.
+- **V8 13.6 implements `using` and `await using` natively.** A build that downlevels them produces a disposal order the
+  runtime does not.

@@ -54,24 +54,26 @@ Floor version per feature — the APIs and behavior changes that decide what may
   `{ shell: true }` runtime-deprecated (DEP0190)
 - **24.12.0** — type stripping Stable
 - **24.20.0** — `--permission-audit`
-- **25.0.0** — `--allow-net`, and with it network confinement under `--permission`. Absent on the 22 and 24 lines
-- **25.5.0** — `--build-sea`
 - **26.0.0** — `Temporal` global; `module.register()` runtime-deprecated (DEP0205); `--experimental-transform-types`
-  removed; `node:_stream_*` removed
+  removed; `node:_stream_*` removed. It also inherits what 25 added and neither 22 nor 24 received: `--allow-net`, and
+  with it network confinement under `--permission`
 - **26.3.0** — `permission.drop()`
 
-Read [`${CLAUDE_SKILL_DIR}/references/versions/node-NN.md`] — one file per major, `node-20.md` through `node-26.md` —
-when writing against a feature near the floor, and whenever raising the floor. Each carries what its major added, the
-stability each addition holds, the behavior it changed, and the traps it introduced.
+**No odd major is a defensible floor.** Node 21, 23, and 25 are end of life — 25 since 2026-06-01 — so a feature that
+arrived on one is reachable only from the LTS major above it.
+
+Read [`${CLAUDE_SKILL_DIR}/references/versions/node-NN.md`] — one file per LTS major: `node-20.md`, `node-22.md`,
+`node-24.md`, `node-26.md` — when writing against a feature near the floor, and whenever raising the floor. Each carries
+what its major added, the stability each addition holds, the behavior it changed, and the traps it introduced.
 
 ## Stability Index
 
 Every documented API carries one, and it decides how the API may be used, not merely how finished it is.
 
 - **2 - Stable** — protected by semver. Safe in a published library's surface.
-- **1.2 - Release candidate** — no further breaking change is anticipated, but none is ruled out.
-- **1.1 - Active development** — nearing minimum viability.
-- **1.0 - Early development** — unfinished; substantial change expected.
+- **1 - Experimental** — outside semver, and the level most unfinished APIs print. Three subdivisions refine it: **1.2 -
+  Release candidate**, where no further breaking change is anticipated but none is ruled out; **1.1 - Active
+  development**, nearing minimum viability; **1.0 - Early development**, unfinished and expecting substantial change.
 - **3 - Legacy** — semver-protected and unmaintained. Bugs in it are not fixed. Migrate rather than report.
 - **0 - Deprecated** — carries a DEP number and a migration.
 
@@ -93,30 +95,31 @@ What follows from the index:
   error into a confusing module-system error.
 - **`.mjs` and `.cjs` override `"type"`; nothing overrides them.** Use them to place one file of the other kind inside a
   package, never as the default.
-- **File extensions are mandatory in ESM**, directory indexes included: `import './startup/index.js'`.
+- **Node's resolver performs no extension search and no directory-index lookup.** It loads the specifier as written, so
+  `./startup` resolves in a bundler and throws `ERR_MODULE_NOT_FOUND` here.
 - **Import a builtin through `node:`** — `import fs from 'node:fs/promises'`. The prefix cannot be shadowed by a package
   of the same name, and `node:test` and `node:sqlite` resolve under no other specifier.
 - **`import.meta.dirname` and `import.meta.filename` replace `__dirname` and `__filename`**, and exist only on `file:`
   modules.
-- **Import attributes use `with`, never `assert`.** The `assert` form was removed in 22.0.0 and throws.
-- **A JSON import needs `with { type: 'json' }`** and exposes only a default export.
+- **The `assert` import-attribute form was removed in 22.0.0 and throws.** Only `with` parses.
 - **`require()` of an ES module works** from 20.19.0 and 22.12.0, and throws `ERR_REQUIRE_ASYNC_MODULE` when anything in
   the graph uses top-level `await`. That is a property of the whole graph, so a transitive dependency can break a caller
   that did not change.
 - **Reach for `module.registerHooks()`, not `module.register()`.** The latter is runtime-deprecated in 26.0.0 (DEP0205)
   and needs `--allow-worker` under the Permission Model, because its hooks run on a worker thread.
 
-Read [`${CLAUDE_SKILL_DIR}/references/conventions/modules.md`] when designing an `"exports"` map, publishing a package
-that must serve both `require` and `import`, writing a loader hook, or debugging a specifier that resolves in a bundler
-and not in Node — it carries the condition-matching rules, the target-path restrictions, the dual-package hazard, and
-the compile cache.
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/modules.md`] when a specifier resolves in a bundler and not in Node,
+when writing a loader hook, or when repeated start-up cost is worth caching — it carries what decides a file's module
+system, the specifier rules, the two hook APIs, and the compile cache.
 
 ## Package Manifest
 
 - **`"exports"` seals the package.** Once present, nothing outside the map is importable, deep relative paths included.
   Add it deliberately: it is the only way to keep internals private, and adding it to a published package is a breaking
   change.
-- **Condition order is match order.** Most specific first, `"default"` last, `"types"` first by convention.
+- **Condition order in the map is the match order.** Earlier keys win, so write the most specific first.
+- **`"default"` goes last and `"types"` first.** `"default"` matches every caller, and `"types"` is a convention of the
+  type systems rather than a condition Node reads.
 - **`"import"` and `"require"` describe the caller's syntax, not the target's format.** A `.mjs` file behind `"require"`
   is legal and loads through `require(esm)`.
 - **Use `"module-sync"` instead of a dual build** where one ES module must serve both callers. Two builds of one package
@@ -124,7 +127,11 @@ the compile cache.
 - **`"imports"` keys start with `#`** and are the only path-alias mechanism that survives `node file.ts`, because
   nothing in the runtime reads `tsconfig.json`.
 - **Every `"exports"` target starts with `./`.** Absolute paths, `file:` URLs, `../`, and any `.`, `..`, or
-  `node_modules` segment are rejected.
+  `node_modules` segment are rejected with `ERR_INVALID_PACKAGE_TARGET`.
+
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/modules.md`] when designing an `"exports"` map or publishing a package
+that must serve both `require` and `import` — it carries the condition-matching rules, the target-path restrictions, and
+the dual-package hazard.
 
 ## TypeScript Execution
 
@@ -161,6 +168,10 @@ carries the flag history, the full refused-syntax list, and the matching compile
   ordering as a dependency.
 - **Partition long synchronous loops** with `setImmediate` between chunks, or move them to a worker.
 
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/concurrency.md`] when a process stops serving traffic while looking
+idle, or when one slow operation surfaces as an unrelated failure — it carries the loop phase order and the list of work
+that shares the libuv thread pool.
+
 ## Streams
 
 - **Compose with `pipeline` from `node:stream/promises`.** A `.pipe()` chain propagates neither errors nor destruction,
@@ -182,18 +193,23 @@ the platform-dependent defaults, and the whole-stream consumers.
 
 ## Errors and Exit
 
-- **Set `process.exitCode` and let the loop drain.** `process.exit()` terminates immediately, and writes to stdout are
-  asynchronous when it is a pipe or a file, so the last output is lost.
+- **Set `process.exitCode` and let the loop drain.** `process.exit()` terminates immediately, and a write to a pipe or a
+  socket may still be in flight — measured on 26.2.0/macOS, 512 KiB written to a pipe arrives as 64 KiB. A write to a
+  file is synchronous and survives, which is why the loss reads as intermittent.
 - **Match on `error.code`, never on the message.** Every built-in error carries one; messages change between minors.
-- **Chain with `cause`**: `new Error('context', { cause: err })`. `util.inspect` and structured loggers walk the chain.
-- **Handle an error once** — log it or rethrow it. Doing both reports one failure at every level of the stack.
+- **`util.inspect` renders a `cause` chain**, so an error chained with `{ cause: err }` reaches a Node logger intact
+  without the caller unwrapping it.
 - **Never resume after `'uncaughtException'`.** Installing the listener disables the crash and leaves the process
   running with unknown state. Log, flush, exit.
 - **An unhandled rejection is fatal by default.** Do not add `--unhandled-rejections=warn` to make a test suite pass.
 - **`'exit'` listeners run synchronously only.** Anything asynchronous scheduled there never runs.
 - **Cancel with `AbortSignal`.** `fetch`, `fs/promises`, `timers/promises`, `pipeline`, `stream.addAbortSignal`, and
-  `events.on` all take `{ signal }`; compose deadlines with `AbortSignal.timeout(ms)` and `AbortSignal.any([...])`. An
-  abort rejects with `err.name === 'AbortError'`, which carries no `code`.
+  `events.on` all take `{ signal }`.
+- **A cancelled call does not report itself the same way twice.** Node's own APIs reject with an `AbortError` carrying
+  `code: 'ABORT_ERR'`; `fetch` rejects with a `DOMException` whose `code` is the number `20`; and a `fetch` deadline
+  built from `AbortSignal.timeout(ms)` rejects with `name === 'TimeoutError'`, not `'AbortError'` — measured on 26.2.0.
+  Test `signal.aborted` where the signal is in scope, and `err.name === 'AbortError' || err.name === 'TimeoutError'`
+  where it is not.
 - **Set the HTTP server timeouts.** `requestTimeout` defaults to 300000 ms and `keepAliveTimeout` to 5000 ms; the latter
   must be shorter than the idle timeout of any proxy in front, or the proxy reuses a socket Node has closed.
 
@@ -203,8 +219,8 @@ deprecation flags, and the timeout defaults.
 
 ## Async Context and Diagnostics
 
-- **`AsyncLocalStorage.run(store, fn)` is the only Stable entry point.** `enterWith` and `withScope` are Experimental,
-  and `enterWith` applies for the rest of the current synchronous execution rather than for a scope — called inside one
+- **`run(store, fn)` is the only Stable way to enter a store.** `enterWith` and `withScope` are Experimental, and
+  `enterWith` applies for the rest of the current synchronous execution rather than for a scope — called inside one
   event handler it leaks into every later handler on the same emit.
 - **Instrument with `diagnostics_channel`, not with a logger call.** Publishing to a channel with no subscriber costs
   nothing measurable, so the instrumentation can ship enabled.
@@ -242,17 +258,18 @@ between `fetch` and `node:http` — it carries the dispatcher model and the undi
   isolate.
 - **Size a pool from `os.availableParallelism()`.** `os.cpus().length` ignores CPU affinity and container limits.
 - **`--max-old-space-size` is per isolate.** Every worker adds its own heap, so the container limit must cover the sum.
-- **A worker receives no signals and does not inherit the Permission Model.** The main thread must tell its workers to
-  stop and wait for them; `process.exit()` inside a worker ends only that thread.
+- **A worker receives no signals.** The main thread must tell its workers to stop and wait for them, and
+  `process.exit()` inside a worker ends only that thread.
+- **A worker does not inherit the Permission Model.**
 - **`process.env` in a worker is a copy** unless the `Worker` was constructed with `env: SHARE_ENV`.
 - **Never pass an argument array together with `{ shell: true }`.** `spawn` and `execFile` join it with spaces without
   escaping, which is command injection — runtime-deprecated as DEP0190 in 24.0.0.
 - **Raise `UV_THREADPOOL_SIZE` in the environment, not in the program.** The pool is built during initialization, so
   assigning `process.env.UV_THREADPOOL_SIZE` at run time does nothing.
 
-Read [`${CLAUDE_SKILL_DIR}/references/conventions/concurrency.md`] when building a worker pool, when choosing between
-`worker_threads`, `child_process`, and `cluster`, or when diagnosing loop starvation — it carries the phase order, the
-thread-pool users, and the full list of behavior differences inside a worker.
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/concurrency.md`] when building a worker pool, or when choosing between
+`worker_threads`, `child_process`, and `cluster` — it carries how data crosses a thread boundary and the full list of
+behavior differences inside a worker.
 
 ## Permission Model
 
@@ -260,7 +277,8 @@ thread-pool users, and the full list of behavior differences inside a worker.
   malicious code. Never present it to a reviewer as containment for untrusted input.
 - **It does not restrict the network below 25.0.0.** `--allow-net` does not exist on the 22 and 24 lines, so a process
   confined there still opens any socket it likes.
-- **Symlinks are followed out of the granted set**, and an already-open file descriptor is never checked.
+- **Symlinks are followed out of the granted set.** A relative link inside a granted directory reaches any path.
+- **An already-open file descriptor is never checked**, including one inherited from the parent process.
 - **A granted directory that exists gets an implicit `/*`; one that does not, does not.** Write the wildcard explicitly
   when the directory is created at run time.
 - **Derive the grant list with `--permission-audit`** (24.20.0) before enforcing. It publishes every violation to a
@@ -298,7 +316,10 @@ and the npm configuration keys.
 - **`--env-file` is read before the Permission Model initializes**, so `--permission` cannot restrict which file it
   reads, and the file can set `NODE_OPTIONS`.
 - **The real environment overrides an `--env-file` value.** Later `--env-file` flags override earlier ones.
-- **`NODE_OPTIONS` refuses script-bearing flags** — `-p`, `-e`, or a path — and Node exits rather than ignoring them.
+- **`NODE_OPTIONS` refuses `-e` and `-p`.** Node exits with `-e is not allowed in NODE_OPTIONS` rather than ignoring the
+  flag.
+- **A bare script path in `NODE_OPTIONS` is dropped silently** — the file never runs and nothing warns, measured on
+  26.2.0. Load code from the variable with `--require` or `--import`.
 - **`--test` defaults to process isolation**, one child per file, and reports asynchronous work that outlives a test as
   a failure rather than dropping it.
 - **`--test` picks up `.ts` files** under the same name patterns unless `--no-strip-types` is passed.
@@ -361,4 +382,5 @@ signal. `typescript` states what each compiler option does; this skill states wh
 `node:test` is this skill's, `bun:test` is the **bun** skill's, and the **vitest** skill owns Vitest. Which one a
 project adopts is a project decision that no skill states. The **coding** skill governs workflow.
 
-**When in doubt, check the floor and the stability index before writing the line.**
+**Node enforces almost nothing it lets you declare — the floor, the permission grant, and the stability index each hold
+by discipline, and the runtime reports no violation of any of them.**

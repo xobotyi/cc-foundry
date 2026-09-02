@@ -14,9 +14,12 @@
 
 ## Exit codes
 
-- **Set `process.exitCode` and let the loop drain.** `process.exit()` terminates immediately, and writes to
-  `process.stdout` and `process.stderr` are asynchronous on some targets — a pipe or a file — so pending output is
-  truncated. Node exits on its own once nothing is pending.
+- **Set `process.exitCode` and let the loop drain.** `process.exit()` terminates immediately and drops whatever write is
+  still pending. Node exits on its own once nothing is.
+- **Whether a pending write survives depends on the target and the platform.** A file is written synchronously and
+  lands; a pipe or a socket may not. Measured on 26.2.0/macOS: 512 KiB written to `process.stdout` then
+  `process.exit(0)` arrived as 64 KiB down a pipe and as 512 KiB into a file, while `process.exitCode` delivered all of
+  it in both. The difference is why the loss reads as intermittent — do not rely on either side of it.
 - **`process.exit(code)` accepts only a number or an integer string** from 20.0.0.
 - **Force-exit only after a deadline**, on a timer you started when shutdown began.
 
@@ -24,11 +27,15 @@
 
 - **Every built-in error carries a `code`** (`ERR_MODULE_NOT_FOUND`, `ERR_REQUIRE_ASYNC_MODULE`, `ERR_ACCESS_DENIED`,
   `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`). Match on `code`; messages are not a contract and change between minors.
-- **`new Error(msg, { cause: err })`** chains without losing the original. `util.inspect` and structured loggers walk
-  the chain; string concatenation into the message does not.
+- **`util.inspect` walks a `cause` chain**, so an error chained with `new Error(msg, { cause: err })` reaches a Node
+  logger intact. A message built by string concatenation does not.
 - **`AggregateError`** carries `errors` for the case where several failures happened. `Promise.any` produces one.
-- **`AbortError`** is signalled by `err.name === 'AbortError'`, not by a code.
-- **Handle an error once.** Logging and rethrowing reports one failure at every level of the stack.
+- **A cancelled call reports itself in three shapes.** Measured on 26.2.0: `fs/promises`, `timers/promises`, and
+  `pipeline` reject with an `AbortError` carrying `code: 'ABORT_ERR'`; `fetch` on an aborted controller rejects with a
+  `DOMException` named `AbortError` whose `code` is the number `20`; and `fetch` under `AbortSignal.timeout(ms)` rejects
+  with a `DOMException` named `TimeoutError`, code `23`. Test `signal.aborted` where the signal is in scope. Where it is
+  not, match `err.name === 'AbortError' || err.name === 'TimeoutError'` — matching `'AbortError'` alone misses every
+  `fetch` deadline, which is the one case the caller wrote the signal for.
 
 ## Deprecation flags
 

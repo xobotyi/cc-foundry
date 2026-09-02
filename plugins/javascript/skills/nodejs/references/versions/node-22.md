@@ -32,8 +32,9 @@ the same promise as `>=22.18`.
 
 - **`require(esm)` unflagged** (22.12.0) — `require()` of an ES module graph without top-level `await` returns the
   namespace object. A graph containing top-level `await` throws `ERR_REQUIRE_ASYNC_MODULE`.
-- **Type stripping on by default** (22.18.0) — `node file.ts` executes without a flag. Disable with `--no-strip-types`
-  (named `--no-experimental-strip-types` before 25.2.0 and 24.12.0).
+- **Type stripping on by default** (22.18.0) — `node file.ts` executes without a flag. Disable it with
+  `--no-experimental-strip-types` on this line; the flag was renamed `--no-strip-types` in 24.12.0 and 25.2.0, and both
+  names work on 26.2.0.
 - **Syntax detection on by default** (22.7.0) — an ambiguous `.js` or extensionless file is retried as an ES module
   after a CommonJS parse failure.
 - **Import assertions removed** (22.0.0) — `assert { type: 'json' }` throws. Only `with { type: 'json' }` parses.

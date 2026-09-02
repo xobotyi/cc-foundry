@@ -4,8 +4,8 @@ Node runs `.ts` files by erasing type syntax and replacing it with whitespace. I
 and does not read `tsconfig.json`.
 
 Type stripping arrived in 22.6.0 behind `--experimental-strip-types`, became the default in 22.18.0 and 23.6.0, stopped
-warning in 22.18.0 and 24.3.0, and was marked Stable in 24.12.0 and 25.2.0. Disable it with `--no-strip-types`, which
-was named `--no-experimental-strip-types` before 24.12.0 and 25.2.0.
+warning in 22.18.0 and 24.3.0, and was marked Stable in 24.12.0 and 25.2.0. Disable it with `--no-strip-types`, renamed
+from `--no-experimental-strip-types` in 24.12.0 and 25.2.0. The old name remains accepted — both work on 26.2.0.
 
 ## What it refuses
 
