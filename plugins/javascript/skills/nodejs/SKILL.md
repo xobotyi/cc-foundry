@@ -143,9 +143,11 @@ Node erases type syntax and runs the result. It does not compile, does not type-
   a value import and fails at run time. `verbatimModuleSyntax: true` makes `tsc` enforce it.
 - **Write the real extension in the specifier** — `import './x.ts'`, and `require('./x.ts')` in CommonJS. Node loads the
   file that exists; it does not rewrite `.js` to `.ts`.
-- **Enums, `namespace` with runtime code, parameter properties, import aliases, and decorators raise
+- **Enums, `namespace` with runtime code, parameter properties, and import aliases raise
   `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`.** `--experimental-transform-types` handled some of them and was removed in
   26.0.0. Set `erasableSyntaxOnly: true` so the compiler rejects them first.
+- **A decorator fails as a bare `SyntaxError` instead**, with no `code` to match on — measured on 26.2.0. The parser
+  rejects the `@` before type stripping runs.
 - **A dependency shipping `.ts` files cannot be loaded.** Node refuses TypeScript under any `node_modules` path,
   deliberately and at every version.
 
