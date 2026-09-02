@@ -1,200 +1,352 @@
 ---
 name: nodejs
 description: >-
-  Node.js runtime conventions, APIs, and ecosystem patterns. Invoke whenever task involves
-  any interaction with Node.js runtime — server code, CLI tools, scripts, module system,
-  streams, process lifecycle, or package configuration.
+  Write and review Node.js: the module system, package manifest, streams, event loop, process and worker lifecycle,
+  the permission model, native TypeScript execution, `node:test`, and the runtime version `engines.node` permits.
+when_to_use: >-
+  Invoke whenever Node.js runtime code is touched at all — writing, reviewing, refactoring, or debugging a server, a
+  CLI, a script, or a `package.json`, and whenever a project's Node floor is raised. Also invoke on the symptoms:
+  `ERR_REQUIRE_ESM`, `ERR_REQUIRE_ASYNC_MODULE`, or `ERR_MODULE_NOT_FOUND`; an import that resolves in the bundler and
+  not in Node; a `.ts` file Node refuses to run; a process that hangs at exit or dies with no stack; a stream that
+  buffers without bound; a leaked HTTP connection; `ERR_ACCESS_DENIED`; a `node:test` mock or fake timer that does not
+  take effect; or a flag that works on one Node major and not the next. Covers the Node runtime and `node:test`;
+  JavaScript semantics belong to the javascript skill, types to typescript, the Bun runtime to bun, and Vitest to
+  vitest.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Node.js
+One thread runs every callback in a Node process, so anything that holds it holds the whole program. Three biases decide
+most calls:
 
-**Respect the event loop. Every blocking operation is a scalability bug.**
+- **The `engines.node` floor decides what may be written**, not the `node` binary on the machine.
+- **Read an API's stability index before depending on it.** Node ships an API for years before committing to it, and an
+  experimental one can be deleted without a deprecation cycle.
+- **Check the standard library before adding a dependency.** It absorbed `fetch`, a test runner, a file watcher, `glob`,
+  SQLite, `.env` parsing, a script runner, and TypeScript execution.
 
-Node.js rewards async-first, stream-oriented code. If your Node.js code fights the event loop, it's wrong.
+## Node Version
 
-## References
+`engines.node` in `package.json` is the floor a project claims. Read it before writing code and never reach for an API
+above it. Nothing enforces it at run time — Node never reads the field, and npm checks it only under
+`engine-strict=true` — so the floor holds by discipline and by CI running the oldest major it names.
 
-- **Module system** — [`${CLAUDE_SKILL_DIR}/references/modules.md`]: ESM/CJS comparison tables, file extension rules,
-  conditional exports patterns
-- **Event loop** — [`${CLAUDE_SKILL_DIR}/references/event-loop.md`]: Phase order, execution priority, blocking
-  operations table, worker pool
-- **Streams** — [`${CLAUDE_SKILL_DIR}/references/streams.md`]: Stream types table, pipeline patterns, backpressure
-  details
-- **Error handling** — [`${CLAUDE_SKILL_DIR}/references/errors.md`]: Error categories table, global handlers,
-  centralized error handling
-- **Security** — [`${CLAUDE_SKILL_DIR}/references/security.md`]: Supply chain threats table, HTTP security headers,
-  process hardening
+**The installed binary is not the floor.** `node --version` reports what one machine has, not what the project supports.
+
+Support windows, which decide whether a floor is defensible:
+
+- **20** — end of life 2026-04-30. A floor of `>=20` claims a runtime that receives no fixes at all.
+- **22** — maintenance from 2025-10-21, end of life 2027-04-30. Security and critical fixes only; no new capability.
+- **24** — Active LTS from 2025-10-28, maintenance from 2026-10-20, end of life 2028-04-30.
+- **26** — released 2026-05-05, Active LTS from 2026-10-28, end of life 2029-04-30.
+
+Floor version per feature — the APIs and behavior changes that decide what may be written.
+
+- **20.19.0** — `require(esm)` unflagged on the 20 line; syntax detection on by default
+- **22.0.0** — `node --run`; `fs.glob`; `WebSocket` global; watch mode Stable; `assert { type: 'json' }` removed
+- **22.12.0** — `require(esm)` unflagged on the 22 line; JSON modules Stable
+- **22.13.0** — Permission Model Stable and `--permission` accepted; `node:sqlite` unflagged
+- **22.15.0** — `module.registerHooks()`
+- **22.16.0** — `import.meta.dirname` and `import.meta.filename` Stable; `--experimental-config-file`
+- **22.18.0** — type stripping on by default; `import.meta.main`
+- **22.21.0** — `--env-file` Stable; `NODE_USE_ENV_PROXY`
+- **24.0.0** — `--experimental-permission` renamed `--permission`; `AsyncLocalStorage` on `AsyncContextFrame`;
+  `URLPattern` global; test runner awaits subtests; `url.parse()` runtime-deprecated (DEP0169); `args` with
+  `{ shell: true }` runtime-deprecated (DEP0190)
+- **24.12.0** — type stripping Stable
+- **24.20.0** — `--permission-audit`
+- **25.0.0** — `--allow-net`, and with it network confinement under `--permission`. Absent on the 22 and 24 lines
+- **25.5.0** — `--build-sea`
+- **26.0.0** — `Temporal` global; `module.register()` runtime-deprecated (DEP0205); `--experimental-transform-types`
+  removed; `node:_stream_*` removed
+- **26.3.0** — `permission.drop()`
+
+Read [`${CLAUDE_SKILL_DIR}/references/versions/node-NN.md`] — one file per major, `node-20.md` through `node-26.md` —
+when writing against a feature near the floor, and whenever raising the floor. Each carries what its major added, the
+stability each addition holds, the behavior it changed, and the traps it introduced.
+
+## Stability Index
+
+Every documented API carries one, and it decides how the API may be used, not merely how finished it is.
+
+- **2 - Stable** — protected by semver. Safe in a published library's surface.
+- **1.2 - Release candidate** — no further breaking change is anticipated, but none is ruled out.
+- **1.1 - Active development** — nearing minimum viability.
+- **1.0 - Early development** — unfinished; substantial change expected.
+- **3 - Legacy** — semver-protected and unmaintained. Bugs in it are not fixed. Migrate rather than report.
+- **0 - Deprecated** — carries a DEP number and a migration.
+
+What follows from the index:
+
+- **An experimental API can be removed with no deprecation cycle.** `--experimental-transform-types` shipped in 22.7.0
+  and was deleted in 26.0.0, taking the runtime path for TypeScript enums with it.
+- **Never put an experimental API in a published library's public surface.** A consumer cannot see that the risk was
+  taken on their behalf.
+- **The index moves per major.** `TracingChannel` is Stable from 26.8.0 and experimental on 24; `module.register()` is
+  supported on 24 and runtime-deprecated on 26. State the index for the floor, not for the machine.
+- **Check the index rather than the flag.** Type stripping needs no flag from 22.18.0 and was not Stable until 24.12.0;
+  an unflagged feature is not a committed one.
 
 ## Module System
 
-- **Use ESM.** Set `"type": "module"` in `package.json`. Use `.mjs`/`.cjs` only when mixing module systems within one
-  package.
-- **Use `node:` prefix** for all built-in imports: `import fs from 'node:fs'`. Prevents package name collision attacks
-  and is unambiguous.
-- **Import `process` explicitly.** `import process from 'node:process'`. Never rely on the `process` global — explicit
-  imports make dependencies visible.
-- **Define `"exports"` in `package.json`** for libraries. Encapsulates internals — only paths listed in `"exports"` are
-  importable by consumers.
-- **Imports at module top.** No dynamic `import()` for statically-known dependencies.
-- **Use `import.meta.dirname`/`import.meta.filename`** instead of `__dirname`/`__filename`.
-- **Use `import.meta.resolve()`** instead of `require.resolve()` in ESM.
-- **Always set `"type"` explicitly** in `package.json`, even in CJS packages — future-proofs the package and helps
-  tooling.
-- **Use conditional exports** for dual CJS/ESM packages. Order: `types` > `import` > `require` > `default`. Always
-  include `"default"` as fallback.
-- **Place `"types"` first** in conditional exports when publishing TypeScript declarations.
-- **Use `#` imports** (`"imports"` in `package.json`) for clean internal paths without `../../../`. Supports conditional
-  resolution for platform-specific implementations.
-- **Keep `"main"` alongside `"exports"`** only for backward compatibility with old Node.js or bundlers. Never use
-  `"main"` alone for new packages.
-- **JSON imports in ESM** require `with { type: 'json' }` attribute.
-- **Use `createRequire()`** from `node:module` only when you must `require()` in ESM (e.g., native addons).
-- **CJS interop:** default import from CJS always works. Named imports work if CJS uses static export patterns;
-  otherwise destructure the default.
-- **`require()` can load synchronous ESM** (no top-level `await`). For ESM with top-level `await`, use dynamic
-  `import()`.
-- **Self-referencing:** a package can import its own exports by name when `"exports"` is defined.
+- **Declare `"type"` in every `package.json`.** Without it, a `.js` or extensionless file is parsed as CommonJS and
+  re-parsed as an ES module when that fails. The retry costs startup time on every ES module and turns a real syntax
+  error into a confusing module-system error.
+- **`.mjs` and `.cjs` override `"type"`; nothing overrides them.** Use them to place one file of the other kind inside a
+  package, never as the default.
+- **File extensions are mandatory in ESM**, directory indexes included: `import './startup/index.js'`.
+- **Import a builtin through `node:`** — `import fs from 'node:fs/promises'`. The prefix cannot be shadowed by a package
+  of the same name, and `node:test` and `node:sqlite` resolve under no other specifier.
+- **`import.meta.dirname` and `import.meta.filename` replace `__dirname` and `__filename`**, and exist only on `file:`
+  modules.
+- **Import attributes use `with`, never `assert`.** The `assert` form was removed in 22.0.0 and throws.
+- **A JSON import needs `with { type: 'json' }`** and exposes only a default export.
+- **`require()` of an ES module works** from 20.19.0 and 22.12.0, and throws `ERR_REQUIRE_ASYNC_MODULE` when anything in
+  the graph uses top-level `await`. That is a property of the whole graph, so a transitive dependency can break a caller
+  that did not change.
+- **Reach for `module.registerHooks()`, not `module.register()`.** The latter is runtime-deprecated in 26.0.0 (DEP0205)
+  and needs `--allow-worker` under the Permission Model, because its hooks run on a worker thread.
 
-File extension rules and ESM vs CJS comparison tables: see `${CLAUDE_SKILL_DIR}/references/modules.md`.
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/modules.md`] when designing an `"exports"` map, publishing a package
+that must serve both `require` and `import`, writing a loader hook, or debugging a specifier that resolves in a bundler
+and not in Node — it carries the condition-matching rules, the target-path restrictions, the dual-package hazard, and
+the compile cache.
 
-## Event Loop
+## Package Manifest
 
-Node.js uses a single-threaded event loop for JavaScript and a libuv worker pool for expensive I/O and CPU tasks.
+- **`"exports"` seals the package.** Once present, nothing outside the map is importable, deep relative paths included.
+  Add it deliberately: it is the only way to keep internals private, and adding it to a published package is a breaking
+  change.
+- **Condition order is match order.** Most specific first, `"default"` last, `"types"` first by convention.
+- **`"import"` and `"require"` describe the caller's syntax, not the target's format.** A `.mjs` file behind `"require"`
+  is legal and loads through `require(esm)`.
+- **Use `"module-sync"` instead of a dual build** where one ES module must serve both callers. Two builds of one package
+  give a process two class identities and two copies of every module-level singleton.
+- **`"imports"` keys start with `#`** and are the only path-alias mechanism that survives `node file.ts`, because
+  nothing in the runtime reads `tsconfig.json`.
+- **Every `"exports"` target starts with `./`.** Absolute paths, `file:` URLs, `../`, and any `.`, `..`, or
+  `node_modules` segment are rejected.
 
-### Core Rules
+## TypeScript Execution
 
-- **Never block the event loop.** No sync I/O in servers (`readFileSync`, `execSync`, `crypto.pbkdf2Sync`,
-  `zlib.inflateSync`). Sync APIs are acceptable only in CLI scripts, startup code, or build tools.
-- **Offload CPU-intensive work** to `worker_threads` or child processes. For main-thread CPU work, partition into chunks
-  with `setImmediate()` between iterations.
-- **Bound input sizes.** Unbounded `JSON.parse`, `JSON.stringify`, regex, or iteration = DoS vector. A 50MB JSON string
-  blocks the loop for ~2 seconds.
-- **Avoid vulnerable regex.** No nested quantifiers `(a+)*`, no overlapping alternations `(a|a)*`, no backreferences
-  with repetition. Use `safe-regex2`, RE2, or `indexOf`.
-- **Prefer `setImmediate()` over recursive `process.nextTick()`.** `nextTick` starves I/O if called recursively. Use
-  `nextTick` only when you must run before any I/O in the current tick (e.g., emitting events after construction before
-  listeners attach).
-- **Prefer `queueMicrotask()`** over `process.nextTick()` for new code — it's cross-platform and web-standard.
-- **Inside I/O callbacks, `setImmediate` always fires before `setTimeout(fn, 0)`.** Outside I/O, the order is
-  non-deterministic — do not depend on it.
-- **Use `AbortController`** for cancellable timers and operations.
+Node erases type syntax and runs the result. It does not compile, does not type-check, and does not read
+`tsconfig.json`.
 
-Phase order, execution priority, blocking operations table, and worker pool details: see
-`${CLAUDE_SKILL_DIR}/references/event-loop.md`.
+- **Keep `tsc --noEmit` in the verification path.** Running a `.ts` file proves it parses, nothing more.
+- **`import type` is mandatory for type-only imports.** Erasure is syntactic: without the keyword the import survives as
+  a value import and fails at run time. `verbatimModuleSyntax: true` makes `tsc` enforce it.
+- **Write the real extension in the specifier** — `import './x.ts'`, and `require('./x.ts')` in CommonJS. Node loads the
+  file that exists; it does not rewrite `.js` to `.ts`.
+- **Enums, `namespace` with runtime code, parameter properties, import aliases, and decorators raise
+  `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`.** `--experimental-transform-types` handled some of them and was removed in
+  26.0.0. Set `erasableSyntaxOnly: true` so the compiler rejects them first.
+- **A dependency shipping `.ts` files cannot be loaded.** Node refuses TypeScript under any `node_modules` path,
+  deliberately and at every version.
+
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/typescript-execution.md`] when a `.ts` file fails to run, when
+choosing between type stripping and a compiler, or when writing the `tsconfig.json` that matches the runtime — it
+carries the flag history, the full refused-syntax list, and the matching compiler options.
+
+## Blocking
+
+- **No synchronous file, process, or crypto call on a request path.** `readFileSync`, `execSync`, `pbkdf2Sync`,
+  `inflateSync` belong in CLIs, build scripts, and startup code that runs before the server listens.
+- **Bound every input before parsing it.** `JSON.parse` is synchronous and scales with input size, so an unbounded body
+  is a denial of service that needs no bug.
+- **Never match a backtracking pattern against user input.** Nested quantifiers, overlapping alternations, and
+  backreferences with repetition give one request the whole thread. Use `indexOf` or a linear engine.
+- **Recursive `process.nextTick` starves I/O.** The tick queue drains to exhaustion before the loop advances, so a
+  self-scheduling `nextTick` stops the process serving traffic while looking idle. `queueMicrotask` has the same
+  property one level down.
+- **`setImmediate` beats `setTimeout(fn, 0)` inside an I/O callback and races it at the top level.** Never encode either
+  ordering as a dependency.
+- **Partition long synchronous loops** with `setImmediate` between chunks, or move them to a worker.
 
 ## Streams
 
-Streams process data incrementally — use them for large files, HTTP bodies, data transformation pipelines, and proxying.
-Do not use streams when data is already fully in memory.
+- **Compose with `pipeline` from `node:stream/promises`.** A `.pipe()` chain propagates neither errors nor destruction,
+  so one failure leaves the rest of the chain open with its descriptors held.
+- **Respect the return value of `write()`.** `false` means the buffer is over `highWaterMark`; keep writing and memory
+  grows without any error being raised. `pipeline` and `for await` handle this.
+- **`highWaterMark` is a threshold, not a cap.** A single write larger than it still buffers in full, and in object mode
+  the count is objects rather than bytes.
+- **Destroy a stream on the error path.** `stream.destroy(err)` releases the descriptor or socket; an undestroyed stream
+  leaks it.
+- **An unhandled `'error'` event crashes the process.** Every stream outside a `pipeline` needs a listener.
+- **`readable.map`, `filter`, `take`, `reduce` and the rest are Experimental**, on every major through 26. They read
+  like committed API and are not. Keep them out of a library's surface.
+- **Do not stream data already in memory.** Streams earn their cost on unbounded or arriving-over-time input.
 
-### Core Rules
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/streams.md`] when crossing between Node streams and web streams, when
+writing a custom `Readable`, `Writable`, or `Transform`, or when tuning `highWaterMark` — it carries the interop matrix,
+the platform-dependent defaults, and the whole-stream consumers.
 
-- **Use `pipeline()`** from `node:stream/promises` for stream composition. Never manual `.pipe()` chains — they don't
-  propagate errors or handle cleanup.
-- **Respect backpressure.** Check `.write()` return value; wait for `'drain'` event before continuing. `pipeline()`
-  handles this automatically.
-- **Prefer `Readable.from()`** for converting iterables/async iterables to streams.
-- **Use async iteration** (`for await (const chunk of stream)`) as the simplest way to consume readable streams.
-  Backpressure is handled automatically.
-- **Use `readline` with `createInterface`** for line-by-line file processing.
-- **`highWaterMark`** defaults to 16 KiB for byte streams, 16 objects for object mode. It's a hint, not a hard limit.
-- **Object mode streams** count objects (not bytes) against `highWaterMark`. Enable with `{ objectMode: true }`.
-- **Destroy streams explicitly** when you need to abort: `stream.destroy(new Error('msg'))`.
-- **Custom Readable:** prefer async generators with `Readable.from()` over class-based `_read()` implementation unless
-  you need fine-grained control.
-- **Custom Transform:** implement `_transform(chunk, encoding, callback)` and optionally `_flush(callback)` for
-  end-of-stream processing.
-- **Custom Writable:** implement `_write(chunk, encoding, callback)` and optionally `_final(callback)` for cleanup
-  before `'finish'` event.
+## Errors and Exit
 
-Stream types table and `.pipe()` pitfalls: see `${CLAUDE_SKILL_DIR}/references/streams.md`.
+- **Set `process.exitCode` and let the loop drain.** `process.exit()` terminates immediately, and writes to stdout are
+  asynchronous when it is a pipe or a file, so the last output is lost.
+- **Match on `error.code`, never on the message.** Every built-in error carries one; messages change between minors.
+- **Chain with `cause`**: `new Error('context', { cause: err })`. `util.inspect` and structured loggers walk the chain.
+- **Handle an error once** — log it or rethrow it. Doing both reports one failure at every level of the stack.
+- **Never resume after `'uncaughtException'`.** Installing the listener disables the crash and leaves the process
+  running with unknown state. Log, flush, exit.
+- **An unhandled rejection is fatal by default.** Do not add `--unhandled-rejections=warn` to make a test suite pass.
+- **`'exit'` listeners run synchronously only.** Anything asynchronous scheduled there never runs.
+- **Cancel with `AbortSignal`.** `fetch`, `fs/promises`, `timers/promises`, `pipeline`, `stream.addAbortSignal`, and
+  `events.on` all take `{ signal }`; compose deadlines with `AbortSignal.timeout(ms)` and `AbortSignal.any([...])`. An
+  abort rejects with `err.name === 'AbortError'`, which carries no `code`.
+- **Set the HTTP server timeouts.** `requestTimeout` defaults to 300000 ms and `keepAliveTimeout` to 5000 ms; the latter
+  must be shorter than the idle timeout of any proxy in front, or the proxy reuses a socket Node has closed.
 
-## Error Handling
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/lifecycle.md`] when writing a graceful shutdown, when a process
+refuses to exit or exits without flushing, or when auditing server timeouts — it carries the shutdown sequence, the
+deprecation flags, and the timeout defaults.
 
-### Core Rules
+## Async Context and Diagnostics
 
-- **Use `async`/`await` with `try`/`catch`.** No callbacks for new code.
-- **Always `return await`** when returning promises from `try` blocks — preserves full stack traces and ensures `catch`
-  fires for rejections.
-- **Extend `Error`.** Custom errors must extend `Error`, set a `code` property for programmatic matching (not message
-  strings, which change), and set `name`.
-- **Use `error.cause`** for chaining: `new Error("context", { cause: originalErr })`. The full chain is visible via
-  `util.inspect()` and structured loggers.
-- **Match errors by `error.code` or `instanceof`**, never by message string.
-- **Register global handlers.** Always handle `process.on('unhandledRejection')` and `process.on('uncaughtException')`.
-  Log, clean up, exit. Since Node.js 15+, unhandled rejections crash the process by default.
-- **Never resume after `uncaughtException`.** The process state is unknown — log, cleanup, exit.
-- **Subscribe to `'error'` events** on all EventEmitters and streams. An unhandled `'error'` event crashes the process.
-  `pipeline()` handles stream errors automatically.
-- **Handle `process.on('warning')`** for non-fatal process warnings (deprecations, memory leaks, experimental features).
-- **Use centralized error handlers.** Don't scatter error handling across every middleware. Use a single error handler
-  that maps error types to HTTP responses without leaking internals.
-- **Handle once: log OR throw, not both.** `catch (e) { log(e); throw e }` causes duplicate logging.
-- **Never swallow errors** in event handlers — always re-emit or log.
+- **`AsyncLocalStorage.run(store, fn)` is the only Stable entry point.** `enterWith` and `withScope` are Experimental,
+  and `enterWith` applies for the rest of the current synchronous execution rather than for a scope — called inside one
+  event handler it leaks into every later handler on the same emit.
+- **Instrument with `diagnostics_channel`, not with a logger call.** Publishing to a channel with no subscriber costs
+  nothing measurable, so the instrumentation can ship enabled.
+- **Create a channel once at module top level** and guard expensive payload construction with `channel.hasSubscribers`.
+- **Subscribers receive the message object by reference.** A subscriber that mutates it changes what the publisher and
+  later subscribers see.
+- **Measure loop lag with `perf_hooks.monitorEventLoopDelay()`**, not with a `setTimeout` drift estimate.
+- **Get a stack out of a native crash with `--report-on-fatalerror`.** No JavaScript handler runs at that point.
 
-Error categories table and operational vs programmer error strategies: see `${CLAUDE_SKILL_DIR}/references/errors.md`.
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/observability.md`] when context goes missing across an async boundary,
+when adding tracing to a library, or when picking a profiling flag — it carries the context-loss diagnosis, the
+`TracingChannel` contract, and the list of channels Node publishes itself.
 
-## Process Lifecycle
+## HTTP Client
 
-- **Graceful shutdown.** Handle `SIGTERM`/`SIGINT`: stop accepting connections, wait for in-flight requests (with
-  timeout), close DB pools, flush logs, then `process.exit(0)`. Force-exit on timeout.
-- **Log to stdout/stderr.** Let infrastructure (Docker, systemd) handle log routing. Use structured JSON logging (pino,
-  winston) in production.
-- **Set `NODE_ENV=production`** in production. It enables framework optimizations and disables debug output.
-- **Use `npm ci`** in CI/production. Never `npm install` — it ignores lockfile mismatches.
+- **Consume or cancel every response body**, on the error path too. undici does not release the connection until the
+  body is read or cancelled, and the garbage collector is not prompt enough to save it — a pool exhausted this way
+  stalls rather than errors.
+- **`fetch` does not reject on a non-2xx status.** Check `res.ok`.
+- **`fetch` has no total timeout.** Pass `signal: AbortSignal.timeout(ms)`, combined with the caller's signal through
+  `AbortSignal.any`.
+- **`http.Agent` options do not reach `fetch`.** It uses undici's global dispatcher; change it with a `dispatcher`
+  option per request or `setGlobalDispatcher` process-wide.
+- **`fetch` ignores `HTTP_PROXY` unless told otherwise** — `NODE_USE_ENV_PROXY=1` or `--use-env-proxy`, from 22.21.0 and
+  24.5.0.
+- **Drop to `node:http` for upgrades, `CONNECT`, trailers, or per-request agent control**, and to `node:http2` for
+  HTTP/2, which `fetch` does not speak.
 
-## Security
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/http-client.md`] when tuning connection pooling, or when deciding
+between `fetch` and `node:http` — it carries the dispatcher model and the undici version each Node major embeds.
 
-### Input Validation
+## Workers and Processes
 
-- **Validate everything from outside** — request bodies, query params, headers, file uploads, environment variables from
-  untrusted sources. Use schema validation (zod, ajv, typebox).
-- **Limit request body size** at the HTTP layer before parsing. Set per-content-type limits. Unbounded payloads exhaust
-  memory.
-- **Validate `Content-Length` header** before reading the body.
-- **Use streaming JSON parsers** (`stream-json`, `@streamparser/json`) for very large JSON payloads.
+- **Workers are for CPU work.** Node's asynchronous I/O beats a worker at I/O, and each worker carries a full V8
+  isolate.
+- **Size a pool from `os.availableParallelism()`.** `os.cpus().length` ignores CPU affinity and container limits.
+- **`--max-old-space-size` is per isolate.** Every worker adds its own heap, so the container limit must cover the sum.
+- **A worker receives no signals and does not inherit the Permission Model.** The main thread must tell its workers to
+  stop and wait for them; `process.exit()` inside a worker ends only that thread.
+- **`process.env` in a worker is a copy** unless the `Worker` was constructed with `env: SHARE_ENV`.
+- **Never pass an argument array together with `{ shell: true }`.** `spawn` and `execFile` join it with spaces without
+  escaping, which is command injection — runtime-deprecated as DEP0190 in 24.0.0.
+- **Raise `UV_THREADPOOL_SIZE` in the environment, not in the program.** The pool is built during initialization, so
+  assigning `process.env.UV_THREADPOOL_SIZE` at run time does nothing.
 
-### HTTP Security
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/concurrency.md`] when building a worker pool, when choosing between
+`worker_threads`, `child_process`, and `cluster`, or when diagnosing loop starvation — it carries the phase order, the
+thread-pool users, and the full list of behavior differences inside a worker.
 
-- **Configure server timeouts.** Defaults are too permissive. Set `headersTimeout`, `requestTimeout`, `timeout`,
-  `keepAliveTimeout`, `maxRequestsPerSocket`.
-- **Use security headers** (via `helmet` or equivalent): `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`,
-  `X-Frame-Options: DENY`, `Content-Security-Policy`.
-- **Delegate TLS/gzip to reverse proxy.** Node.js should not terminate TLS or compress responses in production — let
-  nginx/HAProxy/cloud LB handle TLS termination, compression, rate limiting, and WAF rules.
+## Permission Model
 
-### Secrets & Process Hardening
+- **`--permission` is a seat belt, not a sandbox.** Node's own documentation states it does not protect against
+  malicious code. Never present it to a reviewer as containment for untrusted input.
+- **It does not restrict the network below 25.0.0.** `--allow-net` does not exist on the 22 and 24 lines, so a process
+  confined there still opens any socket it likes.
+- **Symlinks are followed out of the granted set**, and an already-open file descriptor is never checked.
+- **A granted directory that exists gets an implicit `/*`; one that does not, does not.** Write the wildcard explicitly
+  when the directory is created at run time.
+- **Derive the grant list with `--permission-audit`** (24.20.0) before enforcing. It publishes every violation to a
+  `node:permission-model:*` channel and denies nothing.
 
-- **Never hardcode secrets** in source code. Use environment variables from secure vaults.
-- **Never commit `.env` files** — add to `.gitignore`.
-- **Use `crypto.timingSafeEqual()`** for secret comparison (prevents timing attacks).
-- **Use `crypto.scrypt()` or `crypto.pbkdf2()`** (async versions) for password hashing.
-- **Avoid shell injection.** Never use `exec()` with user-controlled strings. Use `execFile()` or `spawn()` with
-  argument arrays.
-- **Never use `eval()`, `new Function()`, or dynamic `require()`** with user input.
-- **Run as non-root** in Docker — use a dedicated user.
-- **Limit V8 heap** with `--max-old-space-size` to prevent memory exhaustion.
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/permissions.md`] when confining a process, when a run fails with
+`ERR_ACCESS_DENIED`, or when writing the grant list — it carries the full scope-to-flag map, the path-matching rules,
+and everything the model does not cover.
 
-Supply chain threats table, dependency auditing, and security checklist: see
-`${CLAUDE_SKILL_DIR}/references/security.md`.
+## Supply Chain
+
+- **`npm ci` in CI and in image builds.** It requires a lockfile, removes `node_modules` first, and fails rather than
+  rewriting the lockfile when it disagrees with `package.json`.
+- **Set `ignore-scripts=true` in `.npmrc`.** Lifecycle scripts run for the whole dependency tree with the runner's
+  privileges, and this is where almost all registry compromise lands. Re-enable it per package where a build genuinely
+  needs it.
+- **Set `min-release-age` to a window in days** (npm 11.10.0). A compromised-account attack publishes a version that is
+  minutes old, and the window is what blocks it. When no version of a dependency clears the window the command errors,
+  so treat that exit as a signal rather than a reason to remove the setting. The `min-release-age-exclude` escape hatch
+  needs npm 12.0.0, which no Node line bundles.
+- **Publish from CI over OIDC trusted publishing**, not with a token. npm classic tokens were revoked on 2025-12-09, and
+  a granular token with `Bypass 2FA` set overrides both account-level and package-level 2FA for publishing.
+- **Node 22 ships npm 10**, so neither `min-release-age` nor trusted publishing works on that line without upgrading
+  npm.
+- **Corepack stopped shipping with Node 25**, so `"packageManager"` is inert unless `corepack` is installed separately.
+
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/supply-chain.md`] when hardening an install, configuring publishing,
+or auditing what a lockfile actually guarantees — it carries the trusted-publishing constraints, the provenance rules,
+and the npm configuration keys.
+
+## CLI and Flags
+
+- **`node --run <script>` is not `npm run`.** It skips `pre` and `post` scripts, sets no `npm_package_*` variables, and
+  does not pass `--env-file` variables to the command.
+- **`--env-file` is read before the Permission Model initializes**, so `--permission` cannot restrict which file it
+  reads, and the file can set `NODE_OPTIONS`.
+- **The real environment overrides an `--env-file` value.** Later `--env-file` flags override earlier ones.
+- **`NODE_OPTIONS` refuses script-bearing flags** — `-p`, `-e`, or a path — and Node exits rather than ignoring them.
+- **`--test` defaults to process isolation**, one child per file, and reports asynchronous work that outlives a test as
+  a failure rather than dropping it.
+- **`--test` picks up `.ts` files** under the same name patterns unless `--no-strip-types` is passed.
+
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/cli-and-flags.md`] when wiring a container entrypoint, building a
+single executable, or choosing hardening flags — it carries the environment-file rules, the test-runner CLI surface, the
+SEA build paths per major, and `--disable-proto`, `--frozen-intrinsics`, and `--secure-heap`.
+
+## Testing with `node:test`
+
+- **Assert through `t.assert.*`, not the bare `node:assert`.** Only the context-bound form is counted by `t.plan()`, so
+  a bare `assert` leaves the plan short and the failure reads as a miscount rather than a wrong assertion.
+- **`t.plan(n)` checks the moment the test function returns.** The default is `{ wait: false }`; an assertion arriving
+  from a callback afterwards is not counted. Pass `{ wait: true }` or a millisecond budget.
+- **`mock.module()` needs `--experimental-test-module-mocks`.** Without the flag it is `undefined`, so the test fails
+  with a `TypeError` instead of a clear message. It is Stability 1.0, the least settled part of the runner.
+- **A destructured timer import is never mocked.** `import { setTimeout } from 'node:timers'` binds the real function
+  before `mock.timers.enable()` runs. Call the global or the namespace property.
+- **Coverage is experimental and off**: `--experimental-test-coverage`, with core modules and `node_modules/` excluded
+  by default.
+- **Never run `--test-update-snapshots` in CI.** It rewrites the baseline, turning every regression into a pass.
+- **`--test-force-exit` hides an open handle rather than closing one.** Find it with `process.getActiveResourcesInfo()`.
+
+Read [`${CLAUDE_SKILL_DIR}/references/conventions/testing.md`] when writing the first test in a project, when a mock or
+a fake timer does not take effect, or when wiring coverage thresholds — it carries the structure and hook rules, the
+mocking surface with its flags, snapshots, and the subtest-awaiting behavior that the shipped documentation states
+incorrectly.
 
 ## Application
 
-When **writing** Node.js code:
+When **writing** Node.js code, apply these rules silently — do not narrate a rule while following it. Where existing
+code contradicts one, follow the codebase and flag the divergence once.
 
-- Apply all conventions silently — don't narrate each rule being followed.
-- If an existing codebase contradicts a convention, follow the codebase and flag the divergence once.
-- Prefer `node:fs/promises` over callback-based `node:fs`.
-- Prefer `node:stream/promises` for pipeline operations.
+When **reviewing** Node.js code, cite the violation and show the fix inline. Do not lecture.
 
-When **reviewing** Node.js code:
-
-- Cite the specific violation and show the fix inline.
-- Don't lecture or quote the rule — state what's wrong and how to fix it.
+```
+Bad:  "Node.js best practice is to avoid process.exit() because stdout writes..."
+Good: process.exit(1) -> process.exitCode = 1
+```
 
 ## Integration
 
-The **javascript** skill governs language choices; this skill governs Node.js runtime decisions. Activate **typescript**
-alongside both when working with TypeScript.
+The **javascript** and **typescript** skills own the language and the type system; this skill owns the runtime that
+executes them. The split with `javascript` is resolution against syntax: `javascript` states what an ES module means,
+this skill states how Node finds it, what `package.json` changes about that, and which of Node's own APIs accept a
+signal. `typescript` states what each compiler option does; this skill states what Node erases and refuses.
 
-**Respect the event loop. When in doubt, make it async.**
+`node:test` is this skill's, `bun:test` is the **bun** skill's, and the **vitest** skill owns Vitest. Which one a
+project adopts is a project decision that no skill states. The **coding** skill governs workflow.
+
+**When in doubt, check the floor and the stability index before writing the line.**
