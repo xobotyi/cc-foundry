@@ -65,11 +65,9 @@ The second argument to the builder form takes the options; the object syntax use
 
 A fixture reaches its own scope and every longer-lived one, never a shorter-lived one.
 
-| Fixture scope | May read                                           |
-| ------------- | -------------------------------------------------- |
-| `worker`      | worker fixtures                                    |
-| `file`        | worker and file fixtures                           |
-| `test`        | worker, file, test fixtures, built-in test context |
+- **`worker`** — worker fixtures
+- **`file`** — worker and file fixtures
+- **`test`** — worker, file and test fixtures, plus the built-in test context
 
 A fixture with no declared scope is a `test` fixture, so it is unreachable from `worker` and `file` fixtures — declare
 the scope explicitly on anything a longer-lived fixture depends on. Only `test` fixtures see `task`, `expect` and

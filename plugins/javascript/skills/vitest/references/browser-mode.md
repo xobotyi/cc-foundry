@@ -34,7 +34,8 @@ export default defineConfig({
 ```
 
 Context imports moved too: `page`, `userEvent`, `commands` and `utils` come from `vitest/browser`, not
-`@vitest/browser/context`. The old specifiers resolve during a transition period and are slated for removal.
+`@vitest/browser/context`. That specifier and `@vitest/browser/utils` still resolve at runtime in Vitest 4.1 and are
+slated for removal.
 
 `vitest init browser` writes the config and installs the packages.
 

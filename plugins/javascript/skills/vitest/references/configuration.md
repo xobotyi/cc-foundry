@@ -23,8 +23,13 @@ import viteConfig from './vite.config'
 export default mergeConfig(viteConfig, defineConfig({ test: {} }))
 ```
 
-Vite options — `define`, `resolve.alias`, `plugins`, `server` — sit at the top level, never inside `test`. Defaults are
-importable as `configDefaults` for extending rather than replacing a default array.
+`define` and `plugins` are Vite-only and sit at the top level, never inside `test`. Two names exist in both places and
+mean different things: `resolve.alias` is Vite's, while `test.alias` is Vitest's own and merges over it; Vite's `server`
+configures the dev server, while `test.server.deps` controls which modules Vite transforms and which the engine imports
+natively. The Vitest 4 docs mark `test.server` deprecated without naming a replacement, and it remains the home of
+`deps.inline` and `deps.external`.
+
+Defaults are importable as `configDefaults` for extending rather than replacing a default array.
 
 `process.env.VITEST` is set during a run, and `mode` is `test` or `benchmark`, which is how one `vite.config.ts`
 branches without a second file.
@@ -72,7 +77,8 @@ ignored under Vitest 4.
 - **`pool: 'forks'`**, **`isolate: true`**, **`fileParallelism: true`**.
 - **`maxWorkers`** — all available parallelism when `watch` is off, half of it when on.
 - **`clearMocks: false`, `mockReset: false`, `restoreMocks: false`** — each runs before every test when enabled.
-- **`testTimeout: 5000`**, **`hookTimeout: 10000`**, **`retry: 0`**.
+- **`testTimeout: 5000`** and **`hookTimeout: 10000`** in Node, `15000` and `30000` when `browser.enabled` is true.
+- **`retry: 0`**.
 - **`watch: !process.env.CI && process.stdin.isTTY`**.
 - **`allowOnly: !process.env.CI`** — a stray `.only` fails the run in CI rather than silently narrowing it.
 - **`sequence.hooks: 'stack'`**.
