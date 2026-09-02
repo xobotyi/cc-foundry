@@ -31,34 +31,37 @@ A type earns its place by making a wrong program fail to compile. Three biases d
 ## Compiler Release
 
 The `typescript` entry in the project's `package.json` sets the release. Read it before writing code and never reach for
-a feature or an option above it. Nothing below 5.5 needs a gate.
+a feature or an option above it. Releases below 5.5 are not indexed here; a rule naming a feature older than 5.5 carries
+its version where it is named.
 
 - **5.5** — inferred type predicates; `isolatedDeclarations`; `${configDir}`; regex literal syntax checking
 - **5.6** — `noUncheckedSideEffectImports`; `noCheck`; `strictBuiltinIteratorReturn`; always-truthy and always-nullish
   checks become errors; `package.json` `"type"` inside `node_modules` is respected in every `module` mode
-- **5.7** — `rewriteRelativeImportExtensions`; never-initialized variable checks; JSON imports require
-  `with { type: "json" }` under `nodenext`; every TypedArray takes a buffer type parameter
+- **5.7** — `rewriteRelativeImportExtensions`; never-initialized variable checks; a JSON import into an ES module under
+  `nodenext` requires `with { type: "json" }`; every TypedArray takes a buffer type parameter
 - **5.8** — `erasableSyntaxOnly`; `module node18`; `libReplacement`; `require()` of ESM under `nodenext`; each branch of
   a conditional in a `return` checked separately
 - **5.9** — `import defer`; `module node20`; the prescriptive `tsc --init` template; `ArrayBuffer` stops being a
   supertype of the TypedArray types
 - **6.0** — `strict`, `module: esnext`, `target: es2025`, `noUncheckedSideEffectImports: true`, `libReplacement: false`,
-  `rootDir: "."`, and `types: []` become the defaults; `outFile` and `moduleResolution: classic` removed; `target: es5`,
-  `downlevelIteration`, `moduleResolution: node10`, `module: amd`/`umd`/`systemjs`/`none`, `baseUrl`,
-  `esModuleInterop: false`, `alwaysStrict: false`, the `module` keyword for namespaces, and `asserts` on imports
-  deprecated; `stableTypeOrdering`; subpath imports starting `#/`
-- **7.0** — the compiler is a native Go binary; every 6.0 deprecation is a hard error; no programmatic API;
-  `stableTypeOrdering` is fixed on; `--checkers`, `--builders`, `--singleThreaded`; template-literal inference consumes
-  whole Unicode code points
+  `rootDir: "."`, and `types: []` become the defaults; `outFile`, `moduleResolution: classic`/`node10`, `target: es5`,
+  `downlevelIteration`, `module: amd`/`umd`/`systemjs`/`none`, `baseUrl`, `esModuleInterop: false`, and
+  `alwaysStrict: false` are deprecated, each silenceable for one release with `"ignoreDeprecations": "6.0"`; the
+  `module` keyword for a namespace and the `assert` import attribute are hard errors `ignoreDeprecations` does not
+  reach; `stableTypeOrdering`; subpath imports starting `#/`
+- **7.0** — the compiler is a native Go binary; every 6.0 deprecation becomes a removal; the 6.0 programmatic API is
+  gone; `stableTypeOrdering` is fixed on; `--checkers`, `--builders`, `--singleThreaded`; template-literal inference
+  consumes whole Unicode code points
 
 Read [`${CLAUDE_SKILL_DIR}/references/versions/ts-N.N.md`] — one file per release, `ts-5.5.md` through `ts-7.0.md` —
 when writing against a feature near the pinned release, and whenever raising it. Each carries what its release added,
 which existing behavior it changed, and the traps it introduced.
 
-**A 6.0 or 7.0 upgrade is a configuration change before it is a code change.** The two defaults that break silently are
-`rootDir`, which moves output into `dist/src/` when the config sits above the sources, and `types`, whose new `[]`
-default drops every global declaration until the packages are listed. Set both explicitly rather than diagnosing the
-symptoms.
+**A 6.0 or 7.0 upgrade is a configuration change before it is a code change.** Set `rootDir` and `types` explicitly
+before anything else. A `rootDir` left to the new default moves output into `dist/src/` when the config sits above the
+sources, and reports `TS5011` naming the directory it wants. `types` is the one that fails silently: its `[]` default
+drops every global declaration until the packages are listed, and the symptom is a burst of `Cannot find name` errors
+that say nothing about the option that caused them.
 
 ## Configuration
 
@@ -215,8 +218,10 @@ or when designing a generic API surface — it carries the inference-control too
 - **A type whose purpose does not fit in one sentence is over budget.** Split it into named aliases a reader can hover.
 - **A naked type parameter distributes over a union.** Wrap both sides in a tuple — `[T] extends [U]` — where the
   question is about the union as a whole.
-- **`TS2589` means the recursion is not in tail position.** A tail-recursive conditional reaches 1000 instantiations;
-  any other stops at 100. Rewrite with an accumulator parameter rather than raising anything.
+- **`TS2589` is the instantiation ceiling, not a diagnosis.** A tail-recursive conditional reaches 1000 instantiations
+  and reports it past that; one that wraps its recursive call stops far earlier, under 50 where the accumulator is a
+  tuple spread. Large unions and deep object types reach the same error by another route. Where recursion is the cause,
+  rewrite with an accumulator so the recursive call is the final operation.
 - **Brand a type only where a wrong value of the same primitive would corrupt something** — an identifier that could be
   swapped with another identifier, a validated string, a unit-bearing number. One `unique symbol` brand, one constructor
   function performing the single `as`, and no other construction site.
@@ -278,10 +283,12 @@ Read [`${CLAUDE_SKILL_DIR}/references/conventions/declarations.md`] when declara
 ## Toolchain
 
 - **`tsc --noEmit` is the check.** Wire it into CI separately from the bundler, which type-checks nothing.
-- **From 7.0 the compiler ships no programmatic API.** Anything that embeds it — typescript-eslint, Volar for Vue,
-  Svelte, Astro and MDX, Angular template checking — needs the 6.0 API. Install both, with `typescript` aliased to
-  `@typescript/typescript6` and `typescript@7` under a second name, and let the tool resolve the one it needs.
-  typescript-eslint 8.69.0 declares a peer range of `>=4.8.4 <6.1.0`; forcing 7.0 past it crashes the parser.
+- **7.0 drops the API a tool calls.** `require("typescript")` returns `{ version, versionMajorMinor }` and nothing else;
+  `createProgram` and its neighbors are gone. A `typescript/unstable/*` family ships beside it, and the compiler team
+  states the expectation that 7.1 carries a stable replacement. Anything that embeds the compiler — typescript-eslint,
+  Volar for Vue, Svelte, Astro and MDX, Angular template checking — needs the 6.0 API until then. Install both, with
+  `typescript` aliased to `@typescript/typescript6` and `typescript@7` under a second name, and let the tool resolve the
+  one it needs. typescript-eslint 8.69.0 declares a peer range of `>=4.8.4 <6.1.0`, which excludes 7.0.
 - **`--checkers N` trades memory for speed** in 7.0 and defaults to 4. Pin one value across CI and local runs, because
   varying it can surface order-dependent results.
 - **`tsc --init` generates the baseline the compiler team recommends for the installed release.** Start from its output

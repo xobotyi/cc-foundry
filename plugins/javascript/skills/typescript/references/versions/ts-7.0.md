@@ -7,13 +7,13 @@ option set, the toolchain integration, and two checker details.
 ## Compatibility contract
 
 Code that compiles cleanly under 6.0 with `stableTypeOrdering` on and no `ignoreDeprecations` set compiles identically
-under 7.0. 7.0 adopts every 6.0 default and turns every 6.0 deprecation into a hard error.
+under 7.0. 7.0 adopts every 6.0 default and turns every 6.0 deprecation into a removal.
 
 - **`target: es5`, `downlevelIteration`, `moduleResolution: node`/`node10`/`classic`, `module: amd`/`umd`/`systemjs`/
   `none`, `baseUrl`, `outFile`** — removed. A removed whole option reports `TS5102`; a removed option value reports
   `TS5108`.
 - **`esModuleInterop: false`, `allowSyntheticDefaultImports: false`, `alwaysStrict: false`** — rejected under `TS5108`.
-- **The `module` keyword in a namespace declaration, and `asserts` on an import** — errors.
+- **The `module` keyword in a namespace declaration, and the `assert` import attribute** — errors.
 - **`/// <reference no-default-lib />` is not respected under `skipDefaultLibCheck`.**
 - **A file argument with a `tsconfig.json` in the directory** needs `--ignoreConfig`.
 - **`stableTypeOrdering` is the behavior**, not an option to weigh. Type and symbol ordering is derived from object
@@ -21,9 +21,9 @@ under 7.0. 7.0 adopts every 6.0 default and turns every 6.0 deprecation into a h
 
 ## Checker changes
 
-- **Template-literal inference consumes a whole Unicode code point**, where 6.0 advanced one UTF-16 code unit and split
-  a supplementary-plane character into its surrogate halves. This breaks a type-level string utility that deliberately
-  modeled UTF-16 code units — a `Length<S>` counting surrogate halves counts differently.
+- **Template-literal inference across an empty placeholder consumes a whole Unicode code point**, where 6.0 advanced one
+  UTF-16 code unit and split a supplementary-plane character into its surrogate halves. This breaks a type-level string
+  utility that deliberately modeled UTF-16 code units — a `Length<S>` counting surrogate halves counts differently.
 
   ```ts
   type HeadTail<S> = S extends `${infer Head}${infer Tail}` ? [Head, Tail] : never;
@@ -41,8 +41,11 @@ under 7.0. 7.0 adopts every 6.0 default and turns every 6.0 deprecation into a h
 
 ## Toolchain
 
-- **7.0 ships no programmatic API.** The compiler is a binary and a language server, and the `typescript` package
-  exports nothing a tool can call. This is the constraint that decides whether a project can adopt 7.0 at all.
+- **7.0 drops the API a tool calls.** `require("typescript")` returns `{ version, versionMajorMinor }` and nothing else;
+  `createProgram` and the rest of the 6.0 surface are gone. The package does ship a `typescript/unstable/*` family —
+  `unstable/sync`, `unstable/async`, `unstable/fs`, `unstable/proto`, and `unstable/ast` with its submodules — and the
+  compiler team states the expectation that 7.1 carries a stable replacement. Until a tool targets the new surface, this
+  is the constraint that decides whether a project can adopt 7.0 at all.
 - **`@typescript/typescript6` re-exports the 6.0 API** and ships a `tsc6` executable, so both can be installed at once:
 
   ```json
@@ -75,5 +78,5 @@ under 7.0. 7.0 adopts every 6.0 default and turns every 6.0 deprecation into a h
   from 7.0 for CLI checking while the editor stays on 6.0 is the documented split.
 - **The JavaScript analysis in `.js` files was rewritten.** Constructor functions built from expando assignments,
   `@class`, `@enum`, Closure function-type syntax, postfix `!`, a standalone `?` type, and values used in type positions
-  all stop working. A JSDoc-typed JavaScript codebase needs the `CHANGES.md` list in `microsoft/typescript-go` — the
-  archived staging repository of the port, still readable — rather than a version bump.
+  all stop working. A JSDoc-typed JavaScript codebase needs the `CHANGES.md` list in `microsoft/typescript-go`, which
+  the compiler team maintains as the record of intentional differences, rather than a version bump.

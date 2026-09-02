@@ -26,8 +26,12 @@ hovered.
 - **Wrap both sides in a tuple to stop distribution**: `[T] extends [string] ? "s" : "o"` applied to `string | number`
   is `"o"`, evaluated once against the whole union. Reach for this whenever the question is about the union as a unit —
   "is this exactly `never`", "does this union contain only strings".
-- **`infer` binds inside the extends clause**, and takes a constraint since 4.7: `T extends `${infer N extends
-  number}` ? N : never`.
+- **`infer` binds inside the extends clause**, and takes a constraint since 4.7:
+
+  ```ts
+  type ToNumber<T> = T extends `${infer N extends number}` ? N : never;
+  ```
+
 - **`never` is the empty union.** A distributive conditional over `never` produces `never` without evaluating the
   branch, which is a common source of a rule that silently does nothing.
 
@@ -53,31 +57,33 @@ hovered.
 - **They are for a naming contract, not for string manipulation.** `` `on${Capitalize<K>}` `` to derive event-handler
   names, `` `${Method} ${Path}` `` to type a route table. Parsing a string into structure at the type level costs
   recursion depth and produces an unreadable error on failure.
-- **From TypeScript 7.0, inference consumes one Unicode code point at a time**, so a supplementary-plane character stays
-  whole. Any utility that counted UTF-16 code units gives different answers.
+- **From TypeScript 7.0, inference across an empty placeholder consumes one Unicode code point at a time**, so a
+  supplementary-plane character stays whole. Any utility that counted UTF-16 code units gives different answers.
 
 ## Recursion limits
 
-- **A non-tail-recursive conditional type stops at 100 instantiations** and reports
-  `TS2589: Type instantiation is excessively deep and possibly infinite`.
-- **A tail-recursive conditional type stops at 1000.** A conditional qualifies when its recursive instantiation is the
-  final operation:
+- **A tail-recursive conditional type reaches 1000 instantiations** and reports
+  `TS2589: Type instantiation is excessively deep and possibly infinite` past that. A conditional qualifies when its
+  recursive instantiation is the final operation:
 
   ```ts
-  // Tail position — qualifies, ceiling 1000.
+  // Tail position — qualifies, reaches 1000.
   type BuildTuple<N extends number, A extends unknown[] = []> = A["length"] extends N
       ? A
       : BuildTuple<N, [...A, unknown]>;
 
-  // Result is wrapped before it returns — does not qualify, ceiling 100.
+  // Result is wrapped before it returns — does not qualify, stops under 50.
   type Deep<N extends number, A extends unknown[] = []> = A["length"] extends N ? A : [...Deep<N, [...A, unknown]>];
   ```
 
+- **A conditional that wraps its recursive call stops far earlier than 1000** — under 50 for the `Deep` form above on
+  both 6.0 and 7.0, because each level spends the budget twice, once on the conditional and once on the tuple spread.
+
 - **The fix for `TS2589` is an accumulator.** Rewrite so the recursive call is in tail position and the work accumulates
   in a second type parameter. Where that does not fit, cap the depth explicitly with a counter parameter.
-- **A large union multiplies against everything it touches.** A conditional distributed over a 200-member union that
-  itself produces a union produces 200 results; two such in sequence produce 40,000. Union size, not nesting depth, is
-  what usually makes a build slow.
+- **A large union multiplies against everything it touches.** A conditional distributed over a 200-member union
+  evaluates 200 times, and a second conditional applied to each of those results multiplies again. Union size, not
+  nesting depth, is what usually makes a build slow.
 
 ## Nominal typing
 

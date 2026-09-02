@@ -14,8 +14,8 @@ Released July 2025. The last release on the 5.x line, and the one that fixes the
   it takes no future behavior, and it implies `--target es2023` where `nodenext` implies the floating `esnext`.
 - **`tsc --init` generates a small prescriptive config** instead of the annotated catalogue. It sets `module: nodenext`,
   `target: esnext`, `types: []`, `strict`, `verbatimModuleSyntax`, `isolatedModules`, `noUncheckedSideEffectImports`,
-  `moduleDetection: force`, `skipLibCheck`, `declaration`, `declarationMap`, `sourceMap`, and — above what `strict`
-  covers — `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`.
+  `moduleDetection: force`, `skipLibCheck`, `declaration`, `declarationMap`, `sourceMap`, `jsx: react-jsx`, and — above
+  what `strict` covers — `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`.
 
 ## Behavior changes
 
