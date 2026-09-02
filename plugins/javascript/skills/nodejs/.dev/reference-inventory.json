@@ -18,7 +18,8 @@
 		"Node.js API: Test Runner": "https://raw.githubusercontent.com/nodejs/node/v26.x/doc/api/test.md",
 		"npm CLI Changelog": "https://raw.githubusercontent.com/npm/cli/latest/CHANGELOG.md",
 		"npm Trusted Publishers": "https://raw.githubusercontent.com/npm/documentation/main/content/packages-and-modules/securing-your-code/trusted-publishers.mdx",
-		"undici README": "https://raw.githubusercontent.com/nodejs/undici/main/README.md"
+		"undici README": "https://raw.githubusercontent.com/nodejs/undici/main/README.md",
+		"npm Config Definitions": "https://raw.githubusercontent.com/npm/cli/latest/workspaces/config/lib/definitions/definitions.js"
 	},
-	"lastFetched": "2026-09-02T09:17:03.988Z"
+	"lastFetched": "2026-09-02T09:25:48.482Z"
 }
