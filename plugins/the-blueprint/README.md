@@ -29,7 +29,8 @@ surfaces codebase patterns for human correction before implementation, and enfor
   document
 - **Frame** — vertical slice phases with per-phase testing strategy → frame document
 - **Tasks** — decompose phases into sized, dependency-mapped work items → task breakdown
-- **task-creation** (standalone) — create tracked items in issue tracker
+- **task-creation** (standalone) — write the item for its reader, verify every claim in it, take approval → tracked
+  items
 
 Each stage builds on the previous one with explicit user approval gates. The pipeline preserves the reasoning behind
 decisions, so it stays discoverable months later when someone asks "why did we build it this way?"
@@ -129,22 +130,31 @@ batches, delete the old form) instead of forcing a vertical slice that can't lan
 
 ### tasks
 
-Decomposes frame phases into individually trackable work items. Each task gets a title, estimate, dependencies, expected
-artifact, and an AFK/HITL classification indicating whether it can run autonomously or needs a human at the keyboard.
-Descriptions anchor to durable contracts — existing types, interfaces, behavior — never to file paths or line numbers,
-so they stay actionable while the task waits in the tracker and the codebase moves under it. The task breakdown bridges
-the frame's vertical phases to the mechanical task creation in an issue tracker.
+Decomposes frame phases into individually trackable work items. Each task gets a title, an estimate, its dependencies,
+the artifact it must produce, and an AFK/HITL classification indicating whether it can run autonomously or needs a human
+at the keyboard. Sizing is enforced — no leaf task over 8 hours, 2–4 hours the target — and every frame phase must
+produce at least one task, so a phase nothing covers surfaces as a gap. What each task's description says belongs to
+`task-creation`; this skill owns only how the work is cut up.
 
 **Use when:** A frame document exists and you need to break phases into assignable, sized work items before creating
 tracker tasks.
 
 ### task-creation
 
-Creates individual tasks in issue trackers with tracker-agnostic field discovery, proper categorization, and native
-linking between related tasks. Standalone skill — not a DRAFT pipeline stage, but the natural next step after frame.
+Writes and reviews the work item itself. It first establishes which of two readers the item is for — a human
+implementer, who pays for volume, or an autonomous agent, which pays for absence — and lets that decide what goes in.
+Every claim is verified against the system before it is written: the failing path is run, the code is read before a
+cause is named, the artifact is pasted rather than paraphrased, and whatever could not be verified is marked as such.
+Each item names a location — the file, module, symbol, or failing test where the work lands — and carries acceptance
+criteria the implementer can see, each written so an observation decides pass or fail. Nothing reaches the tracker until
+the user approves the complete draft, every item in a batch included.
 
-**Use when:** Creating tasks from frame phases (pipeline mode) or creating standalone tasks outside the pipeline
-context.
+Standalone skill — not a DRAFT pipeline stage, but the terminus `tasks` hands off to, and a direct entry point for items
+that never came through the pipeline. Sizing and dependencies belong to `tasks`; field discovery, link types, and query
+syntax belong to the tracker's own skill.
+
+**Use when:** Writing or reviewing any tracked work item — bugs, features, chores — from a task breakdown (pipeline
+mode) or standalone.
 
 ### glossary
 
@@ -163,12 +173,18 @@ domain concepts. Inside DRAFT, it runs automatically — invoked from `alignment
 
 ### youtrack
 
-YouTrack issue tracker domain knowledge — data model, custom fields, query language, commands, linking, state machines,
-and tags. Provides the tracker-specific knowledge that task-creation lacks: field type taxonomy, required field
-mechanics, state machine constraints, and YouTrack's query/command syntax.
+YouTrack behavior as an agent meets it, rather than a restatement of the API reference: what a project configures rather
+than fixes, what a write changes besides the field it names, and which failures report success. It covers discovering a
+project's fields before writing to them, typing a custom field write, sending a query the server receives whole, moving
+a state by its transition name, recording time through work items, linking by link type, applying commands with a
+pre-flight and a read-back, and treating a tag as impermanent. The failure modes are the point: a create that applies
+the issue and drops the field writes, a command answering 200 with an empty body, a guard that refuses a transition the
+option list still offers, an empty result that proves nothing. Depth sits in two references — the query grammar and the
+command forms — because both are languages the agent writes from memory and both fail quietly.
 
-**Use when:** Creating, searching, or updating issues in YouTrack. Use alongside task-creation for issue creation —
-task-creation handles description quality, youtrack handles field correctness.
+**Use when:** Anything touches YouTrack — creating, searching, updating, linking, tagging, or connecting a client to an
+instance. Alongside task-creation for issue creation: task-creation owns what the item says, youtrack owns how the
+tracker takes it.
 
 ### diagramming
 
@@ -191,9 +207,10 @@ Each DRAFT skill prompts the user to proceed to the next stage on completion. Ap
 Discovery is optional — start there to stress-test an idea, or skip to alignment when the problem is already
 well-understood. Research is also optional — invoke when objective codebase findings are needed.
 
-task-creation is standalone — the natural endpoint of the pipeline, but also invocable directly for creating individual
-tasks without the full DRAFT flow. When working with YouTrack, the youtrack skill complements task-creation with
-tracker-specific domain knowledge.
+task-creation is standalone — the endpoint of the pipeline, but also invocable directly for writing or reviewing a
+single item without the full DRAFT flow. The boundary between the three work-item skills is fixed: tasks decides how the
+work is cut up, task-creation decides what each item says, and a tracker skill — youtrack for YouTrack — decides how the
+tracker is driven.
 
 diagramming is a cross-cutting companion — not a pipeline stage. Invoke alongside alignment or frame when creating
 visual artifacts, or standalone for any diagramming task.

@@ -11,13 +11,18 @@ Pipeline stages in order, each owning one artifact:
 - **`research`** — the research document, compiled by the lead from teammate findings
 - **`alignment`** — the alignment document, the ADRs, the ADR index, the glossary
 - **`frame`** — the frame document
-- **`tasks`** — the task breakdown
+- **`tasks`** — the task breakdown: sizing, dependencies, phase coverage, AFK/HITL, the tasks-document format
 
 Standalone, invocable outside the pipeline:
 
-- **`task-creation`** — tracker mechanics; the pipeline's terminus (`tasks` hands off to it) and a direct entry point
+- **`task-creation`** — what a written work item contains: the reader it targets, the verification behind every claim,
+  the location, the acceptance criteria, and the approval gate before anything is created; the pipeline's terminus
+  (`tasks` hands off to it) and a direct entry point
 - **`glossary`** — the vocabulary contract; read by `discovery`, written by `alignment`
-- **`youtrack`** — YouTrack domain knowledge; owns field correctness, `task-creation` owns description quality
+- **`youtrack`** — YouTrack behavior: what a project configures, what a write changes besides the field it names, and
+  which failures report success. Carries no tool inventory and no endpoint reference — the MCP server documents its own
+  tools and JetBrains documents its own API; both drift. Depth routed to `references/` for the query and command
+  languages only
 - **`diagramming`** — cross-cutting; invoked alongside `alignment` or `frame`
 
 ## Agents
@@ -37,6 +42,10 @@ Standalone, invocable outside the pipeline:
   first.
 - **User approval gates every stage transition.** A stage that advances on its own removes the correction point the
   pipeline exists to provide.
+- **One rule has one home across `tasks`, `task-creation`, and `youtrack`.** `task-creation` owns work-item content,
+  `tasks` owns decomposition, `youtrack` owns tracker mechanics. Never restate a content rule in `tasks`, a sizing rule
+  in `task-creation`, or a YouTrack mechanic in either — name the owning skill and stop. A rule that lives in two files
+  is a defect, not redundancy: the copies drift apart under separate edits, and the reader obeys whichever one loaded.
 
 ## Critical Constraints
 

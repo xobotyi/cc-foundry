@@ -66,9 +66,11 @@ Planning is either too shallow or too detailed. This plugin implements the **DRA
 Alignment → Frame → Tasks), a pipeline whose artifacts are consumable by both humans and agents. Discovery stress-tests
 ideas, research investigates the codebase blind to intent, alignment surfaces patterns for human correction, frame
 enforces vertical-slice implementation phases, and tasks decompose phases into sized work items. Each stage builds on
-the previous with explicit approval gates. Four standalone skills sit alongside the pipeline: `task-creation` (writes
-individual tracker items), `glossary` (shared project vocabulary that prevents naming drift), `youtrack` (YouTrack data
-model, queries, and commands), and `diagramming` (Excalidraw and Mermaid with visual design principles).
+the previous with explicit approval gates. Four standalone skills sit alongside the pipeline: `task-creation` (what a
+tracked item says — the reader it targets, the verification behind every claim, the location and acceptance criteria,
+and the approval gate before creation), `glossary` (shared project vocabulary that prevents naming drift), `youtrack`
+(YouTrack behavior an agent has to know: what a project configures, what a write changes besides the field it names, and
+which failures report success), and `diagramming` (Excalidraw and Mermaid with visual design principles).
 
 ```
 /plugin install the-blueprint
