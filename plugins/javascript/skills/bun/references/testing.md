@@ -157,8 +157,10 @@ what an earlier file on the same worker left behind.
 
 Without timings, file `i` of the path-sorted list goes to shard `(i mod n) + 1` — balanced by count, not duration.
 
-`--timings=<path>` reads recorded per-file durations so both `--shard` and `--parallel` balance by wall time.
-`--update-timings` writes them. The file is plain JSON, slowest first, so it doubles as a slow-test report:
+`--timings=<path>` (from 1.4.0) reads recorded per-file durations so both `--shard` and `--parallel` balance by wall
+time. `--update-timings` writes them. Below 1.4.0 both flags are accepted and do nothing — no file is written and
+sharding stays balanced by count, with no warning. The file is plain JSON, slowest first, so it doubles as a slow-test
+report:
 
 ```json
 { "version": 1, "files": { "test/integration/build.test.ts": 41234, "src/router.test.ts": 112 } }

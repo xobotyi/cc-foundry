@@ -182,8 +182,14 @@ matching nothing warns; for `add`, `remove`, `update`, `prune`, and `pm licenses
 
 ## Overrides
 
-`overrides` in `package.json` pins a transitive version. From 1.4.0 the nested forms all work — npm's object form,
-yarn's `a/b`, and pnpm's `a>b` — and an override may be scoped to a range:
+`overrides` in `package.json` pins a transitive version. The flat form works throughout:
+
+```json
+{ "overrides": { "qs": "6.13.0" } }
+```
+
+From 1.4.0 the nested forms also work — npm's object form, yarn's `a/b`, and pnpm's `a>b` — and an override may be
+scoped to a range:
 
 ```json
 {
@@ -193,6 +199,9 @@ yarn's `a/b`, and pnpm's `a>b` — and an override may be scoped to a range:
   }
 }
 ```
+
+Below 1.4.0 a nested override warns `Bun currently does not support nested "overrides"` and resolves the unpinned
+version, so the install succeeds while the pin does nothing.
 
 ## `bunfig.toml` install keys
 

@@ -15,13 +15,15 @@ A route key maps to one of five value shapes. Each has different caching, `404`,
 - **`Bun.file(path)` or `new Response(Bun.file(path))`** — read per request. Sends `Last-Modified`, honors
   `If-Modified-Since` and `If-None-Match` with `304`, honors `Range` with `206`, and answers `404` when the file is
   gone.
-- **`{ dir: "./public" }`** — serves a directory tree. The route key must end in `/*`.
+- **`{ dir: "./public" }`** (from 1.4.0) — serves a directory tree. The route key must end in `/*`. Below 1.4.0 the
+  object is read as a framework config and `Bun.serve` throws at startup asking for React packages, which names nothing
+  about the route.
 
 `new Response(await Bun.file(p).bytes())` and `new Response(Bun.file(p))` are not the same route. The first buffers the
 bytes at startup: no filesystem I/O per request, automatic `ETag`, but a missing file is a startup error rather than a
 runtime `404`, and the whole file sits in RAM. The second streams from disk through `sendfile(2)`.
 
-## Directory routes
+## Directory routes (from 1.4.0)
 
 Bun percent-decodes the path once after the prefix and opens it relative to `dir`. A non-canonical path — one containing
 `.`, `..`, an empty segment, `%2F`, or a `%XX` encoding a character legal in a path segment — is rejected with `404`. On
