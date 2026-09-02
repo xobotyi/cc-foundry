@@ -23,8 +23,10 @@ Which operations see a hole is not consistent, and this is the source of the bug
 
 - **Skipped**: `map` (which preserves the hole in the output), `forEach`, `filter`, `some`, `every`, `reduce`,
   `Object.keys`, `for...in`, object spread.
-- **Treated as `undefined`**: indexed access, `for...of`, array spread, `Array.from`, `includes`, `join`, `sort`, and
-  every ES2023 copying method (`toSorted`, `toReversed`, `toSpliced`, `with`).
+- **Treated as `undefined`**: indexed access, `for...of`, array spread, `Array.from`, `includes`, `join`, and every
+  ES2023 copying method (`toSorted`, `toReversed`, `toSpliced`, `with`).
+- **`sort` does neither.** It skips holes and compacts them past every value, `undefined` included, so `[1, , 3].sort()`
+  keeps its hole at index 2 while the values move down.
 
 `Array(3).map(() => 1)` returns three empty slots and calls the callback zero times. `[...Array(3)]` and
 `Array.from({ length: 3 })` both produce `[undefined, undefined, undefined]` and are the correct way to build a dense

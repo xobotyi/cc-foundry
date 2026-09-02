@@ -12,8 +12,7 @@ engines a project targets can run it.
 `using` and `await using` declarations, `Symbol.dispose` and `Symbol.asyncDispose`, `DisposableStack`,
 `AsyncDisposableStack`, and `SuppressedError`.
 
-Engine floors: Chrome 134, Firefox 141, Node.js 24. No Safari 26.x release implements it; WebKit enables
-`ExplicitResourceManagementEnabled` by default in trunk, so Safari 27 is the earliest Safari that can. A browser target
+Engine floors: Chrome 134, Firefox 141, Node.js 24. No Safari 26.x release implements it, so an engine baseline
 including Safari 26 has no unflagged implementation.
 
 Semantics, verified by execution:
@@ -39,8 +38,8 @@ Semantics, verified by execution:
 The replacement date and time API: `Temporal.PlainDate`, `PlainTime`, `PlainDateTime`, `ZonedDateTime`, `Instant`,
 `Duration`, and the plain year/month types. Immutable values, explicit time zones and calendars, no month-zero indexing.
 
-Engine floors: Chrome 144, Firefox 139, Node.js 26. No Safari 26.x release implements it; WebKit enables
-`TemporalEnabled` by default in trunk, so Safari 27 is the earliest Safari that can.
+Engine floors: Chrome 144, Firefox 139, Node.js 26. No Safari 26.x release implements it; it is enabled in Safari
+Technology Preview, so Safari 27 is the earliest that can.
 
 ## Joint Iteration
 

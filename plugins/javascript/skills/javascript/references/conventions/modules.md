@@ -64,10 +64,9 @@ across. Deferring the read into a function hides the cycle rather than removing 
 
 ## Specifiers
 
-- **Include the file extension.** `"./user.js"`, never `"./user"`. Extensionless resolution is a bundler and CommonJS
-  convention, not module semantics, and it varies by runtime.
-- **Do not import a directory.** `"./utils"` resolving to `"./utils/index.js"` is the same non-standard resolution.
-- **Bare specifiers need a resolver** — an import map in a browser, or the package manager's node_modules resolution.
+**Include the file extension in every relative specifier** — `"./user.js"`, never `"./user"`. Extensionless and
+directory specifiers are a bundler and CommonJS convention rather than module semantics. Resolution past that point
+belongs to the `nodejs` and `bun` skills.
 
 ## Import attributes
 

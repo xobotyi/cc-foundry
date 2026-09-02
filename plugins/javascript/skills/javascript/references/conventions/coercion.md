@@ -1,8 +1,5 @@
 # Coercion, Equality, and Values
 
-Every claim here is reproducible in a current engine. The failures in this file compile, run, and produce a wrong
-answer.
-
 ## The four equality algorithms
 
 - **`==` (IsLooselyEqual)** — coerces. Same type compares as `===`. `null` and `undefined` are equal to each other and
@@ -33,7 +30,7 @@ without a `-0` in the input. `~~(-0)` and `-0 << 2 >> 2` lose the sign, because 
 - **`toFixed` rounds the binary double, not the decimal you wrote.** `(1.005).toFixed(2)` is `"1.00"` and
   `(1.45).toFixed(1)` is `"1.4"`, because neither decimal is exactly representable. For money, hold integer minor units
   or a decimal library, and format with `Intl.NumberFormat`.
-- **`Number.MAX_SAFE_INTEGER + 2` and `+ 3` are the same value.** Above 2^53 − 1, integer arithmetic silently loses
+- **`Number.MAX_SAFE_INTEGER + 1` and `+ 2` are the same value.** Above 2^53 − 1, integer arithmetic silently loses
   precision. Use `BigInt` for identifiers and counters that can exceed it.
 - **`Number.isInteger(1e100)` is `true`.** It tests "has no fractional part", not "is a safe integer". Use
   `Number.isSafeInteger`.
@@ -69,8 +66,11 @@ without a `-0` in the input. `~~(-0)` and `-0 << 2 >> 2` lose the sign, because 
 - **`Object.assign` triggers setters on the target**, spread does not. That difference decides which one is safe when
   the target is a reactive object.
 - **`structuredClone` is deep but not universal.** It throws `DataCloneError` on functions, symbols, and DOM nodes; it
-  discards the prototype, so a class instance clones to a plain object; it preserves `Map`, `Set`, `Date`, `RegExp`,
-  typed arrays, and cycles; and it preserves a null prototype.
+  discards the prototype, so a class instance clones to a plain object; and it preserves `Map`, `Set`, `Date`, `RegExp`,
+  typed arrays, and cycles.
+- **A null-prototype dictionary does not survive `structuredClone`.** The clone is an ordinary object carrying
+  `Object.prototype`, so cloning an `Object.create(null)` map reopens every collision the null prototype closed. Rebuild
+  it with `Object.assign(Object.create(null), clone)`, or hold the data in a `Map`, which clones as a `Map`.
 
 ## Prototype pollution
 
