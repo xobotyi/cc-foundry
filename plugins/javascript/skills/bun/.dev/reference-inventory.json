@@ -1,25 +1,25 @@
 {
-  "sources": {
-    "Bun LLMs Full Documentation": "https://bun.sh/docs/llms-full.txt",
-    "Bun APIs Overview": "https://bun.com/docs/runtime/bun-apis.md",
-    "Bun HTTP Server (Bun.serve)": "https://bun.com/docs/runtime/http/server.md",
-    "Bun Shell API (Bun.$)": "https://bun.com/docs/runtime/shell.md",
-    "Bun File I/O (Bun.file, Bun.write)": "https://bun.com/docs/runtime/file-io.md",
-    "Bun Child Process (Bun.spawn)": "https://bun.com/docs/runtime/child-process.md",
-    "Bun Bundler": "https://bun.com/docs/bundler/index.md",
-    "Bun Macros": "https://bun.com/docs/bundler/macros.md",
-    "Bun Test Runner": "https://bun.com/docs/test/index.md",
-    "Bun Test Writing": "https://bun.com/docs/test/writing-tests.md",
-    "Bun Test Mocks": "https://bun.com/docs/test/mocks.md",
-    "Bun Configuration (bunfig.toml)": "https://bun.com/docs/runtime/bunfig.md",
-    "Bun Node.js Compatibility": "https://bun.com/docs/runtime/nodejs-compat.md",
-    "Bun Package Manager (bun install)": "https://bun.com/docs/pm/cli/install.md",
-    "Bun SQLite": "https://bun.com/docs/runtime/sqlite.md",
-    "Bun Workers": "https://bun.com/docs/runtime/workers.md",
-    "Bun WebSockets": "https://bun.com/docs/runtime/http/websockets.md",
-    "Bun Environment Variables": "https://bun.com/docs/runtime/environment-variables.md",
-    "Bun Plugins": "https://bun.com/docs/runtime/plugins.md",
-    "Bun Fullstack Dev Server": "https://bun.com/docs/bundler/fullstack.md"
-  },
-  "lastFetched": "2026-02-16T13:19:42.784Z"
+	"sources": {
+		"Bun 1.4 release notes (per-feature since-version anchors and every behavior change)": "https://bun.com/blog/bun-v1.4.md",
+		"Bun-native API index": "https://bun.com/docs/runtime/bun-apis.md",
+		"HTTP server (Bun.serve options, lifecycle, idleTimeout, HTTP/2 and HTTP/3)": "https://bun.com/docs/runtime/http/server.md",
+		"HTTP routing (route precedence, static and file and directory routes)": "https://bun.com/docs/runtime/http/routing.md",
+		"Server WebSockets (upgrade, per-socket data, pub/sub, backpressure, limits)": "https://bun.com/docs/runtime/http/websockets.md",
+		"File I/O (Bun.file, Bun.write, FileSink)": "https://bun.com/docs/runtime/file-io.md",
+		"Shell (Bun.$ escaping model, redirection, builtins, injection boundaries)": "https://bun.com/docs/runtime/shell.md",
+		"Child processes and PTY (Bun.spawn, Bun.spawnSync, Bun.Terminal, cgroups)": "https://bun.com/docs/runtime/child-process.md",
+		"SQLite driver (bun:sqlite statement cache, strict mode, WAL, close semantics)": "https://bun.com/docs/runtime/sqlite.md",
+		"SQL clients (Bun.sql adapters, fragments, pooling, reserved connections)": "https://bun.com/docs/runtime/sql.md",
+		"Test runner (bun:test CLI surface, concurrency, reporters, coverage)": "https://bun.com/docs/test.md",
+		"Test mocks (mock, spyOn, mock.module, reset semantics)": "https://bun.com/docs/test/mocks.md",
+		"Parallel and isolated test runs (--parallel, --isolate, --shard, --timings)": "https://bun.com/docs/test/parallel.md",
+		"Bundler (Bun.build options, targets, splitting, failure semantics)": "https://bun.com/docs/bundler.md",
+		"Single-file executables (--compile, cross-compilation, embedded assets)": "https://bun.com/docs/bundler/executables.md",
+		"Package manager (bun install, frozen lockfile, minimum release age)": "https://bun.com/docs/pm/cli/install.md",
+		"Isolated installs and linker defaults (configVersion, global virtual store)": "https://bun.com/docs/pm/isolated-installs.md",
+		"Lifecycle scripts (trustedDependencies replacement semantics)": "https://bun.com/docs/pm/lifecycle.md",
+		"bunfig.toml (runtime, test, install, and run configuration keys)": "https://bun.com/docs/runtime/bunfig.md",
+		"Node.js compatibility (per-module status against Node 26)": "https://bun.com/docs/runtime/nodejs-compat.md"
+	},
+	"lastFetched": "2026-09-02T09:03:05.970Z"
 }
