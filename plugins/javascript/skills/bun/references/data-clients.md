@@ -4,9 +4,10 @@ Depth on the data clients Bun bundles: `bun:sqlite`, `Bun.sql`, `Bun.redis`, and
 
 ## `bun:sqlite`
 
-`new Database(path, options)` from `bun:sqlite`. Constructor options: `readonly`, `create`, `strict`, `safeIntegers`.
-`":memory:"`, `""`, and no argument all open an in-memory database. `import db from "./app.db" with { type: "sqlite" }`
-is equivalent to `new Database("./app.db")`.
+`new Database(path, { create: true, strict: true })` from `bun:sqlite` — open with `strict: true`, for the reason in the
+next section. The other constructor options are `readonly` and `safeIntegers`. `":memory:"`, `""`, and no argument all
+open an in-memory database. `import db from "./app.db" with { type: "sqlite" }` is equivalent to
+`new Database("./app.db")`, which means it opens without `strict`.
 
 ### `strict` changes parameter binding, and silence is the default
 
