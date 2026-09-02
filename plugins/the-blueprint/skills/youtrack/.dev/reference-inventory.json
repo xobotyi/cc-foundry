@@ -1,14 +1,26 @@
 {
-  "sources": {
-    "YouTrack: Custom Fields Overview": "https://www.jetbrains.com/help/youtrack/server/custom-fields.html",
-    "YouTrack: Manage Custom Fields Per Project": "https://www.jetbrains.com/help/youtrack/server/manage-custom-fields-per-project.html",
-    "YouTrack: Required Custom Fields": "https://www.jetbrains.com/help/youtrack/server/required-custom-fields.html",
-    "YouTrack: State Machine Rules Per Issue Type": "https://www.jetbrains.com/help/youtrack/server/state-machine-per-issue-type.html",
-    "YouTrack: Search Query Reference": "https://www.jetbrains.com/help/youtrack/server/search-and-command-attributes.html",
-    "YouTrack: Command Reference": "https://www.jetbrains.com/help/youtrack/server/command-reference.html",
-    "YouTrack: Issue Linking": "https://www.jetbrains.com/help/youtrack/server/link-issues.html",
-    "YouTrack: Workflow Tutorial": "https://www.jetbrains.com/help/youtrack/server/workflow-tutorial.html",
-    "YouTrack: Tag Issues": "https://www.jetbrains.com/help/youtrack/server/using-tags.html"
-  },
-  "lastFetched": "2026-02-28T17:46:36.429Z"
+	"sources": {
+		"YouTrack Cloud: Remote MCP Server": "https://www.jetbrains.com/help/youtrack/cloud/model-context-protocol-server.html",
+		"YouTrack DevPortal: Predefined MCP Tools": "https://www.jetbrains.com/help/youtrack/devportal/predefined-ai-tools.html",
+		"YouTrack DevPortal: MCP Tools": "https://www.jetbrains.com/help/youtrack/devportal/ai-tools.html",
+		"YouTrack DevPortal: Fields Syntax": "https://www.jetbrains.com/help/youtrack/devportal/api-fields-syntax.html",
+		"YouTrack DevPortal: Query Syntax": "https://www.jetbrains.com/help/youtrack/devportal/api-query-syntax.html",
+		"YouTrack DevPortal: Custom Fields in REST API": "https://www.jetbrains.com/help/youtrack/devportal/api-concept-custom-fields.html",
+		"YouTrack DevPortal: Pagination": "https://www.jetbrains.com/help/youtrack/devportal/api-concept-pagination.html",
+		"YouTrack DevPortal: Issues Resource": "https://www.jetbrains.com/help/youtrack/devportal/resource-api-issues.html",
+		"YouTrack DevPortal: Create an Issue and Set Custom Fields": "https://www.jetbrains.com/help/youtrack/devportal/api-howto-create-issue-with-fields.html",
+		"YouTrack DevPortal: Update Issue Custom Fields": "https://www.jetbrains.com/help/youtrack/devportal/api-how-to-update-custom-fields-values.html",
+		"YouTrack DevPortal: Commands Resource": "https://www.jetbrains.com/help/youtrack/devportal/resource-api-commands.html",
+		"YouTrack DevPortal: Command Suggestions Resource": "https://www.jetbrains.com/help/youtrack/devportal/resource-api-commands-assist.html",
+		"YouTrack DevPortal: Issue Link Types Resource": "https://www.jetbrains.com/help/youtrack/devportal/resource-api-issueLinkTypes.html",
+		"YouTrack DevPortal: 400 Bad Request Without Required Field Value": "https://www.jetbrains.com/help/youtrack/devportal/api-troubleshoot-missing-type.html",
+		"YouTrack DevPortal: 500 Server Error When Updating a Custom Field": "https://www.jetbrains.com/help/youtrack/devportal/api-troubleshoot-incorrect-field-type.html",
+		"YouTrack DevPortal: State-machine Rules": "https://www.jetbrains.com/help/youtrack/devportal/state-machine-per-issue-type.html",
+		"YouTrack Cloud: Search Query Reference": "https://www.jetbrains.com/help/youtrack/cloud/search-and-command-attributes.html",
+		"YouTrack Cloud: Command Reference": "https://www.jetbrains.com/help/youtrack/cloud/command-reference.html",
+		"YouTrack Cloud: Required Custom Fields": "https://www.jetbrains.com/help/youtrack/cloud/required-custom-fields.html",
+		"YouTrack Cloud: Custom Field Types": "https://www.jetbrains.com/help/youtrack/cloud/supported-custom-field-types.html",
+		"YouTrack Cloud: Link Issues": "https://www.jetbrains.com/help/youtrack/cloud/link-issues.html"
+	},
+	"lastFetched": "2026-09-02T13:42:19.502Z"
 }
