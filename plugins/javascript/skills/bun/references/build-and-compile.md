@@ -100,8 +100,8 @@ an error is thrown.
 `--target bun-<os>-<arch>[-musl]`, segments in any order: `bun-linux-x64`, `bun-linux-arm64`, `bun-linux-x64-musl`,
 `bun-linux-arm64-musl`, `bun-windows-x64`, `bun-windows-arm64`, `bun-darwin-x64`, `bun-darwin-arm64`.
 
-From 1.4.0 x64 ships one binary that targets Nehalem (SSE4.2) and picks AVX2/AVX-512 paths at runtime. The `-baseline`
-and `-modern` suffixes still parse and resolve to the same binary, so there is no CPU to choose for.
+From 1.4.0 x64 releases ship only the baseline build; the separate `-march=haswell` build is gone. The `-baseline` and
+`-modern` suffixes still parse and resolve to that same binary, so there is no CPU choice left to make.
 
 `--compile` rejects `--outdir` (use `outfile`), `--public-path`, `--target=node`, `--target=browser` without an HTML
 entrypoint, and `--no-bundle`.
@@ -131,8 +131,9 @@ directory tree — `existsSync`, `statSync`, `lstatSync`, `accessSync`, `readdir
 `withFileTypes` and `recursive` all work — so a static-file server that enumerates a directory at startup runs unchanged
 inside a binary.
 
-`Bun.isStandaloneExecutable` reports whether the process came from `--compile`. Prefer it over
-`Bun.embeddedFiles.length > 0`, which allocates a `Blob` per embedded file.
+`Bun.isStandaloneExecutable` (from 1.4.0) reports whether the process came from `--compile`. Prefer it over
+`Bun.embeddedFiles.length > 0`, which allocates a `Blob` per embedded file. On 1.3.x it is `undefined`, which reads as
+"not standalone" inside a compiled binary — test `Bun.embeddedFiles.length` there instead.
 
 A `bun:sqlite` database imported with `with { type: "sqlite" }` is resolved relative to the **process working
 directory**, not the binary. A binary at `/usr/bin/hello` run from `/home/me` opens `/home/me/my.db`.

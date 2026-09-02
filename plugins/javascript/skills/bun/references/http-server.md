@@ -10,8 +10,8 @@ A route key maps to one of five value shapes. Each has different caching, `404`,
   `Request` with `params` and `cookies`. Second argument is the `Server`.
 - **Per-method object** — `{ GET: handler, POST: handler }`. A `HEAD` request falls to the `GET` handler when no `HEAD`
   key exists (from 1.4.0; before that it fell through to the next route or `404`).
-- **`Response` instance** — dispatched with zero allocation after startup, cached for the server's lifetime, and about
-  15% faster than returning the same object from a handler. `server.reload()` is the only way to change it.
+- **`Response` instance** — dispatched with zero allocation after startup and cached for the server's lifetime.
+  `server.reload()` is the only way to change it.
 - **`Bun.file(path)` or `new Response(Bun.file(path))`** — read per request. Sends `Last-Modified`, honors
   `If-Modified-Since` and `If-None-Match` with `304`, honors `Range` with `206`, and answers `404` when the file is
   gone.
@@ -78,7 +78,7 @@ last reference closes.
 
 ## HTTP/2 and HTTP/3
 
-Both are experimental in `Bun.serve`.
+Both are experimental in `Bun.serve` through 1.4.0, whose release notes say not to ship `http3: true` to production.
 
 - **`http2: true`** — serves HTTP/2 on the same port with the same routes. With `tls`, ALPN picks the protocol per
   connection. Without `tls`, connections opening with the HTTP/2 preface get HTTP/2 and the rest get HTTP/1.1.
@@ -93,23 +93,8 @@ Server push and response trailers are absent, so gRPC does not serve over `Bun.s
 ## WebSockets
 
 The `websocket` handler object is declared once per server, not per socket — this is why `ServerWebSocket` is not an
-`EventTarget`.
-
-```ts
-Bun.serve({
-  fetch(req, server) {
-    if (server.upgrade(req, { data: { userId }, headers: { "Set-Cookie": cookie } })) return;
-    return new Response("Upgrade failed", { status: 400 });
-  },
-  websocket: {
-    data: {} as { userId: string },
-    open(ws) {},
-    message(ws, message) {},
-    close(ws, code, reason) {},
-    drain(ws) {},
-  },
-});
-```
+`EventTarget`. Its handlers are `open`, `message`, `close`, and `drain`, plus a `data` property that types `ws.data`.
+`server.upgrade(req, { data, headers })` seeds that data and sets handshake response headers.
 
 - **Type `ws.data` through the `data` property** on the handler object, never through a type parameter on `Bun.serve`.
 - **A successful `upgrade()` must return `undefined`**, not a `Response`.
