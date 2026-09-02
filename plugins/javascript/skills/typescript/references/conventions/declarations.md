@@ -73,8 +73,8 @@ files, or a build that wants a non-TypeScript tool to produce declarations.
 - **Compile the library with `strict`.** A declaration emitted without `strictNullChecks` can contain an
   `interface Sub extends Super` relationship that is an error in a consumer's strict project — and it is very hard to
   write code that breaks only when `strict` is off.
-- **Set `target` to the lowest ECMAScript version the library supports**, because `target` also selects `lib`, and a
-  higher `lib` lets the source reference globals an older consumer runtime lacks.
+- **Set `target` to the lowest ECMAScript version the library supports**, ES2015 being the floor from 6.0, because
+  `target` also selects `lib`, and a higher `lib` lets the source reference globals an older consumer runtime lacks.
 - **`typesVersions` selects a declaration tree by consumer TypeScript version.** It applies only at the package's
   external entry points; imports inside the package ignore it. DefinitelyTyped tests only against releases less than two
   years old, which bounds how far back a published package is worth supporting.

@@ -21,7 +21,7 @@ Released November 2024. The release that makes one source tree runnable in place
 
   ```ts
   import * as foo from "./foo.ts"; // rewritten to "./foo.js"
-  import * as a from "./foo"; // untouched
+  import * as a from "./foo.js"; // untouched
   import * as b from "some-package/file.ts"; // untouched
   import * as d from "#/file.ts"; // untouched
   ```

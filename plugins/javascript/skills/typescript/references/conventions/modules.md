@@ -23,7 +23,9 @@ config, joined by project references.
   `require()` of ESM. `node20` implied `target: es2023` on 5.9 and a 6.0 compiler resolves the release default target
   instead, so set `target` explicitly rather than relying on either.
 - **Library published to npm** — `"module": "node18"` with `"declaration": true`, `"verbatimModuleSyntax": true`,
-  `"rootDir": "src"`, `"outDir": "dist"`, and `target` set to the **lowest** ECMAScript version the library supports.
+  `"rootDir": "src"`, `"outDir": "dist"`, and `target` set to the **lowest** ECMAScript version the library supports,
+  ES2015 being the floor from 6.0. Set `"type": "module"` in `package.json` or write `.mts` sources: without one of the
+  two the files emit as CommonJS and `verbatimModuleSyntax` rejects every `import` in the tree (`TS1295`, `TS1287`).
   Node.js resolution is the strictest of the hosts, so satisfying it satisfies the bundlers too.
 - **Library bundled before publishing** — `"module": "esnext"` with `moduleResolution: bundler` is acceptable only if
   the declaration files are bundled by the same tool. A bundled `.js` plus per-file `.d.ts` emits declaration imports
@@ -51,7 +53,8 @@ to decide the format of each output file.
 
 - **A relative specifier carries the output extension.** In a `nodenext` project, `import { add } from "./math.mjs"`
   resolves to `src/math.mts`, because `dist/main.mjs` will load `dist/math.mjs`. Writing `./math.ts` is an error unless
-  `allowImportingTsExtensions` is set, which requires `noEmit` or `emitDeclarationOnly`.
+  `allowImportingTsExtensions` is set, which requires one of `noEmit`, `emitDeclarationOnly`, or
+  `rewriteRelativeImportExtensions` (`TS5096`).
 - **`rewriteRelativeImportExtensions` (5.7) lets one tree do both.** Source is written with `.ts` extensions so a
   stripping runtime can execute it directly, and emit rewrites those to `.js`. Only relative, non-declaration specifiers
   are rewritten — a `paths` alias, a bare package specifier, a `#`-prefixed subpath import, and a computed `import()`
