@@ -1,382 +1,219 @@
 ---
 name: task-creation
 description: >-
-  Task creation for issue trackers — structured descriptions, acceptance criteria, field
-  categorization, and tracker linking. Invoke whenever task involves creating work items in any
-  issue tracker — bugs, features, stories, tasks, or any tracked work from standalone requests
-  or decomposition documents.
+  Write and review work items in an issue tracker: establish which reader the item is for, verify every claim it
+  makes against the system, and give the implementer a location and acceptance criteria. Sizing and decomposition
+  belong to tasks.
+when_to_use: >-
+  Invoke whenever a work item is written, reviewed, or filed in an issue tracker — a bug, a feature, a story, a chore,
+  a task breakdown being turned into tracked items, or an item drafted for an autonomous coding agent to pick up. Also
+  invoke on the symptoms: an implementer asks a question the item should have answered, an agent edits the wrong
+  files, a report cannot be reproduced, a description restates conventions the repository already states, a tracker
+  field is about to be set to a guessed value. Covers what the item contains and the gate before it is created;
+  sizing, dependencies, and phase coverage belong to tasks, and field discovery, link types, and query syntax to the
+  tracker's own skill — youtrack for YouTrack.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Task Creation
+**A work item has one reader, and the two possible readers pay opposite costs.** A human implementer picks the item up
+later and pays for volume: unstructured and over-long prose is what developers name among the problems that most delay a
+fix. An autonomous agent is handed the item directly and pays for absence: a large share of real issues are
+underspecified for one, and naming the files a change touches is the single largest measured lift in its success rate.
+The opposite costs — over-specification to an agent, under-specification to a human — are not established, so no rule
+here trades on them. Establish which reader the item is for, and let that decide what goes in.
 
-Create well-formed tasks in an issue tracker. The input is either a decomposition document (from the pipeline) or a
-standalone request from a user. The output is a tracked task with enough context for an implementer to start work
-without asking questions.
+**Write only what was run or read.** Completing a missing section trades absence for error: the item stops failing for
+what it omits and starts failing for what it asserts, and a machine writer buys structural completeness while
+reproducibility barely moves. Completeness is not accuracy. Plausibility survives a style checklist, so the check is
+verification against the system — run the path, read the code, capture the output — and whatever could not be verified
+is marked as such inside the item.
 
-## When to Use
+**A filed item cannot answer a question.** Interrogating a human recovers most of what underspecification costs, and a
+model cannot reliably tell an underspecified task from a complete one. Two consequences hold together: everything the
+implementer needs is front-loaded, because the queue has nobody to ask, and the writer cannot trust its own judgement
+that the item is complete, which is what the approval gate is for.
 
-**From the pipeline:** After `frame` produces a frame document with vertical slice phases, this skill handles creating
-tasks from those phases in the issue tracker with proper fields, categorization, and linking.
+## Establish the reader before drafting
 
-**Standalone:** When a user requests a task directly — "create a bug for the pagination issue" or "add a task to upgrade
-the dependency." No decomposition document needed; gather context from the conversation.
+- **The human implementer is the default reader.** Write for a person picking the item up later, including when the
+  assignment is unknown.
+- **Select the agent reader only on a signal that the work goes to an agent** — an explicit assignment to a coding
+  agent, an AFK classification in a task breakdown, or a queue an agent drains. Absent one of those, the reader is the
+  human implementer. The AFK and HITL classification itself belongs to `tasks`.
+- **The readers differ on volume, never on truth.** Nothing in the reader decision licenses an unverified claim for
+  either one.
 
-## Creating a Task
+## Verify the claim before writing it
 
-### Step 1: Gather Context
+- **Run the failing path before filing a defect.** Wrong reproduction steps are the most damaging defect a report can
+  carry, and a report nobody can reproduce does not fail fast — it lingers. Reporters find reproduction steps the
+  hardest element to supply and an agent can simply run the path, which turns the hardest element into the cheapest one.
+- **Never invent an artifact.** No screenshot of an interface that was not opened, no error text that was not produced,
+  no version number that was not checked, no file that was not read.
+- **Read the code before claiming a cause.** An unconfirmed root cause is written as a hypothesis or left out.
+- **Paste the artifact rather than paraphrasing it** — exact error text, the failing command with its output, the stack
+  trace, the log excerpt. Reports that carry the artifact itself are associated with shorter resolution times across
+  large issue corpora; whether the artifact causes that is not established, and a paraphrase is not the artifact either
+  way.
+- **Mark what was not verified.** Name the step not run, the environment not tested, the claim not confirmed. An item
+  that shows its gaps is cheaper than one that hides them.
+- **Take the type from the contract, not from the symptom.** "Something is broken, so it is a bug" is the reflex that
+  misfiles a third of everything filed as a bug. The test is whether the behavior violates a stated contract —
+  documentation, a test, an API guarantee — or only disappoints an expectation.
+- **Search for an existing item, then stop.** Duplicate-hunting is a cheap check, never a gate: developers do not rank
+  duplicates among their costly problems, and a duplicate measurably carries information the master report lacks. Search
+  the symptom and the exact error string; a second report on a known defect is merged into it, and holding the item back
+  for an exhaustive search costs more than the duplicate does.
 
-This is an active discovery step — use available tools, don't rely on inference.
+## Give the item a location
 
-1. **Identify the tracker** — Check which task tracking tools are available (MCP servers, APIs, CLI integrations). If
-   multiple trackers are present, ask the user which one to use. Don't assume.
-2. **Discover the project** — Use the tracker's project listing or configuration tools to find the target project. Infer
-   from conversation context (directory, subsystem, prior tasks) when possible, but validate against the tracker. If
-   ambiguous, ask the user.
-3. **Explore project configuration** — Query the tracker for the project's field setup:
-   - What fields exist (type, priority, severity, component, sprint, etc.)
-   - Which fields are required vs optional
-   - What values are valid for each field (the tracker defines these, not this skill) Don't hardcode assumptions — field
-     names, types, and valid values differ across projects and trackers.
-4. **Determine task type** — Based on the user's intent and the project's available types, select the closest match:
-   - Something is broken → bug/defect type
-   - Implementation work → task/story type
-   - New capability → feature/story type The exact type name comes from the tracker, not from a universal list.
-5. **Identify source material** — Link to decomposition document, design document, or technical design if available. If
-   standalone, the conversation is the source.
+A location is a file, a module, a symbol, or a failing test that exists in the repository now — where the work starts,
+never where it ends up.
 
-### Step 2: Draft the Task
+- **Name it.** Supplying the files a change touches roughly doubles an agent's chance of resolving the issue, and
+  retrieval alone misses them about half the time. For the agent reader this is the highest-value line in the
+  description; for the human reader it costs one line and saves a search, so the location is given whichever reader the
+  item is for.
+- **Name only what exists at HEAD.** The file holding the defect, the module the change enters, the failing test, the
+  symbol — each is read from the repository before it is named. A path for a file the work will create is not a
+  location: choosing where new code goes is the implementer's decision, and prescribing it is implementation
+  prescription.
+- **Name the location; do not paste the code around it.** More retrieved context measures worse, not better. Precision
+  moves the item, volume does not.
+- **Give a location even where the exact file is uncertain** — the module, the symbol, the failing test, the entry
+  point. Localization is where agent runs fail most often, and no architecture is served by a description that starts
+  nowhere.
+- **Add the durable anchor for an item that will queue.** An existing type, interface, or behavioral contract survives a
+  rename; a path does not. The anchor names something that exists too — a contract the work will introduce is part of
+  the acceptance criteria, not a location. This is a convention and its cost is stated: path decay in queued items is
+  unmeasured, while the value of naming the files is measured. Staleness is a reason to add the anchor, never a reason
+  to withhold the location.
 
-1. **Write the title.** The title is what people see in lists, boards, and notifications:
-   - **Imperative mood:** "Add pagination to search results" not "Pagination was added"
-   - **Specific:** "Fix negative offset in paginator navigation" not "Fix pagination bug"
-   - **5-10 words:** Long enough to be meaningful, short enough to scan
-   - **No tracker noise:** Don't prefix with project codes, parent references, or type labels — the tracker handles
-     metadata
+## Write acceptance criteria the implementer can see
 
-2. **Write the description.** Structure depends on task type, but every description needs:
+- **Put every pass/fail condition in the item.** A condition that lives only in a reviewer's head makes the item
+  unsolvable — the implementer cannot satisfy a test it cannot read. This is the strongest reason to write acceptance
+  criteria at all, and it is about visibility, not about format.
+- **Write each criterion so observation decides it.** Name the command, the test, or the output that settles pass or
+  fail.
+- **Name what must not change** — behavior that stays fixed, backward compatibility, interfaces left alone, a process
+  the change must follow. Process fit rejects contributions as often as capability does, and a constraint the
+  implementer could not read is a rejection waiting to happen.
+- **Criterion format is a convention.** No comparison of a checklist against Given/When/Then on implementer outcomes was
+  found. Follow the format the tracker already uses; where there is none, use a checklist. Never present that choice as
+  evidence-backed.
 
-   **Context** — Why this task exists. Connect it to the larger effort. Link to the design document or technical design
-   if one exists. One or two sentences.
+## Match the content to the kind of work
 
-   **What to do** — The specific work. Concrete enough that the implementer knows the scope, abstract enough that they
-   choose the approach. Describe the change, not the code.
+- **A defect item** — the observed behavior in exact words, the expected behavior with what states it, the reproduction
+  that was actually run, the environment and version it was observed in, and the artifact.
+- **A change item** — the problem and the goal before any solution, the location, the acceptance criteria, and the
+  constraints. The solution belongs to the implementer.
+- **An investigation item** — the observation that prompted it, the question it must answer, and the form the answer
+  takes. Its acceptance criteria describe the answer, never code.
 
-   **Acceptance criteria** — How to know it's done. See the dedicated section below.
+**Ask for each element by name, in a fixed shape.** Reports state observed behavior far more often than expected
+behavior, and the projects whose templates name an element are the projects whose reports carry it. That is an
+observational attribution rather than a trial, and it is still the strongest evidence for a fixed shape. The shape also
+guards against a measured failure of the writer rather than of the reader: handed a report with an element removed, a
+model often fails to notice the absence and supplies a plausible substitute instead. Naming every element forces the
+check that noticing does not. The ordering is convention.
 
-   **References** (optional) — Links to resources that already exist: design documents, technical designs, external
-   specs, documentation URLs, mockups. Every item must be a real, verifiable resource — a file that exists on disk or a
-   URL that resolves. Never include code paths, file paths to source code, or references to files that will be created
-   during implementation. Code-level details belong in implementation, not task descriptions. Never reference other
-   tasks in the same tracker — inter-task relationships are handled exclusively through native tracker links in Step 4.
-   Omit this section entirely when there are no existing resources to link.
+Expected behavior is the element to protect — without it the item says only that something happened, and the defect
+claim rests on nothing. The environment is not bureaucracy either: environmental differences cause more irreproducible
+reports than missing information does.
 
-   Every task needs a description. Extract intent, structure it, and link to the conversation if someone needs the raw
-   thread — never copy-paste chat messages directly.
+## Leave out what the reader already has
 
-3. **Set fields** based on what you discovered in Step 1. Carry over estimates from the decomposition document if
-   available. Only set fields that the tracker supports and the project uses — don't invent metadata.
+- **Repository conventions belong in the repository's agent file.** AGENTS.md and CLAUDE.md are read on every run. A
+  description restating build commands, code style, or test invocation duplicates a file the agent already has and
+  charges the human reader for it. An unspecific request is paid for in turns.
+- **Never paste the conversation into the item.** Extract the intent, and link the thread where the raw exchange
+  matters.
+- **Never restate a document the item can link** — the design document, the frame, the alignment record.
 
-### Step 3: Present the Draft
+## Set fields and links from the tracker
 
-1. Show the complete task to the user before creating it. Include all fields using actual field names and values from
-   the project configuration:
+- **Confirm the tracker and the project before drafting.** Where more than one tracker is reachable, ask the user rather
+  than inferring.
+- **Discover the fields, their types, and their allowed values; never guess a name or a value.** They differ per tracker
+  and per project. Discovery mechanics belong to the tracker's own skill — `youtrack` for YouTrack.
+- **Set only the fields the project uses.** Invented metadata does not survive creation.
+- **Give routing fields the care the description gets.** Misrouting is the largest measured latency cost in this domain,
+  larger than anything description quality controls. Component, area, and owner decide who ever sees the item.
+- **The native link is the relationship.** Create every one the tracker supports and every one that applies to a pair.
+  An item ID typed into the description text creates nothing: no dependency view, no query, and no traversal sees it,
+  and it goes stale silently when the item moves. Where the tracker's tools cannot create a link, report that to the
+  user rather than writing the relationship into the text.
+
+## Take approval before anything is created
+
+A created item is visible to everyone with access to the tracker, and retracting it is manual work. A rejected
+contribution also teaches the writer nothing reliably: a large share are closed with no reviewer explanation, or on
+inactivity alone. The correction has to come before filing, not after. This sequence is exact.
+
+1. **Present the complete draft** — project, type, title, description, every field with the value to be set, and every
+   link to be created.
+2. **Name what could not be verified**, in the draft itself and not only in the item body.
+3. **Wait for explicit approval.** Revise and present again after any change. A batch built from a task breakdown is
+   presented as a set and approved as a set; nothing is created ahead of that approval.
+4. **Create the item, set the fields, and create every link that applies.** One pair of items may carry more than one
+   relationship.
+5. **Report the created ID and URL**, and name anything the tracker's tools could not do so the user can finish it by
+   hand.
 
 ```markdown
-## Task Draft
+## Draft
 
-**Project:** [project name]
-**Type:** [value from tracker]
+**Project:** [discovered project]
+**Type:** [value from the tracker]
+**Reader:** [human implementer | autonomous agent]
 
 **Title:** [title]
 
 **Description:**
-[full description with context, what to do, acceptance criteria, references]
+[the item body as it will be created]
 
 **Fields:**
-[list each field you plan to set with its value, based on project config]
+
+- [field name]: [allowed value]
+
+**Links:**
+
+- [relationship] → [item ID]
+
+**Unverified:** [what was not run or read, or "none"]
 ```
 
-2. Wait for explicit approval. Tasks are visible to the entire team once created — a wrong task creates noise and
-   confusion.
-3. If the user requests changes, revise and present again.
+## Title and description conventions
 
-### Step 4: Create in Tracker
+These are conventions of this skill. No measurement stands behind them; they buy consistency across a tracker and
+nothing more. The fixed shape that names each element rests on an observational finding; the order below rests on
+consistency alone.
 
-After approval:
+- **Title in the imperative, naming the specific thing** — "Fix negative offset in paginator navigation", not "Fix
+  pagination bug". No project code, parent reference, or type label: the tracker holds those.
+- **Element order: the problem, the location, the acceptance criteria, then the documents the item links.** A reader who
+  stops after two sections knows what to do and where.
+- **Write the item as a plan, not as a report.** The work has not started when the implementer reads it.
+- **Describe the change, not the code to write.** Pseudocode is acceptable where the logic is the hard part;
+  configuration samples are acceptable where configuration is the deliverable.
 
-1. Create the task using the tracker's API or integration.
-2. Set all agreed fields.
-3. Establish relationships between tasks:
-   - Use the tracker's native linking for all relationships (parent-child, blocks/blocked-by, depends-on, relates-to,
-     duplicates). A single pair of tasks can have more than one relationship — create every one that applies.
-   - Always prefer native links over description text. Native links are visible in dedicated UI, enable dependency
-     tracking, and stay current when tasks move or rename.
-   - Fallback to description-based references only if the tracker's tools genuinely lack linking capabilities. Check the
-     available tools first.
-4. Report the created task ID and URL back to the user.
+## Not evidence
 
-## Acceptance Criteria
+- **INVEST is not authority.** It was published as a blog post in 2003, and no controlled study, dataset, or measurement
+  of its six properties was found. Individual properties may be defensible on other grounds; the acronym carries no
+  evidential weight.
+- **A checklist cannot check truth.** What a quality tool detects is structural — a missing role, a missing action, a
+  non-atomic story, a format violation. Ambiguity, completeness, and independence defeat detection. A shape review has a
+  real hit rate on shape and none on whether the content is true.
 
-Acceptance criteria are the most important part of a task description after context. They transform vague intent ("make
-search faster") into verifiable conditions ("search returns results within 200ms for queries under 50 characters").
+## Apply and review
 
-### What Makes Good Criteria
+When writing an item, apply these rules silently and never narrate them. Where the tracker's existing items contradict a
+convention here, follow the tracker and say so once.
 
-**Testable** — Each criterion has a clear pass/fail outcome. "User experience is improved" fails this test. "Page loads
-in under 2 seconds on 3G" passes.
+When reviewing an item, check the claims before the shape. A well-formed item can be entirely fabricated, and shape is
+the part a checklist already passes. Name the rule, quote the line, and show the replacement.
 
-**Outcome-focused** — Describe what the system does, not how it's built. "Search returns partial matches for inputs of
-3+ characters" — not "implement a LIKE query with wildcard prefix."
-
-**Independent** — Each criterion can be verified on its own. If criterion B can only be tested after criterion A,
-consider whether they're really one criterion.
-
-**Measurable** — Quantify when possible. Response times, character limits, item counts, error rates. Numbers eliminate
-ambiguity. Replace vague conditions like "should be fast" or "user-friendly interface" with measurable thresholds.
-
-### Two Formats
-
-**Rule-oriented (checklist)** — Best for most engineering tasks. Simple, scannable, directly translatable to test cases:
-
-```markdown
-- [ ] Search field appears in the top navigation bar
-- [ ] Search triggers on button click or Enter key
-- [ ] Input accepts up to 200 characters
-- [ ] Results display within 500ms for datasets under 10,000 records
-- [ ] Empty query shows recent items instead of empty state
-```
-
-**Scenario-oriented (Given/When/Then)** — Best for complex user flows where preconditions and sequences matter:
-
-```markdown
-Given the user is on the search page with an empty query
-When they type 3 or more characters
-Then results appear as a dropdown below the search field
-
-Given the user has selected a filter
-When they clear the search field
-Then the filter remains applied and results update accordingly
-```
-
-Use rule-oriented by default. Switch to scenario-oriented when the behavior depends on specific preconditions or
-multi-step sequences.
-
-### Common Mistakes
-
-**Too vague:** "Works correctly" or "handles edge cases" — what does correctly mean? Which edge cases? Every criterion
-needs a clear pass/fail outcome.
-
-**Too prescriptive:** "Use a Redis cache with TTL of 300 seconds" — that's implementation, not acceptance. Say "repeated
-queries return cached results" and let the implementer choose the mechanism.
-
-**Missing negative cases:** Only describing the happy path. Include: what happens with invalid input, empty states,
-error conditions, permission boundaries.
-
-## Task Description Patterns
-
-Different types of work call for different description structures. These patterns can be combined.
-
-### Pattern 1: Bug Report
-
-For broken functionality. The reader needs to understand what's wrong, how to see it, and what should happen instead.
-
-Reproduce the bug before drafting — read the reported steps, trace the code, run the failing path. A confirmed
-reproduction yields precise Steps to Reproduce and a real Actual Behavior; a failed or partial reproduction is the
-signal to gather more detail first, not a reason to file a vague task.
-
-```markdown
-## Context
-[What feature is affected and how it relates to the system]
-
-## Problem
-[What's broken — observable symptoms, not root cause speculation]
-
-## Steps to Reproduce
-1. [Step one]
-2. [Step two]
-3. [Step three]
-
-## Expected Behavior
-[What should happen]
-
-## Actual Behavior
-[What happens instead]
-
-## Acceptance Criteria
-- [ ] [Verifiable fix condition]
-- [ ] [Regression prevention]
-```
-
-Include screenshots, error messages, or log excerpts when they clarify the problem. Omit when the description is
-self-explanatory.
-
-### Pattern 2: Implementation Task
-
-For building or changing functionality. The standard pattern — most tasks from a decomposition document follow this
-structure.
-
-```markdown
-## Context
-[Why this task exists, link to design/technical design]
-
-## What to Do
-- [Specific work items]
-
-## Acceptance Criteria
-- [ ] [Verifiable conditions]
-
-## References
-- [Links to existing design docs, specs, documentation URLs, mockups — never code paths or other tasks]
-```
-
-### Pattern 3: Investigation Task
-
-For work where the outcome is understanding, not code. Debugging, research, feasibility analysis.
-
-```markdown
-## Context
-[What prompted the investigation]
-
-## Symptoms / Evidence
-[What was observed — logs, error messages, metrics, user reports]
-
-## Goal
-[What answer or decision this investigation should produce]
-
-## Acceptance Criteria
-- [ ] Root cause identified and documented
-- [ ] Recommended fix or next steps proposed
-```
-
-### Pattern 4: Refactoring / Cleanup
-
-For code improvements that don't change behavior. The reader needs to understand what's being restructured and why,
-despite no user-visible change.
-
-```markdown
-## Context
-[What motivates the refactoring — upcoming feature, tech debt, performance]
-
-## What to Do
-- [Specific restructuring work]
-
-## Constraints
-- [Behavior must not change]
-- [Backward compatibility requirements]
-
-## Acceptance Criteria
-- [ ] Existing tests pass without modification
-- [ ] [Specific structural improvements verifiable in code review]
-```
-
-## Example: Standalone Task Creation
-
-**User request:** "Create a bug for the search — it returns 500 when the query has special characters like & or %"
-
-**Step 1 (Gather Context):** Query the tracker for the project's field configuration. Discover available types (Bug,
-Task, Story), required fields (Priority, State), and valid values.
-
-**Step 2 (Draft):**
-
-```markdown
-## Task Draft
-
-**Project:** SEARCH
-**Type:** Bug
-**Priority:** High
-
-**Title:** Fix 500 error on search queries containing special characters
-
-**Description:**
-
-## Context
-The search API returns HTTP 500 when queries contain URL-significant characters (& , %, =). This
-affects all clients using the search endpoint.
-
-## Problem
-Special characters in the search query are passed to the backend unescaped, causing the query parser
-to fail with an unhandled exception.
-
-## Steps to Reproduce
-1. Open the search page
-2. Enter a query containing `&` or `%` (e.g., "R&D budget")
-3. Submit the search
-
-## Expected Behavior
-Search returns results matching the literal query text.
-
-## Actual Behavior
-HTTP 500 response. No results displayed.
-
-## Acceptance Criteria
-- [ ] Search queries containing &, %, =, and + return correct results
-- [ ] Invalid UTF-8 sequences return HTTP 400 with a descriptive error message
-- [ ] Existing search functionality is unaffected (run search test suite)
-```
-
-**Step 3 (Present):** Show draft to user, wait for approval.
-
-**Step 4 (Create):** Create in tracker, set fields, link to parent epic via native tracker link if applicable, report
-task ID and URL.
-
-## Writing Rules
-
-Two rules from the `tasks` skill apply equally here:
-
-**Descriptions are plans, not reports.** Write every description as if the work has not started. "Add pagination to the
-search results" — not "Added pagination" or "Pagination was implemented." The implementer reads this fresh. Tell them
-what to do, not what was done.
-
-**No implementation in descriptions.** Describe WHAT should change and what "done" looks like. No production code, no
-function signatures, no class names to create. Pseudocode is acceptable for complex logic. Configuration samples are
-acceptable when configuration is the deliverable. Describe the capability needed, not the code to write.
-
-**Anchor to what survives the wait.** A task may sit in the tracker for weeks while the codebase moves under it.
-Existing types, interfaces, and behavioral contracts are durable anchors — name them freely ("`SkillConfig` gains an
-optional `schedule` field"). File paths and line numbers go stale between writing and pickup — the same razor behind the
-References rule's code-path ban applies to description prose.
-
-## Application
-
-**When creating:** Apply all rules silently. Follow the workflow steps, discover project configuration before drafting,
-write titles in imperative mood, structure descriptions with Context/What to do/Acceptance criteria/References, and use
-native tracker links for all inter-task relationships. Do not narrate which rules you are following.
-
-**When reviewing:** Evaluate existing tasks against the Quality Checklist. For each violation, cite the specific rule,
-quote the problematic section, and show the fix inline. Common review findings:
-
-- Title is vague or past-tense ("Fixed X" instead of "Fix X")
-- Missing or untestable acceptance criteria
-- Description contains implementation prescriptions (code, class names, function signatures)
-- Inter-task relationships written in description text instead of native tracker links
-- References section contains code paths, non-existent files, or other tasks instead of verifiable external resources
-- Fields set with values not matching the project's configuration
-
-## After Completion
-
-When all tasks are created:
-
-- Report created task IDs and URLs to the user.
-- Flag any tasks that need manual linking not supported by the tracker's tools.
-- If working from a frame document, list any remaining phases not yet covered by tasks.
-- Update the frame document with task IDs if descriptions changed during creation.
-
-## Related Skills
-
-- **frame** — Produces the input for pipeline-mode task creation: vertical slice phases with acceptance criteria
-- **alignment** — Source material referenced in task descriptions: solution direction and pattern decisions
-
-## Quality Checklist
-
-Before creating a task in the tracker:
-
-- [ ] Title is imperative, specific, and 5-10 words
-- [ ] Description includes context linking to the larger effort
-- [ ] Work items are concrete but don't prescribe implementation
-- [ ] Acceptance criteria are testable with clear pass/fail outcomes
-- [ ] Negative cases and error conditions are covered where relevant
-- [ ] References (if present) link only to verifiable existing resources — no code paths, no future files
-- [ ] Inter-task relationships use native tracker links, not description text
-- [ ] All tracker fields match the project's configuration
-- [ ] User approved the draft before creation
-- [ ] Task reads as a plan for future work, not a report of past work
+Nothing reaches the tracker without explicit approval on the draft — for every item, including every item in a batch.

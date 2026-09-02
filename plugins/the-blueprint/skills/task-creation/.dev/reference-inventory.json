@@ -1,11 +1,28 @@
 {
-  "sources": {
-    "AltExSoft: Acceptance Criteria Purposes, Formats, and Best Practices": "https://www.altexsoft.com/blog/acceptance-criteria-purposes-formats-and-best-practices/",
-    "Atlassian: Acceptance Criteria Explained": "https://www.atlassian.com/work-management/project-management/acceptance-criteria",
-    "Marker.io: Bug Report Templates for QA Testing": "https://marker.io/blog/bug-report-template",
-    "Selleo: 10 Tips on How to Effectively Describe Tasks for Dev Teams": "https://selleo.com/blog/10-tips-on-how-to-effectively-describe-tasks-for-your-dev-team",
-    "Addy Osmani: How to Write a Good Spec for AI Agents": "https://addyosmani.com/blog/good-spec/",
-    "Continue.dev: Task Decomposition for AI-Assisted Coding": "https://blog.continue.dev/task-decomposition/",
-    "Parallel: What Is Acceptance Criteria Guide 2026": "https://www.parallelhq.com/blog/what-acceptance-criteria"
-  }
+	"sources": {
+		"Bettenburg et al.: What Makes a Good Bug Report? (FSE 2008)": "https://thomas-zimmermann.com/publications/files/bettenburg-fse-2008.pdf",
+		"Chaparro et al.: Detecting Missing Information in Bug Descriptions (ESEC/FSE 2017)": "https://dl.acm.org/doi/10.1145/3106237.3106285",
+		"Herzig, Just, Zeller: It's Not a Bug, It's a Feature (ICSE 2013)": "https://www.st.cs.uni-saarland.de/softevo/bugclassify/paper/icse2013-bugclassify.pdf",
+		"Erfani Joorabchi et al.: Works For Me! Characterizing Non-reproducible Bug Reports (MSR 2014)": "https://people.ece.ubc.ca/amesbah/resources/papers/mona-msr14.pdf",
+		"Anvik, Hiew, Murphy: Coping with an Open Bug Repository (2005)": "https://www.cs.ubc.ca/~murphy/papers/other/coping.pdf",
+		"Jeong, Kim, Zimmermann: Improving Bug Triage with Bug Tossing Graphs (ESEC/FSE 2009)": "https://people.csail.mit.edu/hunkim/images/6/65/Papers_jeong2009fse.pdf",
+		"Lucassen et al.: The Quality User Story Framework and AQUSA (REJ 2016)": "https://webspace.science.uu.nl/~dalpi001/papers/luca-dalp-werf-brin-16-rej.pdf",
+		"OpenAI: Introducing SWE-bench Verified (updated 2025-02-24)": "https://openai.com/index/introducing-swe-bench-verified/",
+		"Jimenez et al.: SWE-bench (ICLR 2024)": "https://arxiv.org/abs/2310.06770",
+		"Vijayvargiya et al.: Ambig-SWE — underspecificity and interaction (ICLR 2026)": "https://arxiv.org/abs/2502.13069",
+		"Liu et al.: An Empirical Study on Failures in Automated Issue Solving (2025)": "https://arxiv.org/abs/2509.13941",
+		"GitHub: Best practices for using Copilot coding agent": "https://docs.github.com/en/copilot/tutorials/coding-agent/best-practices",
+		"Cognition: Instructing Devin Effectively": "https://docs.devin.ai/essential-guidelines/instructing-devin-effectively",
+		"AGENTS.md: open format for agent instructions": "https://agents.md/",
+		"Stenberg: The end of the curl bug-bounty (2026-01-26)": "https://daniel.haxx.se/blog/2026/01/26/the-end-of-the-curl-bug-bounty/",
+		"AI Slop is DDoSing Open Source (2026)": "https://arxiv.org/abs/2607.04003",
+		"ImproBR: Bug Report Improver Using LLMs (2026)": "https://arxiv.org/abs/2604.26142",
+		"Acharya, Ginde: Can We Enhance Bug Report Quality Using LLMs? (EASE 2025)": "https://arxiv.org/abs/2504.18804",
+		"Choi, Yang: AgentReport (Applied Sciences, 2025)": "https://doi.org/10.3390/app152211931",
+		"Pressato et al.: IssueSpecter — LLM-guided issue generation (2026)": "https://arxiv.org/abs/2604.26118",
+		"Hallucinations in LLM-Generated Bug Report Summaries (2026)": "https://arxiv.org/abs/2605.24137",
+		"Soltani et al.: The significance of bug report elements (EMSE 2020)": "https://doi.org/10.1007/s10664-020-09882-z",
+		"Hora, Robbes: AI Policy, Disclosure, and Human in the Loop (2026)": "https://arxiv.org/abs/2605.16706",
+		"Linux kernel: coding assistants policy": "https://docs.kernel.org/process/coding-assistants.html"
+	}
 }
