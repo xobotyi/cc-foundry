@@ -93,12 +93,15 @@ Every rule here follows from that.
 
 - **`module: "preserve"` for anything a bundler or Bun consumes**; it implies `moduleResolution: bundler`.
   **`module: "nodenext"` for output that Node.js runs.** Pin to `node18` or `node20` where the Node.js major is fixed.
-- **`module: "node18"` for a library published to npm**, with `target` set to the **lowest** ECMAScript version
-  supported. Node.js resolution is the strictest host; satisfying it satisfies the bundlers.
+- **`module: "node18"` for a library published to npm**, with `"type": "module"` in the manifest or `.mts` sources —
+  without one of the two the output is CommonJS and `verbatimModuleSyntax` rejects every `import` in the tree
+  (`TS1295`). Set `target` to the **lowest** ECMAScript version supported, ES2015 being the floor from 6.0. Node.js
+  resolution is the strictest host; satisfying it satisfies the bundlers.
 - **`moduleResolution: "bundler"` is infectious.** It accepts `export * from "./utils"`, and the emitted JavaScript then
   fails in Node.js with `ERR_MODULE_NOT_FOUND`. Never publish from it unless the declarations are bundled too.
 - **A relative specifier carries the output extension**, so `./math.js` resolves to `math.ts`. Writing `./math.ts`
-  requires `allowImportingTsExtensions`, which requires `noEmit` or `emitDeclarationOnly`.
+  requires `allowImportingTsExtensions`, which requires one of `noEmit`, `emitDeclarationOnly`, or
+  `rewriteRelativeImportExtensions` (`TS5096`).
 - **`import type` and `export type` for every type-only binding.** `verbatimModuleSyntax` makes this mandatory and
   removes the guesswork of import elision.
 - **`paths` entries carry their own prefix.** `baseUrl` is gone from 6.0.
