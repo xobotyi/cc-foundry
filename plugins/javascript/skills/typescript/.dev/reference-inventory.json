@@ -1,16 +1,20 @@
 {
-  "sources": {
-    "TS Handbook - Narrowing & Type Guards": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Narrowing.md",
-    "TS Handbook - Generics": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Generics.md",
-    "TS Handbook - Conditional Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Conditional%20Types.md",
-    "TS Handbook - Mapped Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Mapped%20Types.md",
-    "TS Handbook - Template Literal Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/handbook-v2/Type%20Manipulation/Template%20Literal%20Types.md",
-    "TS Handbook - Utility Types": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/reference/Utility%20Types.md",
-    "TS Handbook - Do's and Don'ts": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/declaration-files/Do's%20and%20Don'ts.md",
-    "Google TypeScript Style Guide": "https://google.github.io/styleguide/tsguide.html",
-    "Total TypeScript - TSConfig Cheat Sheet": "https://www.totaltypescript.com/tsconfig-cheat-sheet",
-    "typescript-eslint Rules Overview": "https://typescript-eslint.io/rules/",
-    "typescript-eslint Shared Configs": "https://typescript-eslint.io/users/configs/"
-  },
-  "lastFetched": "2026-02-16T13:19:39.900Z"
+	"sources": {
+		"TypeScript 5.5 Release Notes": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/release-notes/TypeScript%205.5.md",
+		"TypeScript 5.6 Release Notes": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/release-notes/TypeScript%205.6.md",
+		"TypeScript 5.7 Release Notes": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/release-notes/TypeScript%205.7.md",
+		"TypeScript 5.8 Release Notes": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/release-notes/TypeScript%205.8.md",
+		"TypeScript 5.9 Release Notes": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/release-notes/TypeScript%205.9.md",
+		"TypeScript 6.0 Release Notes": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/release-notes/TypeScript%206.0.md",
+		"Announcing TypeScript 7.0": "https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/",
+		"Native Port Intentional Changes": "https://raw.githubusercontent.com/microsoft/typescript-go/main/CHANGES.md",
+		"Modules Theory": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/modules-reference/Theory.md",
+		"Modules Reference": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/modules-reference/Reference.md",
+		"Modules Choosing Compiler Options": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/modules-reference/guides/Choosing%20Compiler%20Options.md",
+		"TSConfig Reference": "https://www.typescriptlang.org/tsconfig/",
+		"Declaration Files Do's and Don'ts": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/declaration-files/Do's%20and%20Don'ts.md",
+		"Declaration Files Publishing": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/declaration-files/Publishing.md",
+		"DefinitelyTyped Contribution Guide": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/README.md"
+	},
+	"lastFetched": "2026-09-02T08:52:41.110Z"
 }
