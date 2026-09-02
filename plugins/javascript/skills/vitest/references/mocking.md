@@ -176,13 +176,21 @@ runtime supports explicit resource management. `vi.spyOn` returns one too.
 
 ## Fake timers
 
-`vi.useFakeTimers()` replaces `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`, `setImmediate`,
-`clearImmediate` and `Date`, using `@sinonjs/fake-timers`.
+`vi.useFakeTimers()` fakes every timer API available globally except `process.nextTick` and `queueMicrotask`, using
+`@sinonjs/fake-timers`. That default set is wider than the timer functions alone: alongside `setTimeout`, `setInterval`,
+`clearTimeout`, `clearInterval`, `setImmediate`, `clearImmediate` and `Date`, it also takes `performance`, `hrtime`,
+`requestAnimationFrame`, `cancelAnimationFrame`, `requestIdleCallback` and `cancelIdleCallback` — so code timing itself
+with `performance.now()` stops advancing too. Measured on Vitest 4.1.11.
 
-- `process.nextTick` and `queueMicrotask` are **not** faked by default. Add them through
-  `vi.useFakeTimers({ toFake: ['nextTick', 'queueMicrotask'] })`.
-- Faking `nextTick` hangs under `pool: 'forks'`, because `node:child_process` uses it internally. It works under
-  `pool: 'threads'`.
+- **`toFake` replaces the default set rather than extending it.** `toFake: ['queueMicrotask']` fakes that one and
+  nothing else, leaving `setTimeout` and `Date` real. Name every API the test needs:
+  `toFake: ['setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'Date']`. Measured on Vitest 4.1.11.
+- **Faking `nextTick` under `pool: 'forks'` throws rather than hanging.** The message names its own fix:
+  `vi.useFakeTimers({ toFake: ["nextTick"] }) is not supported in node:child_process. Use --pool=threads if mocking nextTick is required.`
+  The guard fires on `toFake` passed to `vi.useFakeTimers()` and on `fakeTimers.toFake` in the config. Its condition is
+  `process.send` being set — a child process, not a named pool — so `pool: 'threads'` fakes `nextTick` normally. The v4
+  documentation still describes a hang — that is the behavior the guard was added to prevent, and the runtime is what
+  this entry records.
 - `vi.useRealTimers()` discards every timer scheduled while timers were fake.
 - `vi.setSystemTime(date)` moves the clock without advancing timers.
 

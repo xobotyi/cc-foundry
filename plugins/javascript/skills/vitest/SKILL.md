@@ -24,12 +24,13 @@ A test earns its place by failing when the behavior breaks, and at no other time
 ## Version and Toolchain
 
 Vitest 4 is the target. Read the installed version out of the lockfile before touching a config file — the configuration
-surface moved across every recent major, and a key from the wrong one is silently ignored or loudly rejected.
+surface moved in 3.2, 4.0 and 4.1, and a key from the wrong one is silently ignored or loudly rejected.
 
 Vitest 4.1 requires Node `^20 || ^22 || >=24` and Vite `^6 || ^7 || ^8`. Vitest 4.0 shipped requiring Vite 6 and Node
 20; 4.1 added Vite 8 and uses the installed `vite` rather than a bundled copy.
 
-What moved, by version. Anything on the left fails under Vitest 4.
+What changed, by version. Every removal below is rejected or ignored under Vitest 4; the 4.1 entries are additions and
+need 4.1 installed.
 
 - **3.2** — `workspace` deprecated in favor of `projects`; fixture scopes (`test`, `file`, `worker`) added; AST-aware v8
   coverage remapping added behind `coverage.experimentalAstAwareRemapping`
@@ -42,9 +43,8 @@ What moved, by version. Anything on the left fails under Vitest 4.
   test tags with `--tags-filter`; `--detect-async-leaks`; `vi.defineHelper`; `vi.setTimerTickMode`;
   `experimental.viteModuleRunner`
 
-Read [`${CLAUDE_SKILL_DIR}/references/configuration.md`] when creating or editing a config file, setting up projects, or
-reconciling a config written against an older major — it carries the full rename inventory, the defaults, the pool and
-isolation trade, and the CLI surface.
+Read [`${CLAUDE_SKILL_DIR}/references/configuration.md`] when reconciling a config written against an older major — it
+carries the rename inventory entry by entry, each with the major that made the change.
 
 ## Test Structure
 
@@ -53,7 +53,6 @@ isolation trade, and the CLI surface.
 - **Name a test after the behavior it pins, in a phrase that scans.** `'returns an empty array for a null input'`, not
   `'should correctly return an empty array when the provided input value is null or undefined'`. A long name is read in
   a list of forty.
-- **One `describe` per unit under test**, grouping by function, class or component — never by test kind.
 - **Pass options as the second argument**: `test('name', { retry: 2 }, fn)`. The third-argument form was removed in
   Vitest 4. A bare timeout number as the last argument still works, and excludes the options object.
 - **`test.for` over `test.each` when a case needs the test context.** `each` spreads an array row into positional
@@ -61,15 +60,15 @@ isolation trade, and the CLI surface.
   concurrent snapshot needs.
 - **Never leave `.only` in a commit.** `allowOnly` defaults to `!process.env.CI`, so CI fails the run rather than
   quietly testing one case.
-- **`it.fails` asserts that a test fails**; it is not a way to park a broken test. `test.todo` is.
+- **`it.fails` asserts that a test fails**, which is how a known bug is recorded without leaving the suite red.
+  `test.todo` never runs, so it never tells you the bug was fixed; a `fails` test goes red the moment it starts passing.
 
 ## Assertions
 
-- **`toBe` for primitives and identity, `toEqual` for structure, `toStrictEqual` when `undefined` keys, sparse array
-  holes and class identity are part of the contract.** `toEqual` ignores `undefined` properties, so it passes on a field
-  that should not exist.
+- **`toEqual` ignores `undefined` properties**, so it passes on a field that should not exist. Reach for `toStrictEqual`
+  where `undefined` keys, sparse array holes and class identity are part of the contract.
 - **Always `await` `.resolves` and `.rejects`.** Vitest 4 fails a test whose async assertion was never awaited; Vitest 3
-  only warned. Unawaited, the assertion never runs and the test passes unconditionally.
+  only warned, because an unawaited async assertion never runs and passes unconditionally.
 - **Wrap a throwing call in a function**: `expect(() => parse(bad)).toThrow(/unexpected/)`. After `.rejects` the wrapper
   is wrong — the promise is already unwrapped.
 - **Assert a volatile field with an asymmetric matcher, never by deleting the assertion.** `expect.any(String)`,
@@ -116,8 +115,9 @@ writing a custom matcher — it carries the Vitest-only matcher set, the spy and
 - **`onTestFinished` for cleanup registered inside a test** — it runs on pass and on fail, always in reverse order,
   regardless of `sequence.hooks`. `onTestFailed` for diagnostics only.
 - **Reach for `aroundEach`/`aroundAll` (Vitest 4.1) only when the test must run _inside_ a call** — a database
-  transaction, an `AsyncLocalStorage` run, a tracing span. The callback must call `runTest()` or `runSuite()`, or the
-  test fails and the suite is skipped. A `beforeEach` returning a teardown function covers everything else more cheaply.
+  transaction, an `AsyncLocalStorage` run, a tracing span. The callback must call `runTest()` or `runSuite()`. A missed
+  `runTest()` fails the test; a missed `runSuite()` skips every test in the suite. A `beforeEach` returning a teardown
+  function covers everything else more cheaply.
 - **`setupFiles` run in the worker before each test file; `globalSetup` runs once in the main process** before any
   worker exists. Expensive shared state belongs in `globalSetup`; hook and matcher registration belongs in `setupFiles`.
 - **`concurrent` buys nothing for synchronous tests.** No extra worker is created, so the gain is only on tests that
@@ -132,10 +132,11 @@ table, and the exact nested execution order.
 - **`vi.spyOn(obj, 'method')` before `vi.mock`.** Replacing one export is recoverable; replacing a module is a standing
   claim about every export it has, including the ones added later.
 - **A `vi.mock` factory closes over nothing.** The call is hoisted above every import, so any variable it names is still
-  uninitialized: `Cannot access '__vi_import_0__' before initialization`. Put the value in `vi.hoisted` and reference
-  that.
-- **`vi` must be imported from `vitest` in the same file.** The hoisting pass is a static scan; a `vi` re-exported
-  through a project helper is not recognized and the call stays where it was written.
+  uninitialized and the reference throws a temporal-dead-zone error —
+  `Cannot access '__vi_import_0__' before initialization` when what it names is an import. Put the value in `vi.hoisted`
+  and reference that.
+- **`vi` must come from `vitest` in the same file, or `globals` must be on.** The hoisting pass is a static scan; a `vi`
+  re-exported through a project helper is not recognized and the call stays where it was written.
 - **Write the module specifier as `import('./mod.js')`, not a string.** `vi.mock(import('./mod.js'), ...)` types
   `importOriginal`, constrains the factory's return to the real module's exports, and updates when the file moves.
 - **A factory returns the whole namespace, with `default` as an explicit key.** An omitted export throws when the code
@@ -150,8 +151,9 @@ table, and the exact nested execution order.
   `vi.fn(impl)` returns to `impl`, which is the opposite of Jest. `mockRestore` also detaches a `vi.spyOn` spy.
   `vi.restoreAllMocks` detaches spies **without** clearing history or resetting implementations, and leaves automocks
   alone in Vitest 4.
-- **Enable `restoreMocks: true` in the config rather than restoring by hand in every file.** All three switches
-  (`clearMocks`, `mockReset`, `restoreMocks`) default to `false` and run before each test.
+- **Pick the config switch by what has to be undone.** All three (`clearMocks`, `mockReset`, `restoreMocks`) default to
+  `false` and run before each test. `restoreMocks` only detaches `vi.spyOn` spies and clears nothing, so it does not
+  isolate call history on its own; `clearMocks` empties history, and `mockReset` also resets implementations.
 - **Mock a class implementation with `function` or `class`, never an arrow function.** Vitest 4 constructs mocks called
   with `new`; an arrow function raises `<anonymous> is not a constructor`.
 - **Intercept HTTP below the code under test with Mock Service Worker**, configured in a setup file with
@@ -167,8 +169,16 @@ the per-environment differences.
 
 - **Pair `vi.useFakeTimers()` with `vi.useRealTimers()`** in `beforeEach`/`afterEach`, or configure `fakeTimers`
   globally. A leaked fake clock breaks every later file in a non-isolated worker.
-- **`process.nextTick` and `queueMicrotask` are not faked by default.** Add them through
-  `vi.useFakeTimers({ toFake: [...] })` — and not under `pool: 'forks'`, where faking `nextTick` hangs the process.
+- **`vi.useFakeTimers()` fakes every timer API present on the global object** except `process.nextTick` and
+  `queueMicrotask` — `performance` and `requestAnimationFrame` included, not only `setTimeout` and `Date`. Measured on
+  Vitest 4.1.11.
+- **`toFake` replaces that default set, it does not extend it.** `toFake: ['setTimeout']` leaves `Date` real, so the
+  list must name every API the test needs. Measured on Vitest 4.1.11.
+- **`nextTick` cannot be faked under the default `forks` pool.** Vitest 4.1.11 refuses it outright:
+  `vi.useFakeTimers({ toFake: ["nextTick"] }) is not supported in node:child_process. Use --pool=threads if mocking nextTick is required.`
+  It throws for `toFake` passed to the call and for `fakeTimers.toFake` set in the config alike, and it tests for a
+  child process rather than a pool name. Take the fix the message names, or leave `nextTick` off the list — the v4 docs
+  describe a hung process instead, which is the outcome this guard exists to prevent.
 - **Advance deliberately.** `vi.advanceTimersToNextTimer()` fires one timer; `vi.runOnlyPendingTimers()` fires what is
   queued without following the chain; `vi.runAllTimers()` drains everything and throws after 10 000 iterations on an
   endless interval.
@@ -176,14 +186,16 @@ the per-environment differences.
   between.
 - **`vi.setSystemTime(date)` to fix the clock** without advancing any timer.
 
+Read [`${CLAUDE_SKILL_DIR}/references/mocking.md`] when a timer helper does not advance what it should — its fake-timer
+section carries the full set of faked APIs, `fakeTimers.loopLimit`, and the `vi.setTimerTickMode` modes.
+
 ## Snapshots
 
 - **Prefer `toMatchInlineSnapshot` for a small value.** It is reviewed in the same diff as the code that changed it.
 - **Give every volatile field a property matcher**: `toMatchSnapshot({ id: expect.any(String) })`. A snapshot holding a
   timestamp trains everyone to run `-u`.
 - **Never run `-u` on a red suite without reading the diff.** Updating is how a regression becomes the expected value.
-- **Commit `.snap` files and review them.** A snapshot too large to read is a rubber stamp, not a test — assert the
-  handful of properties that matter instead.
+- **A snapshot too large to read is a rubber stamp, not a test** — assert the handful of properties that matter instead.
 - **In CI, a missing or obsolete snapshot fails the run**, not only a mismatch. An obsolete entry is one whose test was
   renamed or deleted; delete the entry in the same change.
 
@@ -196,7 +208,10 @@ the Jest output divergences.
 - **`vitest.config.ts` overrides `vite.config.ts` entirely.** It is not merged. Where the app config must be shared,
   either put `test` inside `vite.config.ts` with `/// <reference types="vitest/config" />`, or `mergeConfig` the two
   deliberately.
-- **Vite options sit at the top level**, never under `test`: `plugins`, `resolve.alias`, `define`, `server`.
+- **`plugins` and `define` are Vite-only and sit at the top level**, never under `test`. `alias` and `server` exist in
+  both places and mean different things: `test.alias` merges over `resolve.alias`, and `test.server.deps` controls
+  inlining and externalization, not Vite's dev server. The Vitest 4 docs mark `test.server` deprecated without naming a
+  replacement, and it is still where `deps.inline` and `deps.external` live.
 - **Extend a default array rather than replacing it**: `exclude: [...configDefaults.exclude, ...]`.
 - **Since Vitest 4, `exclude` covers only `node_modules` and `.git`.** `dist`, `cypress`, `.cache`, `.output` and the
   common `*.config.js` files are collected unless excluded. Narrow the search with `dir` instead — it limits where
@@ -212,6 +227,10 @@ the Jest output divergences.
 - **`coverage`, `reporters` and `resolveSnapshotPath` are root-only** and silently ignored in a project config.
 - **The root config is not itself a project** unless it is listed among them.
 
+Read [`${CLAUDE_SKILL_DIR}/references/configuration.md`] when creating a config file or laying out projects in a
+monorepo — it carries the three config-file shapes, the defaults with their exact values, what a project entry may be,
+and the naming rule a glob entry must satisfy.
+
 ## Pools and Isolation
 
 - **Leave `pool: 'forks'` alone unless a measurement says otherwise.** It is the Vitest 4 default and the compatible
@@ -220,13 +239,17 @@ the Jest output divergences.
   in a worker thread is the cause.
 - **`vmThreads` and `vmForks` leak by construction** — ES modules are cached with no API to clear them, and native
   module globals differ, so `err instanceof Error` can be `false` across the boundary. `isolate` has no effect there.
-- **`isolate: false` is the largest speed lever and the largest correctness cost.** Module registry, `globalThis`
-  mutations and module-level singletons persist across files in the same worker. Scope it to a project holding the files
-  that hold no state, never to the whole run.
+- **`isolate: false` is the biggest single speed gain available to a `node`-environment suite, and its biggest
+  correctness cost.** Module registry, `globalThis` mutations and module-level singletons persist across files in the
+  same worker. Scope it to a project holding the files that hold no state, never to the whole run.
 - **`fileParallelism: false` for a shared external resource**, not for a leak between files — it forces `maxWorkers`
   to 1.
 - **`maxWorkers` replaced `maxThreads` and `maxForks` in Vitest 4**, and `VITEST_MAX_WORKERS` replaced the two matching
   environment variables. It accepts a percentage string.
+
+Read [`${CLAUDE_SKILL_DIR}/references/configuration.md`] when choosing a pool or scoping isolation to part of a suite —
+it carries the four pools side by side, what isolation costs when it is off, and the experimental knobs with the release
+each landed in.
 
 ## Coverage
 
@@ -240,7 +263,6 @@ the Jest output divergences.
   disappears before the provider sees it; `/* v8 ignore if -- @preserve */` survives.
 - **A negative threshold is a maximum count of uncovered items**, which ratchets a legacy codebase where a percentage
   cannot.
-- **Run coverage in CI, not in watch mode.** Instrumentation and report generation cost time on every rerun.
 
 Read [`${CLAUDE_SKILL_DIR}/references/coverage.md`] when tuning what appears in a report, setting thresholds, or merging
 coverage across shards — it carries the provider trade-offs, the include/exclude semantics, and the full ignore-hint
@@ -262,8 +284,8 @@ carries the matcher set, the navigation chain, and the `typecheck` options.
 
 - **`vitest bench` collects `*.bench.*` and `*.benchmark.*` files.** Benchmarking is experimental and outside SemVer —
   pin the version before depending on the output shape.
-- **Compare against a stored baseline, never against a number in a commit message**:
-  `vitest bench --outputJson main.json` on the base branch, `--compare main.json` on the change.
+- **Compare against a stored baseline**: `vitest bench --outputJson main.json` on the base branch, `--compare main.json`
+  on the change.
 - **Options come from tinybench** — `time` (500 ms), `iterations` (10), `warmupTime` (100 ms), `warmupIterations` (5),
   plus `setup` and `teardown` per cycle.
 
@@ -290,6 +312,10 @@ constraints.
 - **`--shard=i/n` with `--reporter=blob`, then one `vitest --merge-reports`.** Sharding splits files, never cases.
 - **`--detect-async-leaks` (Vitest 4.1) when a suite hangs or flakes** — it names the leaked handles and their source
   locations, at a runtime cost that makes it a debugging tool rather than a default.
+
+Read [`${CLAUDE_SKILL_DIR}/references/configuration.md`] when a filter selects the wrong files, or when setting up
+sharding or test tags — it carries the exact matching rule for every filter form, the blob and merge flow, and the tag
+declaration and priority resolution.
 
 ## Migrating from Jest
 
