@@ -309,23 +309,35 @@ SEA build paths per major, and `--disable-proto`, `--frozen-intrinsics`, and `--
 
 ## Testing with `node:test`
 
+- **`test()` and `suite()` are the names; `it()` and `describe()` are aliases.** Subtests come from the context —
+  `await t.test(...)` — and `beforeEach`/`afterEach` fire between subtests, not only between top-level tests.
+- **Await every `t.test()`.** The runner awaits subtests from 24.0.0, but the 22 line does not, and the await is what
+  makes ordering deterministic on both.
 - **Assert through `t.assert.*`, not the bare `node:assert`.** Only the context-bound form is counted by `t.plan()`, so
   a bare `assert` leaves the plan short and the failure reads as a miscount rather than a wrong assertion.
 - **`t.plan(n)` checks the moment the test function returns.** The default is `{ wait: false }`; an assertion arriving
   from a callback afterwards is not counted. Pass `{ wait: true }` or a millisecond budget.
-- **`mock.module()` needs `--experimental-test-module-mocks`.** Without the flag it is `undefined`, so the test fails
-  with a `TypeError` instead of a clear message. It is Stability 1.0, the least settled part of the runner.
+- **Import `node:assert/strict`, never `node:assert`, outside a test.** The legacy surface compares with `==`, so
+  `assert.equal(1, '1')` passes. `assert.CallTracker` was removed in 25.0.0 (DEP0173) — use `mock.fn()` and
+  `fn.mock.callCount()`.
+- **Prefer `t.mock` to the imported `mock`.** The context tracker is reset after each test; the module-level one is
+  process-wide and needs a manual `mock.reset()` or `mock.restoreAll()`.
+- **`mock.module()` needs `--experimental-test-module-mocks`.** Without the flag it is `undefined`, so the test dies on
+  a `TypeError` instead of a clear message. It is Stability 1.0, the least settled part of the runner.
 - **A destructured timer import is never mocked.** `import { setTimeout } from 'node:timers'` binds the real function
   before `mock.timers.enable()` runs. Call the global or the namespace property.
-- **Coverage is experimental and off**: `--experimental-test-coverage`, with core modules and `node_modules/` excluded
-  by default.
+- **Pass `--test-reporter` explicitly.** The non-TTY default changed from `tap` to `spec` in 23.0.0, so a piped CI run
+  emits a different format on 22 than on 24. Reporter output is not a stable contract — parse the `TestsStream` events
+  instead.
+- **Coverage is experimental and off**: `--experimental-test-coverage`, with core modules, `node_modules/`, and the test
+  files excluded by default.
 - **Never run `--test-update-snapshots` in CI.** It rewrites the baseline, turning every regression into a pass.
 - **`--test-force-exit` hides an open handle rather than closing one.** Find it with `process.getActiveResourcesInfo()`.
 
 Read [`${CLAUDE_SKILL_DIR}/references/conventions/testing.md`] when writing the first test in a project, when a mock or
-a fake timer does not take effect, or when wiring coverage thresholds — it carries the structure and hook rules, the
-mocking surface with its flags, snapshots, and the subtest-awaiting behavior that the shipped documentation states
-incorrectly.
+a fake timer does not take effect, or when wiring reporters and coverage thresholds — it carries the structure and hook
+rules, the assertion surface, the mocking API with its restore semantics and flags, snapshots, the reporter pairing
+rules, and the subtest-awaiting behavior that the shipped documentation states incorrectly.
 
 ## Application
 
