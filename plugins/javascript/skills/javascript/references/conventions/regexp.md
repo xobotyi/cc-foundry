@@ -4,8 +4,9 @@
 
 `lastIndex` is the source of most regular-expression bugs that only appear on the second call.
 
-- **A `g` or `y` regex mutates `lastIndex` on every `test` and `exec`.** A module-level `const RE = /a/g` used by two
-  calls alternates `true` and `false` on the same input, because the second call resumes from where the first stopped.
+- **A `g` or `y` regex mutates `lastIndex` on every `test` and `exec`.** A module-level `const pattern = /a/g` used by
+  two calls alternates `true` and `false` on the same input, because the second call resumes from where the first
+  stopped.
 - **The fix is scope, not `lastIndex = 0`.** Build the regex inside the function, or drop `g` where you only need a
   boolean.
 - **A literal in an expression position is a new object each evaluation.** `/x/g.exec(s)` and a later `/x/g.lastIndex`

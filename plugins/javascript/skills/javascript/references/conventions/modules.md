@@ -8,9 +8,9 @@ exporter reassigns, every importer sees the new value at the next read.
 ```js
 // counter.js
 export let count = 0;
-export const bump = () => {
+export function bump() {
 	count += 1;
-};
+}
 
 // main.js
 import { count, bump } from "./counter.js";
@@ -49,14 +49,14 @@ A cycle does not fail by itself. The binding is resolved at the point of **use**
   exporting module has not been evaluated yet.
 
 ```js
-// a.js (entry)
-import { b } from "./b.js";
-export const a = 2;
+// config.js (entry)
+import { banner } from "./banner.js";
+export const title = "app";
 
-// b.js
-import { a } from "./a.js";
-console.log(a); // ReferenceError — a.js has not evaluated its body yet
-export const b = 1;
+// banner.js
+import { title } from "./config.js";
+console.log(title); // ReferenceError — config.js has not evaluated its body yet
+export const banner = "welcome";
 ```
 
 Break a cycle by merging the two modules, extracting the shared part into a third, or moving the code that reaches
