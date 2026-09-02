@@ -68,7 +68,9 @@ it changed, and the traps it introduced.
 
 - **One word per concept across the codebase.** `getUser` everywhere, never `getUser` beside `fetchUserInfo` and
   `loadCustomerRecord`.
-- **`url`, `id`, `err`, `ctx`, `req`, `res`, `db`, `fn` are the accepted abbreviations.** Spell out everything else.
+- **`url`, `id`, `err`, `ctx`, `req`, `res`, `db`, `fn` are the accepted abbreviations.** Spell out everything else in
+  code. A signature written to describe an API rather than to run — `Object.groupBy(items, cb)` — takes the placeholder
+  name the documentation uses.
 - **No redundant context**: `car.make`, never `car.carMake`.
 - **File names are kebab-case**: `user-service.js`. Match the surrounding directory when it already differs.
 - **A single-letter name is legal in a scope of one or two lines** — a loop index, a comparator parameter — and nowhere
@@ -332,8 +334,8 @@ code contradicts one, follow the codebase and flag the divergence once.
 When **reviewing** JavaScript, cite the violation and show the fix inline. Do not lecture.
 
 ```
-Bad:  "Best practice is to use const rather than let when a variable is never reassigned."
-Good: let config -> const config — never reassigned
+Bad:  "Best practice is to use nullish coalescing rather than logical OR for default values."
+Good: options.retries || 3 -> options.retries ?? 3 — 0 is a valid retry count
 ```
 
 ## Integration

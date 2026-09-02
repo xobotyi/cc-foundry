@@ -6,7 +6,7 @@ those the annotations are decoration.
 
 ## Tags that carry weight
 
-- **`@type {T}`** — annotate a declaration whose type is not inferable. Do not annotate `const n = 5`.
+- **`@type {T}`** — annotate a declaration whose type is not inferable. Do not annotate `const count = 5`.
 - **`@param {T} name`** and **`@returns {T}`** — a parameter is optional as `@param {T} [name]` and has a default as
   `@param {T} [name=value]`.
 - **`@typedef {{ a: string, b?: number }} Name`** — a named object shape. The `@typedef` plus `@property` form is
