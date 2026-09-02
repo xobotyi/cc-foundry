@@ -63,7 +63,6 @@ without the `never` assignment reports the same case at runtime instead, one dep
   discriminant.
 - **Truthiness narrowing drops `""`, `0`, `NaN`, and `false`.** `if (count)` skips a legitimate zero. Use
   `if (count !== undefined)`.
-- **`!= null` is the one correct loose comparison.** It tests `null` and `undefined` together and nothing else.
 - **A narrowing is lost at any function boundary that could re-run** — a property read, a call the checker cannot prove
   pure, an `await`. Copy the narrowed value into a `const` and use that.
 - **A closure keeps the narrowing that held after the last assignment to the captured variable** (5.4). This works for a

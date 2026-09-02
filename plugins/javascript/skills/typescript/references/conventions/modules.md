@@ -20,7 +20,8 @@ config, joined by project references.
   `package.json`, or use `.mts`, to emit ESM. Add `"verbatimModuleSyntax": true`.
 - **Application pinned to one Node.js major** — `"module": "node18"` or `"node20"` instead of `nodenext`. Neither takes
   future behavior. `node18` forbids `require()` of ESM and permits the `assert` import syntax; `node20` permits
-  `require()` of ESM and implies `target: es2023`.
+  `require()` of ESM. `node20` implied `target: es2023` on 5.9 and a 6.0 compiler resolves the release default target
+  instead, so set `target` explicitly rather than relying on either.
 - **Library published to npm** — `"module": "node18"` with `"declaration": true`, `"verbatimModuleSyntax": true`,
   `"rootDir": "src"`, `"outDir": "dist"`, and `target` set to the **lowest** ECMAScript version the library supports.
   Node.js resolution is the strictest of the hosts, so satisfying it satisfies the bundlers too.
@@ -56,10 +57,10 @@ to decide the format of each output file.
   are rewritten — a `paths` alias, a bare package specifier, a `#`-prefixed subpath import, and a computed `import()`
   specifier are all left as written and break at runtime.
 - **`verbatimModuleSyntax` forces the intent to be written.** A type-only import must say `import type`, and a re-export
-  of a type must say `export type`. It also blocks `export default` in a file that will emit as CommonJS, because ESM
-  consumers and bundler consumers would reach it differently.
-- **An import attribute uses `with`, never `assert`.** Under `nodenext`, a JSON import requires `with { type: "json" }`
-  and exposes only the default export.
+  of a type must say `export type`. It also blocks ES module syntax in a file that will emit as CommonJS (`TS1295`,
+  `TS1287`), because the flag forbids the very rewrite into `require` and `exports` that would make such a file work.
+- **An import attribute uses `with`, never `assert`.** Under `nodenext`, a JSON import into an ES module requires
+  `with { type: "json" }` and exposes only the default export; a file that emits as CommonJS needs neither.
 
 ## tsconfig structure
 

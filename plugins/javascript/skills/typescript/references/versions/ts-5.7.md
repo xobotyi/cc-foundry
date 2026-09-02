@@ -31,8 +31,9 @@ Released November 2024. The release that makes one source tree runnable in place
 
 ## Behavior changes
 
-- **JSON imports under `--module nodenext` require the `with { type: "json" }` attribute**, and expose only a default
-  export.
+- **A JSON import into an ES module under `--module nodenext` requires the `with { type: "json" }` attribute**
+  (`TS1543`), and exposes only a default export (`TS1544` on a named import). A file that emits as CommonJS needs
+  neither.
 - **Every TypedArray takes a buffer type parameter**:
   `interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike>`. Assignments between a TypedArray and
   an `ArrayBuffer` that passed under 5.6 may need `Uint8Array<ArrayBuffer>` written out.

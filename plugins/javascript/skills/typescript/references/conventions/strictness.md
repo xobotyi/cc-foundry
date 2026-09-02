@@ -1,7 +1,7 @@
 # Strictness Options
 
 `strict` is a family, not a switch. Everything it turns on is listed below; everything it leaves off has to be written
-out. A project that stops at `"strict": true` is running roughly two-thirds of the checks TypeScript can perform.
+out.
 
 ## The `strict` family
 
@@ -27,16 +27,17 @@ by default, so a project that wants any of them off has to say so.
 
 ## Outside `strict`
 
-Each of these is off by default at every release through 7.0 and catches a defect class the family does not. The
-`tsc --init` template sets the first two.
+Each catches a defect class the family does not. All are off by default except `noUncheckedSideEffectImports`, which
+defaults to `true` from 6.0. The `tsc --init` template sets `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
+`verbatimModuleSyntax`, `isolatedModules`, `noUncheckedSideEffectImports`, and `skipLibCheck`.
 
 - **`noUncheckedIndexedAccess`** — an index read yields `T | undefined`. It catches the off-by-one and the missing-key
   read, which is the most common runtime `undefined` in a typed codebase. It costs a guard at every array and record
   access, and it is the flag most likely to produce hundreds of errors in an existing project. Adopt it per package.
-- **`exactOptionalPropertyTypes`** — `{ a?: string }` rejects an explicit `a: undefined` (`TS2412`). This is what
-  separates "the property is absent" from "the property is present and undefined", which matters for anything that
-  round-trips through `JSON.stringify`, a spread merge, or a partial-update API. Where both states are meaningful, write
-  `a?: string | undefined` deliberately.
+- **`exactOptionalPropertyTypes`** — `{ a?: string }` rejects an explicit `a: undefined` (`TS2375` on an object literal,
+  `TS2412` on a property assignment). This is what separates "the property is absent" from "the property is present and
+  undefined", which matters for anything that round-trips through `JSON.stringify`, a spread merge, or a partial-update
+  API. Where both states are meaningful, write `a?: string | undefined` deliberately.
 - **`noImplicitOverride`** — a method that overrides a base member must carry `override`. It catches the rename in the
   base class that silently turns an override into a new method.
 - **`noPropertyAccessFromIndexSignature`** — a property reached only through an index signature must use bracket
@@ -46,8 +47,8 @@ Each of these is off by default at every release through 7.0 and catches a defec
 - **`noImplicitReturns`** — a function with a value-returning path must return on every path.
 - **`noUnusedLocals` and `noUnusedParameters`** — dead bindings are errors. These duplicate a linter rule and turn a
   work-in-progress edit into a build failure; prefer the linter unless there is no linter.
-- **`noUncheckedSideEffectImports`** — an unresolvable `import "x"` is an error. Default `true` from 5.6. Assets a
-  bundler resolves need an ambient declaration: `declare module "*.css" {}`.
+- **`noUncheckedSideEffectImports`** — an unresolvable `import "x"` is an error. Introduced in 5.6, default `true` from
+  6.0. Assets a bundler resolves need an ambient declaration: `declare module "*.css" {}`.
 - **`verbatimModuleSyntax`** — an import or export is emitted exactly as written, so a type-only import must say
   `import type`. It removes the ambiguity of import elision and is required for a file that will be type-stripped rather
   than compiled. It cannot be used with any setup that emits both an ESM and a CJS build from one source file.

@@ -44,4 +44,5 @@ for external tooling rather than for the checker.
 - **Options deprecated in 5.0 stop working**: `charset`, `target: ES3`, `importsNotUsedAsValues`, `noImplicitUseStrict`,
   `noStrictGenericChecks`, `keyofStringsOnly`, `suppressExcessPropertyErrors`, `suppressImplicitAnyIndexErrors`, `out`,
   `preserveValueImports`, `prepend`, and an implicitly OS-specific `newLine`.
-- **A type alias may not shadow a built-in type name.** `type undefined = any` becomes an error.
+- **`undefined` joins the built-in type names a type alias may not shadow.** `type null = any` and `type number = any`
+  were always errors; a bug exempted `undefined`, and `type undefined = any` is an error from 5.5.

@@ -9,6 +9,7 @@ that claim — it stops looking as soon as it finds a `.d.ts`. Every consequence
   compiled output drifts from the implementation with no error anywhere.
 - **Hand-write a `.d.ts` only for**: a JavaScript dependency that ships none, an ambient module for a non-JavaScript
   import a bundler resolves, and a global declaration a runtime injects.
+- **`unknown`, never `any`, for a value a hand-written declaration does not describe.**
 - **Add `declarationMap: true` when the package ships its sources.** It makes a consumer's go-to-definition land on the
   `.ts` rather than the `.d.ts`.
 - **Set `rootDir` and `outDir` to different directories.** A package that publishes its `.ts` sources beside the output
@@ -39,18 +40,6 @@ files, or a build that wants a non-TypeScript tool to produce declarations.
 - **Locals are exempt.** Only the public surface of the module is constrained.
 - **It requires `declaration` or `composite`**, and it does not change what is emitted — only what is reported.
 - **It has ergonomic cost.** Adopt per package, where the parallel-build payoff is real, not repository-wide by default.
-
-## Writing a declaration
-
-- **Never use the boxed types.** `string`, `number`, `boolean`, `symbol`, `object` — never `String`, `Number`,
-  `Boolean`, `Symbol`, `Object`.
-- **Never declare a generic type that does not use its parameter.** It is not a constraint; it is a hole callers fill
-  with anything.
-- **`unknown`, never `any`, for a value the declaration does not describe.**
-- **A callback whose result is discarded returns `void`.** Returning `any` lets the call site consume a value that the
-  implementation does not promise.
-- **Callback parameters are not optional.** A caller may always supply a function of lower arity.
-- **Order overloads specific before general**, since resolution picks the first match.
 
 ## Module augmentation
 
