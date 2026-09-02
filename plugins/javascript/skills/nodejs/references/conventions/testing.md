@@ -69,13 +69,14 @@ nothing where the runner would have awaited for you.
 
 ## Fake timers
 
-`mock.timers.enable({ apis: ['setTimeout'] })`, then advance with `mock.timers.tick(ms)`.
+`mock.timers.enable({ apis: ['setTimeout', 'Date'] })`, then advance with `mock.timers.tick(ms)`.
 
 - **A destructured import is never mocked.** `import { setTimeout } from 'node:timers'` binds the real function before
   the mock installs. Call the global, or the namespace property, instead.
 - Enabling covers the global, `node:timers`, and `node:timers/promises` forms of whichever APIs are named.
-- `Date` is mockable through the same tracker, which is what makes a time-dependent assertion deterministic. **Dates and
-  timers are coupled when both are mocked** — advancing time with `tick()` also moves `Date.now()`.
+- **`tick()` moves `Date.now()` only when `'Date'` is one of the named `apis`.** Measured on 26.2.0: under
+  `{ apis: ['setTimeout'] }` a `tick(1000)` fires the timer and moves the clock by 0, so a test that asserts on elapsed
+  time passes for the wrong reason. Name both, which is why the call above does.
 
 ## Snapshots
 

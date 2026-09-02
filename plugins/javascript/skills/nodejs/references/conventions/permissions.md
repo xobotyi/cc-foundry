@@ -81,19 +81,26 @@ With `--experimental-config-file` (22.16.0 and 23.10.0; Release candidate from 2
 {
 	"permission": {
 		"allow-fs-read": ["./config"],
-		"allow-fs-write": ["./var"],
+		"allow-fs-write": ["./var/*"],
 		"allow-net": true,
 		"allow-child-process": false
 	}
 }
 ```
 
+The write grant carries the explicit `/*` because a `var` directory is typically created by the process itself. Granted
+as `"./var"`, a write to `./var/x` is denied whenever the directory did not exist at startup — measured on 26.2.0.
+
 ## Running under `npx`
 
-`npx` needs read access to resolve and execute the package, so `--permission` alone fails with a `FileSystemRead`
-denial. Pass the flags through and grant the resolver's directory:
+`npx` spawns the package rather than loading it, so the first denial is `ChildProcess`, not `FileSystemRead`. No
+`--allow-fs-read` grant alone gets past it — measured on 26.2.0, `--permission --allow-fs-read=*` still fails with
+`permission: 'ChildProcess'`. Grant the child-process scope and the directory holding `node_modules`:
 
 ```bash
-npx --node-options="--permission --allow-fs-read=$(npm prefix -g)" package-name
-npx --node-options="--permission --allow-fs-read=$(npm config get cache)" package-name
+npx --node-options="--permission --allow-child-process --allow-fs-read=$PWD" package-name
 ```
+
+Neither `npm prefix -g` nor `npm config get cache` is the path that matters; the resolved binary is read from the
+project's own `node_modules`. Granting `--allow-child-process` hands the spawned tool an unconfined process, so this
+confines the `npx` wrapper and nothing below it.

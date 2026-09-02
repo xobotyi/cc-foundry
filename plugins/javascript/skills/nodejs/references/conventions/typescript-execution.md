@@ -15,7 +15,11 @@ Anything that requires emitting JavaScript rather than deleting characters raise
 - `namespace` containing runtime code — a `namespace` exporting only types is erasable and works
 - parameter properties (`constructor(private readonly x: string)`)
 - import aliases (`import X = require('y')`)
-- decorators, which are a TC39 Stage 3 proposal and are not transformed
+
+**Decorators are the exception, and they fail under a different code.** A decorated class raises a plain
+`SyntaxError: Invalid or unexpected token` at the `@`, with no `code` property — measured on 26.2.0. Node's parser never
+reaches the type-stripping stage, because a decorator is TC39 syntax rather than TypeScript syntax. Code that diagnoses
+a failed `.ts` run by matching `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` misses this case entirely.
 
 `--experimental-transform-types` (22.7.0) did handle enums and parameter properties. It was **removed in 26.0.0**. On
 that major there is no runtime path for those constructs; compile them ahead of time or stop writing them.
@@ -57,6 +61,7 @@ always CommonJS. Node never converts between the two, so a `.ts` file using `imp
 		"noEmit": true,
 		"target": "esnext",
 		"module": "nodenext",
+		"allowImportingTsExtensions": true,
 		"rewriteRelativeImportExtensions": true,
 		"erasableSyntaxOnly": true,
 		"verbatimModuleSyntax": true
