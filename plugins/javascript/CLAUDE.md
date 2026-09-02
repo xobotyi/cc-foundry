@@ -33,13 +33,15 @@ in a reference, because it decides what the model may write.
   for the finished-but-unratified set. The body states that the project's declared engine baseline decides availability,
   never the edition number
 - `typescript` — the release pinned in the project's `package.json`. `references/versions/ts-N.N.md` per release
-- `nodejs` — the major named by `engines.node`. `references/versions/node-NN.md` per major, each carrying the support
-  window and the stability index of every addition
+- `nodejs` — the major named by `engines.node`. `references/versions/node-NN.md` per LTS major, each carrying the
+  support window and the stability index of every addition. Odd majors get no file: they reach end of life before an
+  `engines.node` floor could defensibly name one, so a feature that arrived on one is indexed under the LTS major that
+  inherits it
 - `bun` and `vitest` carry no version directory. Each targets the current stable release and anchors a version-sensitive
   claim in the sentence that states it
 
-When a new ECMAScript edition, TypeScript release, or Node major ships: add the version reference, add one index line
-naming only the features the skill's own rules reference, extend the route-list range, update the skill's
+When a new ECMAScript edition, TypeScript release, or Node LTS major ships: add the version reference, add one index
+line naming only the features the skill's own rules reference, extend the route-list range, update the skill's
 `reference-inventory.json`, and drop any gate the new floor makes obsolete.
 
 ## Skill Dependencies
