@@ -1,484 +1,315 @@
 ---
 name: ansible
 description: >-
-  Ansible automation conventions, patterns, and toolchain: playbook design, roles,
-  inventory, vault, collections, execution environments, Event-Driven Ansible,
-  testing, and performance tuning. Invoke whenever task involves any interaction
-  with Ansible — writing playbooks, creating roles, managing inventory, reviewing
-  automation code, debugging runs, upgrading ansible-core, or working with AAP.
+  Write, review, and run Ansible: the ansible-core line a project pins, what the 2.19 templating engine refuses, which
+  task results are claims rather than measurements, where a variable's value comes from, and what ansible-lint and
+  Molecule prove.
+when_to_use: >-
+  Invoke whenever Ansible is touched at all — writing or reviewing a playbook, role, collection, inventory,
+  `ansible.cfg`, `requirements.yml`, or Molecule scenario, running or debugging a play, or raising the ansible-core
+  floor. Also invoke on the symptoms: a value printed as literal `{{ }}`, `Conditionals must have a boolean result`,
+  `Template delimiters are not supported in expressions`, a task that reports `changed` on every run, a handler that
+  never fired, a variable with the wrong value on one host, a delegated task that ran on the wrong machine, a vault
+  that decrypts on one machine only, or ansible-lint failing on code that runs. Covers ansible-core, collections,
+  ansible-lint, and Molecule; container images belong to the containers skill, infrastructure discipline to devops,
+  and the Automation Platform product is out of scope.
+compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
-# Ansible
-
-Idempotency is the highest Ansible virtue. Every task must describe desired state, not a sequence of commands.
-
-## References
-
-Extended examples, patterns, and rationale for the rules below live in `${CLAUDE_SKILL_DIR}/references/`.
-
-- **playbook-patterns** — [`${CLAUDE_SKILL_DIR}/references/playbook-patterns.md`]: Play execution order, static vs
-  dynamic reuse comparison table, batched execution with `serial`, verification flags, standard directory layouts
-- **role-structure** — [`${CLAUDE_SKILL_DIR}/references/role-structure.md`]: Extended directory tree, three ways to use
-  roles (play-level, import_role, include_role) with examples, platform-specific task splitting, argument_specs example,
-  dependency mechanics, deduplication rules
-- **inventory-management** — [`${CLAUDE_SKILL_DIR}/references/inventory-management.md`]: YAML/INI examples, group
-  hierarchy, environment separation, AWS/Azure/GCP/NetBox/Terraform plugins, multi-cloud chaining, caching
-- **vault-and-security** — [`${CLAUDE_SKILL_DIR}/references/vault-and-security.md`]: File vs variable encryption,
-  password sources, ansible-sign, GPG verification, hardening roles, compliance scanning, security smells
-- **variables-and-templating** — [`${CLAUDE_SKILL_DIR}/references/variables-and-templating.md`]: Full 22-level
-  precedence list, magic variables, YAML quoting gotcha, registered variables
-- **error-handling** — [`${CLAUDE_SKILL_DIR}/references/error-handling.md`]: Block execution flow, rescue variables,
-  failed_when/changed_when, any_errors_fatal
-- **handlers-and-delegation** — [`${CLAUDE_SKILL_DIR}/references/handlers-and-delegation.md`]: Handler execution order,
-  flushing, delegate_to, delegate_facts, fire-and-forget async
-- **testing-and-performance** — [`${CLAUDE_SKILL_DIR}/references/testing-and-performance.md`]: Molecule lifecycle,
-  driver comparison, CI matrix testing, strategy plugins, SSH pipelining, fact caching, serial batching
-- **execution-environments-and-collections** —
-  [`${CLAUDE_SKILL_DIR}/references/execution-environments-and-collections.md`]: EE vs local installs, version 3 schema,
-  FQCN migration, collection certification, Galaxy publishing, automation mesh, AAP 2.5/2.6 platform architecture
-- **event-driven-ansible** — [`${CLAUDE_SKILL_DIR}/references/event-driven-ansible.md`]: Rulebook structure, event
-  sources, conditions, actions, Event Streams, decision environments, Kafka vs webhooks, performance tuning,
-  troubleshooting
-- **porting-guide** — [`${CLAUDE_SKILL_DIR}/references/porting-guide.md`]: ansible-core 2.17/2.18 breaking changes,
-  Python version requirements, removed modules, AAP 2.5/2.6 deprecations, upgrade strategy
-
-## Playbook Design
-
-### Naming and Clarity
-
-- **Always name plays, tasks, and blocks.** Unnamed tasks produce opaque output that makes debugging impossible.
-- **Always specify `state:` explicitly.** Different modules have different defaults. `state: present` / `state: absent`
-  makes intent visible.
-- **Always use FQCN** (Fully Qualified Collection Names): `ansible.builtin.copy`, not `copy`. Prevents ambiguity when
-  multiple collections are installed.
-
-### Idempotency
-
-- Prefer declarative modules (`ansible.builtin.template`, `ansible.builtin.service`, `ansible.builtin.user`) over
-  imperative ones (`ansible.builtin.command`, `ansible.builtin.shell`)
-- When `command`/`shell` is unavoidable, add `creates:`, `removes:`, or `changed_when:` to make it idempotent
-- Move complex logic into custom modules or filter plugins — Ansible is a desired state engine, not a scripting language
-- Test idempotency: run twice, second run must report zero changes
-
-### Static vs Dynamic Reuse
-
-- `import_tasks` / `import_role` -- static, parsed at load time. Tags propagate to all imported tasks. Cannot loop. Use
-  when structure is fixed.
-- `include_tasks` / `include_role` -- dynamic, evaluated at runtime. Tags apply only to the include statement. Can loop
-  and use `when`. Use when inclusion is conditional.
-
-Default to `import_*` for predictability.
-
-### Project Layout
-
-```
-inventories/
-  production/
-    hosts
-    group_vars/
-    host_vars/
-  staging/
-    hosts
-    group_vars/
-    host_vars/
-site.yml                  # imports tier playbooks
-webservers.yml
-dbservers.yml
-roles/
-  common/
-  webserver/
-  database/
-```
-
-`site.yml` imports tier playbooks. Each tier playbook maps host groups to roles.
-
-## Roles
-
-A role manages one service or component — not an entire stack. Keep provisioning separate from configuration and
-application deployment. Roles are not programming constructs: avoid deep inheritance hierarchies, tight coupling, or
-hard dependencies on external variables.
-
-### Structure
-
-```
-roles/my_role/
-  tasks/main.yml          # entry point
-  handlers/main.yml       # auto-imported into play scope
-  templates/*.j2          # Jinja2 templates
-  files/                  # static files
-  defaults/main.yml       # low-precedence (user-configurable)
-  vars/main.yml           # high-precedence (internal constants)
-  meta/main.yml           # dependencies
-  meta/argument_specs.yml # argument validation (2.11+)
-```
-
-### defaults/ vs vars/
-
-- `defaults/` -- easily overridden. Use for knobs users should change (ports, paths, feature flags).
-- `vars/` -- hard to override. Use for internal constants the role needs to function.
-
-### Naming
-
-- Role names: lowercase, hyphens: `nginx-proxy`, `ssl-certs`
-- Prefix all role variables with the role name: `nginx_port`, `nginx_worker_count`
-- Prefix handler names with role name: `nginx : Restart nginx`
-
-### Argument Validation
-
-Define expected parameters in `meta/argument_specs.yml`. Validation runs before role tasks execute.
-
-### Dependencies
-
-Defined in `meta/main.yml`. Run before the role. Deduplicated per play unless parameters differ or
-`allow_duplicates: true` is set.
-
-## Inventory
-
-### Format
-
-Prefer YAML over INI. INI `:vars` sections treat all values as strings, causing type confusion.
-
-### Grouping Strategy
-
-Group along three dimensions:
-
-- **What** (function): `webservers`, `dbservers`, `monitoring`
-- **Where** (location): `dc1`, `dc2`, `us_east`
-- **When** (environment): `production`, `staging`, `development`
-
-### Environment Separation
-
-Split large inventories by function or region — a single static file with 5,000+ hosts takes 15-30 seconds to load. Keep
-production and staging in separate inventory files or directories. Never mix environments in a single inventory --
-developers using a mixed inventory need access to all vault passwords.
-
-### Dynamic Inventory
-
-Use inventory plugins (not scripts) for cloud providers:
-
-- **AWS:** `amazon.aws.aws_ec2` -- groups from tags, instance types, regions
-- **Azure:** `azure.azcollection.azure_rm` -- conditional groups, keyed groups
-- **GCP:** `google.cloud.gcp_compute` -- zones, machine types, labels
-- **NetBox:** `netbox.netbox.nb_inventory` -- single source of truth for hybrid environments, automatic group updates
-  from tags/custom fields
-- **Terraform:** `cloud.terraform.terraform_state` -- parse state files as inventory
-
-Mix static and dynamic sources in the same inventory directory.
-
-### Constructed Inventory
-
-Build groups dynamically from host metadata using Jinja2 logic. Chain multiple cloud inventories into a single
-constructed inventory for cross-cloud targeting. Successor to Smart Inventories in AAP.
-
-## Variables and Precedence
-
-### The 22-Level Precedence Rule
-
-Role `defaults/` is lowest. Extra vars (`-e`) always win. Most common layers:
-
-- **Overridable defaults** → Role `defaults/main.yml`
-- **Environment-wide values** → `group_vars/all.yml`
-- **Group-specific values** → `group_vars/<group>.yml`
-- **Host-specific values** → `host_vars/<host>.yml`
-- **Force a value in a role** → Role `vars/main.yml`
-- **Override everything at runtime** → `--extra-vars`
-
-Define each variable in ONE place.
-
-### YAML Quoting
-
-Values starting with `{{ }}` must be quoted:
-
-```yaml
-app_path: "{{ base_path }}/app"    # correct
-app_path: {{ base_path }}/app      # YAML parse error
-```
-
-### Common Gotchas
-
-- **Boolean coercion:** YAML treats `yes`, `no`, `true`, `false`, `on`, `off` as booleans. Quote strings that match:
-  `version: "yes"`, not `version: yes`
-- **Octal numbers:** Leading zeros create octals in YAML 1.1. `mode: 0644` becomes `420` (decimal). Use `mode: "0644"`
-  for file permissions.
-- **Dictionary merge:** `combine()` does shallow merge. Nested dicts are replaced, not merged. Use
-  `combine(recursive=true)` for deep merge.
-- **Variable scope in loops:** `set_fact` in a loop overwrites on each iteration. Use `set_fact` with
-  `{{ result | default([]) + [item] }}` to accumulate.
-
-## Jinja2 Templating
-
-All templating runs on the control node before task execution.
-
-### Key Patterns
-
-- **Filters:** `{{ value | default('fallback') }}`, `{{ list | unique }}`, `{{ dict1 | combine(dict2) }}`
-- **Tests:** `when: result is defined`, `when: path is file`
-- **Template files (.j2):** support loops, conditionals, macros -- full Jinja2
-
-### Templates in Tasks vs Files
-
-- Playbooks: only variable substitution and filters. No loops or conditionals in task arguments.
-- Template files (.j2): full Jinja2 including `{% for %}`, `{% if %}`, `{% macro %}`.
-
-## Vault and Security
-
-### The vars/vault Pattern
-
-```yaml
-# group_vars/production/vars.yml  (plaintext, searchable)
-db_password: "{{ vault_db_password }}"
-
-# group_vars/production/vault.yml  (encrypted)
-vault_db_password: "actual_secret"
-```
-
-Variable names remain greppable. Values stay encrypted.
-
-### Password Automation
-
-- Never type vault passwords manually for every run
-- Use a password file (`--vault-password-file vault_pass.txt`) for local dev
-- Use a password script (`.vault_pass.sh`) that fetches from a secrets manager for team environments
-- In CI/CD, pass vault passwords via `ANSIBLE_VAULT_PASSWORD_FILE` environment variable pointing to a pipeline secret
-
-### External Secret Managers
-
-For enterprise or compliance-heavy environments, shift from static vault files to runtime secret fetching via lookup
-plugins:
-
-- HashiCorp Vault, AWS Secrets Manager, Azure Key Vault
-- Eliminates manual vault file rotation
-- Secrets never touch disk -- fetched at playbook runtime
-
-### Content Signing
-
-Use `ansible-sign` with GPG to sign project content. Creates checksum manifests (SHA256) of protected files with
-detached GPG signatures. AAP automation controller verifies signatures on project sync -- tampered projects fail to
-update and no jobs launch. Automate signing in CI via `ANSIBLE_SIGN_GPG_PASSPHRASE` environment variable.
-
-### Security Hardening
-
-- Use community CIS benchmark roles (e.g., `ansible-lockdown`) for automated compliance. Customize via
-  `defaults/main.yml`, select levels via tags.
-- Integrate OpenSCAP for compliance scanning and report generation.
-- Watch for IaC security smells: root SSH login, command injection, plaintext secrets, unvalidated paths, outdated
-  dependencies.
-
-## Error Handling
-
-### block/rescue/always
-
-```yaml
-block:
-  - name: Deploy new version
-    # ... tasks that might fail
-rescue:
-  - name: Rollback
-    # ... recovery tasks
-always:
-  - name: Send notification
-    # ... runs regardless
-```
-
-- `rescue` runs only when a `block` task fails
-- `always` runs regardless of block/rescue outcome
-- Rescue variables: `ansible_failed_task`, `ansible_failed_result`
-- Hosts that fail in `block` but succeed in `rescue` are reported as **"rescued"**, not "failed" -- account for this in
-  reporting
-
-### Result Aggregation Pattern
-
-For multi-host runs, capture per-host status in `block`/`rescue`, then aggregate in `always` using
-`ansible_play_hosts_all` with `delegate_to: localhost` and `run_once: true`. This produces a single summary of all
-successes and failures across the fleet.
-
-### Error Control
-
-- `failed_when:` -- custom failure conditions
-- `changed_when:` -- control when a task reports "changed"
-- `ignore_errors: true` -- continue on failure (use sparingly)
-- `any_errors_fatal: true` -- stop entire play on any host failure
-
-### Retry
-
-```yaml
-- name: Wait for service
-  ansible.builtin.uri:
-    url: http://localhost:8080/health
-  register: result
-  until: result.status == 200
-  retries: 30
-  delay: 10
-```
+Three biases decide most calls:
+
+- **The ansible-core line the project pins decides what may be written**, not the binary on the machine. The 2.19
+  templating rewrite is the boundary: content that runs on 2.18 can fail, warn, or render literally on 2.19 and later
+  with no YAML change.
+- **`ok` and `changed` are claims made by the module, not measurements.** A `command` task claims a change on every run,
+  an async launch always claims one, and a `--check` run skips whatever it cannot simulate. Idempotence is proven by a
+  second run reporting `changed=0`, and by nothing else.
+- **Where a value comes from is not guessable.** Inventory layout, `group_vars` adjacency, `ansible.cfg` discovery, and
+  collection versions each change what a play does. Read them before the first edit.
+
+## Core Version
+
+Read the pin before writing: `requires_ansible` in `meta/runtime.yml`, the `ansible-core` line in a requirements or
+execution-environment file, and the CI matrix. `ansible --version` reports one machine. The `ansible` community package
+pulls one ansible-core line: 11 → 2.18, 12 → 2.19, 13 → 2.20, 14 → 2.21.
+
+Support windows, which decide whether a pin is defensible:
+
+- **2.18** — end of life May 2026. No fixes of any kind. Control Python 3.11 to 3.13, target 3.8 to 3.13.
+- **2.19** — security fixes only from 2026-05-18, end of life November 2026. Control 3.11 to 3.13, target 3.8 to 3.13.
+- **2.20** — critical fixes only from 2026-05-18, security only from 2026-11-02, end of life May 2027. Control 3.12 to
+  3.14, target 3.9 to 3.14.
+- **2.21** — GA 2026-05-18, critical only from November 2026, end of life November 2027. Control 3.12 to 3.14, target
+  3.9 to 3.14.
+
+Floor per feature — the changes the rules below depend on:
+
+- **2.18** — `loop_control.break_when`; `meta: end_role`; `timedout` and `vaulted_file` tests; `raw` over SSH to Windows
+  runs unwrapped, without `powershell.exe`.
+- **2.19** — trust-tagged templating, boolean-only conditionals, no multi-pass rendering, lazy evaluation, native types
+  only; `ALLOW_BROKEN_CONDITIONALS`; `DISPLAY_TRACEBACK`; `SSH_ASKPASS` replaces `sshpass`; a `become` timeout is
+  unreachable; `omit` dropped from loop items; `bool` filter narrowed; plural `collections_paths` removed; `paramiko`
+  and `auto_legacy` deprecated.
+- **2.20** — control Python 3.12+, target 3.9+; `transport = smart` removed; Galaxy v2 API removed; `vaultid` filter
+  parameter removed; `include_vars` rejects a non-list `extensions`; `INJECT_FACTS_AS_VARS` deprecated, default flips in
+  2.24.
+- **2.21** — register projections and the `_task` object; `ansible-galaxy` refuses a collection whose `requires_ansible`
+  excludes the running core; `paramiko` and `auto_legacy` removed; `invocation` dropped from results; failure inference
+  from `rc` deprecated, warnings from 2.22; `to_yaml` decrypts vaulted values again.
+
+Read [`${CLAUDE_SKILL_DIR}/references/versions/core-2.NN.md`] — `core-2.18.md` through `core-2.21.md` — when writing
+against a feature near the floor, when raising the floor, and before touching content that must run on 2.18 and 2.19
+both. Each carries what its line added, changed, removed, and deprecated with the removal target, and the traps.
+
+## Templating
+
+The 2.19 engine holds on every maintained line. Write for it; do not write for 2.18 unless the project pins 2.18.
+
+- **Never put `{{ }}` inside `when`, `failed_when`, `changed_when`, `until`, `break_when`, `assert.that`, or a
+  `register` projection.** They are expressions already. Delimiters there are the error
+  `Template delimiters are not supported in expressions`.
+- **A conditional must evaluate to a boolean.** `when: some_string` fails with
+  `Conditional result was 'x' of type 'str' ... Conditionals must have a boolean result.` Write
+  `some_string | length > 0`, `is truthy`, `is defined`, or `| bool`. A YAML list under `when` is `and`; write `or` in
+  one string.
+- **A string that arrives with `{{ }}` in it is data.** Module results, facts, command output, and file contents are
+  never rendered, and no setting restores rendering. A custom plugin that returns template text must tag it with
+  `trust_as_template`.
+- **Types survive.** `None` is not `""`; a list through a string filter becomes a string; `range()` needs `| list`
+  before it is stored; `"127" == 127` is false. Convert with `int`, `string`, `bool`, `list`.
+- **`default()` binds to the immediate value only.** A container with an undefined leaf is defined; put `default` at the
+  leaf. `default(x, true)` also replaces `false`, `0`, `""`, and empty containers.
+- **`default(omit)` belongs on the module argument.** A loop item value that resolves to `omit` is dropped from the
+  item, so `item.key` is undefined, not a placeholder.
+- **`set_fact` evaluates on assignment; a `vars` entry is re-evaluated on every access.** Use `set_fact` to freeze a
+  value, `vars` to derive one.
+- **`{% if %}text{% endif %}` in a value yields `None` when the branch is not taken.** Add an explicit
+  `{% else %}{{ "" }}{% endif %}`.
+- **`set_fact` does not turn `"yes"` or `"true"` strings into booleans.** Use YAML booleans.
+
+Read [`${CLAUDE_SKILL_DIR}/references/templating.md`] when writing a filter chain, a boolean conversion, a `combine`
+merge, a serialization, or when an error names a type — it carries the expression contexts, the type rules, undefined
+handling, `omit`, dictionary and list filters, and the trust model.
+
+## YAML
+
+- **Quote a value that starts with `{{`.** Unquoted, `{` opens a flow mapping and the error is a YAML syntax error.
+- **Quote file modes**: `mode: "0644"`. Unquoted `0644` is 420. Symbolic `u=rw,g=r,o=r` also works.
+- **Write `true` and `false`.** `yes`, `no`, `on`, `off` are booleans to the parser; `version: yes` is not a string.
+- **Quote an expression that contains `: `** inside `assert.that` or `when`; otherwise it parses as a mapping and fails
+  with `Conditional expressions must be strings.`
+- **`!unsafe` marks a value as data** so it is never rendered even from a trusted file. `{% raw %}` keeps delimiters
+  literal inside a template that is otherwise rendered.
+- **INI `[group:vars]` values are strings**, while `key=value` on a host line is a Python literal. Apply `| bool` or
+  `| int` when consuming, or use YAML inventory.
+
+## Idempotence
+
+- **`command` and `shell` report `changed` on every run.** Give them `creates`, `removes`, or `changed_when`;
+  `changed_when: false` on a read. Prefer the module that owns the state (`apt`, `service`, `file`, `lineinfile`).
+- **`command` runs no shell.** No `|`, `>`, `;`, `&`, globbing; `$VAR` is expanded by Python and left alone when unset.
+  Use `argv` for arguments with spaces and `quote` for interpolated values.
+- **A `shell` pipeline hides the first failure.** Start it with `set -o pipefail` and set `executable: /bin/bash`.
+- **An async task always reports `changed`.** Put `changed_when`, `creates`, and friends on the `async_status` task.
+- **`lineinfile` `regexp` must match the line after the change too**, or every run rewrites it. `blockinfile` needs a
+  distinct `marker` per logical block, or one block replaces another.
+- **A loop is `changed` if any item changed**, and every notified handler fires once for the whole task. Per-item truth
+  is in `results[]`.
+- **`state: latest` and an unpinned `git` checkout give a different result on a different day.** Pin the version.
+- **Check mode skips a module that cannot simulate, and `command` without `creates` or `removes` is one of them.**
+  `check_mode: false` forces a task to run under `--check`; `ansible_check_mode` is the variable to branch on. `--diff`
+  reveals file contents; `diff: false` on a secret.
+
+## Failure
+
+- **`ignore_errors` swallows only a `failed` result.** An undefined variable, a syntax error, a missing interpreter, or
+  an unreachable host is not covered; `ignore_unreachable` handles the last.
+- **A `failed_when` list is `and`.** `failed_when: rc != 0 or 'ERROR' in stdout` in one string fails on either.
+- **A `become` timeout is unreachable, not failed**, so `ignore_errors` does not cover it.
+- **A `rescue` that succeeds reverts the failure for play control**: the host continues, and neither
+  `max_fail_percentage` nor `any_errors_fatal` counts it, while the recap counts it under `rescued`. An invalid task
+  definition or an unreachable host never enters `rescue`. `ansible_failed_task` and `ansible_failed_result` are set
+  inside it.
+- **`max_fail_percentage` is per `serial` batch and must be exceeded, not met**: with `serial: 4`, aborting on two
+  failures needs `49`. `any_errors_fatal` finishes the failing task on the current batch, then stops every host.
+- **A module that returns `rc: 1` and no `failed` is failed by inference on 2.21 and earlier**, and the inference is
+  deprecated from 2.21. Set `failed` or call `fail_json` in every module.
+- **`_task.result`** replaces `register` inside `failed_when`, `changed_when`, and `until` on 2.21; in a loop it needs
+  `default({})` on the first iteration.
 
 ## Handlers
 
-- Run once per play after all tasks complete (or on `meta: flush_handlers`)
-- Execute in **definition order**, not notification order
-- Multiple notifications to the same handler result in single execution
-- Use `listen:` topics to group related handlers
-- Never use variables in handler **names** -- use them in handler **parameters**
-- Handlers from roles have global scope; prefix with `role_name : handler_name`
+- **A handler does not run on a host where a later task failed** unless `force_handlers` is set. The configuration is
+  changed and the service is not restarted. `meta: flush_handlers` runs the handlers notified so far, and works inside
+  `rescue`.
+- **Handlers run in definition order, once per play section** (`pre_tasks`, `roles` and `tasks`, `post_tasks`), no
+  matter how many tasks notified them or in what order.
+- **Two handlers with one name shadow: the last loaded wins**, in the order `roles:`, `handlers:`, `import_role`,
+  `include_role`. Notify a role's handler as `role_name : handler_name`; use `listen` topics to decouple.
+- **Never template a handler's name.** Names are templated early; a name with an undefined variable, a syntax error, or
+  a value resolving to `omit` is skipped on 2.19 and later and fails the play on 2.18, and in no case runs. Put the
+  variable in the handler's arguments. `listen` topics cannot be templated at all.
+- **A handler inside an `include_tasks` file cannot be notified**; a handler that is an `import_tasks` is rewritten into
+  its tasks. A handler cannot `include_role` or `import_role`, and handlers ignore tags.
 
-## Delegation and Async
+## Delegation and Execution
 
-### Delegation
+- **Under `delegate_to`, everything except `inventory_hostname` is the delegate's**: `ansible_host`, the interpreter,
+  connection, become, and shell options, even `inventory_hostname_short`. Reach the original host with
+  `hostvars[inventory_hostname]`. Facts gathered by a delegated task land on the original host unless
+  `delegate_facts: true`.
+- **Delegation does not serialize.** Five forks writing one file on one delegate overwrite each other. Use
+  `throttle: 1`, or `run_once: true` with a loop over `ansible_play_hosts_all`.
+- **`run_once` is once per `serial` batch**, evaluated with the first host's variables. Truly once is
+  `when: inventory_hostname == ansible_play_hosts_all[0]`.
+- **`throttle` can only lower parallelism below `forks` (default 5) and the batch size.** `serial` takes a number, a
+  percentage, or a list of either; the last batch holds the remainder and a batch is never smaller than one.
+- **`order: inventory` is the compiled selection order, not the file order.** Use `sorted` when the order matters.
+- **`connection: local` runs modules under `/usr/bin/python`** unless `ansible_python_interpreter` is
+  `"{{ ansible_playbook_python }}"`. `delegate_to: localhost` has no such trap.
+- **`add_host` and `group_by` change inventory for later plays**, subject to `--limit`; the current play's host list is
+  already fixed.
+- **Third-party strategy plugins are deprecated.** `linear`, `free`, `host_pinned`, and `debug` are the set.
 
-Execute a task on a different host: `delegate_to: lb.example.com`. Use for load balancer operations, centralized
-notifications, cross-host coordination.
+## Variables
 
-`local_action:` is shorthand for `delegate_to: 127.0.0.1`.
+Lowest to highest, the rungs that decide most disputes: role `defaults/`, inventory group vars, inventory host vars,
+facts and cached `set_fact`, play `vars`, role `vars/`, block and task `vars`, `include_vars`, registered results and
+`set_fact`, role parameters, extra vars.
 
-When multiple hosts delegate to the same target, use `throttle: 1` or `run_once: true` to prevent race conditions.
-`become` applies to the delegated host, not the original target -- verify escalation permissions.
+- **`defaults/` is for what a caller overrides; `vars/` is for what the role forces.** A value in `vars/` beats
+  inventory, facts, and play vars; block and task `vars`, `include_vars`, `set_fact`, role parameters, and `-e` beat it.
+- **`roles:` and `import_role` publish a role's variables to the whole play at parse time**, visible to earlier tasks;
+  `include_role` publishes nothing unless `public: true`, and then only to later tasks. `include_role` also runs the
+  role every time it is called, where `roles:` entries with equal parameters run once per play.
+- **A registered variable exists on every host, including where the task failed or was skipped.** Test `is skipped` or
+  `is failed`, not `is defined`.
+- **`set_fact` with `cacheable: true` makes two copies**, a host variable at `set_fact` precedence for this run and a
+  fact seven rungs lower that the cache persists. `meta: clear_facts` removes only the fact.
+- **Groups at one level merge alphabetically**; `ansible_group_priority` reorders them and is honored only in an
+  inventory source, never in `group_vars/`.
+- **`group_vars/` next to the playbook beats `group_vars/` next to the inventory**, and `ansible-inventory` without
+  `--playbook-dir` never reads the playbook-adjacent copy, so it can print a value a play does not use.
+- **`-e key=value` is a string; `-e '{"key": 1}'` and `-e @file.yml` keep types.**
+- **Ansible loads the first `ansible.cfg` found** — `ANSIBLE_CONFIG`, `./ansible.cfg`, `~/.ansible.cfg`,
+  `/etc/ansible/ansible.cfg` — and refuses one in a world-writable current directory.
+- **Write `ansible_facts['os_family']`, not `ansible_os_family`.** The injected form warns on 2.20 and later and is off
+  by default from 2.24.
+- **Facts are a snapshot from the gathering task**, once per play by default; a cached fact is from a previous run
+  within `CACHE_PLUGIN_TIMEOUT` (86400 s). `gather_subset` and `--limit` decide which hosts have which facts.
 
-### Async
+Read [`${CLAUDE_SKILL_DIR}/references/precedence.md`] when two definitions of one name disagree, when a value differs
+between hosts or commands, or when designing a `group_vars` layout — it carries the full 22-rung ladder, the inventory
+merge order, directory adjacency, INI and extra-vars typing, scope, and role publication.
 
-- `async: N, poll: M` (M > 0) -- extended timeout, still blocks
-- `async: N, poll: 0` -- fire-and-forget, check later with `async_status`
-- Do not use `poll: 0` with tasks requiring exclusive locks (package managers)
+## Roles and Collections
 
-## Event-Driven Ansible (EDA)
+- **Always the FQCN**: `ansible.builtin.copy`. `ansible.legacy.copy` only where a local `library/` override must win.
+  Short names resolve at run time and fail `ansible-lint --profile production`.
+- **The `collections:` keyword is not inherited by roles**, and never applies to lookups, filters, or tests. A role sets
+  its own list in `meta/main.yml`, and a role inside a collection searches its own collection first.
+- **`meta/argument_specs.yml` validates coercively and passes the original value through**: `1` satisfies `type: str`
+  and the role receives the integer. The validation task carries the `always` tag and runs dependencies' specs first.
+- **A role listed twice with equal parameters runs once per play.** Different role parameters (not `vars:`), tags, or
+  `when` make it distinct; `allow_duplicates: true` in the role's own `meta/main.yml` forces it. Deduplication runs
+  before variable evaluation.
+- **`dependencies` run before the role and are deduplicated the same way**; `vars:` inside a dependency entry is play
+  scoped and reaches roles that ran earlier. Galaxy import requires dependencies in `namespace.role` form, never a URL.
+- **`requirements.yml` takes `roles:` and `collections:` sections in one file.** Roles take a single `version` with no
+  ranges; collections take `>=`, `==`, `!=` (treated as unpinned), and `*`. `ansible-galaxy install -r` installs both
+  sections; `role install` and `collection install` each install their own.
+- **A collection's `requires_ansible` is enforced at install from 2.21**: a mismatch is skipped, not installed and
+  failed later. `COLLECTIONS_ON_ANSIBLE_VERSION_MISMATCH` governs both the install and the load-time warning.
+- **`plugin_routing` in `meta/runtime.yml` redirects, deprecates, and tombstones names.** Read it before declaring a
+  plugin missing.
+- **A Galaxy server must speak the v3 API from 2.20.** `collections_path` is singular from 2.19.
+- **Roles inside collections cannot embed plugins in `library/` or `filter_plugins/`**; standalone roles can, and the
+  plugins stay visible to roles that run after them.
 
-EDA is the "Automation Decisions" component of AAP -- a decision engine that listens to event sources and triggers
-automated responses via rulebooks. Rulebooks are the event-driven equivalent of playbooks: YAML files with sources,
-conditions, and actions.
+## Connection and Become
 
-Key concepts:
+- **Pipelining is off by default and is the largest cheap speedup.** It needs `requiretty` absent from sudoers and does
+  not apply to file-transfer modules (`copy`, `template`, `fetch`).
+- **`ssh_args` replaces the default `-C -o ControlMaster=auto -o ControlPersist=60s`.** Add options through
+  `ssh_common_args` or `ssh_extra_args`; a custom `-o ControlPath` disables the managed control path.
+- **SSH passwords use `SSH_ASKPASS` from 2.19**; `sshpass` is opt-in through `ansible_ssh_password_mechanism`. A key
+  with a passphrase needs an agent; Ansible never proxies the passphrase prompt.
+- **`become_user` does not imply `become`.** `-K` supplies one become password for every host; per-host passwords go in
+  vaulted `ansible_become_password`.
+- **Privilege escalation cannot be limited to specific commands.** Modules run from a temporary file with a changing
+  name, so a sudoers command allowlist breaks every module.
+- **An unprivileged connection user becoming another unprivileged user needs POSIX ACLs (`setfacl`) on the target, a
+  shared group named in `ansible_common_remote_group`, or pipelining.** Without one of them Ansible errors rather than
+  fall back to `world_readable_temp`.
+- **Interpreter discovery is `auto`.** Pinning `ansible_python_interpreter` silences the warning and freezes the path.
+- **`ansible_host` must never depend on `inventory_hostname`**; use `inventory_hostname_short` so delegation works.
+- **`become` does not open a systemd session**: `XDG_RUNTIME_DIR` is empty and `systemctl --user` fails;
+  `become_method: machinectl` opens one.
+- **`paramiko` is gone from core in 2.21.** `ansible_connection: paramiko` fails to load; network platforms use
+  `ansible.netcommon` connections.
 
-- **Rulebooks** define event sources, conditions (`when`), and actions (`run_job_template`, `run_workflow_template`,
-  `set_fact`, `debug`)
-- **Event Streams** (AAP 2.5+) route a single webhook endpoint to multiple rulebook activations with credential
-  integration -- use for production
-- **Decision environments** are container images for running rulebooks (analogous to execution environments for
-  playbooks)
-- Supported controller sources: `alertmanager`, `aws_sqs_queue`, `azure_service_bus`, `kafka`, `pg_listener`, `webhook`
-- Use **Kafka** for high-volume mission-critical streams; **webhooks** for simple integrations; **Event Streams** for
-  production webhook scenarios
+## Vault
 
-See [`${CLAUDE_SKILL_DIR}/references/event-driven-ansible.md`] for rulebook structure, event filters, scaling, and
-troubleshooting.
+- **Vault protects data at rest only.** Decrypted values reach modules, diffs, callbacks, and errors. Put `no_log: true`
+  on the task that handles the secret; it does not protect a later `debug` of the same variable.
+- **`ansible-vault encrypt_string` produces an inline `!vault` scalar; `encrypt` encrypts a whole file.** The `vault_`
+  prefix convention (`db_password: "{{ vault_db_password }}"`) keeps variable names greppable at the cost of two
+  variables in precedence.
+- **A vault-id label is a hint.** Every supplied password is tried, matching label first; `DEFAULT_VAULT_ID_MATCH`
+  restricts each password to its label. Two files can carry the same label and different passwords; `rekey` fixes it.
+- **A password source with the executable bit set is run, not read.** A client script must accept `--vault-id`, print
+  the password, and be named `*-client` or `*-client.EXT`. A non-executable file is read as the password.
+- **`ANSIBLE_VAULT_PASSWORD_FILE` or `vault_password_file` in `ansible.cfg`** is a silent default source that changes
+  which secret a run uses from machine to machine; ansible-lint honors both.
+- **An encrypted file passed as `src` to `copy`, `template`, `unarchive`, `script`, or `assemble` lands decrypted on the
+  target.**
+- **`to_yaml` on a vaulted value writes `!vault` ciphertext on 2.19 and 2.20**, and the decrypted value on 2.21
+  (`vault_behavior` selects). `vault_encrypted` tests a variable, `vaulted_file` a path.
 
-## Execution Environments and AAP Platform
+## Verification
 
-Container images bundling Ansible Core, Runner, collections, and all dependencies. Replace traditional virtual
-environments for consistent automation execution.
+- **ansible-lint from the project root**, under the ansible-core line the project pins. With no `--profile` every rule
+  applies; `--profile production` is the bar for content that ships. The rules that fire most on generated code:
+  `no-changed-when`, `risky-shell-pipe`, `fqcn`, `name[casing]`, `name[template]`, `var-naming[no-role-prefix]`,
+  `yaml[octal-values]`, `yaml[truthy]`, `no-free-form`, `partial-become`. `# noqa: rule-id` at the end of the line
+  suppresses one rule; `skip_list` hides it from output.
+- **`--syntax-check` parses without connecting; `--check --diff` on one host simulates what modules can simulate** and
+  skips the rest.
+- **Run the play twice; the second recap is the idempotence result.** Molecule's `idempotence` action is exactly that
+  comparison and nothing deeper: `changed_when: false` passes it, a bare `command` fails it.
+- **`molecule test` runs a configurable `test_sequence`**; a scenario that dropped `idempotence` or `verify` passes all
+  the same. The built-in driver provisions nothing; ansible-native scenarios create instances in `create.yml` and write
+  their addresses into an inventory source. Drivers come from `molecule-plugins`.
+- **`ansible-inventory --list -i <source> --playbook-dir .`** shows the merged variables a play will see;
+  `ansible-config dump --only-changed` shows which `ansible.cfg` won; `ansible-doc -t <type> <fqcn>` is the argument
+  spec.
+- **ansible-lint 26.8.0 and Molecule 26.8.0 support the two newest ansible-core lines at their release.** Testing 2.18
+  content needs a pinned older toolchain in its own environment.
 
-- **ansible-builder:** Creates custom EEs from definition files (version 3 schema). Specify base image, Galaxy
-  collections, Python packages, and system dependencies.
-- **ansible-navigator:** Interactive TUI for playbook development. Drill into task outputs, inspect variables, replay
-  artifacts for collaborative debugging. Tightly integrated with EEs for dev-prod parity.
-- **Automation mesh:** Overlay network distributing workloads across execution nodes via peer-to-peer connections using
-  Receptor. Scale execution capacity independently from the control plane.
+Read [`${CLAUDE_SKILL_DIR}/references/lint.md`] when a rule fires that the list above does not name, when configuring
+`.ansible-lint`, or when a lint result disagrees with a run — it carries the profiles, every rule that fires on
+generated code, suppression, and the coupling to the ansible-core line. Read
+[`${CLAUDE_SKILL_DIR}/references/molecule.md`] when writing or repairing a scenario — it carries the ansible-native and
+legacy layouts, the sequences, the idempotence criterion, dependency paths, and the `MOLECULE_` variables.
 
-Use EEs when: enterprise scale, complex dependencies, team consistency needed. Use local installs for: simple setups,
-ad-hoc tasks, beginners.
+## Boundary
 
-### AAP 2.5/2.6 Awareness
-
-AAP 2.5 introduced a unified UI, Platform Gateway (single auth entry point), and containerized installer (Podman on
-RHEL). AAP 2.6 adds an automation dashboard (ROI tracking), self-service automation portal, and Ansible Lightspeed
-intelligent assistant.
-
-RPM-based installer is deprecated as of AAP 2.5 -- containerized and operator-based deployments are the future.
-
-See [`${CLAUDE_SKILL_DIR}/references/porting-guide.md`] for AAP platform changes and upgrade guidance.
-
-## Collections
-
-- Install with `ansible-galaxy collection install community.general`
-- Pin versions in `requirements.yml` using open ranges:
-  ```yaml
-  collections:
-    - name: community.general
-      version: ">=7.0.0,<8.0.0"
-  ```
-- Always use FQCN in playbooks: `community.general.ufw`, not `ufw`
-- Install collection dependencies before playbook execution in CI:
-  `ansible-galaxy collection install -r requirements.yml`
-- Vendor collections for air-gapped environments:
-  `ansible-galaxy collection download -r requirements.yml -p ./collections/`
-- Scope collection installs per project -- avoid global installs that create version conflicts across projects
-
-### Collection Quality
-
-- `ansible-test sanity --docker default` for coding standards; `ansible-lint --profile production` for certification
-- `galaxy-importer` in CI to replicate automation hub import checks
-- Semantic versioning (minimum 1.0.0), `requires_ansible` in `meta/runtime.yml`
-- FQCN migration: use `plugin_routing` in `meta/runtime.yml` for backward-compatible redirects
-
-## Testing
-
-### Pipeline
-
-Integrate `ansible-lint` in CI and pre-commit hooks. For enterprise environments, add policy-as-code tools (Steampunk
-Spotter, Checkov) as gates before automation reaches production.
-
-1. **ansible-lint** -- static analysis in CI and pre-commit hooks
-2. **--syntax-check** -- parse without executing
-3. **--check --diff** -- dry run against staging
-4. **Molecule** -- role-level testing with idempotency verification
-5. **Matrix testing** -- multiple OS versions and Ansible versions in CI
-6. **Staging environment** -- full run before production
-
-### Molecule
-
-Standard role testing framework. Drivers: Docker (fast, local dev), Podman (rootless, enterprise), Vagrant (full VM),
-delegated (default in Molecule 6). Run `molecule test` for the full lifecycle. Use multiple scenarios for different
-conditions (default, HA cluster, upgrade).
-
-## Performance
-
-- Increase `forks` (default 5) for parallel host execution -- start at 2-4x CPU cores, monitor control node memory
-- Enable SSH pipelining: `pipelining = True` with ControlPersist
-- **Mitogen strategy plugin:** replaces SSH-based execution with RPC protocol, 1.5x-7x faster. Use `mitogen_linear` or
-  `mitogen_free`. Most impactful for playbooks with many small tasks.
-- Cache facts: `gathering = smart` with `fact_caching = jsonfile` (or Redis)
-- Disable `gather_facts` when not needed; use `gather_subset` to limit scope
-- Use `synchronize` over `copy` for large file transfers
-- Install packages as a list, not in a loop
-- Use `serial` for staged batching in rolling deployments
-- Profile before optimizing: `callbacks_enabled = timer, profile_tasks`
-
-### Large Inventories
-
-Enable inventory caching for dynamic sources (30+ seconds to under 1 second). Use constructed inventory plugin over
-large static groups. Flatten group hierarchies (3-4 groups per host, not 6-7). Split inventories by function/region.
-
-## Porting and Compatibility
-
-ansible-core 2.17+ requires Python 3.7+ on managed hosts. RHEL 8 environments must stay on ansible-core 2.16 (system
-Python 3.6 bindings are incompatible). Key removals: `yum` module (redirected to `dnf`), `include` module (use
-`include_tasks`/`import_tasks`), `smart` connection option (select explicit plugin).
-
-ansible-core 2.18 removes old-style vars plugins (`get_host_vars`/`get_group_vars`) and deprecates plural
-`COLLECTIONS_PATHS`. Windows Server 2012/2012 R2 support is removed.
-
-See [`${CLAUDE_SKILL_DIR}/references/porting-guide.md`] for the full list of breaking changes, deprecations, and upgrade
-strategy.
+The automation controller and its job templates and surveys (AWX and the Automation Platform), automation mesh,
+Automation Hub certification, the platform's Event-Driven Ansible service, and Lightspeed are out of scope; a play never
+configures them. `ansible-rulebook`, `ansible-builder`, `ansible-navigator`, and the Ansible development tools MCP
+server are open source and usable without the platform.
 
 ## Application
 
-When **writing** Ansible automation: apply all conventions silently. If an existing codebase contradicts a convention,
-follow the codebase and flag the divergence.
+When **writing** Ansible, apply these rules silently — do not narrate a rule while following it. Where the existing
+content contradicts one, follow the content and flag the divergence once. State the ansible-core line an edit assumes
+when it is not 2.19-compatible.
 
-When **reviewing** Ansible code: cite the specific violation and show the fix inline. Example:
-`copy: -> ansible.builtin.copy:`
+When **reviewing** Ansible, cite the violation and give the corrected line inline. Do not lecture.
 
 ## Integration
 
-The **coding** skill governs workflow; this skill governs Ansible-specific conventions. Both are active simultaneously.
-
-## Non-Negotiable Defaults
-
-- Every task must be idempotent -- run twice, zero changes on second run
-- Always use FQCN -- no short module names
-- Always name plays, tasks, and blocks
-- Never store secrets in plaintext -- use Vault
-- Never commit vault password files to version control
-- Use `no_log: true` on tasks handling secrets
-- Use `become: true` at task level, not play level
-- Use SSH key authentication, not password authentication
-- Sign project content with `ansible-sign` in regulated environments
-
-**Idempotency is the highest Ansible virtue. Describe desired state, never command sequences.**
+The **devops** skill governs infrastructure discipline: what a deliverable must satisfy, change management, and the
+verification that closes a change. This skill governs how Ansible behaves and how Ansible is written, and wins on any
+question of what a play, role, or inventory does. The **coding** skill governs the shape of the work; the **containers**
+skill owns the images an execution environment is built from. All are active at once.
