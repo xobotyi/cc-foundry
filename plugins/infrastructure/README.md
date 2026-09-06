@@ -28,10 +28,10 @@ DORA metrics), and disaster recovery (RTO/RPO tiering). Runs in a sandwich patte
 
 ### ansible
 
-Ansible automation: playbook design, role structure, inventory management (static/dynamic/ multi-cloud), vault
-encryption, collections development, execution environments (ansible-builder/navigator), Molecule testing (5 drivers, CI
-matrix), variable precedence, error handling (block/rescue/always), performance optimization (Mitogen, SSH pipelining,
-fact caching), and content signing (ansible-sign).
+Ansible as it behaves on the ansible-core line a project pins (2.18 through 2.21): what the 2.19 templating engine
+refuses, which task results are claims rather than measurements, where a variable's value comes from, handler and
+delegation semantics, vault at rest, and the ansible-lint and Molecule loop that proves a change. One reference per core
+line carries the additions, removals, deprecations, and traps of that line.
 
 ### containers
 
