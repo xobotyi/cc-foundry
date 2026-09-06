@@ -18,14 +18,23 @@ Proxmox virtualization, Unraid NAS management, and network architecture.
   automation, cloud-init, backups/PBS, PCIe passthrough
 - **`unraid`** — Unraid server management: arrays, Docker, VMs/GPU passthrough, shares, plugins, user scripts, backup
   (3-2-1), UPS/NUT, GraphQL API
-- **`networking`** — network infrastructure: VLANs, firewalls (nftables), DNS, reverse proxies, VPN (WireGuard), TLS,
-  IPv6, IDS/IPS (Suricata/CrowdSec), auth proxies (Authelia/Authentik)
+- **`networking`** — what a network configuration does once loaded, where that differs from what the file reads:
+  nftables evaluation and its coexistence with Docker, firewalld, and ufw, OPNsense and pfSense rule order, bridges and
+  VLANs, reverse-path filtering, policy routing, MTU, IPv6, systemd-resolved and Docker DNS, Unbound, Pi-hole v6,
+  AdGuard Home, dnsmasq, Caddy, Traefik v3, nginx, ACME as written in config, Cloudflare in the path, Authelia and
+  authentik forward auth, WireGuard and wg-quick, Tailscale and Headscale, Suricata, CrowdSec, and fail2ban
 
 ## Version References
 
 `devops` has no version axis: it is a discipline over many tools with no shared release line. Its dated claims (the
 certificate-lifetime schedule, tool status, controller defaults, the incidents its rules are drawn from) carry the date
 or version in the sentence; nothing in it depends on when it is read.
+
+`networking` has no version axis either: its tools share no release line, and each claim is anchored in its own
+sentence. The boundaries it names by version are syntax boundaries, not a gate: Pi-hole v6, Traefik v3, Docker Engine 28
+and 29, wireguard-tools v1.0.20250521, Headscale 0.28 and 0.29, CrowdSec 1.7, fail2ban 1.1.1, Unbound 1.23. A claim
+about any of them is verified against the tool's own documentation, release notes, man page, or source fetched in the
+session; a mailing-list or GitHub release page whose date the fetch could not confirm is not a source.
 
 `ansible` gates on the ansible-core line the project pins and names exactly one axis. The floor index lives inline in
 the SKILL.md, because it decides what may be written; `references/versions/core-2.NN.md` holds one file per maintained
@@ -45,6 +54,10 @@ split, stated from both sides in the Integration sections: `devops` owns what a 
 and the evidence that closes it; the tool skill (`ansible`, `containers`, `proxmox`, `unraid`, `networking`) owns how
 its artifact is written and what it does, and wins on that question.
 
+Ownership between the tool skills: the host-firewall side of a published container port (Docker's chains, the nftables
+backend) is `networking`; container networking modes and Compose are `containers`. The hypervisor bridge setting
+(`bridge-vlan-aware`) is `proxmox`; Linux bridge VLAN semantics are `networking`.
+
 ## Plugin Scope
 
 Skills assume the `the-coder` plugin for language-agnostic coding discipline when writing configuration files, scripts,
@@ -61,7 +74,12 @@ carries nothing about the product.
   postmortem, the tool's own documentation, or the advisory, fetched in the session — never against memory or a research
   report
 - Platform-specific quirks and gotchas are documented explicitly
-- `ansible` and `devops` split their references by load condition and state the condition at the point of need; there is
-  no catalog block. A reference is one hop from SKILL.md
-- `devops` carries no worked examples and no restated principles; every rule is a failure an agent produces without it,
-  and an incident cited beside a rule is a fixed anchor, not an example to imitate
+- `ansible`, `devops`, and `networking` split their references by load condition and state the condition at the point of
+  need; there is no catalog block. A reference is one hop from SKILL.md. `networking` splits per tool where the load
+  condition is the tool (a Caddyfile never needs the Traefik file) and per concern where several tools share it
+- `devops` and `networking` carry no worked examples and no restated principles; every rule is a failure an agent
+  produces without it, and an incident cited beside a rule is a fixed anchor, not an example to imitate
+- `networking` states what a configuration does once loaded and never how to apply it or prove its effect; the effect
+  checks for a firewall, a resolver, a certificate, and a WireGuard peer live in `devops` `references/effect.md` and are
+  named from `networking` in prose, never duplicated. The certificate schedule, profiles, and rate-limit numbers live in
+  `devops` `references/secrets.md`; `networking` `references/acme.md` carries only what the client config decides

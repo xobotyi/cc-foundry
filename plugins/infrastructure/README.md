@@ -57,10 +57,19 @@ integration, and programmatic access (GraphQL API, MCP management agent).
 
 ### networking
 
-Network infrastructure for self-hosted environments: VLAN segmentation and Layer 2 security, firewalls (nftables,
-OPNsense/pfSense), DNS architecture (Pi-hole, AdGuard Home, split-horizon, DoH/DoT), reverse proxies (Traefik, Caddy,
-Cloudflare tunnels), VPN (WireGuard with HA/OSPF, Tailscale), TLS/SSL (Let's Encrypt, ACME), IPv6 dual-stack, IDS/IPS
-(Suricata, CrowdSec), authentication proxies (Authelia, Authentik), and SSH certificate authority.
+What a network configuration does once loaded, where that differs from what the file reads. An nftables `accept` ends
+one chain while `drop` ends the ruleset, and `flush ruleset` takes Docker's tables with it; a published container port
+never meets the host `input` chain, and Docker's nftables backend has no `DOCKER-USER` chain at all; systemd's shipped
+sysctl file makes a write to `rp_filter` on `conf.all` a no-op; Docker rewrites a container's `resolv.conf` toward
+Google when the host runs systemd-resolved; Unbound ships `home.arpa` as a static zone and refuses to query localhost by
+default; Pi-hole v6 renamed every container variable and ignores `/etc/dnsmasq.d`; Caddy sorts directives by its own
+table and trusts no proxy, Traefik attaches a router with no entry point to all of them and computes renewal from a
+configured duration, nginx drops every inherited `proxy_set_header` the moment one is set lower; a forward-auth proxy
+must strip inbound identity headers itself; wg-quick computes MTU from the endpoint route and captures the default route
+on a `/0`; Tailscale on Linux accepts no routes until told to; Suricata's shipped `HOME_NET` makes a sensor on a public
+prefix alert on nothing, and CrowdSec's firewall component writes its rules once and never checks them again. Fourteen
+references, one per tool or concern, each loaded only when that artifact is in hand. Built from the tools' own
+documentation, man pages, source, and advisories, verified page by page.
 
 ## Installation
 

@@ -304,8 +304,9 @@ and naive networking. Six skills supply it: `devops` (the discipline of a change
 and the evidence that closes a change), `ansible` (the ansible-core line a project pins, the 2.19 templating rules,
 idempotence and failure semantics, precedence, ansible-lint and Molecule), `containers` (Docker/Podman, Compose, image
 optimization, security), `proxmox` (VMs, LXC, storage backends, clustering, API automation), `unraid` (arrays, Docker,
-VMs, shares, plugins), and `networking` (VLANs, firewalls, DNS, reverse proxies, VPN, TLS). The devops skill and the
-tool skill are active together across the whole change.
+VMs, shares, plugins), and `networking` (what an nftables ruleset, a resolver zone, a proxy site, a forward-auth chain,
+a tunnel, or an IDS rule does once loaded: evaluation order, trust lists, and the second path around every filter). The
+devops skill and the tool skill are active together across the whole change.
 
 ```
 /plugin install infrastructure
