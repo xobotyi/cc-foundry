@@ -20,11 +20,13 @@ security-first defaults, and ground their guidance in official documentation.
 
 ### devops
 
-Foundational infrastructure discipline — analogous to `the-coder/coding` for software engineering. Defines
-infrastructure-as-code principles, deliverable quality standards (idempotent, reproducible, documented), change
-management patterns (rolling/blue-green/canary), security posture (zero trust, least privilege), observability (SLI/SLO,
-DORA metrics), and disaster recovery (RTO/RPO tiering). Runs in a sandwich pattern: devops -> tool skill -> devops
-(verification).
+The discipline of an infrastructure change, above any one tool — analogous to `the-coder/coding` for software
+engineering. What a change carries before apply (target identity, a plan made against the state apply will use, the
+captured reverse, the credential scope it is allowed), how it is applied and stopped, what "applied" does not prove for
+systemd, daemons, firewalls, Compose, Kubernetes, GitOps controllers, Proxmox, DNS, certificates, and WireGuard, which
+changes a revert cannot reverse, where secrets leak and how fast certificates now expire, what each open-source verifier
+proves and cannot see, backup consistency and recovery order, and the evidence that closes a change. Built from operator
+postmortems and agent incidents of 2023 through 2026, not from restated principles.
 
 ### ansible
 

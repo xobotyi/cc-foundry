@@ -299,12 +299,13 @@ implementation layer (strict mode, quoting, portability, error handling) for scr
 
 Ansible playbooks, Docker containers, Proxmox clusters, network segments: infrastructure work requires domain knowledge
 that generic coding assistants lack. Without it, agents produce configurations with insecure defaults, no idempotency,
-and naive networking. Six skills supply it: `devops` (foundational discipline, what good infrastructure looks like,
-analogous to `the-coder/coding`), `ansible` (the ansible-core line a project pins, the 2.19 templating rules,
+and naive networking. Six skills supply it: `devops` (the discipline of a change: target identity, a fresh plan, what
+"applied" does not prove, what a revert cannot reverse, credential scope, secrets and certificates, verifiers, recovery,
+and the evidence that closes a change), `ansible` (the ansible-core line a project pins, the 2.19 templating rules,
 idempotence and failure semantics, precedence, ansible-lint and Molecule), `containers` (Docker/Podman, Compose, image
 optimization, security), `proxmox` (VMs, LXC, storage backends, clustering, API automation), `unraid` (arrays, Docker,
-VMs, shares, plugins), and `networking` (VLANs, firewalls, DNS, reverse proxies, VPN, TLS). The devops skill runs in a
-sandwich pattern: principles first, tool skill, then verification.
+VMs, shares, plugins), and `networking` (VLANs, firewalls, DNS, reverse proxies, VPN, TLS). The devops skill and the
+tool skill are active together across the whole change.
 
 ```
 /plugin install infrastructure
