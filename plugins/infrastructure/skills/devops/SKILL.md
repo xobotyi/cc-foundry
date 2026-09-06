@@ -17,9 +17,9 @@ compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_t
 
 Three biases decide most calls:
 
-- **Applied is not in effect.** A tool's success reports what the tool did to its own target. Whether the effect exists
-  is reported by the service, the socket, the resolver, the peer, or the guest. A change closes on the second kind of
-  evidence and never on the first.
+- **Applied is not in effect.** A tool's success is a claim the tool makes about its own target. Whether the effect
+  exists is measured at the service, the socket, the resolver, the peer, or the guest. A change closes on the
+  measurement and never on the claim.
 - **A revert is not a rollback.** Re-applying the previous declaration restores what a tool can recreate from a
   declaration and nothing the forward change emitted: deleted data, rotated secrets, withdrawn routes, migrated schemas,
   destroyed objects.

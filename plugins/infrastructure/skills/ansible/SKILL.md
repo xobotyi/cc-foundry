@@ -276,7 +276,9 @@ merge order, directory adjacency, INI and extra-vars typing, scope, and role pub
 - **`--syntax-check` parses without connecting; `--check --diff` on one host simulates what modules can simulate** and
   skips the rest.
 - **Run the play twice; the second recap is the idempotence result.** Molecule's `idempotence` action is exactly that
-  comparison and nothing deeper: `changed_when: false` passes it, a bare `command` fails it.
+  comparison and nothing deeper: `changed_when: false` passes it, a bare `command` fails it. A clean second recap proves
+  the play converged, not that the target runs the result: a run against a real target is a change, and the effect check
+  in the **devops** skill's `references/effect.md` is what closes it.
 - **`molecule test` runs a configurable `test_sequence`**; a scenario that dropped `idempotence` or `verify` passes all
   the same. The built-in driver provisions nothing; ansible-native scenarios create instances in `create.yml` and write
   their addresses into an inventory source. Drivers come from `molecule-plugins`.
@@ -309,7 +311,7 @@ When **reviewing** Ansible, cite the violation and give the corrected line inlin
 
 ## Integration
 
-The **devops** skill governs infrastructure discipline: what a deliverable must satisfy, change management, and the
-verification that closes a change. This skill governs how Ansible behaves and how Ansible is written, and wins on any
-question of what a play, role, or inventory does. The **coding** skill governs the shape of the work; the **containers**
-skill owns the images an execution environment is built from. All are active at once.
+The **devops** skill governs the change: what it must carry before apply, how it is applied, and the evidence that
+closes it. This skill governs how Ansible behaves and how Ansible is written, and wins on any question of what a play,
+role, or inventory does. The **coding** skill governs the shape of the work; the **containers** skill owns the images an
+execution environment is built from. All are active at once.
