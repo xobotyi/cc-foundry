@@ -26,10 +26,10 @@ re-evaluate on a phase shift — and the model acts on it silently.
 
 ```
 Session start    ->  Load the SEF framework
-User prompt      ->  USER-PROMPT: invoke every matching skill before responding
+User prompt      ->  USER-PROMPT: invoke each skill whose description matches, honoring exclusions
 After Read       ->  EVALUATION: act if the read opened a skill-covered domain
 After Edit/Write ->  PHASE-CHANGE: act if the type of work shifted
-After Skill      ->  SKILL-LOAD: read phase-relevant refs; invoke sibling skills
+After Skill      ->  SKILL-LOAD: read refs whose stated condition holds; follow named hand-offs
 ```
 
 Each checkpoint injects a self-contained `<SEF phase="...">` reminder carrying the rule for that point. The model
@@ -48,8 +48,10 @@ applies it silently: it acts on the rule, but never echoes the reminder or narra
 
 At session start (and after compaction) the plugin injects the SEF framework (~600 tokens):
 
-- **Purpose** — skills are matched proactively and are non-atomic (invocation is a start, not an end)
-- **Matching rule** — compare the task to skill names and descriptions; invoke every skill that matches
+- **Matching rule** — a skill matches when its description names the task, a file type in it, or a symptom it shows; a
+  description that assigns the work to another skill is not a match
+- **Reference rule** — invoking a skill loads its body, not its references; the skill is applied only once every
+  reference whose stated condition holds has been read
 - **Checkpoint rules** — the four declarative rules, listed once
 
 This is shared background. The operational contract is restated by every checkpoint reminder, so behaviour stays correct
@@ -79,19 +81,25 @@ Hooks inject a reminder at each tool-usage point:
 
 **`<SEF phase="USER-PROMPT">`** — fires when the user submits a message
 
-- Invoke every skill that matches the task by name or description before responding (a task often matches several)
+- Invoke each skill whose description names the task, a file type in it, or a symptom it shows. A description that
+  assigns the work to another skill is not a match, and "could apply" is not a match: a skill body stays in context for
+  the rest of the session
 
 **`<SEF phase="SKILL-LOAD">`** — fires after a Skill invocation
 
-- Read the references relevant to the current phase; invoke any sibling skills covering a different facet of the task
+- Invocation loads the body, not the references. The skill counts as applied only once every reference whose stated
+  condition holds for the current work is read; invoke another skill only when the loaded skill assigns part of the task
+  to it by name
 
 **`<SEF phase="EVALUATION">`** — fires after a Read
 
-- If the read opened a domain a skill covers, or made a loaded skill's reference newly relevant, act before continuing
+- If the file is of a kind a skill's description names and that skill is not loaded, invoke it before acting on the
+  file; a read alone does not change the kind of work
 
 **`<SEF phase="PHASE-CHANGE">`** — fires after an Edit/Write
 
-- If the type of work shifted (coding -> testing, etc.), invoke the skills and read the references the new phase needs
+- If the kind of work changed with the edit (implementation -> testing, etc.), invoke the skills whose descriptions name
+  the new kind and read the references whose condition now holds
 
 ### Compaction handling
 

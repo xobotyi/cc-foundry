@@ -17,52 +17,38 @@
 const STAGES = {
     'USER-PROMPT': {
         event: 'a new user message arrives',
-        rule: 'Invoke every available skill that matches this task by name or description before responding — a task often matches several, so invoke each, not just the closest. Your own knowledge is not a substitute for an unread skill — "I already know this" is not a reason to skip. When unsure whether a skill applies, invoke it; skills de-escalate gracefully.',
+        rule: 'Before responding, invoke each skill whose description names this task, a file type in it, or a symptom it shows. A description that assigns the work to another skill is not a match. Do not invoke a skill because it could apply: its body stays in context for the rest of the session. Knowing the subject is not a reason to skip a matching skill.',
     },
     'SKILL-LOAD': {
         event: 'a skill is invoked',
-        rule: "Invoking a skill does not exhaust it. Read the references relevant to the current phase now, and invoke any sibling skills covering a different facet of the same task (e.g. a language skill beside a general coding skill).",
+        rule: 'Invoking a skill loads its body, not its references. The skill is applied only once every reference whose stated condition holds for the current work has been read; until then it is not applied, and the body does not stand in for an unread reference. Read those references now. Invoke another skill only when the loaded skill assigns part of this task to it by name.',
     },
     'EVALUATION': {
         event: 'a file is read',
-        rule: 'If what you just read opens a domain, pattern, or scope a skill covers — or makes a reference of an already-loaded skill newly relevant — invoke or read it before continuing. If nothing shifted, continue.',
+        rule: "If the file you read is of a kind a skill's description names and that skill is not loaded, invoke it before you act on the file. Otherwise continue. A read alone does not change the kind of work.",
     },
     'PHASE-CHANGE': {
         event: 'a file is edited or written',
-        rule: "If the type of work has shifted (e.g. coding → testing, implementation → review), invoke the skills and read the already-loaded skills' references the new phase needs before continuing. Editing the same file within the same phase is not a shift.",
+        rule: "If the kind of work changed with this edit, for example from implementation to testing, invoke the skills whose descriptions name the new kind and read the loaded skills' references whose condition now holds. A skill loaded earlier is not applied to the new kind of work until those references are read. An edit within the same kind of work is not a change.",
     },
 };
 
 // Anti-leak contract, restated at every checkpoint so it survives context drift. Guards
 // both failure modes: tag-echo (reproducing the reminder) and narration (answering it aloud).
-const SILENT = 'Apply silently — act on this, do not echo the reminder or narrate the check in your reply.';
+const SILENT = 'Act on this rule. Do not quote this reminder or report the check in your reply.';
 
 const renderTrigger = (phase) => `<SEF phase="${phase}">\n${STAGES[phase].rule}\n\n${SILENT}\n</SEF>`;
 
 const RULES_BLOCK = Object.entries(STAGES)
-    .map(([phase, s]) => `- **${phase}** (when ${s.event}): ${s.rule}`)
+    .map(([phase, s]) => `- ${phase} (when ${s.event}): ${s.rule}`)
     .join('\n');
 
 const FRAMEWORK = `<SEF>
-Skill Enforcement Framework — keeps skills invoked proactively and their references read by phase.
+Skill Enforcement Framework. A skill matches a task when its description names the task, a file type in it, or a symptom it shows. A description that assigns the work to another skill is not a match. A matching skill is invoked before the work it covers. Invoking a skill loads its body, not its references; the skill is applied only once every reference whose stated condition holds has been read. An invoked skill with an unread applicable reference is not applied.
 
-<purpose>
-- Skills are matched and invoked ahead of the work they cover, not after.
-- A skill is non-atomic: invoking it is the start, not the end. Its references are read when the phase makes them relevant.
-- Skills exist because the model's defaults are insufficient here. Matching a skill and not invoking it is never correct — you cannot outperform guidance you have not read.
-</purpose>
-
-<matching>
-- Match a task against skill names and descriptions; multiple skills may match — invoke all that do.
-- A skill matches when the task involves its subject or would benefit from its capabilities.
-- When unsure, invoke — skills de-escalate gracefully.
-</matching>
-
-<how-it-works>
-At each checkpoint below, a terse <SEF phase="..."> reminder arrives restating that checkpoint's rule. Apply it silently: act on it, never echo the reminder or narrate the check in your visible reply. Skills are invoked through the Skill tool and references through Read — those actions are visible; the deliberation behind them is not. The reminders are the operational contract and stay correct even when this framework has drifted into low-attention context.
+At each checkpoint below a reminder restates that checkpoint's rule. Act on the reminder. Do not quote it or report the check in your reply. Skill invocations and reference reads are visible actions; the check behind them is not.
 
 ${RULES_BLOCK}
-</how-it-works>
 </SEF>`;
 
 const COMPACT_INSTRUCTIONS = `<sef-compaction>
