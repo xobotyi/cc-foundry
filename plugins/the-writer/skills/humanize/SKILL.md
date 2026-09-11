@@ -1,15 +1,16 @@
 ---
 name: humanize
 description: >-
-  Remove AI-writing tells from prose and prevent them while drafting: the mechanisms that produce the tells, the
-  thresholds that mark a passage, and the edit that fixes the text without flattening its author.
+  Remove AI-writing tells from reader-facing prose and prevent them while drafting: the mechanisms that produce the
+  tells, the thresholds that mark a passage, and the edit that fixes the text without flattening its author.
 when_to_use: >-
-  Invoke whenever prose written for human readers is drafted, edited, or judged — articles, blog posts, READMEs,
-  documentation, release notes, announcements, reports — or whenever a text is suspected of reading as machine-written.
-  Also invoke on the symptoms: a draft that sounds generated with no nameable fault, a rewrite that flattened the
-  author's voice, a paragraph of true sentences that build to nothing, a citation token or placeholder surviving into
-  delivered text. Covers prose for readers; instruction text belongs to prompt-engineering, commit messages to
-  commit-message, code comments to coding.
+  Invoke whenever prose a person will read is drafted, edited, or judged — an article, a blog post, a README, user
+  documentation, release notes, an announcement, a report — or whenever a text is suspected of reading as
+  machine-written. Also invoke on the symptoms: a draft that sounds generated with no nameable fault, a rewrite that
+  flattened the author's voice, a paragraph of true sentences that build to nothing, a citation token or placeholder
+  surviving into delivered text. The reader decides, not the presence of prose: not for text a model reads. CLAUDE.md
+  and `.claude/rules/` belong to claude-md; a skill body, a system prompt, an agent definition, or a tool description
+  to prompt-engineering. Commit messages belong to commit-message, code comments to coding.
 compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
