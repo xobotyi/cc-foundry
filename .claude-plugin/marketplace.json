@@ -331,7 +331,7 @@
 		{
 			"name": "the-writer",
 			"description": "Prose discipline for agent-authored text: humanize AI-written articles, docs, and communication",
-			"version": "2.0.0",
+			"version": "2.0.1",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
