@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "1.2.6",
-  "description": "Frontend platform discipline: CSS, Tailwind CSS v4, accessibility, and browser-specific practices",
+  "description": "Frontend platform discipline: CSS, Tailwind CSS v4, accessibility, UI design decisions, and browser-specific practices",
   "author": {
     "name": "xobotyi",
     "email": "xog3@yandex.ru",
@@ -15,6 +15,7 @@
     "css",
     "tailwind",
     "accessibility",
+    "design",
     "browser",
     "web"
   ]

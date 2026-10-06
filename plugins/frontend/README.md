@@ -9,9 +9,9 @@ standards, framework-specific patterns, and cross-browser compatibility.
 
 ## The Solution
 
-Provides skills that teach Claude browser-specific practices: CSS methodologies, accessibility patterns, and framework
-conventions for React, Vue, and Svelte. Keeps platform discipline separate from language discipline
-(JavaScript/TypeScript).
+Provides skills that teach Claude browser-specific practices: CSS methodologies, accessibility patterns, visual design
+decisions, and framework conventions for React, Vue, and Svelte. Keeps platform discipline separate from language
+discipline (JavaScript/TypeScript).
 
 ## Installation
 
@@ -56,6 +56,20 @@ configuration, custom utilities, dark mode, or Tailwind integration with React/V
 Web accessibility discipline: WCAG 2.2 compliance, ARIA patterns, semantic HTML, keyboard navigation, and focus
 management. **Use when:** building accessible UI, reviewing accessibility, or implementing interactive component
 patterns.
+
+### frontend-design
+
+Which visible choice to make in a web interface, and whether it landed on the rendered page. The skill finds what
+already decides a choice (the project's design, a host application, the brief), treats every framework and model default
+as a decision to examine, and requires the result to be looked at across widths and states instead of read from markup.
+It prescribes no palette, font, or look. Includes 2 reference files: a dated catalogue of the looks generated interfaces
+converge on, and render-check thresholds with their sources. **Use when:** building or restyling a page, screen, or
+component, adding a control to an existing screen, writing interface copy, mocking up variants, or reviewing a UI that
+reads as generic or templated.
+
+Anthropic publishes a skill with the same name. With both plugins installed they appear as `frontend:frontend-design`
+and `frontend-design:frontend-design`, and both match the same requests. They differ on product screens: Anthropic's
+asks for a distinctive identity on every brief, and this one puts the existing design and familiar conventions first.
 
 ## Related Plugins
 

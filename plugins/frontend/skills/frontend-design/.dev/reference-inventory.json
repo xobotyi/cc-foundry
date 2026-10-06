@@ -1,0 +1,28 @@
+{
+	"sources": {
+		"Anthropic frontend-design skill (prior art: plan, review against the brief, calibration clusters)": "https://raw.githubusercontent.com/anthropics/skills/main/skills/frontend-design/SKILL.md",
+		"Anthropic: Improving frontend design through skills (distributional convergence, prescribed fonts converge)": "https://claude.com/blog/improving-frontend-design-through-skills",
+		"vibecoded-design-tells README (Reddit study: method, counts, comment corpus)": "https://raw.githubusercontent.com/JCarterJohnson/vibecoded-design-tells/main/README.md",
+		"unslop-ui tells catalog (lexicon ranking, cleared patterns)": "https://raw.githubusercontent.com/JCarterJohnson/vibecoded-design-tells/main/skill/references/tells.md",
+		"unslop-ui choosing-a-look (a prescribed look became the tell)": "https://raw.githubusercontent.com/JCarterJohnson/vibecoded-design-tells/main/skill/references/choosing-a-look.md",
+		"Impeccable SKILL.md (prior art: surface modes, bounded verification)": "https://raw.githubusercontent.com/pbakaus/impeccable/main/plugin/skills/impeccable/SKILL.md",
+		"Impeccable craft floor (render checks, refused patterns)": "https://raw.githubusercontent.com/pbakaus/impeccable/main/plugin/skills/impeccable/reference/craft-floor.md",
+		"Vercel Web Interface Guidelines, agent command (checkable UI rules)": "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md",
+		"Rauno Freiberg: Web Interface Guidelines (motion duration, frequent actions)": "https://interfaces.rauno.me/",
+		"DESIGN.md specification (design-context file format)": "https://raw.githubusercontent.com/google-labs-code/design.md/main/docs/spec.md",
+		"Design Theater: stated design rationale vs implementation": "https://arxiv.org/abs/2607.22928",
+		"Interrogating Design Homogenization in Web Vibe Coding": "https://arxiv.org/abs/2603.13036",
+		"UI-Bench: expert pairwise preference across text-to-app tools": "https://arxiv.org/abs/2508.20410",
+		"Elements of Typographic Style Applied to the Web: measure": "https://webtypography.net/2.1.2",
+		"Elements of Typographic Style Applied to the Web: leading": "https://webtypography.net/2.2.1",
+		"Butterick's Practical Typography: summary of key rules": "https://practicaltypography.com/summary-of-key-rules.html",
+		"Refactoring UI: building your color palette": "https://refactoringui.com/previews/building-your-color-palette",
+		"Refactoring UI: line-height is proportional": "https://refactoringui.com/previews/line-height-is-proportional",
+		"Anthony Hobday: Visual design rules you can safely follow every time": "https://anthonyhobday.com/sideprojects/saferules/",
+		"NN/g: Visual Hierarchy in UX": "https://www.nngroup.com/articles/visual-hierarchy-ux-definition/",
+		"Emil Kowalski: You Don't Need Animations": "https://emilkowal.ski/ui/you-dont-need-animations",
+		"Emil Kowalski: Great Animations": "https://emilkowal.ski/ui/great-animations",
+		"Laws of UX: Jakob's Law": "https://lawsofux.com/jakobs-law/"
+	},
+	"lastFetched": "2026-10-06T21:30:58.233Z"
+}

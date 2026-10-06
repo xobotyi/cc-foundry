@@ -240,11 +240,12 @@ proptest, insta, criterion, mockall, rstest). Bundled rust-analyzer LSP for sema
 ### frontend
 
 Browser development requires knowledge beyond general programming: CSS layout systems, accessibility standards,
-framework-specific patterns. This plugin provides six skills: `css` (conventions, layout, SCSS/SASS, responsive design,
-methodologies), `tailwindcss` (Tailwind v4 CSS-first config, `@theme` tokens, class composition), `react` (component
-patterns, hooks, state, performance, testing), `vue` (Composition API, reactivity, composables), `svelte` (Svelte 5
-runes, SvelteKit conventions), and `accessibility` (WCAG 2.2, ARIA, semantic HTML, keyboard navigation). Keeps platform
-discipline separate from language discipline.
+framework-specific patterns. This plugin provides seven skills: `css` (conventions, layout, SCSS/SASS, responsive
+design, methodologies), `tailwindcss` (Tailwind v4 CSS-first config, `@theme` tokens, class composition), `react`
+(component patterns, hooks, state, performance, testing), `vue` (Composition API, reactivity, composables), `svelte`
+(Svelte 5 runes, SvelteKit conventions), `accessibility` (WCAG 2.2, ARIA, semantic HTML, keyboard navigation), and
+`frontend-design` (which visible choice to make, inherited defaults, interface copy, render verification across widths
+and states). Keeps platform discipline separate from language discipline.
 
 ```
 /plugin install frontend
