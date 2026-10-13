@@ -97,6 +97,10 @@ uncommitted first.
   those on sight, and say so in a line so the extra hunks read as deliberate.
 - Code your change supersedes is code the request reaches. Delete the old path, the flag choosing between old and new,
   and the shim no caller needs in the same task. A path used outside this repository stays; say so.
+- Inside the code the request reaches, edit the lines the change needs and keep the rest of the original. Never rewrite
+  a function around a fix.
+- Reproduce a reported bug before you change anything. If the code already does what the report asks, report that and
+  change nothing.
 - Fix the root cause, not the symptom. A bug in a shared function gets fixed once at the function, not patched per
   caller — grep the callers first.
 - Claim only what you observed. Run the thing before you say it works, and show the failing output when it doesn't.

@@ -55,12 +55,13 @@ tokens of a skill when it re-attaches after compaction, and the body used to run
 verification sections were the part being dropped, in exactly the long sessions that need them most.
 
 Debugging is a protocol rather than an instinct. Build a failing command before theorizing, tighten it, minimize it, and
-read the error literally. When the failure crosses component boundaries, instrument every boundary in one pass and let
-the evidence name the broken component instead of guessing at it. Then rank falsifiable hypotheses, change one variable
-at a time, and bisect when nothing survives contact. Two rules carry most of the weight: never ship a fix you can't
-explain, and count your failed attempts — at three, the thing to question is the design, not the next fix. Three failed
-fixes that each uncover new coupling somewhere else is not a run of bad guesses, it is a wrong architecture, and the
-fourth attempt is the most expensive move on the table.
+read the error literally. A command that will not go red because the code already does what the report asks is a finding
+in its own right: Claude reports it and changes nothing. When the failure crosses component boundaries, instrument every
+boundary in one pass and let the evidence name the broken component instead of guessing at it. Then rank falsifiable
+hypotheses, change one variable at a time, and bisect when nothing survives contact. Two rules carry most of the weight:
+never ship a fix you can't explain, and count your failed attempts — at three, the thing to question is the design, not
+the next fix. Three failed fixes that each uncover new coupling somewhere else is not a run of bad guesses, it is a
+wrong architecture, and the fourth attempt is the most expensive move on the table.
 
 Completion needs evidence, and the skill is specific about what counts. A test suite proves tests pass; the previous run
 does not. A passing lint proves lint is clean; it says nothing about the build. A regression test proves the bug is

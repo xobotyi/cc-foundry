@@ -24,9 +24,10 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   (~100-200 lines behind one verification gate). The skill owns discovery, the change list, commit sizing, the comment
   set, naming, debugging, verification.
 - **The style restates the skill's kernel deliberately.** Selecting a style does not load a skill, so the style is
-  self-sufficient for code work — less code and less execution, superseded-code deletion, comment density, no reviewer
-  narration, rename-over-comment, root-cause fixes, observed claims. Overlap between the two artifacts is intended; a
-  copy of a rule the _default prompt_ already states is not, and gets cut.
+  self-sufficient for code work — less code and less execution, superseded-code deletion, edit fidelity, abstaining when
+  a bug does not reproduce, comment density, no reviewer narration, rename-over-comment, root-cause fixes, observed
+  claims. Overlap between the two artifacts is intended; a copy of a rule the _default prompt_ already states is not,
+  and gets cut.
 
 ## Plugin Scope
 
@@ -82,6 +83,9 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   language-agnostic plugin
 - Prior art is taken as methodology, never as craft (ADR 0006): no emphasis stacking, no worked shell examples, no
   quick-reference tables restating the body
+- **No prompted simplification pass.** The skill never prescribes a reviewer or subagent that shrinks a finished diff:
+  prompted post-generation minimization cut patch size only by losing resolved instances (arXiv 2608.13292). Size rules
+  apply while the code is written — the reuse ladder, edit fidelity, superseded-code deletion
 
 ## Critical Constraints
 

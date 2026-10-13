@@ -31,8 +31,6 @@ Discover → Plan → Implement → Verify
 
 ## The Assumption Interrupt
 
-Apply this silently — don't narrate the check.
-
 <assumption-rule>
 Never build on a contract you haven't read in this session. Each of these is an unverified
 assumption, and every unverified assumption is a potential compile failure, runtime bug, or
@@ -172,6 +170,7 @@ The `git-commit` plugin's `commit` skill carries the pipeline for each of these 
 
 - **Every changed line traces to the request.** Run that test over the finished diff; a line that traces to nothing is
   scope creep that got in while you were somewhere else.
+- **Keep the original code.** Edit the lines the change needs; never rewrite the function around them.
 - **Clean up the orphans your change created** — an import, a variable, a helper that your edit made unused — and delete
   what it supersedes: the old path, the flag choosing between them, the shim no caller needs. A path used outside this
   repository stays; say so. Pre-existing dead code is not yours to delete: mention it and leave it.
@@ -272,7 +271,7 @@ weakening the check.
 ### Before Declaring Done
 
 1. **Run the tests.** If none cover the code you changed, write them. If you modified existing behavior, run the full
-   relevant suite, not just the new tests.
+   relevant suite, not just the new tests. A removal gets a test that fails while the removed code remains.
 2. **Check both axes.** _Spec:_ does it do what was asked — the success criteria from planning — not merely something
    plausible? _Standards:_ does it follow this repo's conventions (CLAUDE.md, lint and type config, ADRs)? Check them
    separately: code can satisfy every convention and implement the wrong thing, and a correct result can still violate
@@ -311,7 +310,6 @@ absence you do not claim, and an agent's success report is a claim like any othe
 
 - Don't pre-load files "just in case" — retrieve context when the need for it arrives, not before.
 - After two failed corrections on the same issue, start fresh rather than accumulating failed approaches in context.
-- If you're losing track of what you've tried, say so. Silent degradation wastes more time than admitting it.
 
 ## Application
 

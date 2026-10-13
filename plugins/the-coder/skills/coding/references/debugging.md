@@ -7,7 +7,8 @@ step narrows the search space the next one operates on.
 
 1. **Build the loop first** — capture the failing case as one re-runnable command that goes red on this bug and will go
    green when it's fixed. Run it at least once before theorizing: no red command, no hypothesis. A bug you can't
-   reproduce isn't fixed by any change you make, only perturbed.
+   reproduce isn't fixed by any change you make, only perturbed. When the loop stays green because the code already does
+   what the report asks, that is the finding: report it and change nothing.
 
 2. **Tighten the loop** — make it fast (skip unrelated setup, narrow the scope), sharp (assert the exact symptom, not
    "didn't crash"), and deterministic (pin time, seed randomness, isolate filesystem and network). For flaky bugs the
