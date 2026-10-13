@@ -162,6 +162,9 @@ options.
 - **`mock.module()` is not hoisted.** Unlike `jest.mock`, it runs where it is written, so a module imported above it has
   already been evaluated and its side effects have already happened. Put the override in a `--preload` script when the
   original must never run.
+- **Pass the dependency in before reaching for `mock.module()`.** A fake passed as a parameter or a constructor argument
+  replaces one collaborator for one test. A module override reaches every importer, even one that imported the module
+  before the override, and `mock.restore()` does not undo it.
 - **Pick the right global reset.** `mock.clearAllMocks()` clears history and keeps implementations;
   `jest.resetAllMocks()` also drops them (1.4.0 — before, it behaved like `clearAllMocks`); `mock.restore()` restores
   spied originals and undoes no `mock.module()` override.

@@ -52,7 +52,8 @@
 		"Config - fakeTimers": "https://raw.githubusercontent.com/vitest-dev/vitest/v4/docs/config/faketimers.md",
 		"Config - typecheck": "https://raw.githubusercontent.com/vitest-dev/vitest/v4/docs/config/typecheck.md",
 		"Config - benchmark": "https://raw.githubusercontent.com/vitest-dev/vitest/v4/docs/config/benchmark.md",
-		"Config - snapshotFormat": "https://raw.githubusercontent.com/vitest-dev/vitest/v4/docs/config/snapshotformat.md"
+		"Config - snapshotFormat": "https://raw.githubusercontent.com/vitest-dev/vitest/v4/docs/config/snapshotformat.md",
+		"anti-slop Oxlint Rules": "https://raw.githubusercontent.com/dmmulroy/anti-slop/main/README.md"
 	},
 	"lastFetched": "2026-09-02T09:13:27.031Z"
 }

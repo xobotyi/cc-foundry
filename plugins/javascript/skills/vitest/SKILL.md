@@ -129,6 +129,9 @@ table, and the exact nested execution order.
 
 ## Mocking
 
+- **Pass the dependency in before mocking a module.** Where the code under test can take its collaborator as a parameter
+  or a constructor argument, pass a fake that implements the real interface. `vi.mock` swaps the module for every
+  importer in the file; keep it for a dependency the code imports and the test cannot route around.
 - **`vi.spyOn(obj, 'method')` before `vi.mock`.** Replacing one export is recoverable; replacing a module is a standing
   claim about every export it has, including the ones added later.
 - **A `vi.mock` factory closes over nothing.** The call is hoisted above every import, so any variable it names is still

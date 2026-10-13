@@ -346,7 +346,8 @@ SEA build paths per major, and `--disable-proto`, `--frozen-intrinsics`, and `--
 - **Prefer `t.mock` to the imported `mock`.** The context tracker is reset after each test; the module-level one is
   process-wide and needs a manual `mock.reset()` or `mock.restoreAll()`.
 - **`mock.module()` needs `--experimental-test-module-mocks`.** Without the flag it is `undefined`, so the test dies on
-  a `TypeError` instead of a clear message. It is Stability 1.0, the least settled part of the runner.
+  a `TypeError` instead of a clear message. It is Stability 1.0, the least settled part of the runner. Pass the
+  dependency in as a parameter or a constructor argument before reaching for it.
 - **A destructured timer import is never mocked.** `import { setTimeout } from 'node:timers'` binds the real function
   before `mock.timers.enable()` runs. Call the global or the namespace property.
 - **Pass `--test-reporter` explicitly.** The non-TTY default changed from `tap` to `spec` in 23.0.0, so a piped CI run
