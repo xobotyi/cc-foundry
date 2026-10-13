@@ -8,8 +8,9 @@ code intelligence via `typescript-language-server`.
 - **`javascript`** — the language: declarations and scope, equality and coercion, functions, objects, arrays and
   iteration, classes, async and promise semantics, ES module syntax, errors, regular expressions, `Intl` and the
   built-in globals, JSDoc typing, ECMAScript-edition gating, LSP-first navigation
-- **`typescript`** — the type system: strictness configuration, narrowing, generics, type-level programming, enums,
-  declaration files and emit, module resolution and `tsconfig`, erasable syntax, the compiler toolchain
+- **`typescript`** — the type system: strictness configuration, parsing at the I/O boundary, assertions and escape
+  hatches, narrowing, generics, type-level programming, enums, declaration files and emit, module resolution and
+  `tsconfig`, erasable syntax, the compiler toolchain
 - **`nodejs`** — the Node runtime: module resolution, the package manifest, native TypeScript execution, blocking,
   streams, errors and process lifecycle, async context and diagnostics, the HTTP client, workers, the permission model,
   `node:test`, npm and supply chain, the CLI

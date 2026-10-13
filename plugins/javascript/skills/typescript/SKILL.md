@@ -132,20 +132,53 @@ The ambient forms stay legal: `declare enum` and a `declare namespace` holding o
 - **Never annotate what is trivially inferred.** `const n: number = 5` and `const s: string = "x"` add nothing.
 - **Annotate a local where inference produces a wide or opaque type** and the value flows somewhere that matters.
 - **`satisfies` where the specific type must survive.** `const config = {...} satisfies Config` checks the value against
-  `Config` and keeps the literal keys and value types; `const config: Config = {...}` widens them away.
+  `Config` and keeps the literal keys and value types; `const config: Config = {...}` widens them away. An annotation of
+  `unknown`, `object`, or an open `Record<string, T>` on a value the compiler already knows discards the same keys:
+  `const handlers: Record<string, Handler> = { start }` forgets that `start` exists.
 - **`interface` for an object shape, `type` for everything else** — unions, intersections, tuples, function types,
   mapped and conditional types. An `interface` merges across declarations, which is what makes a public surface
   augmentable and what makes an accidental redeclaration silent.
 
-## Escape Hatches
+## Boundaries
+
+`unknown` marks a value that nothing has checked. It enters at the I/O boundary and leaves through one parser.
 
 - **`unknown` at every boundary, never `any`.** A response body, `JSON.parse`, a message payload, an environment
-  variable, a caught error — each is `unknown` until it is narrowed. `any` disables checking for every value downstream
-  of it, which is why one `any` in a call chain hides a class of bugs rather than one.
+  variable, a caught error — each is `unknown` until it is parsed. `any` disables checking for every value downstream of
+  it, which is why one `any` in a call chain hides a class of bugs rather than one.
+- **Parse once, at the boundary, into a named domain type.** Use the project's schema library, or one parse function per
+  type that returns the domain type or throws. A `typeof` or `in` check repeated at each use site validates the same
+  value again and leaves the next reader unsure which checks hold. A `typeof` that discriminates a union the program
+  declared is narrowing, not parsing, and stays.
+- **A function that inspects its argument takes the parsed type.** A parameter typed `unknown`, `object`, or
+  `Record<string, unknown>` moves the parse from the boundary into every function the value reaches. `unknown` stays
+  correct for a type predicate's subject, an error's `cause`, and a value the body only forwards — to a logger, a
+  serializer, `structuredClone`.
+- **Never return `unknown` from a function that reads data.** `Promise<unknown>` hands the parse to every caller. Take
+  the schema or the parser as an argument and return what it produces.
+- **Give a dictionary a value type.** `Record<string, unknown>`, `Record<string, any>`, and `{ [key: string]: object }`
+  promise nothing about the values they hold. `Record<string, unknown>` is correct as a generic constraint:
+  `T extends Record<string, unknown>`.
+- **Never alias `unknown`.** `type Payload = unknown` reads as a checked type at every use site.
+- **Call a predicate that takes `unknown` on the raw value.** Passing it a value already typed `User` checks again what
+  the compiler proved.
+
+## Escape Hatches
+
 - **`as` proves nothing.** Use an annotation, which checks; use `satisfies`, which checks and preserves. Reserve `as`
-  for a fact the compiler cannot know, on one line, with the reason beside it. Never `as` an object literal — it hides
-  missing and misspelled properties that an annotation catches.
-- **Never double-assert through `any`.** Where a double assertion is genuinely needed, go through `unknown`.
+  for a fact the compiler cannot know. Never `as` an object literal — it hides missing and misspelled properties that an
+  annotation catches.
+- **Every `as` carries the invariant that makes it true**, in a comment directly above it: what holds, and which check
+  established it — `// SAFETY: parseUserId validated the format`. Use the project's marker where it has one. "Needed for
+  types" names no check and justifies nothing. `as const` cannot be wrong and needs no comment.
+- **Never chain assertions.** TS2352 rejects `x as T` when the two types do not overlap, and its message says to convert
+  the expression to `unknown` first. Do not follow that advice: `x as unknown as T` forces a conversion the compiler has
+  already called a mistake. Widening a binding to assert it back — `const stored: unknown = user; stored as User` — is
+  the same conversion split across two statements. Parse the value or fix the declaration.
+- **A test fake that needs `as unknown as Repo` exposes a dependency defect.** The code under test depends on more of
+  `Repo` than it uses. Narrow its parameter to `Pick<Repo, "findUser">`, and the fake type-checks with no assertion.
+- **`Reflect.get` and `Reflect.apply` return `any`** — `get` for a key outside `keyof T`, `apply` for a target typed
+  `Function`. Use property access, a typed call, or a parsed type.
 - **`!` only where the invariant is stated in the same function.** Otherwise narrow, or make the type honest.
 - **`@ts-expect-error` over `@ts-ignore`**, with the reason on the same line. The first fails once the error it
   suppresses is gone, so it cannot outlive its cause.
@@ -200,7 +233,8 @@ predicate and assertion-function contracts, and each gotcha with its mechanism.
 
 - **A type parameter that appears once in a signature is a wider type in disguise.** Delete it.
 - **A type parameter that appears only in the return type cannot be inferred**, so the caller guesses and the function
-  performs an unchecked assertion on their behalf. Return `unknown`, or take an argument that carries the type.
+  performs an unchecked assertion on their behalf. Take an argument that carries the type — the schema or the parser
+  that produces the value.
 - **Constrain by what the body uses**, and relate parameters through the constraint: `<T, K extends keyof T>`.
 - **`const T` (5.0) instead of asking callers to write `as const`** — with a `readonly` constraint, because a mutable
   constraint makes inference fall back to it silently.
@@ -270,7 +304,7 @@ Read [`${CLAUDE_SKILL_DIR}/references/conventions/declarations.md`] when declara
   taking `string`; `{ fn: (x: string | number) => void }` rejects it under `strictFunctionTypes`. Declare a callback as
   a property when the parameter type must be checked.
 - **An empty interface and `{}` accept almost everything.** `{}` is every non-nullish value, primitives included. Use
-  `unknown` for opaque, `object` for non-primitive, `Record<string, unknown>` for a dictionary.
+  `unknown` for a value not yet parsed and a named type for one that is.
 - **A type predicate is unchecked.** The compiler verifies the returned type is assignable to the parameter type, not
   that the body proves it. A wrong predicate lies to every caller.
 - **`filter(Boolean)` does not narrow.** `Boolean` is typed as returning `boolean`, not as a predicate, so

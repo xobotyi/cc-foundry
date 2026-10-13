@@ -14,7 +14,8 @@
 		"TSConfig Reference": "https://www.typescriptlang.org/tsconfig/",
 		"Declaration Files Do's and Don'ts": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/declaration-files/Do's%20and%20Don'ts.md",
 		"Declaration Files Publishing": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/declaration-files/Publishing.md",
-		"DefinitelyTyped Contribution Guide": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/README.md"
+		"DefinitelyTyped Contribution Guide": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/README.md",
+		"anti-slop Oxlint Rules": "https://raw.githubusercontent.com/dmmulroy/anti-slop/main/README.md"
 	},
 	"lastFetched": "2026-09-02T08:52:41.110Z"
 }

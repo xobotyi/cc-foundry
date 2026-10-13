@@ -29,8 +29,8 @@ those the annotations are decoration.
   `@param`.
 - **`{?number}` and `{!number}` are legacy Closure syntax.** Write `{number | null}`. Nullability follows
   `strictNullChecks`; there is no explicit non-nullable form.
-- **`Object` and `object` degrade to `any`** unless `noImplicitAny` is on. Write the actual shape, or
-  `Record<string, unknown>`.
+- **`Object` and `object` degrade to `any`** unless `noImplicitAny` is on. Write the actual shape, or `unknown` for a
+  value nothing has parsed.
 - **`@memberof`, `@member`, and `@yields` are ignored.** So is every other unrecognized tag — silently.
 
 ## What to annotate

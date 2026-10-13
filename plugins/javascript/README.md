@@ -57,10 +57,11 @@ Also carries the LSP-first navigation rules for every JS and TS extension.
 
 ### typescript
 
-The type system and everything downstream of it: strictness configuration, narrowing and control-flow analysis,
-generics, conditional and mapped types, branded types, declaration files and emit, module resolution and `tsconfig`, and
-the erasable-syntax constraint that runtime type-stripping imposes. Covers the compiler releases including the native
-port, whose defaults changed in ways that break silently on upgrade.
+The type system and everything downstream of it: strictness configuration, parsing untrusted input once at the I/O
+boundary, assertions that state their invariant, narrowing and control-flow analysis, generics, conditional and mapped
+types, branded types, declaration files and emit, module resolution and `tsconfig`, and the erasable-syntax constraint
+that runtime type-stripping imposes. Covers the compiler releases including the native port, whose defaults changed in
+ways that break silently on upgrade.
 
 Extends `javascript` and does not restate it.
 

@@ -8,8 +8,8 @@ wearing a variable's name.
 - **It appears once in the signature.** `function log<T>(x: T): void` is `function log(x: unknown): void` with extra
   ceremony. The parameter relates nothing.
 - **It appears only in the return type.** `function parse<T>(s: string): T` cannot be inferred, so the caller supplies
-  it, so the function is `parse(s: string): unknown` with a mandatory unchecked assertion attached. Return `unknown` and
-  let the caller narrow, or take a validator argument that carries the type.
+  it, so the function is `parse(s: string): unknown` with a mandatory unchecked assertion attached. Take a validator
+  argument that carries the type. Returning `unknown` instead hands the parse to every caller.
 - **The constraint lists members the body never touches.** `<T extends Record<string, unknown>>` on a function that only
   passes the value through rejects valid callers for nothing.
 
