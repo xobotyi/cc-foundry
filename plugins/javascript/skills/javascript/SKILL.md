@@ -72,6 +72,8 @@ it changed, and the traps it introduced.
   code. A signature written to describe an API rather than to run — `Object.groupBy(items, cb)` — takes the placeholder
   name the documentation uses.
 - **No redundant context**: `car.make`, never `car.carMake`.
+- **Name a value or a type for its role, never its structure.** `UserShape`, `UserObject`, `UserData`, and `userArray`
+  restate what the declaration already shows; `User`, `users`, `UserPatch`, and `UserRow` say what the value is for.
 - **File names are kebab-case**: `user-service.js`. Match the surrounding directory when it already differs.
 - **A single-letter name is legal in a scope of one or two lines** — a loop index, a comparator parameter — and nowhere
   else.
