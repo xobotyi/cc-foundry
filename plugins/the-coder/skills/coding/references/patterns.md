@@ -1,7 +1,7 @@
-# Error Handling, Dependency Isolation, Local Shape, and Refactor Targets
+# Error Handling, Dependency Isolation, Local Shape, Running Less, and Refactor Targets
 
 How error paths behave, how a dependency is isolated for a test, the four local shapes and what each one collapses to,
-and the named smells with the move each one takes.
+which execution and allocation a change can skip, and the named smells with the move each one takes.
 
 ## Handle Errors Deliberately
 
@@ -63,6 +63,29 @@ fix with the change stated, never inside a refactor commit that promises identic
   gratuitously in one body. A guard whose message needs a local to build it stays expanded, and that is not
   a mix.
 </shape-rules>
+
+## Running Less
+
+Code that never runs beats code made faster, and memory never allocated beats memory reused. Each rule below removes
+execution or allocation; none adds code to do it.
+
+<running-less-rules>
+- **Compute a value on the path that reads it.** A lookup, a format, or a query above an early return
+  that skips its consumer runs for nothing. Move it below the exit only under the Local Shape rule for
+  moving a computation: nothing between the two positions changes its result.
+- **Do once what does not change.** A value constant across iterations leaves the loop; one constant
+  across requests is built at startup. A pattern compiled, a formatter constructed, or a config parsed
+  per call is the common case.
+- **Ask the source for only what you use.** Filter, project, and limit in the query, not after the fetch.
+  Fetch a batch in one round trip — a call inside a loop over rows is the N+1 shape.
+- **Stream what is large or unbounded.** A file, a result set, a response body: process it as it
+  arrives. A whole-file read to check the first line holds the file to use one line.
+- **Copy or convert only at a boundary.** Serializing to text and parsing it back, a defensive copy of
+  data nothing mutates, a conversion between two shapes the code owns — each allocates and moves nothing
+  forward. An existing one may be a scar: chase it as one before you remove it.
+- **A cache, a pool, a memo table, or a hand-tuned loop is new code and new memory.** It needs a
+  measurement that names the cost it removes, and it ships with its invalidation or not at all.
+</running-less-rules>
 
 ## Refactor Targets
 

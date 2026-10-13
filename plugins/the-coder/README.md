@@ -40,13 +40,19 @@ Implement → Verify. Contains assumption interrupt patterns that flag reasoning
 mistakes. Requires reading actual API signatures instead of guessing them. Demands test execution before declaring work
 complete, and refuses to silence a failing check — tests, lint, and type errors get fixed, not suppressed.
 
+The skill ranks changes as well as checking them. Of two correct changes it takes the one that leaves less code, runs
+less, and allocates less, and it prefers a deletion to an addition, counting what a reader has to hold in their head
+rather than characters on the screen. The one thing it will not do to run less is add code: a cache or a pool waits
+until a measurement shows the cost it removes. Code that a change supersedes is deleted in the same task, so the old
+path does not live on beside its replacement.
+
 The skill body holds what applies to every code task. Four reference files carry the depth and load when their situation
 arrives: the comment and documentation policy when a comment is being written or repaired, the naming rules when a
 symbol is being named or renamed, the debugging protocol when something fails, and error-handling, dependency-isolation,
-local-shape, and refactor guidance when an error path, a seam, a tangled function body, or a cleanup is on the table.
-The split is not organizational tidiness. Claude Code keeps only the first 5,000 tokens of a skill when it re-attaches
-after compaction, and the body used to run past that — the debugging and verification sections were the part being
-dropped, in exactly the long sessions that need them most.
+local-shape, running-less, and refactor guidance when an error path, a seam, a tangled function body, a loop or request
+path, or a cleanup is on the table. The split is not organizational tidiness. Claude Code keeps only the first 5,000
+tokens of a skill when it re-attaches after compaction, and the body used to run past that — the debugging and
+verification sections were the part being dropped, in exactly the long sessions that need them most.
 
 Debugging is a protocol rather than an instinct. Build a failing command before theorizing, tighten it, minimize it, and
 read the error literally. When the failure crosses component boundaries, instrument every boundary in one pass and let
@@ -149,8 +155,9 @@ implementation work and should run before language-specific skills engage.
 The style opens by naming what a good outcome is: the task solved with the least new code it allows. Before anything
 gets written, Claude looks for what already does the job — this codebase, its dependencies, the standard library, a
 platform feature the project already has — and a task closed by deleting code counts as better closed than one that adds
-any. The obvious misreading is headed off in the same breath: minimum code is not minimum work, and the reading, the
-tracing, and the verification are unchanged.
+any. The same ranking holds for the code that does get written: it computes nothing on a path that discards the result,
+and it loads nothing whole that it could stream. The obvious misreading is headed off in the same breath: minimum code
+is not minimum work, and the reading, the tracing, and the verification are unchanged.
 
 It opens the skill queue too — `coding` first, then the language and platform skills on top of it (`coding` → `golang` →
 `templ`) — and no code gets written until that queue has run.

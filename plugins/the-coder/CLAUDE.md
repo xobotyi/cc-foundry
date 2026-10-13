@@ -10,12 +10,13 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   - `references/comments.md` — the closed set, routing ladder, provenance, doc contract, repair scope
   - `references/naming.md` — the naming rules and the rename blast-radius limits
   - `references/debugging.md` — the ordered protocol, multi-component localization, the failed-fix counter
-  - `references/patterns.md` — error handling, dependency isolation, local shape, refactor targets
+  - `references/patterns.md` — error handling, dependency isolation, local shape, running less, refactor targets
 
 ## Output Styles
 
-- **`software-engineer`** — least-new-code discipline, autonomy calibration, turn discipline, the skill queue that runs
-  `coding` first, phase-level planning, and controlled-language discipline (ASD-STE100 plus ubiquitous language)
+- **`software-engineer`** — least-code and least-execution discipline, autonomy calibration, turn discipline, the skill
+  queue that runs `coding` first, phase-level planning, and controlled-language discipline (ASD-STE100 plus ubiquitous
+  language)
 
 ## Skill Dependencies
 
@@ -23,9 +24,9 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   (~100-200 lines behind one verification gate). The skill owns discovery, the change list, commit sizing, the comment
   set, naming, debugging, verification.
 - **The style restates the skill's kernel deliberately.** Selecting a style does not load a skill, so the style is
-  self-sufficient for code work — comment density, no reviewer narration, rename-over-comment, root-cause fixes,
-  observed claims. Overlap between the two artifacts is intended; a copy of a rule the _default prompt_ already states
-  is not, and gets cut.
+  self-sufficient for code work — less code and less execution, superseded-code deletion, comment density, no reviewer
+  narration, rename-over-comment, root-cause fixes, observed claims. Overlap between the two artifacts is intended; a
+  copy of a rule the _default prompt_ already states is not, and gets cut.
 
 ## Plugin Scope
 

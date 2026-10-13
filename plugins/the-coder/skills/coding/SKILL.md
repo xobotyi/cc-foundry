@@ -17,16 +17,15 @@ compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_t
 **Discover before assuming. Verify before shipping.** Every coding failure traces to acting on assumptions instead of
 evidence, declaring done without verification, or burning context on noise.
 
+**Less code, less execution.** Of two correct changes, take the one that leaves less code, runs less, and allocates
+less; a deletion beats an addition. Count concepts a reader holds, never characters. Never add code to run less: a
+cache, a pool, or a memo waits for a measurement.
+
 ## Core Loop
 
 ```
 Discover → Plan → Implement → Verify
 ```
-
-- **Discover** — read the code, trace dependencies, understand what exists.
-- **Plan** — define success criteria, scope the change, order the work.
-- **Implement** — write minimal code, one change at a time, commit each.
-- **Verify** — run the checks, confirm the requirement, show the evidence.
 
 **The threshold**: if you can describe the diff in one sentence, skip planning. Otherwise, plan first.
 
@@ -173,8 +172,9 @@ The `git-commit` plugin's `commit` skill carries the pipeline for each of these 
 
 - **Every changed line traces to the request.** Run that test over the finished diff; a line that traces to nothing is
   scope creep that got in while you were somewhere else.
-- **Clean up the orphans your change created** — an import, a variable, a helper that your edit made unused.
-  Pre-existing dead code is not yours to delete: mention it and leave it.
+- **Clean up the orphans your change created** — an import, a variable, a helper that your edit made unused — and delete
+  what it supersedes: the old path, the flag choosing between them, the shim no caller needs. A path used outside this
+  repository stays; say so. Pre-existing dead code is not yours to delete: mention it and leave it.
 - **Wear one hat at a time.** Refactor first with behavior identical, verify, then change behavior. A diff that does
   both can't be reviewed or bisected.
 
@@ -187,15 +187,16 @@ efficiency.
 
 <reuse-ladder>
 1. **Does this need to exist?** Speculative need → skip it, say so in one line. (YAGNI)
-2. **Already in this codebase?** A helper, util, type, or pattern that already lives here → reuse it. Re-implementing
+2. **Can a deletion do it?** A special case, a fallback, or a constraint removed → delete instead of adding.
+3. **Already in this codebase?** A helper, util, type, or pattern that already lives here → reuse it. Re-implementing
    what's a few files over is the most common waste.
-3. **Stdlib does it?** Use it.
-4. **Native platform feature covers it?** `<input type="date">` over a picker lib, CSS over JS, a DB constraint over
+4. **Stdlib does it?** Use it.
+5. **Native platform feature covers it?** `<input type="date">` over a picker lib, CSS over JS, a DB constraint over
    app-level code.
-5. **An already-installed dependency solves it?** Use it. Never add a new dependency for what a few lines or an existing
+6. **An already-installed dependency solves it?** Use it. Never add a new dependency for what a few lines or an existing
    one can do.
-6. **Can it be one line?** One line.
-7. **Only then** write the minimum code that works.
+7. **Can it be one line?** One line.
+8. **Only then** write the minimum code that works.
 
 Two rungs hold → take the higher one and move on. </reuse-ladder>
 
@@ -219,7 +220,8 @@ patterns contradict, pick one (more recent, more tested), explain the choice, an
 blend them into an average. If you think an existing convention is harmful, surface it; don't fork it silently.
 
 Read `references/patterns.md` when writing error paths, introducing a seam for testability, reshaping a function whose
-body reads worse than it works, or improving existing code rather than changing its behavior.
+body reads worse than it works, improving existing code rather than changing its behavior, or writing a loop, a request
+path, or an unbounded read.
 
 ## Naming
 
@@ -277,7 +279,7 @@ weakening the check.
    the conventions.
 3. **Review your own diff** as if it were someone else's. Leftover debug code, comments outside the five kinds, docs
    describing the old contract, missing error handling, hardcoded values, uncovered edge cases, dead code from earlier
-   attempts.
+   attempts, code a deletion or a reuse could replace.
 4. **Type-check and lint.** Don't ship with known warnings.
 5. **Disclose gaps.** "Done" means fully verified. "Done, but I didn't verify X" beats a silent gap.
 
@@ -302,10 +304,8 @@ absence you do not claim, and an agent's success report is a claim like any othe
 
 - Write a failing test first, then implement until it passes.
 - A test must be able to fail. One that cannot fail when the business logic changes is testing nothing.
-- Use subagents for fresh-context review — they catch mistakes you'll miss in the context where you wrote the code.
 - For UI changes, exercise the feature in a browser. Type checks and test suites verify code correctness, not feature
   correctness; if you can't test it, say so rather than claiming success.
-- For refactors, verify identical behavior before and after.
 
 ## Context Management
 
