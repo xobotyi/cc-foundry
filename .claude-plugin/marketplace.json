@@ -136,7 +136,7 @@
 		{
 			"name": "javascript",
 			"description": "JavaScript and TypeScript discipline: the language, the type system, the Node and Bun runtimes, Vitest, and LSP-powered code intelligence",
-			"version": "2.0.0",
+			"version": "2.1.0",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
