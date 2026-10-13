@@ -14,7 +14,8 @@
 		"MDN Guide - Control Flow and Error Handling": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/control_flow_and_error_handling/index.md",
 		"MDN Guide - Internationalization": "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/guide/internationalization/index.md",
 		"TC39 Explicit Resource Management Proposal": "https://raw.githubusercontent.com/tc39/proposal-explicit-resource-management/main/README.md",
-		"TypeScript JSDoc Reference": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/javascript/JSDoc%20Reference.md"
+		"TypeScript JSDoc Reference": "https://raw.githubusercontent.com/microsoft/TypeScript-Website/v2/packages/documentation/copy/en/javascript/JSDoc%20Reference.md",
+		"anti-slop Oxlint Rules": "https://raw.githubusercontent.com/dmmulroy/anti-slop/main/README.md"
 	},
 	"lastFetched": "2026-09-02T08:50:13.466Z"
 }
