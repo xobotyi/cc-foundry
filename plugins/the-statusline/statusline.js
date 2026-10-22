@@ -7,10 +7,6 @@ import os from 'node:os';
 import fs from 'node:fs';
 import {fileURLToPath} from 'node:url';
 
-/*
- * ENSURING ROBUST ERROR LOGGING
- */
-
 /**
  * Writes error to a log file next to the script.
  * @param {unknown} err
@@ -27,7 +23,6 @@ function writeScriptError(err) {
     fs.appendFileSync(errorFile, `[${timestamp}]\n${message}\n\n`);
 }
 
-// Register global exception handlers
 process.on('uncaughtException', (err) => {
     writeScriptError(err);
     process.exit(1);
@@ -37,10 +32,6 @@ process.on('unhandledRejection', (reason) => {
     writeScriptError(reason);
     process.exit(1);
 });
-
-/*
- * ACTUAL STATUSLINE IMPLEMENTATION
- */
 
 const RESET = '\x1b[0m';
 
@@ -95,43 +86,40 @@ function color(colorNum, text) {
     return `${ansi256(colorNum)}${text}${RESET}`;
 }
 
-// 256-color palette choices (pastel tones)
 const c = {
-    gray: (t) => color(245, t),     // medium gray
-    green: (t) => color(151, t),    // pastel green
-    yellow: (t) => color(223, t),   // pastel yellow/cream
-    blue: (t) => color(153, t),     // pastel blue
-    magenta: (t) => color(182, t),  // pastel pink/magenta
+    gray: (t) => color(245, t),
+    green: (t) => color(151, t),
+    yellow: (t) => color(223, t),
+    blue: (t) => color(153, t),
+    magenta: (t) => color(182, t),
     cyan: (t) => color(152, t),
     red: (t) => color(174, t),
 };
 
 /**
- * Colors text with stepped 256-color palette based on percentage remaining.
- * Luminosity increases with urgency (more visible when critical).
+ * Colors text by the percentage remaining, in 10-point steps below 60%: dim gray, light gray, pale yellow, bright
+ * yellow, orange, red, then bright red-pink under 10%. Luminosity rises with urgency.
  * @param {number} percent - Remaining percentage (0-100)
  * @param {string} text - Text to colorize
  * @returns {string}
  */
 function colorByUrgency(percent, text) {
-    // Stepped colors with increasing luminosity as urgency rises
-    // Gray (dim) → Yellow (medium) → Orange (bright) → Red (vivid)
     let colorNum;
 
     if (percent >= 60) {
-        colorNum = 245;      // gray (low luminosity)
+        colorNum = 245;
     } else if (percent >= 50) {
-        colorNum = 251;      // light gray
+        colorNum = 251;
     } else if (percent >= 40) {
-        colorNum = 228;      // pale yellow
+        colorNum = 228;
     } else if (percent >= 30) {
-        colorNum = 220;      // bright yellow
+        colorNum = 220;
     } else if (percent >= 20) {
-        colorNum = 208;      // orange (high luminosity)
+        colorNum = 208;
     } else if (percent >= 10) {
-        colorNum = 196;      // red
+        colorNum = 196;
     } else {
-        colorNum = 197;      // bright red-pink (max luminosity)
+        colorNum = 197;
     }
 
     return `${ansi256(colorNum)}${text}${RESET}`;
@@ -252,10 +240,9 @@ function formatStyleModel(data, level) {
     const model = data.model?.display_name ?? 'unknown';
     const effort = level.effort ? data.effort?.level : undefined;
 
-    // Remove any plugin prefix from style
-    const stylePluginIdx = style.indexOf(':');
-    if (stylePluginIdx !== -1) {
-        style = style.substring(stylePluginIdx + 1).trim();
+    const pluginPrefixEnd = style.indexOf(':');
+    if (pluginPrefixEnd !== -1) {
+        style = style.substring(pluginPrefixEnd + 1).trim();
     }
 
     const engine = effort ? `${model} · ${effort}` : model;
@@ -288,8 +275,8 @@ function trimMiddle(str, maxWidth) {
 }
 
 /**
- * Collapses path segments to first letter to fit within maxWidth.
- * Keeps the last segment (current folder) intact as long as possible.
+ * Collapses a path to fit within maxWidth, in three stages: directory segments shorten to their first letter, then
+ * the segments after the first give way to an ellipsis, then the last segment (current folder) trims in the middle.
  * Always uses unix-style separators.
  * @param {string} path - Path to collapse
  * @param {number} maxWidth - Maximum allowed width
@@ -311,15 +298,12 @@ function collapsePath(path, maxWidth) {
         }
     }
 
-    // if overdue is not fulfilled - we can pop path segments starting from the 2nd, replacing with ellipsis
-    // Keep first segment, replace middle with ellipsis
     if (segments.length > 2 && overdue > 0) {
         const ellipsis = '...';
 
         for (let i = 1; i < segments.length; i++) {
             overdue -= (segments[i].length + 1);
 
-            //replace the segment with ellipsis and adjust overdue
             if (i === 1) {
                 overdue -= (segments[i].length - 1);
                 segments[i] = ellipsis;
@@ -335,7 +319,6 @@ function collapsePath(path, maxWidth) {
 
 
     let basename = posixpath.basename(path);
-    // still overdue - trim in the middle of the basename
     if (overdue > 0) {
         basename = trimMiddle(basename, Math.max(basename.length - overdue, 0));
     }
