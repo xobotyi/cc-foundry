@@ -93,10 +93,11 @@ skill runs on top of it.
 
 ### the-statusline
 
-No visibility into context window usage, cost, or model. This plugin installs a 3-row status line to your user-level
-Claude configuration showing output style, model, session cost, context window remaining, cache hit rate, and current
-working directory. Color urgency increases as context approaches limits. Auto-syncs on every session start and survives
-agent directory changes.
+No visibility into context window usage, rate limits, cost, or model. This plugin installs a two-row status line to your
+user-level Claude configuration showing output style, model and effort, session cost, context left, the rate limit
+closest to running out, working directory, git branch, and lines changed. The layout adapts to the terminal width, and
+color urgency increases as context or rate limits run low. Auto-syncs on every session start and survives agent
+directory changes.
 
 ```
 /plugin install the-statusline

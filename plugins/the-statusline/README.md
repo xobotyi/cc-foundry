@@ -6,24 +6,36 @@ Auto-syncing status line for Claude Code with context window usage, cost trackin
 
 Claude Code's default status line is minimal. When working on complex tasks, you need visibility into:
 
-- Context window consumption (when will you hit limits?)
+- Context window consumption (how much room is left?)
+- Subscription rate limits (which one runs out first, and when does it reset?)
 - Session costs (how much is this costing?)
-- Cache efficiency (is prompt caching working?)
-- Current working directory (where are agents operating?)
+- Where agents are operating (which directory, branch, worktree?)
 
 Project-level status line configurations break when agents change directories during execution, leaving you without
 status visibility mid-session.
 
 ## The Solution
 
-This plugin installs a 3-row status line to your user-level Claude configuration (`~/.claude/`), where it persists
+This plugin installs a two-row status line to your user-level Claude configuration (`~/.claude/`), where it persists
 across all sessions and survives agent directory changes.
 
-**Row 1** — Output style, model name, session cost (USD), API time spent **Row 2** — Context window remaining (%),
-input/output ratio, cache hit rate **Row 3** — Current working directory (relative to project root, collapsed when too
-long)
+The first row shows the output style, the model with its reasoning effort, and the session cost. At its right edge sit
+the context left and whichever rate limit is closer to stopping you, the 5-hour or the 7-day one, with the time it
+resets. A limit counts as closer when, at the pace used so far in its window, it runs out before it resets. When neither
+will, the one with less left is shown.
 
-Color urgency increases as you approach context limits: gray → yellow → orange → red.
+The second row shows the current directory, the git branch, and the lines added and removed in the session. The
+directory reads relative to the project root; in a worktree session it shows the repository the worktree was created
+from, tagged with the worktree name.
+
+Context left is measured against the model's full context window. Claude Code doesn't pass the auto-compact threshold to
+status lines, so if you lowered the auto-compact window, compaction runs before the context reaches zero.
+
+The layout follows the terminal width. On a wide terminal, context and rate limit stay at the right edge. As the
+terminal narrows, the first row drops the reasoning effort, then the output style, the reset time, and the cost; the
+second row folds the path, then drops the line counts and shortens the branch.
+
+Color urgency increases as context or the rate limit runs low: gray → yellow → orange → red.
 
 ## Installation
 
@@ -41,7 +53,7 @@ The plugin automatically:
 ## How It Works
 
 On every session start, a hook copies the status line script to your user-level Claude directory and patches your
-settings if needed. The script receives session data from Claude Code and renders the three-row status display.
+settings if needed. The script receives session data from Claude Code and renders the two-row status display.
 
 User preferences like padding are preserved across updates. The status line uses absolute paths, so it continues working
 even when agents change directories during multi-agent workflows.

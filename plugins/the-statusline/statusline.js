@@ -44,6 +44,38 @@ process.on('unhandledRejection', (reason) => {
 
 const RESET = '\x1b[0m';
 
+// shortcut: a guess at Claude Code's spacing around the status line — measure it if row 1 wraps or leaves a gap
+const RESERVED_COLUMNS = 4;
+
+const FALLBACK_PATH_WIDTH = 50;
+
+const MIN_PATH_WIDTH = 12;
+
+const SHORT_BRANCH_WIDTH = 16;
+
+const ROW1_LEVELS = [
+    {style: true, effort: true, reset: true, cost: true},
+    {style: true, effort: false, reset: true, cost: true},
+    {style: false, effort: false, reset: true, cost: true},
+    {style: false, effort: false, reset: false, cost: true},
+    {style: false, effort: false, reset: false, cost: false},
+];
+
+const ROW2_LEVELS = [
+    {lines: true, branch: 'full', worktree: 'full'},
+    {lines: true, branch: 'full', worktree: 'short'},
+    {lines: false, branch: 'full', worktree: 'short'},
+    {lines: false, branch: 'short', worktree: 'short'},
+    {lines: false, branch: 'none', worktree: 'short'},
+];
+
+const RATE_LIMIT_WINDOWS = [
+    {key: 'five_hour', label: '5h', durationSeconds: 5 * 60 * 60},
+    {key: 'seven_day', label: '7d', durationSeconds: 7 * 24 * 60 * 60},
+];
+
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 /**
  * Returns 256-color ANSI escape code.
  * @param {number} n - Color number (0-255)
@@ -70,6 +102,8 @@ const c = {
     yellow: (t) => color(223, t),   // pastel yellow/cream
     blue: (t) => color(153, t),     // pastel blue
     magenta: (t) => color(182, t),  // pastel pink/magenta
+    cyan: (t) => color(152, t),
+    red: (t) => color(174, t),
 };
 
 /**
@@ -104,57 +138,26 @@ function colorByUrgency(percent, text) {
 }
 
 /**
- * @typedef {object} ModelData
- * @property {string} id - Model identifier (e.g., "claude-opus-4-6")
- * @property {string} display_name - Human-readable name (e.g., "Opus")
+ * Returns the width of a string in terminal columns, color escapes excluded.
+ * @param {string} text
+ * @returns {number}
  */
-
-/**
- * @typedef {object} WorkspaceData
- * @property {string} current_dir - Current working directory
- * @property {string} project_dir - Original project directory
- */
-
-/**
- * @typedef {object} OutputStyleData
- * @property {string} name - Active output style name
- */
+function visibleWidth(text) {
+    // shortcut: one column per code point, so CJK and emoji undercount — add East Asian Width if rows misalign
+    return [...text.replace(/\x1b\[[0-9;]*m/g, '')].length;
+}
 
 /**
  * @typedef {object} CostData
- * @property {number} total_cost_usd - Session cost in USD
- * @property {number} total_duration_ms - Total wall-clock time since session start (ms)
- * @property {number} total_api_duration_ms - Time spent in API calls
+ * @property {number} total_cost_usd - Estimated session cost in USD, at list price
  * @property {number} total_lines_added - Lines added in session
  * @property {number} total_lines_removed - Lines removed in session
  */
 
 /**
- * @typedef {object} CurrentUsageData
- * @property {number} input_tokens - Input tokens in current context
- * @property {number} output_tokens - Output tokens generated
- * @property {number} cache_creation_input_tokens - Tokens written to cache
- * @property {number} cache_read_input_tokens - Tokens read from cache
- */
-
-/**
  * @typedef {object} ContextWindowData
- * @property {number} total_input_tokens - Cumulative input tokens
- * @property {number} total_output_tokens - Cumulative output tokens
- * @property {number} context_window_size - Max context size (200000 default, 1000000 extended)
- * @property {number|null} used_percentage - Pre-calculated usage (0-100), null early in session
- * @property {number|null} remaining_percentage - Pre-calculated remaining (0-100), null early in session
- * @property {CurrentUsageData|null} current_usage - Current context usage
- */
-
-/**
- * @typedef {object} VimData
- * @property {"NORMAL"|"INSERT"} mode - Current vim mode
- */
-
-/**
- * @typedef {object} AgentData
- * @property {string} name - Agent name when running with --agent flag
+ * @property {number|null} remaining_percentage - Remaining share of the model's full context window (0-100), null
+ *     early in session
  */
 
 /**
@@ -165,25 +168,31 @@ function colorByUrgency(percent, text) {
 
 /**
  * @typedef {object} RateLimitsData
- * @property {RateLimitWindow} [five_hour] - 5-hour rate limit (Pro/Max only)
- * @property {RateLimitWindow} [seven_day] - 7-day rate limit
+ * @property {RateLimitWindow} [five_hour] - 5-hour window
+ * @property {RateLimitWindow} [seven_day] - 7-day window
  */
 
 /**
+ * @typedef {object} WorktreeData
+ * @property {string} name - Worktree name
+ * @property {string} path - Absolute path to the worktree directory
+ * @property {string} original_cwd - Directory the session was in before entering the worktree
+ */
+
+/**
+ * The status line payload fields this renderer reads. Full schema:
+ * https://code.claude.com/docs/en/statusline#available-data
+ *
  * @typedef {object} SessionData
- * @property {string} session_id - Unique session identifier
- * @property {string} transcript_path - Path to session transcript
- * @property {string} cwd - Current working directory (alias for workspace.current_dir)
- * @property {ModelData} model - Model information
- * @property {WorkspaceData} workspace - Workspace paths
- * @property {string} version - Claude Code version
- * @property {OutputStyleData} output_style - Active output style
+ * @property {string} cwd - Current working directory
+ * @property {{display_name: string}} model - Model information
+ * @property {{level: string}} [effort] - Reasoning effort; absent when the model doesn't support it
+ * @property {{current_dir: string, project_dir: string}} workspace - Workspace paths
+ * @property {{name: string}} output_style - Active output style, "plugin:Style" when a plugin provides it
  * @property {CostData} cost - Session cost and stats
  * @property {ContextWindowData} context_window - Context usage info
- * @property {boolean} exceeds_200k_tokens - Whether last response exceeded 200k tokens (fixed threshold)
- * @property {VimData} [vim] - Present only when vim mode is enabled
- * @property {AgentData} [agent] - Present only when running with --agent flag or agent settings
- * @property {RateLimitsData} [rate_limits] - Present only for Claude.ai subscribers after first API response
+ * @property {RateLimitsData} [rate_limits] - Subscribers only, after the first API response; each window may be absent
+ * @property {WorktreeData} [worktree] - Present only in a worktree session
  */
 
 
@@ -204,13 +213,44 @@ async function readStdinJSON() {
 }
 
 /**
- * Formats output style and model: "Style (Model)"
+ * Reads the `padding` the user configured for the status line, which narrows the usable width.
+ * @returns {number}
+ */
+function readPadding() {
+    const settingsPath = path.join(os.homedir(), '.claude', 'settings.json');
+    try {
+        const padding = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')).statusLine?.padding;
+        return Number.isFinite(padding) ? padding : 0;
+    } catch {
+        // padding only tunes alignment; an unreadable settings file must not blank the status line
+        return 0;
+    }
+}
+
+/**
+ * Returns the columns available to a status line row, or null when the terminal width is unknown.
+ * @returns {number|null}
+ */
+function readAvailableWidth() {
+    // constraint: Claude Code captures stdout, so the terminal width reaches the script only as COLUMNS
+    const columns = Number(process.env.COLUMNS);
+    if (!Number.isFinite(columns) || columns <= 0) {
+        return null;
+    }
+
+    return columns - RESERVED_COLUMNS - 2 * readPadding();
+}
+
+/**
+ * Formats output style, model and effort: "Style (Model · effort)", or "Model" alone when the style is left out.
  * @param {SessionData} data
+ * @param {{style: boolean, effort: boolean}} level - Which parts to include
  * @returns {string}
  */
-function formatStyleModel(data) {
+function formatStyleModel(data, level) {
     let style = data.output_style?.name ?? 'default';
     const model = data.model?.display_name ?? 'unknown';
+    const effort = level.effort ? data.effort?.level : undefined;
 
     // Remove any plugin prefix from style
     const stylePluginIdx = style.indexOf(':');
@@ -218,7 +258,12 @@ function formatStyleModel(data) {
         style = style.substring(stylePluginIdx + 1).trim();
     }
 
-    return `${c.green(style)} ${c.yellow(`(${model})`)}`;
+    const engine = effort ? `${model} · ${effort}` : model;
+    if (!level.style) {
+        return c.yellow(engine);
+    }
+
+    return `${c.green(style)} ${c.yellow(`(${engine})`)}`;
 }
 
 /**
@@ -304,37 +349,115 @@ function collapsePath(path, maxWidth) {
  * @returns {string}
  */
 function toUnixPath(p) {
-    return posixpath.join(...p.split(/[/\\]/));
+    return p.replace(/\\/g, '/');
 }
 
 /**
- * Formats path relative to project root, with terminal-width-aware folding.
+ * Replaces the home directory prefix with "~".
+ * @param {string} unixPath
+ * @returns {string}
+ */
+function toHomeRelative(unixPath) {
+    const homedir = toUnixPath(os.homedir());
+    return unixPath === homedir || unixPath.startsWith(homedir + '/') ? '~' + unixPath.slice(homedir.length) : unixPath;
+}
+
+/**
+ * Resolves the working directory for display: the project root as a path, a subdirectory as "$/sub/dir". In a
+ * worktree session the root is shown as the repository the worktree was created from, tagged as a worktree, instead
+ * of its .claude/worktrees/... location.
+ * @param {SessionData} data
+ * @param {'full'|'short'} worktreeTag - "[wt name]" or "[wt]"
+ * @returns {{path: string, tag: string}} Uncollapsed path and the tag that follows it
+ */
+function resolveLocation(data, worktreeTag) {
+    const cwd = toUnixPath(data.cwd ?? data.workspace?.current_dir ?? '');
+    const worktree = data.worktree;
+    const root = toUnixPath(worktree?.path ?? data.workspace?.project_dir ?? '');
+    const relPath = root ? posixpath.relative(root, cwd) : '..';
+
+    if (relPath === '..' || relPath.startsWith('../')) {
+        return {path: toHomeRelative(cwd), tag: ''};
+    }
+
+    let tag = '';
+    if (worktree?.name) {
+        tag = worktreeTag === 'full' ? ` [wt ${worktree.name}]` : ' [wt]';
+    }
+
+    const shown = relPath === ''
+        ? toHomeRelative(toUnixPath(worktree?.original_cwd ?? root))
+        : '$/' + relPath;
+
+    return {path: shown, tag};
+}
+
+/**
+ * Returns the branch checked out in the repository that contains `dir`, linked worktrees included: the branch name, a
+ * short commit hash on a detached HEAD, or null outside a repository.
+ * @param {string} dir
+ * @returns {string|null}
+ */
+function readGitBranch(dir) {
+    let current = dir;
+
+    while (current) {
+        const dotGit = path.join(current, '.git');
+        const dotGitStat = fs.statSync(dotGit, {throwIfNoEntry: false});
+
+        if (dotGitStat) {
+            let gitDir = dotGit;
+            if (dotGitStat.isFile()) {
+                const pointer = /^gitdir:\s*(?<gitDir>.+)$/m.exec(fs.readFileSync(dotGit, 'utf-8'));
+                if (!pointer) {
+                    return null;
+                }
+                gitDir = path.resolve(current, pointer.groups.gitDir.trim());
+            }
+
+            const head = fs.readFileSync(path.join(gitDir, 'HEAD'), 'utf-8').trim();
+            const ref = /^ref:\s*(?:refs\/heads\/)?(?<branch>.+)$/.exec(head);
+            return ref ? ref.groups.branch : head.slice(0, 7);
+        }
+
+        const parent = path.dirname(current);
+        if (parent === current) {
+            return null;
+        }
+        current = parent;
+    }
+
+    return null;
+}
+
+/**
+ * Resolves the current branch. Returns null outside a git repository or when HEAD can't be read.
+ * @param {SessionData} data
+ * @returns {string|null}
+ */
+function resolveBranch(data) {
+    const cwd = data.cwd ?? data.workspace?.current_dir;
+    if (!cwd) {
+        return null;
+    }
+
+    try {
+        return readGitBranch(cwd);
+    } catch {
+        // the branch is optional context; an unreadable .git must not blank the status line
+        return null;
+    }
+}
+
+/**
+ * Formats lines added and removed in the session: "+12 −3"
  * @param {SessionData} data
  * @returns {string}
  */
-function formatPath(data) {
-    // since we're not able reliably get terminal width in all environments,
-    // we'll use a fixed max width for now
-    const maxPrintWidth = 50;
-
-    const cwd = toUnixPath(data.cwd ?? data.workspace?.current_dir ?? '');
-    const projectDir = toUnixPath(data.workspace?.project_dir ?? '');
-
-    const relPath = posixpath.relative(projectDir, cwd);
-
-    if (relPath === '') {
-        const homedir = toUnixPath(os.homedir());
-        if (projectDir.startsWith(homedir)) {
-            // Project in home directory - replace home with ~
-            return collapsePath('~' + projectDir.slice(homedir.length), maxPrintWidth);
-        }
-
-        // we're in the project root, print as-is
-        return collapsePath(projectDir, maxPrintWidth);
-    }
-
-    // in case we went deeper than project root, ensure we have $/ prefix, not to print it
-    return collapsePath("$/" + relPath, maxPrintWidth);
+function formatLinesChanged(data) {
+    const added = data.cost?.total_lines_added ?? 0;
+    const removed = data.cost?.total_lines_removed ?? 0;
+    return `${c.green(`+${added}`)} ${c.red(`−${removed}`)}`;
 }
 
 /**
@@ -348,152 +471,168 @@ function formatCost(data) {
 }
 
 /**
- * Formats API time in human-readable form.
- * @param {SessionData} data
- * @returns {string}
- */
-function formatApiTime(data) {
-    const ms = data.cost?.total_api_duration_ms ?? 0;
-    const seconds = ms / 1000;
-    if (seconds < 60) {
-        return c.gray(`${seconds.toFixed(1)}s api`);
-    }
-    const minutes = Math.floor(seconds / 60);
-    const remainingSec = Math.round(seconds % 60);
-    return `${minutes}m${remainingSec}s api`;
-}
-
-/**
  * Formats context window remaining percentage.
  * @param {SessionData} data
  * @returns {string}
  */
 function formatContextRemaining(data) {
-    const remaining = data.context_window?.remaining_percentage ?? undefined;
-    let val = c.gray('--.--%')
-    if (remaining !== undefined) {
-        val = `${remaining.toFixed(2)}%`
-        val = colorByUrgency(remaining, val)
+    const remaining = data.context_window?.remaining_percentage;
+    if (remaining == null) {
+        return c.gray('ctx left --%');
     }
-    return `ctx left ${val}`;
+
+    return colorByUrgency(remaining, `ctx left ${Math.round(remaining)}%`);
 }
 
 /**
- * Formats input/output token ratio.
- * @param {SessionData} data
+ * Formats a reset time as local 24h "HH:MM", prefixed with the weekday when it is a day or more away.
+ * @param {number} epochSeconds - Reset time
+ * @param {number} nowSeconds - Current time
  * @returns {string}
  */
-function formatTokenRatio(data) {
-    const input = data.context_window?.total_input_tokens;
-    const output = data.context_window?.total_output_tokens;
-
-    let ratio = '--%'
-    if (input && output) {
-        ratio = `${Math.round((input / (input + output)) * 100)}%`;
-    }
-
-    return `inp÷out ${ratio}`;
+function formatResetTime(epochSeconds, nowSeconds) {
+    const date = new Date(epochSeconds * 1000);
+    const hhmm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return epochSeconds - nowSeconds < 24 * 60 * 60 ? hhmm : `${WEEKDAYS[date.getDay()]} ${hhmm}`;
 }
 
 /**
- * Formats cache efficiency percentage.
- * @param {SessionData} data
- * @returns {string}
+ * Projects when a rate-limit window runs out if consumption keeps the average pace of the window so far.
+ * @param {RateLimitWindow} limitWindow
+ * @param {number} durationSeconds - Window length
+ * @param {number} nowSeconds - Current time, Unix epoch seconds
+ * @returns {number} Unix epoch seconds; Infinity when nothing is consumed yet
  */
-function formatCacheEfficiency(data) {
-    const usage = data.context_window?.current_usage;
-    if (!usage) {
-        return 'cache --%';
+function projectExhaustion(limitWindow, durationSeconds, nowSeconds) {
+    const used = limitWindow.used_percentage ?? 0;
+    if (used >= 100) {
+        return nowSeconds;
     }
 
-    const fresh = usage.input_tokens ?? 0;
-    const cacheRead = usage.cache_read_input_tokens ?? 0;
-    const cacheWrite = usage.cache_creation_input_tokens ?? 0;
-    const total = fresh + cacheRead + cacheWrite;
-
-    if (total === 0) {
-        return 'cache --%';
+    const elapsed = nowSeconds - (limitWindow.resets_at - durationSeconds);
+    if (used <= 0 || !(elapsed > 0)) {
+        return Infinity;
     }
 
-    const efficiency = Math.round((cacheRead / total) * 100);
-    return `cache ${efficiency}%`;
+    return nowSeconds + (100 - used) * elapsed / used;
 }
 
 /**
- * Formats 5-hour rate limit usage. Returns null when data is unavailable.
+ * Formats the rate-limit window closer to stopping the session, or returns null when no window is reported. A window
+ * stops the session when its projected exhaustion comes before its reset, and the earliest such window wins. When no
+ * window stops the session, the one with less left wins.
  * @param {SessionData} data
+ * @param {{reset: boolean}} level - Whether to include the reset time
  * @returns {string|null}
  */
-function formatRateLimit(data) {
-    const fiveHour = data.rate_limits?.five_hour;
-    if (!fiveHour) {
+function formatRateLimit(data, level) {
+    const nowSeconds = Date.now() / 1000;
+
+    let closest = null;
+    for (const {key, label, durationSeconds} of RATE_LIMIT_WINDOWS) {
+        const limitWindow = data.rate_limits?.[key];
+        if (!limitWindow) {
+            continue;
+        }
+
+        const exhaustsAt = projectExhaustion(limitWindow, durationSeconds, nowSeconds);
+        const candidate = {
+            label,
+            limitWindow,
+            stopsAt: exhaustsAt < limitWindow.resets_at ? exhaustsAt : Infinity,
+            remaining: Math.max(0, 100 - (limitWindow.used_percentage ?? 0)),
+        };
+
+        const isCloser = closest === null
+            || candidate.stopsAt < closest.stopsAt
+            || (candidate.stopsAt === closest.stopsAt && candidate.remaining < closest.remaining);
+        if (isCloser) {
+            closest = candidate;
+        }
+    }
+
+    if (closest === null) {
         return null;
     }
 
-    const used = fiveHour.used_percentage ?? 0;
-    const remaining = 100 - used;
+    const resetLabel = level.reset && closest.limitWindow.resets_at
+        ? ` til ${formatResetTime(closest.limitWindow.resets_at, nowSeconds)}`
+        : '';
+    return colorByUrgency(closest.remaining, `${closest.label} left ${Math.round(closest.remaining)}%${resetLabel}`);
+}
 
-    // Format reset time as local HH:MM
-    let resetLabel = "";
-    if (fiveHour.resets_at) {
-        const resetDate = new Date(fiveHour.resets_at * 1000);
-        const h = resetDate.getHours();
-        const m = String(resetDate.getMinutes()).padStart(2, "0");
-        const suffix = h >= 12 ? "pm" : "am";
-        const h12 = h % 12 || 12;
-        resetLabel = ` til ${h12}:${m}${suffix}`;
+/**
+ * Formats first row of status line: style, model and cost; context and rate limit at the row end.
+ * Walks ROW1_LEVELS until a variant fits; the sparsest one renders even when it doesn't.
+ * @param {SessionData} data
+ * @param {number|null} width - Available columns
+ * @returns {string}
+ */
+function formatRow1(data, width) {
+    const minGap = 3;
+
+    for (const [index, level] of ROW1_LEVELS.entries()) {
+        const left = [
+            formatStyleModel(data, level),
+            level.cost && formatCost(data),
+        ].filter(Boolean).join(c.gray(' | '));
+
+        const right = [
+            formatContextRemaining(data),
+            formatRateLimit(data, level),
+        ].filter(Boolean).join(c.gray(' · '));
+
+        if (width === null) {
+            return left + c.gray(' | ') + right;
+        }
+
+        const gap = width - visibleWidth(left) - visibleWidth(right);
+        if (gap >= minGap || index === ROW1_LEVELS.length - 1) {
+            return left + ' '.repeat(Math.max(gap, minGap)) + right;
+        }
     }
-
-    // Invert: colorByUrgency expects "remaining", rate limit gives "used"
-    const val = colorByUrgency(remaining, `${Math.round(remaining)}%${resetLabel}`);
-    return val;
 }
 
 /**
- * Formats first row of status line: style, model, cost, api time
+ * Formats second row of status line: location, branch and lines changed. Walks ROW2_LEVELS until the path keeps
+ * MIN_PATH_WIDTH after the other segments; the sparsest level renders even when it doesn't.
  * @param {SessionData} data
+ * @param {number|null} width - Available columns
  * @returns {string}
  */
-function formatRow1(data) {
-    const row = [
-        formatStyleModel(data),
-        formatCost(data),
-        formatApiTime(data)
-    ];
-    return row.join(c.gray(" | "));
-}
+function formatRow2(data, width) {
+    const separator = ' | ';
+    const branch = resolveBranch(data);
 
-/**
- * Formats second row of status line: token metrics
- * @param {SessionData} data
- * @returns {string}
- */
-function formatRow2(data) {
-    const row = [
-        formatContextRemaining(data),
-        formatTokenRatio(data),
-        formatCacheEfficiency(data),
-        formatRateLimit(data)
-    ].filter(Boolean);
-    return row.join(" | ");
-}
+    for (const [index, level] of ROW2_LEVELS.entries()) {
+        let branchLabel = null;
+        if (branch && level.branch !== 'none') {
+            branchLabel = c.cyan(level.branch === 'full' ? branch : trimMiddle(branch, SHORT_BRANCH_WIDTH));
+        }
 
-/**
- * Formats third row of status line: path
- * @param {SessionData} data
- * @returns {string}
- */
-function formatRow3(data) {
-    return c.blue(formatPath(data));
+        const tail = [
+            branchLabel,
+            level.lines && formatLinesChanged(data),
+        ].filter(Boolean).join(' ');
+
+        const {path: dirPath, tag} = resolveLocation(data, level.worktree);
+        const tailWidth = tail ? visibleWidth(tail) + separator.length : 0;
+        const pathWidth = width === null ? FALLBACK_PATH_WIDTH : width - tailWidth - tag.length;
+
+        if (width === null || pathWidth >= MIN_PATH_WIDTH || index === ROW2_LEVELS.length - 1) {
+            const location = c.blue(collapsePath(dirPath, Math.max(pathWidth, 1))) + c.gray(tag);
+            return tail ? location + c.gray(separator) + tail : location;
+        }
+    }
 }
 
 async function main() {
     const sessionData = await readStdinJSON();
+    const width = readAvailableWidth();
 
     const rows = [
-        formatRow1(sessionData),
-        formatRow2(sessionData),
-        formatRow3(sessionData)
+        formatRow1(sessionData, width),
+        formatRow2(sessionData, width),
     ];
 
     process.stdout.write(rows.join('\n'));

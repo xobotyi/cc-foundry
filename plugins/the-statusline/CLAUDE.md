@@ -18,3 +18,9 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
   relative script path that breaks when an agent changes working directory mid-session
 - **An edit to `statusline.js` reaches the user on the next session start**, when the hook re-copies it — a change is
   not observable in the session that made it
+- **Context left is measured against the model's full window** — the payload carries no auto-compact state (checked
+  against the v2.1.306 payload builder). Don't re-derive the threshold from settings files: they miss `--autocompact`,
+  managed scope, and server-side overrides, and a wrong countdown is worse than none
+- **Read git state from `.git/HEAD`, never spawn `git`** — the script runs on every assistant message in every open
+  session
+- **Row width comes from `COLUMNS`** — Claude Code captures stdout, so terminal width detection finds no tty
