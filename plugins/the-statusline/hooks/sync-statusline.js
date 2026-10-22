@@ -17,6 +17,9 @@ const SOURCE_SCRIPT = path.join(
     'statusline.js',
 );
 
+// constraint: Claude Code re-runs the status line on session events only; a terminal resize is not one
+const REFRESH_INTERVAL_SECONDS = 10;
+
 try {
     fs.mkdirSync(CLAUDE_DIR, {recursive: true});
     fs.copyFileSync(SOURCE_SCRIPT, TARGET_SCRIPT);
@@ -26,11 +29,15 @@ try {
         : {};
 
     const command = `node ${TARGET_SCRIPT}`;
-    const sl = settings.statusLine;
+    const statusLine = settings.statusLine;
 
-    if (sl?.type !== 'command' || sl?.command !== command) {
+    const isCurrent = statusLine?.type === 'command'
+        && statusLine.command === command
+        && statusLine.refreshInterval !== undefined;
+    if (!isCurrent) {
         settings.statusLine = {
-            ...sl,
+            refreshInterval: REFRESH_INTERVAL_SECONDS,
+            ...statusLine,
             type: 'command',
             command,
         };

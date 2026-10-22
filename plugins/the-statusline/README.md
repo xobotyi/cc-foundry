@@ -58,6 +58,9 @@ settings if needed. The script receives session data from Claude Code and render
 User preferences like padding are preserved across updates. The status line uses absolute paths, so it continues working
 even when agents change directories during multi-agent workflows.
 
+Claude Code doesn't re-run the status line when the terminal is resized, so the hook sets a `refreshInterval` of 10
+seconds: after a resize, the rows refit to the new width within that time. A `refreshInterval` you set yourself is kept.
+
 ## Customization
 
 To modify the status line display, edit `statusline.js` in the plugin directory and bump the version in

@@ -5,7 +5,7 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 ## Components
 
 - **`hooks/sync-statusline.js`** — SessionStart hook; copies the renderer to `~/.claude/statusline.js` and patches
-  `statusLine` in `~/.claude/settings.json`
+  `statusLine` in `~/.claude/settings.json` with the command and a default `refreshInterval`
 - **`hooks/hooks.json`** — hook registration
 - **`statusline.js`** — the renderer; Claude Code runs the installed copy under `~/.claude/` and feeds it session data
   as JSON on stdin
@@ -21,6 +21,8 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 - **Context left is measured against the model's full window** — the payload carries no auto-compact state (checked
   against the v2.1.306 payload builder). Don't re-derive the threshold from settings files: they miss `--autocompact`,
   managed scope, and server-side overrides, and a wrong countdown is worse than none
-- **Read git state from `.git/HEAD`, never spawn `git`** — the script runs on every assistant message in every open
-  session
-- **Row width comes from `COLUMNS`** — Claude Code captures stdout, so terminal width detection finds no tty
+- **Read git state from `.git/HEAD`, never spawn `git`** — the script runs on every assistant message and every
+  `refreshInterval` tick, in every open session
+- **Row width comes from `COLUMNS`, read only when Claude Code runs the script** — stdout is captured, so terminal width
+  detection finds no tty, and a terminal resize triggers no run; the hook's default `refreshInterval` is what refits the
+  rows after one
