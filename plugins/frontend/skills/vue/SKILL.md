@@ -166,7 +166,8 @@ catalog in `${CLAUDE_SKILL_DIR}/references/sfc.md`.
 - Declare in `camelCase`, use in templates as `kebab-case` — Vue converts automatically.
 - Never mutate props. Use `computed()` for transformations, `ref()` + initial value for local copies.
 - One-way data flow — props down, events up.
-- Reactive props destructure (3.5+): destructured props are reactive, usable in watch/computed directly.
+- Reactive props destructure (3.5+): destructured props are reactive inside `computed` and `watchEffect`. `watch` needs
+  a getter, `watch(() => count, …)`; passing `count` directly is a compile error.
 - Pass destructured props to composables via getter: `useComposable(() => id)`.
 
 ### Emits
