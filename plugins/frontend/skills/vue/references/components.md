@@ -209,7 +209,7 @@ const lastName = defineModel<string>('lastName')
 <!-- ItemList.vue -->
 <template>
   <ul>
-    <li v-for="item in items" :key="item.id">
+    <li v-for="(item, index) in items" :key="item.id">
       <slot name="item" :item="item" :index="index" />
     </li>
   </ul>
