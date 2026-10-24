@@ -63,7 +63,7 @@ When compacting this conversation:
 
 const RESPONSES = {
     'session-start': { event: 'SessionStart', context: FRAMEWORK },
-    'pre-compact': { event: 'PreCompact', context: COMPACT_INSTRUCTIONS },
+    'pre-compact': { instructions: COMPACT_INSTRUCTIONS },
     'prompt': { event: 'UserPromptSubmit', context: renderTrigger('USER-PROMPT') },
     'read': { event: 'PostToolUse', context: renderTrigger('EVALUATION') },
     'write': { event: 'PostToolUse', context: renderTrigger('PHASE-CHANGE') },
@@ -81,9 +81,13 @@ if (!response) {
     process.exit(0);
 }
 
-console.log(JSON.stringify({
-    hookSpecificOutput: {
-        hookEventName: response.event,
-        additionalContext: response.context
-    }
-}));
+if (response.instructions) {
+    process.stdout.write(response.instructions);
+} else {
+    console.log(JSON.stringify({
+        hookSpecificOutput: {
+            hookEventName: response.event,
+            additionalContext: response.context
+        }
+    }));
+}

@@ -7,6 +7,8 @@ phase-relevant references get read — not skipped.
 
 - **`hooks/sef-hook.js`** — the whole implementation, one Node script dispatched by a CLI action argument.
 - **`hooks/hooks.json`** — the event wiring below.
+- **`.dev/sef-hook.test.mjs`** — pins the PreCompact output form. Run `node --test plugins/skill-enforcer/.dev/` after
+  any change to the hook.
 
 ## Checkpoints
 
@@ -54,3 +56,5 @@ The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -
 
 - PreCompact strips the framework and reminders (auto-reinjected on SessionStart) and preserves the flat list of
   references read, for restoration after compaction.
+- The compaction instructions go out as plain stdout, never as JSON: Claude Code merges a PreCompact hook's plain stdout
+  into the compaction instructions and rejects `hookSpecificOutput` for this event (verified on 2.1.310).
