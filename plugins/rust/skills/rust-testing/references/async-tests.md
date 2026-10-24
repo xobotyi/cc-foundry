@@ -95,7 +95,8 @@ run instantly and deterministically.
 
 - **`tokio::time::pause()`** freezes time. While paused, the runtime auto-advances the clock to the next scheduled timer
   the moment all tasks are idle (parked on a timer) - so `sleep`/`timeout`/`interval` fire instantly without wall-clock
-  waiting. Auto-advance works only on the **current-thread** runtime.
+  waiting. Paused time needs the **current-thread** runtime: `pause()` panics on `multi_thread`, and `start_paused` with
+  it does not compile.
 - **`tokio::time::advance(dur)`** manually jumps the clock forward by `dur`, firing every timer that becomes due. Use it
   to fire timers at controlled points (e.g. between assertions) rather than letting them all auto-fire.
 - **`tokio::time::resume()`** returns to the real clock if a single test needs both modes.
@@ -154,8 +155,8 @@ async fn request_times_out() {
 
 Gotchas with virtual time:
 
-- **Auto-advance needs the current-thread runtime.** On `multi_thread`, the clock does not auto-advance to the next
-  timer; call `advance` explicitly. This is another reason to keep timer tests on the default flavor.
+- **Paused time needs the current-thread runtime.** On `multi_thread`, `pause()` panics and `start_paused` fails to
+  compile, so neither auto-advance nor `advance` is available there. Keep timer tests on the default flavor.
 - **Auto-advance fires only when every task is idle.** If a task is busy-looping or blocked on something other than a
   timer, the clock will not move. A test that hangs under `start_paused` usually has a task that never parks.
 - **`Instant::now()` from `std` is not virtualized** - only Tokio's clock (`tokio::time::Instant`, `sleep`, `interval`,
@@ -321,8 +322,8 @@ pub async fn banner(&self) -> Result<String, Error> { /* ... */ }
 - **Spawned task panics** - on the default current-thread runtime a panic in a `tokio::spawn`ed task surfaces when you
   `.await` its `JoinHandle` (it returns `Err(JoinError)`); a detached spawned task's panic may be swallowed. Always
   `.await` the handle and assert on the `JoinError` when the test's point is that a task panicked.
-- **Time and `multi_thread` together** - auto-advance does not apply; you must call `advance` explicitly, and timer
-  ordering across threads is nondeterministic. Keep deterministic-time tests on the current-thread default.
+- **Time and `multi_thread` together** - time cannot be paused there at all: `pause()` panics and `start_paused` does
+  not compile. Keep deterministic-time tests on the current-thread default.
 - **`block_on` inside an existing runtime** - calling `tokio_test::block_on` (or `Runtime::block_on`) from within a
   `#[tokio::test]` body panics ("cannot block the current thread from within a runtime"). Use `block_on` only from a
   plain `#[test]` or a doctest, never nested inside an async test.
