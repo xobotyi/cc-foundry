@@ -10,6 +10,9 @@ const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
 const INTERRUPT_PREFIX = "[Request interrupted by user";
 const SKILL_BODY_PREFIX = "Base directory for this skill:";
 const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
+const RAN_AND_FAILED = /^Exit code \d+/;
+const ERROR_LIMIT = 300;
+const SIGNATURE_LIMIT = 160;
 const TEXT_LIMIT = 2000;
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
@@ -57,6 +60,20 @@ function describeTool({ name, input }) {
 	return `${name} ${truncate(detail.replaceAll("\n", " "), INPUT_LIMIT)}`;
 }
 
+function errorLine(text) {
+	const line = text
+		.replaceAll(/<\/?tool_use_error>/g, "")
+		.split("\n")
+		.map((candidate) => candidate.trim())
+		.find((candidate) => candidate !== "" && !/^<[^>]+>$/.test(candidate));
+	return truncate(line ?? "", ERROR_LIMIT);
+}
+
+function errorSignature(tool, line) {
+	const masked = line.replaceAll(/(?:~|\/)[^\s:'"`,)]+/g, "<path>").replaceAll(/\d+/g, "<n>");
+	return `${tool}: ${masked.slice(0, SIGNATURE_LIMIT)}`;
+}
+
 function isRejection(content) {
 	return (
 		Array.isArray(content) &&
@@ -94,6 +111,8 @@ async function* sessionCandidates(file, since) {
 	let sessionHasOrigin = false;
 	const skills = new Set();
 	let typedCommand;
+	const calls = new Map();
+	const unresolved = new Map();
 
 	const candidate = (entry, signal, text) => ({
 		id: entry.uuid,
@@ -118,6 +137,7 @@ async function* sessionCandidates(file, since) {
 			for (const block of entry.message?.content ?? []) {
 				if (block.type === "text" && block.text.trim() !== "") said = block.text;
 				if (block.type === "tool_use") did = [...did, describeTool(block)].slice(-DID_LIMIT);
+				if (block.type === "tool_use") calls.set(block.id, { tool: block.name, call: describeTool(block) });
 				if (block.type === "tool_use" && block.name === "Skill" && typeof block.input?.skill === "string")
 					skills.add(block.input.skill);
 			}
@@ -140,6 +160,32 @@ async function* sessionCandidates(file, since) {
 		sessionHasOrigin ||= "origin" in entry;
 
 		const { content } = entry.message ?? {};
+		for (const block of Array.isArray(content) ? content : []) {
+			const call = block.type === "tool_result" ? calls.get(block.tool_use_id) : undefined;
+			if (call === undefined) continue;
+			if (!block.is_error) {
+				const failed = unresolved.get(call.tool);
+				unresolved.delete(call.tool);
+				if (failed) yield { ...failed, fix: call.call };
+				continue;
+			}
+			const text = contentText(block.content);
+			if (text.startsWith(REJECTION_PREFIX) || text.startsWith(INTERRUPT_PREFIX) || RAN_AND_FAILED.test(text)) continue;
+			const line = errorLine(text);
+			if (!inWindow || line === "") continue;
+			if (unresolved.has(call.tool)) yield unresolved.get(call.tool);
+			unresolved.set(call.tool, {
+				id: `${entry.uuid}/${block.tool_use_id}`,
+				project,
+				session: entry.sessionId,
+				at: entry.timestamp,
+				signal: "tool-error",
+				signature: errorSignature(call.tool, line),
+				text: line,
+				did: [call.call],
+				skills: [...skills],
+			});
+		}
 		const body = contentText(content);
 		if (typedCommand && entry.isMeta && body.startsWith(SKILL_BODY_PREFIX)) skills.add(typedCommand);
 		typedCommand = COMMAND_NAME.exec(body)?.[1];
@@ -171,6 +217,33 @@ async function* sessionCandidates(file, since) {
 		pending = undefined;
 	}
 	if (held) yield held;
+	yield* unresolved.values();
+}
+
+function recurringErrors(occurrences, minSessions) {
+	const groups = new Map();
+	for (const occurrence of occurrences) {
+		const group = groups.get(occurrence.signature) ?? { count: 0, sessions: new Set(), projects: new Set() };
+		group.count += 1;
+		group.sessions.add(occurrence.session);
+		group.projects.add(occurrence.project);
+		group.latest = occurrence;
+		groups.set(occurrence.signature, group);
+	}
+	return [...groups]
+		.filter(([, { count, sessions }]) => count >= 2 && sessions.size >= minSessions)
+		.map(([signature, { count, sessions, projects, latest }]) => ({
+			id: `error:${signature}`,
+			projects: [...projects],
+			at: latest.at,
+			signal: "tool-error",
+			text: latest.text,
+			count,
+			sessions: sessions.size,
+			did: latest.did,
+			fix: latest.fix,
+			skills: latest.skills,
+		}));
 }
 
 async function projectDirs(projectsDir, projects, allProjects) {
@@ -257,15 +330,21 @@ try {
 		const counts = {};
 		const projects = new Set();
 		const emitted = new Set();
+		const errors = [];
+		const write = (record) => {
+			counts[record.signal] = (counts[record.signal] ?? 0) + 1;
+			for (const project of record.projects ?? [record.project]) projects.add(project);
+			process.stdout.write(`${JSON.stringify(record)}\n`);
+		};
 		for (const { file } of files) {
 			for await (const candidate of sessionCandidates(file, since)) {
 				if (candidate.id !== undefined && emitted.has(candidate.id)) continue;
 				emitted.add(candidate.id);
-				counts[candidate.signal] = (counts[candidate.signal] ?? 0) + 1;
-				projects.add(candidate.project);
-				process.stdout.write(`${JSON.stringify(candidate)}\n`);
+				if (candidate.signal === "tool-error") errors.push(candidate);
+				else write(candidate);
 			}
 		}
+		for (const error of recurringErrors(errors, values.session === undefined ? 2 : 1)) write(error);
 		const summary = Object.entries(counts)
 			.map(([signal, count]) => `${signal} ${count}`)
 			.join(", ");

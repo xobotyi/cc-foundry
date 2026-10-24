@@ -119,6 +119,36 @@ const skillSession = [
 	human("2026-10-05T10:00:05Z", "correction after skills"),
 ];
 
+const call = (at, id, name, input) => assistant(at, { type: "tool_use", id, name, input });
+const result = (at, id, text, isError, uuid) => ({
+	...toolResult(at, text, isError),
+	uuid,
+	message: { role: "user", content: [{ type: "tool_result", tool_use_id: id, is_error: isError, content: text }] },
+});
+const NOT_FOUND = "<tool_use_error>String to replace not found in file.\nString: foo</tool_use_error>";
+
+const errorSession = [
+	human("2026-10-06T10:00:00Z", "open"),
+	call("2026-10-06T10:00:01Z", "e1", "Edit", { file_path: "/work/learn.app/a.js" }),
+	result("2026-10-06T10:00:02Z", "e1", NOT_FOUND, true, "r7a"),
+	call("2026-10-06T10:00:03Z", "e2", "Edit", { file_path: "/work/learn.app/b.js" }),
+	result("2026-10-06T10:00:04Z", "e2", "ok", false, "r7b"),
+	call("2026-10-06T10:00:05Z", "b1", "Bash", { command: "npm test" }),
+	result("2026-10-06T10:00:06Z", "b1", "Exit code 1\nFAIL suite", true, "r7c"),
+	call("2026-10-06T10:00:07Z", "r1", "Read", { file_path: "/work/learn.app/missing.js" }),
+	result("2026-10-06T10:00:08Z", "r1", "File does not exist.", true, "r7d"),
+].map((entry) => ({ ...entry, sessionId: "s7" }));
+
+const repeatSession = [
+	human("2026-10-07T10:00:00Z", "open"),
+	call("2026-10-07T10:00:01Z", "e3", "Edit", { file_path: "/work/learn.app/c.js" }),
+	result("2026-10-07T10:00:02Z", "e3", NOT_FOUND, true, "r8a"),
+	call("2026-10-07T10:00:03Z", "e4", "Edit", { file_path: "/work/learn.app/c.js" }),
+	result("2026-10-07T10:00:04Z", "e4", "ok", false, "r8b"),
+	call("2026-10-07T10:00:05Z", "b2", "Bash", { command: "npm test" }),
+	result("2026-10-07T10:00:06Z", "b2", "Exit code 1\nFAIL suite", true, "r8c"),
+].map((entry) => ({ ...entry, sessionId: "s8" }));
+
 const unattributedSession = [
 	unattributed("2026-10-03T10:00:00Z", "legacy open"),
 	{ ...unattributed("2026-10-03T10:00:01Z", "This session is being continued"), isCompactSummary: true },
@@ -167,6 +197,8 @@ before(async () => {
 	);
 	await mkdir(path.join(projectsDir, "-work-empty"));
 	await writeSession(LEARN_SLUG, "s6", skillSession, { cwd: LEARN, mtime: "2026-10-05T11:00:00Z" });
+	await writeSession(LEARN_SLUG, "s7", errorSession, { cwd: LEARN, mtime: "2026-10-06T11:00:00Z" });
+	await writeSession(LEARN_SLUG, "s8", repeatSession, { cwd: LEARN, mtime: "2026-10-07T11:00:00Z" });
 });
 
 after(() => rm(projectsDir, { recursive: true, force: true }));
@@ -220,6 +252,24 @@ suite("extract-corrections", () => {
 		t.assert.deepStrictEqual(candidate.skills, ["the-coder:coding", "git-commit:commit", "deep-research"]);
 	});
 
+	test("groups a tool error the agent repeated across sessions with the call that fixed it", async (t) => {
+		const errors = (await extractFrom(LEARN)).filter(({ signal }) => signal === "tool-error");
+		t.assert.deepStrictEqual(errors, [
+			{
+				id: "error:Edit: String to replace not found in file.",
+				projects: [LEARN],
+				at: "2026-10-07T10:00:02Z",
+				signal: "tool-error",
+				text: "String to replace not found in file.",
+				count: 2,
+				sessions: 2,
+				did: ["Edit /work/learn.app/c.js"],
+				fix: "Edit /work/learn.app/c.js",
+				skills: [],
+			},
+		]);
+	});
+
 	test("drops entries older than --since", async (t) => {
 		const candidates = await extract("--since", "2026-10-10");
 		t.assert.deepStrictEqual(
@@ -270,7 +320,7 @@ suite("extract-corrections", () => {
 		t.assert.deepStrictEqual(stdout.trim().split("\n"), [
 			`2026-10-22\t1\t${PROJECT}-other`,
 			`2026-10-21\t3\t${PROJECT}`,
-			`2026-10-05\t1\t${LEARN}`,
+			`2026-10-07\t3\t${LEARN}`,
 		]);
 	});
 

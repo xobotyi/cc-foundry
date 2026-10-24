@@ -63,3 +63,6 @@ structured context transfer across a boundary, and the user's corrections turned
   - A skill the user types is a `<command-name>` entry followed by an `isMeta` entry that opens with
     `Base directory for this skill:`; a built-in command such as `/compact` has no such entry. A skill stays loaded
     across compaction, which re-attaches it in an `invoked_skills` attachment
+  - A failed tool call is a `tool_result` with `is_error: true`, joined to its call by `tool_use_id`. A Bash error that
+    opens with `Exit code N` is a command that ran and failed, which is ordinary work; one without it was refused before
+    it ran, by the harness, a hook, or a permission
