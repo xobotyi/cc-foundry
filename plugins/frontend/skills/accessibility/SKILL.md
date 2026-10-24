@@ -107,9 +107,7 @@ interaction, or appearance.
 
 ### Naming and Describing
 
-**Priority:** `aria-labelledby` > `aria-label` > `<label>` > element content
-
-> `title`.
+**Priority:** `aria-labelledby` > `aria-label` > `<label>` > element content > `title`.
 
 - Prefer visible labels over `aria-label`.
 - Use `aria-labelledby` to compose names from multiple elements.
