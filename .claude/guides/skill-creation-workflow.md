@@ -57,6 +57,12 @@ summarization over a fixed set of documents.
     skills, blog posts, agentic workflows, and integration patterns. Prioritize quality sources — original findings,
     undocumented behavior, novel techniques. Skip tutorials that repackage official docs.
 
+    Start from the local session transcripts under `~/.claude/projects/`: the sessions that exercised the domain hold
+    the user's own corrections, and those outrank any public corpus. A message the user typed while the agent worked is
+    an `attachment` record of type `queued_command`, not a `user` record. Read the transcript around each correction to
+    see what the agent had done — the user's message alone does not say. Session content stays out of NotebookLM and
+    deep research; only generalized rules and aggregate counts enter the skill.
+
 5.  **Assess source quality and recency.** After each research pass, review source summaries and remove entries that are
     low-quality **or outdated**. NotebookLM deep research sometimes pulls in low-signal sources. Verify claims that seem
     outdated against the live web — a version-specific `WebSearch` plus a `WebFetch` on the changelog settles most of
