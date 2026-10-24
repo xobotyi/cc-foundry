@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createReadStream } from "node:fs";
-import { readdir, stat } from "node:fs/promises";
+import { access, readdir, readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import path from "node:path";
 import { createInterface } from "node:readline";
@@ -13,6 +13,13 @@ const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const RAN_AND_FAILED = /^Exit code \d+/;
 const ERROR_LIMIT = 300;
 const SIGNATURE_LIMIT = 160;
+const MEMORY_INDEX = "MEMORY.md";
+const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
+const MANAGED_SETTINGS =
+	{
+		darwin: "/Library/Application Support/ClaudeCode/managed-settings.json",
+		win32: "C:\\Program Files\\ClaudeCode\\managed-settings.json",
+	}[process.platform] ?? "/etc/claude-code/managed-settings.json";
 const TEXT_LIMIT = 2000;
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
@@ -288,6 +295,93 @@ async function sessionHead(file) {
 	}
 }
 
+async function exists(file) {
+	try {
+		await access(file);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+async function readJson(file) {
+	try {
+		return JSON.parse(await readFile(file, "utf8"));
+	} catch {
+		return undefined;
+	}
+}
+
+async function setting(project, configDir, key) {
+	const layers = [
+		MANAGED_SETTINGS,
+		path.join(project, ".claude", "settings.local.json"),
+		path.join(project, ".claude", "settings.json"),
+		path.join(configDir, "settings.json"),
+	];
+	for (const file of layers) {
+		const value = (await readJson(file))?.[key];
+		if (value !== undefined) return value;
+	}
+	return undefined;
+}
+
+async function repositoryRoot(project) {
+	for (let dir = path.resolve(project); ; dir = path.dirname(dir)) {
+		if (await exists(path.join(dir, ".git"))) return dir;
+		if (path.dirname(dir) === dir) return path.resolve(project);
+	}
+}
+
+async function memoryDir(project, configDir, projectsDir) {
+	const forced = process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY;
+	if (forced === "1") return undefined;
+	if (forced !== "0" && (await setting(project, configDir, "autoMemoryEnabled")) === false) return undefined;
+	const custom = await setting(project, configDir, "autoMemoryDirectory");
+	if (typeof custom === "string") return custom.startsWith("~/") ? path.join(homedir(), custom.slice(2)) : custom;
+	const slug = (await repositoryRoot(project)).replace(/[^a-zA-Z0-9]/g, "-");
+	const dir = path.join(projectsDir, slug, "memory");
+	return (await exists(dir)) ? dir : undefined;
+}
+
+function frontmatterValue(head, key) {
+	const match = new RegExp(`^${key}:[ \\t]*(.*)((?:\\n[ \\t]+.*)*)`, "m").exec(head);
+	if (match === null) return undefined;
+	const [, first, rest] = match;
+	const folded = /^[>|][-+]?$/.test(first.trim()) ? rest : `${first}${rest}`;
+	return folded
+		.split("\n")
+		.map((line) => line.trim())
+		.filter(Boolean)
+		.join(" ")
+		.replace(/^"(.*)"$/, "$1");
+}
+
+async function memoryRecords(project, dir, since) {
+	const records = [];
+	for (const name of await readdir(dir)) {
+		if (!name.endsWith(".md") || name === MEMORY_INDEX) continue;
+		const file = path.join(dir, name);
+		const { mtimeMs } = await stat(file);
+		if (mtimeMs < since) continue;
+		const text = await readFile(file, "utf8");
+		const frontmatter = FRONTMATTER.exec(text);
+		const head = frontmatter?.[1] ?? "";
+		const description = frontmatterValue(head, "description");
+		const body = (frontmatter ? text.slice(frontmatter[0].length) : text).trim();
+		records.push({
+			id: `memory:${file}`,
+			project,
+			at: new Date(mtimeMs).toISOString(),
+			signal: "memory",
+			type: /^\s*type:\s*(\S+)/m.exec(head)?.[1],
+			file,
+			text: truncate([description, body].filter(Boolean).join("\n\n"), TEXT_LIMIT),
+		});
+	}
+	return records.toSorted((a, b) => a.at.localeCompare(b.at));
+}
+
 async function listProjects(projectsDir) {
 	const projects = new Map();
 	for (const dir of await projectDirs(projectsDir, [], true)) {
@@ -345,6 +439,24 @@ try {
 			}
 		}
 		for (const error of recurringErrors(errors, values.session === undefined ? 2 : 1)) write(error);
+
+		const memorySince = new Map();
+		for (const { file } of files) {
+			const head = await sessionHead(file);
+			const project = projectOf(head.cwd);
+			if (project === null || head.entrypoint?.startsWith("sdk-")) continue;
+			const start = values.session === undefined ? since : Date.parse(head.timestamp) || since;
+			memorySince.set(project, Math.min(memorySince.get(project) ?? Infinity, start));
+		}
+		for (const [project, start] of memorySince) {
+			const dir = await memoryDir(project, configDir, projectsDir);
+			if (dir === undefined) continue;
+			for (const record of await memoryRecords(project, dir, start)) {
+				if (emitted.has(record.id)) continue;
+				emitted.add(record.id);
+				write(record);
+			}
+		}
 		const summary = Object.entries(counts)
 			.map(([signal, count]) => `${signal} ${count}`)
 			.join(", ");

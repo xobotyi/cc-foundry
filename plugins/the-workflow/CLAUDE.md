@@ -66,3 +66,7 @@ structured context transfer across a boundary, and the user's corrections turned
   - A failed tool call is a `tool_result` with `is_error: true`, joined to its call by `tool_use_id`. A Bash error that
     opens with `Exit code N` is a command that ran and failed, which is ordinary work; one without it was refused before
     it ran, by the harness, a hook, or a permission
+  - Auto memory is on unless `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, or the first settings layer that sets
+    `autoMemoryEnabled` (managed, local, project, user) sets it `false`; `CLAUDE_CODE_DISABLE_AUTO_MEMORY=0` forces it
+    on. Its directory is `autoMemoryDirectory` when set, else `projects/<slug>/memory` keyed to the git repository root,
+    not to the launch directory. `MEMORY.md` is the index; every other `.md` file there is one memory

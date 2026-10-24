@@ -157,6 +157,19 @@ const unattributedSession = [
 ];
 
 let projectsDir;
+let configDir;
+
+const memoryEnv = (settings, disable) => {
+	const env = { ...process.env, CLAUDE_CONFIG_DIR: configDir };
+	delete env.CLAUDE_CODE_DISABLE_AUTO_MEMORY;
+	if (disable !== undefined) env.CLAUDE_CODE_DISABLE_AUTO_MEMORY = disable;
+	return writeFile(path.join(configDir, "settings.json"), JSON.stringify(settings)).then(() => env);
+};
+
+const memoryOf = async (args, env) =>
+	(await extractFrom(LEARN, args, env))
+		.filter(({ signal }) => signal === "memory")
+		.map(({ type, text }) => [type, text]);
 
 async function writeSession(dir, name, entries, { cwd, mtime }) {
 	const file = path.join(projectsDir, dir, `${name}.jsonl`);
@@ -199,9 +212,31 @@ before(async () => {
 	await writeSession(LEARN_SLUG, "s6", skillSession, { cwd: LEARN, mtime: "2026-10-05T11:00:00Z" });
 	await writeSession(LEARN_SLUG, "s7", errorSession, { cwd: LEARN, mtime: "2026-10-06T11:00:00Z" });
 	await writeSession(LEARN_SLUG, "s8", repeatSession, { cwd: LEARN, mtime: "2026-10-07T11:00:00Z" });
+
+	const memory = path.join(projectsDir, LEARN_SLUG, "memory");
+	await mkdir(memory);
+	await writeFile(path.join(memory, "MEMORY.md"), "- [Pin versions](feedback_pins.md) — hook\n");
+	await writeFile(
+		path.join(memory, "feedback_pins.md"),
+		"---\nname: pins\ndescription: Pin exact versions\nmetadata:\n  type: feedback\n---\n\nPin every dependency.\n",
+	);
+	await writeFile(
+		path.join(memory, "user_role.md"),
+		'---\ndescription: >-\n  "Backend engineer,\n  new to Go"\ntype: user\n---\nGo.\n',
+	);
+	await utimes(
+		path.join(memory, "feedback_pins.md"),
+		new Date("2026-10-06T12:00:00Z"),
+		new Date("2026-10-06T12:00:00Z"),
+	);
+	await utimes(path.join(memory, "user_role.md"), new Date("2026-10-01T12:00:00Z"), new Date("2026-10-01T12:00:00Z"));
+
+	configDir = await mkdtemp(path.join(tmpdir(), "debrief-config-"));
 });
 
-after(() => rm(projectsDir, { recursive: true, force: true }));
+after(() =>
+	Promise.all([rm(projectsDir, { recursive: true, force: true }), rm(configDir, { recursive: true, force: true })]),
+);
 
 async function extractFrom(project, args = [], env = process.env) {
 	const { stdout } = await run(
@@ -268,6 +303,22 @@ suite("extract-corrections", () => {
 				skills: [],
 			},
 		]);
+	});
+
+	test("reads auto memory entries in the window, the index excluded", async (t) => {
+		t.assert.deepStrictEqual(await memoryOf([], await memoryEnv({})), [
+			["user", "Backend engineer, new to Go\n\nGo."],
+			["feedback", "Pin exact versions\n\nPin every dependency."],
+		]);
+		t.assert.deepStrictEqual(await memoryOf(["--since", "2026-10-05"], await memoryEnv({})), [
+			["feedback", "Pin exact versions\n\nPin every dependency."],
+		]);
+	});
+
+	test("skips auto memory where it is off, and the environment overrides settings", async (t) => {
+		t.assert.deepStrictEqual(await memoryOf([], await memoryEnv({}, "1")), []);
+		t.assert.deepStrictEqual(await memoryOf([], await memoryEnv({ autoMemoryEnabled: false })), []);
+		t.assert.strictEqual((await memoryOf([], await memoryEnv({ autoMemoryEnabled: false }, "0"))).length, 2);
 	});
 
 	test("drops entries older than --since", async (t) => {
