@@ -26,8 +26,9 @@ if tracing {
 }
 ```
 
-Be especially careful with `:=` in `if`/`for` blocks. The `err` variable is commonly shadowed. Use `go vet -shadow` or
-`golangci-lint` to detect.
+Be especially careful with `:=` in `if`/`for` blocks. The `err` variable is commonly shadowed. Detect it with the
+`shadow` analyzer (`go vet -vettool=$(which shadow)`) or with golangci-lint's `govet` with `shadow` enabled; plain
+`go vet` has no shadow check.
 
 ## Defer
 
