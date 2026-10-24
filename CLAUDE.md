@@ -93,6 +93,13 @@ process (Research → Scaffold → Write → Ship).
   enable time. Where userConfig is warranted, plumb it into the same env name via `${user_config.KEY}` in the hook
   command rather than reading a second variable
 
+**Plugin dependencies:**
+
+- A plugin works on a bare Claude Code install. It never requires a system from outside this marketplace — a memory
+  server, a third-party plugin — because users install different subsets
+- It uses such a system when the session shows it is present, and the plugin's text names the system by the role it
+  fills, never by product name
+
 **Version management:**
 
 - Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and the repo-root
