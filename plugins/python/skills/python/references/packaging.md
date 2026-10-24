@@ -353,7 +353,7 @@ select = [
     "RUF",  # ruff-specific rules
     "PTH",  # flake8-use-pathlib
     "T20",  # flake8-print (no print statements)
-    "TCH",  # flake8-type-checking (TYPE_CHECKING imports)
+    "TC",   # flake8-type-checking (TYPE_CHECKING imports)
 ]
 
 ignore = [
