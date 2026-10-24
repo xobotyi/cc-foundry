@@ -20,6 +20,11 @@ lost, and what would reopen it.
 - [1.6 Take methodology from external skill libraries, never authoring craft](/design-docs/adr/1.6-prior-art-reuse.md)
 - [1.9 Write instruction artifacts in the timeless present](/design-docs/adr/1.9-instruction-timelessness.md)
 
+## plugins/the-blueprint
+
+- [1.10 Keep decision records living: rewritten in place, deleted once they stop holding](/design-docs/adr/1.10-decision-record-lifecycle.md)
+- [1.11 Import the ADR index into every session, one line per ADR](/design-docs/adr/1.11-decision-record-index.md)
+
 ## plugins/the-coder
 
 - [1.7 Let the coding skill state comment and documentation policy in full](/design-docs/adr/1.7-comment-policy-ownership.md)

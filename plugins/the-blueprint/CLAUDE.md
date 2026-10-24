@@ -56,9 +56,9 @@ Standalone, invocable outside the pipeline:
 
 - **`adr` keeps ADRs living — rewritten in place and deleted once they stop holding — because an agent follows a
   superseded ADR it can find.** Do not reintroduce statuses, supersession lines, amendment blocks, tombstones, or
-  proposals in the ADR directory.
+  proposals in the ADR directory ([ADR 1.10](/design-docs/adr/1.10-decision-record-lifecycle.md)).
 - **An ADR index line carries only number, title, and link** — the index is imported into every session, so every added
-  field is paid for in every session.
+  field is paid for in every session ([ADR 1.11](/design-docs/adr/1.11-decision-record-index.md)).
 
 ## Critical Constraints
 
