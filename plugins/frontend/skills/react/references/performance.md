@@ -76,7 +76,7 @@ Caches a computed value between renders:
 
 ```tsx
 const sortedItems = useMemo(
-  () => items.sort((a, b) => a.name.localeCompare(b.name)),
+  () => items.toSorted((a, b) => a.name.localeCompare(b.name)),
   [items]
 );
 ```
