@@ -77,7 +77,9 @@ Turns the user's corrections into instructions the agent reads next time. `/debr
 Claude Code keeps under `~/.claude/projects/`, finds the places where the user corrected the agent, and keeps the
 lessons that would change the agent's work on a different task. For each one it proposes a rule and the file the rule
 belongs in: the project's CLAUDE.md or a document it links, a `.claude/rules/` file, the personal `~/.claude/CLAUDE.md`,
-or the skill that prescribed the behavior. Nothing is written until the user approves that item.
+or the skill that prescribed the behavior. A lesson that forbids an action, or wants it confirmed first, can also become
+a `deny` or `ask` permission rule, which Claude Code enforces instead of merely reading. Nothing is written until the
+user approves that item.
 
 A bundled script does the extraction without a model. It marks the moments that carry the most evidence — a refused tool
 call, an interrupt, a rewind, a message typed while the agent was still working — and attaches what the agent had just

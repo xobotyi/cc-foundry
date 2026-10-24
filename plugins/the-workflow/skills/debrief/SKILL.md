@@ -2,7 +2,7 @@
 name: debrief
 description: >-
   Harvest corrections from Claude Code sessions and auto memory, and write each lesson that outlives its task into the
-  instruction file it belongs in, after the user approves it.
+  instruction file or permission rule it belongs in, after the user approves it.
 when_to_use: >-
   Run after a session that needed correcting, or over a window of past sessions, in this repository, in named ones, or
   in every repository with transcripts. Covers the user's corrections, tool errors the agent kept repeating, and auto
@@ -103,6 +103,11 @@ Give each lesson one target:
   loaded. Target that skill's `SKILL.md` when the file is outside `~/.claude/plugins/`. Inside `~/.claude/plugins/` the
   next plugin update overwrites an edit: target the project or personal `CLAUDE.md` with an override instead, and draft
   a note for the plugin's author.
+- **Settings** — the lesson forbids an action, or lets it run only after the user confirms, and a permission rule can
+  match the action: a tool, a command, a file path. Target `permissions.deny` or `permissions.ask` in the repository's
+  `.claude/settings.json` for a project lesson, in `~/.claude/settings.json` for a personal one. A rule stops only the
+  forms it names — `Bash(git push *)` misses `git -C . push` — so a `deny` lesson also keeps a prose rule in the
+  matching `CLAUDE.md`, which tells the agent not to look for another route.
 - **Code** — the correction traces to a hook, a script, or other code, and no instruction text fixes it. Write nothing;
   the report names the file and the change it needs.
 
