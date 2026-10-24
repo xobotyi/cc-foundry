@@ -62,11 +62,11 @@ process (Research → Scaffold → Write → Ship).
 
 **Design decisions:**
 
-- Load-bearing decisions about how cc-foundry's own skills and plugins are authored are recorded as ADRs in
-  `design-docs/adr/` (`1.N-topic.md`, indexed in `docs/adr/README.md`). Record one when the rationale would otherwise
-  live only in a commit message or memory.
-- These are distinct from the per-project ADRs the `the-blueprint:alignment` skill writes to a downstream project's
-  `design-docs/adr/`.
+- Load-bearing decisions about how cc-foundry's own skills and plugins are authored are ADRs in `design-docs/adr/`,
+  written and maintained through the `the-blueprint:adr` skill. Record one when the rationale would otherwise live only
+  in a commit message or memory.
+
+@design-docs/ADR.md
 
 **Documentation maintenance:** Update plugin docs in the same work session as the code change:
 
