@@ -22,7 +22,7 @@ dependencies = [
     "pydantic>=2.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
@@ -164,7 +164,7 @@ uv add "pydantic>=2.0"
 # Add dev dependency
 uv add --dev pytest ruff mypy
 
-# Add optional dependency group
+# Add to another dependency group
 uv add --group docs mkdocs
 
 # Remove a dependency
