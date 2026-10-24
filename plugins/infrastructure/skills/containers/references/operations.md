@@ -206,7 +206,7 @@ For production monitoring:
 Implement multiple health endpoints for fine-grained monitoring:
 
 - **`/livez`** — Liveness (process is alive): Always 200 if event loop runs
-- **`/readyz`** — Readiness (can handle traffic): DB + cache connectivity
+- **`/readyz`** — Readiness (can handle traffic): local state only — startup finished, pools initialized
 - **`/healthz`** — Combined (simple apps): Basic connectivity check
 
 Configure Compose health checks against the readiness endpoint:
