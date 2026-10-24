@@ -93,6 +93,32 @@ const SESSION = [
 	LATE,
 ];
 
+const LEARN = "/work/learn.app";
+const LEARN_SLUG = "-work-learn-app";
+
+const skillSession = [
+	human("2026-10-05T10:00:00Z", "open"),
+	assistant("2026-10-05T10:00:01Z", {
+		type: "tool_use",
+		id: "k1",
+		name: "Skill",
+		input: { skill: "the-coder:coding" },
+	}),
+	human("2026-10-05T10:00:02Z", "<command-message>compact</command-message>\n<command-name>/compact</command-name>"),
+	human("2026-10-05T10:00:03Z", "<command-name>/git-commit:commit</command-name>"),
+	{
+		...unattributed("2026-10-05T10:00:03Z", "Base directory for this skill: /skills/commit\n\n# Commit"),
+		isMeta: true,
+	},
+	{
+		type: "attachment",
+		timestamp: "2026-10-05T10:00:04Z",
+		sessionId: "s1",
+		attachment: { type: "invoked_skills", skills: [{ name: "deep-research", path: "userSettings:deep-research" }] },
+	},
+	human("2026-10-05T10:00:05Z", "correction after skills"),
+];
+
 const unattributedSession = [
 	unattributed("2026-10-03T10:00:00Z", "legacy open"),
 	{ ...unattributed("2026-10-03T10:00:01Z", "This session is being continued"), isCompactSummary: true },
@@ -140,25 +166,25 @@ before(async () => {
 		{ cwd: "/work/observer", mtime: "2026-10-23T11:00:00Z" },
 	);
 	await mkdir(path.join(projectsDir, "-work-empty"));
+	await writeSession(LEARN_SLUG, "s6", skillSession, { cwd: LEARN, mtime: "2026-10-05T11:00:00Z" });
 });
 
 after(() => rm(projectsDir, { recursive: true, force: true }));
 
-async function extract(...args) {
-	const { stdout } = await run(process.execPath, [
-		SCRIPT,
-		"--projects-dir",
-		projectsDir,
-		"--project",
-		PROJECT,
-		...args,
-	]);
+async function extractFrom(project, args = [], env = process.env) {
+	const { stdout } = await run(
+		process.execPath,
+		[SCRIPT, "--projects-dir", projectsDir, "--project", project, ...args],
+		{ env },
+	);
 	return stdout
 		.trim()
 		.split("\n")
 		.filter(Boolean)
 		.map((line) => JSON.parse(line));
 }
+
+const extract = (...args) => extractFrom(PROJECT, args);
 
 suite("extract-corrections", () => {
 	test("emits each human correction with the signal that preceded it", async (t) => {
@@ -186,6 +212,12 @@ suite("extract-corrections", () => {
 	test("attaches the abandoned work to a rewind", async (t) => {
 		const rewind = (await extract()).find(({ signal }) => signal === "rewind");
 		t.assert.deepStrictEqual(rewind.did, ["Write /work/acme.app/b.js"]);
+	});
+
+	test("attaches the skills invoked before a candidate, typed or called, built-in commands excluded", async (t) => {
+		const [candidate] = await extractFrom(LEARN);
+		t.assert.strictEqual(candidate.text, "correction after skills");
+		t.assert.deepStrictEqual(candidate.skills, ["the-coder:coding", "git-commit:commit", "deep-research"]);
 	});
 
 	test("drops entries older than --since", async (t) => {
@@ -238,6 +270,7 @@ suite("extract-corrections", () => {
 		t.assert.deepStrictEqual(stdout.trim().split("\n"), [
 			`2026-10-22\t1\t${PROJECT}-other`,
 			`2026-10-21\t3\t${PROJECT}`,
+			`2026-10-05\t1\t${LEARN}`,
 		]);
 	});
 

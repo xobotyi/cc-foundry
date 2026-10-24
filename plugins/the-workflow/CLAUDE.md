@@ -60,3 +60,6 @@ structured context transfer across a boundary, and the user's corrections turned
   - A resumed or forked session copies earlier entries into its own file under a new `sessionId` and the same `uuid`
   - SDK-driven sessions, such as a memory plugin's background observer, carry `entrypoint: sdk-*` and hold no human
     corrections
+  - A skill the user types is a `<command-name>` entry followed by an `isMeta` entry that opens with
+    `Base directory for this skill:`; a built-in command such as `/compact` has no such entry. A skill stays loaded
+    across compaction, which re-attaches it in an `invoked_skills` attachment

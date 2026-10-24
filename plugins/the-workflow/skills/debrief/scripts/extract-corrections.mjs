@@ -8,6 +8,8 @@ import { parseArgs } from "node:util";
 
 const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
 const INTERRUPT_PREFIX = "[Request interrupted by user";
+const SKILL_BODY_PREFIX = "Base directory for this skill:";
+const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const TEXT_LIMIT = 2000;
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
@@ -90,6 +92,8 @@ async function* sessionCandidates(file, since) {
 	let pending;
 	let project = null;
 	let sessionHasOrigin = false;
+	const skills = new Set();
+	let typedCommand;
 
 	const candidate = (entry, signal, text) => ({
 		id: entry.uuid,
@@ -100,6 +104,7 @@ async function* sessionCandidates(file, since) {
 		text: truncate(text, TEXT_LIMIT),
 		said: truncate(said, SAID_LIMIT),
 		did,
+		skills: [...skills],
 	});
 
 	for await (const line of lines) {
@@ -113,12 +118,18 @@ async function* sessionCandidates(file, since) {
 			for (const block of entry.message?.content ?? []) {
 				if (block.type === "text" && block.text.trim() !== "") said = block.text;
 				if (block.type === "tool_use") did = [...did, describeTool(block)].slice(-DID_LIMIT);
+				if (block.type === "tool_use" && block.name === "Skill" && typeof block.input?.skill === "string")
+					skills.add(block.input.skill);
 			}
 			continue;
 		}
 
 		const inWindow = Date.parse(entry.timestamp) >= since;
 
+		if (entry.type === "attachment" && entry.attachment?.type === "invoked_skills") {
+			for (const { name } of entry.attachment.skills ?? []) if (typeof name === "string") skills.add(name);
+			continue;
+		}
 		if (entry.type === "attachment" && isHumanQueuedCommand(entry.attachment)) {
 			if (held) yield held;
 			held = undefined;
@@ -129,6 +140,9 @@ async function* sessionCandidates(file, since) {
 		sessionHasOrigin ||= "origin" in entry;
 
 		const { content } = entry.message ?? {};
+		const body = contentText(content);
+		if (typedCommand && entry.isMeta && body.startsWith(SKILL_BODY_PREFIX)) skills.add(typedCommand);
+		typedCommand = COMMAND_NAME.exec(body)?.[1];
 		if (isRejection(content)) {
 			pending = "rejection";
 			continue;
