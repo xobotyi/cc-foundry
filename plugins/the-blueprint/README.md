@@ -171,6 +171,20 @@ iterations to resolve ambiguities discovery flagged.
 **Use when:** Starting a new project, encountering naming inconsistencies, or when agents keep using the wrong terms for
 domain concepts. Inside DRAFT, it runs automatically — invoked from `alignment` Phase 3.
 
+### adr
+
+Writes and maintains architecture decision records as living documents: each record states the decision in force — the
+rule, why it holds, what it costs, what lost, and what would reopen it. A changed decision is rewritten in place, a
+decision that no longer holds is deleted, and git keeps every earlier wording; a short History line per rule change
+records why it moved. A decision earns a record when a real alternative lost for a stated reason and a future agent
+would plausibly undo it; anything smaller becomes one rule with its reason in the documentation of the code it governs.
+A decision recorded before its code exists carries a pending line until the implementing change brings the record to
+what was built. The index, `design-docs/ADR.md`, is imported into the project's CLAUDE.md, so every agent session knows
+which decisions govern the code it is about to change.
+
+**Use when:** A decision is made, changed, or retired; code an ADR governs changes or disappears; or a task conflicts
+with a recorded decision. Inside the DRAFT pipeline, alignment hands each settled decision to this skill.
+
 ### youtrack
 
 YouTrack behavior as an agent meets it, rather than a restatement of the API reference: what a project configures rather

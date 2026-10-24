@@ -19,6 +19,9 @@ Standalone, invocable outside the pipeline:
   the location, the acceptance criteria, and the approval gate before anything is created; the pipeline's terminus
   (`tasks` hands off to it) and a direct entry point
 - **`glossary`** — the vocabulary contract; read by `discovery`, written by `alignment`
+- **`adr`** — the decision records and their index: what earns a record, its shape and identity, rewriting and deleting
+  it, pending implementation, and the index every session imports; invoked by `alignment` and directly during
+  implementation
 - **`youtrack`** — YouTrack behavior: what a project configures, what a write changes besides the field it names, and
   which failures report success. Carries no tool inventory and no endpoint reference — the MCP server documents its own
   tools and JetBrains documents its own API; both drift. Depth routed to `references/` for the query and command
@@ -46,6 +49,14 @@ Standalone, invocable outside the pipeline:
   `tasks` owns decomposition, `youtrack` owns tracker mechanics. Never restate a content rule in `tasks`, a sizing rule
   in `task-creation`, or a YouTrack mechanic in either — name the owning skill and stop. A rule that lives in two files
   is a defect, not redundancy: the copies drift apart under separate edits, and the reader obeys whichever one loaded.
+
+## Conventions
+
+- **`adr` keeps ADRs living — rewritten in place and deleted once they stop holding — because an agent follows a
+  superseded ADR it can find.** Do not reintroduce statuses, supersession lines, amendment blocks, tombstones, or
+  proposals in the ADR directory.
+- **An ADR index line carries only number, title, and link** — the index is imported into every session, so every added
+  field is paid for in every session.
 
 ## Critical Constraints
 
