@@ -44,11 +44,9 @@ Use `sync.WaitGroup` to wait for multiple goroutines to finish — it handles jo
 ```go
 var wg sync.WaitGroup
 for _, item := range items {
-    wg.Add(1)
-    go func(item Item) {
-        defer wg.Done()
+    wg.Go(func() {
         process(item)
-    }(item)
+    })
 }
 wg.Wait()
 ```
@@ -189,14 +187,12 @@ func sq(in <-chan int) <-chan int {
 func merge(cs ...<-chan int) <-chan int {
     var wg sync.WaitGroup
     out := make(chan int)
-    wg.Add(len(cs))
     for _, c := range cs {
-        go func(c <-chan int) {
-            defer wg.Done()
+        wg.Go(func() {
             for n := range c {
                 out <- n
             }
-        }(c)
+        })
     }
     go func() {
         wg.Wait()
@@ -240,10 +236,8 @@ paths, errc := walkFiles(done, root)
 c := make(chan result)
 
 var wg sync.WaitGroup
-wg.Add(numWorkers)
 for i := 0; i < numWorkers; i++ {
-    go func() {
-        defer wg.Done()
+    wg.Go(func() {
         for path := range paths {
             data, err := os.ReadFile(path)
             select {
@@ -252,7 +246,7 @@ for i := 0; i < numWorkers; i++ {
                 return
             }
         }
-    }()
+    })
 }
 go func() {
     wg.Wait()
