@@ -158,6 +158,8 @@ const unattributedSession = [
 
 let projectsDir;
 let configDir;
+let repoRoot;
+let linkedWorktree;
 
 const memoryEnv = (settings, disable) => {
 	const env = { ...process.env, CLAUDE_CONFIG_DIR: configDir };
@@ -232,10 +234,32 @@ before(async () => {
 	await utimes(path.join(memory, "user_role.md"), new Date("2026-10-01T12:00:00Z"), new Date("2026-10-01T12:00:00Z"));
 
 	configDir = await mkdtemp(path.join(tmpdir(), "debrief-config-"));
+
+	repoRoot = await mkdtemp(path.join(tmpdir(), "debrief-repo-"));
+	linkedWorktree = `${repoRoot}-wt`;
+	await mkdir(path.join(repoRoot, ".git", "worktrees", "wt"), { recursive: true });
+	await mkdir(path.join(repoRoot, "pkg"));
+	await mkdir(linkedWorktree);
+	await writeFile(path.join(linkedWorktree, ".git"), `gitdir: ${repoRoot}/.git/worktrees/wt\n`);
+	const slugOf = (dir) => dir.replace(/[^a-zA-Z0-9]/g, "-");
+	await writeSession(
+		slugOf(`${repoRoot}/pkg`),
+		"s9",
+		[human("2026-10-08T10:00:00Z", "open"), human("2026-10-08T10:00:01Z", "subdirectory correction")],
+		{ cwd: `${repoRoot}/pkg`, mtime: "2026-10-08T11:00:00Z" },
+	);
+	await writeSession(
+		slugOf(linkedWorktree),
+		"s10",
+		[human("2026-10-08T12:00:00Z", "open"), human("2026-10-08T12:00:01Z", "linked worktree correction")],
+		{ cwd: linkedWorktree, mtime: "2026-10-08T13:00:00Z" },
+	);
 });
 
 after(() =>
-	Promise.all([rm(projectsDir, { recursive: true, force: true }), rm(configDir, { recursive: true, force: true })]),
+	Promise.all(
+		[projectsDir, configDir, repoRoot, linkedWorktree].map((dir) => rm(dir, { recursive: true, force: true })),
+	),
 );
 
 async function extractFrom(project, args = [], env = process.env) {
@@ -371,14 +395,26 @@ suite("extract-corrections", () => {
 		t.assert.deepStrictEqual(stdout.trim().split("\n"), [
 			`2026-10-22\t1\t${PROJECT}-other`,
 			`2026-10-21\t3\t${PROJECT}`,
+			`2026-10-08\t2\t${repoRoot}`,
 			`2026-10-07\t3\t${LEARN}`,
 		]);
 	});
 
-	test("names the missing transcript directory", async (t) => {
+	test("keys a subdirectory launch and a linked worktree to their repository root", async (t) => {
+		const candidates = await extractFrom(repoRoot);
+		t.assert.deepStrictEqual(
+			candidates.map(({ text, project }) => [text, project]),
+			[
+				["subdirectory correction", repoRoot],
+				["linked worktree correction", repoRoot],
+			],
+		);
+	});
+
+	test("names a repository no session ran in", async (t) => {
 		await t.assert.rejects(
 			run(process.execPath, [SCRIPT, "--projects-dir", projectsDir, "--project", "/nowhere"]),
-			(err) => err.code === 1 && err.stderr.includes(`${path.join(projectsDir, "-nowhere")} does not exist`),
+			(err) => err.code === 1 && err.stderr.includes("no transcripts for /nowhere"),
 		);
 	});
 });

@@ -36,8 +36,24 @@ function parseSince(value) {
 	return since;
 }
 
-function projectOf(cwd) {
-	return cwd?.replace(WORKTREE_SUFFIX, "") ?? null;
+async function repositoryRoot(start) {
+	for (let dir = start; ; dir = path.dirname(dir)) {
+		const marker = path.join(dir, ".git");
+		const gitdir = /^gitdir:\s*(.+)$/m.exec(await readFile(marker, "utf8").catch(() => ""))?.[1];
+		const linked = gitdir && /^(.*)\/\.git\/worktrees\/[^/]+$/.exec(path.resolve(dir, gitdir.trim()));
+		if (linked) return linked[1];
+		if (await exists(marker)) return dir;
+		if (path.dirname(dir) === dir) return start;
+	}
+}
+
+const repositories = new Map();
+
+async function repositoryOf(cwd) {
+	if (!cwd) return null;
+	const folded = path.resolve(cwd.replace(WORKTREE_SUFFIX, ""));
+	if (!repositories.has(folded)) repositories.set(folded, repositoryRoot(folded));
+	return repositories.get(folded);
 }
 
 function parseEntry(line) {
@@ -137,7 +153,7 @@ async function* sessionCandidates(file, since) {
 		const entry = parseEntry(line);
 		if (entry === undefined || entry.isSidechain) continue;
 		if (entry.entrypoint?.startsWith("sdk-")) return;
-		project ??= projectOf(entry.cwd);
+		project ??= await repositoryOf(entry.cwd);
 
 		if (entry.type === "assistant") {
 			answered = true;
@@ -253,20 +269,31 @@ function recurringErrors(occurrences, minSessions) {
 		}));
 }
 
-async function projectDirs(projectsDir, projects, allProjects) {
-	const names = (await readdir(projectsDir, { withFileTypes: true }))
+async function transcriptDirs(projectsDir) {
+	return (await readdir(projectsDir, { withFileTypes: true }))
 		.filter((dirent) => dirent.isDirectory())
-		.map((dirent) => dirent.name);
-	if (allProjects) return names.map((name) => path.join(projectsDir, name));
+		.map((dirent) => path.join(projectsDir, dirent.name));
+}
 
-	return projects.flatMap((projectDir) => {
-		const slug = path.resolve(projectDir).replace(/[^a-zA-Z0-9]/g, "-");
-		const worktreePrefix = `${slug}--claude-worktrees-`;
-		const matched = names.filter((name) => name === slug || name.startsWith(worktreePrefix));
+async function dirRepository(dir) {
+	const newest = (await transcriptFiles([dir], 0)).at(-1);
+	return newest === undefined ? null : repositoryOf((await sessionHead(newest.file)).cwd);
+}
+
+async function projectDirs(projectsDir, projects, allProjects) {
+	const dirs = await transcriptDirs(projectsDir);
+	if (allProjects) return dirs;
+
+	const owners = await Promise.all(dirs.map(async (dir) => ({ dir, repository: await dirRepository(dir) })));
+	const selected = [];
+	for (const projectDir of projects) {
+		const repository = await repositoryOf(projectDir);
+		const matched = owners.filter((owner) => owner.repository === repository);
 		if (matched.length === 0)
-			throw new Error(`no transcripts for ${projectDir}: ${path.join(projectsDir, slug)} does not exist`);
-		return matched.map((name) => path.join(projectsDir, name));
-	});
+			throw new Error(`no transcripts for ${projectDir}: no session under ${projectsDir} ran in ${repository}`);
+		selected.push(...matched.map(({ dir }) => dir));
+	}
+	return selected;
 }
 
 async function transcriptFiles(dirs, since, session) {
@@ -326,20 +353,13 @@ async function setting(project, configDir, key) {
 	return undefined;
 }
 
-async function repositoryRoot(project) {
-	for (let dir = path.resolve(project); ; dir = path.dirname(dir)) {
-		if (await exists(path.join(dir, ".git"))) return dir;
-		if (path.dirname(dir) === dir) return path.resolve(project);
-	}
-}
-
 async function memoryDir(project, configDir, projectsDir) {
 	const forced = process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY;
 	if (forced === "1") return undefined;
 	if (forced !== "0" && (await setting(project, configDir, "autoMemoryEnabled")) === false) return undefined;
 	const custom = await setting(project, configDir, "autoMemoryDirectory");
 	if (typeof custom === "string") return custom.startsWith("~/") ? path.join(homedir(), custom.slice(2)) : custom;
-	const slug = (await repositoryRoot(project)).replace(/[^a-zA-Z0-9]/g, "-");
+	const slug = project.replace(/[^a-zA-Z0-9]/g, "-");
 	const dir = path.join(projectsDir, slug, "memory");
 	return (await exists(dir)) ? dir : undefined;
 }
@@ -384,13 +404,13 @@ async function memoryRecords(project, dir, since) {
 
 async function listProjects(projectsDir) {
 	const projects = new Map();
-	for (const dir of await projectDirs(projectsDir, [], true)) {
+	for (const dir of await transcriptDirs(projectsDir)) {
 		const files = await transcriptFiles([dir], 0);
 		if (files.length === 0) continue;
 		const newest = files.at(-1);
 		const head = await sessionHead(newest.file);
 		if (head.entrypoint?.startsWith("sdk-")) continue;
-		const project = projectOf(head.cwd) ?? dir;
+		const project = (await repositoryOf(head.cwd)) ?? dir;
 		const known = projects.get(project) ?? { sessions: 0, last: 0 };
 		projects.set(project, { sessions: known.sessions + files.length, last: Math.max(known.last, newest.mtimeMs) });
 	}
@@ -443,7 +463,7 @@ try {
 		const memorySince = new Map();
 		for (const { file } of files) {
 			const head = await sessionHead(file);
-			const project = projectOf(head.cwd);
+			const project = await repositoryOf(head.cwd);
 			if (project === null || head.entrypoint?.startsWith("sdk-")) continue;
 			const start = values.session === undefined ? since : Date.parse(head.timestamp) || since;
 			memorySince.set(project, Math.min(memorySince.get(project) ?? Infinity, start));

@@ -55,8 +55,10 @@ structured context transfer across a boundary, and the user's corrections turned
   - A human prompt carries `origin.kind: "human"`. In a session whose entries carry `origin`, an entry without it is
     synthetic: a compaction summary, a teammate message, a typed slash command
   - A message the user types while the agent works is an `attachment` of type `queued_command`, not a `user` entry
-  - An entry's `cwd` follows the agent's `cd`, so a session's repository is its first `cwd`, with a
-    `/.claude/worktrees/<name>` suffix folded into the main repository
+  - An entry's `cwd` follows the agent's `cd`, so a session's repository comes from its first `cwd`: a
+    `/.claude/worktrees/<name>` suffix folded off, then the nearest ancestor holding `.git`, where a linked worktree's
+    `.git` file points through `gitdir` to the main repository. A transcript directory is keyed to the launch directory,
+    so a session launched in a subdirectory lands in its own directory under the same repository
   - A resumed or forked session copies earlier entries into its own file under a new `sessionId` and the same `uuid`
   - SDK-driven sessions, such as a memory plugin's background observer, carry `entrypoint: sdk-*` and hold no human
     corrections
