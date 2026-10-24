@@ -228,7 +228,7 @@ declaration, or embedding decision needs a worked example — it carries the dec
   non-zero default is required.
 - **Embed only where the promoted method set is the API you intend.** Embedding in an exported struct commits you to
   every exported method of the inner type, including the ones it has not added yet. Use a named field otherwise.
-- **A type alias earns its place by adding meaning**: `type UserID string` does, `type MyString string` does not.
+- **A defined type earns its place by adding meaning**: `type UserID string` does, `type MyString string` does not.
 - **`Run` blocks until the work is done; `Start` returns immediately and owns a goroutine.** `Start` takes a context
   first.
 

@@ -489,9 +489,10 @@ func Process(data interface{}) error { ... }
 Only use `any` when truly accepting any type (marshaling, formatting). If the set of types is known, use generics or
 concrete types.
 
-### Type Aliases for Semantics
+### Defined Types for Semantics
 
-Use type aliases when they add type safety or semantic meaning:
+Use defined types (`type UserID string`) when they add type safety or semantic meaning; an alias (`type A = B`) adds
+neither:
 
 ```go
 // Good — adds semantic clarity
