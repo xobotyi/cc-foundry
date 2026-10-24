@@ -355,7 +355,7 @@
 		{
 			"name": "wall-clock",
 			"description": "Wall-clock and elapsed-time grounding for agent context",
-			"version": "1.0.0",
+			"version": "1.0.1",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"
