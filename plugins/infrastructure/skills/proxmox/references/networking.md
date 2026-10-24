@@ -20,16 +20,24 @@ Physical NIC (eno1) --- Bridge (vmbr0) -+- VM 100 (virtio)
 - **One bridge per network segment.** Create additional bridges for isolated networks or different VLANs.
 - **VLAN-aware bridges** (recommended): A single bridge handles multiple VLANs via 802.1Q tagging, eliminating the need
   for separate bridges per VLAN. The VLAN-aware checkbox must be **explicitly enabled** — it is off by default.
+
   ```
   auto vmbr0
-  iface vmbr0 inet static
-      address 10.0.0.1/24
+  iface vmbr0 inet manual
       bridge-ports eno1
       bridge-stp off
       bridge-fd 0
       bridge-vlan-aware yes
       bridge-vids 2-4094
+
+  auto vmbr0.5
+  iface vmbr0.5 inet static
+      address 10.0.0.1/24
   ```
+
+  The host address sits on a tagged VLAN interface, not on the bridge: a guest NIC with no tag joins VLAN 1 untagged, so
+  a host address on the bare bridge shares a segment with every untagged guest.
+
 - **Traditional bridges** (legacy): One bridge per VLAN, using VLAN sub-interfaces. More complex to manage at scale.
 
 ### OVS vs Linux Bridge
@@ -56,7 +64,8 @@ VLANs (802.1Q) segment network traffic at Layer 2 without additional physical ca
 - Use a **trunk port** on the physical switch connected to the Proxmox host, allowing all required VLAN tags — frames
   with unrecognized VLAN IDs are silently dropped
 - Common VLAN layout:
-  - **VLAN 1 (native)** — Management / host access
+  - **VLAN 1 (native)** — unused; a guest NIC with no tag lands here
+  - **VLAN 5** — Management / host access (`vmbr0.5`)
   - **VLAN 10** — Server/infrastructure
   - **VLAN 20** — User/client network
   - **VLAN 30** — IoT/untrusted devices
