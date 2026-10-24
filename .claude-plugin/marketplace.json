@@ -232,7 +232,7 @@
 		{
 			"name": "rust",
 			"description": "Rust language discipline: ownership, idioms, error handling, concurrency (threads/rayon and async), toolchain, testing, and LSP-powered code intelligence",
-			"version": "1.0.0",
+			"version": "1.0.1",
 			"author": {
 				"name": "xobotyi",
 				"email": "xog3@yandex.ru"

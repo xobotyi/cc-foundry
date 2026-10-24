@@ -1,6 +1,6 @@
 {
   "name": "rust",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Rust language discipline: ownership, idioms, error handling, concurrency, toolchain, and LSP-powered code intelligence",
   "lspServers": "./.lsp.json",
   "author": {
