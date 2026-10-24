@@ -23,7 +23,7 @@ workflow to `git-commit`.
 
 - `skill-engineering`, `subagent-engineering`, and `output-style-engineering` each declare `prompt-engineering` as a
   hard `<prerequisite>` — every AI artifact is a prompt. `prompt-terser` names it as a boundary with no invoke pointer,
-  which is the soft tier of ADR 0003
+  which is the soft tier of [ADR 1.3](/design-docs/adr/1.3-skill-dependencies.md)
 - `prompt-terser` is user-invoked only (`disable-model-invocation`) — its triggers sit inside `prompt-engineering`'s, so
   in the routing pool it only draws a contest it cannot win
 - Other plugins depend inward on these skills: `the-workflow`'s `claude-md` declares a hard `<prerequisite>` on

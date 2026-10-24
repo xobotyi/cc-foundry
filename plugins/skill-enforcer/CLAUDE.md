@@ -43,8 +43,7 @@ The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -
 - Every reminder ends with the shared `SILENT` clause: act on the rule, never echo the reminder or narrate the check.
   Guards both failure modes — tag-echo and narration.
 - Injected payloads carry no artifact the model is asked to reproduce. Never reintroduce a `<thinking>` or `<sef-eval>`
-  template into injected output — see
-  [ADR 0004](../../docs/adr/0004-declarative-rules-over-emitted-reasoning-artifacts.md).
+  template into injected output — see [ADR 1.4](/design-docs/adr/1.4-behavioral-nudges.md).
 
 **Token cost:**
 

@@ -9,7 +9,8 @@ description: >-
 # Plugin Releases
 
 Every plugin version bump that lands on master ships with a GitHub release. The release notes are the plugin's changelog
-— there are no CHANGELOG.md files (see `docs/adr/0005`). A pushed version bump without a release is an incomplete ship.
+— there are no CHANGELOG.md files (see [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)). A pushed version bump
+without a release is an incomplete ship.
 
 ## When to Release
 

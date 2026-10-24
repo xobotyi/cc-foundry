@@ -41,7 +41,7 @@ process (Research → Scaffold → Write → Ship).
 
 - Router pattern: SKILL.md routes to `references/` for detailed content
 - SKILL.md must be behaviorally self-sufficient; route only lookup-oriented depth to `references/`. No hard line cap —
-  length is governed by the deletion test, not a line budget (see `docs/adr/0002`)
+  length is governed by the deletion test, not a line budget (see [ADR 1.2](/design-docs/adr/1.2-skill-md-length.md))
 
 **Auditing prompt text:**
 
@@ -62,9 +62,9 @@ process (Research → Scaffold → Write → Ship).
 
 **Design decisions:**
 
-- Load-bearing decisions about how cc-foundry's own skills and plugins are authored are recorded as ADRs in `docs/adr/`
-  (sequential `NNNN-slug.md`, indexed in `docs/adr/README.md`). Record one when the rationale would otherwise live only
-  in a commit message or memory.
+- Load-bearing decisions about how cc-foundry's own skills and plugins are authored are recorded as ADRs in
+  `design-docs/adr/` (`1.N-topic.md`, indexed in `docs/adr/README.md`). Record one when the rationale would otherwise
+  live only in a commit message or memory.
 - These are distinct from the per-project ADRs the `the-blueprint:alignment` skill writes to a downstream project's
   `design-docs/adr/`.
 
@@ -99,7 +99,8 @@ process (Research → Scaffold → Write → Ship).
   `.claude-plugin/marketplace.json` (which lists all plugins in a single file)
 - Update both files when bumping versions
 - Every plugin version bump pushed to master ships with a GitHub release whose notes are the plugin's changelog — no
-  CHANGELOG.md files. Workflow: the `release` skill (`.claude/skills/release/`); rationale: `docs/adr/0005`
+  CHANGELOG.md files. Workflow: the `release` skill (`.claude/skills/release/`); rationale:
+  [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)
 
 **Licensing:**
 

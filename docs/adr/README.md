@@ -20,16 +20,16 @@ neither re-litigate it nor cargo-cult it.
 
 ## Index
 
-- [0001 — KV lists over tables for independent-entry data](0001-kv-lists-over-tables-for-independent-entries.md) —
-  accepted
-- [0002 — No SKILL.md line cap](0002-no-skill-md-line-cap.md) — accepted
-- [0003 — Skill dependencies: soft vs hard tiers](0003-skill-dependencies-soft-vs-hard.md) — accepted
-- [0004 — Behavioral nudges as declarative rules, not emitted reasoning artifacts](0004-declarative-rules-over-emitted-reasoning-artifacts.md)
+- [0001 — KV lists over tables for independent-entry data](/design-docs/adr/1.1-structured-data-shape.md) — accepted
+- [0002 — No SKILL.md line cap](/design-docs/adr/1.2-skill-md-length.md) — accepted
+- [0003 — Skill dependencies: soft vs hard tiers](/design-docs/adr/1.3-skill-dependencies.md) — accepted
+- [0004 — Behavioral nudges as declarative rules, not emitted reasoning artifacts](/design-docs/adr/1.4-behavioral-nudges.md)
   — accepted
-- [0005 — Per-plugin GitHub releases as the changelog](0005-per-plugin-github-releases-as-changelog.md) — accepted
-- [0006 — Prior art: steal methodology, not authoring craft](0006-prior-art-steal-methodology-not-craft.md) — accepted
-- [0007 — The `coding` skill owns comment and documentation policy, stated in full](0007-coding-skill-owns-comment-policy.md)
+- [0005 — Per-plugin GitHub releases as the changelog](/design-docs/adr/1.5-plugin-changelog.md) — accepted
+- [0006 — Prior art: steal methodology, not authoring craft](/design-docs/adr/1.6-prior-art-reuse.md) — accepted
+- [0007 — The `coding` skill owns comment and documentation policy, stated in full](/design-docs/adr/1.7-comment-policy-ownership.md)
   — accepted (WHY clause superseded by 0008)
-- [0008 — Comments are a closed set of five kinds, not a judgment call](0008-comments-as-a-closed-set.md) — accepted
-- [0009 — Instruction artifacts are written in the timeless present](0009-timeless-present-for-instruction-artifacts.md)
-  — accepted
+- [0008 — Comments are a closed set of five kinds, not a judgment call](/design-docs/adr/1.8-permitted-comments.md) —
+  accepted
+- [0009 — Instruction artifacts are written in the timeless present](/design-docs/adr/1.9-instruction-timelessness.md) —
+  accepted

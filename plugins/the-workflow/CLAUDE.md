@@ -20,7 +20,8 @@ context (CLAUDE.md and `.claude/rules/`) and structured context transfer across 
 **`handoff`:**
 
 - Stays self-contained and under 200 lines — no reference files, no external dependencies. The skill runs when context
-  is nearly full, which is the documented exception to the no-line-cap rule (`docs/adr/0002`)
+  is nearly full, which is the documented exception to the no-line-cap rule
+  ([ADR 1.2](/design-docs/adr/1.2-skill-md-length.md))
 - The state grade, the Contingencies section, and the closing read-back come from the I-PASS handoff protocol (Starmer
   et al., _Pediatrics_ 129:201-204); the recall-then-precision two-pass triage comes from Anthropic's
   context-engineering guidance. Each replaces an element real handoffs omit — do not cut them as ceremony

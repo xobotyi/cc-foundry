@@ -20,7 +20,8 @@ Frontend platform discipline: CSS, accessibility, framework conventions, and bro
 
 - `tailwindcss` → `css` — hard prerequisite, enforced by a `<prerequisite>` block that invokes `frontend:css`
 - `frontend-design` names `css`, `tailwindcss`, and `accessibility` as boundaries with no invoke pointer — the soft tier
-  of ADR 0003. `frontend-design` decides which value; they govern how it is written and whether it conforms
+  of [ADR 1.3](/design-docs/adr/1.3-skill-dependencies.md). `frontend-design` decides which value; they govern how it is
+  written and whether it conforms
 
 ## Plugin Scope
 
@@ -47,8 +48,9 @@ Frontend platform discipline: CSS, accessibility, framework conventions, and bro
   non-visual categories absent from it. Re-ground by reading
 - **A threshold in `references/render-checks.md` carries the source that states it**, and where sources disagree both
   numbers stay. A number with no source goes under the rules no source supports
-- Prior art is taken as methodology, never as craft or text (ADR 0006): Anthropic's skill of the same name, unslop-ui,
-  Impeccable, and Vercel's Web Interface Guidelines are sources for method, and their text is not copied
+- Prior art is taken as methodology, never as craft or text ([ADR 1.6](/design-docs/adr/1.6-prior-art-reuse.md)):
+  Anthropic's skill of the same name, unslop-ui, Impeccable, and Vercel's Web Interface Guidelines are sources for
+  method, and their text is not copied
 - The name is shared with Anthropic's `frontend-design:frontend-design` on purpose — it is the term users search for.
   The description and `when_to_use` carry the discrimination. The two differ where this one ranks the user's instruction
   and the existing design first, examines inherited defaults, and prescribes a render pass across widths and states
