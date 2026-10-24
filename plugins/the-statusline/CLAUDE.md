@@ -26,3 +26,5 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 - **Row width comes from `COLUMNS`, read only when Claude Code runs the script** — stdout is captured, so terminal width
   detection finds no tty, and a terminal resize triggers no run; the hook's default `refreshInterval` is what refits the
   rows after one
+- **Render every layout change at a narrow and a wide `COLUMNS` value** — each row has to fit at both ends, because the
+  renderer runs in every open session at whatever width each pane has
