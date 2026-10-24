@@ -115,7 +115,9 @@ survives compaction, and which split actually reclaims context. From there it co
 file, trimming, and an ordered diagnosis for a rule that is written down and still ignored. The `handoff` skill produces
 structured transfer documents for the moments when work crosses a context boundary: a session restart, a teammate
 delegation, an async resumption. Each document carries the decisions, constraints, and remaining work in 500-2000 tokens
-and drops the noise.
+and drops the noise. The `debrief` skill reads the session transcripts for the places where the user corrected the
+agent, in this repository or across all of them, and turns each lesson that outlives its task into a rule in the file
+the agent reads next time, after the user approves it.
 
 ```
 /plugin install the-workflow

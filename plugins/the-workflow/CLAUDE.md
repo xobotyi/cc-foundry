@@ -1,13 +1,21 @@
 # the-workflow Plugin
 
-Agentic workflow mechanics — the two sides of workflow quality that hold across every project: persistent project
-context (CLAUDE.md and `.claude/rules/`) and structured context transfer across a boundary.
+Agentic workflow mechanics that hold across every project: persistent project context (CLAUDE.md and `.claude/rules/`),
+structured context transfer across a boundary, and the user's corrections turned into that persistent context.
 
 ## Skills
 
 - **`claude-md`** — CLAUDE.md and `.claude/rules/` authoring: what loads when, layer routing, writing, trimming,
   diagnosis of an ignored rule
 - **`handoff`** — triage conversation context into a standalone transfer document. User-invoked only, via `/handoff`
+- **`debrief`** — harvest the user's corrections from session transcripts and write each durable lesson into the
+  instruction file it belongs in, through an approval gate. User-invoked only, via `/debrief`; the extractor is
+  `scripts/extract-corrections.mjs`
+
+## Skill Dependencies
+
+- **`debrief` invokes `claude-md` before its gate.** Choosing the layer a lesson belongs in is `claude-md`'s subject,
+  and `debrief` carries only the routing that is specific to a correction
 
 ## Conventions
 
@@ -32,3 +40,23 @@ context (CLAUDE.md and `.claude/rules/`) and structured context transfer across 
   `/` menu. Keep trigger phrasing out of `description`, where it only crowds the menu line
 - Never give handoff `context: fork`. A forked skill runs as a subagent with no conversation history, and the
   conversation is handoff's only input
+
+**`debrief`:**
+
+- `disable-model-invocation: true` stays: the skill writes instruction files, so a run starts only when the user asks
+  for one. The `handoff` rule on `description` and `when_to_use` applies here too
+- Never give debrief `context: fork`. The gate needs the user's answer on each lesson, and a forked run has no user to
+  ask
+- The skill keeps no state between runs — a ledger of processed candidates grows without bound
+- The transcript format is undocumented and changes between CLI versions. `.dev/extract-corrections.test.mjs` pins every
+  marker the extractor relies on; run `node --test plugins/the-workflow/skills/debrief/.dev/` after any change to the
+  script, and add a fixture entry for each new marker
+- Transcript facts that defy a reasonable assumption, each pinned by that test:
+  - A human prompt carries `origin.kind: "human"`. In a session whose entries carry `origin`, an entry without it is
+    synthetic: a compaction summary, a teammate message, a typed slash command
+  - A message the user types while the agent works is an `attachment` of type `queued_command`, not a `user` entry
+  - An entry's `cwd` follows the agent's `cd`, so a session's repository is its first `cwd`, with a
+    `/.claude/worktrees/<name>` suffix folded into the main repository
+  - A resumed or forked session copies earlier entries into its own file under a new `sessionId` and the same `uuid`
+  - SDK-driven sessions, such as a memory plugin's background observer, carry `entrypoint: sdk-*` and hold no human
+    corrections

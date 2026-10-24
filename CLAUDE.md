@@ -13,7 +13,7 @@ styles, hooks, and workflow automation.
 - `plugins/the-statusline/` — session metrics status line
 - `plugins/the-writer/` — prose discipline for agent-authored text
 - `plugins/infrastructure/` — infrastructure discipline (Ansible, Docker, Proxmox, Unraid, networking)
-- `plugins/the-workflow/` — agentic workflow mechanics (CLAUDE.md quality, context handoff)
+- `plugins/the-workflow/` — agentic workflow mechanics (CLAUDE.md quality, context handoff, correction harvesting)
 - `plugins/frontend/` — frontend platform discipline
 - `plugins/backend/` — backend platform discipline (observability, Prometheus, StatsD, OTel)
 - `plugins/grafana/` — Grafana platform (dashboards, PromQL, MetricsQL, LogsQL, alerting, provisioning, dataviz)

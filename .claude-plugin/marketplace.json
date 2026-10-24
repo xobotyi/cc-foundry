@@ -314,7 +314,7 @@
 		},
 		{
 			"name": "the-workflow",
-			"description": "Agentic workflow mechanics: CLAUDE.md instruction quality and structured context handoff",
+			"description": "Agentic workflow mechanics: CLAUDE.md instruction quality, structured context handoff, and correction harvesting",
 			"version": "1.4.0",
 			"author": {
 				"name": "xobotyi",
@@ -325,7 +325,15 @@
 			"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/the-workflow",
 			"repository": "https://github.com/xobotyi/cc-foundry",
 			"license": "MIT",
-			"keywords": ["workflow", "handoff", "context-boundaries", "delegation", "claude-md", "instructions"],
+			"keywords": [
+				"workflow",
+				"handoff",
+				"context-boundaries",
+				"delegation",
+				"claude-md",
+				"instructions",
+				"corrections"
+			],
 			"tags": ["workflow", "productivity", "automation"]
 		},
 		{

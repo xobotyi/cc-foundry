@@ -5,7 +5,7 @@ projects, and teams.
 
 ## The Problem
 
-Two workflow problems compound across every project that uses agentic coding:
+Three workflow problems compound across every project that uses agentic coding:
 
 **Persistent context degrades.** CLAUDE.md files grow until Claude ignores half the instructions. Rules get buried in
 noise, drift from reality, or sit at the wrong abstraction level. Some never reach the session at all — a nested file
@@ -16,9 +16,13 @@ the last compaction. The file exists, but compliance drops, and the cause is rar
 resumption — the handoff is either a wall of text that overloads the receiver, or a paragraph that loses decisions,
 constraints, and resource identifiers. The receiving agent wastes tokens re-deriving information that was already known.
 
+**Corrections do not outlive the session.** The user corrects the agent, and the agent complies until the session ends.
+The next session starts without the correction, and the user gives it again. The lesson sits in a transcript nobody
+reads, until Claude Code deletes it.
+
 ## The Solution
 
-the-workflow provides skills for the two sides of agentic workflow quality:
+the-workflow provides a skill for each of them:
 
 ### claude-md
 
@@ -66,6 +70,33 @@ that turns out to matter.
 
 Designed for late-session use when context is nearly full — reads only from the conversation window, gathers nothing
 new, and targets 500-2000 token output.
+
+### debrief
+
+Turns the user's corrections into instructions the agent reads next time. `/debrief` reads the session transcripts that
+Claude Code keeps under `~/.claude/projects/`, finds the places where the user corrected the agent, and keeps the
+lessons that would change the agent's work on a different task. For each one it proposes a rule and the file the rule
+belongs in: the project's CLAUDE.md or a document it links, a `.claude/rules/` file, the personal `~/.claude/CLAUDE.md`,
+or the skill that prescribed the behavior. Nothing is written until the user approves that item.
+
+A bundled script does the extraction without a model. It marks the moments that carry the most evidence — a refused tool
+call, an interrupt, a rewind, a message typed while the agent was still working — and attaches what the agent had just
+said and done, so each correction is judged against the action it answered. It skips what only looks like the user:
+compaction summaries, messages from teammate agents, history a resumed session copied from its parent, and background
+sessions driven through the SDK.
+
+The argument sets the scope:
+
+- **`/debrief`** — this session.
+- **`/debrief 14d`** — this repository over a window. A date works too, and `all` takes every transcript.
+- **`/debrief 14d api web`** — the named repositories instead of this one.
+- **`/debrief 7d everywhere`** — every repository with transcripts. A correction that recurs across repositories becomes
+  a personal rule rather than a project one.
+
+Before it proposes a rule, the skill reads the target file end to end, because the usual case is a rule that already
+says the same thing in other words. It runs on a bare Claude Code install. When the session has a memory server, a
+search server, or an issue tracker, it also checks each lesson against the decisions recorded there. Claude Code deletes
+transcripts after `cleanupPeriodDays`, 30 days by default, so a run sees only what is still on disk.
 
 ## Installation
 

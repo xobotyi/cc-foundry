@@ -1,7 +1,7 @@
 {
   "name": "the-workflow",
   "version": "1.4.0",
-  "description": "Agentic workflow mechanics: CLAUDE.md instruction quality and structured context handoff",
+  "description": "Agentic workflow mechanics: CLAUDE.md instruction quality, structured context handoff, and correction harvesting",
   "author": {
     "name": "xobotyi",
     "email": "xog3@yandex.ru",
@@ -14,6 +14,7 @@
     "workflow",
     "handoff",
     "context-boundaries",
-    "delegation"
+    "delegation",
+    "corrections"
   ]
 }
