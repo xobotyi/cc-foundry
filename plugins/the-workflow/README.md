@@ -81,9 +81,14 @@ or the skill that prescribed the behavior. Nothing is written until the user app
 
 A bundled script does the extraction without a model. It marks the moments that carry the most evidence — a refused tool
 call, an interrupt, a rewind, a message typed while the agent was still working — and attaches what the agent had just
-said and done, so each correction is judged against the action it answered. It skips what only looks like the user:
-compaction summaries, messages from teammate agents, history a resumed session copied from its parent, and background
-sessions driven through the SDK.
+said and done and which skills were loaded, so each correction is judged against the action it answered. It skips what
+only looks like the user: compaction summaries, messages from teammate agents, history a resumed session copied from its
+parent, and background sessions driven through the SDK.
+
+Two more sources feed the same review. An error the agent hit and fixed on its own, then hit again in later sessions,
+arrives with the failing call and the call that worked; Bash commands that ran and exited non-zero stay out, because
+that is ordinary work. And where auto memory is on, the notes Claude Code saved from earlier corrections are read too,
+so a note that turns out to be a standing rule can move into the file where the whole team sees it.
 
 The argument sets the scope:
 
