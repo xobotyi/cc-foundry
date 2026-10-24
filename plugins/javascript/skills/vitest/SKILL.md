@@ -262,8 +262,9 @@ each landed in.
   flag in 3.2, the only mode since 4.0 — which matches Istanbul's accuracy at lower cost. Choose `istanbul` for a non-V8
   runtime, or when the module count makes v8 slower.
 - **Neither provider ships with Vitest**: `@vitest/coverage-v8` or `@vitest/coverage-istanbul`.
-- **An ignore hint needs `-- @preserve`.** esbuild strips comments during transpilation, so `/* v8 ignore if */`
-  disappears before the provider sees it; `/* v8 ignore if -- @preserve */` survives.
+- **An ignore hint needs `-- @preserve` on Vite 6 and 7.** Their esbuild transform strips comments, so
+  `/* v8 ignore if */` disappears before the provider sees it; `/* v8 ignore if -- @preserve */` survives. Vite 8's Oxc
+  transform keeps the plain hint.
 - **A negative threshold is a maximum count of uncovered items**, which ratchets a legacy codebase where a percentage
   cannot.
 

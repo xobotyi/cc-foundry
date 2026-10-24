@@ -68,8 +68,9 @@ Each provider has its own comment prefix — `/* v8 ignore ... */` and `/* istan
 `next`, `file`, and `start`/`stop` forms. Vitest 4.0 dropped the `start`/`stop` pair; Vitest 4.1 reimplemented it for
 both providers.
 
-TypeScript is transpiled by esbuild, which **strips every comment that is not a legal comment**. An ignore hint written
-plainly disappears before the provider sees it. Add `-- @preserve` so it survives:
+Vite 6 and 7 transpile TypeScript with esbuild, which **strips every comment that is not a legal comment**: an ignore
+hint written plainly disappears before the provider sees it. Vite 8 transforms with Oxc, which keeps it — measured on
+Vitest 4.1.12 with Vite 7.3.7 and 8.3.5. Add `-- @preserve`, which survives under every Vite major Vitest supports:
 
 ```ts
 /* v8 ignore if -- @preserve */
