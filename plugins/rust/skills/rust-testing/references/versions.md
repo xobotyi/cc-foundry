@@ -41,7 +41,8 @@ Mocking and fixtures:
 - **mockall** `0.14.0` — `#[automock]` / `mock!` mock generation
 - **rstest** `0.26.1` — `#[case]` parametrization and `#[fixture]` injection
 - **test-case** `3.3.1` — lightweight `#[test_case(...)]` parametrization
-- **serial_test** `3.5.0` — `#[serial]` to serialize tests touching shared global state
+- **serial_test** `3.5.0` — `#[serial]` and, with feature `file_locks`, `#[file_serial]` to serialize tests touching
+  shared state
 
 Assertions and CLI:
 
@@ -68,7 +69,7 @@ rstest = "0.26.1"
 pretty_assertions = "1.4.1"
 assert_cmd = "2.2.2"
 predicates = "3.1.4"
-serial_test = "3.5.0"
+serial_test = { version = "3.5.0", features = ["file_locks"] }
 tokio = { version = "1.52.3", features = ["macros", "rt", "test-util"] }
 tokio-test = "0.4.5"
 criterion = "0.8.2"

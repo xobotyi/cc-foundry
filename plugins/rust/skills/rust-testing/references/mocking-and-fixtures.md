@@ -387,25 +387,29 @@ async fn squares(#[case] n: u32, #[case] expected: u32) {
 
 ## serial_test and nextest Isolation
 
-`cargo nextest run` executes every test in its own process, so independent tests are already isolated from one another's
-process-global state. That covers the common case — but it does not protect tests that share state _outside_ the
-process: a fixed network port, a shared file path, an environment variable, a real database row, or mockall's global
-static-method `Context` expectations. Two such tests running in parallel (in separate processes or threads) still race.
+`cargo nextest run` executes every test in its own process, so process-global state — an environment variable, mockall's
+global static-method `Context` expectations — is isolated per test. `cargo test` runs tests as threads of one process,
+where the same state races. Neither runner protects state _outside_ the process: a fixed network port, a shared file
+path, a real database row. Two tests touching it in parallel race under both.
 
-Mark those tests `#[serial]` from the `serial_test` crate. Tests sharing a `#[serial]` key never run concurrently with
-each other; the runner serializes them:
+The `serial_test` crate has two locks, and only one of them holds under nextest:
+
+- **`#[serial]`** is an in-process lock. It serializes tests under `cargo test` and does nothing under nextest, where
+  each test process holds its own copy of the lock.
+- **`#[file_serial]`** (feature `file_locks`) locks through a file, so it serializes across processes and holds under
+  both runners. Use it for state outside the process, or define a nextest test group with `max-threads = 1`.
 
 ```rust
-use serial_test::serial;
+use serial_test::file_serial;
 
 #[test]
-#[serial]
+#[file_serial]
 fn binds_the_shared_port() {
     // owns localhost:8080 for the duration; no parallel test may also bind it
 }
 
 #[test]
-#[serial]
+#[file_serial]
 fn also_uses_the_shared_port() {
     // serialized against the test above
 }
@@ -413,13 +417,10 @@ fn also_uses_the_shared_port() {
 
 Interaction notes:
 
-- `#[serial]` serializes _within_ a single test binary's run. nextest's process-per-test model parallelizes across
-  tests, so without `#[serial]` two tests touching the same external resource race even though each is in its own
-  process. The attribute, not the runner, provides the mutual exclusion.
 - Prefer eliminating shared state over serializing: use a `tempfile` scratch directory per test, bind port `0` to get an
-  OS-assigned free port, or inject a fake clock instead of reading the system clock. Reach for `#[serial]` only when the
-  shared resource is genuinely global and cannot be parameterized away.
-- Keep `#[serial]` sets small. A large serial group throttles the whole suite back to sequential execution and erases
+  OS-assigned free port, or inject a fake clock instead of reading the system clock. Reach for a serial lock only when
+  the shared resource is genuinely global and cannot be parameterized away.
+- Keep serial sets small. A large serial group throttles the whole suite back to sequential execution and erases
   nextest's parallelism gains.
 
 ## assert_cmd: Black-Box CLI Testing
