@@ -13,6 +13,7 @@ const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const RAN_AND_FAILED = /^Exit code \d+/;
 const ERROR_LIMIT = 300;
 const SIGNATURE_LIMIT = 160;
+const INDEX_TEXT_LIMIT = 160;
 const MEMORY_INDEX = "MEMORY.md";
 const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
 const MANAGED_SETTINGS =
@@ -402,6 +403,28 @@ async function memoryRecords(project, dir, since) {
 	return records.toSorted((a, b) => a.at.localeCompare(b.at));
 }
 
+function indexRow(number, record) {
+	const home = homedir();
+	const where = (record.projects ?? [record.project])
+		.map((project) => (project?.startsWith(home) ? `~${project.slice(home.length)}` : project))
+		.join(",");
+	const text = truncate(record.text.replaceAll(/\s+/g, " ").trim(), INDEX_TEXT_LIMIT);
+	return [number, record.signal, where, record.at?.slice(0, 10) ?? "", text].join("\t");
+}
+
+async function extractionLines(file) {
+	return (await readFile(file, "utf8")).split("\n").filter((line) => line !== "");
+}
+
+function lineNumbers(value, count) {
+	return (value ?? "").split(",").map((part) => {
+		const number = Number(part.trim());
+		if (!Number.isInteger(number) || number < 1 || number > count)
+			throw new Error(`--lines ${part}: expected line numbers from 1 to ${count}`);
+		return number;
+	});
+}
+
 async function listProjects(projectsDir) {
 	const projects = new Map();
 	for (const dir of await transcriptDirs(projectsDir)) {
@@ -425,6 +448,9 @@ const { values } = parseArgs({
 		since: { type: "string" },
 		session: { type: "string" },
 		"projects-dir": { type: "string" },
+		index: { type: "string" },
+		pick: { type: "string" },
+		lines: { type: "string" },
 	},
 });
 
@@ -436,6 +462,12 @@ try {
 		for (const [project, { sessions, last }] of await listProjects(projectsDir)) {
 			process.stdout.write(`${new Date(last).toISOString().slice(0, 10)}\t${sessions}\t${project}\n`);
 		}
+	} else if (values.index !== undefined) {
+		const lines = await extractionLines(values.index);
+		lines.forEach((line, i) => process.stdout.write(`${indexRow(i + 1, JSON.parse(line))}\n`));
+	} else if (values.pick !== undefined) {
+		const lines = await extractionLines(values.pick);
+		for (const number of lineNumbers(values.lines, lines.length)) process.stdout.write(`${lines[number - 1]}\n`);
 	} else {
 		const since = parseSince(values.since);
 		const dirs = await projectDirs(projectsDir, values.project, values["all-projects"]);

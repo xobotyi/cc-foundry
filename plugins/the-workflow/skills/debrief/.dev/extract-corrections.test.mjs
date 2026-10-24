@@ -411,6 +411,27 @@ suite("extract-corrections", () => {
 		);
 	});
 
+	test("indexes an extraction by line number and prints picked lines in full", async (t) => {
+		const file = path.join(projectsDir, "extraction.jsonl");
+		const records = [
+			{ signal: "rejection", project: PROJECT, at: "2026-10-01T10:00:00Z", text: "no,\n  keep it pure" },
+			{ signal: "tool-error", projects: [LEARN, PROJECT], at: "2026-10-02T00:00:00Z", text: "String not found." },
+		];
+		await writeFile(file, `${records.map((record) => JSON.stringify(record)).join("\n")}\n`);
+
+		const { stdout: index } = await run(process.execPath, [SCRIPT, "--index", file]);
+		t.assert.deepStrictEqual(index.trim().split("\n"), [
+			`1\trejection\t${PROJECT}\t2026-10-01\tno, keep it pure`,
+			`2\ttool-error\t${LEARN},${PROJECT}\t2026-10-02\tString not found.`,
+		]);
+		const { stdout: picked } = await run(process.execPath, [SCRIPT, "--pick", file, "--lines", "2"]);
+		t.assert.deepStrictEqual(JSON.parse(picked), records[1]);
+		await t.assert.rejects(
+			run(process.execPath, [SCRIPT, "--pick", file, "--lines", "3"]),
+			(err) => err.code === 1 && err.stderr.includes("--lines 3: expected line numbers from 1 to 2"),
+		);
+	});
+
 	test("names a repository no session ran in", async (t) => {
 		await t.assert.rejects(
 			run(process.execPath, [SCRIPT, "--projects-dir", projectsDir, "--project", "/nowhere"]),
