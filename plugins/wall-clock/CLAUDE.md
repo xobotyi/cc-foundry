@@ -8,6 +8,8 @@ at process start.
 
 - **`hooks/wall-clock.js`** — the whole implementation. ESM with `node:` imports, no dependencies.
 - **`hooks/hooks.json`** — registers the three events, 5s timeout each.
+- **`.dev/wall-clock.test.mjs`** — pins the PreCompact output form. Run `node --test plugins/wall-clock/.dev/` after any
+  change to the hook.
 
 ## How It Works
 
@@ -17,6 +19,8 @@ nothing can go stale across `--resume`, a crash, or two concurrent sessions in o
 - **UserPromptSubmit** — emits `at` plus `away`, the gap since the agent last spoke.
 - **PostToolBatch** — emits `at` plus `turn`, elapsed since the current prompt landed, throttled to one tick per period.
 - **PreCompact** — emits an instruction to drop the accumulated ticks, which are re-injected on the next turn anyway.
+  The instruction goes out as plain stdout, never as JSON: Claude Code merges a PreCompact hook's plain stdout into the
+  compaction instructions and rejects `hookSpecificOutput` for this event (verified on 2.1.310).
 
 **Anchors** — chosen so that neither event depends on whether the current prompt has reached the transcript yet:
 

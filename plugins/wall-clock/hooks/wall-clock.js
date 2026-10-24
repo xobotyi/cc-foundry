@@ -151,7 +151,7 @@ const main = async () => {
     }
 
     if (event === 'PreCompact') {
-        emit(event, COMPACT_NOTE);
+        process.stdout.write(COMPACT_NOTE);
 
         return;
     }
