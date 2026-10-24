@@ -1,7 +1,7 @@
 {
 	"name": "the-blueprint",
-	"version": "2.5.0",
-	"description": "Structured planning pipeline implementing DRAFT: discovery, research, alignment, frame, tasks, plus work-item creation, YouTrack mechanics, glossary, and technical diagramming",
+	"version": "2.6.0",
+	"description": "Structured planning pipeline implementing DRAFT: discovery, research, alignment, frame, tasks, plus work-item creation, YouTrack mechanics, glossary, living decision records, and technical diagramming",
 	"author": {
 		"name": "xobotyi",
 		"email": "xog3@yandex.ru",
@@ -19,6 +19,7 @@
 		"task-creation",
 		"youtrack",
 		"glossary",
+		"adr",
 		"planning",
 		"diagramming",
 		"DRAFT"
