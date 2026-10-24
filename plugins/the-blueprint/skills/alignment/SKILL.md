@@ -2,9 +2,9 @@
 name: alignment
 description: >-
   Solution direction synthesis — design opinions from research findings,
-  presented for human correction, with decision capture. Invoke whenever
-  task involves the A stage of the DRAFT pipeline, aligning on approach
-  before implementation, or recording design decisions.
+  presented for human correction, with each settled decision handed to the
+  adr skill. Invoke whenever task involves the A stage of the DRAFT pipeline
+  or aligning on approach before implementation.
 ---
 
 # Alignment
@@ -108,37 +108,11 @@ the end loses the rationale that was live when the term was resolved. Before com
 - **If glossary missing (first iteration):** invoke the `glossary` skill to create one from canonical terms used in
   brief, research, and alignment dialog. The glossary is a sibling artifact, not a section of `alignment.md`.
 
-### Phase 4 — Conditional ADRs
+### Phase 4 — Record Decisions
 
-ADRs are standalone files at `design-docs/adr/{N.M}-slug.md` — never embedded in `alignment.md`. The number tracks the
-initiative that birthed the ADR; the ADR itself is system-wide and outlives its parent initiative.
-
-**Numbering.** Initiative `04-orders-refactor` writing its first ADR creates `design-docs/adr/4.1-{slug}.md`. Second ADR
-from the same initiative is `4.2-{slug}.md`. Different initiatives never collide because the prefix matches the
-initiative number.
-
-**Trigger gate (all three must be true):**
-
-1. **Hard to reverse** — changing the decision later carries meaningful cost.
-2. **Surprising without context** — a future reader will look at the code and ask "why on earth did they do it this
-   way?"
-3. **Result of a real trade-off** — genuine alternatives existed, and one was picked for specific reasons.
-
-If any of the three is missing, skip the ADR. Easy-to-reverse decisions get reversed; non-surprising ones don't need a
-record; "we did the obvious thing" isn't worth preserving.
-
-**Qualifying types (non-exhaustive — the gate is the test, this list is the catalog):**
-
-- **Architectural shape.** "Write model is event-sourced, read model projects into Postgres."
-- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
-- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target — not every
-  library, just the ones that would take a quarter to replace.
-- **Boundary and scope decisions.** "Customer data is owned by the Customer context; others reference by ID only."
-- **Deliberate deviations from the obvious path.** "We use manual SQL instead of an ORM because X."
-- **Constraints not visible in code.** "Response times must stay under 200ms because of partner API contract."
-- **Rejected alternatives when rejection is non-obvious.** Considered GraphQL, picked REST for subtle reasons — record
-  it, or someone re-proposes GraphQL in six months.
-- **Compliance, legal, regulatory, or security boundary decisions** — even when not architecturally surprising.
+When the dialog settles a choice between real alternatives, invoke the `adr` skill. It decides whether the choice earns
+an ADR, and it owns the ADR, its format, its number, and the ADR index. Alignment adds no ADR rule of its own; the
+initiative's number is the group the `adr` skill numbers the record in.
 
 **Explore alternatives before committing (optional).** The first workable design anchors — when a genuine trade-off
 surfaces and no option is clearly right, generate alternatives before asking the user to commit:
@@ -150,50 +124,12 @@ surfaces and no option is clearly right, generate alternatives before asking the
    optimize for operational simplicity. Give each the problem framing; each returns its direction, what it changes, and
    where its trade-offs bite.
 3. Compare the returns on named dimensions, recommend one — or a hybrid — with reasoning. The user picks; the chosen
-   direction feeds the ADR gate below.
+   direction goes to the `adr` skill.
 
 Fire this only when a real trade-off exists — routine alignments never need it.
 
 **When to prompt.** When the dialog surfaces two or more viable approaches and the user expresses uncertainty, ask:
-"Multiple paths exist — write an ADR to commit to one?" Run the trigger gate before writing — uncertainty isn't enough
-on its own.
-
-**ADR file format:**
-
-```markdown
-# {Short title of the decision}
-
-- **Status:** accepted
-- **Date:** {YYYY-MM-DD}
-- **Initiative:** {NN-slug}
-
-{1-3 paragraphs: context, what was decided, why.}
-```
-
-A one-paragraph ADR is fine. Status values: `accepted | deprecated | superseded by {N.M}`. Optional sections
-(`Considered Options`, `Consequences`) only when they add genuine value — most ADRs don't need them.
-
-**Write the file, then update the index.** After writing `design-docs/adr/{N.M}-slug.md`, update `design-docs/ADR.md`:
-
-```markdown
-# ADR Index
-
-## Accepted
-
-- [4.1 Event-sourced write model](./adr/4.1-event-sourced-write-model.md) — initiative `04-orders-refactor`, 2026-05-15
-- ...
-
-## Deprecated
-
-- [2.1 ...] — superseded by 4.1
-
-## Superseded
-
-- ...
-```
-
-If `design-docs/ADR.md` does not exist, create it on the first ADR write. Create `design-docs/adr/` lazily on the same
-write.
+"Multiple paths exist — commit to one and record it?" Uncertainty alone earns no ADR; the `adr` skill's test decides.
 
 **Cross-reference from alignment.md.** Add a line under `## Recorded ADRs` pointing at the ADR file. Do not copy ADR
 content into `alignment.md` — the ADR file is the source of truth.
@@ -251,7 +187,7 @@ during alignment, written as loosely as the current view allows.)
 
 (Only when ADRs were written during this alignment. List paths — ADR content lives in the files, not here.)
 
-- [ADR 4.1: Event-sourced write model](./adr/4.1-event-sourced-write-model.md)
+- [4.1 Event-source the write model](/design-docs/adr/4.1-write-model.md)
 ```
 
 ## Rules
@@ -261,12 +197,8 @@ during alignment, written as loosely as the current view allows.)
 - **Living artifact.** `alignment.md` may be updated throughout development. Immutable only when moved to `completed/`.
 - **Always persists to disk.** No "skip file" option. Brief and research may live in conversation context; alignment
   always writes to the filesystem.
-- **ADRs are standalone files, not alignment sections.** Each ADR lives at `design-docs/adr/{N.M}-slug.md`. The ADR file
-  is the source of truth; `alignment.md` only references it.
-- **ADRs outlive their initiative.** When the initiative moves to `completed/`, ADRs stay in `design-docs/adr/`.
-  Lifecycle is decoupled.
-- **Update the ADR index on every write.** `design-docs/ADR.md` is the single discoverability surface for ADRs across
-  all initiatives — a stale index is a broken contract.
+- **ADRs belong to the `adr` skill.** Alignment writes every record and every index line through it, and `alignment.md`
+  only links the records.
 - **Glossary maintenance is alignment's job.** Discovery flags ambiguities; alignment resolves them by invoking the
   `glossary` skill before Phase 4.
 - **Complexity is a signal.** If the user struggles to answer your questions during alignment, the scope is too large or

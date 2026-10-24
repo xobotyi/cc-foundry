@@ -25,8 +25,8 @@ surfaces codebase patterns for human correction before implementation, and enfor
 
 - **Discovery** — stress-test the idea through adversarial questioning, against the project glossary → brief
 - **Research** — parallel codebase investigation blind to intent → research document
-- **Alignment** — surface patterns, align on end state, write standalone ADRs, maintain the glossary → alignment
-  document
+- **Alignment** — surface patterns, align on end state, record decisions through `adr`, maintain the glossary →
+  alignment document
 - **Frame** — vertical slice phases with per-phase testing strategy → frame document
 - **Tasks** — decompose phases into sized, dependency-mapped work items → task breakdown
 - **task-creation** (standalone) — write the item for its reader, verify every claim in it, take approval → tracked
@@ -107,10 +107,8 @@ including not-yet-specified items from the brief that research has sharpened eno
 trade-off surfaces and no option is clearly right, alignment can fan out parallel subagents, each designing the same
 decision under a different bias, then compare and recommend — so the first workable design doesn't win by default.
 Before completing the end-state phase, alignment maintains the glossary — resolving ambiguities discovery flagged,
-sharpening definitions, and (on the first iteration) creating the glossary if none exists. When genuine trade-offs
-surface, alignment writes standalone ADRs to `design-docs/adr/{N.M}-slug.md` and updates the `design-docs/ADR.md` index.
-ADRs are gated by a strict three-part test: hard-to-reverse, surprising-without-context, and a real trade-off. ADRs
-outlive their parent initiative — they stay in `design-docs/adr/` even when the initiative moves to `completed/`.
+sharpening definitions, and (on the first iteration) creating the glossary if none exists. Each decision the dialog
+settles goes to the `adr` skill, which decides whether it earns a record and writes it.
 
 **Use when:** Research findings are available and you need to align on solution direction before implementation. This is
 where you correct the agent's understanding before it writes 2,000 lines of code based on wrong assumptions.
@@ -229,6 +227,10 @@ tracker is driven.
 diagramming is a cross-cutting companion — not a pipeline stage. Invoke alongside alignment or frame when creating
 visual artifacts, or standalone for any diagramming task.
 
+adr outlives the pipeline run that first calls it. Alignment hands it each decision an initiative settles, and from then
+on the agents implementing, refactoring, or removing the governed code keep the records true through the same skill.
+Alignment adds no ADR rules of its own, so a record looks the same whether planning or implementation wrote it.
+
 ## Document Conventions
 
 Initiative artifacts are stored in `design-docs/` with consistent numbering:
@@ -241,10 +243,10 @@ Initiative artifacts are stored in `design-docs/` with consistent numbering:
 
 ADRs and the glossary live alongside but on different lifecycles:
 
-- ADR: `design-docs/adr/{N.M}-slug.md` — `N` is the initiative number that birthed the ADR, `M` is the sequence within
-  that initiative (initiative `04` writing two ADRs creates `4.1-*.md` and `4.2-*.md`).
-- ADR index: `design-docs/ADR.md` — flat index grouped by status (Accepted / Deprecated / Superseded), updated by
-  `alignment` on every ADR write.
+- ADR: `design-docs/adr/{N.M}-topic.md` — `N` is the number of the initiative that recorded it, `M` the sequence within
+  that group, and the topic names the question the ADR answers, so a rewrite never renames the file.
+- ADR index: `design-docs/ADR.md` — one line per ADR, grouped by the code area it governs, imported into CLAUDE.md;
+  maintained by `adr` with every ADR change.
 - Glossary: `docs/glossary.md` — created by `alignment` when missing, updated as terms are resolved during alignment.
 
 Brief, research, and tasks have optional file persistence — the user may keep them in conversation context only.

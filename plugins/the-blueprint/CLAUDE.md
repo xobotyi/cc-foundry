@@ -9,7 +9,7 @@ Pipeline stages in order, each owning one artifact:
 
 - **`discovery`** — the brief
 - **`research`** — the research document, compiled by the lead from teammate findings
-- **`alignment`** — the alignment document, the ADRs, the ADR index, the glossary
+- **`alignment`** — the alignment document and the glossary; hands each settled decision to `adr`
 - **`frame`** — the frame document
 - **`tasks`** — the task breakdown: sizing, dependencies, phase coverage, AFK/HITL, the tasks-document format
 
@@ -37,9 +37,11 @@ Standalone, invocable outside the pipeline:
 
 - **The artifact chain is path-coupled.** Every stage loads its predecessor from `design-docs/NN-name.{stage}.md`,
   checking conversation context before disk. Renaming the scheme in one skill breaks every downstream loader.
-- **`alignment` is the sole writer of ADRs, the ADR index, and the glossary.** All three outlive the initiative and
-  never move to `completed/`. Changing the `design-docs/adr/{N.M}-slug.md` path, the numbering, or the index grouping
-  touches `alignment` and `glossary` together.
+- **`adr` owns the ADRs and the ADR index; `alignment` writes them only through it.** Alignment states no ADR rule of
+  its own — a local variant in alignment is the drift this split exists to prevent. `alignment` is the sole writer of
+  the glossary. ADRs, the index, and the glossary outlive the initiative and never move to `completed/`. Changing the
+  `design-docs/adr/{N.M}-topic.md` path or the numbering touches `adr`, its two templates, and `alignment`'s Phase 4
+  together.
 - **Persistence tiers differ by artifact.** `alignment`, `frame`, ADRs, and the ADR index always write to disk; brief,
   research, and tasks are optional and may stay in conversation context — which is why every loader checks context
   first.
