@@ -339,13 +339,14 @@ With `pytest-asyncio`:
 
 ```python
 import pytest
+import pytest_asyncio
 
 @pytest.mark.asyncio
 async def test_async_fetch():
     result = await fetch_data("https://api.example.com")
     assert result.status == 200
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def async_client():
     async with AsyncClient() as client:
         yield client
@@ -356,7 +357,9 @@ async def test_with_async_client(async_client):
     assert response.status_code == 200
 ```
 
-- **`@pytest.mark.asyncio`** on every async test (or configure `asyncio_mode = "auto"` in `pyproject.toml`).
+- **`@pytest.mark.asyncio`** on every async test and **`@pytest_asyncio.fixture`** on every async fixture, in the
+  default `strict` mode. An `async def` under `@pytest.fixture` fails at setup: no plugin handles it. Configuring
+  `asyncio_mode = "auto"` in `pyproject.toml` lifts both requirements.
 - **Async fixtures** work with `yield` for teardown — same pattern as sync fixtures.
 
 ## conftest.py Patterns

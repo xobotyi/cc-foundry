@@ -15,7 +15,8 @@ asyncio_mode = "auto"  # auto-detect async tests (recommended)
 ```
 
 - **`auto`** — Async tests and fixtures detected automatically — no decorator needed
-- **`strict`** — Requires explicit `@pytest.mark.asyncio` on every async test (default)
+- **`strict`** — Requires explicit `@pytest.mark.asyncio` on every async test and `@pytest_asyncio.fixture` on every
+  async fixture (default)
 
 With `auto` mode, any `async def test_*` function is treated as an async test without needing `@pytest.mark.asyncio`.
 
@@ -32,12 +33,12 @@ asyncio_default_fixture_loop_scope = "session"
 ### Async Fixtures
 
 ```python
-@pytest.fixture
+@pytest_asyncio.fixture
 async def async_client():
     async with httpx.AsyncClient(base_url="http://test") as client:
         yield client
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def database():
     db = await Database.connect("postgresql://test")
     yield db
