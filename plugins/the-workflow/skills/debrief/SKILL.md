@@ -133,7 +133,9 @@ memory entry — the target path, the verdict, and the exact text to write. The 
 nothing before the user answers. Apply only the approved items, in the approved wording.
 
 The written text states the rule in force. It carries no date, session id, quote, or account of the correction — the
-evidence stays in this conversation. Match the placement and style of the rules around it.
+evidence stays in this conversation. A rule that holds only while an outside fact holds — an open upstream bug, a tool
+version — names that fact with its version or issue, so a later reader can tell when the rule stops holding. Match the
+placement and style of the rules around it.
 
 ## Phase 5 — Report
 
