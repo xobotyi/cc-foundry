@@ -100,6 +100,10 @@ The argument sets the scope:
 - **`/debrief 7d everywhere`** — every repository with transcripts. A correction that recurs across repositories becomes
   a personal rule rather than a project one.
 
+A wide scope can turn up hundreds of candidates. The agent then reads a one-line index of all of them first and opens in
+full only the ones that can hold a lesson, so a run over every repository and the whole retained history still fits in
+one session.
+
 Before it proposes a rule, the skill reads the target file end to end, because the usual case is a rule that already
 says the same thing in other words. It runs on a bare Claude Code install. When the session has a memory server, a
 search server, or an issue tracker, it also checks each lesson against the decisions recorded there. Claude Code deletes

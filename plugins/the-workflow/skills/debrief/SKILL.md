@@ -56,7 +56,17 @@ the rest:
 - **`memory`** — an entry of the repository's auto memory, present only where auto memory is on. `text` is its
   description and body, `type` its memory type, `file` its path, `project` its repository.
 
-When the count is above 300, stop and ask the user for a narrower window. Read the file in slices of 100 lines.
+With 100 candidates or fewer, read the file in slices of 100 lines. Above that, triage in two passes:
+
+1. Write the index, `node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mjs --index <file> > <file>.index`, and read
+   it in slices of 200 rows. A row is a candidate's line number in the file, its signal, its repository, its date, and
+   the start of its text.
+2. Choose every candidate that is not a `follow-up` or `mid-turn`, and every `follow-up` or `mid-turn` whose text reads
+   as a correction under phase 2. Write the chosen candidates in full,
+   `node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mjs --pick <file> --lines <n,n,…> > <file>.picked`, and read
+   that file in slices of 100 lines.
+
+Above 2,000 candidates, stop and ask the user for a narrower window.
 
 ## Phase 2 — Classify
 

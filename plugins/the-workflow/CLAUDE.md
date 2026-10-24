@@ -47,7 +47,9 @@ structured context transfer across a boundary, and the user's corrections turned
   for one. The `handoff` rule on `description` and `when_to_use` applies here too
 - Never give debrief `context: fork`. The gate needs the user's answer on each lesson, and a forked run has no user to
   ask
-- The skill keeps no state between runs — a ledger of processed candidates grows without bound
+- The skill keeps no state between runs — a ledger of processed candidates grows without bound, and a cursor that skips
+  sessions already read hides the recurrence that makes a lesson. Every run rereads its whole window; volume is handled
+  by the two-pass index and pick, never by skipping history
 - The transcript format is undocumented and changes between CLI versions. `.dev/extract-corrections.test.mjs` pins every
   marker the extractor relies on; run `node --test plugins/the-workflow/skills/debrief/.dev/` after any change to the
   script, and add a fixture entry for each new marker
