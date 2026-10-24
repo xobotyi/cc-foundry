@@ -25,10 +25,15 @@ With `auto` mode, any `async def test_*` function is treated as an async test wi
 ```toml
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 ```
 
-- **`function`** — Fresh event loop per test (more isolated, default)
-- **`session`** — One event loop for the entire test run (faster, shared connections)
+- **`asyncio_default_fixture_loop_scope`** — the loop async fixtures run in. Unset, each fixture runs in the loop of its
+  own scope
+- **`asyncio_default_test_loop_scope`** — the loop async tests run in. Unset, it is `function`: a fresh loop per test
+- What a fixture starts on its loop — a server, a connection pool, a background task — runs only while that loop runs. A
+  session-loop fixture serving function-loop tests stalls them: set both options to `"session"`, or pass
+  `loop_scope="session"` to `@pytest_asyncio.fixture` and `@pytest.mark.asyncio`
 
 ### Async Fixtures
 
@@ -52,8 +57,6 @@ sync test can use async fixtures and vice versa when pytest-asyncio is configure
 
 - Test classes subclassing `unittest.TestCase` are **not supported** — use `unittest.IsolatedAsyncioTestCase` instead or
   plain pytest async tests
-- When using `scope="session"` on async fixtures, configure `asyncio_default_fixture_loop_scope = "session"` to avoid
-  loop mismatch errors
 
 ## pytest-mock
 
