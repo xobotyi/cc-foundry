@@ -153,7 +153,7 @@ activates buttons, checkboxes, toggles. Escape closes overlays.
 - Never `outline: none` without a custom focus style replacement.
 - Use `:focus-visible` for keyboard-only focus styles.
 - Focus indicator: at least 3:1 contrast against adjacent background.
-- Focus indicator area: at least 2px border equivalent (WCAG 2.4.13).
+- Focus indicator area: at least 2px border equivalent (WCAG 2.4.13, AAA — beyond the AA target).
 - Focused element must not be entirely obscured (WCAG 2.4.11).
 
 ### Focus Management
