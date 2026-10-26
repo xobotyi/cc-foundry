@@ -15,6 +15,5 @@
     "skills",
     "agents",
     "output-styles"
-  ],
-  "outputStyles": "./output-styles/"
+  ]
 }
