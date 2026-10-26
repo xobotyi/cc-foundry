@@ -1,9 +1,9 @@
-# .dev — Development Tools
+# Development Tools
 
-## Running Commands
+The repository's dev CLI. Run every command from the repository root.
 
 ```bash
-cd .dev
+yarn install
 yarn cli <command> [options]
 ```
 
@@ -74,7 +74,7 @@ Fetch the URLs listed in a skill's `reference-inventory.json` into a `reference/
 ```bash
 yarn cli docs-fetch <inventory-path> [--dirty]
 
-# e.g. yarn cli docs-fetch ../plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json
+# e.g. yarn cli docs-fetch plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json
 ```
 
 **Arguments:**

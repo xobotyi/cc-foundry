@@ -158,11 +158,11 @@ summarization over a fixed set of documents.
 12. **Fetch and distill** — fetch docs, then distill into `references/*.md` files:
 
     ```bash
-    cd .dev && yarn cli docs-fetch <path-to-inventory.json>
+    yarn cli docs-fetch <path-to-inventory.json>
     ```
 
     URLs ending in `.md`/`.mdx` fetch as raw markdown. Others convert from HTML. Full CLI docs:
-    [.dev/CLAUDE.md](.dev/CLAUDE.md)
+    [src/CLAUDE.md](/src/CLAUDE.md)
 
 ## Phase 3: Write
 

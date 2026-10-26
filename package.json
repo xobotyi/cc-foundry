@@ -6,7 +6,7 @@
   "packageManager": "yarn@4.13.0",
   "scripts": {
     "cli": "node src/index.ts",
-    "test": "node --test --test-reporter=spec",
+    "test": "node --test --test-reporter=spec \"src/**/*.test.ts\"",
     "typecheck": "tsc"
   },
   "bin": {
