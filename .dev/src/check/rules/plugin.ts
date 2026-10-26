@@ -66,21 +66,22 @@ export async function defaultLocations(repo: Repo): Promise<Finding[]> {
     repo.plugins.map(async (plugin) => {
       const file = `${plugin.path}/.claude-plugin/plugin.json`;
       const text = await fs.readFile(path.join(repo.root, file), "utf-8");
-      return DEFAULT_LOCATIONS.flatMap(({ key, location }): Finding[] => {
-        const value = valueAt(plugin.manifest.raw, key);
-        const paths = typeof value === "string" ? [value] : Array.isArray(value) ? value : [];
-        if (paths.length === 0 || !paths.every((p) => typeof p === "string" && normalize(p) === location)) return [];
-        const name = key.join(".");
-        return [
-          {
-            ...pluginError("default-paths", file, `"${name}" names its default location ./${location}`),
-            line: lineOf(text, `"${key.at(-1)}"`),
-          },
-        ];
-      });
+      return keysNamingDefaults(plugin.manifest.raw).map(({ key, location }) => ({
+        ...pluginError("default-paths", file, `"${key.join(".")}" names its default location ./${location}`),
+        line: lineOf(text, `"${key.at(-1)}"`),
+      }));
     }),
   );
   return findings.flat();
+}
+
+/** The component keys of a manifest that name the location Claude Code reads without them. */
+export function keysNamingDefaults(manifest: JsonObject): { key: readonly string[]; location: string }[] {
+  return DEFAULT_LOCATIONS.filter(({ key, location }) => {
+    const value = valueAt(manifest, key);
+    const paths = typeof value === "string" ? [value] : Array.isArray(value) ? value : [];
+    return paths.length > 0 && paths.every((p) => typeof p === "string" && normalize(p) === location);
+  });
 }
 
 /** A hook command that names a plugin path placeholder runs in exec form: `command` plus `args`, with no shell. */
