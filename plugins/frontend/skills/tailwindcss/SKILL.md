@@ -340,7 +340,9 @@ filter, and mask utility catalogs.
 
 ## Motion and Accessibility
 
-- **Respect reduced motion.** Gate animations with `motion-safe:` or disable with `motion-reduce:transition-none`
+- **Respect reduced motion.** Gate movement — translate, scale, rotate, `animate-*` — behind `motion-safe:`, and keep
+  color and opacity transitions for everyone. `motion-reduce:transition-none` also removes the feedback that the state
+  changed
 - `sr-only` / `not-sr-only` for screen reader accessibility
 - `forced-color-adjust-none` only for elements where forced colors destroys essential visual information — always
   include `sr-only` text label

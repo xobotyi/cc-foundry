@@ -158,27 +158,30 @@ sizes.
 
 ```css
 /* Default: with motion */
-.element {
-  transition: transform 0.3s ease;
+.panel {
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .element {
-    transition: none;
+  .panel {
+    transition: opacity 0.15s ease;  /* the panel fades instead of sliding */
   }
 }
 
 /* Or: progressive enhancement approach */
-.element {
-  transition: none;  /* default: no motion */
+.panel {
+  transition: opacity 0.15s ease;  /* default: fade only */
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .element {
-    transition: transform 0.3s ease;
+  .panel {
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
 }
 ```
+
+The reduced branch keeps the opacity transition. WCAG 2.3.3 does not count opacity or color change as motion, and
+`transition: none` would also remove the only sign that the state changed.
 
 ### High Contrast
 

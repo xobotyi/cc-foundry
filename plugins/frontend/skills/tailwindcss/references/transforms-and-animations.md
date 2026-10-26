@@ -47,10 +47,10 @@ Then use `ease-in-expo`.
 **Reduced motion — always respect user preferences:**
 
 ```html
-<!-- Disable transition for motion-sensitive users -->
-<button class="transition motion-reduce:transition-none ...">...</button>
-<!-- Disable animation -->
-<svg class="animate-spin motion-safe:animate-spin ...">...</svg>
+<!-- Movement only without the reduce preference; the color transition stays for everyone -->
+<button class="transition hover:bg-indigo-500 motion-safe:hover:-translate-y-1 ...">Save</button>
+<!-- Spin only without the reduce preference -->
+<svg class="motion-safe:animate-spin ...">...</svg>
 ```
 
 ---

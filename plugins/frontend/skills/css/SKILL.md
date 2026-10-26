@@ -167,8 +167,9 @@ Shorthands: `margin-block: 1rem 2rem` (block-start, block-end); `margin-inline: 
 
 - Color scheme: declare `color-scheme: light dark` on `:root` and use `@media (prefers-color-scheme: dark)` for
   overrides
-- Reduced motion: either remove motion in `prefers-reduced-motion: reduce` or add motion only in
-  `prefers-reduced-motion: no-preference` (progressive enhancement approach)
+- Reduced motion removes movement, not feedback. Under `prefers-reduced-motion: reduce`, replace a transform, size, or
+  position change with a short opacity or color transition. WCAG 2.3.3 does not count opacity or color change as motion.
+  Add the movement only in `prefers-reduced-motion: no-preference` (progressive enhancement), or remove it in `reduce`
 - High contrast: `@media (prefers-contrast: more)`
 - Interaction: `@media (hover: hover)` for hover effects on capable devices; `@media (pointer: coarse)` for touch
   targets (min 44px)
