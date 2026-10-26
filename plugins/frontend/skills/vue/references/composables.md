@@ -64,21 +64,30 @@ export function useFetch(url: MaybeRefOrGetter<string>) {
   const data = ref<unknown>(null)
   const error = ref<Error | null>(null)
 
-  watchEffect(() => {
+  watchEffect((onCleanup) => {
     data.value = null
     error.value = null
 
-    fetch(toValue(url))
-      .then(res => res.json())
+    const controller = new AbortController()
+    onCleanup(() => controller.abort())
+
+    fetch(toValue(url), { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
       .then(json => { data.value = json })
-      .catch(err => { error.value = err })
+      .catch(err => {
+        if (!controller.signal.aborted) error.value = err
+      })
   })
 
   return { data, error }
 }
 ```
 
-Calling `toValue()` inside `watchEffect` ensures the reactive source is tracked.
+Calling `toValue()` inside `watchEffect` ensures the reactive source is tracked. The cleanup aborts the previous request
+when the URL changes, so a slow older response never overwrites a newer one.
 
 Usage:
 
