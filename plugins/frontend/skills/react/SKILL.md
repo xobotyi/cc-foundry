@@ -332,6 +332,19 @@ using the compiler:
 Start rendering immediately, stream slower parts as they resolve. Create promises in Server Components, pass to Client
 Components, read with `use()` inside `<Suspense>`.
 
+### Hydration
+
+The first client render must produce the server's HTML. Treat a mismatch as a bug. A mismatch comes from:
+
+- a value that differs between the two runs — `Date.now()`, `Math.random()`, locale or time-zone formatting
+- a browser-only read during render — a `typeof window` check, `window.matchMedia`, `localStorage`
+- invalid HTML nesting, such as `<div>` inside `<p>`: the browser's parser rewrites the server HTML before React
+  hydrates
+
+Render a client-only value in a second pass, from state that an Effect sets after hydration. Generate ids with `useId`.
+Put `suppressHydrationWarning` only on the one element whose text must differ, such as a timestamp: it works one level
+deep, and React does not patch the mismatched text.
+
 ### Bundle Optimization
 
 - Avoid barrel file imports — `import { Button } from '@/components/Button'` not `from '@/components'`.

@@ -210,6 +210,17 @@ catalog in `${CLAUDE_SKILL_DIR}/references/sfc.md`.
 - Simple expressions only in templates. Move logic to `computed` or functions.
 - Multi-attribute elements span multiple lines — one attribute per line.
 
+## SSR Hydration
+
+The first client render must produce the server's HTML. A mismatch comes from:
+
+- invalid HTML nesting, such as `<div>` inside `<p>`: the browser's parser rewrites the server HTML before Vue hydrates
+- a value that differs between the two runs — a random value, the current time, a local-time conversion done in the
+  server's time zone
+
+Render such a value only on the client, behind a `v-if` flag that `onMounted` sets. Reserve `data-allow-mismatch` (3.5+)
+for one element whose text must differ; it silences the warning, not the cause.
+
 ## Composables
 
 ### Design
