@@ -282,6 +282,9 @@ patterns. Subagents exploring Go code reach the same LSP server — instruct the
 
 - **`golangci-lint run` must pass before a commit**, and **`golangci-lint fmt`** formats — never run `gofmt` or
   `goimports` separately.
+- **`govulncheck ./...` must exit 0 before a commit that changes `go.mod`.** It traces calls only from the packages in
+  its pattern, so a narrower pattern hides reachable vulnerabilities. `-json` and the `json`, `sarif`, and `openvex`
+  formats exit 0 whatever they report, so none of them is a gate.
 - **`go fix` after raising the `go` directive.** It applies the modernizers mechanically; review the diff as a normal
   change.
 - **`tool` directives in `go.mod` track executable dependencies.** Add with `go get -tool`, run with `go tool <name>`.
