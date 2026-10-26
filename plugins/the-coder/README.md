@@ -27,8 +27,14 @@ brings engineering judgment, incremental commits, and a skill queue system that 
 ## Installation
 
 ```
+/plugin install the-coder --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install the-coder
+/plugin install the-coder@foundry
 ```
 
 ## Skills

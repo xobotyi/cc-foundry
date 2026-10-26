@@ -112,8 +112,14 @@ transcripts after `cleanupPeriodDays`, 30 days by default, so a run sees only wh
 ## Installation
 
 ```
+/plugin install the-workflow --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install the-workflow
+/plugin install the-workflow@foundry
 ```
 
 Installing the-workflow also installs `ai-helpers`, because the `claude-md` skill loads its `prompt-engineering` skill

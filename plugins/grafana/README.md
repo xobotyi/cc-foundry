@@ -19,8 +19,14 @@ perceptually sound design choices, not just technically valid ones.
 ## Installation
 
 ```
+/plugin install grafana --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install grafana
+/plugin install grafana@foundry
 ```
 
 ## Skills

@@ -7,12 +7,26 @@ turns AI-artifact work into trial and error, and ships code without validation. 
 
 ## Installation
 
-Add the marketplace, then install any plugin:
+Install any plugin in one step. The command adds the marketplace the first time:
+
+```
+/plugin install <plugin-name> --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
 
 ```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install <plugin-name>
+/plugin install <plugin-name>@foundry
 ```
+
+### Updates
+
+Claude Code does not update plugins from this marketplace in the background until you turn it on. Run `/plugin`, open
+the **Marketplaces** tab, select **foundry**, and select **Enable auto-update**.
+
+To update by hand, select **Update marketplace** on the same screen. It refreshes the plugin list and updates every
+plugin you installed from foundry. From the shell, `claude plugin update <plugin-name>@foundry` updates one plugin.
 
 ## Workflow Plugins
 
@@ -24,7 +38,7 @@ editing, and after loading skills. The framework treats skills as non-atomic, so
 sends Claude back to the unread references of skills it already loaded.
 
 ```
-/plugin install skill-enforcer
+/plugin install skill-enforcer --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -39,7 +53,7 @@ audit: before each commit the drafted message is checked paragraph by paragraph 
 committed.
 
 ```
-/plugin install git-commit
+/plugin install git-commit --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -55,7 +69,7 @@ submit. Neither treats machine authorship as a defect to hide, and neither touch
 which stay with `the-coder` and `git-commit`.
 
 ```
-/plugin install open-source
+/plugin install open-source --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -74,7 +88,7 @@ behavior an agent has to know: what a project configures, what a write changes b
 failures report success), and `diagramming` (Excalidraw and Mermaid with visual design principles).
 
 ```
-/plugin install the-blueprint
+/plugin install the-blueprint --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -87,7 +101,7 @@ plugin provides a `coding` skill that enforces a discovery-first workflow (Disco
 skill runs on top of it.
 
 ```
-/plugin install the-coder
+/plugin install the-coder --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -101,7 +115,7 @@ color urgency increases as context or rate limits run low. Auto-syncs on every s
 directory changes.
 
 ```
-/plugin install the-statusline
+/plugin install the-statusline --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -120,7 +134,7 @@ agent, in this repository or across all of them, and turns each lesson that outl
 the agent reads next time, after the user approves it.
 
 ```
-/plugin install the-workflow
+/plugin install the-workflow --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -135,7 +149,7 @@ weak drafts and damages strong ones. Hard constraints: never fabricate specifics
 conserve every claim, fix writing for readers and never for AI detectors.
 
 ```
-/plugin install the-writer
+/plugin install the-writer --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -150,7 +164,7 @@ transcript Claude Code already writes, so the model never subtracts timestamps a
 period is configurable.
 
 ```
-/plugin install wall-clock
+/plugin install wall-clock --marketplace xobotyi/cc-foundry
 ```
 
 ### plugin-rollcall
@@ -163,7 +177,7 @@ plugins it reloaded. It only reads, and it does nothing in sessions where every 
 Install it at user scope.
 
 ```
-/plugin install plugin-rollcall
+/plugin install plugin-rollcall --marketplace xobotyi/cc-foundry
 ```
 
 ## AI Artifact Plugins
@@ -176,7 +190,7 @@ skills encoding best practices for each artifact type: `prompt-engineering` (fou
 prompt-engineering fundamentals. Includes an `ai-engineer` output style for collaborative artifact work.
 
 ```
-/plugin install ai-helpers
+/plugin install ai-helpers --marketplace xobotyi/cc-foundry
 ```
 
 ## Language Discipline Plugins
@@ -191,7 +205,7 @@ terminal UIs with the Charmbracelet v2 stack (Bubble Tea, Bubbles, Lip Gloss, Hu
 validation.
 
 ```
-/plugin install golang
+/plugin install golang --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -207,7 +221,7 @@ toolchain), and `vitest` (Vitest, carrying the configuration renames across majo
 on file context.
 
 ```
-/plugin install javascript
+/plugin install javascript --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -222,7 +236,7 @@ tests, the `expect()` API, datasets, architecture/mutation/type-coverage/browser
 semantic code navigation.
 
 ```
-/plugin install php
+/plugin install php --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -235,7 +249,7 @@ annotations (built-in generics, `|` unions, protocols), data classes, pattern ma
 markers, mocking, async testing, conftest patterns).
 
 ```
-/plugin install python
+/plugin install python --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -249,7 +263,7 @@ handles ownership and borrowing, error handling (`thiserror`/`anyhow`), traits a
 proptest, insta, criterion, mockall, rstest). Bundled rust-analyzer LSP for semantic code navigation.
 
 ```
-/plugin install rust
+/plugin install rust --marketplace xobotyi/cc-foundry
 ```
 
 ## Platform Discipline Plugins
@@ -265,7 +279,7 @@ design, methodologies), `tailwindcss` (Tailwind v4 CSS-first config, `@theme` to
 and states). Keeps platform discipline separate from language discipline.
 
 ```
-/plugin install frontend
+/plugin install frontend --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -279,7 +293,7 @@ Building reliable services requires consistent approaches to observability and i
 guidance in `observability`; tool-specific depth in the others.
 
 ```
-/plugin install backend
+/plugin install backend --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -295,7 +309,7 @@ hierarchy, color theory, dashboard layout, observability frameworks). Companion 
 telemetry, grafana consumes it.
 
 ```
-/plugin install grafana
+/plugin install grafana --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -308,7 +322,7 @@ configuration hierarchy, signal handling) for CLIs written in any language, whil
 implementation layer (strict mode, quoting, portability, error handling) for scripts written in shell.
 
 ```
-/plugin install cli
+/plugin install cli --marketplace xobotyi/cc-foundry
 ```
 
 ---
@@ -327,7 +341,7 @@ a tunnel, or an IDS rule does once loaded: evaluation order, trust lists, and th
 devops skill and the tool skill are active together across the whole change.
 
 ```
-/plugin install infrastructure
+/plugin install infrastructure --marketplace xobotyi/cc-foundry
 ```
 
 ## License

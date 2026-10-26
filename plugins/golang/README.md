@@ -35,8 +35,14 @@ Make sure `$GOPATH/bin` (or `$HOME/go/bin`) is in your PATH.
 ## Installation
 
 ```
+/plugin install golang --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install golang
+/plugin install golang@foundry
 ```
 
 ## Skills

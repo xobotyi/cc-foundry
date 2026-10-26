@@ -33,8 +33,14 @@ minimal filler, iterative refinement focus.
 ## Installation
 
 ```
+/plugin install ai-helpers --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install ai-helpers
+/plugin install ai-helpers@foundry
 ```
 
 ## Skills

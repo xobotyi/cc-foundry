@@ -39,8 +39,14 @@ produce a stale reading.
 ## Installation
 
 ```
+/plugin install wall-clock --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install wall-clock
+/plugin install wall-clock@foundry
 ```
 
 ## Configuration

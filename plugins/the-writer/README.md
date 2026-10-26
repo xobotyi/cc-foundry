@@ -61,8 +61,14 @@ markers that failed to replicate and the ones no study has measured.
 ## Installation
 
 ```
+/plugin install the-writer --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install the-writer
+/plugin install the-writer@foundry
 ```
 
 ## Usage

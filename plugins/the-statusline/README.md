@@ -40,8 +40,14 @@ Color urgency increases as context or the rate limit runs low: gray â†’ yellow â
 ## Installation
 
 ```
+/plugin install the-statusline --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install the-statusline
+/plugin install the-statusline@foundry
 ```
 
 The plugin automatically:

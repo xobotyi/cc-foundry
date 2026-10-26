@@ -43,8 +43,14 @@ npm install -g intelephense
 ## Installation
 
 ```
+/plugin install php --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install php
+/plugin install php@foundry
 ```
 
 ## Skills

@@ -43,8 +43,14 @@ formatting conventions the audit measures against.
 ## Installation
 
 ```
+/plugin install git-commit --marketplace xobotyi/cc-foundry
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+
+```
 /plugin marketplace add xobotyi/cc-foundry
-/plugin install git-commit
+/plugin install git-commit@foundry
 ```
 
 ## Usage

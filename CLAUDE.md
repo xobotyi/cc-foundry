@@ -79,10 +79,15 @@ process (Research → Scaffold → Write → Ship).
 
 **Installation instructions:**
 
-- All plugin READMEs must use marketplace commands:
+- Every plugin README's Installation section gives the one-step command, then the two-step form for Claude Code before
+  2.1.275 — `claude plugin validate .` advises the one-step line, and `@foundry` refreshes a stale catalog before the
+  lookup:
+  ```
+  /plugin install <plugin-name> --marketplace xobotyi/cc-foundry
+  ```
   ```
   /plugin marketplace add xobotyi/cc-foundry
-  /plugin install <plugin-name>
+  /plugin install <plugin-name>@foundry
   ```
 - Do not use manual cp/ln installation methods
 
