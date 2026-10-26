@@ -7,6 +7,10 @@ lost, and what would reopen it.
 - A task that conflicts with a listed decision stops and asks; it does not change the decision or work around it.
 - Writing, changing, or removing a record follows the `the-blueprint:adr` skill.
 
+## .claude-plugin
+
+- [1.12 Keep plugin metadata in plugin.json and only catalog fields in the marketplace entry](/design-docs/adr/1.12-plugin-metadata-source.md)
+
 ## .claude/skills/release
 
 - [1.5 Ship one GitHub release per plugin version bump as its changelog](/design-docs/adr/1.5-plugin-changelog.md)

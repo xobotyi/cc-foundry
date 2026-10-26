@@ -182,7 +182,6 @@ summarization over a fixed set of documents.
 16. **Update documentation** — plugin CLAUDE.md (skill table, flow diagram if applicable), plugin README.md (skill
     listing), root CLAUDE.md structure diagram (only if new plugin).
 
-17. **Version bump** — update both `plugins/<plugin>/.claude-plugin/plugin.json` and root
-    `.claude-plugin/marketplace.json`.
+17. **Version bump** — update the version in `plugins/<plugin>/.claude-plugin/plugin.json`.
 
 </workflow>

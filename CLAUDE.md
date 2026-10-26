@@ -101,11 +101,12 @@ process (Research → Scaffold → Write → Ship).
 - It uses such a system when the session shows it is present, and the plugin's text names the system by the role it
   fills, never by product name
 
-**Version management:**
+**Plugin metadata and versions:**
 
-- Plugin versions must be synchronized between each plugin's `.claude-plugin/plugin.json` and the repo-root
-  `.claude-plugin/marketplace.json` (which lists all plugins in a single file)
-- Update both files when bumping versions
+- A plugin's version, description, keywords, and every other field `plugin.json` accepts live only in its
+  `.claude-plugin/plugin.json`. Its entry in `.claude-plugin/marketplace.json` holds `name`, `source`, `category`, and
+  `tags` ([ADR 1.12](/design-docs/adr/1.12-plugin-metadata-source.md))
+- A version bump changes `plugin.json` only
 - Every plugin version bump pushed to master ships with a GitHub release whose notes are the plugin's changelog — no
   CHANGELOG.md files. Workflow: the `release` skill (`.claude/skills/release/`); rationale:
   [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)
