@@ -107,6 +107,9 @@ process (Research → Scaffold → Write → Ship).
   `.claude-plugin/plugin.json`. Its entry in `.claude-plugin/marketplace.json` holds `name`, `source`, `category`, and
   `tags` ([ADR 1.12](/design-docs/adr/1.12-plugin-metadata-source.md))
 - A version bump changes `plugin.json` only
+- Renaming or removing a plugin adds a key to `renames` in `.claude-plugin/marketplace.json`: the old name maps to the
+  new name, or to `null` for a removal. Never edit or delete an existing key — Claude Code follows the chain from the
+  oldest name, and `forceRemoveDeletedPlugins` uninstalls an unmapped old name instead of migrating it
 - Every plugin version bump pushed to master ships with a GitHub release whose notes are the plugin's changelog — no
   CHANGELOG.md files. Workflow: the `release` skill (`.claude/skills/release/`); rationale:
   [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)

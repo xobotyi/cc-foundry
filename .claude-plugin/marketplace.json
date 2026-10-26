@@ -7,6 +7,12 @@
 	"metadata": {
 		"description": "Shared Claude Code configurations, skills, agents, and commands"
 	},
+	"forceRemoveDeletedPlugins": true,
+	"renames": {
+		"skill-reminder": "skill-enforcer",
+		"the-crucible": null,
+		"the-kensai": null
+	},
 	"plugins": [
 		{
 			"name": "skill-enforcer",
