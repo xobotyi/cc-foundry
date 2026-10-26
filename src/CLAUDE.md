@@ -59,8 +59,9 @@ vp run typecheck   # tsc
 - `release-version` — a plugin's version is not below its latest `<plugin>-v<X.Y.Z>` release tag
 - `unbumped-change` — a plugin whose shipped files changed keeps no unchanged version. Shipped means everything except
   `CLAUDE.md`, `README.md`, `LICENSE`, `.dev/`, `tests/`, and `*.test.*`; a `plugin.json` change counts unless it only
-  touches display keys (`description`, `keywords`, `author`, …) or a key naming its default location. A warning since
-  the latest release tag, an error under `--pre-push`
+  touches display keys (`description`, `keywords`, `author`, …) or a key naming its default location. A file whose two
+  versions format to the same text through `vp fmt` has not changed. A warning since the latest release tag, an error
+  under `--pre-push`
 - `root-docs` — the root `CLAUDE.md` names `plugins/<name>/` and the root `README.md` has a `### <name>` section, for
   every plugin. Only the names are checked, not the prose around them
 

@@ -76,6 +76,7 @@ export async function createFixture(plugins: readonly FixturePlugin[] = DEFAULT_
   };
   await write(MARKETPLACE_FILE, JSON.stringify(marketplace, null, 2) + "\n");
   await write("LICENSE", LICENSE);
+  await write("package.json", JSON.stringify({ name: "fixture", private: true }) + "\n");
   await write("CLAUDE.md", `# fixture\n\n## Plugins\n\n${plugins.map((p) => `- \`plugins/${p.name}/\``).join("\n")}\n`);
   await write("README.md", `# fixture\n\n${plugins.map((p) => `### ${p.name}\n`).join("\n")}`);
   for (const plugin of plugins) {

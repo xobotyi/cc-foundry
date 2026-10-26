@@ -1,6 +1,9 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import type { Finding } from "../finding.ts";
+import { formatted } from "../format.ts";
 import { git } from "../git.ts";
-import { isObject } from "../repo.ts";
+import { isErrnoCode, isObject } from "../repo.ts";
 import type { JsonObject, Plugin, Repo } from "../repo.ts";
 import { keysNamingDefaults } from "./plugin.ts";
 import type { RuleContext } from "./rule.ts";
@@ -81,11 +84,49 @@ export async function unbumpedChanges(repo: Repo, ctx: RuleContext): Promise<Fin
 async function shippedChanges(root: string, plugin: Plugin, base: string, prePush: boolean): Promise<string[]> {
   const range = prePush ? [base, "HEAD"] : [base];
   const out = await git(root, ["diff", "--name-only", ...range, "--", plugin.path]);
-  return out
+  const candidates = out
     .split("\n")
     .filter(Boolean)
     .map((file) => file.slice(plugin.path.length + 1))
     .filter((file) => file !== MANIFEST && !UNSHIPPED.some((pattern) => pattern.test(file)));
+  const reformatted = await Promise.all(
+    candidates.map((file) => formattingOnly(root, `${plugin.path}/${file}`, base, prePush)),
+  );
+  return candidates.filter((_, i) => !reformatted[i]);
+}
+
+/** Whether the file differs from `base` only in what the formatter rewrites, which needs no release. */
+async function formattingOnly(root: string, file: string, base: string, prePush: boolean): Promise<boolean> {
+  const [before, after] = await Promise.all([
+    contentAt(root, base, file),
+    prePush ? contentAt(root, "HEAD", file) : workingContent(root, file),
+  ]);
+  if (before === null || after === null) return false;
+  const [formattedBefore, formattedAfter] = await Promise.all([
+    formatted(root, file, before),
+    formatted(root, file, after),
+  ]);
+  return formattedBefore !== null && formattedBefore === formattedAfter;
+}
+
+/** The file's content in the working tree, or null when the change deleted it. */
+async function workingContent(root: string, file: string): Promise<string | null> {
+  try {
+    return await fs.readFile(path.join(root, file), "utf-8");
+  } catch (err) {
+    if (isErrnoCode(err, "ENOENT")) return null;
+    throw err;
+  }
+}
+
+/** The file's content at `ref`, or null when the ref has no such file. */
+async function contentAt(root: string, ref: string, file: string): Promise<string | null> {
+  try {
+    return await git(root, ["show", `${ref}:${file}`]);
+  } catch {
+    // git show fails when the ref holds no such file, which is the case this function reports as null
+    return null;
+  }
 }
 
 async function latestRelease(root: string, dir: string): Promise<{ tag: string; version: Version } | null> {

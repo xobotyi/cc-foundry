@@ -59,6 +59,23 @@ test("unbumped-change ignores docs, dev files, tests, and display-only manifest 
   expect(await unbumpedChanges(await loadRepo(fixture.root), normalRun)).toStrictEqual([]);
 });
 
+test("unbumped-change ignores a change the formatter rewrites away, and counts one it keeps", async () => {
+  await using fixture = await createFixture();
+  await fixture.write("plugins/alpha/hooks/run.js", "const greeting = 'hi'\nconsole.log(greeting)\n");
+  await fixture.commit("add the hook");
+  await fixture.git("tag", "alpha-v1.0.0");
+  await fixture.write("plugins/alpha/hooks/run.js", 'const greeting = "hi";\nconsole.log( greeting );\n');
+
+  expect(await unbumpedChanges(await loadRepo(fixture.root), normalRun)).toStrictEqual([]);
+
+  await fixture.write("plugins/alpha/hooks/run.js", "const greeting = 'hello'\nconsole.log(greeting)\n");
+
+  expect(brief(await unbumpedChanges(await loadRepo(fixture.root), normalRun))).toStrictEqual([
+    "warning plugins/alpha/.claude-plugin/plugin.json: hooks/run.js changed since alpha-v1.0.0, " +
+      "and the version is still 1.0.0",
+  ]);
+});
+
 test("unbumped-change counts a manifest key that changes the install", async () => {
   await using fixture = await released();
   await fixture.editManifest("alpha", (m) => {
