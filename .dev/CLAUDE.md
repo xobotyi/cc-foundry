@@ -31,6 +31,14 @@ yarn typecheck   # tsc
   listing) and its advice are ignored
 - Exits 1 when any finding is an error
 
+**Rules** — each finding names its rule:
+
+- `catalog-entry` — each `plugins/*/` has exactly one marketplace entry, and the directory name, entry `name`, manifest
+  `name`, and `source` (`./plugins/<name>`) agree
+- `entry-keys` — an entry carries only `name`, `source`, `category`, `tags`, and the entry-only keys `strict`,
+  `relevance`, `headers`, `headersHelper` ([ADR 1.12](/design-docs/adr/1.12-plugin-metadata-source.md))
+- `renames-history` — every plugin name in the git history of `marketplace.json` is listed today or is a `renames` key
+
 **Adding a rule:** a function in `src/check/rules/`, listed in `RULES` (`src/check/rules/index.ts`), with a test that
 breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule never repeats a check that
 `claude plugin validate` makes.
