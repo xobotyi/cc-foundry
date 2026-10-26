@@ -44,6 +44,14 @@ yarn typecheck   # tsc
   `"lspServers": "./.lsp.json"`
 - `hook-exec-form` — a hook command that names `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}` sets `args`, so no
   shell splits the expanded path
+- `skill-ref` — an explicit reference, `Skill(plugin:name)` or a code span that is exactly `plugin:name` or
+  `/plugin:name`, names a skill, agent, or command of that plugin. Only prefixes that are plugins of this marketplace
+  count, so `node:test` stays out. Scans the plugins, the root docs, `.claude/`, and `design-docs/`, skipping `.dev/`
+- `prerequisite-dependency` — a `<prerequisite>` block in a plugin's skill, agent, command, or output style that names
+  another plugin's skill needs that plugin in `dependencies` ([ADR 1.3](/design-docs/adr/1.3-skill-dependencies.md)). A
+  bare code span counts when it equals a skill name: the block's own plugin first, then the one plugin that ships it; a
+  name two other plugins ship is an error
+- `dependency-scope` — every `dependencies` entry is a plugin of this marketplace
 
 **Adding a rule:** a function in `src/check/rules/`, listed in `RULES` (`src/check/rules/index.ts`), with a test that
 breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule never repeats a check that
