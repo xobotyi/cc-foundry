@@ -80,5 +80,4 @@ for ignored instructions, and the canonical scaffold. Subagents briefed to touch
 
 ## Formatting
 
-- After editing, format the file with `yarn dlx prettier --write <file>`. The repo config picks the parser — never pass
-  `--parser`, which forces the wrong one for CLAUDE.md and SKILL.md.
+- After editing, format the file with `vp fmt <file>`.

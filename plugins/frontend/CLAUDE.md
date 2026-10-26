@@ -55,4 +55,4 @@ Frontend platform discipline: CSS, accessibility, framework conventions, and bro
   The description and `when_to_use` carry the discrimination. The two differ where this one ranks the user's instruction
   and the existing design first, examines inherited defaults, and prescribes a render pass across widths and states
 - Re-ground the references by refreshing `skills/frontend-design/.dev/reference-inventory.json` and running
-  `yarn cli docs-fetch plugins/frontend/skills/frontend-design/.dev/reference-inventory.json`
+  `vp run cli docs-fetch plugins/frontend/skills/frontend-design/.dev/reference-inventory.json`

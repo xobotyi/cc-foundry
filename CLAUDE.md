@@ -34,9 +34,9 @@ process (Research → Scaffold → Write → Ship).
 
 **Formatting:**
 
-- The repo uses Prettier for markdown formatting (`.prettierrc.yaml` at root)
-- After editing any `.md` file, run `yarn dlx prettier --write <file>` before committing
-- Never pass `--parser` — the config assigns mdx to CLAUDE.md and files under `skills/`, markdown to README.md
+- Vite+ formats and lints every file: Oxfmt and Oxlint, configured in `vite.config.ts` from the ver0 project's settings
+  (`@ver0/oxlint-config` for lint)
+- After editing any file, run `vp fmt <file>` before committing; `vp check` fails on an unformatted file
 
 **Skill structure:**
 
@@ -57,7 +57,7 @@ process (Research → Scaffold → Write → Ship).
 
 **Development artifacts:**
 
-- `src/` holds the repository's dev CLI, run from the root as `yarn cli <command>`: `check` validates the marketplace
+- `src/` holds the repository's dev CLI, run from the root as `vp run cli <command>`: `check` validates the marketplace
   and every plugin, `docs-fetch` fetches a skill's reference sources ([src/CLAUDE.md](/src/CLAUDE.md))
 - A plugin's `.dev/` directory holds its build tooling and source materials
 - `.dev/reference/` holds fetched docs (raw source, not shipped as-is)

@@ -3,8 +3,9 @@
 The repository's dev CLI. Run every command from the repository root.
 
 ```bash
-yarn install
-yarn cli <command> [options]
+vp install
+vp run cli <command> [options]
+vp check          # format, lint, and type-check every file
 ```
 
 ## Commands
@@ -14,9 +15,9 @@ yarn cli <command> [options]
 Check the marketplace and every plugin with `claude plugin validate`, then against this repository's own rules.
 
 ```bash
-yarn cli check [--pre-push] [--format text|github]
-yarn test        # node:test suites under src/
-yarn typecheck   # tsc
+vp run cli check [--pre-push] [--format text|github]
+vp run test        # node:test suites under src/
+vp run typecheck   # tsc
 ```
 
 **Flags:**
@@ -72,9 +73,9 @@ breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule nev
 Fetch the URLs listed in a skill's `reference-inventory.json` into a `reference/` directory beside that inventory file.
 
 ```bash
-yarn cli docs-fetch <inventory-path> [--dirty]
+vp run cli docs-fetch <inventory-path> [--dirty]
 
-# e.g. yarn cli docs-fetch plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json
+# e.g. vp run cli docs-fetch plugins/ai-helpers/skills/prompt-engineering/.dev/reference-inventory.json
 ```
 
 **Arguments:**
