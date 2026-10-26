@@ -19,6 +19,9 @@ export default defineConfig({
 			{files: ['**/skills/**/*.md', '**/CLAUDE.md'], options: {embeddedLanguageFormatting: 'off'}},
 		],
 	},
+	test: {
+		include: ['src/**/*.test.ts'],
+	},
 	lint: {
 		// constraint: these files type-check against types Claude Code writes only when it loads the mod
 		// interactively, so a checkout without them fails with an invalid tsconfig

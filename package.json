@@ -9,7 +9,7 @@
     "check": "vp check",
     "fmt": "vp fmt",
     "lint": "vp lint",
-    "test": "node --test --test-reporter=spec \"src/**/*.test.ts\"",
+    "test": "vp test",
     "typecheck": "tsc"
   },
   "bin": {

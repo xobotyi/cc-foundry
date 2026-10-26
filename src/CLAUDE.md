@@ -16,7 +16,7 @@ Check the marketplace and every plugin with `claude plugin validate`, then again
 
 ```bash
 vp run cli check [--pre-push] [--format text|github]
-vp run test        # node:test suites under src/
+vp test            # Vitest suites under src/
 vp run typecheck   # tsc
 ```
 

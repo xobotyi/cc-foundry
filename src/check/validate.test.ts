@@ -1,10 +1,9 @@
-import { test } from "node:test";
-import type { TestContext } from "node:test";
+import { expect, test } from "vite-plus/test";
 import { createFixture } from "./fixture.ts";
 import { loadRepo } from "./repo.ts";
 import { findingsFromReport, validateRepo } from "./validate.ts";
 
-test("findingsFromReport fails every validator issue except the accepted warnings", (t: TestContext) => {
+test("findingsFromReport fails every validator issue except the accepted warnings", () => {
   const report = {
     success: false,
     manifest: {
@@ -29,7 +28,7 @@ test("findingsFromReport fails every validator issue except the accepted warning
 
   const findings = findingsFromReport(JSON.stringify(report), "/repo");
 
-  t.assert.deepStrictEqual(findings, [
+  expect(findings).toStrictEqual([
     {
       rule: "validate",
       severity: "error",
@@ -45,7 +44,7 @@ test("findingsFromReport fails every validator issue except the accepted warning
   ]);
 });
 
-test("validateRepo reports what claude plugin validate finds in a plugin", async (t: TestContext) => {
+test("validateRepo reports what claude plugin validate finds in a plugin", async () => {
   await using fixture = await createFixture();
   await fixture.write(
     "plugins/alpha/hooks/hooks.json",
@@ -57,9 +56,6 @@ test("validateRepo reports what claude plugin validate finds in a plugin", async
 
   const findings = await validateRepo(await loadRepo(fixture.root));
 
-  t.assert.deepStrictEqual(
-    findings.map((f) => [f.file, f.severity]),
-    [["plugins/alpha/hooks/hooks.json", "error"]],
-  );
-  t.assert.match(findings[0]?.message ?? "", /without quotes/);
+  expect(findings.map((f) => [f.file, f.severity])).toStrictEqual([["plugins/alpha/hooks/hooks.json", "error"]]);
+  expect(findings[0]?.message ?? "").toMatch(/without quotes/);
 });
