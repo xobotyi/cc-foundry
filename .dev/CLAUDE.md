@@ -14,18 +14,21 @@ yarn cli <command> [options]
 Check the marketplace and every plugin with `claude plugin validate`, then against this repository's own rules.
 
 ```bash
-yarn cli check [--format text|github]
+yarn cli check [--pre-push] [--format text|github]
 yarn test        # node:test suites under src/
 yarn typecheck   # tsc
 ```
 
 **Flags:**
 
+- `--pre-push` — `unbumped-change` compares against `origin/master` instead of each plugin's latest release tag, and
+  fails instead of warning
 - `--format` — `github` prints GitHub Actions annotations, and is the default when `GITHUB_ACTIONS` is set
 
 **Behavior:**
 
 - Runs `claude plugin validate --json` on the marketplace and on each `plugins/*/`, so `claude` must be on `PATH`
+- Reads the full git history and the release tags; a shallow clone breaks `renames-history` and `unbumped-change`
 - Every validator error and warning fails the check, except the accepted warnings in `ACCEPTED_WARNINGS`
   (`src/check/validate.ts`): the plugin-root `CLAUDE.md` warning. The validator's plugin-directory checks (icon,
   listing) and its advice are ignored
@@ -52,6 +55,11 @@ yarn typecheck   # tsc
   bare code span counts when it equals a skill name: the block's own plugin first, then the one plugin that ships it; a
   name two other plugins ship is an error
 - `dependency-scope` — every `dependencies` entry is a plugin of this marketplace
+- `release-version` — a plugin's version is not below its latest `<plugin>-v<X.Y.Z>` release tag
+- `unbumped-change` — a plugin whose shipped files changed keeps no unchanged version. Shipped means everything except
+  `CLAUDE.md`, `README.md`, `LICENSE`, `.dev/`, `tests/`, and `*.test.*`; a `plugin.json` change counts unless it only
+  touches display keys (`description`, `keywords`, `author`, …) or a key naming its default location. A warning since
+  the latest release tag, an error under `--pre-push`
 
 **Adding a rule:** a function in `src/check/rules/`, listed in `RULES` (`src/check/rules/index.ts`), with a test that
 breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule never repeats a check that

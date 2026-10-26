@@ -3,8 +3,8 @@ import type { Repo } from "../repo.ts";
 import { catalogEntries, entryKeys, renamesCoverHistory } from "./catalog.ts";
 import { dependencyScope, prerequisiteDependencies, skillReferences } from "./links.ts";
 import { defaultLocations, hookExecForm, licenseCopy, readmeInstall } from "./plugin.ts";
-
-export type Rule = (repo: Repo) => Promise<Finding[]>;
+import { releaseVersion, unbumpedChanges } from "./release.ts";
+import type { Rule, RuleContext } from "./rule.ts";
 
 const RULES: readonly Rule[] = [
   catalogEntries,
@@ -17,9 +17,11 @@ const RULES: readonly Rule[] = [
   skillReferences,
   prerequisiteDependencies,
   dependencyScope,
+  releaseVersion,
+  unbumpedChanges,
 ];
 
-export async function runRules(repo: Repo): Promise<Finding[]> {
-  const results = await Promise.all(RULES.map((rule) => rule(repo)));
+export async function runRules(repo: Repo, ctx: RuleContext): Promise<Finding[]> {
+  const results = await Promise.all(RULES.map((rule) => rule(repo, ctx)));
   return results.flat();
 }
