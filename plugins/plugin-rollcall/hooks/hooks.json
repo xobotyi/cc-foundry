@@ -1,0 +1,4 @@
+{
+  "description": "Reloads plugins at session start when a plugin the settings enable was skipped at startup",
+  "modules": ["./register.ts"]
+}

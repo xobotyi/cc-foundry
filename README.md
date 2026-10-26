@@ -153,6 +153,19 @@ period is configurable.
 /plugin install wall-clock
 ```
 
+### plugin-rollcall
+
+A plugin that a repository enables in its `.claude/settings.json` can be missing from your sessions there until you type
+`/reload-plugins`: Claude Code skips it at startup when no install record exists for your user or for that project's
+path, which is the usual state in a fresh clone or a new worktree. This mod checks the enabled plugins against the
+install records at session start, runs the reload for you, holds your first prompt until it completes, and names the
+plugins it reloaded. It only reads, and it does nothing in sessions where every enabled plugin has an install record.
+Install it at user scope.
+
+```
+/plugin install plugin-rollcall
+```
+
 ## AI Artifact Plugins
 
 ### ai-helpers

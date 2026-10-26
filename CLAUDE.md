@@ -21,6 +21,7 @@ styles, hooks, and workflow automation.
 - `plugins/open-source/` — open-source contribution discipline (issues, pull requests)
 - `plugins/golang/`, `plugins/javascript/`, `plugins/php/`, `plugins/python/`, `plugins/rust/` — language disciplines
 - `plugins/wall-clock/` — wall-clock and elapsed-time grounding for agent context (hook-only)
+- `plugins/plugin-rollcall/` — reloads settings-enabled plugins that Claude Code skipped at startup (mod)
 
 Each plugin has its own `CLAUDE.md` with plugin-specific context.
 
