@@ -14,6 +14,11 @@ export default defineCommand({
     description: "Check marketplace and plugin integrity",
   },
   args: {
+    "pre-push": {
+      type: "boolean",
+      default: false,
+      description: "Compare against origin/master instead of the latest release tags, and fail on an unbumped change",
+    },
     format: {
       type: "enum",
       options: ["text", "github"],
@@ -25,7 +30,8 @@ export default defineCommand({
       ? args.format
       : process.env.GITHUB_ACTIONS === "true" ? "github" : "text";
     const repo = await loadRepo(REPO_ROOT);
-    const [validated, ruled] = await Promise.all([validateRepo(repo), runRules(repo)]);
+    const ctx = { prePush: args["pre-push"] };
+    const [validated, ruled] = await Promise.all([validateRepo(repo), runRules(repo, ctx)]);
     const findings = [...validated, ...ruled];
     process.stdout.write(formatFindings(findings, format));
     if (findings.some((f) => f.severity === "error")) {
