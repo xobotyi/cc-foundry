@@ -54,7 +54,7 @@ The `research` skill uses Claude Code agent teams to investigate the codebase in
 and disabled by default. Enable them by adding to your settings:
 
 ```json
-{ "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
+{"env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"}}
 ```
 
 Teammates also need an interactive session — `claude -p` runs them as ordinary subagents. Without this flag, `research`

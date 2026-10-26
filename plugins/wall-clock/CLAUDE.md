@@ -8,8 +8,8 @@ at process start.
 
 - **`hooks/wall-clock.js`** — the whole implementation. ESM with `node:` imports, no dependencies.
 - **`hooks/hooks.json`** — registers the three events, 5s timeout each.
-- **`.dev/wall-clock.test.mjs`** — pins the PreCompact output form. Run `vp test plugins/wall-clock` after any
-  change to the hook.
+- **`.dev/wall-clock.test.mjs`** — pins the PreCompact output form. Run `vp test plugins/wall-clock` after any change to
+  the hook.
 
 ## How It Works
 
@@ -55,7 +55,6 @@ a hook that disturbs a session is worse than a missing tick:
 - **Elapsed values are computed in the hook**, never left to the model. An injected figure must never require the model
   to subtract two timestamps.
 - **Sync `fs` calls are correct here** — this is a one-shot CLI process with no event loop to starve.
-- **Format with the neighbouring hooks' style** (4-space indent, single quotes), not the repo's Prettier JS defaults.
 
 ## Known Limits
 

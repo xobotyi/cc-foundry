@@ -28,15 +28,15 @@ const BODY_START = 2;
 // "now", "I", and similar appear legitimately in narrative bodies. Subject
 // lines are short and factual; tics here are almost always drift.
 const SUBJECT_TIC_PATTERNS = [
-    {
-        rx: /\bthis (commit|change|fix|patch|update|pr)\b/i,
-        msg: '"this commit" / "this change" — the diff already says what',
-    },
-    {
-        // Negative lookahead avoids "I/O", "I/Os" etc.
-        rx: /\b(I|we)\b(?!\/)/i,
-        msg: 'first-person ("I", "we") — the commit speaks for itself',
-    },
+	{
+		rx: /\bthis (commit|change|fix|patch|update|pr)\b/i,
+		msg: '"this commit" / "this change" — the diff already says what',
+	},
+	{
+		// Negative lookahead avoids "I/O", "I/Os" etc.
+		rx: /\b(I|we)\b(?!\/)/i,
+		msg: 'first-person ("I", "we") — the commit speaks for itself',
+	},
 ];
 
 let hasErrors = false;
@@ -46,8 +46,8 @@ let hasErrors = false;
  * @param {string} msg
  */
 function printError(msg) {
-    hasErrors = true;
-    console.log(`ERROR: ${msg}`);
+	hasErrors = true;
+	console.log(`ERROR: ${msg}`);
 }
 
 /**
@@ -55,7 +55,7 @@ function printError(msg) {
  * @param {string} msg
  */
 function printWarn(msg) {
-    console.log(`WARN: ${msg}`);
+	console.log(`WARN: ${msg}`);
 }
 
 /**
@@ -64,11 +64,11 @@ function printWarn(msg) {
  * @returns {Promise<string>}
  */
 async function readStdin() {
-    const chunks = [];
-    for await (const chunk of process.stdin) {
-        chunks.push(chunk);
-    }
-    return Buffer.concat(chunks).toString('utf8');
+	const chunks = [];
+	for await (const chunk of process.stdin) {
+		chunks.push(chunk);
+	}
+	return Buffer.concat(chunks).toString('utf8');
 }
 
 /**
@@ -79,13 +79,13 @@ async function readStdin() {
  * @returns {Promise<string>}
  */
 async function readFile(filePath) {
-    try {
-        const buf = await fs.readFile(filePath, 'utf8');
-        return buf.toString('utf8');
-    } catch (err) {
-        console.error(`ERROR: Cannot read file: ${filePath}`);
-        process.exit(1);
-    }
+	try {
+		const buf = await fs.readFile(filePath, 'utf8');
+		return buf.toString('utf8');
+	} catch (err) {
+		console.error(`ERROR: Cannot read file: ${filePath}`);
+		process.exit(1);
+	}
 }
 
 /**
@@ -93,12 +93,12 @@ async function readFile(filePath) {
  * Exits the process after printing help.
  */
 function maybePrintHelp() {
-    for (const argv of process.argv) {
-        if (argv === '--help' || argv === '-h') {
-            console.log(HELP_TEXT);
-            process.exit(0);
-        }
-    }
+	for (const argv of process.argv) {
+		if (argv === '--help' || argv === '-h') {
+			console.log(HELP_TEXT);
+			process.exit(0);
+		}
+	}
 }
 
 /**
@@ -108,57 +108,57 @@ function maybePrintHelp() {
  * @returns {Promise<string>}
  */
 async function getMessage() {
-    let fileArg = null;
-    let msgArg = null;
+	let fileArg = null;
+	let msgArg = null;
 
-    // Parse flags first (before reading stdin)
-    for (let i = 2; i < process.argv.length; i++) {
-        switch (process.argv[i]) {
-            case FILE_FLAG:
-                if (process.argv.length === i + 1) {
-                    console.error(`ERROR: ${FILE_FLAG} requires a path argument`);
-                    process.exit(1);
-                }
-                fileArg = process.argv[i + 1];
-                break;
+	// Parse flags first (before reading stdin)
+	for (let i = 2; i < process.argv.length; i++) {
+		switch (process.argv[i]) {
+			case FILE_FLAG:
+				if (process.argv.length === i + 1) {
+					console.error(`ERROR: ${FILE_FLAG} requires a path argument`);
+					process.exit(1);
+				}
+				fileArg = process.argv[i + 1];
+				break;
 
-            case MSG_FLAG:
-                if (process.argv.length === i + 1) {
-                    console.error(`ERROR: ${MSG_FLAG} requires a message argument`);
-                    process.exit(1);
-                }
-                msgArg = process.argv[i + 1];
-                break;
+			case MSG_FLAG:
+				if (process.argv.length === i + 1) {
+					console.error(`ERROR: ${MSG_FLAG} requires a message argument`);
+					process.exit(1);
+				}
+				msgArg = process.argv[i + 1];
+				break;
 
-            case REQUIRE_TRAILERS_FLAG:
-                // Handled separately in getRequiredTrailers()
-                break;
-        }
-    }
+			case REQUIRE_TRAILERS_FLAG:
+				// Handled separately in getRequiredTrailers()
+				break;
+		}
+	}
 
-    if (fileArg && msgArg) {
-        console.error('ERROR: Only one of --file or --msg may be used at a time.');
-        process.exit(1);
-    }
+	if (fileArg && msgArg) {
+		console.error('ERROR: Only one of --file or --msg may be used at a time.');
+		process.exit(1);
+	}
 
-    if (fileArg) {
-        return await readFile(fileArg);
-    }
+	if (fileArg) {
+		return await readFile(fileArg);
+	}
 
-    if (msgArg) {
-        return msgArg;
-    }
+	if (msgArg) {
+		return msgArg;
+	}
 
-    // Only read stdin if no flags provided and stdin has data (not a TTY)
-    if (!process.stdin.isTTY) {
-        const stdin = await readStdin();
-        if (stdin) {
-            return stdin;
-        }
-    }
+	// Only read stdin if no flags provided and stdin has data (not a TTY)
+	if (!process.stdin.isTTY) {
+		const stdin = await readStdin();
+		if (stdin) {
+			return stdin;
+		}
+	}
 
-    console.error('ERROR: No commit message provided. Use --file, --msg, or stdin.');
-    process.exit(1);
+	console.error('ERROR: No commit message provided. Use --file, --msg, or stdin.');
+	process.exit(1);
 }
 
 /**
@@ -167,16 +167,19 @@ async function getMessage() {
  * @returns {string[]}
  */
 function getRequiredTrailers() {
-    for (let i = 2; i < process.argv.length; i++) {
-        if (process.argv[i] === REQUIRE_TRAILERS_FLAG) {
-            if (process.argv.length === i + 1) {
-                console.error(`ERROR: ${REQUIRE_TRAILERS_FLAG} requires a comma-separated list`);
-                process.exit(1);
-            }
-            return process.argv[i + 1].split(',').map(t => t.trim()).filter(Boolean);
-        }
-    }
-    return [];
+	for (let i = 2; i < process.argv.length; i++) {
+		if (process.argv[i] === REQUIRE_TRAILERS_FLAG) {
+			if (process.argv.length === i + 1) {
+				console.error(`ERROR: ${REQUIRE_TRAILERS_FLAG} requires a comma-separated list`);
+				process.exit(1);
+			}
+			return process.argv[i + 1]
+				.split(',')
+				.map((t) => t.trim())
+				.filter(Boolean);
+		}
+	}
+	return [];
 }
 
 /**
@@ -187,20 +190,20 @@ function getRequiredTrailers() {
  * @returns {number}
  */
 function findTrailerStart(lines) {
-    let end = lines.length - 1;
-    while (end >= BODY_START && lines[end] === '') {
-        end--;
-    }
+	let end = lines.length - 1;
+	while (end >= BODY_START && lines[end] === '') {
+		end--;
+	}
 
-    let start = end + 1;
-    for (let i = end; i >= BODY_START; i--) {
-        if (lines[i] === '' || !TRAILER_RX.test(lines[i])) {
-            break;
-        }
-        start = i;
-    }
+	let start = end + 1;
+	for (let i = end; i >= BODY_START; i--) {
+		if (lines[i] === '' || !TRAILER_RX.test(lines[i])) {
+			break;
+		}
+		start = i;
+	}
 
-    return start;
+	return start;
 }
 
 /**
@@ -209,23 +212,23 @@ function findTrailerStart(lines) {
  * @param subject {string}
  */
 function validateSubject(subject) {
-    if (subject.length < 10) {
-        printWarn('Subject line is very short (less than 10 characters). Consider making it more descriptive.');
-    }
+	if (subject.length < 10) {
+		printWarn('Subject line is very short (less than 10 characters). Consider making it more descriptive.');
+	}
 
-    if (subject.length > SUBJECT_MAX_LENGTH) {
-        printWarn(`Subject line exceeds ${SUBJECT_MAX_LENGTH} characters. Consider tightening — soft target is 50.`);
-    }
+	if (subject.length > SUBJECT_MAX_LENGTH) {
+		printWarn(`Subject line exceeds ${SUBJECT_MAX_LENGTH} characters. Consider tightening — soft target is 50.`);
+	}
 
-    if (subject.endsWith('.')) {
-        printError('Subject line should not end with a period.');
-    }
+	if (subject.endsWith('.')) {
+		printError('Subject line should not end with a period.');
+	}
 
-    for (const { rx, msg } of SUBJECT_TIC_PATTERNS) {
-        if (rx.test(subject)) {
-            printWarn(`Subject filler tic: ${msg}.`);
-        }
-    }
+	for (const {rx, msg} of SUBJECT_TIC_PATTERNS) {
+		if (rx.test(subject)) {
+			printWarn(`Subject filler tic: ${msg}.`);
+		}
+	}
 }
 
 /**
@@ -235,58 +238,58 @@ function validateSubject(subject) {
  * @param requiredTrailers {string[]}
  */
 function validateMessage(message, requiredTrailers) {
-    if (!message || message.trim().length === 0) {
-        printError('Commit message is empty.');
-        process.exit(1);
-    }
+	if (!message || message.trim().length === 0) {
+		printError('Commit message is empty.');
+		process.exit(1);
+	}
 
-    const lines = message.split('\n').map(line => line.trim());
-    const trailerStart = findTrailerStart(lines);
+	const lines = message.split('\n').map((line) => line.trim());
+	const trailerStart = findTrailerStart(lines);
 
-    validateSubject(lines[0]);
+	validateSubject(lines[0]);
 
-    // Blank lines and the trailer block are excluded: a subject plus trailers is still bodyless.
-    const bodyLines = lines.slice(BODY_START, trailerStart).filter(line => line !== '');
-    if (bodyLines.length === 0) {
-        printWarn('Commit message has no body. A subject-only message is rarely acceptable.');
-    }
+	// Blank lines and the trailer block are excluded: a subject plus trailers is still bodyless.
+	const bodyLines = lines.slice(BODY_START, trailerStart).filter((line) => line !== '');
+	if (bodyLines.length === 0) {
+		printWarn('Commit message has no body. A subject-only message is rarely acceptable.');
+	}
 
-    if (lines.length > 1) {
-        if (lines[1] !== '') {
-            printError('Subject must be separated from body by a blank line.');
-        }
-    }
+	if (lines.length > 1) {
+		if (lines[1] !== '') {
+			printError('Subject must be separated from body by a blank line.');
+		}
+	}
 
-    // Extract and validate trailers
-    if (requiredTrailers.length > 0) {
-        const trailers = new Set();
+	// Extract and validate trailers
+	if (requiredTrailers.length > 0) {
+		const trailers = new Set();
 
-        for (let i = trailerStart; i < lines.length; i++) {
-            const match = lines[i].match(TRAILER_RX);
-            if (match) {
-                trailers.add(match[1]);
-            }
-        }
+		for (let i = trailerStart; i < lines.length; i++) {
+			const match = lines[i].match(TRAILER_RX);
+			if (match) {
+				trailers.add(match[1]);
+			}
+		}
 
-        for (const required of requiredTrailers) {
-            if (!trailers.has(required)) {
-                printError(`Required trailer missing: ${required}`);
-            }
-        }
-    }
+		for (const required of requiredTrailers) {
+			if (!trailers.has(required)) {
+				printError(`Required trailer missing: ${required}`);
+			}
+		}
+	}
 }
 
 async function main() {
-    maybePrintHelp();
+	maybePrintHelp();
 
-    const message = await getMessage();
-    const requiredTrailers = getRequiredTrailers();
+	const message = await getMessage();
+	const requiredTrailers = getRequiredTrailers();
 
-    validateMessage(message, requiredTrailers);
+	validateMessage(message, requiredTrailers);
 
-    if (!hasErrors) {
-        console.log('OK: Commit message is valid.');
-    }
+	if (!hasErrors) {
+		console.log('OK: Commit message is valid.');
+	}
 }
 
 main().catch(console.error);

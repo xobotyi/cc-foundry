@@ -1,6 +1,6 @@
 ---
 paths:
-  - "**/README.md"
+  - '**/README.md'
 ---
 
 # README Authoring

@@ -1,8 +1,8 @@
 {
-  "gopls": {
-    "command": "gopls",
-    "extensionToLanguage": {
-      ".go": "go"
-    }
-  }
+	"gopls": {
+		"command": "gopls",
+		"extensionToLanguage": {
+			".go": "go"
+		}
+	}
 }

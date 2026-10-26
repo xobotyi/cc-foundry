@@ -292,8 +292,8 @@ The WebGUI is fully responsive -- adapts to desktops, tablets, and smartphones. 
 - Tools > Open Terminal page accessible via search
 
 **Upgrade note**: Theme Engine, Dark Theme, Dynamix Date Time, and Flash Remount plugins are automatically removed
-during 7.2 upgrade (incompatible with responsive CSS). Update all plugins -- especially Unraid Connect and Nvidia Driver
--- before upgrading.
+during 7.2 upgrade (incompatible with responsive CSS). Update all plugins -- especially Unraid Connect and Nvidia
+Driver -- before upgrading.
 
 ## Flash Drive Security
 

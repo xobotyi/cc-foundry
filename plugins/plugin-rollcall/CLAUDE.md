@@ -50,5 +50,3 @@ Run every command in this file from the repository root.
 - Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in
   `register.ts`. `claude plugin validate` refuses any other form, because its static analysis reads the calls off the
   source.
-- Format with the neighbouring hooks' style (4-space indent, single quotes, semicolons), not the repo's Prettier
-  defaults.

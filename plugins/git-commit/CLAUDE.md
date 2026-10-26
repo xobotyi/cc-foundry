@@ -72,7 +72,6 @@ CLAUDE.md:
 - One term per concept: `unit` for one logical change, plus `subject`, `body`, `trailer`, `staged`, `unstaged`,
   `untracked`
 - Em dashes only as KV-list separators, never inside a sentence
-- Code fences carry a language label (` ```text `) — the prettier MDX parser reflows an unlabeled fence
 - Frontmatter `description` and `when_to_use` are exempt — they are activation surfaces and follow the
   `skill-engineering` formula
 

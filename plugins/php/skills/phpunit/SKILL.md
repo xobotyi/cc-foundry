@@ -21,8 +21,8 @@ annotations are deprecated in 11, removed in 12.
   assertion API grouped by category, constraint system, custom assertions
 - **Test doubles — stubs, mocks, MockBuilder** → [`${CLAUDE_SKILL_DIR}/references/mocking.md`] — createStub vs
   createMock, return config, invocation matchers, argument constraints, MockBuilder
-- **Data providers — static, named, generators** → [`${CLAUDE_SKILL_DIR}/references/data-providers.md`]
-  — #[DataProvider], #[TestWith], named datasets, generator providers, external providers
+- **Data providers — static, named, generators** → [`${CLAUDE_SKILL_DIR}/references/data-providers.md`] —
+  #[DataProvider], #[TestWith], named datasets, generator providers, external providers
 - **phpunit.xml structure, test suites, source config** → [`${CLAUDE_SKILL_DIR}/references/configuration.md`] — XML
   elements, strict settings, source element, coverage reports, execution order
 

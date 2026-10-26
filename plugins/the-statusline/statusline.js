@@ -12,25 +12,23 @@ import {fileURLToPath} from 'node:url';
  * @param {unknown} err
  */
 function writeScriptError(err) {
-    const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-    const errorFile = path.join(scriptDir, 'statusline.error.log');
+	const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+	const errorFile = path.join(scriptDir, 'statusline.error.log');
 
-    const timestamp = new Date().toISOString();
-    const message = err instanceof Error
-        ? `${err.name}: ${err.message}\n${err.stack}`
-        : String(err);
+	const timestamp = new Date().toISOString();
+	const message = err instanceof Error ? `${err.name}: ${err.message}\n${err.stack}` : String(err);
 
-    fs.appendFileSync(errorFile, `[${timestamp}]\n${message}\n\n`);
+	fs.appendFileSync(errorFile, `[${timestamp}]\n${message}\n\n`);
 }
 
 process.on('uncaughtException', (err) => {
-    writeScriptError(err);
-    process.exit(1);
+	writeScriptError(err);
+	process.exit(1);
 });
 
 process.on('unhandledRejection', (reason) => {
-    writeScriptError(reason);
-    process.exit(1);
+	writeScriptError(reason);
+	process.exit(1);
 });
 
 const RESET = '\x1b[0m';
@@ -45,24 +43,24 @@ const MIN_PATH_WIDTH = 12;
 const SHORT_BRANCH_WIDTH = 16;
 
 const ROW1_LEVELS = [
-    {style: true, effort: true, reset: true, cost: true},
-    {style: true, effort: false, reset: true, cost: true},
-    {style: false, effort: false, reset: true, cost: true},
-    {style: false, effort: false, reset: false, cost: true},
-    {style: false, effort: false, reset: false, cost: false},
+	{style: true, effort: true, reset: true, cost: true},
+	{style: true, effort: false, reset: true, cost: true},
+	{style: false, effort: false, reset: true, cost: true},
+	{style: false, effort: false, reset: false, cost: true},
+	{style: false, effort: false, reset: false, cost: false},
 ];
 
 const ROW2_LEVELS = [
-    {lines: true, branch: 'full', worktree: 'full'},
-    {lines: true, branch: 'full', worktree: 'short'},
-    {lines: false, branch: 'full', worktree: 'short'},
-    {lines: false, branch: 'short', worktree: 'short'},
-    {lines: false, branch: 'none', worktree: 'short'},
+	{lines: true, branch: 'full', worktree: 'full'},
+	{lines: true, branch: 'full', worktree: 'short'},
+	{lines: false, branch: 'full', worktree: 'short'},
+	{lines: false, branch: 'short', worktree: 'short'},
+	{lines: false, branch: 'none', worktree: 'short'},
 ];
 
 const RATE_LIMIT_WINDOWS = [
-    {key: 'five_hour', label: '5h', durationSeconds: 5 * 60 * 60},
-    {key: 'seven_day', label: '7d', durationSeconds: 7 * 24 * 60 * 60},
+	{key: 'five_hour', label: '5h', durationSeconds: 5 * 60 * 60},
+	{key: 'seven_day', label: '7d', durationSeconds: 7 * 24 * 60 * 60},
 ];
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -73,7 +71,7 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  * @returns {string}
  */
 function ansi256(n) {
-    return `\x1b[38;5;${n}m`;
+	return `\x1b[38;5;${n}m`;
 }
 
 /**
@@ -83,17 +81,17 @@ function ansi256(n) {
  * @returns {string}
  */
 function color(colorNum, text) {
-    return `${ansi256(colorNum)}${text}${RESET}`;
+	return `${ansi256(colorNum)}${text}${RESET}`;
 }
 
 const c = {
-    gray: (t) => color(245, t),
-    green: (t) => color(151, t),
-    yellow: (t) => color(223, t),
-    blue: (t) => color(153, t),
-    magenta: (t) => color(182, t),
-    cyan: (t) => color(152, t),
-    red: (t) => color(174, t),
+	gray: (t) => color(245, t),
+	green: (t) => color(151, t),
+	yellow: (t) => color(223, t),
+	blue: (t) => color(153, t),
+	magenta: (t) => color(182, t),
+	cyan: (t) => color(152, t),
+	red: (t) => color(174, t),
 };
 
 /**
@@ -104,25 +102,25 @@ const c = {
  * @returns {string}
  */
 function colorByUrgency(percent, text) {
-    let colorNum;
+	let colorNum;
 
-    if (percent >= 60) {
-        colorNum = 245;
-    } else if (percent >= 50) {
-        colorNum = 251;
-    } else if (percent >= 40) {
-        colorNum = 228;
-    } else if (percent >= 30) {
-        colorNum = 220;
-    } else if (percent >= 20) {
-        colorNum = 208;
-    } else if (percent >= 10) {
-        colorNum = 196;
-    } else {
-        colorNum = 197;
-    }
+	if (percent >= 60) {
+		colorNum = 245;
+	} else if (percent >= 50) {
+		colorNum = 251;
+	} else if (percent >= 40) {
+		colorNum = 228;
+	} else if (percent >= 30) {
+		colorNum = 220;
+	} else if (percent >= 20) {
+		colorNum = 208;
+	} else if (percent >= 10) {
+		colorNum = 196;
+	} else {
+		colorNum = 197;
+	}
 
-    return `${ansi256(colorNum)}${text}${RESET}`;
+	return `${ansi256(colorNum)}${text}${RESET}`;
 }
 
 /**
@@ -131,8 +129,8 @@ function colorByUrgency(percent, text) {
  * @returns {number}
  */
 function visibleWidth(text) {
-    // shortcut: one column per code point, so CJK and emoji undercount — add East Asian Width if rows misalign
-    return [...text.replace(/\x1b\[[0-9;]*m/g, '')].length;
+	// shortcut: one column per code point, so CJK and emoji undercount — add East Asian Width if rows misalign
+	return [...text.replace(/\x1b\[[0-9;]*m/g, '')].length;
 }
 
 /**
@@ -183,7 +181,6 @@ function visibleWidth(text) {
  * @property {WorktreeData} [worktree] - Present only in a worktree session
  */
 
-
 /**
  * Reads JSON data from stdin and parses it into a SessionData object.
  * No validation is performed.
@@ -191,13 +188,13 @@ function visibleWidth(text) {
  * @returns {Promise<SessionData>}
  */
 async function readStdinJSON() {
-    const chunks = [];
-    for await (const chunk of process.stdin) {
-        chunks.push(chunk);
-    }
+	const chunks = [];
+	for await (const chunk of process.stdin) {
+		chunks.push(chunk);
+	}
 
-    const input = Buffer.concat(chunks).toString('utf-8');
-    return JSON.parse(input);
+	const input = Buffer.concat(chunks).toString('utf-8');
+	return JSON.parse(input);
 }
 
 /**
@@ -205,14 +202,14 @@ async function readStdinJSON() {
  * @returns {number}
  */
 function readPadding() {
-    const settingsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'settings.json');
-    try {
-        const padding = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')).statusLine?.padding;
-        return Number.isFinite(padding) ? padding : 0;
-    } catch {
-        // padding only tunes alignment; an unreadable settings file must not blank the status line
-        return 0;
-    }
+	const settingsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'settings.json');
+	try {
+		const padding = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')).statusLine?.padding;
+		return Number.isFinite(padding) ? padding : 0;
+	} catch {
+		// padding only tunes alignment; an unreadable settings file must not blank the status line
+		return 0;
+	}
 }
 
 /**
@@ -220,13 +217,13 @@ function readPadding() {
  * @returns {number|null}
  */
 function readAvailableWidth() {
-    // constraint: Claude Code captures stdout, so the terminal width reaches the script only as COLUMNS
-    const columns = Number(process.env.COLUMNS);
-    if (!Number.isFinite(columns) || columns <= 0) {
-        return null;
-    }
+	// constraint: Claude Code captures stdout, so the terminal width reaches the script only as COLUMNS
+	const columns = Number(process.env.COLUMNS);
+	if (!Number.isFinite(columns) || columns <= 0) {
+		return null;
+	}
 
-    return columns - RESERVED_COLUMNS - 2 * readPadding();
+	return columns - RESERVED_COLUMNS - 2 * readPadding();
 }
 
 /**
@@ -236,21 +233,21 @@ function readAvailableWidth() {
  * @returns {string}
  */
 function formatStyleModel(data, level) {
-    let style = data.output_style?.name ?? 'default';
-    const model = data.model?.display_name ?? 'unknown';
-    const effort = level.effort ? data.effort?.level : undefined;
+	let style = data.output_style?.name ?? 'default';
+	const model = data.model?.display_name ?? 'unknown';
+	const effort = level.effort ? data.effort?.level : undefined;
 
-    const pluginPrefixEnd = style.indexOf(':');
-    if (pluginPrefixEnd !== -1) {
-        style = style.substring(pluginPrefixEnd + 1).trim();
-    }
+	const pluginPrefixEnd = style.indexOf(':');
+	if (pluginPrefixEnd !== -1) {
+		style = style.substring(pluginPrefixEnd + 1).trim();
+	}
 
-    const engine = effort ? `${model} · ${effort}` : model;
-    if (!level.style) {
-        return c.yellow(engine);
-    }
+	const engine = effort ? `${model} · ${effort}` : model;
+	if (!level.style) {
+		return c.yellow(engine);
+	}
 
-    return `${c.green(style)} ${c.yellow(`(${engine})`)}`;
+	return `${c.green(style)} ${c.yellow(`(${engine})`)}`;
 }
 
 /**
@@ -261,17 +258,17 @@ function formatStyleModel(data, level) {
  * @returns {string}
  */
 function trimMiddle(str, maxWidth) {
-    if (str.length <= maxWidth) {
-        return str;
-    }
+	if (str.length <= maxWidth) {
+		return str;
+	}
 
-    const ellipsis = '...';
-    const available = maxWidth - ellipsis.length;
-    if (available <= 0) {
-        return str.slice(0, maxWidth);
-    }
+	const ellipsis = '...';
+	const available = maxWidth - ellipsis.length;
+	if (available <= 0) {
+		return str.slice(0, maxWidth);
+	}
 
-    return str.slice(0, Math.ceil(available / 2)) + ellipsis + str.slice(-Math.floor(available / 2));
+	return str.slice(0, Math.ceil(available / 2)) + ellipsis + str.slice(-Math.floor(available / 2));
 }
 
 /**
@@ -283,47 +280,46 @@ function trimMiddle(str, maxWidth) {
  * @returns {string}
  */
 function collapsePath(path, maxWidth) {
-    if (path.length <= maxWidth) {
-        return path;
-    }
+	if (path.length <= maxWidth) {
+		return path;
+	}
 
-    let overdue = path.length - maxWidth;
-    const segments = posixpath.dirname(path).split(posixpath.sep);
+	let overdue = path.length - maxWidth;
+	const segments = posixpath.dirname(path).split(posixpath.sep);
 
-    for (let i = 0; i < segments.length; i++) {
-        overdue -= (segments[i].length - 1);
-        segments[i] = segments[i][0];
-        if (overdue <= 0) {
-            break
-        }
-    }
+	for (let i = 0; i < segments.length; i++) {
+		overdue -= segments[i].length - 1;
+		segments[i] = segments[i][0];
+		if (overdue <= 0) {
+			break;
+		}
+	}
 
-    if (segments.length > 2 && overdue > 0) {
-        const ellipsis = '...';
+	if (segments.length > 2 && overdue > 0) {
+		const ellipsis = '...';
 
-        for (let i = 1; i < segments.length; i++) {
-            overdue -= (segments[i].length + 1);
+		for (let i = 1; i < segments.length; i++) {
+			overdue -= segments[i].length + 1;
 
-            if (i === 1) {
-                overdue -= (segments[i].length - 1);
-                segments[i] = ellipsis;
-            } else {
-                segments[i] = '';
-            }
+			if (i === 1) {
+				overdue -= segments[i].length - 1;
+				segments[i] = ellipsis;
+			} else {
+				segments[i] = '';
+			}
 
-            if (overdue <= 0) {
-                break;
-            }
-        }
-    }
+			if (overdue <= 0) {
+				break;
+			}
+		}
+	}
 
+	let basename = posixpath.basename(path);
+	if (overdue > 0) {
+		basename = trimMiddle(basename, Math.max(basename.length - overdue, 0));
+	}
 
-    let basename = posixpath.basename(path);
-    if (overdue > 0) {
-        basename = trimMiddle(basename, Math.max(basename.length - overdue, 0));
-    }
-
-    return posixpath.join(...segments.filter(seg => seg !== ''), basename);
+	return posixpath.join(...segments.filter((seg) => seg !== ''), basename);
 }
 
 /**
@@ -332,7 +328,7 @@ function collapsePath(path, maxWidth) {
  * @returns {string}
  */
 function toUnixPath(p) {
-    return p.replace(/\\/g, '/');
+	return p.replace(/\\/g, '/');
 }
 
 /**
@@ -341,8 +337,8 @@ function toUnixPath(p) {
  * @returns {string}
  */
 function toHomeRelative(unixPath) {
-    const homedir = toUnixPath(os.homedir());
-    return unixPath === homedir || unixPath.startsWith(homedir + '/') ? '~' + unixPath.slice(homedir.length) : unixPath;
+	const homedir = toUnixPath(os.homedir());
+	return unixPath === homedir || unixPath.startsWith(homedir + '/') ? '~' + unixPath.slice(homedir.length) : unixPath;
 }
 
 /**
@@ -354,25 +350,23 @@ function toHomeRelative(unixPath) {
  * @returns {{path: string, tag: string}} Uncollapsed path and the tag that follows it
  */
 function resolveLocation(data, worktreeTag) {
-    const cwd = toUnixPath(data.cwd ?? data.workspace?.current_dir ?? '');
-    const worktree = data.worktree;
-    const root = toUnixPath(worktree?.path ?? data.workspace?.project_dir ?? '');
-    const relPath = root ? posixpath.relative(root, cwd) : '..';
+	const cwd = toUnixPath(data.cwd ?? data.workspace?.current_dir ?? '');
+	const worktree = data.worktree;
+	const root = toUnixPath(worktree?.path ?? data.workspace?.project_dir ?? '');
+	const relPath = root ? posixpath.relative(root, cwd) : '..';
 
-    if (relPath === '..' || relPath.startsWith('../')) {
-        return {path: toHomeRelative(cwd), tag: ''};
-    }
+	if (relPath === '..' || relPath.startsWith('../')) {
+		return {path: toHomeRelative(cwd), tag: ''};
+	}
 
-    let tag = '';
-    if (worktree?.name) {
-        tag = worktreeTag === 'full' ? ` [wt ${worktree.name}]` : ' [wt]';
-    }
+	let tag = '';
+	if (worktree?.name) {
+		tag = worktreeTag === 'full' ? ` [wt ${worktree.name}]` : ' [wt]';
+	}
 
-    const shown = relPath === ''
-        ? toHomeRelative(toUnixPath(worktree?.original_cwd ?? root))
-        : '$/' + relPath;
+	const shown = relPath === '' ? toHomeRelative(toUnixPath(worktree?.original_cwd ?? root)) : '$/' + relPath;
 
-    return {path: shown, tag};
+	return {path: shown, tag};
 }
 
 /**
@@ -382,35 +376,35 @@ function resolveLocation(data, worktreeTag) {
  * @returns {string|null}
  */
 function readGitBranch(dir) {
-    let current = dir;
+	let current = dir;
 
-    while (current) {
-        const dotGit = path.join(current, '.git');
-        const dotGitStat = fs.statSync(dotGit, {throwIfNoEntry: false});
+	while (current) {
+		const dotGit = path.join(current, '.git');
+		const dotGitStat = fs.statSync(dotGit, {throwIfNoEntry: false});
 
-        if (dotGitStat) {
-            let gitDir = dotGit;
-            if (dotGitStat.isFile()) {
-                const pointer = /^gitdir:\s*(?<gitDir>.+)$/m.exec(fs.readFileSync(dotGit, 'utf-8'));
-                if (!pointer) {
-                    return null;
-                }
-                gitDir = path.resolve(current, pointer.groups.gitDir.trim());
-            }
+		if (dotGitStat) {
+			let gitDir = dotGit;
+			if (dotGitStat.isFile()) {
+				const pointer = /^gitdir:\s*(?<gitDir>.+)$/m.exec(fs.readFileSync(dotGit, 'utf-8'));
+				if (!pointer) {
+					return null;
+				}
+				gitDir = path.resolve(current, pointer.groups.gitDir.trim());
+			}
 
-            const head = fs.readFileSync(path.join(gitDir, 'HEAD'), 'utf-8').trim();
-            const ref = /^ref:\s*(?:refs\/heads\/)?(?<branch>.+)$/.exec(head);
-            return ref ? ref.groups.branch : head.slice(0, 7);
-        }
+			const head = fs.readFileSync(path.join(gitDir, 'HEAD'), 'utf-8').trim();
+			const ref = /^ref:\s*(?:refs\/heads\/)?(?<branch>.+)$/.exec(head);
+			return ref ? ref.groups.branch : head.slice(0, 7);
+		}
 
-        const parent = path.dirname(current);
-        if (parent === current) {
-            return null;
-        }
-        current = parent;
-    }
+		const parent = path.dirname(current);
+		if (parent === current) {
+			return null;
+		}
+		current = parent;
+	}
 
-    return null;
+	return null;
 }
 
 /**
@@ -419,17 +413,17 @@ function readGitBranch(dir) {
  * @returns {string|null}
  */
 function resolveBranch(data) {
-    const cwd = data.cwd ?? data.workspace?.current_dir;
-    if (!cwd) {
-        return null;
-    }
+	const cwd = data.cwd ?? data.workspace?.current_dir;
+	if (!cwd) {
+		return null;
+	}
 
-    try {
-        return readGitBranch(cwd);
-    } catch {
-        // the branch is optional context; an unreadable .git must not blank the status line
-        return null;
-    }
+	try {
+		return readGitBranch(cwd);
+	} catch {
+		// the branch is optional context; an unreadable .git must not blank the status line
+		return null;
+	}
 }
 
 /**
@@ -438,9 +432,9 @@ function resolveBranch(data) {
  * @returns {string}
  */
 function formatLinesChanged(data) {
-    const added = data.cost?.total_lines_added ?? 0;
-    const removed = data.cost?.total_lines_removed ?? 0;
-    return `${c.green(`+${added}`)} ${c.red(`−${removed}`)}`;
+	const added = data.cost?.total_lines_added ?? 0;
+	const removed = data.cost?.total_lines_removed ?? 0;
+	return `${c.green(`+${added}`)} ${c.red(`−${removed}`)}`;
 }
 
 /**
@@ -449,8 +443,8 @@ function formatLinesChanged(data) {
  * @returns {string}
  */
 function formatCost(data) {
-    const cost = data.cost?.total_cost_usd ?? 0;
-    return c.magenta(`$${cost.toFixed(2)}`);
+	const cost = data.cost?.total_cost_usd ?? 0;
+	return c.magenta(`$${cost.toFixed(2)}`);
 }
 
 /**
@@ -459,12 +453,12 @@ function formatCost(data) {
  * @returns {string}
  */
 function formatContextRemaining(data) {
-    const remaining = data.context_window?.remaining_percentage;
-    if (remaining == null) {
-        return c.gray('ctx left --%');
-    }
+	const remaining = data.context_window?.remaining_percentage;
+	if (remaining == null) {
+		return c.gray('ctx left --%');
+	}
 
-    return colorByUrgency(remaining, `ctx left ${Math.round(remaining)}%`);
+	return colorByUrgency(remaining, `ctx left ${Math.round(remaining)}%`);
 }
 
 /**
@@ -474,9 +468,9 @@ function formatContextRemaining(data) {
  * @returns {string}
  */
 function formatResetTime(epochSeconds, nowSeconds) {
-    const date = new Date(epochSeconds * 1000);
-    const hhmm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    return epochSeconds - nowSeconds < 24 * 60 * 60 ? hhmm : `${WEEKDAYS[date.getDay()]} ${hhmm}`;
+	const date = new Date(epochSeconds * 1000);
+	const hhmm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+	return epochSeconds - nowSeconds < 24 * 60 * 60 ? hhmm : `${WEEKDAYS[date.getDay()]} ${hhmm}`;
 }
 
 /**
@@ -487,17 +481,17 @@ function formatResetTime(epochSeconds, nowSeconds) {
  * @returns {number} Unix epoch seconds; Infinity when nothing is consumed yet
  */
 function projectExhaustion(limitWindow, durationSeconds, nowSeconds) {
-    const used = limitWindow.used_percentage ?? 0;
-    if (used >= 100) {
-        return nowSeconds;
-    }
+	const used = limitWindow.used_percentage ?? 0;
+	if (used >= 100) {
+		return nowSeconds;
+	}
 
-    const elapsed = nowSeconds - (limitWindow.resets_at - durationSeconds);
-    if (used <= 0 || !(elapsed > 0)) {
-        return Infinity;
-    }
+	const elapsed = nowSeconds - (limitWindow.resets_at - durationSeconds);
+	if (used <= 0 || !(elapsed > 0)) {
+		return Infinity;
+	}
 
-    return nowSeconds + (100 - used) * elapsed / used;
+	return nowSeconds + ((100 - used) * elapsed) / used;
 }
 
 /**
@@ -509,39 +503,41 @@ function projectExhaustion(limitWindow, durationSeconds, nowSeconds) {
  * @returns {string|null}
  */
 function formatRateLimit(data, level) {
-    const nowSeconds = Date.now() / 1000;
+	const nowSeconds = Date.now() / 1000;
 
-    let closest = null;
-    for (const {key, label, durationSeconds} of RATE_LIMIT_WINDOWS) {
-        const limitWindow = data.rate_limits?.[key];
-        if (!limitWindow) {
-            continue;
-        }
+	let closest = null;
+	for (const {key, label, durationSeconds} of RATE_LIMIT_WINDOWS) {
+		const limitWindow = data.rate_limits?.[key];
+		if (!limitWindow) {
+			continue;
+		}
 
-        const exhaustsAt = projectExhaustion(limitWindow, durationSeconds, nowSeconds);
-        const candidate = {
-            label,
-            limitWindow,
-            stopsAt: exhaustsAt < limitWindow.resets_at ? exhaustsAt : Infinity,
-            remaining: Math.max(0, 100 - (limitWindow.used_percentage ?? 0)),
-        };
+		const exhaustsAt = projectExhaustion(limitWindow, durationSeconds, nowSeconds);
+		const candidate = {
+			label,
+			limitWindow,
+			stopsAt: exhaustsAt < limitWindow.resets_at ? exhaustsAt : Infinity,
+			remaining: Math.max(0, 100 - (limitWindow.used_percentage ?? 0)),
+		};
 
-        const isCloser = closest === null
-            || candidate.stopsAt < closest.stopsAt
-            || (candidate.stopsAt === closest.stopsAt && candidate.remaining < closest.remaining);
-        if (isCloser) {
-            closest = candidate;
-        }
-    }
+		const isCloser =
+			closest === null ||
+			candidate.stopsAt < closest.stopsAt ||
+			(candidate.stopsAt === closest.stopsAt && candidate.remaining < closest.remaining);
+		if (isCloser) {
+			closest = candidate;
+		}
+	}
 
-    if (closest === null) {
-        return null;
-    }
+	if (closest === null) {
+		return null;
+	}
 
-    const resetLabel = level.reset && closest.limitWindow.resets_at
-        ? ` til ${formatResetTime(closest.limitWindow.resets_at, nowSeconds)}`
-        : '';
-    return colorByUrgency(closest.remaining, `${closest.label} left ${Math.round(closest.remaining)}%${resetLabel}`);
+	const resetLabel =
+		level.reset && closest.limitWindow.resets_at
+			? ` til ${formatResetTime(closest.limitWindow.resets_at, nowSeconds)}`
+			: '';
+	return colorByUrgency(closest.remaining, `${closest.label} left ${Math.round(closest.remaining)}%${resetLabel}`);
 }
 
 /**
@@ -552,28 +548,22 @@ function formatRateLimit(data, level) {
  * @returns {string}
  */
 function formatRow1(data, width) {
-    const minGap = 3;
+	const minGap = 3;
 
-    for (const [index, level] of ROW1_LEVELS.entries()) {
-        const left = [
-            formatStyleModel(data, level),
-            level.cost && formatCost(data),
-        ].filter(Boolean).join(c.gray(' | '));
+	for (const [index, level] of ROW1_LEVELS.entries()) {
+		const left = [formatStyleModel(data, level), level.cost && formatCost(data)].filter(Boolean).join(c.gray(' | '));
 
-        const right = [
-            formatContextRemaining(data),
-            formatRateLimit(data, level),
-        ].filter(Boolean).join(c.gray(' · '));
+		const right = [formatContextRemaining(data), formatRateLimit(data, level)].filter(Boolean).join(c.gray(' · '));
 
-        if (width === null) {
-            return left + c.gray(' | ') + right;
-        }
+		if (width === null) {
+			return left + c.gray(' | ') + right;
+		}
 
-        const gap = width - visibleWidth(left) - visibleWidth(right);
-        if (gap >= minGap || index === ROW1_LEVELS.length - 1) {
-            return left + ' '.repeat(Math.max(gap, minGap)) + right;
-        }
-    }
+		const gap = width - visibleWidth(left) - visibleWidth(right);
+		if (gap >= minGap || index === ROW1_LEVELS.length - 1) {
+			return left + ' '.repeat(Math.max(gap, minGap)) + right;
+		}
+	}
 }
 
 /**
@@ -584,41 +574,35 @@ function formatRow1(data, width) {
  * @returns {string}
  */
 function formatRow2(data, width) {
-    const separator = ' | ';
-    const branch = resolveBranch(data);
+	const separator = ' | ';
+	const branch = resolveBranch(data);
 
-    for (const [index, level] of ROW2_LEVELS.entries()) {
-        let branchLabel = null;
-        if (branch && level.branch !== 'none') {
-            branchLabel = c.cyan(level.branch === 'full' ? branch : trimMiddle(branch, SHORT_BRANCH_WIDTH));
-        }
+	for (const [index, level] of ROW2_LEVELS.entries()) {
+		let branchLabel = null;
+		if (branch && level.branch !== 'none') {
+			branchLabel = c.cyan(level.branch === 'full' ? branch : trimMiddle(branch, SHORT_BRANCH_WIDTH));
+		}
 
-        const tail = [
-            branchLabel,
-            level.lines && formatLinesChanged(data),
-        ].filter(Boolean).join(' ');
+		const tail = [branchLabel, level.lines && formatLinesChanged(data)].filter(Boolean).join(' ');
 
-        const {path: dirPath, tag} = resolveLocation(data, level.worktree);
-        const tailWidth = tail ? visibleWidth(tail) + separator.length : 0;
-        const pathWidth = width === null ? FALLBACK_PATH_WIDTH : width - tailWidth - tag.length;
+		const {path: dirPath, tag} = resolveLocation(data, level.worktree);
+		const tailWidth = tail ? visibleWidth(tail) + separator.length : 0;
+		const pathWidth = width === null ? FALLBACK_PATH_WIDTH : width - tailWidth - tag.length;
 
-        if (width === null || pathWidth >= MIN_PATH_WIDTH || index === ROW2_LEVELS.length - 1) {
-            const location = c.blue(collapsePath(dirPath, Math.max(pathWidth, 1))) + c.gray(tag);
-            return tail ? location + c.gray(separator) + tail : location;
-        }
-    }
+		if (width === null || pathWidth >= MIN_PATH_WIDTH || index === ROW2_LEVELS.length - 1) {
+			const location = c.blue(collapsePath(dirPath, Math.max(pathWidth, 1))) + c.gray(tag);
+			return tail ? location + c.gray(separator) + tail : location;
+		}
+	}
 }
 
 async function main() {
-    const sessionData = await readStdinJSON();
-    const width = readAvailableWidth();
+	const sessionData = await readStdinJSON();
+	const width = readAvailableWidth();
 
-    const rows = [
-        formatRow1(sessionData, width),
-        formatRow2(sessionData, width),
-    ];
+	const rows = [formatRow1(sessionData, width), formatRow2(sessionData, width)];
 
-    process.stdout.write(rows.join('\n'));
+	process.stdout.write(rows.join('\n'));
 }
 
 main();
