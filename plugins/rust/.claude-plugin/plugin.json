@@ -1,7 +1,7 @@
 {
   "name": "rust",
   "version": "1.0.1",
-  "description": "Rust language discipline: ownership, idioms, error handling, concurrency, toolchain, and LSP-powered code intelligence",
+  "description": "Rust language discipline: ownership, idioms, error handling, concurrency (threads/rayon and async), toolchain, testing, and LSP-powered code intelligence",
   "lspServers": "./.lsp.json",
   "author": {
     "name": "xobotyi",
@@ -14,6 +14,9 @@
     "rust",
     "cargo",
     "conventions",
-    "idioms"
+    "idioms",
+    "rayon",
+    "tokio",
+    "testing"
   ]
 }
