@@ -8,7 +8,7 @@ at process start.
 
 - **`hooks/wall-clock.js`** — the whole implementation. ESM with `node:` imports, no dependencies.
 - **`hooks/hooks.json`** — registers the three events, 5s timeout each.
-- **`.dev/wall-clock.test.mjs`** — pins the PreCompact output form. Run `node --test plugins/wall-clock/.dev/` after any
+- **`.dev/wall-clock.test.mjs`** — pins the PreCompact output form. Run `vp test plugins/wall-clock` after any
   change to the hook.
 
 ## How It Works
