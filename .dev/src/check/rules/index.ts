@@ -1,6 +1,7 @@
 import type { Finding } from "../finding.ts";
 import type { Repo } from "../repo.ts";
 import { catalogEntries, entryKeys, renamesCoverHistory } from "./catalog.ts";
+import { rootDocs } from "./docs.ts";
 import { dependencyScope, prerequisiteDependencies, skillReferences } from "./links.ts";
 import { defaultLocations, hookExecForm, licenseCopy, readmeInstall } from "./plugin.ts";
 import { releaseVersion, unbumpedChanges } from "./release.ts";
@@ -19,6 +20,7 @@ const RULES: readonly Rule[] = [
   dependencyScope,
   releaseVersion,
   unbumpedChanges,
+  rootDocs,
 ];
 
 export async function runRules(repo: Repo, ctx: RuleContext): Promise<Finding[]> {

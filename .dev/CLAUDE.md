@@ -60,6 +60,8 @@ yarn typecheck   # tsc
   `CLAUDE.md`, `README.md`, `LICENSE`, `.dev/`, `tests/`, and `*.test.*`; a `plugin.json` change counts unless it only
   touches display keys (`description`, `keywords`, `author`, …) or a key naming its default location. A warning since
   the latest release tag, an error under `--pre-push`
+- `root-docs` — the root `CLAUDE.md` names `plugins/<name>/` and the root `README.md` has a `### <name>` section, for
+  every plugin. Only the names are checked, not the prose around them
 
 **Adding a rule:** a function in `src/check/rules/`, listed in `RULES` (`src/check/rules/index.ts`), with a test that
 breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule never repeats a check that
