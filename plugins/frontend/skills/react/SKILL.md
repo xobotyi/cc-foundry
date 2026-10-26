@@ -48,6 +48,8 @@ variables declared before rendering.
 ### Component Structure
 
 - One component per file. Small helpers co-located in the same file are acceptable but extract when reused.
+- Never define a component inside another component. Each render creates a new component type, so React remounts the
+  subtree and resets its state.
 - Prefer function declarations for components.
 - Do not use `React.FC` — it adds implicit `children` typing and complicates generics. Use
   `function Component(props: Props)`.
@@ -96,6 +98,8 @@ declarative — it references results, not processes.
 ### Refs
 
 - `ref` is a prop. Pass `ref` directly as a prop to function components. Never use `forwardRef` — it is deprecated.
+- Never read or write `ref.current` during render, except to initialize it once (`if (ref.current === null)`). A value
+  the render output depends on belongs in state.
 - Ref callbacks can return a cleanup function, called when the element unmounts.
 - Avoid implicit returns in ref callbacks — use block body `{}` not parentheses to prevent TypeScript confusion.
 
@@ -143,6 +147,9 @@ attributes.
 - React functions only. Call hooks from function components or custom hooks — never from regular JavaScript functions.
 - Exhaustive deps. Include all reactive values used inside the Effect in the dependency array. The linter enforces this
   — don't suppress it. If a dependency causes unwanted re-runs, restructure the code.
+- Effect Events (19.2+). Logic that reads the latest props or state but must not re-synchronize the Effect goes in a
+  `useEffectEvent` function. Call it only from inside Effects, and leave it out of the dependency array. Never use it to
+  drop a dependency the Effect should re-run for.
 - One Effect per concern. Don't merge unrelated sync logic into a single Effect. Separate Effects for separate external
   systems.
 
