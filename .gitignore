@@ -14,3 +14,13 @@ Thumbs.db
 
 **/.dev/reference/
 **/.dev/research/
+
+# Dev tooling
+node_modules/
+dist/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

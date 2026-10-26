@@ -6,7 +6,7 @@ import { loadRepo } from "../check/repo.ts";
 import { runRules } from "../check/rules/index.ts";
 import { validateRepo } from "../check/validate.ts";
 
-const REPO_ROOT = path.resolve(import.meta.dirname, "../../..");
+const REPO_ROOT = path.resolve(import.meta.dirname, "../..");
 
 export default defineCommand({
   meta: {

@@ -26,4 +26,4 @@ quality (covered by the-workflow).
 - When editing the skill, never weaken the Hard Constraints block (never fabricate, never inject, conserve substance,
   match voice, house style wins, secondhand text immune) — every edit path depends on it
 - Re-ground the references by refreshing `skills/humanize/.dev/reference-inventory.json` and running
-  `cd .dev && yarn cli docs-fetch ../plugins/the-writer/skills/humanize/.dev/reference-inventory.json`
+  `yarn cli docs-fetch plugins/the-writer/skills/humanize/.dev/reference-inventory.json`

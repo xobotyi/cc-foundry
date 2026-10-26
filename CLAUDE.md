@@ -57,7 +57,9 @@ process (Research → Scaffold → Write → Ship).
 
 **Development artifacts:**
 
-- `.dev/` directories contain build tooling and source materials
+- `src/` holds the repository's dev CLI, run from the root as `yarn cli <command>`: `check` validates the marketplace
+  and every plugin, `docs-fetch` fetches a skill's reference sources ([src/CLAUDE.md](/src/CLAUDE.md))
+- A plugin's `.dev/` directory holds its build tooling and source materials
 - `.dev/reference/` holds fetched docs (raw source, not shipped as-is)
 - `references/` holds processed content (shipped with plugin)
 
