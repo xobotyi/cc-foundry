@@ -44,8 +44,8 @@ export async function catalogEntries(repo: Repo): Promise<Finding[]> {
     if (!dirs.has(entry.name)) {
       findings.push(catalogError(`entry "${entry.name}" has no directory under plugins/`, at(entry.name)));
     } else if (entry.source !== `./plugins/${entry.name}`) {
-      const source = JSON.stringify(entry.source);
-      findings.push(catalogError(`entry "${entry.name}" has source ${source}, not "./plugins/${entry.name}"`, at(entry.name)));
+      const message = `entry "${entry.name}" has source ${JSON.stringify(entry.source)}, not "./plugins/${entry.name}"`;
+      findings.push(catalogError(message, at(entry.name)));
     }
   }
   return findings;
@@ -62,7 +62,7 @@ export async function entryKeys(repo: Repo): Promise<Finding[]> {
         severity: "error" as const,
         file: MARKETPLACE_FILE,
         line: lineOf(text, `"name": "${entry.name}"`),
-        message: `entry "${entry.name}" carries "${key}", which belongs in plugins/${entry.name}/.claude-plugin/plugin.json`,
+        message: `entry "${entry.name}" carries "${key}", which belongs in its plugin.json`,
       })),
   );
 }

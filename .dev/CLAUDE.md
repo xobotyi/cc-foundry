@@ -38,6 +38,12 @@ yarn typecheck   # tsc
 - `entry-keys` — an entry carries only `name`, `source`, `category`, `tags`, and the entry-only keys `strict`,
   `relevance`, `headers`, `headersHelper` ([ADR 1.12](/design-docs/adr/1.12-plugin-metadata-source.md))
 - `renames-history` — every plugin name in the git history of `marketplace.json` is listed today or is a `renames` key
+- `license` — each plugin's `LICENSE` is byte-identical to the root `LICENSE`
+- `readme-install` — each plugin README carries the install commands the root `CLAUDE.md` prescribes, for its own name
+- `default-paths` — no manifest key names the location Claude Code reads by default, such as
+  `"lspServers": "./.lsp.json"`
+- `hook-exec-form` — a hook command that names `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}` sets `args`, so no
+  shell splits the expanded path
 
 **Adding a rule:** a function in `src/check/rules/`, listed in `RULES` (`src/check/rules/index.ts`), with a test that
 breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule never repeats a check that

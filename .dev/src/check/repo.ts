@@ -13,6 +13,7 @@ export interface MarketplaceEntry {
 }
 
 export interface Marketplace {
+  name: string;
   entries: readonly MarketplaceEntry[];
   renames: ReadonlyMap<string, string | null>;
 }
@@ -86,7 +87,7 @@ function parseMarketplace(json: JsonObject): Marketplace {
       renames.set(from, typeof to === "string" ? to : null);
     }
   }
-  return { entries, renames };
+  return { name: typeof json.name === "string" ? json.name : "", entries, renames };
 }
 
 async function loadPlugin(root: string, dir: string): Promise<Plugin> {
@@ -114,7 +115,8 @@ function parseManifest(raw: JsonObject): Manifest {
 function parseDependency(value: unknown): Dependency[] {
   if (typeof value === "string") {
     const at = value.indexOf("@");
-    return [at === -1 ? { name: value, marketplace: null } : { name: value.slice(0, at), marketplace: value.slice(at + 1) }];
+    if (at === -1) return [{ name: value, marketplace: null }];
+    return [{ name: value.slice(0, at), marketplace: value.slice(at + 1) }];
   }
   if (isObject(value) && typeof value.name === "string") {
     return [{ name: value.name, marketplace: typeof value.marketplace === "string" ? value.marketplace : null }];
