@@ -27,5 +27,6 @@ workflow to `git-commit`.
 - `prompt-terser` is user-invoked only (`disable-model-invocation`) — its triggers sit inside `prompt-engineering`'s, so
   in the routing pool it only draws a contest it cannot win
 - Other plugins depend inward on these skills: `the-workflow`'s `claude-md` declares a hard `<prerequisite>` on
-  `prompt-engineering`, and `git-commit`'s CLAUDE.md cites `skill-engineering`. Renaming a skill here, or dropping a
-  section a dependent defers to, breaks a file in another plugin
+  `prompt-engineering`, and `the-workflow`'s `plugin.json` lists `ai-helpers` in `dependencies`. `git-commit`'s
+  CLAUDE.md cites `skill-engineering`. Renaming a skill here, or dropping a section a dependent defers to, breaks a file
+  in another plugin

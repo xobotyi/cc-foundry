@@ -116,6 +116,9 @@ transcripts after `cleanupPeriodDays`, 30 days by default, so a run sees only wh
 /plugin install the-workflow
 ```
 
+Installing the-workflow also installs `ai-helpers`, because the `claude-md` skill loads its `prompt-engineering` skill
+first.
+
 ## License
 
 MIT

@@ -17,6 +17,12 @@ structured context transfer across a boundary, and the user's corrections turned
 - **`debrief` invokes `claude-md` before its gate.** Choosing the layer a lesson belongs in is `claude-md`'s subject,
   and `debrief` carries only the routing that is specific to a correction
 
+## Plugin Scope
+
+- The wording of instruction text belongs to `ai-helpers`' `prompt-engineering`, which `claude-md` declares as a hard
+  `<prerequisite>`. `plugin.json` lists `ai-helpers` in `dependencies` for that prerequisite, so the dependency goes
+  when the prerequisite goes ([ADR 1.3](/design-docs/adr/1.3-skill-dependencies.md))
+
 ## Conventions
 
 **`claude-md`:**

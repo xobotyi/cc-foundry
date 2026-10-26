@@ -18,5 +18,8 @@
     "claude-md",
     "instructions",
     "corrections"
+  ],
+  "dependencies": [
+    "ai-helpers"
   ]
 }
