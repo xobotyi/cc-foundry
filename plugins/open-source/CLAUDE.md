@@ -40,4 +40,4 @@ requests that maintainers see. It does not cover:
 - Acceptance and rejection figures carry the caveat that the corpora measure agents working inside repositories that
   invited them — not the outside contribution this plugin covers
 - Re-ground a skill's references by refreshing its `.dev/reference-inventory.json` and running
-  `yarn cli docs-fetch plugins/open-source/skills/<skill>/.dev/reference-inventory.json`
+  `vp run cli docs-fetch plugins/open-source/skills/<skill>/.dev/reference-inventory.json`
