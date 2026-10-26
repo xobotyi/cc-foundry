@@ -16,7 +16,7 @@ test("findingsFromReport fails every validator issue except the accepted warning
       {
         file: "/repo/plugins/alpha/CLAUDE.md",
         errors: [],
-        warnings: [{ path: "root", message: "CLAUDE.md at the plugin root is not loaded as project context. Use a skill." }],
+        warnings: [{ path: "root", message: "CLAUDE.md at the plugin root is not loaded as project context." }],
       },
       {
         file: "/repo/plugins/alpha/hooks/hooks.json",

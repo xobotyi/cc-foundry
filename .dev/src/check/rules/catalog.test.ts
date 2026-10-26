@@ -29,7 +29,7 @@ test("catalog-entry reports a plugin directory with no entry", async (t: TestCon
   ]);
 });
 
-test("catalog-entry reports an entry with no directory, and a source off the plugin's directory", async (t: TestContext) => {
+test("catalog-entry reports an entry with no directory, and a source off its directory", async (t: TestContext) => {
   await using fixture = await createFixture();
   await fixture.editMarketplace((m) => {
     m.plugins.push({ name: "gamma", source: "./plugins/gamma" });
@@ -67,7 +67,7 @@ test("entry-keys reports a field that belongs in plugin.json", async (t: TestCon
   const findings = await entryKeys(await loadRepo(fixture.root));
 
   t.assert.deepStrictEqual(brief(findings), [
-    '.claude-plugin/marketplace.json: entry "alpha" carries "version", which belongs in plugins/alpha/.claude-plugin/plugin.json',
+    '.claude-plugin/marketplace.json: entry "alpha" carries "version", which belongs in its plugin.json',
   ]);
   t.assert.strictEqual(findings[0]?.line, 11);
 });
@@ -81,7 +81,8 @@ test("renames-history reports a removed plugin until renames maps it", async (t:
   await fixture.commit("remove beta");
 
   t.assert.deepStrictEqual(brief(await renamesCoverHistory(await loadRepo(fixture.root))), [
-    '.claude-plugin/marketplace.json: "beta" left the marketplace with no renames key; map it to its new name, or to null',
+    '.claude-plugin/marketplace.json: "beta" left the marketplace with no renames key; ' +
+      "map it to its new name, or to null",
   ]);
 
   await fixture.editMarketplace((m) => {

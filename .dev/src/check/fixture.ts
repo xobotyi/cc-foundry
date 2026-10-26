@@ -69,7 +69,7 @@ export async function createFixture(plugins: readonly FixturePlugin[] = DEFAULT_
   const runGit = (...args: string[]): Promise<string> => git(root, args);
 
   const marketplace: MarketplaceJson = {
-    name: "fixture",
+    name: "foundry",
     owner: { name: "fixture" },
     metadata: { description: "A fixture marketplace" },
     plugins: plugins.map((p) => ({ name: p.name, source: `./plugins/${p.name}`, category: "development", tags: [] })),
