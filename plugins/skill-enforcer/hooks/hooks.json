@@ -6,7 +6,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js prompt",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js",
+              "prompt"
+            ],
             "timeout": 5
           }
         ]
@@ -18,7 +22,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js session-start",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js",
+              "session-start"
+            ],
             "timeout": 5
           }
         ]
@@ -29,7 +37,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js pre-compact",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js",
+              "pre-compact"
+            ],
             "timeout": 5
           }
         ]
@@ -41,7 +53,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js read",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js",
+              "read"
+            ],
             "timeout": 5
           }
         ]
@@ -51,7 +67,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js write",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js",
+              "write"
+            ],
             "timeout": 5
           }
         ]
@@ -61,7 +81,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js skill",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js",
+              "skill"
+            ],
             "timeout": 5
           }
         ]
