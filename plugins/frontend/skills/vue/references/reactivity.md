@@ -122,7 +122,8 @@ watch(source, callback, { deep: true })
 
 ### `watchEffect()`
 
-Runs immediately, auto-tracks all reactive dependencies accessed during execution.
+Runs immediately, auto-tracks all reactive dependencies accessed during its synchronous execution. In an async callback,
+only the reads before the first `await` are tracked.
 
 ```ts
 import { ref, watchEffect } from 'vue'
@@ -157,6 +158,9 @@ watchEffect((onCleanup) => {
   onCleanup(() => controller.abort())
 })
 ```
+
+`onWatcherCleanup()` (3.5+) registers the same cleanup without the parameter, but only during the synchronous part of
+the callback. Called after an `await`, it warns and the cleanup never runs.
 
 ## Deep Reactivity
 

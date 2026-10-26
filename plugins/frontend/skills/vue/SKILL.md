@@ -86,7 +86,15 @@ runtime-only validation. References contain extended examples, rationale, and ed
 - Watch multiple sources: `watch([a, b], ([newA, newB]) => {...})`.
 
 **Cleanup:** Both `watch` and `watchEffect` support cleanup via the `onCleanup` parameter. Use it for aborting fetch
-requests, clearing timers, removing listeners.
+requests, clearing timers, removing listeners. `onWatcherCleanup()` (3.5+) registers a cleanup only before the first
+`await` of an async callback: after it, Vue warns and drops the cleanup. The `onCleanup` parameter has no such limit.
+
+**Async `watchEffect`:** dependency tracking stops at the first `await`. Read every reactive source before it, or use
+`watch()` with explicit sources.
+
+**Route params:** Vue Router reuses the component instance when only the params change, as from `/users/1` to
+`/users/2`: `setup` and the mount hooks do not run again. Load route-dependent data with
+`watch(() => route.params.id, load, { immediate: true })`, never only in `setup` or `onMounted`.
 
 ### DOM Update Timing
 
