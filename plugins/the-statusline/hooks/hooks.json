@@ -7,7 +7,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/sync-statusline.js",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/sync-statusline.js"
+            ],
             "timeout": 5
           }
         ]
