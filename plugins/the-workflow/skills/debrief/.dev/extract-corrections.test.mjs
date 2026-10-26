@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { mkdir, mkdtemp, rm, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { after, before, suite, test } from "node:test";
+import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import { promisify } from "node:util";
 
 const run = promisify(execFile);
@@ -181,7 +181,7 @@ async function writeSession(dir, name, entries, { cwd, mtime }) {
 	await utimes(file, new Date(mtime), new Date(mtime));
 }
 
-before(async () => {
+beforeAll(async () => {
 	projectsDir = await mkdtemp(path.join(tmpdir(), "debrief-"));
 	await writeSession(SLUG, "s1", SESSION, { cwd: PROJECT, mtime: "2026-10-20T11:00:00Z" });
 	await writeSession(
@@ -256,7 +256,7 @@ before(async () => {
 	);
 });
 
-after(() =>
+afterAll(() =>
 	Promise.all(
 		[projectsDir, configDir, repoRoot, linkedWorktree].map((dir) => rm(dir, { recursive: true, force: true })),
 	),
@@ -277,12 +277,10 @@ async function extractFrom(project, args = [], env = process.env) {
 
 const extract = (...args) => extractFrom(PROJECT, args);
 
-suite("extract-corrections", () => {
-	test("emits each human correction with the signal that preceded it", async (t) => {
+describe("extract-corrections", () => {
+	test("emits each human correction with the signal that preceded it", async () => {
 		const candidates = await extract();
-		t.assert.deepStrictEqual(
-			candidates.map(({ signal, text }) => [signal, text]),
-			[
+		expect(candidates.map(({ signal, text }) => [signal, text])).toStrictEqual([
 				["rejection", "no, keep the handler pure"],
 				["mid-turn", "also run lint"],
 				["interrupt", "stop, wrong suite"],
@@ -290,30 +288,29 @@ suite("extract-corrections", () => {
 				["follow-up", "late follow-up"],
 				["follow-up", "worktree correction"],
 				["follow-up", "legacy correction without origin"],
-			],
-		);
+			]);
 	});
 
-	test("attaches the assistant action the user reacted to", async (t) => {
+	test("attaches the assistant action the user reacted to", async () => {
 		const [rejection] = await extract();
-		t.assert.strictEqual(rejection.said, "Editing the handler.");
-		t.assert.deepStrictEqual(rejection.did, ["Edit /work/acme.app/a.js"]);
+		expect(rejection.said).toBe("Editing the handler.");
+		expect(rejection.did).toStrictEqual(["Edit /work/acme.app/a.js"]);
 	});
 
-	test("attaches the abandoned work to a rewind", async (t) => {
+	test("attaches the abandoned work to a rewind", async () => {
 		const rewind = (await extract()).find(({ signal }) => signal === "rewind");
-		t.assert.deepStrictEqual(rewind.did, ["Write /work/acme.app/b.js"]);
+		expect(rewind.did).toStrictEqual(["Write /work/acme.app/b.js"]);
 	});
 
-	test("attaches the skills invoked before a candidate, typed or called, built-in commands excluded", async (t) => {
+	test("attaches the skills invoked before a candidate, typed or called, built-in commands excluded", async () => {
 		const [candidate] = await extractFrom(LEARN);
-		t.assert.strictEqual(candidate.text, "correction after skills");
-		t.assert.deepStrictEqual(candidate.skills, ["the-coder:coding", "git-commit:commit", "deep-research"]);
+		expect(candidate.text).toBe("correction after skills");
+		expect(candidate.skills).toStrictEqual(["the-coder:coding", "git-commit:commit", "deep-research"]);
 	});
 
-	test("groups a tool error the agent repeated across sessions with the call that fixed it", async (t) => {
+	test("groups a tool error the agent repeated across sessions with the call that fixed it", async () => {
 		const errors = (await extractFrom(LEARN)).filter(({ signal }) => signal === "tool-error");
-		t.assert.deepStrictEqual(errors, [
+		expect(errors).toStrictEqual([
 			{
 				id: "error:Edit: String to replace not found in file.",
 				projects: [LEARN],
@@ -329,70 +326,61 @@ suite("extract-corrections", () => {
 		]);
 	});
 
-	test("reads auto memory entries in the window, the index excluded", async (t) => {
-		t.assert.deepStrictEqual(await memoryOf([], await memoryEnv({})), [
+	test("reads auto memory entries in the window, the index excluded", async () => {
+		expect(await memoryOf([], await memoryEnv({}))).toStrictEqual([
 			["user", "Backend engineer, new to Go\n\nGo."],
 			["feedback", "Pin exact versions\n\nPin every dependency."],
 		]);
-		t.assert.deepStrictEqual(await memoryOf(["--since", "2026-10-05"], await memoryEnv({})), [
+		expect(await memoryOf(["--since", "2026-10-05"], await memoryEnv({}))).toStrictEqual([
 			["feedback", "Pin exact versions\n\nPin every dependency."],
 		]);
 	});
 
-	test("skips auto memory where it is off, and the environment overrides settings", async (t) => {
-		t.assert.deepStrictEqual(await memoryOf([], await memoryEnv({}, "1")), []);
-		t.assert.deepStrictEqual(await memoryOf([], await memoryEnv({ autoMemoryEnabled: false })), []);
-		t.assert.strictEqual((await memoryOf([], await memoryEnv({ autoMemoryEnabled: false }, "0"))).length, 2);
+	test("skips auto memory where it is off, and the environment overrides settings", async () => {
+		expect(await memoryOf([], await memoryEnv({}, "1"))).toStrictEqual([]);
+		expect(await memoryOf([], await memoryEnv({ autoMemoryEnabled: false }))).toStrictEqual([]);
+		expect((await memoryOf([], await memoryEnv({ autoMemoryEnabled: false }, "0"))).length).toBe(2);
 	});
 
-	test("drops entries older than --since", async (t) => {
+	test("drops entries older than --since", async () => {
 		const candidates = await extract("--since", "2026-10-10");
-		t.assert.deepStrictEqual(
-			candidates.map(({ text }) => text),
-			["late follow-up"],
-		);
+		expect(candidates.map(({ text }) => text)).toStrictEqual(["late follow-up"]);
 	});
 
-	test("reads only the transcript named by --session, copied history included", async (t) => {
+	test("reads only the transcript named by --session, copied history included", async () => {
 		const candidates = await extract("--session", "s2");
-		t.assert.deepStrictEqual(
-			candidates.map(({ text }) => text),
-			["worktree correction", "late follow-up"],
-		);
+		expect(candidates.map(({ text }) => text)).toStrictEqual(["worktree correction", "late follow-up"]);
 	});
 
-	test("emits an entry copied into a later transcript once", async (t) => {
+	test("emits an entry copied into a later transcript once", async () => {
 		const late = (await extract()).filter(({ text }) => text === "late follow-up");
-		t.assert.deepStrictEqual(
-			late.map(({ session }) => session),
-			["s1"],
-		);
+		expect(late.map(({ session }) => session)).toStrictEqual(["s1"]);
 	});
 
-	test("folds a worktree session into its repository", async (t) => {
+	test("folds a worktree session into its repository", async () => {
 		const worktree = (await extract()).find(({ text }) => text === "worktree correction");
-		t.assert.strictEqual(worktree.project, PROJECT);
+		expect(worktree.project).toBe(PROJECT);
 	});
 
-	test("keeps the launch repository after the agent changes directory", async (t) => {
+	test("keeps the launch repository after the agent changes directory", async () => {
 		const late = (await extract()).find(({ text }) => text === "late follow-up");
-		t.assert.strictEqual(late.project, PROJECT);
+		expect(late.project).toBe(PROJECT);
 	});
 
-	test("reads every project named by --project", async (t) => {
+	test("reads every project named by --project", async () => {
 		const candidates = await extract("--project", `${PROJECT}-other`);
-		t.assert.ok(candidates.some(({ text, project }) => text === "foreign project" && project === `${PROJECT}-other`));
+		expect(candidates.some(({ text, project }) => text === "foreign project" && project === `${PROJECT}-other`)).toBe(true);
 	});
 
-	test("reads every project under --all-projects and skips SDK sessions", async (t) => {
+	test("reads every project under --all-projects and skips SDK sessions", async () => {
 		const texts = (await extract("--all-projects")).map(({ text }) => text);
-		t.assert.ok(texts.includes("foreign project"));
-		t.assert.ok(!texts.includes("observer prompt"));
+		expect(texts.includes("foreign project")).toBe(true);
+		expect(!texts.includes("observer prompt")).toBe(true);
 	});
 
-	test("lists each repository once, newest first", async (t) => {
+	test("lists each repository once, newest first", async () => {
 		const { stdout } = await run(process.execPath, [SCRIPT, "--projects-dir", projectsDir, "--list-projects"]);
-		t.assert.deepStrictEqual(stdout.trim().split("\n"), [
+		expect(stdout.trim().split("\n")).toStrictEqual([
 			`2026-10-22\t1\t${PROJECT}-other`,
 			`2026-10-21\t3\t${PROJECT}`,
 			`2026-10-08\t2\t${repoRoot}`,
@@ -400,18 +388,15 @@ suite("extract-corrections", () => {
 		]);
 	});
 
-	test("keys a subdirectory launch and a linked worktree to their repository root", async (t) => {
+	test("keys a subdirectory launch and a linked worktree to their repository root", async () => {
 		const candidates = await extractFrom(repoRoot);
-		t.assert.deepStrictEqual(
-			candidates.map(({ text, project }) => [text, project]),
-			[
+		expect(candidates.map(({ text, project }) => [text, project])).toStrictEqual([
 				["subdirectory correction", repoRoot],
 				["linked worktree correction", repoRoot],
-			],
-		);
+			]);
 	});
 
-	test("indexes an extraction by line number and prints picked lines in full", async (t) => {
+	test("indexes an extraction by line number and prints picked lines in full", async () => {
 		const file = path.join(projectsDir, "extraction.jsonl");
 		const records = [
 			{ signal: "rejection", project: PROJECT, at: "2026-10-01T10:00:00Z", text: "no,\n  keep it pure" },
@@ -420,22 +405,22 @@ suite("extract-corrections", () => {
 		await writeFile(file, `${records.map((record) => JSON.stringify(record)).join("\n")}\n`);
 
 		const { stdout: index } = await run(process.execPath, [SCRIPT, "--index", file]);
-		t.assert.deepStrictEqual(index.trim().split("\n"), [
+		expect(index.trim().split("\n")).toStrictEqual([
 			`1\trejection\t${PROJECT}\t2026-10-01\tno, keep it pure`,
 			`2\ttool-error\t${LEARN},${PROJECT}\t2026-10-02\tString not found.`,
 		]);
 		const { stdout: picked } = await run(process.execPath, [SCRIPT, "--pick", file, "--lines", "2"]);
-		t.assert.deepStrictEqual(JSON.parse(picked), records[1]);
-		await t.assert.rejects(
-			run(process.execPath, [SCRIPT, "--pick", file, "--lines", "3"]),
-			(err) => err.code === 1 && err.stderr.includes("--lines 3: expected line numbers from 1 to 2"),
-		);
+		expect(JSON.parse(picked)).toStrictEqual(records[1]);
+		await expect(run(process.execPath, [SCRIPT, "--pick", file, "--lines", "3"])).rejects.toMatchObject({
+			code: 1,
+			stderr: expect.stringContaining("--lines 3: expected line numbers from 1 to 2"),
+		});
 	});
 
-	test("names a repository no session ran in", async (t) => {
-		await t.assert.rejects(
-			run(process.execPath, [SCRIPT, "--projects-dir", projectsDir, "--project", "/nowhere"]),
-			(err) => err.code === 1 && err.stderr.includes("no transcripts for /nowhere"),
-		);
+	test("names a repository no session ran in", async () => {
+		await expect(run(process.execPath, [SCRIPT, "--projects-dir", projectsDir, "--project", "/nowhere"])).rejects.toMatchObject({
+			code: 1,
+			stderr: expect.stringContaining("no transcripts for /nowhere"),
+		});
 	});
 });

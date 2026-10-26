@@ -20,7 +20,7 @@ export default defineConfig({
 		],
 	},
 	test: {
-		include: ['src/**/*.test.ts'],
+		include: ['src/**/*.test.ts', 'plugins/**/.dev/**/*.test.mjs'],
 	},
 	lint: {
 		// constraint: these files type-check against types Claude Code writes only when it loads the mod

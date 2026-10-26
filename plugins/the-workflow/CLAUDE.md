@@ -57,7 +57,7 @@ structured context transfer across a boundary, and the user's corrections turned
   sessions already read hides the recurrence that makes a lesson. Every run rereads its whole window; volume is handled
   by the two-pass index and pick, never by skipping history
 - The transcript format is undocumented and changes between CLI versions. `.dev/extract-corrections.test.mjs` pins every
-  marker the extractor relies on; run `node --test plugins/the-workflow/skills/debrief/.dev/` after any change to the
+  marker the extractor relies on; run `vp test plugins/the-workflow` after any change to the
   script, and add a fixture entry for each new marker
 - Transcript facts that defy a reasonable assumption, each pinned by that test:
   - A human prompt carries `origin.kind: "human"`. In a session whose entries carry `origin`, an entry without it is
