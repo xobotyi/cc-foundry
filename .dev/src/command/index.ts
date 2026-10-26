@@ -1,4 +1,5 @@
 import { defineCommand } from "citty";
+import check from "./check.ts";
 import docsFetch from "./docs-fetch.ts";
 
 export default defineCommand({
@@ -8,6 +9,7 @@ export default defineCommand({
     description: "Development tools for cc-foundry marketplace",
   },
   subCommands: {
+    check,
     "docs-fetch": docsFetch,
   },
 });

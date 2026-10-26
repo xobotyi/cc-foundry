@@ -9,6 +9,32 @@ yarn cli <command> [options]
 
 ## Commands
 
+### check
+
+Check the marketplace and every plugin with `claude plugin validate`, then against this repository's own rules.
+
+```bash
+yarn cli check [--format text|github]
+yarn test        # node:test suites under src/
+yarn typecheck   # tsc
+```
+
+**Flags:**
+
+- `--format` — `github` prints GitHub Actions annotations, and is the default when `GITHUB_ACTIONS` is set
+
+**Behavior:**
+
+- Runs `claude plugin validate --json` on the marketplace and on each `plugins/*/`, so `claude` must be on `PATH`
+- Every validator error and warning fails the check, except the accepted warnings in `ACCEPTED_WARNINGS`
+  (`src/check/validate.ts`): the plugin-root `CLAUDE.md` warning. The validator's plugin-directory checks (icon,
+  listing) and its advice are ignored
+- Exits 1 when any finding is an error
+
+**Adding a rule:** a function in `src/check/rules/`, listed in `RULES` (`src/check/rules/index.ts`), with a test that
+breaks it on a `createFixture()` repository (`src/check/fixture.ts`). A rule never repeats a check that
+`claude plugin validate` makes.
+
 ### docs-fetch
 
 Fetch the URLs listed in a skill's `reference-inventory.json` into a `reference/` directory beside that inventory file.
