@@ -55,7 +55,7 @@ The tick period defaults to one minute. Change it in `~/.claude/settings.json` o
 `.claude/settings.local.json`:
 
 ```json
-{ "env": { "FOUNDRY_WALL_CLOCK_TICK_SECONDS": "300" } }
+{"env": {"FOUNDRY_WALL_CLOCK_TICK_SECONDS": "300"}}
 ```
 
 `0` ticks on every tool batch. That helps when you are debugging something timing-sensitive, and costs tokens the rest

@@ -1,21 +1,13 @@
 {
-  "name": "rust",
-  "version": "1.0.1",
-  "description": "Rust language discipline: ownership, idioms, error handling, concurrency (threads/rayon and async), toolchain, testing, and LSP-powered code intelligence",
-  "author": {
-    "name": "xobotyi",
-    "email": "xog3@yandex.ru"
-  },
-  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/rust",
-  "repository": "https://github.com/xobotyi/cc-foundry",
-  "license": "MIT",
-  "keywords": [
-    "rust",
-    "cargo",
-    "conventions",
-    "idioms",
-    "rayon",
-    "tokio",
-    "testing"
-  ]
+	"name": "rust",
+	"version": "1.0.1",
+	"description": "Rust language discipline: ownership, idioms, error handling, concurrency (threads/rayon and async), toolchain, testing, and LSP-powered code intelligence",
+	"author": {
+		"name": "xobotyi",
+		"email": "xog3@yandex.ru"
+	},
+	"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/rust",
+	"repository": "https://github.com/xobotyi/cc-foundry",
+	"license": "MIT",
+	"keywords": ["rust", "cargo", "conventions", "idioms", "rayon", "tokio", "testing"]
 }

@@ -57,8 +57,8 @@ For the full landmark-to-role mapping table, see [`semantic-html.md`](${CLAUDE_S
 
 ### Interactive Elements
 
-Use `<button>` for actions (submit, toggle, open dialog) -- activates via Enter and Space. Use `<a href>` for navigation
--- activates via Enter. Never `<a href="#" onclick="...">` for actions. Never `<button>` for navigation.
+Use `<button>` for actions (submit, toggle, open dialog) -- activates via Enter and Space. Use `<a href>` for
+navigation -- activates via Enter. Never `<a href="#" onclick="...">` for actions. Never `<button>` for navigation.
 
 ### Tables
 

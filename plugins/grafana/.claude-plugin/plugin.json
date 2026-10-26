@@ -1,25 +1,25 @@
 {
-  "name": "grafana",
-  "version": "1.1.0",
-  "description": "Grafana observability platform: dashboards, query languages (PromQL, MetricsQL, LogsQL), alerting, provisioning, and data visualization discipline",
-  "author": {
-    "name": "xobotyi",
-    "email": "xog3@yandex.ru",
-    "url": "https://github.com/xobotyi"
-  },
-  "homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/grafana",
-  "repository": "https://github.com/xobotyi/cc-foundry",
-  "license": "MIT",
-  "keywords": [
-    "grafana",
-    "dashboards",
-    "promql",
-    "metricsql",
-    "logsql",
-    "victoriametrics",
-    "alerting",
-    "provisioning",
-    "dataviz",
-    "observability"
-  ]
+	"name": "grafana",
+	"version": "1.1.0",
+	"description": "Grafana observability platform: dashboards, query languages (PromQL, MetricsQL, LogsQL), alerting, provisioning, and data visualization discipline",
+	"author": {
+		"name": "xobotyi",
+		"email": "xog3@yandex.ru",
+		"url": "https://github.com/xobotyi"
+	},
+	"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/grafana",
+	"repository": "https://github.com/xobotyi/cc-foundry",
+	"license": "MIT",
+	"keywords": [
+		"grafana",
+		"dashboards",
+		"promql",
+		"metricsql",
+		"logsql",
+		"victoriametrics",
+		"alerting",
+		"provisioning",
+		"dataviz",
+		"observability"
+	]
 }

@@ -7,8 +7,8 @@ phase-relevant references get read — not skipped.
 
 - **`hooks/sef-hook.js`** — the whole implementation, one Node script dispatched by a CLI action argument.
 - **`hooks/hooks.json`** — the event wiring below.
-- **`.dev/sef-hook.test.mjs`** — pins the PreCompact output form. Run `vp test plugins/skill-enforcer` after
-  any change to the hook.
+- **`.dev/sef-hook.test.mjs`** — pins the PreCompact output form. Run `vp test plugins/skill-enforcer` after any change
+  to the hook.
 
 ## Checkpoints
 

@@ -1,19 +1,19 @@
 {
-  "sources": {
-    "Agent Skills Specification": "https://agentskills.io/specification.md",
-    "Agent Skills Best Practices": "https://agentskills.io/skill-creation/best-practices.md",
-    "Agent Skills Optimizing Descriptions": "https://agentskills.io/skill-creation/optimizing-descriptions.md",
-    "Agent Skills Evaluating Skills": "https://agentskills.io/skill-creation/evaluating-skills.md",
-    "Agent Skills Using Scripts": "https://agentskills.io/skill-creation/using-scripts.md",
-    "Agent Skills Client Implementation": "https://agentskills.io/client-implementation/adding-skills-support.md",
-    "Agent Plugins Specification 1.0.0": "https://raw.githubusercontent.com/agentplugins/agent-plugins-spec/main/spec/1.0.0.md",
-    "Anthropic Skill Authoring Best Practices": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
-    "Anthropic Agent Skills Overview": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
-    "Claude Code Skills": "https://code.claude.com/docs/en/skills.md",
-    "Claude Code Plugins": "https://code.claude.com/docs/en/plugins.md",
-    "Claude Code Plugin Marketplaces": "https://code.claude.com/docs/en/plugin-marketplaces.md",
-    "Claude Code Subagents": "https://code.claude.com/docs/en/sub-agents.md",
-    "Claude Code Hooks": "https://code.claude.com/docs/en/hooks.md"
-  },
-  "lastFetched": "2026-08-28T15:43:33.219Z"
+	"sources": {
+		"Agent Skills Specification": "https://agentskills.io/specification.md",
+		"Agent Skills Best Practices": "https://agentskills.io/skill-creation/best-practices.md",
+		"Agent Skills Optimizing Descriptions": "https://agentskills.io/skill-creation/optimizing-descriptions.md",
+		"Agent Skills Evaluating Skills": "https://agentskills.io/skill-creation/evaluating-skills.md",
+		"Agent Skills Using Scripts": "https://agentskills.io/skill-creation/using-scripts.md",
+		"Agent Skills Client Implementation": "https://agentskills.io/client-implementation/adding-skills-support.md",
+		"Agent Plugins Specification 1.0.0": "https://raw.githubusercontent.com/agentplugins/agent-plugins-spec/main/spec/1.0.0.md",
+		"Anthropic Skill Authoring Best Practices": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
+		"Anthropic Agent Skills Overview": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
+		"Claude Code Skills": "https://code.claude.com/docs/en/skills.md",
+		"Claude Code Plugins": "https://code.claude.com/docs/en/plugins.md",
+		"Claude Code Plugin Marketplaces": "https://code.claude.com/docs/en/plugin-marketplaces.md",
+		"Claude Code Subagents": "https://code.claude.com/docs/en/sub-agents.md",
+		"Claude Code Hooks": "https://code.claude.com/docs/en/hooks.md"
+	},
+	"lastFetched": "2026-08-28T15:43:33.219Z"
 }

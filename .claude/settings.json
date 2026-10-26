@@ -1,21 +1,21 @@
 {
-  "enabledPlugins": {
-    "ai-helpers@foundry": true,
-    "git-commit@foundry": true,
-    "open-source@foundry": true,
-    "skill-enforcer@foundry": true,
-    "the-blueprint@foundry": true,
-    "the-coder@foundry": true,
-    "the-workflow@foundry": true,
-    "javascript@foundry": true
-  },
-  "extraKnownMarketplaces": {
-    "foundry": {
-      "source": {
-        "source": "github",
-        "repo": "xobotyi/cc-foundry"
-      }
-    }
-  },
-  "outputStyle": "ai-helpers:AI Engineer"
+	"enabledPlugins": {
+		"ai-helpers@foundry": true,
+		"git-commit@foundry": true,
+		"open-source@foundry": true,
+		"skill-enforcer@foundry": true,
+		"the-blueprint@foundry": true,
+		"the-coder@foundry": true,
+		"the-workflow@foundry": true,
+		"javascript@foundry": true
+	},
+	"extraKnownMarketplaces": {
+		"foundry": {
+			"source": {
+				"source": "github",
+				"repo": "xobotyi/cc-foundry"
+			}
+		}
+	},
+	"outputStyle": "ai-helpers:AI Engineer"
 }

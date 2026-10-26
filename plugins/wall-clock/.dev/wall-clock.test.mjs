@@ -1,18 +1,18 @@
-import { execFile } from 'node:child_process';
+import {execFile} from 'node:child_process';
 import path from 'node:path';
-import { expect, test } from "vite-plus/test";
+import {expect, test} from 'vite-plus/test';
 
 const HOOK = path.join(import.meta.dirname, '..', 'hooks', 'wall-clock.js');
 
 const runHook = (payload) =>
-    new Promise((resolve, reject) => {
-        const child = execFile(process.execPath, [HOOK], (err, stdout) => (err ? reject(err) : resolve(stdout)));
+	new Promise((resolve, reject) => {
+		const child = execFile(process.execPath, [HOOK], (err, stdout) => (err ? reject(err) : resolve(stdout)));
 
-        child.stdin.end(JSON.stringify(payload));
-    });
+		child.stdin.end(JSON.stringify(payload));
+	});
 
 test('PreCompact writes its instruction as plain text, the only output Claude Code reads for that event', async () => {
-    const stdout = await runHook({ hook_event_name: 'PreCompact', transcript_path: '/nonexistent', trigger: 'manual' });
+	const stdout = await runHook({hook_event_name: 'PreCompact', transcript_path: '/nonexistent', trigger: 'manual'});
 
-    expect(stdout).toMatch(/^When compacting, drop every <wall-clock/);
+	expect(stdout).toMatch(/^When compacting, drop every <wall-clock/);
 });

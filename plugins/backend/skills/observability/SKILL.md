@@ -373,8 +373,8 @@ like 404 on a server span — the server operated correctly.
 ### Sampling
 
 At high traffic volumes, tracing 100% of requests is expensive. Sampling reduces cost while preserving signal. |
-Strategy | How It Works | Trade-off | | ------------------------ |
------------------------------------------------------- | ---------------------------------------------- | |
+Strategy | How It Works |
+Trade-off | | ------------------------ | ------------------------------------------------------ | ---------------------------------------------- | |
 **Head-based** | Decide at trace start whether to sample | Simple; may miss rare errors | | **Tail-based** | Decide
 after trace completes based on content | Catches errors; needs buffering infrastructure | | **Always-on for errors** |
 Sample 100% of error traces, probabilistic for success | Good default balance |
