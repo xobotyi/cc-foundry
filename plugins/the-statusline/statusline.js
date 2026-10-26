@@ -205,7 +205,7 @@ async function readStdinJSON() {
  * @returns {number}
  */
 function readPadding() {
-    const settingsPath = path.join(os.homedir(), '.claude', 'settings.json');
+    const settingsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'settings.json');
     try {
         const padding = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')).statusLine?.padding;
         return Number.isFinite(padding) ? padding : 0;

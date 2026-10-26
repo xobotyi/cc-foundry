@@ -16,8 +16,8 @@ status visibility mid-session.
 
 ## The Solution
 
-This plugin installs a two-row status line to your user-level Claude configuration (`~/.claude/`), where it persists
-across all sessions and survives agent directory changes.
+This plugin installs a two-row status line to your user-level Claude configuration directory, where it persists across
+all sessions and survives agent directory changes.
 
 The first row shows the output style, the model with its reasoning effort, and the session cost. At its right edge sit
 the context left and whichever rate limit is closer to stopping you, the 5-hour or the 7-day one, with the time it
@@ -52,8 +52,9 @@ On Claude Code before 2.1.275, add the marketplace first:
 
 The plugin automatically:
 
-- Installs the status line script to `~/.claude/statusline.js`
-- Configures `~/.claude/settings.json` with the correct status line command
+- Installs the status line script as `statusline.js` in your Claude configuration directory: `CLAUDE_CONFIG_DIR` when
+  you set it, `~/.claude` otherwise
+- Sets the status line command in `settings.json` in the same directory
 - Keeps the script synchronized on every session start
 
 ## How It Works
@@ -78,7 +79,8 @@ To modify the status line display, edit `statusline.js` in the plugin directory 
 /plugin uninstall the-statusline
 ```
 
-To fully clean up, remove the `statusLine` key from `~/.claude/settings.json` and delete `~/.claude/statusline.js`.
+To fully clean up, remove the `statusLine` key from `settings.json` in your Claude configuration directory and delete
+`statusline.js` there. The directory is `CLAUDE_CONFIG_DIR` when you set it, `~/.claude` otherwise.
 
 ## License
 

@@ -4,18 +4,20 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 
 ## Components
 
-- **`hooks/sync-statusline.js`** — SessionStart hook; copies the renderer to `~/.claude/statusline.js` and patches
-  `statusLine` in `~/.claude/settings.json` with the command and a default `refreshInterval`
+- **`hooks/sync-statusline.js`** — SessionStart hook; copies the renderer to `statusline.js` in the user's config
+  directory (`CLAUDE_CONFIG_DIR`, or `~/.claude`) and patches `statusLine` in that directory's `settings.json` with the
+  command and a default `refreshInterval`
 - **`hooks/hooks.json`** — hook registration
-- **`statusline.js`** — the renderer; Claude Code runs the installed copy under `~/.claude/` and feeds it session data
-  as JSON on stdin
+- **`statusline.js`** — the renderer; Claude Code runs the installed copy in the config directory and feeds it session
+  data as JSON on stdin. It reads `padding` from the `settings.json` beside it
 
 ## Conventions
 
-- **Patch `~/.claude/settings.json` by spreading the existing object** — the hook rewrites the whole file, so any key
-  not spread through is erased from the user's global config, including `padding` under `statusLine`
-- **The status line installs at user level with an absolute command path** — a project-level `statusLine` carries a
-  relative script path that breaks when an agent changes working directory mid-session
+- **Patch the config directory's `settings.json` by spreading the existing object** — the hook rewrites the whole file,
+  so any key not spread through is erased from the user's global config, including `padding` under `statusLine`
+- **The status line installs at user level with an absolute, double-quoted command path** — a project-level `statusLine`
+  carries a relative script path that breaks when an agent changes working directory mid-session, and an unquoted path
+  splits at a space
 - **An edit to `statusline.js` reaches the user on the next session start**, when the hook re-copies it — a change is
   not observable in the session that made it
 - **Context left is measured against the model's full window** — the payload carries no auto-compact state (checked

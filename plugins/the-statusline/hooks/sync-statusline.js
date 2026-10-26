@@ -2,14 +2,14 @@
 
 /**
  * SessionStart hook — syncs status line script and settings
- * to user-level Claude configuration (~/.claude/).
+ * to the user-level Claude configuration directory: CLAUDE_CONFIG_DIR, or ~/.claude.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const CLAUDE_DIR = path.join(os.homedir(), '.claude');
+const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 const SETTINGS_PATH = path.join(CLAUDE_DIR, 'settings.json');
 const TARGET_SCRIPT = path.join(CLAUDE_DIR, 'statusline.js');
 const SOURCE_SCRIPT = path.join(
@@ -28,7 +28,7 @@ try {
         ? JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf-8'))
         : {};
 
-    const command = `node ${TARGET_SCRIPT}`;
+    const command = `node "${TARGET_SCRIPT}"`;
     const statusLine = settings.statusLine;
 
     const isCurrent = statusLine?.type === 'command'
