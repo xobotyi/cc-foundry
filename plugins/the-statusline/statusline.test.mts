@@ -126,7 +126,7 @@ describe('collapsePath', () => {
 		const dir = '/opt/some/deeply/nested/working/directory';
 
 		expect(collapsePath(dir, 30)).toBe('/o/s/d/n/working/directory');
-		expect(collapsePath(dir, 12)).toBe('/o/.../directory');
+		expect(collapsePath(dir, 12)).toBe('/o/.../d...y');
 	});
 });
 
@@ -334,7 +334,7 @@ describe('rows', () => {
 		expect(row(50)).toMatch(/^Opus 5\.5 \| \$12\.35 +ctx left 43% · 5h left 37%$/);
 	});
 
-	test.each([100])('fits row 2 into %i columns', async (width) => {
+	test.each([100, 60, 40, 25])('fits row 2 into %i columns', async (width) => {
 		const repo = path.join(await tempDir(), 'a-fairly-long-repository-name');
 		await mkdir(path.join(repo, '.git'), {recursive: true});
 		await writeFile(path.join(repo, '.git', 'HEAD'), 'ref: refs/heads/feature/a-really-long-branch-name\n');

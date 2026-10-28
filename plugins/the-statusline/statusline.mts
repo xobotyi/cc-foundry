@@ -256,12 +256,12 @@ export function collapsePath(unixPath: string, maxWidth: number): string {
 
 		for (let i = 1; i < segments.length; i++) {
 			const segment = segments[i] ?? '';
-			overdue -= segment.length + 1;
 
 			if (i === 1) {
-				overdue -= segment.length - 1;
+				overdue += ellipsis.length - segment.length;
 				segments[i] = ellipsis;
 			} else {
+				overdue -= segment.length + 1;
 				segments[i] = '';
 			}
 
