@@ -71,9 +71,9 @@ const RESPONSES = {
 };
 
 const action = process.argv[2];
-const response = RESPONSES[action];
+const response = Object.hasOwn(RESPONSES, action) ? RESPONSES[action] : undefined;
 
-if (!response) {
+if (response === undefined) {
 	console.log(
 		JSON.stringify({
 			continue: true,
@@ -83,9 +83,7 @@ if (!response) {
 	process.exit(0);
 }
 
-if (response.instructions) {
-	process.stdout.write(response.instructions);
-} else {
+if (response.instructions === undefined) {
 	console.log(
 		JSON.stringify({
 			hookSpecificOutput: {
@@ -94,4 +92,6 @@ if (response.instructions) {
 			},
 		}),
 	);
+} else {
+	process.stdout.write(response.instructions);
 }
