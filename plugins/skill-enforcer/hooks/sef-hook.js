@@ -14,6 +14,9 @@
 // Single source of truth: STAGES[phase].rule feeds both the session-start framework and
 // the per-checkpoint reminder. Edit a rule once; both update, byte-identical (KV-cached).
 
+import fs from 'node:fs';
+import {fileURLToPath} from 'node:url';
+
 const STAGES = {
 	'USER-PROMPT': {
 		event: 'a new user message arrives',
@@ -70,28 +73,30 @@ const RESPONSES = {
 	skill: {event: 'PostToolUse', context: renderTrigger('SKILL-LOAD')},
 };
 
-const action = process.argv[2];
-const response = Object.hasOwn(RESPONSES, action) ? RESPONSES[action] : undefined;
+/**
+ * Returns the text the hook writes to stdout for a CLI action.
+ * @param {string | undefined} action
+ * @returns {string}
+ */
+export function respond(action) {
+	const response = Object.hasOwn(RESPONSES, action) ? RESPONSES[action] : undefined;
 
-if (response === undefined) {
-	console.log(
-		JSON.stringify({
-			continue: true,
-			systemMessage: `SEF hook error: Unknown action "${action}". Valid: ${Object.keys(RESPONSES).join(', ')}`,
-		}),
-	);
-	process.exit(0);
+	if (response === undefined) {
+		const systemMessage = `SEF hook error: Unknown action "${action}". Valid: ${Object.keys(RESPONSES).join(', ')}`;
+		return `${JSON.stringify({continue: true, systemMessage})}\n`;
+	}
+
+	if (response.instructions === undefined) {
+		const hookSpecificOutput = {hookEventName: response.event, additionalContext: response.context};
+		return `${JSON.stringify({hookSpecificOutput})}\n`;
+	}
+
+	return response.instructions;
 }
 
-if (response.instructions === undefined) {
-	console.log(
-		JSON.stringify({
-			hookSpecificOutput: {
-				hookEventName: response.event,
-				additionalContext: response.context,
-			},
-		}),
-	);
-} else {
-	process.stdout.write(response.instructions);
+// constraint: Node gives import.meta.url the entry's real path and argv[1] the typed one, so a symlink breaks equality
+const invoked = process.argv[1] !== undefined && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invoked) {
+	process.stdout.write(respond(process.argv[2]));
 }
