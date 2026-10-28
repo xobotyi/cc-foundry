@@ -4,14 +4,16 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 
 ## Components
 
-- **`hooks/sync-statusline.js`** — SessionStart hook; copies the renderer to `statusline.js` in the user's config
+- **`hooks/sync-statusline.mts`** — SessionStart hook; copies the renderer to `statusline.mts` in the user's config
   directory (`CLAUDE_CONFIG_DIR`, or `~/.claude`) and patches `statusLine` in that directory's `settings.json` with the
-  command and a default `refreshInterval`
+  command and a default `refreshInterval`. It deletes the `statusline.js` a release before 2.0.0 installed, only when
+  the settings still name it
 - **`hooks/hooks.json`** — hook registration
-- **`statusline.js`** — the renderer; Claude Code runs the installed copy in the config directory and feeds it session
+- **`statusline.mts`** — the renderer; Claude Code runs the installed copy in the config directory and feeds it session
   data as JSON on stdin. It reads `padding` from the `settings.json` beside it
-- **`statusline.test.mjs`** — imports the renderer's exports, so module scope in `statusline.js` holds no side effect
-  outside the `invoked` block. Run `vp test plugins/the-statusline` after any change to the renderer
+- **`statusline.test.mts`**, **`hooks/sync-statusline.test.mts`** — import the exports of the renderer and the hook, so
+  module scope in either holds no side effect outside its `import.meta.main` block. Run `vp test plugins/the-statusline`
+  after any change to either
 
 ## Conventions
 
@@ -20,8 +22,10 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 - **The status line installs at user level with an absolute, double-quoted command path** — a project-level `statusLine`
   carries a relative script path that breaks when an agent changes working directory mid-session, and an unquoted path
   splits at a space
-- **An edit to `statusline.js` reaches the user on the next session start**, when the hook re-copies it — a change is
+- **An edit to `statusline.mts` reaches the user on the next session start**, when the hook re-copies it — a change is
   not observable in the session that made it
+- **`statusline.mts` imports only `node:` builtins** — the hook copies that one file into the config directory, so a
+  relative import resolves to nothing there
 - **Context left is measured against the model's full window** — the payload carries no auto-compact state (checked
   against the v2.1.306 payload builder). Don't re-derive the threshold from settings files: they miss `--autocompact`,
   managed scope, and server-side overrides, and a wrong countdown is worse than none
