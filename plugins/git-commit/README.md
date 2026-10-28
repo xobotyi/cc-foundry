@@ -42,6 +42,9 @@ formatting conventions the audit measures against.
 
 ## Installation
 
+The validator needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and the commit skill
+runs it with `node`, which strips the types itself, so nothing is built at install time.
+
 ```
 /plugin install git-commit --marketplace xobotyi/cc-foundry
 ```
@@ -82,9 +85,9 @@ a second look: a unit that removes code, changes a signature, or moves a symbol.
 
 ## Message Validation
 
-Before each commit, the message runs through `validate-commit-message.js`. The script is advisory — it prints `ERROR:`
-and `WARN:` lines and always exits 0. What stops a bad commit is the pipeline, which refuses to run `git commit` while
-an error stands.
+Before each commit, the message runs through `validate-commit-message.mts`. The script is advisory — it prints `ERROR:`
+and `WARN:` lines and exits 0 whatever it finds; only a missing, unreadable, or empty message exits 1. What stops a bad
+commit is the pipeline, which refuses to run `git commit` while an error stands.
 
 It checks the subject length, a trailing period, two first-person and "this commit" filler patterns in the subject, the
 blank line after the subject, whether a body exists at all, and any trailers the project requires. It does not check the

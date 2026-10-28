@@ -8,7 +8,7 @@ when_to_use: >-
   commit, stage, or split a diff. Invoke during the work, before the tree grows past one unit, not
   once at the end of the task. Also invoke on the symptoms: a tree holding several unrelated
   changes, a commit that needs an amend, or a message the validator rejected.
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git restore:*), Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js:*)
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git restore:*), Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.mts:*)
 compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
@@ -290,7 +290,7 @@ the deletions.
 Validate the drafted message:
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.js --file /tmp/commit-msg.txt
+node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.mts --file /tmp/commit-msg.txt
 ```
 
 - Add the flags from `<validator-args>` when the project config defines them.
