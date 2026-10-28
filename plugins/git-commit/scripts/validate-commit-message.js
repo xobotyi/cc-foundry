@@ -82,9 +82,9 @@ async function readFile(filePath) {
 	try {
 		const buf = await fs.readFile(filePath, 'utf8');
 		return buf.toString('utf8');
-	} catch (err) {
+	} catch {
 		console.error(`ERROR: Cannot read file: ${filePath}`);
-		process.exit(1);
+		return process.exit(1);
 	}
 }
 
@@ -108,44 +108,36 @@ function maybePrintHelp() {
  * @returns {Promise<string>}
  */
 async function getMessage() {
-	let fileArg = null;
-	let msgArg = null;
+	let fileArg = '';
+	let msgArg = '';
 
 	// Parse flags first (before reading stdin)
 	for (let i = 2; i < process.argv.length; i++) {
-		switch (process.argv[i]) {
-			case FILE_FLAG:
-				if (process.argv.length === i + 1) {
-					console.error(`ERROR: ${FILE_FLAG} requires a path argument`);
-					process.exit(1);
-				}
-				fileArg = process.argv[i + 1];
-				break;
-
-			case MSG_FLAG:
-				if (process.argv.length === i + 1) {
-					console.error(`ERROR: ${MSG_FLAG} requires a message argument`);
-					process.exit(1);
-				}
-				msgArg = process.argv[i + 1];
-				break;
-
-			case REQUIRE_TRAILERS_FLAG:
-				// Handled separately in getRequiredTrailers()
-				break;
+		if (process.argv[i] === FILE_FLAG) {
+			if (process.argv.length === i + 1) {
+				console.error(`ERROR: ${FILE_FLAG} requires a path argument`);
+				process.exit(1);
+			}
+			fileArg = process.argv[i + 1];
+		} else if (process.argv[i] === MSG_FLAG) {
+			if (process.argv.length === i + 1) {
+				console.error(`ERROR: ${MSG_FLAG} requires a message argument`);
+				process.exit(1);
+			}
+			msgArg = process.argv[i + 1];
 		}
 	}
 
-	if (fileArg && msgArg) {
+	if (fileArg !== '' && msgArg !== '') {
 		console.error('ERROR: Only one of --file or --msg may be used at a time.');
 		process.exit(1);
 	}
 
-	if (fileArg) {
-		return await readFile(fileArg);
+	if (fileArg !== '') {
+		return readFile(fileArg);
 	}
 
-	if (msgArg) {
+	if (msgArg !== '') {
 		return msgArg;
 	}
 
@@ -158,7 +150,7 @@ async function getMessage() {
 	}
 
 	console.error('ERROR: No commit message provided. Use --file, --msg, or stdin.');
-	process.exit(1);
+	return process.exit(1);
 }
 
 /**
@@ -254,10 +246,8 @@ function validateMessage(message, requiredTrailers) {
 		printWarn('Commit message has no body. A subject-only message is rarely acceptable.');
 	}
 
-	if (lines.length > 1) {
-		if (lines[1] !== '') {
-			printError('Subject must be separated from body by a blank line.');
-		}
+	if (lines.length > 1 && lines[1] !== '') {
+		printError('Subject must be separated from body by a blank line.');
 	}
 
 	// Extract and validate trailers
@@ -292,4 +282,4 @@ async function main() {
 	}
 }
 
-main().catch(console.error);
+await main();
