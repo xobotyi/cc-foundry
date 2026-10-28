@@ -10,6 +10,8 @@ Auto-syncing status line for Claude Code sessions with context window usage, cos
 - **`hooks/hooks.json`** — hook registration
 - **`statusline.js`** — the renderer; Claude Code runs the installed copy in the config directory and feeds it session
   data as JSON on stdin. It reads `padding` from the `settings.json` beside it
+- **`statusline.test.mjs`** — imports the renderer's exports, so module scope in `statusline.js` holds no side effect
+  outside the `invoked` block. Run `vp test plugins/the-statusline` after any change to the renderer
 
 ## Conventions
 
