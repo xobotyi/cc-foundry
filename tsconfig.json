@@ -3,6 +3,8 @@
 		"target": "ESNext",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
+		"allowJs": true,
+		"checkJs": false,
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
@@ -14,5 +16,5 @@
 		"noUncheckedIndexedAccess": true,
 		"types": ["node"]
 	},
-	"include": ["src"]
+	"include": ["src", "plugins/**/*.js", "plugins/**/*.mjs", "plugins/**/*.cjs", "plugins/**/.dev/*.test.mjs"]
 }
