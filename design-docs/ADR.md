@@ -23,6 +23,7 @@ lost, and what would reopen it.
 - [1.4 State checkpoint nudges as declarative rules](/design-docs/adr/1.4-behavioral-nudges.md)
 - [1.6 Take methodology from external skill libraries, never authoring craft](/design-docs/adr/1.6-prior-art-reuse.md)
 - [1.9 Write instruction artifacts in the timeless present](/design-docs/adr/1.9-instruction-timelessness.md)
+- [1.13 Write plugin scripts as TypeScript that Node 26 runs directly](/design-docs/adr/1.13-plugin-script-runtime.md)
 
 ## plugins/the-blueprint
 
