@@ -6,6 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs';
 import {fileURLToPath} from 'node:url';
+import {stripVTControlCharacters} from 'node:util';
 
 /**
  * Writes error to a log file next to the script.
@@ -31,7 +32,7 @@ process.on('unhandledRejection', (reason) => {
 	process.exit(1);
 });
 
-const RESET = '\x1b[0m';
+const RESET = '\u001B[0m';
 
 // shortcut: a guess at Claude Code's spacing around the status line — measure it if row 1 wraps or leaves a gap
 const RESERVED_COLUMNS = 4;
@@ -58,6 +59,7 @@ const ROW2_LEVELS = [
 	{lines: false, branch: 'none', worktree: 'short'},
 ];
 
+/** @type {{key: keyof RateLimitsData, label: string, durationSeconds: number}[]} */
 const RATE_LIMIT_WINDOWS = [
 	{key: 'five_hour', label: '5h', durationSeconds: 5 * 60 * 60},
 	{key: 'seven_day', label: '7d', durationSeconds: 7 * 24 * 60 * 60},
@@ -71,7 +73,7 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  * @returns {string}
  */
 function ansi256(n) {
-	return `\x1b[38;5;${n}m`;
+	return `\u001B[38;5;${n}m`;
 }
 
 /**
@@ -130,7 +132,8 @@ function colorByUrgency(percent, text) {
  */
 function visibleWidth(text) {
 	// shortcut: one column per code point, so CJK and emoji undercount — add East Asian Width if rows misalign
-	return [...text.replace(/\x1b\[[0-9;]*m/g, '')].length;
+	// oxlint-disable-next-line typescript/no-misused-spread -- counts code points, the ceiling the shortcut above names
+	return [...stripVTControlCharacters(text)].length;
 }
 
 /**
@@ -193,7 +196,7 @@ async function readStdinJSON() {
 		chunks.push(chunk);
 	}
 
-	const input = Buffer.concat(chunks).toString('utf-8');
+	const input = Buffer.concat(chunks).toString('utf8');
 	return JSON.parse(input);
 }
 
@@ -204,7 +207,7 @@ async function readStdinJSON() {
 function readPadding() {
 	const settingsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'settings.json');
 	try {
-		const padding = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')).statusLine?.padding;
+		const padding = JSON.parse(fs.readFileSync(settingsPath, 'utf8')).statusLine?.padding;
 		return Number.isFinite(padding) ? padding : 0;
 	} catch {
 		// padding only tunes alignment; an unreadable settings file must not blank the status line
@@ -235,14 +238,14 @@ function readAvailableWidth() {
 function formatStyleModel(data, level) {
 	let style = data.output_style?.name ?? 'default';
 	const model = data.model?.display_name ?? 'unknown';
-	const effort = level.effort ? data.effort?.level : undefined;
+	const effort = level.effort ? (data.effort?.level ?? '') : '';
 
 	const pluginPrefixEnd = style.indexOf(':');
 	if (pluginPrefixEnd !== -1) {
-		style = style.substring(pluginPrefixEnd + 1).trim();
+		style = style.slice(pluginPrefixEnd + 1).trim();
 	}
 
-	const engine = effort ? `${model} · ${effort}` : model;
+	const engine = effort === '' ? model : `${model} · ${effort}`;
 	if (!level.style) {
 		return c.yellow(engine);
 	}
@@ -275,17 +278,17 @@ function trimMiddle(str, maxWidth) {
  * Collapses a path to fit within maxWidth, in three stages: directory segments shorten to their first letter, then
  * the segments after the first give way to an ellipsis, then the last segment (current folder) trims in the middle.
  * Always uses unix-style separators.
- * @param {string} path - Path to collapse
+ * @param {string} unixPath - Path to collapse
  * @param {number} maxWidth - Maximum allowed width
  * @returns {string}
  */
-function collapsePath(path, maxWidth) {
-	if (path.length <= maxWidth) {
-		return path;
+function collapsePath(unixPath, maxWidth) {
+	if (unixPath.length <= maxWidth) {
+		return unixPath;
 	}
 
-	let overdue = path.length - maxWidth;
-	const segments = posixpath.dirname(path).split(posixpath.sep);
+	let overdue = unixPath.length - maxWidth;
+	const segments = posixpath.dirname(unixPath).split(posixpath.sep);
 
 	for (let i = 0; i < segments.length; i++) {
 		overdue -= segments[i].length - 1;
@@ -314,7 +317,7 @@ function collapsePath(path, maxWidth) {
 		}
 	}
 
-	let basename = posixpath.basename(path);
+	let basename = posixpath.basename(unixPath);
 	if (overdue > 0) {
 		basename = trimMiddle(basename, Math.max(basename.length - overdue, 0));
 	}
@@ -328,7 +331,7 @@ function collapsePath(path, maxWidth) {
  * @returns {string}
  */
 function toUnixPath(p) {
-	return p.replace(/\\/g, '/');
+	return p.replaceAll('\\', '/');
 }
 
 /**
@@ -360,7 +363,7 @@ function resolveLocation(data, worktreeTag) {
 	}
 
 	let tag = '';
-	if (worktree?.name) {
+	if ((worktree?.name ?? '') !== '') {
 		tag = worktreeTag === 'full' ? ` [wt ${worktree.name}]` : ' [wt]';
 	}
 
@@ -385,14 +388,14 @@ function readGitBranch(dir) {
 		if (dotGitStat) {
 			let gitDir = dotGit;
 			if (dotGitStat.isFile()) {
-				const pointer = /^gitdir:\s*(?<gitDir>.+)$/m.exec(fs.readFileSync(dotGit, 'utf-8'));
+				const pointer = /^gitdir:\s*(?<gitDir>.+)$/m.exec(fs.readFileSync(dotGit, 'utf8'));
 				if (!pointer) {
 					return null;
 				}
 				gitDir = path.resolve(current, pointer.groups.gitDir.trim());
 			}
 
-			const head = fs.readFileSync(path.join(gitDir, 'HEAD'), 'utf-8').trim();
+			const head = fs.readFileSync(path.join(gitDir, 'HEAD'), 'utf8').trim();
 			const ref = /^ref:\s*(?:refs\/heads\/)?(?<branch>.+)$/.exec(head);
 			return ref ? ref.groups.branch : head.slice(0, 7);
 		}
@@ -454,7 +457,7 @@ function formatCost(data) {
  */
 function formatContextRemaining(data) {
 	const remaining = data.context_window?.remaining_percentage;
-	if (remaining == null) {
+	if (remaining === null || remaining === undefined) {
 		return c.gray('ctx left --%');
 	}
 
@@ -505,6 +508,7 @@ function projectExhaustion(limitWindow, durationSeconds, nowSeconds) {
 function formatRateLimit(data, level) {
 	const nowSeconds = Date.now() / 1000;
 
+	/** @type {{label: string, limitWindow: RateLimitWindow, stopsAt: number, remaining: number} | null} */
 	let closest = null;
 	for (const {key, label, durationSeconds} of RATE_LIMIT_WINDOWS) {
 		const limitWindow = data.rate_limits?.[key];
@@ -564,6 +568,8 @@ function formatRow1(data, width) {
 			return left + ' '.repeat(Math.max(gap, minGap)) + right;
 		}
 	}
+
+	throw new Error('ROW1_LEVELS is empty');
 }
 
 /**
@@ -579,7 +585,7 @@ function formatRow2(data, width) {
 
 	for (const [index, level] of ROW2_LEVELS.entries()) {
 		let branchLabel = null;
-		if (branch && level.branch !== 'none') {
+		if ((branch ?? '') !== '' && level.branch !== 'none') {
 			branchLabel = c.cyan(level.branch === 'full' ? branch : trimMiddle(branch, SHORT_BRANCH_WIDTH));
 		}
 
@@ -594,6 +600,8 @@ function formatRow2(data, width) {
 			return tail ? location + c.gray(separator) + tail : location;
 		}
 	}
+
+	throw new Error('ROW2_LEVELS is empty');
 }
 
 async function main() {
@@ -605,4 +613,4 @@ async function main() {
 	process.stdout.write(rows.join('\n'));
 }
 
-main();
+await main();
