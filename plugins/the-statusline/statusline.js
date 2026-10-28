@@ -22,16 +22,6 @@ function writeScriptError(err) {
 	fs.appendFileSync(errorFile, `[${timestamp}]\n${message}\n\n`);
 }
 
-process.on('uncaughtException', (err) => {
-	writeScriptError(err);
-	process.exit(1);
-});
-
-process.on('unhandledRejection', (reason) => {
-	writeScriptError(reason);
-	process.exit(1);
-});
-
 const RESET = '\u001B[0m';
 
 // shortcut: a guess at Claude Code's spacing around the status line — measure it if row 1 wraps or leaves a gap
@@ -613,4 +603,19 @@ async function main() {
 	process.stdout.write(rows.join('\n'));
 }
 
-await main();
+// constraint: Node gives import.meta.url the entry's real path and argv[1] the typed one, so a symlink breaks equality
+const invoked = process.argv[1] !== undefined && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invoked) {
+	process.on('uncaughtException', (err) => {
+		writeScriptError(err);
+		process.exit(1);
+	});
+
+	process.on('unhandledRejection', (reason) => {
+		writeScriptError(reason);
+		process.exit(1);
+	});
+
+	await main();
+}
