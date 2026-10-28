@@ -12,7 +12,10 @@ assumes another cc-foundry plugin is installed.
 
 ## Scripts
 
-- **`validate-commit-message.js`** — commit message checks, printed as `ERROR:` and `WARN:` lines
+- **`validate-commit-message.mts`** — commit message checks, printed as `ERROR:` and `WARN:` lines; a TypeScript module
+  Node 26 runs directly
+- **`validate-commit-message.test.mts`** — imports the checks and the argument parsing, and spawns the script for its
+  exit-code contract. Run `vp test plugins/git-commit` after any change to the script
 
 ## Validator Contract
 
