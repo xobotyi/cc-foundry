@@ -32,6 +32,13 @@ export default defineConfig({
 			node,
 			vitest,
 			{
+				rules: {
+					// shortcut: duplicates the @ver0/oxlint-config entry — delete once a release carrying it is installed
+					'typescript/prefer-readonly-parameter-types': [
+						'error',
+						{ignoreInferredTypes: true, treatMethodsAsReadonly: true},
+					],
+				},
 				overrides: [
 					{
 						files: ['plugins/**/*.{js,mjs,cjs}'],

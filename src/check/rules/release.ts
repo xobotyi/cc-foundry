@@ -56,7 +56,7 @@ export async function releaseVersion(repo: Repo): Promise<Finding[]> {
 export async function unbumpedChanges(repo: Repo, ctx: RuleContext): Promise<Finding[]> {
 	const findings = await Promise.all(
 		repo.plugins.map(async (plugin): Promise<Finding[]> => {
-			const base = ctx.prePush ? PUSH_BASE : (await latestRelease(repo.root, plugin.dir))?.tag;
+			const base = ctx.prePush ? PUSH_BASE : await latestTag(repo.root, plugin.dir);
 			if (base === undefined) return [];
 			const before = await manifestAt(repo.root, base, plugin.path);
 			if (before === null) return [];
@@ -90,9 +90,9 @@ async function shippedChanges(root: string, plugin: Plugin, base: string, prePus
 		.map((file) => file.slice(plugin.path.length + 1))
 		.filter((file) => file !== MANIFEST && !UNSHIPPED.some((pattern) => pattern.test(file)));
 	const reformatted = await Promise.all(
-		candidates.map((file) => formattingOnly(root, `${plugin.path}/${file}`, base, prePush)),
+		candidates.map(async (file) => formattingOnly(root, `${plugin.path}/${file}`, base, prePush)),
 	);
-	return candidates.filter((_, i) => !reformatted[i]);
+	return candidates.filter((_, i) => reformatted[i] !== true);
 }
 
 /** Whether the file differs from `base` only in what the formatter rewrites, which needs no release. */
@@ -112,10 +112,10 @@ async function formattingOnly(root: string, file: string, base: string, prePush:
 /** The file's content in the working tree, or null when the change deleted it. */
 async function workingContent(root: string, file: string): Promise<string | null> {
 	try {
-		return await fs.readFile(path.join(root, file), 'utf-8');
-	} catch (err) {
-		if (isErrnoCode(err, 'ENOENT')) return null;
-		throw err;
+		return await fs.readFile(path.join(root, file), 'utf8');
+	} catch (error) {
+		if (isErrnoCode(error, 'ENOENT')) return null;
+		throw error;
 	}
 }
 
@@ -129,8 +129,14 @@ async function contentAt(root: string, ref: string, file: string): Promise<strin
 	}
 }
 
+async function latestTag(root: string, dir: string): Promise<string | undefined> {
+	const latest = await latestRelease(root, dir);
+	return latest?.tag;
+}
+
 async function latestRelease(root: string, dir: string): Promise<{tag: string; version: Version} | null> {
-	const tags = (await git(root, ['tag', '--list', `${dir}-v*`])).split('\n').filter(Boolean);
+	const list = await git(root, ['tag', '--list', `${dir}-v*`]);
+	const tags = list.split('\n').filter(Boolean);
 	let latest: {tag: string; version: Version} | null = null;
 	for (const tag of tags) {
 		const version = parseVersion(tag.slice(`${dir}-v`.length));

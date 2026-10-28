@@ -24,6 +24,6 @@ const RULES: readonly Rule[] = [
 ];
 
 export async function runRules(repo: Repo, ctx: RuleContext): Promise<Finding[]> {
-	const results = await Promise.all(RULES.map((rule) => rule(repo, ctx)));
+	const results = await Promise.all(RULES.map(async (rule) => rule(repo, ctx)));
 	return results.flat();
 }

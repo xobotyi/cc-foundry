@@ -19,10 +19,11 @@ const COMPONENT_DIRS = ['skills', 'agents', 'commands', 'output-styles'];
 /** An explicit `plugin:name` reference to a plugin of this marketplace names one of its skills, agents, or commands. */
 export async function skillReferences(repo: Repo): Promise<Finding[]> {
 	const plugins = new Map(repo.plugins.map((p) => [p.dir, p]));
-	const files = (await Promise.all([...DOC_ROOTS, 'plugins'].map((rel) => listMarkdown(repo.root, rel)))).flat();
+	const lists = await Promise.all([...DOC_ROOTS, 'plugins'].map(async (rel) => listMarkdown(repo.root, rel)));
+	const files = lists.flat();
 	const findings = await Promise.all(
 		files.map(async (file): Promise<Finding[]> => {
-			const text = await fs.readFile(path.join(repo.root, file), 'utf-8');
+			const text = await fs.readFile(path.join(repo.root, file), 'utf8');
 			return explicitRefs(text).flatMap(({plugin, name, index}): Finding[] => {
 				const target = plugins.get(plugin);
 				if (target === undefined || components(target).has(name)) return [];
@@ -48,34 +49,53 @@ export async function prerequisiteDependencies(repo: Repo): Promise<Finding[]> {
 		for (const skill of plugin.skills) owners.set(skill, [...(owners.get(skill) ?? []), plugin.dir]);
 	}
 	const plugins = new Set(repo.plugins.map((p) => p.dir));
-	const findings: Finding[] = [];
-	for (const plugin of repo.plugins) {
-		const declared = new Set(
-			plugin.manifest.dependencies
-				.filter((d) => d.marketplace === null || d.marketplace === repo.marketplace.name)
-				.map((d) => d.name),
-		);
-		const dirs = COMPONENT_DIRS.map((d) => listMarkdown(repo.root, `${plugin.path}/${d}`));
-		for (const file of (await Promise.all(dirs)).flat()) {
-			const text = await fs.readFile(path.join(repo.root, file), 'utf-8');
-			for (const block of text.matchAll(PREREQUISITE)) {
-				const line = lineAt(text, block.index);
-				const at = {rule: 'prerequisite-dependency', severity: 'error' as const, file, line};
-				for (const target of prerequisiteTargets(block[1] ?? '', owners, plugins)) {
-					const [owner, ...others] = target.owners;
-					if (owner === undefined || target.owners.includes(plugin.dir)) continue;
-					if (others.length > 0) {
-						const message = `\`${target.skill}\` is a skill in ${target.owners.join(', ')}; name it as plugin:skill`;
-						findings.push({...at, message});
-					} else if (!declared.has(owner)) {
-						const message = `the prerequisite \`${target.skill}\` ships in "${owner}", missing from dependencies`;
-						findings.push({...at, message});
-					}
-				}
+	const perPlugin = await Promise.all(
+		repo.plugins.map(async (plugin) => {
+			const declared = new Set(
+				plugin.manifest.dependencies
+					.filter((d) => d.marketplace === null || d.marketplace === repo.marketplace.name)
+					.map((d) => d.name),
+			);
+			const lists = await Promise.all(COMPONENT_DIRS.map(async (d) => listMarkdown(repo.root, `${plugin.path}/${d}`)));
+			const perFile = await Promise.all(
+				lists.flat().map(async (file) => {
+					const text = await fs.readFile(path.join(repo.root, file), 'utf8');
+					return prerequisiteFindings({text, file, plugin: plugin.dir, declared, owners, plugins});
+				}),
+			);
+			return perFile.flat();
+		}),
+	);
+	return perPlugin.flat();
+}
+
+type PrerequisiteScope = {
+	readonly text: string;
+	readonly file: string;
+	/** The plugin the file belongs to. */
+	readonly plugin: string;
+	/** The plugins its manifest lists in `dependencies`. */
+	readonly declared: ReadonlySet<string>;
+	/** Each skill name and the plugins that ship a skill of that name. */
+	readonly owners: ReadonlyMap<string, readonly string[]>;
+	readonly plugins: ReadonlySet<string>;
+};
+
+function prerequisiteFindings({text, file, plugin, declared, owners, plugins}: PrerequisiteScope): Finding[] {
+	return [...text.matchAll(PREREQUISITE)].flatMap((block) => {
+		const at = {rule: 'prerequisite-dependency', severity: 'error' as const, file, line: lineAt(text, block.index)};
+		return prerequisiteTargets(block[1] ?? '', owners, plugins).flatMap((target): Finding[] => {
+			const [owner, ...others] = target.owners;
+			if (owner === undefined || target.owners.includes(plugin)) return [];
+			if (others.length > 0) {
+				return [
+					{...at, message: `\`${target.skill}\` is a skill in ${target.owners.join(', ')}; name it as plugin:skill`},
+				];
 			}
-		}
-	}
-	return findings;
+			if (declared.has(owner)) return [];
+			return [{...at, message: `the prerequisite \`${target.skill}\` ships in "${owner}", missing from dependencies`}];
+		});
+	});
 }
 
 /** The skills a prerequisite block names, each with the plugins that ship a skill of that name. */
@@ -83,7 +103,7 @@ function prerequisiteTargets(
 	body: string,
 	owners: ReadonlyMap<string, readonly string[]>,
 	plugins: ReadonlySet<string>,
-): {skill: string; owners: readonly string[]}[] {
+): Array<{skill: string; owners: readonly string[]}> {
 	const explicit = explicitRefs(body)
 		.filter((ref) => plugins.has(ref.plugin))
 		.map((ref) => ({skill: `${ref.plugin}:${ref.name}`, owners: [ref.plugin]}));
@@ -96,7 +116,7 @@ function prerequisiteTargets(
 }
 
 /** A dependency names a plugin of this marketplace: a plugin never requires one from outside it. */
-export async function dependencyScope(repo: Repo): Promise<Finding[]> {
+export function dependencyScope(repo: Repo): Finding[] {
 	const plugins = new Set(repo.plugins.map((p) => p.dir));
 	return repo.plugins.flatMap((plugin) =>
 		plugin.manifest.dependencies.flatMap((dep): Finding[] => {
@@ -114,7 +134,7 @@ export async function dependencyScope(repo: Repo): Promise<Finding[]> {
 	);
 }
 
-function explicitRefs(text: string): {plugin: string; name: string; index: number}[] {
+function explicitRefs(text: string): Array<{plugin: string; name: string; index: number}> {
 	return [...text.matchAll(EXPLICIT_REF)].map((m) => ({
 		plugin: m[1] ?? m[3] ?? '',
 		name: m[2] ?? m[4] ?? '',
@@ -138,10 +158,10 @@ async function listMarkdown(root: string, rel: string): Promise<string[]> {
 	if (stat.isFile()) return rel.endsWith('.md') ? [rel] : [];
 	const entries = await fs.readdir(path.join(root, rel), {withFileTypes: true});
 	const nested = await Promise.all(
-		entries.map((entry): Promise<string[]> => {
+		entries.map(async (entry): Promise<string[]> => {
 			const child = `${rel}/${entry.name}`;
-			if (entry.isDirectory()) return SKIPPED_DIRS.has(entry.name) ? Promise.resolve([]) : listMarkdown(root, child);
-			return Promise.resolve(entry.isFile() && entry.name.endsWith('.md') ? [child] : []);
+			if (entry.isDirectory()) return SKIPPED_DIRS.has(entry.name) ? [] : listMarkdown(root, child);
+			return entry.isFile() && entry.name.endsWith('.md') ? [child] : [];
 		}),
 	);
 	return nested.flat();

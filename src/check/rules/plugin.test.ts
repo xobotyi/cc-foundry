@@ -4,14 +4,14 @@ import {createFixture} from '../fixture.ts';
 import {loadRepo} from '../repo.ts';
 import {defaultLocations, hookExecForm, licenseCopy, readmeInstall} from './plugin.ts';
 
-const brief = (findings: Finding[]) => findings.map((f) => `${f.file}: ${f.message}`);
+const brief = (findings: readonly Finding[]) => findings.map((f) => `${f.file}: ${f.message}`);
 
 test('well-formed plugins pass', async () => {
 	await using fixture = await createFixture();
 	const repo = await loadRepo(fixture.root);
 
 	const rules = [licenseCopy, readmeInstall, defaultLocations, hookExecForm];
-	const findings = await Promise.all(rules.map((rule) => rule(repo)));
+	const findings = await Promise.all(rules.map(async (rule) => rule(repo)));
 
 	expect(findings.flat()).toStrictEqual([]);
 });
@@ -40,12 +40,13 @@ test('readme-install reports each missing install line', async () => {
 
 test('default-paths reports a key naming its default location, and keeps a custom one', async () => {
 	await using fixture = await createFixture();
-	await fixture.editManifest('alpha', (m) => {
-		m.lspServers = './.lsp.json';
-		m.outputStyles = ['./output-styles/'];
-		m.agents = './custom-agents/';
-		m.experimental = {monitors: 'monitors/monitors.json'};
-	});
+	await fixture.editManifest('alpha', (m) => ({
+		...m,
+		lspServers: './.lsp.json',
+		outputStyles: ['./output-styles/'],
+		agents: './custom-agents/',
+		experimental: {monitors: 'monitors/monitors.json'},
+	}));
 
 	const findings = await defaultLocations(await loadRepo(fixture.root));
 
@@ -60,7 +61,7 @@ test('default-paths reports a key naming its default location, and keeps a custo
 
 test('hook-exec-form reports a shell-form command that names a plugin path', async () => {
 	await using fixture = await createFixture();
-	const handler = (command: string, args?: string[]) => ({hooks: [{type: 'command', command, args}]});
+	const handler = (command: string, args?: readonly string[]) => ({hooks: [{type: 'command', command, args}]});
 	await fixture.write(
 		'plugins/alpha/hooks/hooks.json',
 		JSON.stringify(

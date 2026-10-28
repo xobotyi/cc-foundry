@@ -5,54 +5,54 @@ export const MARKETPLACE_FILE = '.claude-plugin/marketplace.json';
 
 export type JsonObject = Readonly<Record<string, unknown>>;
 
-export interface MarketplaceEntry {
-	name: string;
+export type MarketplaceEntry = {
+	readonly name: string;
 	/** The source when it is a relative path string; null for an object source. */
-	source: string | null;
-	keys: readonly string[];
-}
+	readonly source: string | null;
+	readonly keys: readonly string[];
+};
 
-export interface Marketplace {
-	name: string;
-	entries: readonly MarketplaceEntry[];
-	renames: ReadonlyMap<string, string | null>;
-}
+export type Marketplace = {
+	readonly name: string;
+	readonly entries: readonly MarketplaceEntry[];
+	readonly renames: ReadonlyMap<string, string | null>;
+};
 
-export interface Dependency {
-	name: string;
+export type Dependency = {
+	readonly name: string;
 	/** The marketplace the dependency names, or null for a bare name. */
-	marketplace: string | null;
-}
+	readonly marketplace: string | null;
+};
 
-export interface Manifest {
-	name: string | null;
-	version: string | null;
-	dependencies: readonly Dependency[];
-	raw: JsonObject;
-}
+export type Manifest = {
+	readonly name: string | null;
+	readonly version: string | null;
+	readonly dependencies: readonly Dependency[];
+	readonly raw: JsonObject;
+};
 
-export interface Plugin {
+export type Plugin = {
 	/** The directory name under `plugins/`. */
-	dir: string;
+	readonly dir: string;
 	/** The plugin directory relative to the repository root, `plugins/<dir>`. */
-	path: string;
-	manifest: Manifest;
-	skills: readonly string[];
-	agents: readonly string[];
-	commands: readonly string[];
-}
+	readonly path: string;
+	readonly manifest: Manifest;
+	readonly skills: readonly string[];
+	readonly agents: readonly string[];
+	readonly commands: readonly string[];
+};
 
-export interface Repo {
-	root: string;
-	marketplace: Marketplace;
-	plugins: readonly Plugin[];
-}
+export type Repo = {
+	readonly root: string;
+	readonly marketplace: Marketplace;
+	readonly plugins: readonly Plugin[];
+};
 
 /** Reads the marketplace and every plugin under `plugins/`; throws when a manifest is missing or malformed. */
 export async function loadRepo(root: string): Promise<Repo> {
 	const marketplace = parseMarketplace(await readJsonObject(root, MARKETPLACE_FILE));
 	const dirs = await listDirs(path.join(root, 'plugins'));
-	const plugins = await Promise.all(dirs.map((dir) => loadPlugin(root, dir)));
+	const plugins = await Promise.all(dirs.map(async (dir) => loadPlugin(root, dir)));
 	return {root, marketplace, plugins};
 }
 
@@ -60,9 +60,9 @@ export async function loadRepo(root: string): Promise<Repo> {
 export async function readJsonObject(root: string, rel: string): Promise<JsonObject> {
 	let data: unknown;
 	try {
-		data = JSON.parse(await fs.readFile(path.join(root, rel), 'utf-8'));
-	} catch (err) {
-		throw new Error(`${rel}: cannot read JSON`, {cause: err});
+		data = JSON.parse(await fs.readFile(path.join(root, rel), 'utf8'));
+	} catch (error) {
+		throw new Error(`${rel}: cannot read JSON`, {cause: error});
 	}
 	if (!isObject(data)) {
 		throw new Error(`${rel}: the top level is not an object`);
@@ -75,12 +75,14 @@ export function isObject(value: unknown): value is JsonObject {
 }
 
 function parseMarketplace(json: JsonObject): Marketplace {
-	const plugins = Array.isArray(json.plugins) ? json.plugins : [];
-	const entries = plugins.filter(isObject).map((entry) => ({
-		name: typeof entry.name === 'string' ? entry.name : '',
-		source: typeof entry.source === 'string' ? entry.source : null,
-		keys: Object.keys(entry),
-	}));
+	const plugins: unknown[] = Array.isArray(json.plugins) ? json.plugins : [];
+	const entries = plugins
+		.filter((entry) => isObject(entry))
+		.map((entry) => ({
+			name: typeof entry.name === 'string' ? entry.name : '',
+			source: typeof entry.source === 'string' ? entry.source : null,
+			keys: Object.keys(entry),
+		}));
 	const renames = new Map<string, string | null>();
 	if (isObject(json.renames)) {
 		for (const [from, to] of Object.entries(json.renames)) {
@@ -134,8 +136,8 @@ async function listDirs(dir: string): Promise<string[]> {
 
 async function listSkills(dir: string): Promise<string[]> {
 	const names = await listDirs(dir);
-	const present = await Promise.all(names.map((name) => exists(path.join(dir, name, 'SKILL.md'))));
-	return names.filter((_, i) => present[i]);
+	const present = await Promise.all(names.map(async (name) => exists(path.join(dir, name, 'SKILL.md'))));
+	return names.filter((_, i) => present[i] === true);
 }
 
 async function listMarkdownNames(dir: string): Promise<string[]> {
@@ -149,9 +151,9 @@ async function listMarkdownNames(dir: string): Promise<string[]> {
 async function readDirOrEmpty(dir: string) {
 	try {
 		return await fs.readdir(dir, {withFileTypes: true});
-	} catch (err) {
-		if (isErrnoCode(err, 'ENOENT')) return [];
-		throw err;
+	} catch (error) {
+		if (isErrnoCode(error, 'ENOENT')) return [];
+		throw error;
 	}
 }
 

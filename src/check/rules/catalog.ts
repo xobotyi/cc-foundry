@@ -69,11 +69,14 @@ export async function entryKeys(repo: Repo): Promise<Finding[]> {
 
 /** Every plugin name the marketplace ever listed is still listed, or is a `renames` key. */
 export async function renamesCoverHistory(repo: Repo): Promise<Finding[]> {
-	const shas = (await git(repo.root, ['log', '--format=%H', '--', MARKETPLACE_FILE])).split('\n').filter(Boolean);
-	const historic = new Set<string>();
-	for (const sha of shas) {
-		for (const name of await namesAt(repo.root, sha)) historic.add(name);
-	}
+	const log = await git(repo.root, ['log', '--format=%H', '--', MARKETPLACE_FILE]);
+	const names = await Promise.all(
+		log
+			.split('\n')
+			.filter(Boolean)
+			.map(async (sha) => namesAt(repo.root, sha)),
+	);
+	const historic = new Set(names.flat());
 	const current = new Set(repo.marketplace.entries.map((e) => e.name));
 	return [...historic]
 		.filter((name) => !current.has(name) && !repo.marketplace.renames.has(name))
@@ -98,8 +101,8 @@ async function namesAt(root: string, sha: string): Promise<string[]> {
 	return data.plugins.filter(isObject).flatMap((p) => (typeof p.name === 'string' ? [p.name] : []));
 }
 
-function readMarketplace(root: string): Promise<string> {
-	return fs.readFile(path.join(root, MARKETPLACE_FILE), 'utf-8');
+async function readMarketplace(root: string): Promise<string> {
+	return fs.readFile(path.join(root, MARKETPLACE_FILE), 'utf8');
 }
 
 function catalogError(message: string, line?: number): Finding {

@@ -4,44 +4,46 @@ import path from 'node:path';
 import {git} from './git.ts';
 import {MARKETPLACE_FILE} from './repo.ts';
 
-export interface EntryJson {
-	name: string;
-	source: string;
-	[key: string]: unknown;
-}
+export type EntryJson = {
+	readonly name: string;
+	readonly source: string;
+	readonly [key: string]: unknown;
+};
 
-export interface MarketplaceJson {
-	name: string;
-	owner: {name: string};
-	plugins: EntryJson[];
-	renames?: Record<string, string | null>;
-	[key: string]: unknown;
-}
+export type MarketplaceJson = {
+	readonly name: string;
+	readonly owner: {readonly name: string};
+	readonly plugins: readonly EntryJson[];
+	readonly renames?: Readonly<Record<string, string | null>>;
+	readonly [key: string]: unknown;
+};
 
-export interface ManifestJson {
-	name: string;
-	version: string;
-	dependencies?: (string | {name: string; marketplace?: string})[];
-	[key: string]: unknown;
-}
+export type ManifestJson = {
+	readonly name: string;
+	readonly version: string;
+	readonly dependencies?: ReadonlyArray<string | {readonly name: string; readonly marketplace?: string}>;
+	readonly [key: string]: unknown;
+};
 
-export interface FixturePlugin {
-	name: string;
-	skills?: string[];
-}
+export type FixturePlugin = {
+	readonly name: string;
+	readonly skills?: readonly string[];
+};
 
 /** A throwaway repository in a temp directory that passes every rule until a test breaks one thing. */
-export interface Fixture extends AsyncDisposable {
-	root: string;
+export type Fixture = {
+	readonly root: string;
 	write(rel: string, content: string): Promise<void>;
 	read(rel: string): Promise<string>;
 	remove(rel: string): Promise<void>;
-	editMarketplace(edit: (m: MarketplaceJson) => void): Promise<void>;
-	editManifest(plugin: string, edit: (m: ManifestJson) => void): Promise<void>;
+	/** Replaces the marketplace with what `edit` returns for the current one, and writes it. */
+	editMarketplace(edit: (m: MarketplaceJson) => MarketplaceJson): Promise<void>;
+	/** Replaces a plugin's manifest with what `edit` returns for the current one, and writes it. */
+	editManifest(plugin: string, edit: (m: ManifestJson) => ManifestJson): Promise<void>;
 	/** Stages every change and commits it. */
 	commit(message: string): Promise<void>;
-	git(...args: string[]): Promise<string>;
-}
+	git(...args: readonly string[]): Promise<string>;
+} & AsyncDisposable;
 
 const LICENSE = 'MIT License\n\nCopyright (c) fixture\n';
 
@@ -59,29 +61,25 @@ export async function createFixture(plugins: readonly FixturePlugin[] = DEFAULT_
 		await fs.mkdir(path.dirname(file), {recursive: true});
 		await fs.writeFile(file, content);
 	};
-	const read = (rel: string): Promise<string> => fs.readFile(path.join(root, rel), 'utf-8');
-	const editJson = async <T>(rel: string, edit: (json: T) => void): Promise<void> => {
-		// SAFETY: the fixture wrote this file from a T, and tests edit it only through these helpers
-		const json = JSON.parse(await read(rel)) as T;
-		edit(json);
-		await write(rel, JSON.stringify(json, null, 2) + '\n');
-	};
-	const runGit = (...args: string[]): Promise<string> => git(root, args);
+	const writeJson = async (rel: string, json: unknown): Promise<void> =>
+		write(rel, JSON.stringify(json, null, 2) + '\n');
+	const runGit = async (...args: readonly string[]): Promise<string> => git(root, args);
 
-	const marketplace: MarketplaceJson = {
+	let marketplace: MarketplaceJson = {
 		name: 'foundry',
 		owner: {name: 'fixture'},
 		metadata: {description: 'A fixture marketplace'},
 		plugins: plugins.map((p) => ({name: p.name, source: `./plugins/${p.name}`, category: 'development', tags: []})),
 	};
-	await write(MARKETPLACE_FILE, JSON.stringify(marketplace, null, 2) + '\n');
-	await write('LICENSE', LICENSE);
-	await write('package.json', JSON.stringify({name: 'fixture', private: true}) + '\n');
-	await write('CLAUDE.md', `# fixture\n\n## Plugins\n\n${plugins.map((p) => `- \`plugins/${p.name}/\``).join('\n')}\n`);
-	await write('README.md', `# fixture\n\n${plugins.map((p) => `### ${p.name}\n`).join('\n')}`);
-	for (const plugin of plugins) {
-		await writePlugin(write, plugin);
-	}
+	const manifests = new Map(plugins.map((p) => [p.name, manifestOf(p)]));
+	await Promise.all([
+		writeJson(MARKETPLACE_FILE, marketplace),
+		write('LICENSE', LICENSE),
+		write('package.json', JSON.stringify({name: 'fixture', private: true}) + '\n'),
+		write('CLAUDE.md', `# fixture\n\n## Plugins\n\n${plugins.map((p) => `- \`plugins/${p.name}/\``).join('\n')}\n`),
+		write('README.md', `# fixture\n\n${plugins.map((p) => `### ${p.name}\n`).join('\n')}`),
+		...plugins.map(async (p) => writePlugin(write, p)),
+	]);
 
 	await runGit('init', '--quiet', '--initial-branch=master');
 	await runGit('config', 'user.email', 'fixture@example.com');
@@ -97,46 +95,56 @@ export async function createFixture(plugins: readonly FixturePlugin[] = DEFAULT_
 	return {
 		root,
 		write,
-		read,
-		remove: (rel) => fs.rm(path.join(root, rel), {recursive: true, force: true}),
-		editMarketplace: (edit) => editJson(MARKETPLACE_FILE, edit),
-		editManifest: (plugin, edit) => editJson(`plugins/${plugin}/.claude-plugin/plugin.json`, edit),
+		read: async (rel) => fs.readFile(path.join(root, rel), 'utf8'),
+		remove: async (rel) => fs.rm(path.join(root, rel), {recursive: true, force: true}),
+		async editMarketplace(edit) {
+			marketplace = edit(marketplace);
+			await writeJson(MARKETPLACE_FILE, marketplace);
+		},
+		async editManifest(plugin, edit) {
+			const manifest = manifests.get(plugin);
+			if (manifest === undefined) throw new Error(`the fixture has no plugin "${plugin}"`);
+			const edited = edit(manifest);
+			manifests.set(plugin, edited);
+			await writeJson(`plugins/${plugin}/.claude-plugin/plugin.json`, edited);
+		},
 		commit,
 		git: runGit,
-		[Symbol.asyncDispose]: () => fs.rm(root, {recursive: true, force: true}),
+		[Symbol.asyncDispose]: async () => fs.rm(root, {recursive: true, force: true}),
 	};
 }
 
-async function writePlugin(write: (rel: string, content: string) => Promise<void>, plugin: FixturePlugin) {
+function manifestOf(plugin: FixturePlugin): ManifestJson {
+	return {name: plugin.name, version: '1.0.0', description: `The ${plugin.name} plugin`, author: {name: 'fixture'}};
+}
+
+async function writePlugin(
+	write: (rel: string, content: string) => Promise<void>,
+	plugin: FixturePlugin,
+): Promise<void> {
 	const dir = `plugins/${plugin.name}`;
-	const manifest: ManifestJson = {
-		name: plugin.name,
-		version: '1.0.0',
-		description: `The ${plugin.name} plugin`,
-		author: {name: 'fixture'},
-	};
-	await write(`${dir}/.claude-plugin/plugin.json`, JSON.stringify(manifest, null, 2) + '\n');
-	await write(`${dir}/LICENSE`, LICENSE);
-	await write(
-		`${dir}/README.md`,
-		[
-			`# ${plugin.name}`,
-			'',
-			'```',
-			`/plugin install ${plugin.name} --marketplace xobotyi/cc-foundry`,
-			'```',
-			'',
-			'```',
-			'/plugin marketplace add xobotyi/cc-foundry',
-			`/plugin install ${plugin.name}@foundry`,
-			'```',
-			'',
-		].join('\n'),
-	);
-	for (const skill of plugin.skills ?? []) {
-		await write(
-			`${dir}/skills/${skill}/SKILL.md`,
-			`---\nname: ${skill}\ndescription: The ${skill} skill. Invoke when testing.\n---\n\nThe ${skill} skill.\n`,
-		);
-	}
+	const readme = [
+		`# ${plugin.name}`,
+		'',
+		'```',
+		`/plugin install ${plugin.name} --marketplace xobotyi/cc-foundry`,
+		'```',
+		'',
+		'```',
+		'/plugin marketplace add xobotyi/cc-foundry',
+		`/plugin install ${plugin.name}@foundry`,
+		'```',
+		'',
+	].join('\n');
+	await Promise.all([
+		write(`${dir}/.claude-plugin/plugin.json`, JSON.stringify(manifestOf(plugin), null, 2) + '\n'),
+		write(`${dir}/LICENSE`, LICENSE),
+		write(`${dir}/README.md`, readme),
+		...(plugin.skills ?? []).map(async (skill) =>
+			write(
+				`${dir}/skills/${skill}/SKILL.md`,
+				`---\nname: ${skill}\ndescription: The ${skill} skill. Invoke when testing.\n---\n\nThe ${skill} skill.\n`,
+			),
+		),
+	]);
 }

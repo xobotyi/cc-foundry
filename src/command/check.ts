@@ -26,12 +26,7 @@ export default defineCommand({
 		},
 	},
 	async run({args}) {
-		const format: Format =
-			args.format === 'github' || args.format === 'text'
-				? args.format
-				: process.env.GITHUB_ACTIONS === 'true'
-					? 'github'
-					: 'text';
+		const format = formatOf(args.format);
 		const repo = await loadRepo(REPO_ROOT);
 		const ctx = {prePush: args['pre-push']};
 		const [validated, ruled] = await Promise.all([validateRepo(repo), runRules(repo, ctx)]);
@@ -42,3 +37,9 @@ export default defineCommand({
 		}
 	},
 });
+
+/** The format the flag names, or github under GitHub Actions and text elsewhere. */
+function formatOf(flag: string | undefined): Format {
+	if (flag === 'github' || flag === 'text') return flag;
+	return process.env.GITHUB_ACTIONS === 'true' ? 'github' : 'text';
+}

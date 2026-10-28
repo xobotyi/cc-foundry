@@ -9,7 +9,7 @@ import {lineOf} from '../text.ts';
 const MARKETPLACE_SOURCE = 'xobotyi/cc-foundry';
 
 /** Each component key and the location Claude Code reads it from when the manifest names none. */
-const DEFAULT_LOCATIONS: readonly {key: readonly string[]; location: string}[] = [
+const DEFAULT_LOCATIONS: ReadonlyArray<{key: readonly string[]; location: string}> = [
 	{key: ['skills'], location: 'skills'},
 	{key: ['commands'], location: 'commands'},
 	{key: ['agents'], location: 'agents'},
@@ -24,15 +24,15 @@ const DEFAULT_LOCATIONS: readonly {key: readonly string[]; location: string}[] =
 
 const PATH_PLACEHOLDER = /\$\{CLAUDE_PLUGIN_(ROOT|DATA)\}/;
 
-/** Each plugin carries a byte-identical copy of the root LICENSE. */
+/** Each plugin carries an identical copy of the root LICENSE. */
 export async function licenseCopy(repo: Repo): Promise<Finding[]> {
-	const root = await fs.readFile(path.join(repo.root, 'LICENSE'));
+	const root = await fs.readFile(path.join(repo.root, 'LICENSE'), 'utf8');
 	const findings = await Promise.all(
 		repo.plugins.map(async (plugin): Promise<Finding[]> => {
 			const file = `${plugin.path}/LICENSE`;
-			const copy = await readOrNull(path.join(repo.root, file));
+			const copy = await readTextOrNull(path.join(repo.root, file));
 			if (copy === null) return [pluginError('license', file, 'the plugin has no LICENSE; copy the root LICENSE')];
-			if (!copy.equals(root)) return [pluginError('license', file, 'LICENSE differs from the root LICENSE')];
+			if (copy !== root) return [pluginError('license', file, 'LICENSE differs from the root LICENSE')];
 			return [];
 		}),
 	);
@@ -44,14 +44,9 @@ export async function readmeInstall(repo: Repo): Promise<Finding[]> {
 	const findings = await Promise.all(
 		repo.plugins.map(async (plugin): Promise<Finding[]> => {
 			const file = `${plugin.path}/README.md`;
-			const readme = await readOrNull(path.join(repo.root, file));
+			const readme = await readTextOrNull(path.join(repo.root, file));
 			if (readme === null) return [pluginError('readme-install', file, 'the plugin has no README.md')];
-			const lines = new Set(
-				readme
-					.toString('utf-8')
-					.split('\n')
-					.map((l) => l.trim()),
-			);
+			const lines = new Set(readme.split('\n').map((l) => l.trim()));
 			const required = [
 				`/plugin install ${plugin.dir} --marketplace ${MARKETPLACE_SOURCE}`,
 				`/plugin marketplace add ${MARKETPLACE_SOURCE}`,
@@ -70,36 +65,35 @@ export async function defaultLocations(repo: Repo): Promise<Finding[]> {
 	const findings = await Promise.all(
 		repo.plugins.map(async (plugin) => {
 			const file = `${plugin.path}/.claude-plugin/plugin.json`;
-			const text = await fs.readFile(path.join(repo.root, file), 'utf-8');
-			return keysNamingDefaults(plugin.manifest.raw).map(({key, location}) => ({
-				...pluginError('default-paths', file, `"${key.join('.')}" names its default location ./${location}`),
-				line: lineOf(text, `"${key.at(-1)}"`),
-			}));
+			const text = await fs.readFile(path.join(repo.root, file), 'utf8');
+			return keysNamingDefaults(plugin.manifest.raw).map(({key, location}) => {
+				const message = `"${key.join('.')}" names its default location ./${location}`;
+				return pluginError('default-paths', file, message, lineOf(text, `"${key.at(-1)}"`));
+			});
 		}),
 	);
 	return findings.flat();
 }
 
 /** The component keys of a manifest that name the location Claude Code reads without them. */
-export function keysNamingDefaults(manifest: JsonObject): {key: readonly string[]; location: string}[] {
+export function keysNamingDefaults(manifest: JsonObject): Array<{key: readonly string[]; location: string}> {
 	return DEFAULT_LOCATIONS.filter(({key, location}) => {
 		const value = valueAt(manifest, key);
-		const paths = typeof value === 'string' ? [value] : Array.isArray(value) ? value : [];
+		const paths = asList(value);
 		return paths.length > 0 && paths.every((p) => typeof p === 'string' && normalize(p) === location);
 	});
 }
 
 /** A hook command that names a plugin path placeholder runs in exec form: `command` plus `args`, with no shell. */
 export async function hookExecForm(repo: Repo): Promise<Finding[]> {
-	const findings = await Promise.all(repo.plugins.map((plugin) => hookExecFormIn(repo.root, plugin)));
+	const findings = await Promise.all(repo.plugins.map(async (plugin) => hookExecFormIn(repo.root, plugin)));
 	return findings.flat();
 }
 
 async function hookExecFormIn(root: string, plugin: Plugin): Promise<Finding[]> {
 	const file = `${plugin.path}/hooks/hooks.json`;
-	const text = await readOrNull(path.join(root, file));
-	if (text === null) return [];
-	const source = text.toString('utf-8');
+	const source = await readTextOrNull(path.join(root, file));
+	if (source === null) return [];
 	let config: unknown;
 	try {
 		config = JSON.parse(source);
@@ -109,14 +103,14 @@ async function hookExecFormIn(root: string, plugin: Plugin): Promise<Finding[]> 
 	}
 	if (!isObject(config) || !isObject(config.hooks)) return [];
 	return Object.values(config.hooks)
-		.flatMap((groups) => (Array.isArray(groups) ? groups.filter(isObject) : []))
-		.flatMap((group) => (Array.isArray(group.hooks) ? group.hooks.filter(isObject) : []))
+		.flatMap((groups) => asList(groups).filter((group) => isObject(group)))
+		.flatMap((group) => asList(group.hooks).filter((handler) => isObject(handler)))
 		.flatMap((handler): Finding[] => {
 			if (handler.type !== 'command' || typeof handler.command !== 'string') return [];
 			if (handler.args !== undefined || !PATH_PLACEHOLDER.test(handler.command)) return [];
 			const message = `\`${handler.command}\` runs through a shell; split it into command and args`;
 			const line = lineOf(source, JSON.stringify(handler.command));
-			return [{...pluginError('hook-exec-form', file, message), line}];
+			return [pluginError('hook-exec-form', file, message, line)];
 		});
 }
 
@@ -133,15 +127,21 @@ function normalize(location: string): string {
 	return location.replace(/^\.\//, '').replace(/\/+$/, '');
 }
 
-async function readOrNull(file: string): Promise<Buffer | null> {
+/** A string as a one-item list, an array as itself, and anything else as an empty list. */
+function asList(value: unknown): readonly unknown[] {
+	if (typeof value === 'string') return [value];
+	return Array.isArray(value) ? value : [];
+}
+
+async function readTextOrNull(file: string): Promise<string | null> {
 	try {
-		return await fs.readFile(file);
-	} catch (err) {
-		if (isErrnoCode(err, 'ENOENT')) return null;
-		throw err;
+		return await fs.readFile(file, 'utf8');
+	} catch (error) {
+		if (isErrnoCode(error, 'ENOENT')) return null;
+		throw error;
 	}
 }
 
-function pluginError(rule: string, file: string, message: string): Finding {
-	return {rule, severity: 'error', file, message};
+function pluginError(rule: string, file: string, message: string, line?: number): Finding {
+	return line === undefined ? {rule, severity: 'error', file, message} : {rule, severity: 'error', file, line, message};
 }

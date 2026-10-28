@@ -5,7 +5,7 @@ export type Format = 'text' | 'github';
 /** Renders findings for a terminal, or as GitHub Actions workflow commands that annotate the files. */
 export function formatFindings(findings: readonly Finding[], format: Format): string {
 	const sorted = findings.toSorted((a, b) => a.file.localeCompare(b.file) || (a.line ?? 0) - (b.line ?? 0));
-	const lines = sorted.map(format === 'github' ? githubLine : textLine);
+	const lines = sorted.map((f) => (format === 'github' ? githubLine(f) : textLine(f)));
 	lines.push(summary(findings));
 	return lines.join('\n') + '\n';
 }

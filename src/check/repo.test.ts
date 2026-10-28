@@ -4,9 +4,10 @@ import {loadRepo} from './repo.ts';
 
 test("loadRepo reads the catalog, each manifest, and each plugin's components", async () => {
 	await using fixture = await createFixture();
-	await fixture.editManifest('alpha', (m) => {
-		m.dependencies = ['beta', 'gamma@other', {name: 'delta', marketplace: 'elsewhere'}];
-	});
+	await fixture.editManifest('alpha', (m) => ({
+		...m,
+		dependencies: ['beta', 'gamma@other', {name: 'delta', marketplace: 'elsewhere'}],
+	}));
 	await fixture.write('plugins/beta/agents/scout.md', '---\nname: scout\n---\n');
 	await fixture.write('plugins/beta/skills/notes/README.md', 'a directory without SKILL.md is not a skill\n');
 
