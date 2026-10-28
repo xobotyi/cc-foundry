@@ -8,7 +8,7 @@
 					{
 						"type": "command",
 						"command": "node",
-						"args": ["${CLAUDE_PLUGIN_ROOT}/hooks/sync-statusline.js"],
+						"args": ["${CLAUDE_PLUGIN_ROOT}/hooks/sync-statusline.mts"],
 						"timeout": 5
 					}
 				]

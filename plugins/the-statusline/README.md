@@ -39,6 +39,9 @@ Color urgency increases as context or the rate limit runs low: gray â†’ yellow â
 
 ## Installation
 
+The status line needs Node.js 26 or later as the `node` on your `PATH`. Its script is written in TypeScript, and Claude
+Code runs it with `node`, which strips the types itself, so nothing is built at install time.
+
 ```
 /plugin install the-statusline --marketplace xobotyi/cc-foundry
 ```
@@ -52,10 +55,11 @@ On Claude Code before 2.1.275, add the marketplace first:
 
 The plugin automatically:
 
-- Installs the status line script as `statusline.js` in your Claude configuration directory: `CLAUDE_CONFIG_DIR` when
+- Installs the status line script as `statusline.mts` in your Claude configuration directory: `CLAUDE_CONFIG_DIR` when
   you set it, `~/.claude` otherwise
 - Sets the status line command in `settings.json` in the same directory
-- Keeps the script synchronized on every session start
+- Keeps the script synchronized on every session start, and deletes the `statusline.js` that releases before 2.0.0
+  installed there
 
 ## How It Works
 
@@ -70,7 +74,7 @@ seconds: after a resize, the rows refit to the new width within that time. A `re
 
 ## Customization
 
-To modify the status line display, edit `statusline.js` in the plugin directory and bump the version in
+To modify the status line display, edit `statusline.mts` in the plugin directory and bump the version in
 `.claude-plugin/plugin.json`. Changes propagate on the next session start.
 
 ## Uninstalling
@@ -80,7 +84,7 @@ To modify the status line display, edit `statusline.js` in the plugin directory 
 ```
 
 To fully clean up, remove the `statusLine` key from `settings.json` in your Claude configuration directory and delete
-`statusline.js` there. The directory is `CLAUDE_CONFIG_DIR` when you set it, `~/.claude` otherwise.
+`statusline.mts` there. The directory is `CLAUDE_CONFIG_DIR` when you set it, `~/.claude` otherwise.
 
 ## License
 
