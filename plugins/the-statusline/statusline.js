@@ -272,13 +272,17 @@ function trimMiddle(str, maxWidth) {
  * @param {number} maxWidth - Maximum allowed width
  * @returns {string}
  */
-function collapsePath(unixPath, maxWidth) {
+export function collapsePath(unixPath, maxWidth) {
 	if (unixPath.length <= maxWidth) {
 		return unixPath;
 	}
 
 	let overdue = unixPath.length - maxWidth;
-	const segments = posixpath.dirname(unixPath).split(posixpath.sep);
+	const root = unixPath.startsWith(posixpath.sep) ? posixpath.sep : '';
+	const segments = posixpath
+		.dirname(unixPath.slice(root.length))
+		.split(posixpath.sep)
+		.filter((seg) => seg !== '');
 
 	for (let i = 0; i < segments.length; i++) {
 		overdue -= segments[i].length - 1;
@@ -312,7 +316,7 @@ function collapsePath(unixPath, maxWidth) {
 		basename = trimMiddle(basename, Math.max(basename.length - overdue, 0));
 	}
 
-	return posixpath.join(...segments.filter((seg) => seg !== ''), basename);
+	return root + posixpath.join(...segments.filter((seg) => seg !== ''), basename);
 }
 
 /**
