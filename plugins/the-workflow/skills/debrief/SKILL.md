@@ -9,7 +9,7 @@ when_to_use: >-
   memory where it is on; it writes only through its approval gate and keeps no state between runs.
 argument-hint: "[14d | 2026-10-01 | all] [<repository>… | everywhere]"
 disable-model-invocation: true
-allowed-tools: Bash(node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mjs *)
+allowed-tools: Bash(node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mts *)
 compatibility: >-
   Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use, disable-model-invocation, argument-hint,
   allowed-tools) and reads Claude Code session transcripts
@@ -39,7 +39,7 @@ The repositories:
 - `everywhere` — every repository: `--all-projects`
 
 Run
-`node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mjs <flags> > "${TMPDIR:-/tmp}/debrief-${CLAUDE_SESSION_ID}.jsonl"`.
+`node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mts <flags> > "${TMPDIR:-/tmp}/debrief-${CLAUDE_SESSION_ID}.jsonl"`.
 The script reads the transcripts and auto memory under `~/.claude/projects/` and prints a count per signal to stderr. A
 non-zero exit ends the workflow: report the script's message.
 
@@ -58,12 +58,12 @@ the rest:
 
 With 100 candidates or fewer, read the file in slices of 100 lines. Above that, triage in two passes:
 
-1. Write the index, `node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mjs --index <file> > <file>.index`, and read
+1. Write the index, `node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mts --index <file> > <file>.index`, and read
    it in slices of 200 rows. A row is a candidate's line number in the file, its signal, its repository, its date, and
    the start of its text.
 2. Choose every candidate that is not a `follow-up` or `mid-turn`, and every `follow-up` or `mid-turn` whose text reads
    as a correction under phase 2. Write the chosen candidates in full,
-   `node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mjs --pick <file> --lines <n,n,…> > <file>.picked`, and read
+   `node ${CLAUDE_SKILL_DIR}/scripts/extract-corrections.mts --pick <file> --lines <n,n,…> > <file>.picked`, and read
    that file in slices of 100 lines.
 
 Above 2,000 candidates, stop and ask the user for a narrower window.
