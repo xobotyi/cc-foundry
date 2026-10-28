@@ -1,7 +1,7 @@
 import {defineConfig} from 'vite-plus';
 import javascript from '@ver0/oxlint-config/javascript.js';
 import node from '@ver0/oxlint-config/node.js';
-import typescript, {typescriptUnsafe} from '@ver0/oxlint-config/typescript.js';
+import typescript from '@ver0/oxlint-config/typescript.js';
 import vitest from '@ver0/oxlint-config/vitest.js';
 
 export default defineConfig({
@@ -20,7 +20,7 @@ export default defineConfig({
 		],
 	},
 	test: {
-		include: ['src/**/*.test.ts', 'plugins/**/*.test.mts', 'plugins/**/*.test.mjs', 'plugins/**/.dev/**/*.test.mjs'],
+		include: ['src/**/*.test.ts', 'plugins/**/*.test.mts'],
 	},
 	lint: {
 		// constraint: these files type-check against types Claude Code writes only when it loads the mod
@@ -39,16 +39,6 @@ export default defineConfig({
 						{ignoreInferredTypes: true, treatMethodsAsReadonly: true},
 					],
 				},
-				overrides: [
-					{
-						files: ['plugins/**/*.{js,mjs,cjs}'],
-						rules: {
-							...typescriptUnsafe.rules,
-							// a JavaScript parameter carries no type annotation to mark readonly
-							'typescript/prefer-readonly-parameter-types': 'off',
-						},
-					},
-				],
 			},
 		],
 		options: {typeAware: true, typeCheck: true},
