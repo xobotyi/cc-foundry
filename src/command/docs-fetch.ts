@@ -5,11 +5,14 @@ import path from 'node:path';
 import {Readability} from '@mozilla/readability';
 import {parseHTML} from 'linkedom';
 import TurndownService from 'turndown';
+import {isObject} from '../check/repo.ts';
+import type {JsonObject} from '../check/repo.ts';
 
-interface ReferenceInventory {
-	sources: Record<string, string>;
-	lastFetched?: string;
-}
+type ReferenceInventory = {
+	/** The file as read, so writing it back keeps keys this command does not know. */
+	readonly raw: JsonObject;
+	readonly sources: ReadonlyArray<readonly [label: string, url: string]>;
+};
 
 const BROWSER_HEADERS: HeadersInit = {
 	'User-Agent':
@@ -33,13 +36,17 @@ async function parseInventory(filePath: string): Promise<ReferenceInventory> {
 		throw new Error(`Inventory not found: ${filePath}`);
 	}
 
-	const data = await fs.readJson(filePath);
+	const data: unknown = await fs.readJson(filePath);
 
-	if (typeof data?.sources !== 'object' || Array.isArray(data.sources)) {
-		throw new Error(`Invalid inventory: 'sources' must be an object`);
+	if (!isObject(data) || !isObject(data.sources)) {
+		throw new TypeError(`Invalid inventory: 'sources' must be an object`);
 	}
 
-	return data as ReferenceInventory;
+	const sources = Object.entries(data.sources).map(([label, url]): readonly [string, string] => {
+		if (typeof url !== 'string') throw new TypeError(`Invalid inventory: source "${label}" is not a URL`);
+		return [label, url];
+	});
+	return {raw: data, sources};
 }
 
 /**
@@ -65,8 +72,8 @@ function toFilename(label: string, ext: string): string {
 	return (
 		label
 			.toLowerCase()
-			.replace(/[^a-z0-9]+/g, '-')
-			.replace(/^-|-$/g, '') + ext
+			.replaceAll(/[^a-z0-9]+/g, '-')
+			.replaceAll(/^-|-$/g, '') + ext
 	);
 }
 
@@ -79,14 +86,14 @@ const turndown = new TurndownService({
  * Minify HTML by removing extra whitespace
  */
 function minifyHtml(html: string): string {
-	return html.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+	return html.replaceAll(/\s+/g, ' ').replaceAll(/>\s+</g, '><').trim();
 }
 
-interface ProcessedContent {
+type ProcessedContent = {
 	content: string;
 	format: 'markdown' | 'html';
 	title?: string;
-}
+};
 
 /**
  * Process HTML with graceful degradation:
@@ -95,8 +102,7 @@ interface ProcessedContent {
  * 3. If all succeed → return Markdown
  */
 function processHtml(html: string): ProcessedContent {
-	// Step 1: Try Readability
-	let article: ReturnType<Readability<string>['parse']>;
+	let article: ReturnType<Readability['parse']>;
 	try {
 		const {document} = parseHTML(html);
 		const reader = new Readability(document);
@@ -106,28 +112,27 @@ function processHtml(html: string): ProcessedContent {
 		return {content: minifyHtml(html), format: 'html'};
 	}
 
-	if (!article || !article.content) {
+	const articleContent = article?.content ?? '';
+	if (articleContent === '') {
 		consola.warn(`    Readability returned no content, using original HTML`);
 		return {content: minifyHtml(html), format: 'html'};
 	}
 
-	const title = article.title ?? undefined;
+	const title = article?.title ?? undefined;
 
-	// Step 2: Try Turndown
 	let markdown: string;
 	try {
-		markdown = turndown.turndown(article.content);
+		markdown = turndown.turndown(articleContent);
 	} catch {
 		consola.warn(`    Turndown failed, using Readability HTML`);
 		return {
-			content: minifyHtml(article.content),
+			content: minifyHtml(articleContent),
 			format: 'html',
 			title,
 		};
 	}
 
-	// Step 3: Success - return Markdown with title
-	if (title) {
+	if (title !== undefined && title !== '') {
 		markdown = `# ${title}\n\n${markdown}`;
 	}
 
@@ -167,7 +172,6 @@ export default defineCommand({
 	async run({args}) {
 		const inventoryPath = path.resolve(args.inventory);
 		const inventory = await parseInventory(inventoryPath);
-		const entries = Object.entries(inventory.sources);
 
 		const inventoryDir = path.dirname(inventoryPath);
 		const referenceDir = path.join(inventoryDir, 'reference');
@@ -179,48 +183,50 @@ export default defineCommand({
 
 		await fs.ensureDir(referenceDir);
 
-		consola.info(`Found ${entries.length} source(s)`);
+		consola.info(`Found ${inventory.sources.length} source(s)`);
 
-		for (const [label, url] of entries) {
-			consola.start(`${label}`);
-
-			let raw: string;
-			try {
-				raw = await fetchContent(url);
-			} catch (err) {
-				consola.error(`  Failed: ${err instanceof Error ? err.message : err}`);
-				continue;
-			}
-
-			const fetchDate = new Date().toISOString();
-			const isMarkdown = url.endsWith('.md') || url.endsWith('.mdx');
-
-			let content: string;
-			let ext: string;
-
-			if (isMarkdown) {
-				consola.log(`  Raw markdown`);
-				content = raw;
-				ext = path.extname(url);
-			} else {
-				consola.log(`  Processing HTML`);
-				const processed = processHtml(raw);
-				content = processed.content;
-				ext = processed.format === 'markdown' ? '.md' : '.html';
-				consola.log(`    Output: ${processed.format}`);
-			}
-
-			const filename = toFilename(label, ext);
-			const outputPath = path.join(referenceDir, filename);
-			const withFrontmatter = addFrontmatter(content, url, fetchDate);
-			await fs.writeFile(outputPath, withFrontmatter, 'utf-8');
-			consola.success(`  Saved: ${filename}`);
+		for (const [label, url] of inventory.sources) {
+			// oxlint-disable-next-line no-await-in-loop -- one source at a time keeps each source's log lines together
+			await fetchSource(label, url, referenceDir);
 		}
 
-		// Update lastFetched timestamp
-		inventory.lastFetched = new Date().toISOString();
-		await fs.writeJson(inventoryPath, inventory, {spaces: 2});
+		await fs.writeJson(inventoryPath, {...inventory.raw, lastFetched: new Date().toISOString()}, {spaces: 2});
 
 		consola.success('Done');
 	},
 });
+
+/** Fetches one source into the reference directory; a source that fails to download is reported and skipped. */
+async function fetchSource(label: string, url: string, referenceDir: string): Promise<void> {
+	consola.start(label);
+
+	let raw: string;
+	try {
+		raw = await fetchContent(url);
+	} catch (error) {
+		consola.error(`  Failed: ${error instanceof Error ? error.message : String(error)}`);
+		return;
+	}
+
+	const fetchDate = new Date().toISOString();
+	const isMarkdown = url.endsWith('.md') || url.endsWith('.mdx');
+
+	let content: string;
+	let ext: string;
+
+	if (isMarkdown) {
+		consola.log(`  Raw markdown`);
+		content = raw;
+		ext = path.extname(url);
+	} else {
+		consola.log(`  Processing HTML`);
+		const processed = processHtml(raw);
+		content = processed.content;
+		ext = processed.format === 'markdown' ? '.md' : '.html';
+		consola.log(`    Output: ${processed.format}`);
+	}
+
+	const filename = toFilename(label, ext);
+	await fs.writeFile(path.join(referenceDir, filename), addFrontmatter(content, url, fetchDate), 'utf8');
+	consola.success(`  Saved: ${filename}`);
+}

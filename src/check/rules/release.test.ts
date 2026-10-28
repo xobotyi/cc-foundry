@@ -5,7 +5,7 @@ import type {Fixture} from '../fixture.ts';
 import {loadRepo} from '../repo.ts';
 import {releaseVersion, unbumpedChanges} from './release.ts';
 
-const brief = (findings: Finding[]) => findings.map((f) => `${f.severity} ${f.file}: ${f.message}`);
+const brief = (findings: readonly Finding[]) => findings.map((f) => `${f.severity} ${f.file}: ${f.message}`);
 
 const normalRun = {prePush: false};
 const prePush = {prePush: true};
@@ -36,9 +36,7 @@ test('unbumped-change warns about a shipped change since the release tag', async
 			'and the version is still 1.0.0',
 	]);
 
-	await fixture.editManifest('alpha', (m) => {
-		m.version = '1.0.1';
-	});
+	await fixture.editManifest('alpha', (m) => ({...m, version: '1.0.1'}));
 
 	expect(await unbumpedChanges(await loadRepo(fixture.root), normalRun)).toStrictEqual([]);
 });
@@ -49,11 +47,12 @@ test('unbumped-change ignores docs, dev files, tests, and display-only manifest 
 	await fixture.write('plugins/alpha/CLAUDE.md', '# alpha\n');
 	await fixture.write('plugins/alpha/.dev/notes.md', 'notes\n');
 	await fixture.write('plugins/alpha/tests/one.test.ts', '');
-	await fixture.editManifest('alpha', (m) => {
-		m.description = 'A new description';
-		m.keywords = ['new'];
-		m.lspServers = './.lsp.json';
-	});
+	await fixture.editManifest('alpha', (m) => ({
+		...m,
+		description: 'A new description',
+		keywords: ['new'],
+		lspServers: './.lsp.json',
+	}));
 	await fixture.commit('docs and metadata');
 
 	expect(await unbumpedChanges(await loadRepo(fixture.root), normalRun)).toStrictEqual([]);
@@ -78,9 +77,7 @@ test('unbumped-change ignores a change the formatter rewrites away, and counts o
 
 test('unbumped-change counts a manifest key that changes the install', async () => {
 	await using fixture = await released();
-	await fixture.editManifest('alpha', (m) => {
-		m.dependencies = ['beta'];
-	});
+	await fixture.editManifest('alpha', (m) => ({...m, dependencies: ['beta']}));
 
 	expect(brief(await unbumpedChanges(await loadRepo(fixture.root), normalRun))).toStrictEqual([
 		'warning plugins/alpha/.claude-plugin/plugin.json: .claude-plugin/plugin.json changed since alpha-v1.0.0, ' +
@@ -102,9 +99,7 @@ test('unbumped-change before a push judges only the commits the remote lacks, an
 			'and the version is still 1.0.0',
 	]);
 
-	await fixture.editManifest('alpha', (m) => {
-		m.version = '1.1.0';
-	});
+	await fixture.editManifest('alpha', (m) => ({...m, version: '1.1.0'}));
 	await fixture.commit('bump alpha');
 
 	expect(await unbumpedChanges(await loadRepo(fixture.root), prePush)).toStrictEqual([]);

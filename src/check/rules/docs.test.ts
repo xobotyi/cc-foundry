@@ -11,7 +11,9 @@ test('root-docs reports a plugin missing from the root CLAUDE.md or README', asy
 	await fixture.write('CLAUDE.md', '# fixture\n\n## Plugins\n\n- `plugins/alpha/`\n');
 	await fixture.write('README.md', '# fixture\n\n### beta\n');
 
-	expect((await rootDocs(await loadRepo(fixture.root))).map((f) => `${f.file}: ${f.message}`)).toStrictEqual([
+	const findings = await rootDocs(await loadRepo(fixture.root));
+
+	expect(findings.map((f) => `${f.file}: ${f.message}`)).toStrictEqual([
 		'README.md: no "### alpha" section describes the plugin',
 		'CLAUDE.md: the plugin list does not name plugins/beta/',
 	]);

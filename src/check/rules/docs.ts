@@ -6,7 +6,7 @@ import type {Repo} from '../repo.ts';
 /** The root CLAUDE.md names every plugin by its directory, and the root README gives each one a section. */
 export async function rootDocs(repo: Repo): Promise<Finding[]> {
 	const [claude, readme] = await Promise.all(
-		['CLAUDE.md', 'README.md'].map((file) => fs.readFile(path.join(repo.root, file), 'utf-8')),
+		['CLAUDE.md', 'README.md'].map(async (file) => fs.readFile(path.join(repo.root, file), 'utf8')),
 	);
 	const headings = new Set((readme ?? '').split('\n').map((line) => line.trim()));
 	return repo.plugins.flatMap((plugin): Finding[] => {

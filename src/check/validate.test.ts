@@ -56,6 +56,7 @@ test('validateRepo reports what claude plugin validate finds in a plugin', async
 
 	const findings = await validateRepo(await loadRepo(fixture.root));
 
-	expect(findings.map((f) => [f.file, f.severity])).toStrictEqual([['plugins/alpha/hooks/hooks.json', 'error']]);
-	expect(findings[0]?.message ?? '').toMatch(/without quotes/);
+	expect(findings.map((f) => [f.file, f.severity, f.message.includes('without quotes')])).toStrictEqual([
+		['plugins/alpha/hooks/hooks.json', 'error', true],
+	]);
 });

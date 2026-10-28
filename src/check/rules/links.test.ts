@@ -4,7 +4,7 @@ import {createFixture} from '../fixture.ts';
 import {loadRepo} from '../repo.ts';
 import {dependencyScope, prerequisiteDependencies, skillReferences} from './links.ts';
 
-const brief = (findings: Finding[]) => findings.map((f) => `${f.file}:${f.line ?? ''} ${f.message}`);
+const brief = (findings: readonly Finding[]) => findings.map((f) => `${f.file}:${f.line ?? ''} ${f.message}`);
 
 const skill = (name: string, body: string) => `---\nname: ${name}\ndescription: The ${name} skill.\n---\n\n${body}\n`;
 
@@ -47,9 +47,7 @@ test("prerequisite-dependency requires a dependency for another plugin's skill",
 		'plugins/alpha/skills/one/SKILL.md:6 the prerequisite `two` ships in "beta", missing from dependencies',
 	]);
 
-	await fixture.editManifest('alpha', (m) => {
-		m.dependencies = ['beta'];
-	});
+	await fixture.editManifest('alpha', (m) => ({...m, dependencies: ['beta']}));
 
 	expect(await prerequisiteDependencies(await loadRepo(fixture.root))).toStrictEqual([]);
 });
@@ -73,11 +71,12 @@ test('prerequisite-dependency reads explicit references and refuses an ambiguous
 
 test('dependency-scope refuses a dependency outside this marketplace', async () => {
 	await using fixture = await createFixture();
-	await fixture.editManifest('alpha', (m) => {
-		m.dependencies = ['beta', 'beta@foundry', 'delta', 'linter@elsewhere'];
-	});
+	await fixture.editManifest('alpha', (m) => ({
+		...m,
+		dependencies: ['beta', 'beta@foundry', 'delta', 'linter@elsewhere'],
+	}));
 
-	expect(brief(await dependencyScope(await loadRepo(fixture.root)))).toStrictEqual([
+	expect(brief(dependencyScope(await loadRepo(fixture.root)))).toStrictEqual([
 		'plugins/alpha/.claude-plugin/plugin.json: dependency "delta" is no plugin of this marketplace',
 		'plugins/alpha/.claude-plugin/plugin.json: dependency "linter@elsewhere" comes from another marketplace',
 	]);
