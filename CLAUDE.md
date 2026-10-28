@@ -108,6 +108,12 @@ process (Research → Scaffold → Write → Ship).
 - It uses such a system when the session shows it is present, and the plugin's text names the system by the role it
   fills, never by product name
 
+**Plugin scripts:**
+
+- A script Claude Code runs through `node` is an `.mts` file of erasable TypeScript, run by Node 26's type stripping and
+  doing I/O only under `import.meta.main` ([ADR 1.13](/design-docs/adr/1.13-plugin-script-runtime.md))
+- Its tests sit beside it as `<name>.test.mts` and import its exports; a `.dev/` folder never exists only to hold a test
+
 **Plugin metadata and versions:**
 
 - A plugin's version, description, keywords, and every other field `plugin.json` accepts live only in its
