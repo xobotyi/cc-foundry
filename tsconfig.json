@@ -16,5 +16,12 @@
 		"noUncheckedIndexedAccess": true,
 		"types": ["node"]
 	},
-	"include": ["src", "plugins/**/*.js", "plugins/**/*.mjs", "plugins/**/*.cjs", "plugins/**/.dev/*.test.mjs"]
+	"include": [
+		"src",
+		"plugins/**/*.mts",
+		"plugins/**/*.js",
+		"plugins/**/*.mjs",
+		"plugins/**/*.cjs",
+		"plugins/**/.dev/*.test.mjs"
+	]
 }
