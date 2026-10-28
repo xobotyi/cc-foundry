@@ -12,9 +12,9 @@ phase-relevant references get read — not skipped.
 
 ## Checkpoints
 
-`hooks/hooks.json` maps each lifecycle event to `node ${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js <action>` with a 5-second
-timeout; the action argument selects the payload. Event names and matchers are exact strings — a mismatch fires nothing
-and reports nothing.
+`hooks/hooks.json` maps each lifecycle event to `node` with `${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js <action>` as its
+exec-form `args`, under a 5-second timeout; the action argument selects the payload. Event names and matchers are exact
+strings — a mismatch fires nothing and reports nothing.
 
 - `SessionStart`, matcher `startup|resume|clear|compact` -> `session-start` — the full SEF framework
 - `PreCompact`, no matcher -> `pre-compact` — compaction instructions
