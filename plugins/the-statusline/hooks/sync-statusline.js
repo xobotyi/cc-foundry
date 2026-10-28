@@ -9,7 +9,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
+const CONFIG_DIR_ENV = process.env.CLAUDE_CONFIG_DIR ?? '';
+const CLAUDE_DIR = CONFIG_DIR_ENV === '' ? path.join(os.homedir(), '.claude') : CONFIG_DIR_ENV;
 const SETTINGS_PATH = path.join(CLAUDE_DIR, 'settings.json');
 const TARGET_SCRIPT = path.join(CLAUDE_DIR, 'statusline.js');
 const SOURCE_SCRIPT = path.join(process.env.CLAUDE_PLUGIN_ROOT, 'statusline.js');
@@ -21,7 +22,7 @@ try {
 	fs.mkdirSync(CLAUDE_DIR, {recursive: true});
 	fs.copyFileSync(SOURCE_SCRIPT, TARGET_SCRIPT);
 
-	const settings = fs.existsSync(SETTINGS_PATH) ? JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf-8')) : {};
+	const settings = fs.existsSync(SETTINGS_PATH) ? JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf8')) : {};
 
 	const command = `node "${TARGET_SCRIPT}"`;
 	const statusLine = settings.statusLine;
@@ -37,6 +38,6 @@ try {
 		};
 		fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2) + '\n');
 	}
-} catch (err) {
-	console.error(`[statusline-sync] ${err.message}`);
+} catch (error) {
+	console.error(`[statusline-sync] ${error.message}`);
 }
