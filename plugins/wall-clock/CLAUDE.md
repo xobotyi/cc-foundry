@@ -6,9 +6,11 @@ at process start.
 
 ## Components
 
-- **`hooks/wall-clock.js`** — the whole implementation. ESM with `node:` imports, no dependencies.
+- **`hooks/wall-clock.mts`** — the whole implementation, a TypeScript module Node 26 runs directly, with no
+  dependencies. `respond` holds the logic; the entry point only reads stdin and the tick-period knob.
 - **`hooks/hooks.json`** — registers the three events, 5s timeout each.
-- **`.dev/wall-clock.test.mjs`** — pins the PreCompact output form. Run `vp test plugins/wall-clock` after any change to
+- **`hooks/wall-clock.test.mts`** — pins the anchors, the throttle and the shapes a tick is recorded in, the failure
+  paths, and the formatting, against transcripts written per test. Run `vp test plugins/wall-clock` after any change to
   the hook.
 
 ## How It Works
@@ -30,8 +32,11 @@ nothing can go stale across `--resume`, a crash, or two concurrent sessions in o
 
 **Throttle** — also stateless. The previous tick is found by scanning the transcript tail for `<wall-clock `, matching
 only inside `attachment.stdout` or `attachment.content`. Batch ticks are recorded in both forms and prompt ticks only in
-`content`, so both fields must be read or a prompt tick fails to throttle the batch tick behind it. Requiring the
-attachment is what stops the hook's own source, quoted into the transcript by a Read or a Write, from matching itself.
+`content`, so both fields must be read or a prompt tick fails to throttle the batch tick behind it. `content` is a
+string in a `hook_success` attachment and an array of strings in a `hook_additional_context` one, so both shapes are
+read (2.1.310). Requiring the attachment is what stops the hook's own source, quoted into the transcript by a Read or a
+Write, from matching itself; an instruction file loaded into context is a `nested_memory` attachment whose `content` is
+an object, and it never counts.
 
 **Failure paths** — the exit code is always 0 and a diagnostic goes to stderr (visible under `claude --debug`), because
 a hook that disturbs a session is worse than a missing tick:
@@ -50,8 +55,8 @@ a hook that disturbs a session is worse than a missing tick:
 
 ## Conventions
 
-- **One vocabulary.** The plugin is `wall-clock`, the script is `wall-clock.js`, the injected tag is `<wall-clock>`, and
-  one emission is a **tick**. Never introduce a second word for any of them.
+- **One vocabulary.** The plugin is `wall-clock`, the script is `wall-clock.mts`, the injected tag is `<wall-clock>`,
+  and one emission is a **tick**. Never introduce a second word for any of them.
 - **Elapsed values are computed in the hook**, never left to the model. An injected figure must never require the model
   to subtract two timestamps.
 - **Sync `fs` calls are correct here** — this is a one-shot CLI process with no event loop to starve.

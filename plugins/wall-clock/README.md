@@ -38,6 +38,9 @@ produce a stale reading.
 
 ## Installation
 
+The hook needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and Claude Code runs it
+with `node`, which strips the types itself, so nothing is built at install time.
+
 ```
 /plugin install wall-clock --marketplace xobotyi/cc-foundry
 ```
