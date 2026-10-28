@@ -125,6 +125,10 @@ On Claude Code before 2.1.275, add the marketplace first:
 Installing the-workflow also installs `ai-helpers`, because the `claude-md` skill loads its `prompt-engineering` skill
 first.
 
+The `debrief` skill runs its transcript extractor with the `node` on your `PATH`, which must be Node.js 26 or later: the
+extractor is written in TypeScript, and Node strips the types itself, so nothing is built at install time. The other
+skills run no script.
+
 ## License
 
 MIT

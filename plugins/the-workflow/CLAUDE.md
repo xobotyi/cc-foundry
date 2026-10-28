@@ -10,7 +10,7 @@ structured context transfer across a boundary, and the user's corrections turned
 - **`handoff`** — triage conversation context into a standalone transfer document. User-invoked only, via `/handoff`
 - **`debrief`** — harvest the user's corrections from session transcripts and write each durable lesson into the
   instruction file it belongs in, through an approval gate. User-invoked only, via `/debrief`; the extractor is
-  `scripts/extract-corrections.mjs`
+  `scripts/extract-corrections.mts`
 
 ## Skill Dependencies
 
@@ -56,9 +56,9 @@ structured context transfer across a boundary, and the user's corrections turned
 - The skill keeps no state between runs — a ledger of processed candidates grows without bound, and a cursor that skips
   sessions already read hides the recurrence that makes a lesson. Every run rereads its whole window; volume is handled
   by the two-pass index and pick, never by skipping history
-- The transcript format is undocumented and changes between CLI versions. `.dev/extract-corrections.test.mjs` pins every
-  marker the extractor relies on; run `vp test plugins/the-workflow` after any change to the script, and add a fixture
-  entry for each new marker
+- The transcript format is undocumented and changes between CLI versions. `scripts/extract-corrections.test.mts` pins
+  every marker the extractor relies on; run `vp test plugins/the-workflow` after any change to the script, and add a
+  fixture entry for each new marker
 - Transcript facts that defy a reasonable assumption, each pinned by that test:
   - A human prompt carries `origin.kind: "human"`. In a session whose entries carry `origin`, an entry without it is
     synthetic: a compaction summary, a teammate message, a typed slash command
