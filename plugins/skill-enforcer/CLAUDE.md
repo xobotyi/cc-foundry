@@ -5,15 +5,16 @@ phase-relevant references get read — not skipped.
 
 ## Components
 
-- **`hooks/sef-hook.js`** — the whole implementation, one Node script dispatched by a CLI action argument.
+- **`hooks/sef-hook.mts`** — the whole implementation, one TypeScript module that Node 26 runs directly, dispatched by a
+  CLI action argument.
 - **`hooks/hooks.json`** — the event wiring below.
-- **`hooks/sef-hook.test.mjs`** — imports `respond` and pins the checkpoint table, the anti-leak contract, the
-  PreCompact output form, and the `hooks.json` wiring. Run `vp test plugins/skill-enforcer` after any change to the
+- **`hooks/sef-hook.test.mts`** — imports `reply` and `serialize` and pins the checkpoint table, the anti-leak contract,
+  the PreCompact output form, and the `hooks.json` wiring. Run `vp test plugins/skill-enforcer` after any change to the
   hook.
 
 ## Checkpoints
 
-`hooks/hooks.json` maps each lifecycle event to `node` with `${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.js <action>` as its
+`hooks/hooks.json` maps each lifecycle event to `node` with `${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.mts <action>` as its
 exec-form `args`, under a 5-second timeout; the action argument selects the payload. Event names and matchers are exact
 strings — a mismatch fires nothing and reports nothing.
 
@@ -24,14 +25,14 @@ strings — a mismatch fires nothing and reports nothing.
 - `PostToolUse`, matcher `Edit|Write` -> `write` — `PHASE-CHANGE` reminder
 - `PostToolUse`, matcher `Skill` -> `skill` — `SKILL-LOAD` reminder
 
-The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -> `PHASE-CHANGE`). `RESPONSES` in
-`sef-hook.js` holds that mapping.
+The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -> `PHASE-CHANGE`). `REPLIES` in
+`sef-hook.mts` holds that mapping.
 
 ## Conventions
 
 **Single source of truth:**
 
-- Each checkpoint's rule lives once in the `STAGES` object in `sef-hook.js`. `STAGES[phase].rule` feeds both the
+- Each checkpoint's rule lives once in the `STAGES` object in `sef-hook.mts`. `STAGES[phase].rule` feeds both the
   session-start framework list and the per-checkpoint reminder.
 - Add or rename a checkpoint by editing `STAGES`; the framework and reminder update together. Do not duplicate rule text
   elsewhere.

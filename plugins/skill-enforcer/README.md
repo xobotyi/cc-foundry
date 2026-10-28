@@ -37,6 +37,9 @@ applies it silently: it acts on the rule, but never echoes the reminder or narra
 
 ## Installation
 
+The hook needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and Claude Code runs it
+with `node`, which strips the types itself, so nothing is built at install time.
+
 ```
 /plugin install skill-enforcer --marketplace xobotyi/cc-foundry
 ```
@@ -118,21 +121,21 @@ after compaction.
 ```
 hooks/
 ├── hooks.json     # Hook configuration (event -> command mapping)
-└── sef-hook.js    # Unified hook script with an action parameter
+└── sef-hook.mts    # Unified hook module with an action parameter
 ```
 
-The single `sef-hook.js` script handles all hook events via a command-line argument:
+The single `sef-hook.mts` script handles all hook events via a command-line argument:
 
 ```bash
-node sef-hook.js session-start  # Full framework (~600 tokens)
-node sef-hook.js pre-compact    # Compaction instructions
-node sef-hook.js prompt         # USER-PROMPT reminder
-node sef-hook.js read           # EVALUATION reminder
-node sef-hook.js write          # PHASE-CHANGE reminder
-node sef-hook.js skill          # SKILL-LOAD reminder
+node sef-hook.mts session-start  # Full framework (~600 tokens)
+node sef-hook.mts pre-compact    # Compaction instructions
+node sef-hook.mts prompt         # USER-PROMPT reminder
+node sef-hook.mts read           # EVALUATION reminder
+node sef-hook.mts write          # PHASE-CHANGE reminder
+node sef-hook.mts skill          # SKILL-LOAD reminder
 ```
 
-Every payload is rendered from a single `STAGES` object in `sef-hook.js`. Each checkpoint's rule is defined once
+Every payload is rendered from a single `STAGES` object in `sef-hook.mts`. Each checkpoint's rule is defined once
 (`STAGES[phase].rule`) and feeds both the session-start framework list and the per-checkpoint reminder — adding a
 checkpoint or editing a rule updates both at once, with no risk of drift.
 

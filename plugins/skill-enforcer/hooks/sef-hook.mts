@@ -1,23 +1,14 @@
 #!/usr/bin/env node
 
-// SEF injects skill-discipline reminders at lifecycle checkpoints.
-//
-// Design: each checkpoint is ONE declarative behavioral rule — not a <sef-eval> field
-// skeleton wrapped in <thinking>. The old skeleton design failed on reasoning models
-// (Opus 4.8+): handed a fill-in template and told to "emit it in the thinking stream",
-// the model either echoed the tags into the VISIBLE reply (the native reasoning channel
-// is not addressable by typing <thinking>) or, on low-effort/no-think steps, had nowhere
-// to put the eval at all. A declarative rule constrains the ACTION regardless of whether
-// the model enters a thinking block on a given step, and carries no tag-shaped artifact
-// to complete-and-leak.
-//
-// Single source of truth: STAGES[phase].rule feeds both the session-start framework and
-// the per-checkpoint reminder. Edit a rule once; both update, byte-identical (KV-cached).
+type Phase = 'USER-PROMPT' | 'SKILL-LOAD' | 'EVALUATION' | 'PHASE-CHANGE';
 
-import fs from 'node:fs';
-import {fileURLToPath} from 'node:url';
+/** The hook's answer to one CLI action. */
+export type Reply =
+	| {readonly event: string; readonly context: string}
+	| {readonly instructions: string}
+	| {readonly error: string};
 
-const STAGES = {
+const STAGES: Readonly<Record<Phase, {readonly event: string; readonly rule: string}>> = {
 	'USER-PROMPT': {
 		event: 'a new user message arrives',
 		rule: 'Before responding, invoke each skill whose description names this task, a file type in it, or a symptom it shows. A description that assigns the work to another skill is not a match. Do not invoke a skill because it could apply: its body stays in context for the rest of the session. Knowing the subject is not a reason to skip a matching skill.',
@@ -36,11 +27,9 @@ const STAGES = {
 	},
 };
 
-// Anti-leak contract, restated at every checkpoint so it survives context drift. Guards
-// both failure modes: tag-echo (reproducing the reminder) and narration (answering it aloud).
 const SILENT = 'Act on this rule. Do not quote this reminder or report the check in your reply.';
 
-const renderTrigger = (phase) => `<SEF phase="${phase}">\n${STAGES[phase].rule}\n\n${SILENT}\n</SEF>`;
+const renderTrigger = (phase: Phase): string => `<SEF phase="${phase}">\n${STAGES[phase].rule}\n\n${SILENT}\n</SEF>`;
 
 const RULES_BLOCK = Object.entries(STAGES)
 	.map(([phase, s]) => `- ${phase} (when ${s.event}): ${s.rule}`)
@@ -64,7 +53,7 @@ When compacting this conversation:
 - After compaction, skills are re-invoked automatically; the references listed above must be re-read to restore context.
 </sef-compaction>`;
 
-const RESPONSES = {
+const REPLIES: Readonly<Record<string, Reply>> = {
 	'session-start': {event: 'SessionStart', context: FRAMEWORK},
 	'pre-compact': {instructions: COMPACT_INSTRUCTIONS},
 	prompt: {event: 'UserPromptSubmit', context: renderTrigger('USER-PROMPT')},
@@ -73,30 +62,28 @@ const RESPONSES = {
 	skill: {event: 'PostToolUse', context: renderTrigger('SKILL-LOAD')},
 };
 
-/**
- * Returns the text the hook writes to stdout for a CLI action.
- * @param {string | undefined} action
- * @returns {string}
- */
-export function respond(action) {
-	const response = Object.hasOwn(RESPONSES, action) ? RESPONSES[action] : undefined;
+/** The CLI actions the hook answers. */
+export const ACTIONS: readonly string[] = Object.keys(REPLIES);
 
-	if (response === undefined) {
-		const systemMessage = `SEF hook error: Unknown action "${action}". Valid: ${Object.keys(RESPONSES).join(', ')}`;
-		return `${JSON.stringify({continue: true, systemMessage})}\n`;
-	}
-
-	if (response.instructions === undefined) {
-		const hookSpecificOutput = {hookEventName: response.event, additionalContext: response.context};
-		return `${JSON.stringify({hookSpecificOutput})}\n`;
-	}
-
-	return response.instructions;
+/** Returns the reply to a CLI action; a name the table only inherits, such as `constructor`, is an unknown action. */
+export function reply(action: string | undefined): Reply {
+	const known = action !== undefined && Object.hasOwn(REPLIES, action) ? REPLIES[action] : undefined;
+	return known ?? {error: `SEF hook error: Unknown action "${String(action)}". Valid: ${ACTIONS.join(', ')}`};
 }
 
-// constraint: Node gives import.meta.url the entry's real path and argv[1] the typed one, so a symlink breaks equality
-const invoked = process.argv[1] !== undefined && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+/** Returns the text the hook writes to stdout: instructions as they are, anything else as one JSON line. */
+export function serialize(answer: Reply): string {
+	if ('instructions' in answer) {
+		return answer.instructions;
+	}
 
-if (invoked) {
-	process.stdout.write(respond(process.argv[2]));
+	if ('error' in answer) {
+		return `${JSON.stringify({continue: true, systemMessage: answer.error})}\n`;
+	}
+
+	return `${JSON.stringify({hookSpecificOutput: {hookEventName: answer.event, additionalContext: answer.context}})}\n`;
+}
+
+if (import.meta.main) {
+	process.stdout.write(serialize(reply(process.argv[2])));
 }
