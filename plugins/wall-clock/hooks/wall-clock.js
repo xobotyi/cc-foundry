@@ -17,6 +17,16 @@
 
 import fs from 'node:fs';
 import process from 'node:process';
+import {text} from 'node:stream/consumers';
+
+/**
+ * @typedef {object} TranscriptEntry
+ * @property {string} [type]
+ * @property {string} [timestamp]
+ * @property {boolean} [isMeta]
+ * @property {{stdout?: string, content?: string}} [attachment]
+ * @property {{content?: unknown}} [message]
+ */
 
 const TICK_DEFAULT_SECONDS = 60; // quiet period between PostToolBatch ticks
 const WINDOW = 256 * 1024; // transcript tail scanned for the anchor and the previous tick
@@ -63,6 +73,7 @@ const hms = (ms) => {
 	return minutes ? `${minutes}m${pad(total % 60)}s` : `${total}s`;
 };
 
+/** @param {Date} date */
 const stamp = (date) => {
 	const offset = -date.getTimezoneOffset();
 	const ymd = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -70,14 +81,6 @@ const stamp = (date) => {
 	const zone = `${offset < 0 ? '-' : '+'}${pad(Math.floor(Math.abs(offset) / 60))}:${pad(Math.abs(offset) % 60)}`;
 
 	return `${DAYS[date.getDay()]} ${ymd} ${time}${zone}`;
-};
-
-const readStdin = async () => {
-	let raw = '';
-
-	for await (const chunk of process.stdin) raw += chunk;
-
-	return raw;
 };
 
 const readTail = (path) => {
@@ -107,18 +110,26 @@ const hasText = (content) =>
 // `content`; a prompt tick gets only the second form. Both fields count, or a prompt tick never
 // throttles the batch tick behind it. Demanding an attachment keeps this file's own source, quoted
 // into the transcript by a Read or a Write, from matching the marker.
+/** @param {TranscriptEntry} entry */
 const isTick = (entry) => `${entry.attachment?.stdout ?? ''}${entry.attachment?.content ?? ''}`.includes(MARK);
 
+/**
+ * @param {string[]} lines
+ * @param {(entry: TranscriptEntry) => boolean} isAnchor
+ */
 const scan = (lines, isAnchor) => {
+	/** @type {number | null} */
 	let anchor = null;
+	/** @type {number | null} */
 	let tick = null;
 
-	for (let i = lines.length - 1; i >= 0 && !(anchor && tick); i--) {
-		const line = lines[i];
-		const candidate = !tick && line.includes(MARK);
+	for (let i = lines.length - 1; i >= 0 && (anchor === null || tick === null); i--) {
+		const line = lines[i] ?? '';
+		const candidate = tick === null && line.includes(MARK);
 
-		if (line.length < 2 || (!candidate && anchor)) continue;
+		if (line.length < 2 || (!candidate && anchor !== null)) continue;
 
+		/** @type {TranscriptEntry} */
 		let entry;
 
 		try {
@@ -132,7 +143,7 @@ const scan = (lines, isAnchor) => {
 		if (!at) continue;
 
 		if (candidate && isTick(entry)) tick = at;
-		else if (!anchor && isAnchor(entry)) anchor = at;
+		else if (anchor === null && isAnchor(entry)) anchor = at;
 	}
 
 	return {anchor, tick};
@@ -143,9 +154,9 @@ const main = async () => {
 	let transcript;
 
 	try {
-		({hook_event_name: event, transcript_path: transcript} = JSON.parse(await readStdin()));
-	} catch (err) {
-		process.stderr.write(`wall-clock hook: unreadable hook payload: ${err.message}\n`);
+		({hook_event_name: event, transcript_path: transcript} = JSON.parse(await text(process.stdin)));
+	} catch (error) {
+		process.stderr.write(`wall-clock hook: unreadable hook payload: ${error.message}\n`);
 
 		return;
 	}
@@ -158,9 +169,14 @@ const main = async () => {
 
 	const isPrompt = event === 'UserPromptSubmit';
 	// Anchored so that neither event depends on whether the current prompt reached the transcript.
+	/** @type {(entry: TranscriptEntry) => boolean} */
 	const isAnchor = isPrompt
 		? (entry) => entry.type === 'assistant'
-		: (entry) => entry.type === 'user' && !entry.attachment && !entry.isMeta && hasText(entry.message?.content);
+		: (entry) =>
+				entry.type === 'user' &&
+				entry.attachment === undefined &&
+				entry.isMeta !== true &&
+				hasText(entry.message?.content);
 
 	const now = new Date();
 	const fields = [`at="${stamp(now)}"`];
@@ -169,12 +185,12 @@ const main = async () => {
 	try {
 		const {anchor, tick} = scan(readTail(transcript), isAnchor);
 
-		isFirstTick = !tick;
+		isFirstTick = tick === null;
 
-		if (!isPrompt && tick && now - tick < tickMs) return;
-		if (anchor) fields.push(`${isPrompt ? 'away' : 'turn'}="${hms(now - anchor)}"`);
-	} catch (err) {
-		process.stderr.write(`wall-clock hook: ${transcript}: ${err.message}\n`);
+		if (!isPrompt && tick !== null && now.getTime() - tick < tickMs) return;
+		if (anchor !== null) fields.push(`${isPrompt ? 'away' : 'turn'}="${hms(now.getTime() - anchor)}"`);
+	} catch (error) {
+		process.stderr.write(`wall-clock hook: ${transcript}: ${error.message}\n`);
 
 		if (!isPrompt) return;
 	}
