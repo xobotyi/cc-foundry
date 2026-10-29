@@ -23,11 +23,6 @@ files keep their own rules.
 A commit message is a factual record of one change. It tells the reader why the change happened. The reader has the diff
 and the docs. The message adds only what the diff and the docs cannot show.
 
-<mental-model>
-Write for the colleague who reads `git log` at 3am to find the defect. That colleague can open the
-diff. That colleague cannot recover your reasons. Record the reasons.
-</mental-model>
-
 ## What Makes a Good Message
 
 <context-principle>
@@ -35,15 +30,6 @@ Draw the _why_ from three sources: the task that you solved, the reason that thi
 the code that you built. Do not copy the sources into the message. If the context is incomplete,
 record what the code and the available information can verify.
 </context-principle>
-
-<factual-principle>
-A commit message is a **factual record**. It is not marketing copy. The subject answers this
-question: what did this commit do? It does not answer this question: why is this commit good?
-
-- **Subject** — only facts, in the imperative mood. It says what you did, not how good the change is.
-- **Body** — it gives the reasons and the trade-offs. It stays objective. It has no promotional words.
-
-</factual-principle>
 
 ## Structure
 
@@ -58,7 +44,7 @@ body
 trailers
 ```
 
-- **Subject** — what changed. The target is 50 characters. The hard limit is 72 characters.
+- **Subject** — what changed.
 - **Body** — the reason for the change, and the procedure that verifies it.
 - **Trailers** — structured metadata such as references and authorship.
 
@@ -167,9 +153,8 @@ not give a paragraph to each change:
 ```
 
 Mark each item with `-`. A wrapped line then keeps its item visible in `git log`. Each line gives the behavior that the
-caller sees. Do not put the old behavior beside it as a contrast: the minus side of the diff carries the old behavior,
-and `git log` carries the history. A line that names a file, a function, or a test inventories the diff. Delete such a
-line.
+caller sees, without the old behavior as a contrast. A line that names a file, a function, or a test inventories the
+diff. Delete such a line.
 
 The list does not license a longer body. Several behavior changes under one reason stay in one commit, and the reason
 keeps its paragraph. Two independent reasons are two commits, whatever the number of behavior changes.
@@ -190,7 +175,6 @@ These signs show that a body became documentation:
   flag that gates the new code reports the procedure, and the diff shows the procedure.
 - A list of the surfaces, the files, or the tests that the change touches. The diff already lists them.
 - A repeat of what the updated docs say.
-- A story of your verification, such as "verified by building X" or "measured on Y". That is a session artifact.
 
 **Two tests. Apply both to each paragraph.**
 
@@ -210,10 +194,6 @@ meaning stays clear. Identifiers, file paths, and error strings stay exact.
 marks the "now". The past tense belongs to the cause of the change, and to nothing else:
 `Empty input dereferenced nil. Returns empty token list instead.`
 
-**The old behavior is not the cause.** A fix names the defect, because the diff cannot show why the code was wrong. A
-behavior line names what the caller gets, and stops there. `git log` holds the history, and the diff holds the previous
-code, so a before-and-after contrast in the message duplicates both.
-
 **Never include:**
 
 - "This commit does X", "This change...". The diff says what.
@@ -222,11 +202,8 @@ code, so a before-and-after contrast in the message duplicates both.
 - The old behavior as a contrast: "X, where Y used to", "no longer does Y", "changed from Y to X". The diff holds the
   previous code. Name the old behavior only as the cause of a fix, or as the thing that a `BREAKING:` change removes.
 - "As requested by...". Use a `Co-Authored-By:` trailer, or write nothing.
-- A walkthrough of the new behavior: the call order, the empty case, the fallback, the flag that gates it. A code
-  comment keeps such a fact, and the diff carries the comment into the history.
 - The scope repeated: `[parser] update parser code` becomes `[parser] handle empty input`.
 - Promotional adjectives without data: "great", "amazing", "improved", "better". Say what is better.
-- Decorative Unicode. See ASCII Symbols above.
 - Filler: "just", "really", "basically", "actually", "simply". Connective fluff: "however", "furthermore",
   "additionally".
 - Session artifacts: test counts, lint status, typecheck status, build status, quality-gate status, CI results, and
@@ -281,8 +258,7 @@ When you amend a commit with `git commit --amend`, **write the message again as 
 new**.
 
 An amended commit replaces the original commit and rewrites the history. The final message must describe what the commit
-introduces. It must not describe the sequence of revisions. From the reader's position there is no original commit.
-There is only the resulting commit.
+introduces. It must not describe the sequence of revisions.
 
 **Common violation:** the agent treats the amend as iterative work. It then describes the changes against the original
 commit: "also update the tests", "fix the edge case from the previous version", "address review feedback". The reader

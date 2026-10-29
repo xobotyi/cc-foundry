@@ -54,7 +54,9 @@ CLAUDE.md:
   The session ID separates sessions; subagents and forks share it, so the path and the unit separate them, and the two
   collision signs in `<message-file>` cover two writers that still share a name
 - **Both SKILL.md files stay under 5,000 tokens** — the per-skill compaction budget, past which the tail is dropped on
-  re-attach, and the tail is where the `<critical>` block sits
+  re-attach, and the tail is where the `<critical>` block sits. Measure what Claude Code injects: the
+  `Base directory for this skill:` line and the body without frontmatter, piped to `claude -p`, minus the input tokens
+  of the same call with an empty stdin. A character or word count misses the budget by hundreds of tokens
 - **No `references/` directory.** Each skill is behaviorally self-sufficient; content that would go to a reference is
   trimmed or rewritten instead
 - **No worked examples in either skill** — a filled specimen is read as a specification, and the model reproduces its
