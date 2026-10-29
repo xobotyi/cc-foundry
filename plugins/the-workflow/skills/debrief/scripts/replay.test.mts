@@ -1,3 +1,4 @@
+import {spawnSync} from 'node:child_process';
 import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
@@ -5,7 +6,7 @@ import {afterAll, beforeAll, describe, expect, test} from 'vite-plus/test';
 import {type HookDecision, runHook, verdictOf} from './lib/hooks.mts';
 import type {Json} from './lib/json.mts';
 import {stopHookCommand} from './lib/replay.mts';
-import {prepareArms} from './replay.mts';
+import {prepareArms, transcriptOf} from './replay.mts';
 
 const SCRIPT = path.join(import.meta.dirname, 'replay.mts');
 
@@ -95,6 +96,31 @@ describe('prepareArms', () => {
 	test('refuses an output directory inside the working directory the replay excludes', async () => {
 		await expect(prepare(path.join(work, 'arms'))).rejects.toThrow(`lies inside ${work}`);
 		await expect(prepare(path.join(work, '..cache', 'arms'))).rejects.toThrow(`lies inside ${work}`);
+	});
+});
+
+describe('transcriptOf', () => {
+	test('finds the one transcript a session id names in any project directory', async () => {
+		const projects = path.join(dir, 'projects');
+		await mkdir(path.join(projects, '-w-a'), {recursive: true});
+		await mkdir(path.join(projects, '-w-b'), {recursive: true});
+		await writeFile(path.join(projects, '-w-a', 's8.jsonl'), '');
+		await writeFile(path.join(projects, '-w-b', 's9.jsonl'), '');
+
+		await expect(transcriptOf(projects, 's9')).resolves.toBe(path.join(projects, '-w-b', 's9.jsonl'));
+		await expect(transcriptOf(projects, 's7')).rejects.toThrow(`session s7: 0 transcripts under ${projects}`);
+	});
+});
+
+describe('the command line', () => {
+	test.each([
+		['an unknown command', 'inspect'],
+		['verify without edits', 'verify'],
+	])('reports a usage error for %s before it looks up the session', (_name, command) => {
+		const args = [SCRIPT, command, '--session', 's7', '--entry', 'p1', '--projects-dir', dir];
+		const run = spawnSync(process.execPath, args, {encoding: 'utf8'});
+		expect(run.stderr).toMatch(/^replay: usage:/);
+		expect(run.status).toBe(2);
 	});
 });
 

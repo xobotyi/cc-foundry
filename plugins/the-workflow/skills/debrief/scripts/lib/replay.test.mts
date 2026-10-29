@@ -404,7 +404,7 @@ describe('buildCopy', () => {
 		await expect(
 			build('missed', [...edits, {path: REPO_MD, op: 'remove', anchor: '- use pnpm', text: ''}]),
 		).rejects.toThrow(
-			`edits that match no rendered section, for a file the session never loaded or text it lacks: remove in ${REPO_MD}`,
+			`edits that match no rendered section, for a file the session never loaded or text it lacks: remove in ${REPO_MD}; the session loaded ${USER_MD}, ${REPO_MD}, ${MEMORY_MD}, ${NESTED_MD}`,
 		);
 		await expect(exists(path.join(dir, 'missed'))).resolves.toBe(false);
 	});

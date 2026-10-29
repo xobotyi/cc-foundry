@@ -311,6 +311,7 @@ export async function buildCopy({
 	const memoryDir = path.join(dir, 'memory');
 	const scratch = new Map<string, {readonly file: string; readonly type: string}>();
 	const contents = new Map<string, string>();
+	const nested = new Set<string>();
 	const hits = edits.map(() => 0);
 
 	const remap = (file: Json): Json => {
@@ -387,6 +388,7 @@ export async function buildCopy({
 		if (attachment?.type === 'instructions') {
 			lines.push(JSON.stringify(controlled(entry, attachment)));
 		} else if (attachment?.type === 'nested_memory' && isList(entry.rendered)) {
+			nested.add(stringOf(attachment.path) ?? '');
 			lines.push(JSON.stringify({...entry, rendered: entry.rendered.map((block) => edit(block))}));
 		} else {
 			lines.push(line);
@@ -400,7 +402,7 @@ export async function buildCopy({
 	if (missed.length > 0) {
 		const named = missed.map((change) => `${change.op} in ${change.path}`).join('; ');
 		throw new Error(
-			`edits that match no rendered section, for a file the session never loaded or text it lacks: ${named}`,
+			`edits that match no rendered section, for a file the session never loaded or text it lacks: ${named}; the session loaded ${[...scratch.keys(), ...nested].join(', ')}`,
 		);
 	}
 
