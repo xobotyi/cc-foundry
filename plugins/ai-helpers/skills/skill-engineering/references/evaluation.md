@@ -177,7 +177,9 @@ Version the evaluation across **task, skill version, host version, and model**. 
 - **`skill-creator`** (`/plugin install skill-creator@claude-plugins-official`) — automates the loop: stores cases,
   spawns a subagent per case for clean context, grades assertions with evidence, aggregates with-skill against
   without-skill pass rate, runs a blind A/B between two skill versions, and generates should-trigger and
-  should-not-trigger prompts for description tuning.
+  should-not-trigger prompts for description tuning. Its trigger runner (`scripts/run_eval.py`, in the copy of
+  2026-10-28) builds the test skill from `description` alone, so a trigger kept in `when_to_use` is never tested, and it
+  counts a run as triggered only when loading the skill is the first tool call of the run.
 - **`claude plugin eval`** — a non-interactive harness with a with-without ablation arm exists in the CLI but is gated
   behind early access, so it may report `plugin eval is currently in early access` instead of running.
 
