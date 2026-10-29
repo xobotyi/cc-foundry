@@ -44,7 +44,7 @@ equality. From 1.4.0 `Temporal` objects compare by value in `toEqual`, `toStrict
 ## Type assertions
 
 `expectTypeOf` from `bun:test` is Vitest-compatible and is a **no-op at runtime**. `bun test` passing says nothing about
-the types — run `bunx tsc --noEmit` separately or the assertions check nothing.
+the types — run the project's type-check command separately or the assertions check nothing.
 
 ```ts
 expectTypeOf(greet).parameters.toEqualTypeOf<[string]>();

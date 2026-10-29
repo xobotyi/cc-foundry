@@ -74,9 +74,9 @@ type-check time. Drop `noEmit` when the same sources are also compiled for distr
 
 ## When to reach for a compiler instead
 
-Type stripping gives no type checking and no downlevelling. Keep `tsc --noEmit` in the verification path regardless.
-Reach for a full toolchain (`tsc`, `tsx`, `swc`, `esbuild`) when the project needs decorators, enums, path aliases, or
-output for a runtime older than the one it is developed on.
+Type stripping gives no type checking and no downlevelling. Keep the project's type-check command in the verification
+path regardless. Reach for a full toolchain (`tsc`, `tsx`, `swc`, `esbuild`) when the project needs decorators, enums,
+path aliases, or output for a runtime older than the one it is developed on.
 
 ## Programmatic form
 

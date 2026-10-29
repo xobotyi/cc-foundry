@@ -319,7 +319,10 @@ Read [`${CLAUDE_SKILL_DIR}/references/conventions/declarations.md`] when declara
 
 ## Toolchain
 
-- **`tsc --noEmit` is the check.** Wire it into CI separately from the bundler, which type-checks nothing.
+- **The project's own type-check command is the check** — a `typecheck` script, or the `tsc` step of its `build` script.
+  Run it in CI as its own step, because the bundler type-checks nothing. Without one, run `tsc --noEmit`. A root
+  `tsconfig.json` that only joins project references with `"files": []` gives `tsc --noEmit` no file: it exits 0 on any
+  error, on 5.5 through 7.0. Run `tsc -b` on that root, which checks every referenced project.
 - **7.0 drops the API a tool calls.** `require("typescript")` returns `{ version, versionMajorMinor }` and nothing else;
   `createProgram` and its neighbors are gone. A `typescript/unstable/*` family ships beside it, and the compiler team
   states the expectation that 7.1 carries a stable replacement. Anything that embeds the compiler — typescript-eslint,
