@@ -14,6 +14,17 @@ const human = (at: string, text: string, fields: Line = {}): Line => ({
 	message: {role: 'user', content: text},
 	...fields,
 });
+const call = (at: string, id: string, command: string): Line => ({
+	type: 'assistant',
+	timestamp: `2026-10-01T10:00:${at}Z`,
+	message: {role: 'assistant', content: [{type: 'tool_use', id, name: 'Bash', input: {command}}]},
+});
+const result = (at: string, id: string, text: string, isError: boolean): Line => ({
+	type: 'user',
+	timestamp: `2026-10-01T10:00:${at}Z`,
+	message: {role: 'user', content: [{type: 'tool_result', tool_use_id: id, is_error: isError, content: text}]},
+});
+const REJECTED = "The user doesn't want to proceed with this tool use. The tool use was rejected.";
 const said = (at: string, text: string): Line => ({
 	type: 'assistant',
 	timestamp: `2026-10-01T10:00:${at}Z`,
@@ -88,5 +99,20 @@ describe('sessionCandidates', () => {
 		const long = await afterRewind(`${pasted}${'alpha '.repeat(300)}`, `${pasted}${'beta '.repeat(300)}`);
 
 		expect(long.map(([signal]) => signal)).toStrictEqual(['follow-up', 'rewind']);
+	});
+
+	test('reads a prompt sent within a second of a rejection as an interjection', async () => {
+		const signalAfter = async (rejected: string, prompted: string): Promise<string | undefined> => {
+			const [candidate] = await candidatesOf([
+				human('00', 'open'),
+				call('01', 't1', 'git push'),
+				result(rejected, 't1', REJECTED, true),
+				human(prompted, 'what does the review say?'),
+			]);
+			return candidate?.signal;
+		};
+
+		expect(await signalAfter('02.100', '02.400')).toBe('interjection');
+		expect(await signalAfter('02', '05')).toBe('rejection');
 	});
 });
