@@ -90,6 +90,20 @@ describe('parseEntry', () => {
 		});
 	});
 
+	test('reads the model and the request size of an assistant message', () => {
+		const usage = {input_tokens: 3, cache_creation_input_tokens: 40, cache_read_input_tokens: 500, output_tokens: 9};
+		const entry = parseEntry(line({type: 'assistant', message: {model: 'claude-opus-5-5', usage, content: []}}));
+
+		expect(entry).toMatchObject({kind: 'assistant', model: 'claude-opus-5-5', context: 543});
+	});
+
+	test('reads no request size from an assistant message without usage', () => {
+		expect(parseEntry(line({type: 'assistant', message: {content: []}}))).toMatchObject({
+			model: undefined,
+			context: undefined,
+		});
+	});
+
 	test('reads a queued command, a null origin read as absent', () => {
 		const entry = parseEntry(
 			line({
