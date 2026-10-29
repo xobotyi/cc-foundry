@@ -537,6 +537,41 @@ describe('tool error signatures', () => {
 	});
 });
 
+describe('procedures', () => {
+	test('reports a run of calls repeated in six sessions, and none for one named session', async () => {
+		const root = await mkdtemp(path.join(tmpdir(), 'debrief-procedures-'));
+		onTestFinished(async () => {
+			await rm(root, {recursive: true, force: true});
+		});
+		const dir = slugOf('/work/proc.app');
+		const meta = {cwd: '/work/proc.app', mtime: '2026-10-09T11:00:00Z'};
+		await Promise.all(
+			Array.from({length: 6}, async (_, n) =>
+				writeSession(
+					dir,
+					`p${n}`,
+					[
+						human('2026-10-09T10:00:00Z', 'ship it'),
+						call('2026-10-09T10:00:01Z', `a${n}`, 'Bash', {command: 'git add -A'}),
+						call('2026-10-09T10:00:02Z', `c${n}`, 'Bash', {command: 'git commit -m x'}),
+						call('2026-10-09T10:00:03Z', `p${n}`, 'Bash', {command: 'git push'}),
+					],
+					{...meta, sessionId: `p${n}`},
+					root,
+				),
+			),
+		);
+
+		const all = await extractFrom('/work/proc.app', {projectsDir: root});
+		const one = await extractFrom('/work/proc.app', {projectsDir: root, session: 'p0'});
+
+		expect(all.filter(({signal}) => signal === 'procedure')).toStrictEqual([
+			expect.objectContaining({text: 'git add > git commit > git push', sessions: 6, projects: ['/work/proc.app']}),
+		]);
+		expect(one.filter(({signal}) => signal === 'procedure')).toStrictEqual([]);
+	});
+});
+
 describe('parseSince', () => {
 	const now = Date.parse('2026-10-28T12:00:00Z');
 

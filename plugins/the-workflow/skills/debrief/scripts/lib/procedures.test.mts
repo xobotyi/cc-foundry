@@ -80,7 +80,7 @@ describe('sessionSteps', () => {
 			].join('\n'),
 		);
 
-		expect(await sessionSteps(file, Date.parse('2026-10-01T10:00:01Z'), '/w')).toStrictEqual({
+		expect(await sessionSteps(file, Date.parse('2026-10-01T10:00:01Z'), '/w', new Set())).toStrictEqual({
 			session: 's1',
 			project: '/w',
 			at: '2026-10-01T10:00:04Z',
@@ -94,7 +94,28 @@ describe('sessionSteps', () => {
 		const file = path.join(dir, 'sdk.jsonl');
 		await writeFile(file, step('00', 'git status', {entrypoint: 'sdk-ts'}));
 
-		expect(await sessionSteps(file, 0, '/w')).toBeUndefined();
+		expect(await sessionSteps(file, 0, '/w', new Set())).toBeUndefined();
+	});
+
+	test('reads no step from history a resumed session copied', async () => {
+		const original = path.join(dir, 'original.jsonl');
+		const resumed = path.join(dir, 'resumed.jsonl');
+		await writeFile(
+			original,
+			[step('00', 'git add a', {uuid: 'u1'}), step('01', 'git commit', {uuid: 'u2'})].join('\n'),
+		);
+		await writeFile(
+			resumed,
+			[
+				step('00', 'git add a', {uuid: 'u1', sessionId: 's2'}),
+				step('01', 'git commit', {uuid: 'u2', sessionId: 's2'}),
+				step('02', 'git push', {uuid: 'u3', sessionId: 's2'}),
+			].join('\n'),
+		);
+		const seen = new Set<string>();
+		await sessionSteps(original, 0, '/w', seen);
+
+		expect(await sessionSteps(resumed, 0, '/w', seen)).toMatchObject({session: 's2', steps: ['git push']});
 	});
 });
 
