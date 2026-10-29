@@ -63,4 +63,30 @@ describe('sessionCandidates', () => {
 			expect.objectContaining({signal: 'follow-up', text: 'no, amend instead', said: 'Committed.'}),
 		]);
 	});
+
+	test('reads a rewind to a reworded prompt as a rewind, and a retyped one as no candidate', async () => {
+		const asked = 'rename the config loader to settings loader please';
+		const afterRewind = async (first: string, second: string): Promise<string[][]> => {
+			const candidates = await candidatesOf([
+				human('00', 'open', {parentUuid: 'root'}),
+				said('01', 'Ready.'),
+				human('02', first, {parentUuid: 'p'}),
+				said('03', 'Renamed.'),
+				human('04', second, {parentUuid: 'p'}),
+			]);
+			return candidates.map(({signal, text}) => [signal, text]);
+		};
+		const pasted = 'x '.repeat(1100);
+
+		expect(await afterRewind(asked, 'keep the config loader and add a settings alias')).toStrictEqual([
+			['follow-up', asked],
+			['rewind', 'keep the config loader and add a settings alias'],
+		]);
+		expect(await afterRewind(asked, 'rename the config loader to the settings loader please')).toStrictEqual([
+			['follow-up', asked],
+		]);
+		const long = await afterRewind(`${pasted}${'alpha '.repeat(300)}`, `${pasted}${'beta '.repeat(300)}`);
+
+		expect(long.map(([signal]) => signal)).toStrictEqual(['follow-up', 'rewind']);
+	});
 });
