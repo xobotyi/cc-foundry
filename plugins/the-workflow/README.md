@@ -79,8 +79,10 @@ transcripts that Claude Code keeps under `~/.claude/projects/`, finds the places
 keeps the lessons that would change the agent's work on a different task. For each one it proposes a rule and the file
 the rule belongs in: the project's CLAUDE.md or a document it links, a `.claude/rules/` file, the personal
 `~/.claude/CLAUDE.md`, or the skill that prescribed the behavior. A lesson that forbids an action, or wants it confirmed
-first, can also become a `deny` or `ask` permission rule, which Claude Code enforces instead of merely reading. Nothing
-is written until the user approves that item.
+first, can also become a `deny` or `ask` permission rule, which Claude Code enforces instead of merely reading. When the
+decision depends on a flag or a path, the lesson becomes a `PreToolUse` hook instead, and the skill runs that hook on
+the tool calls the sessions recorded, so the proposal shows which past calls it would have stopped and that it lets the
+rest through. Nothing is written until the user approves that item.
 
 A bundled script does the extraction without a model. It marks the moments that carry the most evidence — a refused tool
 call, an interrupt, a rewind, a message typed while the agent was still working — and attaches what the agent had just
@@ -88,10 +90,14 @@ said and done and which skills were loaded, so each correction is judged against
 only looks like the user: compaction summaries, messages from teammate agents, history a resumed session copied from its
 parent, and background sessions driven through the SDK.
 
-Two more sources feed the same review. An error the agent hit and fixed on its own, then hit again in later sessions,
-arrives with the failing call and the call that worked; Bash commands that ran and exited non-zero stay out, because
-that is ordinary work. And where auto memory is on, the notes Claude Code saved from earlier corrections are read too,
-so a note that turns out to be a standing rule can move into the file where the whole team sees it.
+More sources feed the same review. An error the agent hit and fixed on its own, then hit again in later sessions,
+arrives with the failing call and the call that worked. Bash commands that ran and exited non-zero stay out, because
+that is ordinary work, except for shell dialect errors such as a zsh glob that matched nothing or a GNU flag passed to
+BSD `sed`: those mean the agent picked the wrong command again. The agent's own retractions count, and so do the places
+where it reread its own transcript after a compaction to recover what the summary dropped. A run of steps the agent
+repeated in six or more sessions arrives as a procedure, which debrief proposes as a skill to write and never writes
+itself. And where auto memory is on, the notes Claude Code saved from earlier corrections are read too, so a note that
+turns out to be a standing rule can move into the file where the whole team sees it.
 
 The argument sets the scope:
 
@@ -108,9 +114,20 @@ full only the ones that can hold a lesson, so a run over every repository and th
 one session.
 
 Before it proposes a rule, the skill reads the target file end to end, because the usual case is a rule that already
-says the same thing in other words. It runs on a bare Claude Code install. When the session has a memory server, a
-search server, or an issue tracker, it also checks each lesson against the decisions recorded there. Claude Code deletes
-transcripts after `cleanupPeriodDays`, 30 days by default, so a run sees only what is still on disk.
+says the same thing in other words. Each correction also names the instruction files that were loaded when the user made
+it. A rule that was in context and still failed is no reason to drop the lesson, so the skill proposes to sharpen that
+rule, move it out of auto memory, enforce it with a hook, or replace it when the rule itself produced the corrected
+behavior, and it reports pairs of loaded rules that contradict each other. It runs on a bare Claude Code install. When
+the session has a memory server, a search server, or an issue tracker, it also checks each lesson against the decisions
+recorded there. Claude Code deletes transcripts after `cleanupPeriodDays`, 30 days by default, so a run sees only what
+is still on disk.
+
+When the user corrected the first thing the agent did in a turn, the user can ask the skill to verify a proposed rule
+before deciding on it. The skill replays that turn from a copy of the transcript three times with the rule written into
+the instructions the session had loaded, and three times with a meaningless edit in its place, then shows what each run
+did first. A replay changes nothing: a run may load a skill or a tool definition, every other tool call is stopped
+before it runs, and no run is saved as a session. It costs six runs of up to eight turns each, on the session's model
+with the session's full context, which is why it runs only on request.
 
 ## Installation
 
@@ -121,9 +138,9 @@ transcripts after `cleanupPeriodDays`, 30 days by default, so a run sees only wh
 Installing the-workflow also installs `ai-helpers`, because the `claude-md` skill loads its `prompt-engineering` skill
 first.
 
-The `debrief` skill runs its transcript extractor with the `node` on your `PATH`, which must be Node.js 26 or later: the
-extractor is written in TypeScript, and Node strips the types itself, so nothing is built at install time. The other
-skills run no script.
+The `debrief` skill runs its scripts with the `node` on your `PATH`, which must be Node.js 26 or later: the scripts are
+written in TypeScript, and Node strips the types itself, so nothing is built at install time. Verifying a rule by replay
+also runs `claude` from your `PATH`. The other skills run no script.
 
 ## License
 
