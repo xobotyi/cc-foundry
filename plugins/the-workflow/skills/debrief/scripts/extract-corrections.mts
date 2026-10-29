@@ -3,6 +3,7 @@ import {readFile} from 'node:fs/promises';
 import {homedir} from 'node:os';
 import path from 'node:path';
 import {parseArgs} from 'node:util';
+import {extractCalls} from './lib/calls.mts';
 import {extract} from './lib/extract.mts';
 import {isList, isObject, type Json, parseJson, stringOf} from './lib/json.mts';
 import {listProjects} from './lib/projects.mts';
@@ -70,6 +71,8 @@ async function main(): Promise<void> {
 			pick: {type: 'string'},
 			lines: {type: 'string'},
 			context: {type: 'string'},
+			calls: {type: 'string'},
+			match: {type: 'string'},
 		},
 	});
 
@@ -99,14 +102,25 @@ async function main(): Promise<void> {
 		return;
 	}
 
-	const counts = new Map<string, number>();
-	const projects = new Set<string | null>();
-	const records = extract({
+	const selection = {
 		projectsDir,
 		projects: values.project,
 		allProjects: values['all-projects'],
 		since: parseSince(values.since),
 		session: values.session,
+	};
+
+	if (values.calls !== undefined) {
+		for await (const call of extractCalls(selection, {tool: values.calls, match: values.match})) {
+			process.stdout.write(`${JSON.stringify(call)}\n`);
+		}
+		return;
+	}
+
+	const counts = new Map<string, number>();
+	const projects = new Set<string | null>();
+	const records = extract({
+		...selection,
 		contextDir: values.context === undefined ? undefined : path.resolve(values.context),
 		configDir,
 		disableAutoMemory: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY,
