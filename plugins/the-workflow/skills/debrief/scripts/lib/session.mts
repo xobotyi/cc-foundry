@@ -1,4 +1,4 @@
-import {errorLine, errorSignature, type ToolErrorOccurrence} from './errors.mts';
+import {type ToolErrorOccurrence, toolFailure} from './errors.mts';
 import {isObject} from './json.mts';
 import {type LoadedContext, SessionInstructions} from './loaded.mts';
 import {repositoryOf} from './projects.mts';
@@ -9,7 +9,6 @@ const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
 const INTERRUPT_PREFIX = '[Request interrupted by user';
 const SKILL_BODY_PREFIX = 'Base directory for this skill:';
 const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
-const RAN_AND_FAILED = /^Exit code \d+/;
 const SUGGESTION_ACCEPTED = 'suggestion_accepted';
 const RETYPED_SIMILARITY = 0.9;
 const INTERJECTION_MS = 1000;
@@ -200,7 +199,13 @@ export async function* sessionCandidates(
 				continue;
 			}
 
-			if (!result.isError) {
+			const {text} = result;
+			if (text.startsWith(REJECTION_PREFIX) || text.startsWith(INTERRUPT_PREFIX)) {
+				continue;
+			}
+
+			const failure = toolFailure(call.tool, text, result.isError);
+			if (failure === undefined && !result.isError) {
 				const failed = unresolved.get(call.tool);
 				unresolved.delete(call.tool);
 				if (failed !== undefined) {
@@ -209,13 +214,7 @@ export async function* sessionCandidates(
 				continue;
 			}
 
-			const {text} = result;
-			if (text.startsWith(REJECTION_PREFIX) || text.startsWith(INTERRUPT_PREFIX) || RAN_AND_FAILED.test(text)) {
-				continue;
-			}
-
-			const firstLine = errorLine(text);
-			if (!inWindow || firstLine === '') {
+			if (!inWindow || failure === undefined) {
 				continue;
 			}
 
@@ -229,8 +228,8 @@ export async function* sessionCandidates(
 				session: entry.sessionId,
 				at: entry.timestamp,
 				signal: 'tool-error',
-				signature: errorSignature(call.tool, firstLine),
-				text: firstLine,
+				signature: failure.signature,
+				text: failure.line,
 				did: [call.call],
 				skills: [...skills],
 			});
