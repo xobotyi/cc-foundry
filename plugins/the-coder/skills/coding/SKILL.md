@@ -59,7 +59,8 @@ These words in your reasoning are the tell:
 - **Trace dependencies** — what this code imports, what imports it. Grep the function and type names for usages.
 - **Verify contracts** — read the actual signatures, interfaces, and type definitions. For third-party code, read the
   vendored source or fetch the docs. Confirm the function exists, the signature matches, the types line up.
-- **Assess impact** — who calls what you are modifying, what tests cover it, what breaks.
+- **Assess impact** — who calls what you are modifying, what tests cover it, what breaks. Where no test covers behavior
+  the change reaches, pin it first: characterization tests of what the unchanged code does, committed alone and green.
 </discovery-protocol>
 
 ### Read the Scars
@@ -153,7 +154,8 @@ Four rules qualify all three:
 
 <commit-constraints>
 - **Tests don't count toward the size checkpoint.** They ship in the commit with the code they cover, however long they
-  run. A small feature with a wide test surface is one legitimate commit of a few thousand lines.
+  run. A small feature with a wide test surface is one legitimate commit of a few thousand lines. Characterization tests
+  pin code already committed, so they ship alone, before the change.
 - **Atomicity outranks the size checkpoint only after the split test fails.** A mechanical rename across 60 files, or a
   signature change with all its callers, cannot be cut without leaving a broken tree, so it ships whole at any size. Run
   the test before invoking this.
@@ -217,9 +219,9 @@ adjacent tests, and the naming conventions. Read CLAUDE.md and the lint config f
 patterns contradict, pick one (more recent, more tested), explain the choice, and flag the other for cleanup — never
 blend them into an average. If you think an existing convention is harmful, surface it; don't fork it silently.
 
-Read `references/patterns.md` when writing error paths, introducing a seam for testability, reshaping a function whose
-body reads worse than it works, improving existing code rather than changing its behavior, or writing a loop, a request
-path, or an unbounded read.
+Read `references/patterns.md` when writing error paths, introducing a seam for testability, pinning behavior no test
+covers, reshaping a function whose body reads worse than it works, improving existing code rather than changing its
+behavior, or writing a loop, a request path, or an unbounded read.
 
 ## Naming
 

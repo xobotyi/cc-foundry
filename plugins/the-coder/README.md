@@ -48,10 +48,11 @@ path does not live on beside its replacement.
 The skill body holds what applies to every code task. Four reference files carry the depth and load when their situation
 arrives: the comment and documentation policy when a comment is being written or repaired, the naming rules when a
 symbol is being named or renamed, the debugging protocol when something fails, and error-handling, dependency-isolation,
-local-shape, running-less, and refactor guidance when an error path, a seam, a tangled function body, a loop or request
-path, or a cleanup is on the table. The split is not organizational tidiness. Claude Code keeps only the first 5,000
-tokens of a skill when it re-attaches after compaction, and the body used to run past that — the debugging and
-verification sections were the part being dropped, in exactly the long sessions that need them most.
+characterization-test, local-shape, running-less, and refactor guidance when an error path, a seam, untested code about
+to change, a tangled function body, a loop or request path, or a cleanup is on the table. The split is not
+organizational tidiness. Claude Code keeps only the first 5,000 tokens of a skill when it re-attaches after compaction,
+and the body used to run past that — the debugging and verification sections were the part being dropped, in exactly the
+long sessions that need them most.
 
 Debugging is a protocol rather than an instinct. Build a failing command before theorizing, tighten it, minimize it, and
 read the error literally. A command that will not go red because the code already does what the report asks is a finding
@@ -66,6 +67,15 @@ Completion needs evidence, and the skill is specific about what counts. A test s
 does not. A passing lint proves lint is clean; it says nothing about the build. A regression test proves the bug is
 fixed only once it has been watched failing with the fix reverted — one that never went red may be asserting something
 the bug never touched. And a subagent reporting success proves nothing at all: the diff it left behind is the evidence.
+
+Code that no test covers gets pinned before it changes. Claude writes characterization tests that assert what the
+unchanged code does, faults included, and commits them on their own while they pass. The change then lands against that
+baseline. A refactor keeps every one of those tests green. A behavior change turns red only the tests whose behavior the
+task asked to change, and their expected values change in the same commit, so the reviewer reads the new behavior as a
+diff of old and new values. Any other red test is a regression the change caused, with no argument about whether it was
+already broken. The tests stay narrow: they cover what the change can reach, through an entry point that already exists.
+Where no entry point reaches the behavior, Claude says so instead of restructuring untested code to make room for a
+test.
 
 Crucially, all of that happens before any code is written. The skill asks for an ordered list of changes up front — one
 commit each, one kind of work each — and then binds execution to it: no code for the next entry until the current one is
@@ -94,7 +104,8 @@ doesn't happen. The audience is the point: a change is split for someone who has
 It sizes the work as it goes. Crossing roughly 400 to 500 lines of production code means stop, commit what is coherent,
 and build the next change on top of it — a checkpoint that triggers a commit rather than a quota to fill, so a 30-line
 commit is finished work. Tests sit outside the budget and ship with the code they cover, which keeps a small feature
-with a wide test surface as one honest commit. Atomicity wins where the two conflict: a rename across sixty files stays
+with a wide test surface as one honest commit. Characterization tests are the exception: they pin code that is already
+committed, so they go in first, on their own. Atomicity wins where the two conflict: a rename across sixty files stays
 one commit at any size, because splitting it leaves a commit whose tree doesn't build.
 
 It also carries the comment and documentation policy, and that policy starts from zero. Code already says what it does,

@@ -10,7 +10,8 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
   - `references/comments.md` — the closed set, routing ladder, provenance, doc contract, repair scope
   - `references/naming.md` — the naming rules and the rename blast-radius limits
   - `references/debugging.md` — the ordered protocol, multi-component localization, the failed-fix counter
-  - `references/patterns.md` — error handling, dependency isolation, local shape, running less, refactor targets
+  - `references/patterns.md` — error handling, dependency isolation, characterization tests, local shape, running less,
+    refactor targets
 
 ## Output Styles
 

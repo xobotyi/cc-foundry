@@ -1,7 +1,8 @@
-# Error Handling, Dependency Isolation, Local Shape, Running Less, and Refactor Targets
+# Error Handling, Dependency Isolation, Characterization Tests, Local Shape, Running Less, and Refactor Targets
 
-How error paths behave, how a dependency is isolated for a test, the four local shapes and what each one collapses to,
-which execution and allocation a change can skip, and the named smells with the move each one takes.
+How error paths behave, how a dependency is isolated for a test, how behavior no test covers is pinned before a change,
+the four local shapes and what each one collapses to, which execution and allocation a change can skip, and the named
+smells with the move each one takes.
 
 ## Handle Errors Deliberately
 
@@ -32,6 +33,27 @@ reaching for a mock by default.
 - **Third-party or external** — inject it behind your own narrow interface and mock that interface, not
   the vendor SDK.
 </dependency-rules>
+
+## Pin Behavior Before Changing It
+
+A test written after a change pins the new behavior. It cannot show what else the change moved. Where the change reaches
+behavior no test covers, characterization tests come first: tests that assert what the unchanged code does, committed
+alone and green before the change starts.
+
+<pinning-rules>
+- **Pin what the change can reach, not the module.** Test through the nearest entry point a test can
+  already call, often the public one. A one-line change in a large untested module pins what that line
+  can affect.
+- **Pin the code as it is, faults included.** Report a pinned value that looks wrong, and leave it: the
+  fix is a second behavior change and ships as its own.
+- **Never restructure code to make it testable before it is pinned.** That restructuring is a refactor of
+  untested code, the risk the characterization tests exist to remove. Where no existing entry point
+  reaches the behavior, say so in the report and change the code unpinned.
+- **Read the red after the change.** A refactor leaves every characterization test green. A behavior
+  change turns red only the tests whose behavior the task changes, and their expected values change in
+  the commit that changes the behavior, so the diff shows the old and the new value together. Any other
+  red test is a regression of this change.
+</pinning-rules>
 
 ## Local Shape
 
