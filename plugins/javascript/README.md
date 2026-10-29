@@ -41,13 +41,6 @@ npm install -g typescript-language-server typescript
 /plugin install javascript --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install javascript@foundry
-```
-
 ## Skills
 
 ### javascript

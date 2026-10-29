@@ -39,22 +39,16 @@ export async function licenseCopy(repo: Repo): Promise<Finding[]> {
 	return findings.flat();
 }
 
-/** Each README gives the one-step install command and the two-step form for Claude Code before 2.1.275. */
+/** Each README gives the one-step install command. */
 export async function readmeInstall(repo: Repo): Promise<Finding[]> {
 	const findings = await Promise.all(
 		repo.plugins.map(async (plugin): Promise<Finding[]> => {
 			const file = `${plugin.path}/README.md`;
 			const readme = await readTextOrNull(path.join(repo.root, file));
 			if (readme === null) return [pluginError('readme-install', file, 'the plugin has no README.md')];
-			const lines = new Set(readme.split('\n').map((l) => l.trim()));
-			const required = [
-				`/plugin install ${plugin.dir} --marketplace ${MARKETPLACE_SOURCE}`,
-				`/plugin marketplace add ${MARKETPLACE_SOURCE}`,
-				`/plugin install ${plugin.dir}@${repo.marketplace.name}`,
-			];
-			return required
-				.filter((line) => !lines.has(line))
-				.map((line) => pluginError('readme-install', file, `the README has no line \`${line}\``));
+			const line = `/plugin install ${plugin.dir} --marketplace ${MARKETPLACE_SOURCE}`;
+			if (readme.split('\n').some((l) => l.trim() === line)) return [];
+			return [pluginError('readme-install', file, `the README has no line \`${line}\``)];
 		}),
 	);
 	return findings.flat();

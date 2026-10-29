@@ -50,13 +50,6 @@ uv tool install pyright
 /plugin install python --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install python@foundry
-```
-
 ## Skills
 
 ### python

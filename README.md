@@ -13,13 +13,6 @@ Install any plugin in one step. The command adds the marketplace the first time:
 /plugin install <plugin-name> --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install <plugin-name>@foundry
-```
-
 ### Updates
 
 Claude Code does not update plugins from this marketplace in the background until you turn it on. Run `/plugin`, open

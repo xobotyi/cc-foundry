@@ -37,13 +37,6 @@ rustup component add rust-analyzer
 /plugin install rust --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install rust@foundry
-```
-
 ## Skills
 
 ### rust

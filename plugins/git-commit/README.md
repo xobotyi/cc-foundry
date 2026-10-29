@@ -49,13 +49,6 @@ runs it with `node`, which strips the types itself, so nothing is built at insta
 /plugin install git-commit --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install git-commit@foundry
-```
-
 ## Usage
 
 Type the skill command, or let Claude reach for it on its own when work arrives at a committable state:

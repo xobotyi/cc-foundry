@@ -41,13 +41,6 @@ decisions, so it stays discoverable months later when someone asks "why did we b
 /plugin install the-blueprint --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install the-blueprint@foundry
-```
-
 ### Optional: enable agent teams for parallel research
 
 The `research` skill uses Claude Code agent teams to investigate the codebase in parallel. Agent teams are experimental

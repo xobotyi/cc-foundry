@@ -27,14 +27,12 @@ test('license reports a missing and a diverged copy', async () => {
 	]);
 });
 
-test('readme-install reports each missing install line', async () => {
+test('readme-install reports a missing one-step install line', async () => {
 	await using fixture = await createFixture();
 	await fixture.write('plugins/alpha/README.md', '# alpha\n\n```\n/plugin install alpha\n```\n');
 
 	expect(brief(await readmeInstall(await loadRepo(fixture.root)))).toStrictEqual([
 		'plugins/alpha/README.md: the README has no line `/plugin install alpha --marketplace xobotyi/cc-foundry`',
-		'plugins/alpha/README.md: the README has no line `/plugin marketplace add xobotyi/cc-foundry`',
-		'plugins/alpha/README.md: the README has no line `/plugin install alpha@foundry`',
 	]);
 });
 

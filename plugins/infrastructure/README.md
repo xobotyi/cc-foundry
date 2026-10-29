@@ -76,10 +76,3 @@ documentation, man pages, source, and advisories, verified page by page.
 ```
 /plugin install infrastructure --marketplace xobotyi/cc-foundry
 ```
-
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install infrastructure@foundry
-```

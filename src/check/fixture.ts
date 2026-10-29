@@ -130,11 +130,6 @@ async function writePlugin(
 		`/plugin install ${plugin.name} --marketplace xobotyi/cc-foundry`,
 		'```',
 		'',
-		'```',
-		'/plugin marketplace add xobotyi/cc-foundry',
-		`/plugin install ${plugin.name}@foundry`,
-		'```',
-		'',
 	].join('\n');
 	await Promise.all([
 		write(`${dir}/.claude-plugin/plugin.json`, JSON.stringify(manifestOf(plugin), null, 2) + '\n'),

@@ -19,13 +19,6 @@ discipline (JavaScript/TypeScript).
 /plugin install frontend --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install frontend@foundry
-```
-
 ## Skills
 
 ### css

@@ -45,13 +45,6 @@ with `node`, which strips the types itself, so nothing is built at install time.
 /plugin install wall-clock --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install wall-clock@foundry
-```
-
 ## Configuration
 
 The tick period defaults to one minute. Change it in `~/.claude/settings.json` or a project's
