@@ -117,15 +117,74 @@ describe('parseEntry', () => {
 		expect(entry).toMatchObject({attachment: {kind: 'invoked-skills', skills: ['a', 'b']}});
 	});
 
+	test('reads the instruction files in context, a delta with its unloaded paths', () => {
+		const full = parseEntry(
+			line({
+				type: 'attachment',
+				attachment: {
+					type: 'instructions',
+					files: [{type: 'User', path: '/home/.claude/CLAUDE.md', content: 'Be terse.'}, {path: '/broken'}],
+				},
+			}),
+		);
+		const delta = parseEntry(
+			line({
+				type: 'attachment',
+				attachment: {
+					type: 'instructions',
+					files: [{type: 'AutoMem', path: '/m/MEMORY.md', content: '- [x](x.md)'}],
+					changed: true,
+					reason: 'compaction',
+					removed: ['/work/.claude/worktrees/a/CLAUDE.md'],
+				},
+			}),
+		);
+
+		expect(full).toMatchObject({
+			attachment: {
+				kind: 'instructions',
+				files: [{type: 'User', path: '/home/.claude/CLAUDE.md', content: 'Be terse.'}],
+				delta: false,
+				removed: [],
+			},
+		});
+		expect(delta).toMatchObject({
+			attachment: {kind: 'instructions', delta: true, removed: ['/work/.claude/worktrees/a/CLAUDE.md']},
+		});
+	});
+
+	test('reads a nested instruction file', () => {
+		const entry = parseEntry(
+			line({
+				type: 'attachment',
+				attachment: {
+					type: 'nested_memory',
+					path: '/work/.claude/rules/a.md',
+					displayPath: '.claude/rules/a.md',
+					content: {path: '/work/.claude/rules/a.md', type: 'Project', content: '# Rule'},
+				},
+			}),
+		);
+
+		expect(entry).toMatchObject({
+			attachment: {kind: 'nested-memory', file: {type: 'Project', path: '/work/.claude/rules/a.md', content: '# Rule'}},
+		});
+	});
+
+	test('reads a system entry with its subtype', () => {
+		expect(parseEntry(line({type: 'system', subtype: 'compact_boundary', cwd: '/work'}))).toMatchObject({
+			kind: 'system',
+			subtype: 'compact_boundary',
+			cwd: '/work',
+		});
+	});
+
 	test('reads other attachments and entry types as unread', () => {
 		expect(parseEntry(line({type: 'attachment', attachment: {type: 'edited_text_file'}}))).toMatchObject({
 			kind: 'attachment',
 			attachment: {kind: 'unread'},
 		});
-		expect(parseEntry(line({type: 'system', subtype: 'compact_boundary', cwd: '/work'}))).toMatchObject({
-			kind: 'unread',
-			cwd: '/work',
-		});
+		expect(parseEntry(line({type: 'api-request', cwd: '/work'}))).toMatchObject({kind: 'unread', cwd: '/work'});
 	});
 });
 
