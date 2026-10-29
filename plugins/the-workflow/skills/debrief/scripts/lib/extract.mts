@@ -2,11 +2,11 @@ import {recurringErrors, type RecurringError, type ToolErrorOccurrence} from './
 import {LoadedContext} from './loaded.mts';
 import {type MemoryLookup, memoryDir, type MemoryRecord, memoryRecords} from './memory.mts';
 import {projectDirs, repositoryOf, transcriptFiles} from './projects.mts';
-import {type Correction, type Retraction, sessionCandidates} from './session.mts';
+import {type CompactionLoss, type Correction, type Retraction, sessionCandidates} from './session.mts';
 import {isSdk, sessionHead} from './transcript.mts';
 
 /** One record the extractor emits as a JSON line: a correction candidate, a recurring tool error, or a memory. */
-export type Candidate = Correction | Retraction | RecurringError | MemoryRecord;
+export type Candidate = Correction | Retraction | CompactionLoss | RecurringError | MemoryRecord;
 
 /** What one extraction reads: the transcript directory, the repositories, the window, and the auto-memory switch. */
 export type ExtractOptions = MemoryLookup & {

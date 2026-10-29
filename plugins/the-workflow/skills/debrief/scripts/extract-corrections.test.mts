@@ -292,7 +292,7 @@ async function correctionsFrom(project: string, options: Partial<ExtractOptions>
 	const records = await extractFrom(project, options);
 	return records.filter(
 		(record): record is Correction =>
-			record.signal !== 'tool-error' && record.signal !== 'memory' && record.signal !== 'retraction',
+			!['tool-error', 'memory', 'retraction', 'compaction-loss'].includes(record.signal),
 	);
 }
 

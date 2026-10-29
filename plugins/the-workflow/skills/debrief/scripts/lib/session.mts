@@ -1,3 +1,4 @@
+import path from 'node:path';
 import {type ToolErrorOccurrence, toolFailure} from './errors.mts';
 import {isObject} from './json.mts';
 import {type LoadedContext, SessionInstructions} from './loaded.mts';
@@ -15,6 +16,8 @@ const INTERJECTION_MS = 1000;
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
 const INPUT_LIMIT = 160;
+const READ_LIMIT = 400;
+const WRITE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit']);
 const INPUT_KEYS = ['file_path', 'command', 'pattern', 'skill', 'description', 'url', 'query', 'prompt'];
 const RETRACTION = new RegExp(
 	[
@@ -56,6 +59,20 @@ export type Retraction = {
 	readonly loaded?: string;
 };
 
+/** The agent's reads of its own transcript after one compaction: the working state the summary dropped. */
+export type CompactionLoss = {
+	readonly id: string | undefined;
+	readonly project: string | null;
+	readonly session: string | undefined;
+	readonly at: string | undefined;
+	readonly signal: 'compaction-loss';
+	/** Each read on its own line, the transcript's path shown as `<transcript>`. */
+	readonly text: string;
+	readonly count: number;
+	readonly skills: readonly string[];
+	readonly loaded?: string;
+};
+
 /** A human message that may correct the agent, with what the agent said and did just before it. */
 export type Correction = {
 	readonly id: string | undefined;
@@ -71,12 +88,15 @@ export type Correction = {
 	readonly loaded?: string;
 };
 
-function describeTool(call: ToolUse): string {
+function toolDetail(call: ToolUse): string {
 	const input = isObject(call.input) ? call.input : {};
-	const detail =
-		INPUT_KEYS.map((key) => input[key]).find((value) => typeof value === 'string') ?? JSON.stringify(call.input ?? {});
-	return `${call.name} ${truncate(detail.replaceAll('\n', ' '), INPUT_LIMIT)}`;
+	return (
+		INPUT_KEYS.map((key) => input[key]).find((value) => typeof value === 'string') ?? JSON.stringify(call.input ?? {})
+	);
 }
+
+const describeTool = (call: ToolUse): string =>
+	`${call.name} ${truncate(toolDetail(call).replaceAll('\n', ' '), INPUT_LIMIT)}`;
 
 function isHumanPrompt(entry: UserEntry, sessionHasOrigin: boolean): boolean {
 	if (entry.isMeta || entry.isCompactSummary || entry.results.length > 0) {
@@ -106,14 +126,15 @@ function isHumanQueuedCommand(command: QueuedCommand): boolean {
 /**
  * Reads one transcript and yields its correction candidates in order: each human prompt that follows a rejection,
  * an interrupt, a rewind, or another prompt, each message queued mid-turn, each agent message that retracts its own
- * claim, and each tool error with the call that fixed it. A session's first prompt and anything before `since` are skipped; an SDK session yields nothing. With
+ * claim, the agent's reads of its own transcript after each compaction, and each tool error with the call that fixed
+ * it. A session's first prompt and anything before `since` are skipped; an SDK session yields nothing. With
  * `context`, each correction names the set of instruction files it was made under.
  */
 export async function* sessionCandidates(
 	file: string,
 	since: number,
 	context?: LoadedContext,
-): AsyncGenerator<Correction | Retraction | ToolErrorOccurrence> {
+): AsyncGenerator<Correction | Retraction | CompactionLoss | ToolErrorOccurrence> {
 	let opening = true;
 	let held: Correction | undefined;
 	let lastParent: string | undefined;
@@ -130,6 +151,15 @@ export async function* sessionCandidates(
 	const instructions = new SessionInstructions();
 	const calls = new Map<string, {tool: string; call: string}>();
 	const unresolved = new Map<string, ToolErrorOccurrence>();
+	const transcriptName = `${path.basename(file, '.jsonl')}.jsonl`;
+	const transcriptPath = new RegExp(String.raw`\S*${RegExp.escape(transcriptName)}`, 'g');
+	let compacted = false;
+	let recovery: {readonly start: CompactionLoss; readonly reads: string[]} | undefined;
+
+	const recovered = (): CompactionLoss | undefined =>
+		recovery === undefined
+			? undefined
+			: {...recovery.start, text: truncate(recovery.reads.join('\n'), TEXT_LIMIT), count: recovery.reads.length};
 
 	const loadedSet = (): string | undefined => {
 		const files = instructions.files();
@@ -197,6 +227,27 @@ export async function* sessionCandidates(
 				did = [...did, described].slice(-DID_LIMIT);
 				calls.set(block.id, {tool: block.name, call: described});
 
+				if (compacted && !WRITE_TOOLS.has(block.name) && JSON.stringify(block.input ?? {}).includes(transcriptName)) {
+					const detail = toolDetail(block).replaceAll(transcriptPath, '<transcript>').replaceAll('\n', ' ');
+					const read = `${block.name} ${truncate(detail, READ_LIMIT)}`;
+					if (recovery !== undefined) {
+						recovery.reads.push(read);
+					} else if (inWindow) {
+						const start: CompactionLoss = {
+							id: entry.uuid,
+							project,
+							session: entry.sessionId,
+							at: entry.timestamp,
+							signal: 'compaction-loss',
+							text: '',
+							count: 0,
+							skills: [...skills],
+							loaded: loadedSet(),
+						};
+						recovery = {start, reads: [read]};
+					}
+				}
+
 				const skill = isObject(block.input) ? block.input.skill : undefined;
 				if (block.name === 'Skill' && typeof skill === 'string') {
 					skills.add(skill);
@@ -208,6 +259,12 @@ export async function* sessionCandidates(
 		if (entry.kind === 'system') {
 			if (entry.subtype === 'compact_boundary') {
 				instructions.compact();
+				const loss = recovered();
+				if (loss !== undefined) {
+					yield loss;
+				}
+				recovery = undefined;
+				compacted = true;
 			}
 			continue;
 		}
@@ -340,6 +397,10 @@ export async function* sessionCandidates(
 
 	if (held !== undefined) {
 		yield held;
+	}
+	const loss = recovered();
+	if (loss !== undefined) {
+		yield loss;
 	}
 	yield* unresolved.values();
 }
