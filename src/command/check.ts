@@ -1,6 +1,7 @@
 import {defineCommand} from 'citty';
 import path from 'node:path';
 import {formatFindings} from '../check/report.ts';
+import {testMods} from '../check/mods.ts';
 import type {Format} from '../check/report.ts';
 import {loadRepo} from '../check/repo.ts';
 import {runRules} from '../check/rules/index.ts';
@@ -29,8 +30,8 @@ export default defineCommand({
 		const format = formatOf(args.format);
 		const repo = await loadRepo(REPO_ROOT);
 		const ctx = {prePush: args['pre-push']};
-		const [validated, ruled] = await Promise.all([validateRepo(repo), runRules(repo, ctx)]);
-		const findings = [...validated, ...ruled];
+		const [validated, modTests, ruled] = await Promise.all([validateRepo(repo), testMods(repo), runRules(repo, ctx)]);
+		const findings = [...validated, ...modTests, ...ruled];
 		process.stdout.write(formatFindings(findings, format));
 		if (findings.some((f) => f.severity === 'error')) {
 			process.exitCode = 1;
