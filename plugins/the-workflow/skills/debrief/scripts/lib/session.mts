@@ -3,13 +3,12 @@ import {type ToolErrorOccurrence, toolFailure} from './errors.mts';
 import {isObject} from './json.mts';
 import {type LoadedContext, SessionInstructions} from './loaded.mts';
 import {repositoryOf} from './projects.mts';
+import {LoadedSkills} from './skills.mts';
 import {similarity, tail, TEXT_LIMIT, truncate} from './text.mts';
 import {type EntryBase, isSdk, type QueuedCommand, readEntries, type ToolUse, type UserEntry} from './transcript.mts';
 
 const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
 const INTERRUPT_PREFIX = '[Request interrupted by user';
-const SKILL_BODY_PREFIX = 'Base directory for this skill:';
-const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const SUGGESTION_ACCEPTED = 'suggestion_accepted';
 const RETYPED_SIMILARITY = 0.9;
 const INTERJECTION_MS = 1000;
@@ -146,8 +145,7 @@ export async function* sessionCandidates(
 	let rejectedAt = Number.NaN;
 	let project: string | null = null;
 	let sessionHasOrigin = false;
-	const skills = new Set<string>();
-	let typedCommand: string | undefined;
+	const skills = new LoadedSkills();
 	const instructions = new SessionInstructions();
 	const calls = new Map<string, {tool: string; call: string}>();
 	const unresolved = new Map<string, ToolErrorOccurrence>();
@@ -176,7 +174,7 @@ export async function* sessionCandidates(
 			text: truncate(text, TEXT_LIMIT),
 			said: tail(said, SAID_LIMIT),
 			did,
-			skills: [...skills],
+			skills: skills.list(),
 			loaded: loadedSet(),
 		};
 	};
@@ -216,7 +214,7 @@ export async function* sessionCandidates(
 							signal: 'retraction',
 							text: truncate(block.text.slice(line).trim(), TEXT_LIMIT),
 							did,
-							skills: [...skills],
+							skills: skills.list(),
 							loaded: loadedSet(),
 						};
 					}
@@ -241,18 +239,14 @@ export async function* sessionCandidates(
 							signal: 'compaction-loss',
 							text: '',
 							count: 0,
-							skills: [...skills],
+							skills: skills.list(),
 							loaded: loadedSet(),
 						};
 						recovery = {start, reads: [read]};
 					}
 				}
-
-				const skill = isObject(block.input) ? block.input.skill : undefined;
-				if (block.name === 'Skill' && typeof skill === 'string') {
-					skills.add(skill);
-				}
 			}
+			skills.observe(entry);
 			continue;
 		}
 
@@ -282,9 +276,7 @@ export async function* sessionCandidates(
 			}
 
 			if (attachment.kind === 'invoked-skills') {
-				for (const skill of attachment.skills) {
-					skills.add(skill);
-				}
+				skills.observe(entry);
 				continue;
 			}
 
@@ -343,15 +335,12 @@ export async function* sessionCandidates(
 				signature: failure.signature,
 				text: failure.line,
 				did: [call.call],
-				skills: [...skills],
+				skills: skills.list(),
 			});
 		}
 
 		const body = entry.text;
-		if (typedCommand !== undefined && entry.isMeta && body.startsWith(SKILL_BODY_PREFIX)) {
-			skills.add(typedCommand);
-		}
-		typedCommand = COMMAND_NAME.exec(body)?.[1];
+		skills.observe(entry);
 
 		if (entry.results.some((result) => result.text.startsWith(REJECTION_PREFIX))) {
 			pending = 'rejection';
