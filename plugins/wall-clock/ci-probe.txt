@@ -1,0 +1,1 @@
+A shipped file changed without a version bump, so plugin-check fails this pull request.
