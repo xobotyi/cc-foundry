@@ -105,6 +105,8 @@ process (Research → Scaffold → Write → Ship).
 - `master` accepts a change only through a pull request whose `ci-ok` check passes, merged by rebase
   (`gh pr merge --rebase`); GitHub refuses a direct push
 - A rebase merge gives every commit a new SHA, so a file never cites a commit of its own pull request by SHA
+- Before the first push from a clone, run `vp hooks enable` when `vp hooks status` shows no dispatcher; the
+  `.vite-hooks/pre-push` hook then runs `vp run cli check --pre-push` and refuses a push it fails
 
 **Plugin metadata and versions:**
 
