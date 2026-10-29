@@ -79,15 +79,6 @@ process (Research → Scaffold → Write → Ship).
 - **Root CLAUDE.md** — update plugin list when: adding/removing a plugin
 - **Root README.md** — update plugin listing when: plugin purpose or skill roster changes significantly
 
-**Installation instructions:**
-
-- Every plugin README's Installation section gives the one-step command, which `claude plugin validate .` advises, and
-  no older-version form — Claude Code updates itself:
-  ```
-  /plugin install <plugin-name> --marketplace xobotyi/cc-foundry
-  ```
-- Do not use manual cp/ln installation methods
-
 **Plugin configuration:**
 
 - A plugin's user-facing environment knobs are named `FOUNDRY_<PLUGIN>_<KNOB>` — the marketplace prefix keeps them clear

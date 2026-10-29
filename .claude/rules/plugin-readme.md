@@ -20,8 +20,12 @@ Sections in this order:
    construct a sample; a plugin with no citable output skips this step.
 3. `## The Problem` — the failures the plugin fixes and what each costs the user, in at most three prose paragraphs.
 4. `## The Solution` — what each skill does, when it fires, and how the skills relate to each other.
-5. `## Installation` — prerequisites such as a Node version or a language-server binary, then the one-step command the
-   root `CLAUDE.md` prescribes.
+5. `## Installation` — prerequisites such as a Node version or a language-server binary, then the one-step command,
+   which `claude plugin validate .` advises. No form for older Claude Code releases, since Claude Code updates itself,
+   and no manual `cp` or `ln` installation:
+   ```
+   /plugin install <plugin-name> --marketplace xobotyi/cc-foundry
+   ```
 6. Plugin-specific sections as the plugin needs them (usage, configuration, limits), then `## License`.
 
 ## Root README
