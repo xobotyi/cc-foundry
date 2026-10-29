@@ -18,8 +18,8 @@
 		"@mozilla/readability": "^0.6.0",
 		"citty": "^0.2.2",
 		"consola": "^3.4.2",
-		"fs-extra": "^11.3.4",
-		"linkedom": "^0.18.12",
+		"fs-extra": "^11.4.1",
+		"linkedom": "^0.18.14",
 		"turndown": "^7.2.4"
 	},
 	"devDependencies": {
