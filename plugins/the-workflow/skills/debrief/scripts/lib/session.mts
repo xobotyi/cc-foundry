@@ -8,7 +8,8 @@ import {similarity, tail, TEXT_LIMIT, truncate} from './text.mts';
 import {type EntryBase, isSdk, type QueuedCommand, readEntries, type ToolUse, type UserEntry} from './transcript.mts';
 
 const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
-const INTERRUPT_PREFIX = '[Request interrupted by user';
+/** The text that opens the entry an interrupt leaves. */
+export const INTERRUPT_PREFIX = '[Request interrupted by user';
 const SUGGESTION_ACCEPTED = 'suggestion_accepted';
 const RETYPED_SIMILARITY = 0.9;
 const INTERJECTION_MS = 1000;
@@ -97,7 +98,11 @@ function toolDetail(call: ToolUse): string {
 const describeTool = (call: ToolUse): string =>
 	`${call.name} ${truncate(toolDetail(call).replaceAll('\n', ' '), INPUT_LIMIT)}`;
 
-function isHumanPrompt(entry: UserEntry, sessionHasOrigin: boolean): boolean {
+/**
+ * Returns whether a user entry is a prompt a human typed. In a session whose entries carry `origin`, only an entry with
+ * `origin.kind: "human"` is one; in an older session, any prompt that is not a slash command.
+ */
+export function isHumanPrompt(entry: UserEntry, sessionHasOrigin: boolean): boolean {
 	if (entry.isMeta || entry.isCompactSummary || entry.results.length > 0) {
 		return false;
 	}
