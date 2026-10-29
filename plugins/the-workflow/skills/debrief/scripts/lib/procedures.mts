@@ -180,11 +180,15 @@ export function callStep(call: ToolUse): string | undefined {
 	return call.name === 'Bash' ? commandStep(stringOf(input.command) ?? '') : call.name;
 }
 
-/** Reads the main-thread tool calls of one session since `since` as steps, a repeated step collapsed into one. */
+/**
+ * Reads the main-thread tool calls of one session since `since` as steps, a repeated step collapsed into one. An entry
+ * whose uuid is in `seen` is history a resumed session copied, and gives no step; every other uuid is added to it.
+ */
 export async function sessionSteps(
 	file: string,
 	since: number,
 	project: string | null,
+	seen: Set<string>,
 ): Promise<SessionSteps | undefined> {
 	const steps: string[] = [];
 	const skills: Array<readonly string[]> = [];
@@ -202,7 +206,12 @@ export async function sessionSteps(
 		}
 
 		loaded.observe(entry);
-		if (entry.kind !== 'assistant' || !(Date.parse(entry.timestamp ?? '') >= since)) {
+		const copied = entry.uuid !== undefined && seen.has(entry.uuid);
+		if (entry.uuid !== undefined) {
+			seen.add(entry.uuid);
+		}
+
+		if (copied || entry.kind !== 'assistant' || !(Date.parse(entry.timestamp ?? '') >= since)) {
 			continue;
 		}
 
