@@ -227,9 +227,23 @@ One file can hold two units. Do one of these two things:
 
 #### 4b. Draft Message
 
-Write the message of this unit. Obey the commit-message conventions. Save the message to `/tmp/commit-msg.txt` with the
-Write tool. A file gives git the multi-line message, the quotes, and the backticks without damage. Shell quoting damages
-them.
+Write the message of this unit. Obey the commit-message conventions. Save the message with the Write tool to a file in
+the temp directory of the system. A file gives git the multi-line message, the quotes, and the backticks without damage.
+Shell quoting damages them.
+
+<message-file>
+**Give each commit its own message file.** Parallel sessions and agents share the temp directory, so a fixed name lets
+one writer overwrite the message of another. Name the file `commit-msg-<path>-<unit>-${CLAUDE_SESSION_ID}.txt`. `<path>`
+is the absolute path of the repository, with `-` in place of each separator. `<unit>` is a short name for the unit.
+
+The Write tool overwrites an existing file without a warning. Two signs show that another writer uses the name:
+
+- The first write reports that the file was updated, not created. Write the message again under a different name.
+- The file changes after you write it, and you did not change it. Write the message again under a different name.
+
+Leave the file of the other writer alone. Never commit a message file that holds text you did not write.
+
+</message-file>
 
 Write the reason first, in one paragraph. Then cut: delete each sentence that the diff shows, and each paragraph that
 walks the reader through the new procedure. A fact the next maintainer needs lives in the artifact -- a name, a test, a
@@ -287,7 +301,7 @@ the deletions.
 Validate the drafted message:
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.mts --file /tmp/commit-msg.txt
+node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.mts --file <message file>
 ```
 
 - Add the flags from `<validator-args>` when the project config defines them.
@@ -308,7 +322,7 @@ wrap, the scope format, or the register. You own those.
 Show the full message to the user as a blockquote. Then commit:
 
 ```bash
-git commit -F /tmp/commit-msg.txt
+git commit -F <message file>
 ```
 
 A project hook can stop the commit or change the files. Read the output. A hook that exits with an error stops the

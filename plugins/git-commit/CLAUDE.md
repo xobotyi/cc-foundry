@@ -49,6 +49,10 @@ CLAUDE.md:
 - **`commit` has no dynamic context** — a `!` command runs in the working directory of the session, which is not always
   the repository that gets the commit, and a command that fails stops the skill from loading. Step 1 reads the target
   repository instead, and its log shows the subject form of the history
+- **The agent names each message file from the repository path, the unit, and `${CLAUDE_SESSION_ID}`** — no shell
+  command makes a unique temp path on every platform, and a random part that the model makes up repeats across sessions.
+  The session ID separates sessions; subagents and forks share it, so the path and the unit separate them, and the two
+  collision signs in `<message-file>` cover two writers that still share a name
 - **Both SKILL.md files stay under 5,000 tokens** — the per-skill compaction budget, past which the tail is dropped on
   re-attach, and the tail is where the `<critical>` block sits
 - **No `references/` directory.** Each skill is behaviorally self-sufficient; content that would go to a reference is
