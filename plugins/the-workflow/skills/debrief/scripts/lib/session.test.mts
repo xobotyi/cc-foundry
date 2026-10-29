@@ -158,4 +158,42 @@ describe('sessionCandidates', () => {
 
 		expect(candidate).not.toHaveProperty('loaded', expect.anything());
 	});
+
+	test('reads a command that hit a shell trap as a tool error, fixed by the next command that ran', async () => {
+		const candidates = await candidatesOf([
+			human('00', 'open'),
+			call('01', 'b1', 'ls docs/*.md'),
+			result('02', 'b1', 'Exit code 1\n(eval):1: no matches found: docs/*.md', true),
+			call('03', 'b2', 'npm test'),
+			result('04', 'b2', 'Exit code 1\nFAIL src/a.test.ts', true),
+			call('05', 'b3', "ls docs | rg '\\.md$'"),
+			result('06', 'b3', 'a.md', false),
+		]);
+
+		expect(candidates).toStrictEqual([
+			expect.objectContaining({
+				signal: 'tool-error',
+				signature: 'Bash: zsh-nomatch',
+				text: '(eval):1: no matches found: docs/*.md',
+				did: ['Bash ls docs/*.md'],
+				fix: "Bash ls docs | rg '\\.md$'",
+			}),
+		]);
+	});
+
+	test('reads a shell trap in a command that exited 0 as a tool error', async () => {
+		const candidates = await candidatesOf([
+			human('00', 'open'),
+			call('01', 'b1', 'ls *.txt; echo done'),
+			result('02', 'b1', '(eval):1: no matches found: *.txt\ndone', false),
+		]);
+
+		expect(candidates).toStrictEqual([
+			expect.objectContaining({
+				signal: 'tool-error',
+				signature: 'Bash: zsh-nomatch',
+				did: ['Bash ls *.txt; echo done'],
+			}),
+		]);
+	});
 });
