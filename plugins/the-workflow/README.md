@@ -51,7 +51,8 @@ monorepo layouts.
 
 Structured context transfer across session boundaries. Produces a prompt-quality transfer document by triaging the
 agent's conversation context into "preserve" (decisions, constraints, resource IDs, verification state) and "drop"
-(exploration paths, failed approaches, raw tool output).
+(exploration paths, raw tool output). A failed attempt counts as a decision while its reason still constrains the work;
+only the attempts that constrain nothing are dropped.
 
 Two modes handle different receivers, selected by argument:
 
