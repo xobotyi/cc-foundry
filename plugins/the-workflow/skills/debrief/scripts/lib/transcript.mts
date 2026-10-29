@@ -73,18 +73,49 @@ export type InvokedSkills = {
 	readonly skills: readonly string[];
 };
 
+/** One instruction file as the harness loaded it: a CLAUDE.md, a rules file, or a MEMORY.md. */
+export type InstructionFile = {
+	/** Its layer: `User`, `Project`, `Local`, `AutoMem`, or another the CLI adds. */
+	readonly type: string;
+	readonly path: string;
+	readonly content: string;
+};
+
+/**
+ * The instruction files in context. The first attachment of a session lists every file; a later one with `delta` set
+ * lists only the files that changed and the paths it unloaded, after a compaction or a resume.
+ */
+export type Instructions = {
+	readonly kind: 'instructions';
+	readonly files: readonly InstructionFile[];
+	readonly delta: boolean;
+	readonly removed: readonly string[];
+};
+
+/** A nested CLAUDE.md or rules file the harness loaded when the agent reached its directory. */
+export type NestedMemory = {
+	readonly kind: 'nested-memory';
+	readonly file: InstructionFile;
+};
+
 /** An attachment of a type debrief does not read. */
 export type UnreadAttachment = {
 	readonly kind: 'unread';
 };
 
 /** The payload of an `attachment` entry. */
-export type Attachment = QueuedCommand | InvokedSkills | UnreadAttachment;
+export type Attachment = QueuedCommand | InvokedSkills | Instructions | NestedMemory | UnreadAttachment;
 
 /** An `attachment` entry. */
 export type AttachmentEntry = EntryBase & {
 	readonly kind: 'attachment';
 	readonly attachment: Attachment;
+};
+
+/** A `system` entry, such as the `compact_boundary` a compaction leaves. */
+export type SystemEntry = EntryBase & {
+	readonly kind: 'system';
+	readonly subtype: string | undefined;
 };
 
 /** An entry of a type debrief reads only the common fields of. */
@@ -93,7 +124,7 @@ export type UnreadEntry = EntryBase & {
 };
 
 /** One parsed transcript entry. */
-export type Entry = UserEntry | AssistantEntry | AttachmentEntry | UnreadEntry;
+export type Entry = UserEntry | AssistantEntry | AttachmentEntry | SystemEntry | UnreadEntry;
 
 /** Joins the text of a message content: a plain string, or the text blocks of a block list. */
 export function contentText(content: Json | undefined): string {
@@ -135,6 +166,14 @@ function assistantBlocks(content: Json | undefined): Array<TextBlock | ToolUse> 
 	});
 }
 
+function instructionFileOf(value: Json | undefined): InstructionFile | undefined {
+	if (!isObject(value) || typeof value.path !== 'string' || typeof value.content !== 'string') {
+		return undefined;
+	}
+
+	return {type: stringOf(value.type) ?? '', path: value.path, content: value.content};
+}
+
 function attachmentOf(value: Json | undefined): Attachment {
 	if (!isObject(value)) {
 		return {kind: 'unread'};
@@ -152,6 +191,18 @@ function attachmentOf(value: Json | undefined): Attachment {
 		case 'invoked_skills': {
 			const names = listOf(value.skills).map((skill) => (isObject(skill) ? stringOf(skill.name) : undefined));
 			return {kind: 'invoked-skills', skills: names.filter((name) => name !== undefined)};
+		}
+		case 'instructions': {
+			return {
+				kind: 'instructions',
+				files: listOf(value.files).flatMap((file) => instructionFileOf(file) ?? []),
+				delta: value.changed === true,
+				removed: listOf(value.removed).flatMap((removed) => stringOf(removed) ?? []),
+			};
+		}
+		case 'nested_memory': {
+			const file = instructionFileOf(value.content);
+			return file === undefined ? {kind: 'unread'} : {kind: 'nested-memory', file};
 		}
 		default: {
 			return {kind: 'unread'};
@@ -201,6 +252,9 @@ export function parseEntry(line: string): Entry | undefined {
 		}
 		case 'attachment': {
 			return {...base, kind: 'attachment', attachment: attachmentOf(raw.attachment)};
+		}
+		case 'system': {
+			return {...base, kind: 'system', subtype: stringOf(raw.subtype)};
 		}
 		default: {
 			return {...base, kind: 'unread'};
