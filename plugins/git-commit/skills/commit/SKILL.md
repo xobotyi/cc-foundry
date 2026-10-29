@@ -167,7 +167,8 @@ Give a type to each unit. Then commit the types in this order:
 Commit the style units and the refactor units first. This keeps the commits that change behavior clean.
 
 Dependency order has priority over type order. If a fix builds on a feature, commit the feature first. Put the tests of
-a unit in the commit of that unit. Do not make a separate test commit.
+a unit in the commit of that unit. Do not make a separate test commit, with one exception. Characterization tests pin
+the behavior of committed code before a change. They are a unit of their own. Commit them before that change.
 
 ### 3. Quality Gate
 
