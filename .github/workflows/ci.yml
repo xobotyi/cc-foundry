@@ -25,6 +25,7 @@ jobs:
       - run: vp check
       - run: vp run typecheck
       - run: vp test
+      - run: claude plugin test plugins/plugin-rollcall
 
   plugin-check:
     runs-on: ubuntu-24.04
