@@ -10,8 +10,9 @@ structured context transfer across a boundary, and the user's corrections turned
 - **`handoff`** — triage conversation context into a standalone transfer document. User-invoked only, via
   `/the-workflow:handoff`
 - **`debrief`** — harvest the user's corrections from session transcripts and write each durable lesson into the
-  instruction file it belongs in, through an approval gate. User-invoked only, via `/the-workflow:debrief`; the
-  extractor is `scripts/extract-corrections.mts`
+  instruction file it belongs in, through an approval gate. User-invoked only, via `/the-workflow:debrief`. Its scripts,
+  in `skills/debrief/scripts/`: the extractor `extract-corrections.mts`, the hook validator `check-hook.mts`, and the
+  turn replay `replay.mts`, each a thin entry over modules in `lib/`
 
 ## Skill Dependencies
 
@@ -57,13 +58,20 @@ structured context transfer across a boundary, and the user's corrections turned
 - The skill keeps no state between runs — a ledger of processed candidates grows without bound, and a cursor that skips
   sessions already read hides the recurrence that makes a lesson. Every run rereads its whole window; volume is handled
   by the two-pass index and pick, never by skipping history
-- The transcript format is undocumented and changes between CLI versions. `scripts/extract-corrections.test.mts` pins
-  every marker the extractor relies on; run `vp test plugins/the-workflow` after any change to the script, and add a
-  fixture entry for each new marker
-- Transcript facts that defy a reasonable assumption, each pinned by that test:
+- The transcript format is undocumented and changes between CLI versions. The tests beside the scripts and their modules
+  (`skills/debrief/scripts/**/*.test.mts`) pin every marker the scripts rely on; run `vp test plugins/the-workflow`
+  after any change to a script or a module, and add a fixture entry for each new marker
+- `replay.mts stop-hook` fails closed: input it cannot read stops the run, and so does its own error, through exit 2. A
+  PreToolUse hook that errors any other way lets the call through, and a replay that runs a tool acts on the present
+  world
+- Transcript facts that defy a reasonable assumption, each pinned by those tests:
   - A human prompt carries `origin.kind: "human"`. In a session whose entries carry `origin`, an entry without it is
     synthetic: a compaction summary, a teammate message, a typed slash command
   - A message the user types while the agent works is an `attachment` of type `queued_command`, not a `user` entry
+  - A prompt with `promptSource: "suggestion_accepted"` is one the CLI predicted and the user accepted, never a
+    correction
+  - A message the user sends while a tool call waits for approval refuses the call with the same text as a refusal the
+    user chose; the prompt follows the refusal within a second
   - An entry's `cwd` follows the agent's `cd`, so a session's repository comes from its first `cwd`: a
     `/.claude/worktrees/<name>` suffix folded off, then the nearest ancestor holding `.git`, where a linked worktree's
     `.git` file points through `gitdir` to the main repository. A transcript directory is keyed to the launch directory,
@@ -76,7 +84,16 @@ structured context transfer across a boundary, and the user's corrections turned
     across compaction, which re-attaches it in an `invoked_skills` attachment
   - A failed tool call is a `tool_result` with `is_error: true`, joined to its call by `tool_use_id`. A Bash error that
     opens with `Exit code N` is a command that ran and failed, which is ordinary work; one without it was refused before
-    it ran, by the harness, a hook, or a permission
+    it ran, by the harness, a hook, or a permission. A shell dialect error in the output, such as a zsh glob that
+    matched nothing, is a wrong choice of command whatever the exit code
+  - The instruction files in context are `instructions` attachments, with each file's text recorded trimmed. The first
+    lists every file; a later one with `changed: true` lists only the changed files and the `removed` paths. A nested
+    CLAUDE.md or rules file arrives in a `nested_memory` attachment, and a compaction unloads it
+  - On resume the CLI replays an attachment from its recorded `rendered` text, not from its `files`, and compares the
+    recorded `files` with the files it loads from disk, appending each that differs. `--resume-session-at` takes the
+    uuid of a message entry; an attachment's uuid fails
+  - In `stream-json` output a streamed message's `usage` holds the output count of its first token. The result's `usage`
+    holds the run's own requests; its cost fields include the usage of the session a run resumed
   - Auto memory is on unless `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, or the first settings layer that sets
     `autoMemoryEnabled` (managed, local, project, user) sets it `false`; `CLAUDE_CODE_DISABLE_AUTO_MEMORY=0` forces it
     on. Its directory is `autoMemoryDirectory` when set, else `projects/<slug>/memory` keyed to the git repository root,
