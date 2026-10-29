@@ -1,7 +1,6 @@
 # python
 
-Python language discipline plugin for Claude Code targeting Python 3.14+, with LSP-powered code intelligence via
-Pyright.
+Python 3.14 code with modern typing and a uv and ruff toolchain, navigated through Pyright instead of text search.
 
 ## The Problem
 
@@ -30,7 +29,7 @@ detailed patterns.
 The bundled Pyright LSP configuration enables semantic code intelligence — go to definition, find references, hover for
 type info, workspace symbol search — directly in Claude Code for `.py` and `.pyi` files.
 
-## Prerequisites
+## Installation
 
 Install Pyright (the Python language server) and ensure it's available in PATH:
 
@@ -44,7 +43,7 @@ Or via uv:
 uv tool install pyright
 ```
 
-## Installation
+Then install the plugin:
 
 ```
 /plugin install python --marketplace xobotyi/cc-foundry

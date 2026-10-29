@@ -1,15 +1,15 @@
 # the-coder
 
-Language-agnostic software engineering discipline for Claude Code.
+Claude reads the code that exists before it writes, verifies the work before it calls it done, and commits in steps a
+reviewer can follow, in any language.
 
 ## The Problem
 
-**Claude writes code before understanding what exists.** It assumes API signatures from memory, guesses at method names,
-and skips verification until compile failures force corrections. This wastes tokens debugging preventable errors and
-burns context on fix attempts that could have been avoided with 30 seconds of upfront discovery.
-
-**Tests get skipped.** Code that "looks right" ships without validation. Regressions appear in production. The symptom
-is broken code — the cause is declaring "done" before actually verifying the work meets requirements.
+**Claude writes code before understanding what exists, and calls it done before verifying it.** It assumes API
+signatures from memory, guesses at method names, and skips verification until compile failures force corrections. This
+wastes tokens debugging preventable errors and burns context on fix attempts that 30 seconds of upfront discovery would
+have avoided. Code that "looks right" ships without tests, and regressions appear in production: the symptom is broken
+code, and the cause is declaring "done" before verifying the work meets requirements.
 
 **Abstractions multiply without justification.** Every task becomes an opportunity to add layers, extract interfaces,
 and invent patterns the codebase doesn't need. The result is code bloat that makes future changes harder, not easier.

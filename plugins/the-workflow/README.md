@@ -1,11 +1,9 @@
 # the-workflow
 
-Agentic workflow mechanics: the foundational skills that make working with Claude Code effective across sessions,
-projects, and teams.
+Rules in CLAUDE.md that Claude follows, handoffs that carry decisions across a session boundary, and corrections that
+become rules instead of being given again next session.
 
 ## The Problem
-
-Three workflow problems compound across every project that uses agentic coding:
 
 **Persistent context degrades.** CLAUDE.md files grow until Claude ignores half the instructions. Rules get buried in
 noise, drift from reality, or sit at the wrong abstraction level. Some never reach the session at all — a nested file

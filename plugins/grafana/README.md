@@ -1,6 +1,7 @@
 # grafana
 
-Grafana observability platform plugin for Claude Code.
+Grafana dashboards, queries, alerts, and provisioning that follow Grafana's own model, with visualizations chosen for
+how people read them.
 
 ## The Problem
 

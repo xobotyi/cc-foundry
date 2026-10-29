@@ -1,6 +1,14 @@
 # the-statusline
 
-Auto-syncing status line for Claude Code with context window usage, cost tracking, and model information.
+A two-row status line that shows the context left, the rate limit closest to running out, and what the session costs,
+and keeps working when an agent changes directory.
+
+A session in this repository, rendered by [`statusline.mts`](statusline.mts):
+
+![The status line under a Claude Code prompt. First row: AI Engineer (Opus 5.5 · xhigh), $11.32, ctx left 53%, 5h left 23% til 13:30. Second row: ~/wrk/github.com/xobotyi/cc-foundry, master, +280 -365.](../../assets/the-statusline.png)
+
+The first row carries the output style, the model with its effort, and the session cost, with the context left and the
+closer rate limit at its right edge; the second carries the directory, the branch, and the lines changed this session.
 
 ## The Problem
 

@@ -1,6 +1,7 @@
 # golang
 
-Go language discipline plugin for Claude Code with built-in `gopls` LSP support.
+Go that follows the language's own idioms and the version the module's `go` directive permits, navigated through `gopls`
+instead of text search.
 
 ## The Problem
 
@@ -15,14 +16,14 @@ hierarchies. Without LSP-powered navigation, exploration is imprecise and error-
 
 ## The Solution
 
-This plugin provides language and library skills plus a `gopls` LSP server that together give Claude deep Go fluency.
-The `golang` skill covers core Go conventions (naming, error handling, interfaces, concurrency, testing, project
-structure) and enforces LSP-first code navigation — agents must use `goToDefinition`, `findReferences`, `hover`, and
-other LSP tools instead of text search for semantic navigation tasks. The `templ` skill extends those conventions to
-type-safe HTML templating, `charm-tui` covers the Charmbracelet v2 terminal UI stack, and `zog` covers schema
-validation. Skills include anti-pattern references and route to detailed topic-specific guides.
+This plugin provides language and library skills plus a `gopls` language-server configuration that together give Claude
+deep Go fluency. The `golang` skill covers core Go conventions (naming, error handling, interfaces, concurrency,
+testing, project structure) and enforces LSP-first code navigation — agents must use `goToDefinition`, `findReferences`,
+`hover`, and other LSP tools instead of text search for semantic navigation tasks. The `templ` skill extends those
+conventions to type-safe HTML templating, `charm-tui` covers the Charmbracelet v2 terminal UI stack, and `zog` covers
+schema validation. Skills include anti-pattern references and route to detailed topic-specific guides.
 
-## Prerequisites
+## Installation
 
 Install `gopls` (the Go language server) and ensure it's available in PATH:
 
@@ -32,7 +33,7 @@ go install golang.org/x/tools/gopls@latest
 
 Make sure `$GOPATH/bin` (or `$HOME/go/bin`) is in your PATH.
 
-## Installation
+Then install the plugin:
 
 ```
 /plugin install golang --marketplace xobotyi/cc-foundry

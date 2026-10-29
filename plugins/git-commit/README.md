@@ -1,30 +1,38 @@
 # git-commit
 
-Structured git commit workflow with atomic commits, message validation, and conventions.
+Claude's work, committed in units a reviewer can read one at a time. The `commit` skill splits the diff into the
+smallest units it judges to keep the tree working, orders them, and audits every message body against the staged diff
+before the commit lands.
+
+A commit from this repository, made through the skill ([0f876f6](https://github.com/xobotyi/cc-foundry/commit/0f876f6)):
+
+```
+[the-statusline] count the ellipsis as width when collapsing a path
+
+The second collapse stage counted the ellipsis that replaces the first
+shortened segment as two columns removed, where it adds two. A path
+that needed that stage came out four columns wider than its budget, so
+row 2 overflowed a narrow pane. The collapsed path fits its budget.
+```
+
+The subject names the change. The body gives the cause and what the user saw, and leaves the code to the diff.
 
 ## The Problem
 
-**Mixed changes in single commits.** Claude's default commit behavior bundles bug fixes, refactoring, and new features
-together. The resulting history is impossible to bisect, cherry-pick, or review meaningfully. When something breaks, you
-can't isolate the change that caused it.
+Claude's default commit bundles a bug fix, a refactor, and a new feature under a message like "Fix stuff". The history
+can't be bisected, cherry-picked, or reviewed in pieces, and when something breaks at 3am the log doesn't say what
+changed or why. The order goes wrong as well: new behavior lands before the refactor that enables it, and style edits
+ride along with logic changes. Nothing checks the message before it lands, so typos, missing context, forgotten scope
+prefixes, and inconsistent formatting get through whenever a manual review misses them.
 
-**Vague commit messages.** "Fix stuff" or "Update code" tells future readers nothing. When debugging at 3am, you need to
-understand what changed and why by reading the log. Generic messages waste that opportunity.
+Two habits make it worse. The first is reading "atomic" as one commit per task. Every boundary test in a commit workflow
+asks whether the diff mixes unrelated things, so a single large coherent feature passes all of them and arrives as one
+unit. The word gives an agent an honest-sounding reason to never split anything.
 
-**No validation before commit.** Typos in messages, missing context, forgotten scope prefixes, inconsistent formatting —
-all slip through. Manual review catches some, but not systematically.
-
-**Wrong commit order.** New behavior committed before the refactoring that enables it. Style changes mixed with logic
-changes. The commit sequence doesn't tell a coherent story, making git bisect and code review harder than necessary.
-
-**"Atomic" read as one commit per task.** Every boundary test in a commit workflow asks whether the diff mixes unrelated
-things, so a single large coherent feature passes all of them and arrives as one unit. The word gives an agent an
-honest-sounding reason to never split anything.
-
-**Committing left until the end.** An agent works for an hour and then reaches for git with a few thousand uncommitted
+The second is committing at the end. An agent works for an hour and then reaches for git with a few thousand uncommitted
 lines in the tree. Splitting that afterwards recovers a readable history, but the work itself was never done against a
-committed base, so every decision along the way is welded to the ones after it. Worse, the split usually can't be made
-cleanly at all — the pieces are interleaved across the same files by the time anyone asks.
+committed base, so every decision along the way is welded to the ones after it. Usually the split can't be made cleanly
+at all, because by then the pieces are interleaved across the same files.
 
 ## The Solution
 

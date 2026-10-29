@@ -1,6 +1,7 @@
 # ai-helpers
 
-Claude Code plugin for engineering AI artifacts: prompts, skills, agents, and output styles.
+Prompts, skills, subagents, and output styles that do what you wrote them to do: skills that activate, agents that stay
+in scope, and styles that hold their voice.
 
 ## The Problem
 
@@ -8,17 +9,12 @@ Claude Code plugin for engineering AI artifacts: prompts, skills, agents, and ou
 fills gaps with defaults that may not match your intent. Without explicit structure, examples, and format
 specifications, prompts produce inconsistent results.
 
-**Skills don't activate reliably.** You write a skill, but Claude ignores it. The description doesn't match how users
-phrase requests, trigger keywords are missing, or the frontmatter is misconfigured. Vague descriptions like "helps with
-X" waste the highest-leverage field.
-
-**Agents overstep or quit early.** Without clear scope boundaries, subagents either try to handle everything (exceeding
-their mandate) or bail too early (leaving work incomplete). Tool restrictions and termination conditions need explicit
-design.
-
-**Output styles revert to defaults.** You want a specific persona, but Claude falls back to base behavior under
-pressure. The style instructions compete with the system prompt instead of claiming precedence over it, or the voice is
-described too loosely to hold.
+Every artifact built on a prompt inherits that, and each fails in its own way. You write a skill, but Claude ignores it:
+the description doesn't match how users phrase requests, trigger keywords are missing, or the frontmatter is
+misconfigured, and a vague "helps with X" wastes the highest-leverage field. A subagent without clear scope boundaries
+tries to handle everything or bails too early, because nobody designed its tool restrictions and termination conditions.
+An output style falls back to base behavior under pressure, because its rules are stated too generally to win against
+the defaults they compete with, or the voice is described too loosely to hold.
 
 ## The Solution
 

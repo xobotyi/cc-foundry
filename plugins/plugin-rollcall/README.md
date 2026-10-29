@@ -1,7 +1,15 @@
 # plugin-rollcall
 
-A plugin that a repository enables in its `.claude/settings.json` can be missing from your sessions in that repository
-until you type `/reload-plugins`. This mod notices that at session start and runs the reload for you.
+Plugins that a repository enables in its `.claude/settings.json` load from your first prompt there, including in a fresh
+clone or a new worktree, where Claude Code skips them until you type `/reload-plugins`.
+
+The line the mod adds to the transcript after it reloads ([`hooks/register.ts`](hooks/register.ts)):
+
+```
+reloaded plugins skipped at startup: the-coder@foundry
+```
+
+It names every plugin it had to reload, so a skipped plugin is visible instead of silently missing.
 
 ## The Problem
 

@@ -1,7 +1,7 @@
 # infrastructure
 
-Infrastructure management discipline for Claude Code. Provides domain-specific guidance for Ansible automation,
-container orchestration, Proxmox virtualization, Unraid NAS management, and network architecture.
+Infrastructure changes handled like production work, from the plan to the evidence that closes them, across Ansible,
+containers, Proxmox, Unraid, and network configuration.
 
 ## The Problem
 
@@ -15,6 +15,12 @@ guarantees, naive networking assumptions.
 Six skills: one foundational discipline skill defining what good infrastructure work looks like, and five
 domain-specific skills targeting concrete tools and technologies. All enforce production-grade conventions,
 security-first defaults, and ground their guidance in official documentation.
+
+## Installation
+
+```
+/plugin install infrastructure --marketplace xobotyi/cc-foundry
+```
 
 ## Skills
 
@@ -71,8 +77,6 @@ prefix alert on nothing, and CrowdSec's firewall component writes its rules once
 references, one per tool or concern, each loaded only when that artifact is in hand. Built from the tools' own
 documentation, man pages, source, and advisories, verified page by page.
 
-## Installation
+## License
 
-```
-/plugin install infrastructure --marketplace xobotyi/cc-foundry
-```
+MIT

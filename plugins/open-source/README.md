@@ -1,7 +1,6 @@
 # open-source
 
-Open-source contribution discipline for Claude Code — structured issue creation and pull request submission for external
-projects.
+Issues and pull requests for projects you don't maintain, drafted to the project's own rules for a human to submit.
 
 ## The Problem
 

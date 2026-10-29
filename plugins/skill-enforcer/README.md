@@ -1,6 +1,23 @@
 # skill-enforcer
 
-Keeps skills invoked proactively and their references read by phase, throughout a coding session.
+Claude checks which skills apply before it answers, and goes back to the unread references of a loaded skill when the
+work moves to a new phase, such as from coding to testing.
+
+The reminder the hook injects after an edit ([`hooks/sef-hook.mts`](hooks/sef-hook.mts)):
+
+```
+<SEF phase="PHASE-CHANGE">
+If the kind of work changed with this edit, for example from implementation to testing, invoke the skills
+whose descriptions name the new kind and read the loaded skills' references whose condition now holds. A
+skill loaded earlier is not applied to the new kind of work until those references are read. An edit within
+the same kind of work is not a change.
+
+Act on this rule. Do not quote this reminder or report the check in your reply.
+</SEF>
+```
+
+It states one rule for one checkpoint and asks for the action, not a report, so the check stays out of your
+conversation.
 
 ## The Problem
 

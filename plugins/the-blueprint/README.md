@@ -1,6 +1,20 @@
 # the-blueprint
 
-Structured planning pipeline that converts problem analysis into tracked work items.
+An idea becomes tracked work items through stages you approve one at a time, and the reasoning behind each decision is
+kept where the next reader finds it.
+
+Two entries from this repository's decision index, written with the `adr` skill
+([`design-docs/ADR.md`](../../design-docs/ADR.md)):
+
+```
+## plugins/the-blueprint
+
+- [1.10 Keep decision records living: rewritten in place, deleted once they stop holding](/design-docs/adr/1.10-decision-record-lifecycle.md)
+- [1.11 Import the ADR index into every session, one line per ADR](/design-docs/adr/1.11-decision-record-index.md)
+```
+
+Each title states the decision in force, and the index loads into every session, so an agent meets the decision before
+it changes the code the decision governs.
 
 ## The Problem
 
