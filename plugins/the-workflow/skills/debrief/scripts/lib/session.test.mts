@@ -5,7 +5,7 @@ import {afterAll, beforeAll, describe, expect, test} from 'vite-plus/test';
 import type {ToolErrorOccurrence} from './errors.mts';
 import {isObject, type Json, listOf, parseJson} from './json.mts';
 import {LoadedContext} from './loaded.mts';
-import {type Correction, type Retraction, sessionCandidates} from './session.mts';
+import {type CompactionLoss, type Correction, type Retraction, sessionCandidates} from './session.mts';
 
 type Line = Readonly<Record<string, unknown>>;
 
@@ -44,7 +44,7 @@ afterAll(async () => {
 	await rm(dir, {recursive: true, force: true});
 });
 
-async function loadedPaths(candidate: Correction | Retraction | ToolErrorOccurrence): Promise<Json[]> {
+async function loadedPaths(candidate: Correction | Retraction | CompactionLoss | ToolErrorOccurrence): Promise<Json[]> {
 	const set = parseJson(await readFile('loaded' in candidate ? String(candidate.loaded) : '', 'utf8'));
 	return listOf(isObject(set) ? set.files : undefined).map((file) => (isObject(file) ? (file.path ?? null) : null));
 }
@@ -52,11 +52,12 @@ async function loadedPaths(candidate: Correction | Retraction | ToolErrorOccurre
 async function candidatesOf(
 	entries: readonly Line[],
 	context?: LoadedContext,
-): Promise<Array<Correction | Retraction | ToolErrorOccurrence>> {
+	name = `${files + 1}`,
+): Promise<Array<Correction | Retraction | CompactionLoss | ToolErrorOccurrence>> {
 	files += 1;
-	const file = path.join(dir, `${files}.jsonl`);
+	const file = path.join(dir, `${name}.jsonl`);
 	await writeFile(file, entries.map((entry) => JSON.stringify(entry)).join('\n'));
-	const candidates: Array<Correction | Retraction | ToolErrorOccurrence> = [];
+	const candidates: Array<Correction | Retraction | CompactionLoss | ToolErrorOccurrence> = [];
 	for await (const candidate of sessionCandidates(file, 0, context)) {
 		candidates.push(candidate);
 	}
@@ -210,6 +211,33 @@ describe('sessionCandidates', () => {
 				signal: 'retraction',
 				text: 'Correction: the flag is `--run`; I was wrong about `--once`.\n\nRerunning.',
 				did: ['Bash npm test -- --once'],
+			}),
+		]);
+	});
+
+	test("groups the agent's reads of its own transcript after each compaction", async () => {
+		const own = '/home/.claude/projects/-work/f00d.jsonl';
+		const candidates = await candidatesOf(
+			[
+				human('00', 'open'),
+				call('01', 'b1', `rg -c . ${own}`),
+				{type: 'system', subtype: 'compact_boundary'},
+				call('02', 'b2', `rg -n "notify" ${own}`),
+				call('03', 'b3', 'rg -n "notify" /home/.claude/projects/-work/other.jsonl'),
+				{type: 'system', subtype: 'compact_boundary'},
+				call('04', 'b4', `jq -r .uuid ${own} | tail -1`),
+				call('05', 'b5', `rg -n "push" ${own}`),
+			],
+			undefined,
+			'f00d',
+		);
+
+		expect(candidates).toStrictEqual([
+			expect.objectContaining({signal: 'compaction-loss', text: 'Bash rg -n "notify" <transcript>', count: 1}),
+			expect.objectContaining({
+				signal: 'compaction-loss',
+				text: 'Bash jq -r .uuid <transcript> | tail -1\nBash rg -n "push" <transcript>',
+				count: 2,
 			}),
 		]);
 	});
