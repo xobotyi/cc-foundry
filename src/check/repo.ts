@@ -40,6 +40,8 @@ export type Plugin = {
 	readonly skills: readonly string[];
 	readonly agents: readonly string[];
 	readonly commands: readonly string[];
+	/** The hooks modules `hooks/hooks.json` names, the file `claude plugin test` loads; a plugin naming one is a mod. */
+	readonly modules: readonly string[];
 };
 
 export type Repo = {
@@ -96,12 +98,27 @@ async function loadPlugin(root: string, dir: string): Promise<Plugin> {
 	const pluginPath = `plugins/${dir}`;
 	const raw = await readJsonObject(root, `${pluginPath}/.claude-plugin/plugin.json`);
 	const abs = path.join(root, pluginPath);
-	const [skills, agents, commands] = await Promise.all([
+	const [skills, agents, commands, modules] = await Promise.all([
 		listSkills(path.join(abs, 'skills')),
 		listMarkdownNames(path.join(abs, 'agents')),
 		listMarkdownNames(path.join(abs, 'commands')),
+		readModules(abs),
 	]);
-	return {dir, path: pluginPath, manifest: parseManifest(raw), skills, agents, commands};
+	return {dir, path: pluginPath, manifest: parseManifest(raw), skills, agents, commands, modules};
+}
+
+async function readModules(pluginDir: string): Promise<string[]> {
+	let config: unknown;
+	try {
+		config = JSON.parse(await fs.readFile(path.join(pluginDir, 'hooks', 'hooks.json'), 'utf8'));
+	} catch (error) {
+		// claude plugin validate reports a hooks file that is not JSON
+		if (isErrnoCode(error, 'ENOENT') || error instanceof SyntaxError) return [];
+		throw error;
+	}
+	if (!isObject(config) || !Array.isArray(config.modules)) return [];
+	const modules: unknown[] = config.modules;
+	return modules.filter((module) => typeof module === 'string');
 }
 
 function parseManifest(raw: JsonObject): Manifest {
