@@ -11,13 +11,17 @@ const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const RAN_AND_FAILED = /^Exit code \d+/;
 const SUGGESTION_ACCEPTED = 'suggestion_accepted';
 const RETYPED_SIMILARITY = 0.9;
+const INTERJECTION_MS = 1000;
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
 const INPUT_LIMIT = 160;
 const INPUT_KEYS = ['file_path', 'command', 'pattern', 'skill', 'description', 'url', 'query', 'prompt'];
 
-/** What preceded a correction candidate. */
-export type CorrectionSignal = 'rejection' | 'interrupt' | 'rewind' | 'mid-turn' | 'follow-up';
+/**
+ * What preceded a correction candidate. An `interjection` is a prompt sent within a second of a rejected tool call: the
+ * harness rejects the pending call because the user sent a message, so the rejection refuses nothing.
+ */
+export type CorrectionSignal = 'rejection' | 'interjection' | 'interrupt' | 'rewind' | 'mid-turn' | 'follow-up';
 
 /** A human message that may correct the agent, with what the agent said and did just before it. */
 export type Correction = {
@@ -81,6 +85,7 @@ export async function* sessionCandidates(
 	let said = '';
 	let did: string[] = [];
 	let pending: 'rejection' | 'interrupt' | undefined;
+	let rejectedAt = Number.NaN;
 	let project: string | null = null;
 	let sessionHasOrigin = false;
 	const skills = new Set<string>();
@@ -212,6 +217,7 @@ export async function* sessionCandidates(
 
 		if (entry.results.some((result) => result.text.startsWith(REJECTION_PREFIX))) {
 			pending = 'rejection';
+			rejectedAt = Date.parse(entry.timestamp ?? '');
 			continue;
 		}
 
@@ -235,7 +241,9 @@ export async function* sessionCandidates(
 				yield held;
 			}
 			const replaced = parent === undefined ? undefined : promptsByParent.get(parent);
-			const signal = replaced === undefined ? (pending ?? 'follow-up') : 'rewind';
+			const interjected = pending === 'rejection' && Date.parse(entry.timestamp ?? '') - rejectedAt < INTERJECTION_MS;
+			const precedent = interjected ? 'interjection' : (pending ?? 'follow-up');
+			const signal = replaced === undefined ? precedent : 'rewind';
 			const predicted = entry.promptSource === SUGGESTION_ACCEPTED;
 			const retyped = replaced !== undefined && similarity(replaced, text) >= RETYPED_SIMILARITY;
 			held = !opening && inWindow && !predicted && !retyped ? candidate(entry, signal, text) : undefined;
