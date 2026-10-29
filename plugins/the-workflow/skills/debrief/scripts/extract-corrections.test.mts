@@ -3,6 +3,7 @@ import {homedir, tmpdir} from 'node:os';
 import path from 'node:path';
 import {afterAll, beforeAll, describe, expect, onTestFinished, test} from 'vite-plus/test';
 import {indexRow, lineNumbers, parseSince} from './extract-corrections.mts';
+import {extractCalls} from './lib/calls.mts';
 import {recurringErrors, type ToolErrorOccurrence} from './lib/errors.mts';
 import {type Candidate, extract, type ExtractOptions} from './lib/extract.mts';
 import {type JsonObject, parseJson} from './lib/json.mts';
@@ -534,6 +535,21 @@ describe('tool error signatures', () => {
 			expect.objectContaining({id: 'error:Read: ENOENT <path> line <n>', count: 2, sessions: 2}),
 		]);
 		await rm(root, {recursive: true, force: true});
+	});
+});
+
+describe('extractCalls', () => {
+	test('reads the recorded calls of one tool across the sessions of a repository', async () => {
+		const options = {projectsDir, projects: [LEARN], allProjects: false, since: 0, session: undefined};
+		const calls = [];
+		for await (const recorded of extractCalls(options, {tool: 'Edit', match: String.raw`c\.js`})) {
+			calls.push(recorded);
+		}
+
+		expect(calls.map(({id, session, input, outcome}) => [id, session, input, outcome])).toStrictEqual([
+			['e3', 's8', {file_path: '/work/learn.app/c.js'}, 'error'],
+			['e4', 's8', {file_path: '/work/learn.app/c.js'}, 'ok'],
+		]);
 	});
 });
 
