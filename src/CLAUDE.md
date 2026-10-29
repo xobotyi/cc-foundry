@@ -12,7 +12,8 @@ vp check          # format, lint, and type-check every file
 
 ### check
 
-Check the marketplace and every plugin with `claude plugin validate`, then against this repository's own rules.
+Check the marketplace and every plugin with `claude plugin validate`, every mod's tests with `claude plugin test`, and
+this repository's own rules, all at once.
 
 ```bash
 vp run cli check [--pre-push] [--format text|github]
@@ -29,6 +30,8 @@ vp run typecheck   # tsc
 **Behavior:**
 
 - Runs `claude plugin validate --json` on the marketplace and on each `plugins/*/`, so `claude` must be on `PATH`
+- Runs `claude plugin test` on each mod, a plugin whose `hooks/hooks.json` names `modules`. A failing test, or a mod
+  with no `*.test.ts` or `*.test.tsx`, is a `mod-test` error; the kit runs without credentials
 - Reads the full git history and the release tags; a shallow clone breaks `renames-history` and `unbumped-change`
 - Every validator error and warning fails the check, except the accepted warnings in `ACCEPTED_WARNINGS`
   (`src/check/validate.ts`): the plugin-root `CLAUDE.md` warning. The validator's plugin-directory checks (icon,
