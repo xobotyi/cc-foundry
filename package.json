@@ -26,7 +26,7 @@
 		"@types/fs-extra": "^11.0.4",
 		"@types/node": "^26.6.5",
 		"@types/turndown": "^5.0.6",
-		"@ver0/oxlint-config": "^2.0.3",
+		"@ver0/oxlint-config": "^2.0.4",
 		"typescript": "^6.0.2",
 		"vite-plus": "^1.4.0"
 	},

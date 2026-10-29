@@ -26,21 +26,7 @@ export default defineConfig({
 		// constraint: these files type-check against types Claude Code writes only when it loads the mod
 		// interactively, so a checkout without them fails with an invalid tsconfig
 		ignorePatterns: ['plugins/plugin-rollcall/**/*.ts'],
-		extends: [
-			javascript,
-			typescript,
-			node,
-			vitest,
-			{
-				rules: {
-					// shortcut: duplicates the @ver0/oxlint-config entry — delete once a release carrying it is installed
-					'typescript/prefer-readonly-parameter-types': [
-						'error',
-						{ignoreInferredTypes: true, treatMethodsAsReadonly: true},
-					],
-				},
-			},
-		],
+		extends: [javascript, typescript, node, vitest],
 		options: {typeAware: true, typeCheck: true},
 	},
 });
