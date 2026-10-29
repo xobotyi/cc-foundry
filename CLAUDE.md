@@ -114,6 +114,12 @@ process (Research → Scaffold → Write → Ship).
   doing I/O only under `import.meta.main` ([ADR 1.13](/design-docs/adr/1.13-plugin-script-runtime.md))
 - Its tests sit beside it as `<name>.test.mts` and import its exports; a `.dev/` folder never exists only to hold a test
 
+**Landing changes:**
+
+- `master` accepts a change only through a pull request whose `ci-ok` check passes, merged by rebase
+  (`gh pr merge --rebase`); GitHub refuses a direct push
+- A rebase merge gives every commit a new SHA, so a file never cites a commit of its own pull request by SHA
+
 **Plugin metadata and versions:**
 
 - A plugin's version, description, keywords, and every other field `plugin.json` accepts live only in its
@@ -123,7 +129,7 @@ process (Research → Scaffold → Write → Ship).
 - Renaming or removing a plugin adds a key to `renames` in `.claude-plugin/marketplace.json`: the old name maps to the
   new name, or to `null` for a removal. Never edit or delete an existing key — Claude Code follows the chain from the
   oldest name, and `forceRemoveDeletedPlugins` uninstalls an unmapped old name instead of migrating it
-- Every plugin version bump pushed to master ships with a GitHub release whose notes are the plugin's changelog — no
+- Every plugin version bump merged into master ships with a GitHub release whose notes are the plugin's changelog — no
   CHANGELOG.md files. Workflow: the `release` skill (`.claude/skills/release/`); rationale:
   [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)
 

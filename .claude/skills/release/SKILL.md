@@ -1,15 +1,15 @@
 ---
 name: release
 description: >-
-  GitHub release creation for cc-foundry plugins: per-plugin tags, release notes as the changelog, and post-push
-  publishing. Invoke whenever task involves pushing commits to master, releasing or publishing a plugin version,
-  bumping plugin versions, or writing release notes.
+  GitHub release creation for cc-foundry plugins: per-plugin tags, release notes as the changelog, and post-merge
+  publishing. Invoke whenever task involves merging a pull request into master, releasing or publishing a plugin
+  version, bumping plugin versions, or writing release notes.
 ---
 
 # Plugin Releases
 
 Every plugin version bump that lands on master ships with a GitHub release. The release notes are the plugin's changelog
-— there are no CHANGELOG.md files (see [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)). A pushed version bump
+— there are no CHANGELOG.md files (see [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)). A merged version bump
 without a release is an incomplete ship.
 
 ## Before the Push
@@ -20,20 +20,20 @@ keys its plugin cache on the version.
 
 ## When to Release
 
-- After every push to master, check the pushed range for plugin version bumps; create one release per plugin whose
+- After every merge into master, check the merged range for plugin version bumps; create one release per plugin whose
   version changed.
-- The user's authorization to push covers release creation — do not ask a second time.
+- The user's authorization to merge covers release creation — do not ask a second time.
 - Repo-level changes that bump no plugin version (ADRs, root docs, the dev CLI in `src/`, CI, this skill) get no
   release.
-- Several plugins bumped in one push → one release each.
+- Several plugins bumped in one merge → one release each.
 
 ## Identify What to Release
 
-1. Find bumped plugins in the pushed range: `git diff <old-origin-head>..origin/master -- '*/plugin.json'`. When the old
+1. Find bumped plugins in the merged range: `git diff <old-origin-head>..origin/master -- '*/plugin.json'`. When the old
    head is unknown, compare each plugin's `plugin.json` version against its latest `<plugin>-v*` tag from
    `gh release list`.
 2. For each bumped plugin, resolve:
-   - the pushed commit that changed its `plugin.json` version — the release target
+   - the commit on master that changed its `plugin.json` version — the release target
    - the previous release tag `<plugin>-v*`, if any — the notes range and compare-link anchor
 3. Collect source material: `git log <prev-tag>..<target> -- plugins/<name>/` plus the diff of that range. For a first
    release, use the commits of the bump itself.
@@ -42,7 +42,7 @@ keys its plugin cache on the version.
 
 - **Tag** — `<plugin>-v<X.Y.Z>`, e.g. `the-coder-v1.5.0`
 - **Title** — `<plugin> v<X.Y.Z>`, e.g. `the-coder v1.5.0`
-- **Target** — the pushed commit that landed the version bump, as its **full 40-character SHA**. GitHub rejects an
+- **Target** — the commit on master that landed the version bump, as its **full 40-character SHA**. GitHub rejects an
   abbreviated SHA with `HTTP 422 Validation Failed` and the misleading trio `tag_name is not a valid tag`,
   `Release.target_commitish is invalid`, `Published releases must have a valid tag`. A rebase-merged pull request gives
   every commit a new SHA, so take the target from `origin/master` after the merge, never from the branch. Resolve it
@@ -104,9 +104,9 @@ gh release create <plugin>-v<X.Y.Z> \
 
 - To stage a release for user review, add `--draft` (visible to collaborators only; the tag is created at publish, not
   at draft creation). Publish with `gh release edit <tag> --draft=false` — re-set `--target` to the bump commit first if
-  the draft was created before the push.
+  the draft was created before the merge.
 
 ## Verify
 
 - `gh release view <tag>` — confirm title, target, and notes.
-- Cross-check: every plugin bumped in the pushed range has a release; `plugin.json` version equals the latest tag.
+- Cross-check: every plugin bumped in the merged range has a release; `plugin.json` version equals the latest tag.
