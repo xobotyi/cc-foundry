@@ -1,8 +1,10 @@
-import {mkdtemp, rm, writeFile} from 'node:fs/promises';
+import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {afterAll, beforeAll, describe, expect, test} from 'vite-plus/test';
 import type {ToolErrorOccurrence} from './errors.mts';
+import {isObject, type Json, listOf, parseJson} from './json.mts';
+import {LoadedContext} from './loaded.mts';
 import {type Correction, sessionCandidates} from './session.mts';
 
 type Line = Readonly<Record<string, unknown>>;
@@ -42,12 +44,20 @@ afterAll(async () => {
 	await rm(dir, {recursive: true, force: true});
 });
 
-async function candidatesOf(entries: readonly Line[]): Promise<Array<Correction | ToolErrorOccurrence>> {
+async function loadedPaths(candidate: Correction | ToolErrorOccurrence): Promise<Json[]> {
+	const set = parseJson(await readFile('loaded' in candidate ? String(candidate.loaded) : '', 'utf8'));
+	return listOf(isObject(set) ? set.files : undefined).map((file) => (isObject(file) ? (file.path ?? null) : null));
+}
+
+async function candidatesOf(
+	entries: readonly Line[],
+	context?: LoadedContext,
+): Promise<Array<Correction | ToolErrorOccurrence>> {
 	files += 1;
 	const file = path.join(dir, `${files}.jsonl`);
 	await writeFile(file, entries.map((entry) => JSON.stringify(entry)).join('\n'));
 	const candidates: Array<Correction | ToolErrorOccurrence> = [];
-	for await (const candidate of sessionCandidates(file, 0)) {
+	for await (const candidate of sessionCandidates(file, 0, context)) {
 		candidates.push(candidate);
 	}
 	return candidates;
@@ -114,5 +124,38 @@ describe('sessionCandidates', () => {
 
 		expect(await signalAfter('02.100', '02.400')).toBe('interjection');
 		expect(await signalAfter('02', '05')).toBe('rejection');
+	});
+
+	test('names the instruction files in context at each correction, nested ones until a compaction', async () => {
+		const context = new LoadedContext(path.join(dir, 'context'));
+		const root = {type: 'Project', path: '/work/CLAUDE.md', content: '# Work'};
+		const rule = {type: 'Project', path: '/work/api/CLAUDE.md', content: '# API'};
+		const candidates = await candidatesOf(
+			[
+				{type: 'attachment', attachment: {type: 'instructions', files: [root]}},
+				human('00', 'open'),
+				{type: 'attachment', attachment: {type: 'nested_memory', path: rule.path, content: rule}},
+				human('01', 'before compaction'),
+				{type: 'system', subtype: 'compact_boundary'},
+				human('02', 'after compaction'),
+			],
+			context,
+		);
+		await context.write();
+
+		expect(await Promise.all(candidates.map(async (candidate) => loadedPaths(candidate)))).toStrictEqual([
+			['/work/CLAUDE.md', '/work/api/CLAUDE.md'],
+			['/work/CLAUDE.md'],
+		]);
+	});
+
+	test('names no instruction set when the extraction collects none', async () => {
+		const [candidate] = await candidatesOf([
+			{type: 'attachment', attachment: {type: 'instructions', files: [{path: '/w/CLAUDE.md', content: 'x'}]}},
+			human('00', 'open'),
+			human('01', 'fix'),
+		]);
+
+		expect(candidate).not.toHaveProperty('loaded', expect.anything());
 	});
 });

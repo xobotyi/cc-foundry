@@ -1,5 +1,6 @@
 import {errorLine, errorSignature, type ToolErrorOccurrence} from './errors.mts';
 import {isObject} from './json.mts';
+import {type LoadedContext, SessionInstructions} from './loaded.mts';
 import {repositoryOf} from './projects.mts';
 import {similarity, tail, TEXT_LIMIT, truncate} from './text.mts';
 import {type EntryBase, isSdk, type QueuedCommand, readEntries, type ToolUse, type UserEntry} from './transcript.mts';
@@ -34,6 +35,8 @@ export type Correction = {
 	readonly said: string;
 	readonly did: readonly string[];
 	readonly skills: readonly string[];
+	/** The JSON file that lists the instruction files in context, when the extraction collects them. */
+	readonly loaded?: string;
 };
 
 function describeTool(call: ToolUse): string {
@@ -71,11 +74,13 @@ function isHumanQueuedCommand(command: QueuedCommand): boolean {
 /**
  * Reads one transcript and yields its correction candidates in order: each human prompt that follows a rejection,
  * an interrupt, a rewind, or another prompt, each message queued mid-turn, and each tool error with the call that
- * fixed it. A session's first prompt and anything before `since` are skipped; an SDK session yields nothing.
+ * fixed it. A session's first prompt and anything before `since` are skipped; an SDK session yields nothing. With
+ * `context`, each correction names the set of instruction files it was made under.
  */
 export async function* sessionCandidates(
 	file: string,
 	since: number,
+	context?: LoadedContext,
 ): AsyncGenerator<Correction | ToolErrorOccurrence> {
 	let opening = true;
 	let held: Correction | undefined;
@@ -90,20 +95,25 @@ export async function* sessionCandidates(
 	let sessionHasOrigin = false;
 	const skills = new Set<string>();
 	let typedCommand: string | undefined;
+	const instructions = new SessionInstructions();
 	const calls = new Map<string, {tool: string; call: string}>();
 	const unresolved = new Map<string, ToolErrorOccurrence>();
 
-	const candidate = (entry: EntryBase, signal: CorrectionSignal, text: string): Correction => ({
-		id: entry.uuid,
-		project,
-		session: entry.sessionId,
-		at: entry.timestamp,
-		signal,
-		text: truncate(text, TEXT_LIMIT),
-		said: tail(said, SAID_LIMIT),
-		did,
-		skills: [...skills],
-	});
+	const candidate = (entry: EntryBase, signal: CorrectionSignal, text: string): Correction => {
+		const files = instructions.files();
+		return {
+			id: entry.uuid,
+			project,
+			session: entry.sessionId,
+			at: entry.timestamp,
+			signal,
+			text: truncate(text, TEXT_LIMIT),
+			said: tail(said, SAID_LIMIT),
+			did,
+			skills: [...skills],
+			loaded: context === undefined || files.length === 0 ? undefined : context.record(files),
+		};
+	};
 
 	for await (const entry of readEntries(file)) {
 		if (entry.isSidechain) {
@@ -141,8 +151,25 @@ export async function* sessionCandidates(
 
 		const inWindow = Date.parse(entry.timestamp ?? '') >= since;
 
+		if (entry.kind === 'system') {
+			if (entry.subtype === 'compact_boundary') {
+				instructions.compact();
+			}
+			continue;
+		}
+
 		if (entry.kind === 'attachment') {
 			const {attachment} = entry;
+			if (attachment.kind === 'instructions') {
+				instructions.apply(attachment);
+				continue;
+			}
+
+			if (attachment.kind === 'nested-memory') {
+				instructions.nest(attachment.file);
+				continue;
+			}
+
 			if (attachment.kind === 'invoked-skills') {
 				for (const skill of attachment.skills) {
 					skills.add(skill);

@@ -69,6 +69,7 @@ async function main(): Promise<void> {
 			index: {type: 'string'},
 			pick: {type: 'string'},
 			lines: {type: 'string'},
+			context: {type: 'string'},
 		},
 	});
 
@@ -106,6 +107,7 @@ async function main(): Promise<void> {
 		allProjects: values['all-projects'],
 		since: parseSince(values.since),
 		session: values.session,
+		contextDir: values.context === undefined ? undefined : path.resolve(values.context),
 		configDir,
 		disableAutoMemory: process.env.CLAUDE_CODE_DISABLE_AUTO_MEMORY,
 	});

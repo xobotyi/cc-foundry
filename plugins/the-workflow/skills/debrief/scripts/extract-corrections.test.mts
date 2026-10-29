@@ -1,11 +1,11 @@
-import {mkdir, mkdtemp, rm, utimes, writeFile} from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, rm, utimes, writeFile} from 'node:fs/promises';
 import {homedir, tmpdir} from 'node:os';
 import path from 'node:path';
 import {afterAll, beforeAll, describe, expect, onTestFinished, test} from 'vite-plus/test';
 import {indexRow, lineNumbers, parseSince} from './extract-corrections.mts';
 import {recurringErrors, type ToolErrorOccurrence} from './lib/errors.mts';
 import {type Candidate, extract, type ExtractOptions} from './lib/extract.mts';
-import type {JsonObject} from './lib/json.mts';
+import {type JsonObject, parseJson} from './lib/json.mts';
 import {frontmatterValue} from './lib/memory.mts';
 import {listProjects, projectDirs} from './lib/projects.mts';
 import type {Correction} from './lib/session.mts';
@@ -54,7 +54,20 @@ const unattributed = (at: string, text: string): Line => ({
 });
 const LATE: Line = {...human('2026-10-20T10:00:00Z', 'late follow-up'), uuid: 'u-late', cwd: `${PROJECT}/packages/api`};
 
+const LOADED: Line = {
+	type: 'attachment',
+	timestamp: '2026-10-01T09:59:59Z',
+	sessionId: 's1',
+	attachment: {
+		type: 'instructions',
+		files: [
+			{type: 'Project', path: `${PROJECT}/.claude/worktrees/feature/CLAUDE.md`, content: '# Acme\n\nKeep it pure.'},
+		],
+	},
+};
+
 const SESSION: readonly Line[] = [
+	LOADED,
 	human('2026-10-01T10:00:00Z', 'build the feature'),
 	assistant(
 		'2026-10-01T10:00:01Z',
@@ -264,6 +277,7 @@ async function extractFrom(project: string, options: Partial<ExtractOptions> = {
 		allProjects: false,
 		since: 0,
 		session: undefined,
+		contextDir: undefined,
 		configDir,
 		disableAutoMemory: undefined,
 		...options,
@@ -425,6 +439,15 @@ describe('extract', () => {
 			['subdirectory correction', repoRoot],
 			['linked worktree correction', repoRoot],
 		]);
+	});
+
+	test('names the instruction files loaded at a correction, with their state on disk', async () => {
+		const contextDir = path.join(configDir, 'context');
+		const [rejection] = await correctionsFrom(PROJECT, {contextDir});
+		const set = parseJson(await readFile(String(rejection?.loaded), 'utf8'));
+
+		expect(set).toMatchObject({files: [{type: 'Project', path: `${PROJECT}/CLAUDE.md`, state: 'missing'}]});
+		expect(JSON.stringify(set)).toMatch(/"recorded":"[^"]+\/versions\/[0-9a-f]{8}\.md"/);
 	});
 
 	test('names a repository no session ran in', async () => {
