@@ -18,6 +18,7 @@ describe('parseEntry', () => {
 				timestamp: '2026-10-01T10:00:00Z',
 				cwd: '/work',
 				origin: {kind: 'human'},
+				promptSource: 'typed',
 				message: {role: 'user', content: 'fix it'},
 			}),
 		);
@@ -36,6 +37,7 @@ describe('parseEntry', () => {
 			isMeta: false,
 			isCompactSummary: false,
 			origin: {kind: 'human'},
+			promptSource: 'typed',
 		});
 	});
 

@@ -34,6 +34,8 @@ export type UserEntry = EntryBase & {
 	readonly isCompactSummary: boolean;
 	/** Undefined when the entry carries no `origin` field. */
 	readonly origin: Origin | undefined;
+	/** How the user produced the prompt: `typed`, or `suggestion_accepted` for a prompt the CLI predicted. */
+	readonly promptSource: string | undefined;
 };
 
 /** A text block of an assistant message. */
@@ -191,6 +193,7 @@ export function parseEntry(line: string): Entry | undefined {
 				isMeta: raw.isMeta === true,
 				isCompactSummary: raw.isCompactSummary === true,
 				origin: 'origin' in raw ? originOf(raw.origin) : undefined,
+				promptSource: stringOf(raw.promptSource),
 			};
 		}
 		case 'assistant': {

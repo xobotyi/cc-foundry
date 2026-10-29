@@ -49,4 +49,18 @@ describe('sessionCandidates', () => {
 
 		expect(candidate).toMatchObject({signal: 'follow-up', said: `…${message.slice(-600)}`});
 	});
+
+	test('skips a prompt the user accepted from the CLI suggestion, which still ends the turn', async () => {
+		const candidates = await candidatesOf([
+			human('00', 'open'),
+			said('01', 'Tests pass.'),
+			human('02', 'commit it', {promptSource: 'suggestion_accepted'}),
+			said('03', 'Committed.'),
+			human('04', 'no, amend instead', {promptSource: 'typed'}),
+		]);
+
+		expect(candidates).toStrictEqual([
+			expect.objectContaining({signal: 'follow-up', text: 'no, amend instead', said: 'Committed.'}),
+		]);
+	});
 });
