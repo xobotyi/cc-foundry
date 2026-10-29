@@ -163,7 +163,9 @@ matching nothing warns; for `add`, `remove`, `update`, `prune`, and `pm licenses
 - **`[install.security] scanner = "<package>"`** — runs a scanner before installation, cancels the install on a fatal
   finding, and disables auto-install while configured.
 - **`bun audit`** lists advisories; **`bun audit fix`** (from 1.4.0) upgrades to a safe version and installs, reporting
-  what a dependent's range blocks. `--latest` allows a major bump, `--dry-run` previews.
+  what a dependent's range blocks. `--latest` allows a major bump, `--dry-run` previews. A scope that `[install.scopes]`
+  routes to a registry with no advisory endpoint goes unaudited: Bun lists its packages as skipped, prints
+  `No vulnerabilities found`, and exits 0, so a gate on the exit code passes (1.4.4).
 - **`bun pm diff <pkg>`** (from 1.4.0) diffs two versions of a package, leading with the changed files, any new install
   scripts, and any new imports of `child_process`, `fs`, `net`, or `vm`. Minified files are un-minified before the diff.
 - **`bun pm licenses`** (from 1.4.0) groups dependencies by license; `--json` and `--prod` apply.
