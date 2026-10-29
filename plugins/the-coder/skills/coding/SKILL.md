@@ -14,8 +14,7 @@ compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_t
 
 # Coding
 
-**Discover before assuming. Verify before shipping.** Every coding failure traces to acting on assumptions instead of
-evidence, declaring done without verification, or burning context on noise.
+**Discover before assuming. Verify before shipping.**
 
 **Less code, less execution.** Of two correct changes, take the one that leaves less code, runs less, and allocates
 less; a deletion beats an addition. Count concepts a reader holds, never characters. Never add code to run less: a
@@ -326,8 +325,6 @@ not its prose.
 
 ## Integration
 
-This skill runs before the language skill and again before you declare done. It governs the shape of the work — what to
-read, how to split it, when to commit, what may be a comment, what proves completion. The language skill governs syntax,
-idiom, toolchain, and which symbols need a doc, and it wins on anything language-specific.
-
-Return to the verification protocol above before declaring any task complete.
+This skill runs before the language skill and again before you declare done. It governs the shape of the work. The
+language skill governs syntax, idiom, toolchain, and which symbols need a doc, and it wins on anything
+language-specific.
