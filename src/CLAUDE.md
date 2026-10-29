@@ -46,7 +46,8 @@ vp run typecheck   # tsc
   `relevance`, `headers`, `headersHelper` ([ADR 1.12](/design-docs/adr/1.12-plugin-metadata-source.md))
 - `renames-history` — every plugin name in the git history of `marketplace.json` is listed today or is a `renames` key
 - `license` — each plugin's `LICENSE` is byte-identical to the root `LICENSE`
-- `readme-install` — each plugin README carries the install commands the root `CLAUDE.md` prescribes, for its own name
+- `readme-install` — each plugin README carries the install command `.claude/rules/plugin-readme.md` prescribes, for its
+  own name
 - `default-paths` — no manifest key names the location Claude Code reads by default, such as
   `"lspServers": "./.lsp.json"`
 - `hook-exec-form` — a hook command that names `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}` sets `args`, so no
