@@ -177,9 +177,6 @@ the behavior of committed code before a change. They are a unit of their own. Co
 3. If a check fails, correct the problem first. Do not commit defective code.
 4. If all checks pass, start the Commit Loop.
 
-Keep the gate results out of the commit message. They are session artifacts. The commit-message conventions give the
-rule.
-
 Read `<pipeline-awareness>` again after you return from the fixes. Then continue at the first step of the Commit Loop.
 Do not start the pipeline again. Do not skip a step.
 
@@ -190,9 +187,8 @@ Do not start the pipeline again. Do not skip a step.
 loop then makes several commits. The working tree holds every unit during the loop, so a check that
 runs inside the loop still tests the full tree, and not the staged unit.
 
-The split test asserts that each unit builds and passes alone. This pipeline does not measure that assertion, and a
-check inside the loop cannot measure it either. A wrong split leaves a broken commit in the middle of the history, and
-`git bisect` finds it much later.
+The split test asserts that each unit builds and passes alone. This pipeline does not measure that assertion. A wrong
+split leaves a broken commit in the middle of the history, and `git bisect` finds it much later.
 
 Two habits keep the risk low. Commit a unit before the unit that depends on it. Give more care to the split test when a
 unit removes code, changes a signature, or moves a symbol, because these three cases break the callers that a later unit
@@ -211,8 +207,7 @@ git add <files>
 ```
 
 Give an explicit path for each file. Do not use `git add -p`: it opens an interactive prompt, and the Bash tool has no
-terminal to answer it. Do not send input into an interactive command through a pipe, because a piped command falls
-outside the tool permissions of this skill.
+terminal to answer it.
 
 To unstage the wrong file:
 
@@ -246,8 +241,7 @@ Leave the file of the other writer alone. Never commit a message file that holds
 </message-file>
 
 Write the reason first, in one paragraph. Then cut: delete each sentence that the diff shows, and each paragraph that
-walks the reader through the new procedure. A fact the next maintainer needs lives in the artifact -- a name, a test, a
-doc comment, or a project document -- not in the message.
+walks the reader through the new procedure.
 
 #### 4c. Self-Review
 
@@ -273,18 +267,11 @@ P3.1: keep -- <the fact that it records>
 P3.2: cut -- inventory of the diff
 ```
 
-A paragraph earns `keep` only when it records one of these facts:
+A paragraph earns `keep` only when it records the cause of the change, or an item of the earns-its-lines list in the
+commit-message conventions.
 
-- The cause of the change.
-- A second reason that another paragraph does not carry.
-- A `BREAKING:` declaration, or a step of the migration path.
-- A behavior change that the subject cannot predict, such as the new meaning of an absent value.
-- The work that follows in the chain, in one line.
-
-A paragraph can hold a list. One unit that changes several behaviors gives one line to each change. Audit such a
-paragraph line by line, as `P3.1` and `P3.2` above. A line that names a file, a function, or a test inventories the
-diff. Cut it. A line that states the old behavior beside the new one duplicates the diff. Cut the contrast and keep the
-new behavior, unless the old behavior is the cause of a fix or the thing that a `BREAKING:` change removes.
+A paragraph can hold a list, with one line for each behavior change. Audit such a paragraph line by line, as `P3.1` and
+`P3.2` above, against the list rules of the commit-message conventions.
 
 A paragraph gets `cut` when it names a function, a call order, an empty case, a fallback, or a flag that gates the new
 code. Such a paragraph reports the procedure, and the staged diff shows the procedure. Move the fact into the artifact
@@ -309,11 +296,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.mts --file <message f
   the exit status tells you nothing about the message.
 - Correct each ERROR before you continue.
 - A WARN is a recommendation. Correct it when the correction is reasonable.
-- Do not commit until the validator reports no error.
 
-The validator checks the subject length, the trailing period, the filler tics of the subject, the blank line after the
-subject, the presence of a body, and the required trailers. It does not check the ASCII rule, the 72-character body
-wrap, the scope format, the register, or AI attribution. You own those.
+The validator does not check the ASCII rule, the 72-character body wrap, the scope format, the register, or AI
+attribution. You own those.
 
 </mandatory>
 
@@ -348,10 +333,7 @@ committed.
 
 ## Breaking Changes
 
-A commit that breaks backward compatibility starts its body with `BREAKING:`. The body gives the migration path. The
-commit-message conventions define the format.
-
-Prefer a migration series when you can stage the break:
+Prefer a migration series to one breaking commit when you can stage the break:
 
 1. Add the new code. Keep the old code.
 2. Move the callers to the new code.
