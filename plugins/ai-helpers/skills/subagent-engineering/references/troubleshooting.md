@@ -19,6 +19,7 @@ background agents, worktree isolation, and the Agent SDK.
 - **Task coordination failure** → [Agent Teams](#agent-teams)
 - **Background agent status unknown** → [Background Agents](#background-agents)
 - **Worktree branch conflict** → [Worktree Isolation](#worktree-isolation)
+- **Worktree agent cannot find the caller's changes** → [Worktree Isolation](#worktree-isolation)
 - **SDK `settingSources` missing** → [Agent SDK](#agent-sdk)
 - **Hook not firing** → [Hooks Configuration](#hooks-configuration)
 - **Context exhaustion** → [Context Issues](#context-issues)
@@ -298,6 +299,19 @@ Fix:
 
 - This is expected behavior. Merge or cherry-pick from the worktree branch into main after the agent completes.
 - Do not expect the main session to see worktree file changes directly.
+
+### Worktree agent cannot find the caller's changes
+
+Cause: the worktree checks out committed files only. From Claude Code 2.1.133 it branches from the remote's default
+branch unless the `worktree.baseRef` setting is `"head"`, so unpushed commits, uncommitted edits, and untracked files in
+the main checkout are absent. Where an older version of a file exists on the base, the agent works on that version and
+reports no error.
+
+Fix:
+
+- Commit the work the agent must see, set `worktree.baseRef` to `"head"`, then spawn the agent.
+- List the gitignored files the agent needs, such as `.env`, in `.worktreeinclude`; it copies only files that are
+  gitignored.
 
 ---
 
