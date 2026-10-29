@@ -1,341 +1,206 @@
 # cc-foundry
 
-Plugins that make Claude Code better at its job.
+Plugins that give Claude Code a working discipline (how it codes, commits, plans, and writes) and the language and
+platform knowledge to apply it. It is the set its author works with every day, made public, and its rules come with
+their reasons.
 
-Claude Code does a lot out of the box, and it still has gaps: it forgets skills mid-session, produces messy commits,
-turns AI-artifact work into trial and error, and ships code without validation. These plugins close those gaps.
+Left to its defaults, Claude skips the skill that holds the answer and forgets the ones it loaded. It commits an hour of
+work as one unit, writes JavaScript from twenty years of the language at once, and resumes after your lunch break as
+though you never left. Each plugin below targets one failure like these. Some of them are measured: across four frontier
+models, agents opened a repository's AI policy file in 3.5% of unaided runs, and the `open-source` plugin starts from
+that number.
 
-## Installation
+Foundry is built for Claude Code, and the hooks, output styles, status line, and language-server configs work only
+there. Most of the skills adapt to other agents with little work: each one is a folder with a `SKILL.md` and any
+references it carries, and the usual changes are where it reads project rules (`CLAUDE.md`) and how it loads the skills
+it depends on. The exceptions are the few skills whose subject is Claude Code itself, such as `claude-md` and
+`output-style-engineering`.
 
-Install any plugin in one step. The command adds the marketplace the first time:
+## Start Here
+
+Install what matches your work. Each command adds the marketplace the first time it runs.
+
+- **You write code** — `the-coder` for the workflow, `git-commit` for the history, `skill-enforcer` so the skills load
+  when the work calls for them, and your language: `golang`, `javascript`, `php`, `python`, or `rust`.
+- **You build prompts, skills, agents, or output styles** — `ai-helpers`.
+- **You plan work before anyone builds it** — `the-blueprint`.
+- **Your sessions run long or unattended** — `wall-clock` for the time, `the-statusline` for context and rate limits,
+  and `the-workflow` for handoffs between sessions.
 
 ```
-/plugin install <plugin-name> --marketplace xobotyi/cc-foundry
+/plugin install the-coder --marketplace xobotyi/cc-foundry
+/plugin install git-commit --marketplace xobotyi/cc-foundry
+/plugin install skill-enforcer --marketplace xobotyi/cc-foundry
+/plugin install golang --marketplace xobotyi/cc-foundry
 ```
 
-### Updates
+Swap `golang` for your language.
+
+## Built From Daily Use
+
+Foundry grows out of its author's own work. A plugin exists because a real workflow needed it, and it is maintained as
+part of a working setup: fixed when it fails in use, changed when the work changes. Nothing here was built to fill a
+catalog or to chase attention.
+
+The repository itself is developed with these plugins, so it doubles as a sample of what they produce.
+[`.claude/settings.json`](.claude/settings.json) enables eight of them for every session opened here, and the commit log
+is `git-commit` output. A fix from the status line, cause first, then what the user saw
+([ae8e706](https://github.com/xobotyi/cc-foundry/commit/ae8e706)):
+
+```
+[the-statusline] keep the root when collapsing an absolute path
+
+Collapsing cut each directory segment to its first character, and the
+empty segment before a leading slash became undefined, which the posix
+join rejects. A working directory outside home and the project crashed
+the renderer on a narrow pane, leaving the status line blank.
+```
+
+The decisions about how the skills are written live in [`design-docs/adr/`](design-docs/adr/), kept with the
+`the-blueprint` plugin's `adr` skill and indexed in [`design-docs/ADR.md`](design-docs/ADR.md) for every session.
+
+## Workflow
+
+### the-coder
+
+Claude writes code before it reads what exists: it guesses at APIs, skips tests, and multiplies abstractions. The
+`coding` skill enforces a discovery-first workflow (discover, plan, implement, verify), and the `software-engineer`
+output style carries the peer-engineering register and the skill queue. Every language plugin runs on top of it.
+[Read more](plugins/the-coder/)
+
+### skill-enforcer
+
+Claude skips skills and forgets them mid-session. Lifecycle hooks make it check which skills apply at every checkpoint:
+your prompt, after it reads a file, after it edits one, and after it loads a skill. When the work shifts from coding to
+testing, it goes back to the references it has not read. [Read more](plugins/skill-enforcer/)
+
+### git-commit
+
+An hour of work lands as one commit under a message that says nothing. The `commit` skill splits the diff into the
+smallest units it judges to keep the tree working, orders them, and audits every message body paragraph by paragraph
+against the staged diff, so a body that narrates the code gets cut before it is committed.
+[Read more](plugins/git-commit/)
+
+### the-blueprint
+
+Planning comes out too shallow or too detailed. The DRAFT pipeline (Discovery → Research → Alignment → Frame → Tasks)
+moves an idea through approval gates to sized work items. Standalone skills cover tracker items (`task-creation`),
+shared vocabulary (`glossary`), living decision records (`adr`), YouTrack behavior (`youtrack`), and diagrams
+(`diagramming`). [Read more](plugins/the-blueprint/)
+
+### the-workflow
+
+The mechanics of working with Claude Code across sessions. `claude-md` owns CLAUDE.md and `.claude/rules/`, starting
+from which files load when and what survives compaction. `handoff` writes a 500–2000-token transfer document when work
+crosses a context boundary, and `debrief` turns the corrections you made into rules the agent reads next time, after you
+approve them. [Read more](plugins/the-workflow/)
+
+### the-writer
+
+Agent prose carries tells, and readers discount the substance along with the style. The `humanize` skill traces them to
+the post-training pressures that produce them, and decides whether a text should be edited before it decides what to
+edit. [Read more](plugins/the-writer/)
+
+### open-source
+
+Contributing to a project you don't maintain means following rules that live outside its code. `issue-writing` and
+`pr-contribution` start from the project's own files and draft reports and pull requests for a human to submit.
+[Read more](plugins/open-source/)
+
+## Session
+
+### wall-clock
+
+Claude Code gives the model today's date and nothing else about time. Hooks inject the wall clock on every prompt, with
+how long you were away, and once a minute during a long turn. [Read more](plugins/wall-clock/)
+
+### the-statusline
+
+A two-row status line: output style, model and effort, session cost, context left, the rate limit closest to running
+out, working directory, git branch, and lines changed. The color grows more urgent as context or limits run low.
+[Read more](plugins/the-statusline/)
+
+### plugin-rollcall
+
+A plugin a repository enables can be missing from your sessions in a fresh clone or a new worktree until you type
+`/reload-plugins`. This mod runs the reload at session start and holds your first prompt until it completes. Install it
+at user scope. [Read more](plugins/plugin-rollcall/)
+
+## AI Artifacts
+
+### ai-helpers
+
+Skills for each artifact you build for an agent: `prompt-engineering` as the foundation, then `skill-engineering`,
+`subagent-engineering`, `output-style-engineering`, and `prompt-terser` for a retrospective audit. The `ai-engineer`
+output style sets the register for the work. [Read more](plugins/ai-helpers/)
+
+## Languages
+
+Each language plugin ships a language-server configuration for semantic navigation; its README names the server to
+install.
+
+### golang
+
+Conventions, error handling, interfaces, generics, concurrency, and testing, written for the version the module's `go`
+directive permits. Library skills: `templ`, `charm-tui` for the Charmbracelet v2 stack, and `zog`.
+[Read more](plugins/golang/)
+
+### javascript
+
+Claude writes JavaScript from twenty years of the language at once. `javascript`, `typescript`, `nodejs`, `bun`, and
+`vitest` hold it to the baseline and the runtime version the project declares. [Read more](plugins/javascript/)
+
+### php
+
+PHP 8.5 and later: `php` for the language, Composer, and PSR conventions, with `phpunit` and `pest` for tests.
+[Read more](plugins/php/)
+
+### python
+
+Python 3.14 and later: `python` for idioms, typing, and packaging with uv and ruff, with `pytest` for tests.
+[Read more](plugins/python/)
+
+### rust
+
+The 2024 edition: `rust` for ownership, error handling, traits, and concurrency (threads and rayon for CPU work, Tokio
+for I/O), with `rust-testing` for tests. [Read more](plugins/rust/)
+
+## Platforms
+
+### frontend
+
+`css`, `tailwindcss` (v4), `react`, `vue`, `svelte` (Svelte 5), and `accessibility` (WCAG 2.2), plus `frontend-design`
+for which visible choice to make and how to verify the render across widths and states. [Read more](plugins/frontend/)
+
+### backend
+
+`observability` for the practice of logging, metrics, and tracing together, with `prometheus`, `statsd`, and
+`otel-tracing` for the tools. [Read more](plugins/backend/)
+
+### grafana
+
+The other side of `backend`: querying, visualizing, and alerting on telemetry through Grafana. Skills: `dashboards`,
+`promql`, `metricsql`, `logsql`, `alerting`, `provisioning`, and `dataviz`. [Read more](plugins/grafana/)
+
+### cli
+
+`cli` designs command-line interfaces in any language: arguments, output streams, exit codes, configuration, and
+signals. `shell-scripting` writes the scripts: strict mode, quoting, portability, and error handling.
+[Read more](plugins/cli/)
+
+### infrastructure
+
+Without domain knowledge, agents ship configurations with insecure defaults, no idempotency, and naive networking.
+`devops` governs the change itself, from target identity to the evidence that closes it, and stays active beside the
+tool skill: `ansible`, `containers`, `proxmox`, `unraid`, or `networking`. [Read more](plugins/infrastructure/)
+
+## Updates
 
 Claude Code does not update plugins from this marketplace in the background until you turn it on. Run `/plugin`, open
 the **Marketplaces** tab, select **foundry**, and select **Enable auto-update**.
 
 To update by hand, select **Update marketplace** on the same screen. It refreshes the plugin list and updates every
 plugin you installed from foundry. From the shell, `claude plugin update <plugin-name>@foundry` updates one plugin.
-
-## Workflow Plugins
-
-### skill-enforcer
-
-Claude skips skills and forgets about them mid-session. This plugin injects a Skill Enforcement Framework via lifecycle
-hooks that forces Claude to evaluate which skills apply at every checkpoint: user prompt, after reading files, after
-editing, and after loading skills. The framework treats skills as non-atomic, so a phase shift from coding to testing
-sends Claude back to the unread references of skills it already loaded.
-
-```
-/plugin install skill-enforcer --marketplace xobotyi/cc-foundry
-```
-
----
-
-### git-commit
-
-Messy commits — mixed changes, vague messages, wrong order. The `/git-commit:commit` skill runs a five-stage pipeline:
-identify logical units in the diff, plan commit order (style to refactor to fix to feature), run quality gates, then a
-per-unit loop of stage, draft, self-review, validate, commit — and finally verify. The distinguishing step is the body
-audit: before each commit the drafted message is checked paragraph by paragraph against the staged diff, with a visible
-`keep` or `cut` verdict, so a body that documents the code instead of recording the reason gets caught rather than
-committed.
-
-```
-/plugin install git-commit --marketplace xobotyi/cc-foundry
-```
-
----
-
-### open-source
-
-Contributing to a project you don't maintain means following rules that live outside the code, and agents mostly don't
-find them — measured across four frontier models, agents opened a repository's AI policy file in 3.5% of unaided runs.
-Two skills handle the artifacts maintainers see: `issue-writing` (routing a report to the right channel, the evidence
-bar, bug and feature and vulnerability shapes) and `pr-contribution` (finding and obeying the project's rules, earning a
-reviewer, titles and descriptions, fork mechanics). Both start from the project's own files and draft for a human to
-submit. Neither treats machine authorship as a defect to hide, and neither touches implementation or commit messages,
-which stay with `the-coder` and `git-commit`.
-
-```
-/plugin install open-source --marketplace xobotyi/cc-foundry
-```
-
----
-
-### the-blueprint
-
-Planning is either too shallow or too detailed. This plugin implements the **DRAFT** methodology (Discovery → Research →
-Alignment → Frame → Tasks), a pipeline whose artifacts are consumable by both humans and agents. Discovery stress-tests
-ideas, research investigates the codebase blind to intent, alignment surfaces patterns for human correction, frame
-enforces vertical-slice implementation phases, and tasks decompose phases into sized work items. Each stage builds on
-the previous with explicit approval gates. Five standalone skills sit alongside the pipeline: `task-creation` (what a
-tracked item says — the reader it targets, the verification behind every claim, the location and acceptance criteria,
-and the approval gate before creation), `glossary` (shared project vocabulary that prevents naming drift), `adr`
-(architecture decision records kept as living documents, with an index every agent session loads), `youtrack` (YouTrack
-behavior an agent has to know: what a project configures, what a write changes besides the field it names, and which
-failures report success), and `diagramming` (Excalidraw and Mermaid with visual design principles).
-
-```
-/plugin install the-blueprint --marketplace xobotyi/cc-foundry
-```
-
----
-
-### the-coder
-
-Claude writes code before understanding what exists: guessing at APIs, skipping tests, multiplying abstractions. This
-plugin provides a `coding` skill that enforces a discovery-first workflow (Discover, Plan, Implement, Verify) and a
-`software-engineer` output style that carries the peer-engineering register and the skill queue. Every language-specific
-skill runs on top of it.
-
-```
-/plugin install the-coder --marketplace xobotyi/cc-foundry
-```
-
----
-
-### the-statusline
-
-No visibility into context window usage, rate limits, cost, or model. This plugin installs a two-row status line to your
-user-level Claude configuration showing output style, model and effort, session cost, context left, the rate limit
-closest to running out, working directory, git branch, and lines changed. The layout adapts to the terminal width, and
-color urgency increases as context or rate limits run low. Auto-syncs on every session start and survives agent
-directory changes.
-
-```
-/plugin install the-statusline --marketplace xobotyi/cc-foundry
-```
-
----
-
-### the-workflow
-
-Agentic workflow mechanics — the foundational skills that make working with Claude Code effective across sessions and
-teams. The `claude-md` skill owns the CLAUDE.md and `.claude/rules/` artifacts, starting from the loading model that
-most advice about them gets wrong: which files reach the session at launch, which wait for a file to be read, what
-survives compaction, and which split actually reclaims context. From there it covers layer routing, what belongs in the
-file, trimming, and an ordered diagnosis for a rule that is written down and still ignored. The `handoff` skill produces
-structured transfer documents for the moments when work crosses a context boundary: a session restart, a teammate
-delegation, an async resumption. Each document carries the decisions, constraints, and remaining work in 500-2000 tokens
-and drops the noise. The `debrief` skill reads the session transcripts for the places where the user corrected the
-agent, in this repository or across all of them, and turns each lesson that outlives its task into a rule in the file
-the agent reads next time, after the user approves it.
-
-```
-/plugin install the-workflow --marketplace xobotyi/cc-foundry
-```
-
----
-
-### the-writer
-
-Agent-written prose carries fingerprints: inflated significance, hedged comparisons, participle padding, chat-register
-leaks, leftover citation tokens. Readers notice them and discount the substance along with the style. The `humanize`
-skill traces these tells to the six post-training pressures that produce them, so the agent catches variants no flat
-list would name — and decides whether to edit before deciding what to edit, because model editing measurably improves
-weak drafts and damages strong ones. Hard constraints: never fabricate specifics, never inject voice the source lacked,
-conserve every claim, fix writing for readers and never for AI detectors.
-
-```
-/plugin install the-writer --marketplace xobotyi/cc-foundry
-```
-
----
-
-### wall-clock
-
-Claude Code tells the model today's date and nothing else about time: no clock, no timezone, no sense of elapsed time.
-So the agent resumes after your lunch break as though you never left, and finishes an hour of unattended work unable to
-say how long it took. This plugin injects the wall clock on every prompt (`away`, the gap since it last spoke) and once
-a minute during a turn (`turn`, elapsed since your prompt landed). Every figure is computed in the hook from the
-transcript Claude Code already writes, so the model never subtracts timestamps and no state file can go stale. Tick
-period is configurable.
-
-```
-/plugin install wall-clock --marketplace xobotyi/cc-foundry
-```
-
-### plugin-rollcall
-
-A plugin that a repository enables in its `.claude/settings.json` can be missing from your sessions there until you type
-`/reload-plugins`: Claude Code skips it at startup when no install record exists for your user or for that project's
-path, which is the usual state in a fresh clone or a new worktree. This mod checks the enabled plugins against the
-install records at session start, runs the reload for you, holds your first prompt until it completes, and names the
-plugins it reloaded. It only reads, and it does nothing in sessions where every enabled plugin has an install record.
-Install it at user scope.
-
-```
-/plugin install plugin-rollcall --marketplace xobotyi/cc-foundry
-```
-
-## AI Artifact Plugins
-
-### ai-helpers
-
-Creating prompts, skills, agents, and output styles is guesswork without structured guidance. This plugin provides
-skills encoding best practices for each artifact type: `prompt-engineering` (foundation), `skill-engineering`,
-`subagent-engineering`, `output-style-engineering`, and `prompt-terser` (retrospective audit). All skills build on
-prompt-engineering fundamentals. Includes an `ai-engineer` output style for collaborative artifact work.
-
-```
-/plugin install ai-helpers --marketplace xobotyi/cc-foundry
-```
-
-## Language Discipline Plugins
-
-### golang
-
-Go's idioms differ from what other languages teach, and the common pitfalls follow: premature abstraction, incorrect
-error handling, interface misuse, concurrency bugs. This plugin provides a `golang` skill covering conventions, error
-handling, interfaces, generics, concurrency, testing, and project structure, with per-version references so it writes
-code the module's `go` directive permits, plus library skills: `templ` for type-safe HTML templating, `charm-tui` for
-terminal UIs with the Charmbracelet v2 stack (Bubble Tea, Bubbles, Lip Gloss, Huh, Glamour), and `zog` for schema
-validation.
-
-```
-/plugin install golang --marketplace xobotyi/cc-foundry
-```
-
----
-
-### javascript
-
-Claude writes JavaScript from twenty years of the language at once, and the wrong choice rarely fails loudly — the value
-coerces, the runtime warns, the test passes. Five skills fix a baseline instead: `javascript` (the language, gated on
-the engine baseline a project declares), `typescript` (the type system, `tsconfig`, and the compiler), `nodejs` (the
-runtime, gated on `engines.node`, with the stability index of every API it names), `bun` (the runtime and its
-toolchain), and `vitest` (Vitest, carrying the configuration renames across majors). Ships a
-`typescript-language-server` config and the LSP-first navigation rules that use it. Skills activate automatically based
-on file context.
-
-```
-/plugin install javascript --marketplace xobotyi/cc-foundry
-```
-
----
-
-### php
-
-PHP language discipline targeting 8.5+. Three skills cover the full PHP surface: `php` handles conventions, type
-declarations (union, intersection, DNF), enums, readonly classes, property hooks, closures, Fibers, error handling,
-Composer, PSR-4/PER-CS, and project structure; `phpunit` handles PHPUnit testing conventions (test structure, data
-providers, assertions, stubs vs mocks, attributes, configuration); and `pest` handles the Pest framework (function-style
-tests, the `expect()` API, datasets, architecture/mutation/type-coverage/browser testing). Bundled Intelephense LSP for
-semantic code navigation.
-
-```
-/plugin install php --marketplace xobotyi/cc-foundry
-```
-
----
-
-### python
-
-Python language discipline targeting 3.14+. Two skills divide it: `python` handles conventions, modern idioms, type
-annotations (built-in generics, `|` unions, protocols), data classes, pattern matching, exception handling, packaging
-(pyproject.toml, uv, ruff), and project structure, while `pytest` handles testing conventions (fixtures, parametrize,
-markers, mocking, async testing, conftest patterns).
-
-```
-/plugin install python --marketplace xobotyi/cc-foundry
-```
-
----
-
-### rust
-
-Rust language discipline targeting the 2024 edition. Two skills cover the language and its test ecosystem: `rust`
-handles ownership and borrowing, error handling (`thiserror`/`anyhow`), traits and generics, iterators, concurrency
-(CPU-bound parallelism with threads/rayon vs I/O-bound async with Tokio), the cargo/clippy/rustfmt toolchain, and Rust
-2024 edition specifics, while `rust-testing` covers testing conventions (unit/integration/doctest layout, cargo-nextest,
-proptest, insta, criterion, mockall, rstest). Bundled rust-analyzer LSP for semantic code navigation.
-
-```
-/plugin install rust --marketplace xobotyi/cc-foundry
-```
-
-## Platform Discipline Plugins
-
-### frontend
-
-Browser development requires knowledge beyond general programming: CSS layout systems, accessibility standards,
-framework-specific patterns. This plugin provides seven skills: `css` (conventions, layout, SCSS/SASS, responsive
-design, methodologies), `tailwindcss` (Tailwind v4 CSS-first config, `@theme` tokens, class composition), `react`
-(component patterns, hooks, state, performance, testing), `vue` (Composition API, reactivity, composables), `svelte`
-(Svelte 5 runes, SvelteKit conventions), `accessibility` (WCAG 2.2, ARIA, semantic HTML, keyboard navigation), and
-`frontend-design` (which visible choice to make, inherited defaults, interface copy, render verification across widths
-and states). Keeps platform discipline separate from language discipline.
-
-```
-/plugin install frontend --marketplace xobotyi/cc-foundry
-```
-
----
-
-### backend
-
-Building reliable services requires consistent approaches to observability and instrumentation. Four skills:
-`observability` (the three pillars: logging, metrics, tracing; how they interconnect; high-level practice), `prometheus`
-(metric types, naming, labels, PromQL, alerting), `statsd` (metric types, UDP push model, DogStatsD extensions), and
-`otel-tracing` (spans, context propagation, instrumentation, sampling, semantic conventions). Technology-agnostic
-guidance in `observability`; tool-specific depth in the others.
-
-```
-/plugin install backend --marketplace xobotyi/cc-foundry
-```
-
----
-
-### grafana
-
-The observability consumption stack — querying, visualizing, alerting on, and managing telemetry through Grafana. Seven
-skills cover the full surface: `dashboards` (JSON model, panels, variables, transformations), `promql` (Prometheus query
-writing, native histograms, optimization), `metricsql` (VictoriaMetrics PromQL superset: behavioral diffs, rollup
-extensions, WITH templates), `logsql` (VictoriaLogs log querying: filters, pipes, stats), `alerting` (unified alerting,
-notification routing, templates), `provisioning` (file YAML, HTTP API, gcx CLI, Terraform), and `dataviz` (encoding
-hierarchy, color theory, dashboard layout, observability frameworks). Companion to `backend` — backend produces
-telemetry, grafana consumes it.
-
-```
-/plugin install grafana --marketplace xobotyi/cc-foundry
-```
-
----
-
-### cli
-
-CLI platform discipline: command-line interface design, shell scripting conventions, and terminal UX patterns. Two
-skills split it by layer: `cli` handles the design layer (argument conventions, output streams, exit codes,
-configuration hierarchy, signal handling) for CLIs written in any language, while `shell-scripting` handles the
-implementation layer (strict mode, quoting, portability, error handling) for scripts written in shell.
-
-```
-/plugin install cli --marketplace xobotyi/cc-foundry
-```
-
----
-
-### infrastructure
-
-Ansible playbooks, Docker containers, Proxmox clusters, network segments: infrastructure work requires domain knowledge
-that generic coding assistants lack. Without it, agents produce configurations with insecure defaults, no idempotency,
-and naive networking. Six skills supply it: `devops` (the discipline of a change: target identity, a fresh plan, what
-"applied" does not prove, what a revert cannot reverse, credential scope, secrets and certificates, verifiers, recovery,
-and the evidence that closes a change), `ansible` (the ansible-core line a project pins, the 2.19 templating rules,
-idempotence and failure semantics, precedence, ansible-lint and Molecule), `containers` (Docker/Podman, Compose, image
-optimization, security), `proxmox` (VMs, LXC, storage backends, clustering, API automation), `unraid` (arrays, Docker,
-VMs, shares, plugins), and `networking` (what an nftables ruleset, a resolver zone, a proxy site, a forward-auth chain,
-a tunnel, or an IDS rule does once loaded: evaluation order, trust lists, and the second path around every filter). The
-devops skill and the tool skill are active together across the whole change.
-
-```
-/plugin install infrastructure --marketplace xobotyi/cc-foundry
-```
 
 ## License
 
