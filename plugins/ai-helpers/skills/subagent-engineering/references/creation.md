@@ -132,7 +132,9 @@ Only `name` and `description` are required. Everything else is optional.
 - `mcpServers` — MCP servers scoped to this subagent only
 - `hooks` — lifecycle hooks scoped to this subagent
 - `memory` — `user`, `project`, or `local` for persistent cross-session learning
-- `isolation` — `worktree` gives the subagent an isolated git worktree copy
+- `isolation` — `worktree` runs the subagent in a temporary git worktree of committed work. From Claude Code 2.1.133 it
+  branches from the remote's default branch unless the `worktree.baseRef` setting is `"head"`, which branches from the
+  local `HEAD`
 - `background` — `true` to always run as a background task
 - `effort` — `low`, `medium`, `high`, `max` (Opus 4.6 only)
 - `color` — UI color: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan`

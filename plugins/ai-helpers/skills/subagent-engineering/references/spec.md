@@ -40,8 +40,9 @@ required; all other fields are optional.
   first 200 lines / 25KB of `MEMORY.md` into system prompt; enables Read, Write, Edit for memory management.
 - **`background`** — `true` to always run as a background task. Default: `false`.
 - **`effort`** — Effort level: `low`, `medium`, `high`, `max` (Opus 4.6 only). Overrides session effort level.
-- **`isolation`** — `worktree` runs the subagent in a temporary git worktree (isolated copy of the repo). Worktree is
-  cleaned up automatically if the subagent makes no changes.
+- **`isolation`** — `worktree` runs the subagent in a temporary git worktree of committed work. From Claude Code 2.1.133
+  it branches from the remote's default branch unless the `worktree.baseRef` setting is `"head"`, which branches from
+  the local `HEAD`. Worktree is cleaned up automatically if the subagent makes no changes.
 - **`color`** — Display color in the task list and transcript: `red`, `blue`, `green`, `yellow`, `purple`, `orange`,
   `pink`, `cyan`.
 - **`initialPrompt`** — Auto-submitted as first user turn when this agent runs as the main session agent (via

@@ -267,8 +267,11 @@ tools: Read, Edit, Write, Bash
 
 **Behavior:**
 
-- Claude Code creates a temporary git worktree for the subagent
-- Subagent works on the isolated copy without touching the main branch
+- Claude Code creates a temporary git worktree for the subagent. From Claude Code 2.1.133 it branches from the remote's
+  default branch unless the `worktree.baseRef` setting is `"head"`, which branches from the local `HEAD`
+- The worktree checks out tracked files only. Uncommitted edits and untracked files in the main checkout never reach it;
+  `.worktreeinclude` (gitignore syntax) copies only files that match it and are gitignored
+- Subagent works on the isolated copy without touching the main checkout
 - Auto-cleaned up if the subagent makes no changes
 - If changes exist: branch and path are returned so the main agent can inspect or merge
 

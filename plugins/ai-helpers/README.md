@@ -74,7 +74,9 @@ empty report reads to them like a failed run — so the skill carries the calibr
 audit as a success, don't scale findings to input size, split the burden of proof between bright-line rules and judgment
 calls, and carry evidence for any claim of absence. Separately, an agent whose method mutates the tree — a test auditor
 running negative controls, anything that edits and reverts to prove a point — needs its own worktree and a
-restore-and-verify rule, because a crash mid-mutation strands a broken tree the caller believes is clean.
+restore-and-verify rule, because a crash mid-mutation strands a broken tree the caller believes is clean. That worktree
+holds committed work only, and by default only what the remote's default branch holds, so the skill has the caller
+commit the work and branch the worktree from `HEAD` before the agent starts.
 
 **Use when:** Creating custom agents, designing agent teams, debugging agent behavior, or deciding if a subagent is the
 right solution for a task.

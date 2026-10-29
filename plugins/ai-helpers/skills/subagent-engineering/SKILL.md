@@ -127,6 +127,10 @@ prover, anything running a negative control — needs `isolation: worktree`, not
 not two agents colliding but one agent crashing mid-mutation and stranding a broken tree that its caller believes is
 clean.
 
+- **The worktree holds committed work only.** From Claude Code 2.1.133 it branches from the remote's default branch
+  unless the `worktree.baseRef` setting is `"head"`, which branches from the local `HEAD`. Uncommitted edits never reach
+  it, and `.worktreeinclude` copies gitignored files only. Commit the work the agent must see and set `"head"` before
+  the spawn. Otherwise the agent works on code other than the work in progress and reports on it as if it were.
 - **Never end a run with a mutation in place.** If a tool error or a timeout interrupts a control, restoring the tree is
   the first action before anything else.
 - **Restore and verify.** Reverse the edit, then confirm with `git diff` that the file is back to its pre-mutation
