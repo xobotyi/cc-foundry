@@ -31,6 +31,8 @@ recovery depends on that the backup does not contain.
 - **Neither restic nor Borg coordinates with an application.** A database file inside a restic or Borg snapshot has the
   consistency of a power cut. Pre-backup hooks (engine dump, filesystem freeze, ZFS snapshot) are the operator's
   responsibility.
+- **Parity protects against a failed disk, not against deletion, corruption, or ransomware**; a deleted file is deleted
+  on parity too. Parity is not a backup and does not count toward any copy.
 
 ## Virtual machines and containers (Proxmox VE)
 
@@ -42,13 +44,6 @@ recovery depends on that the backup does not contain.
   message is `skip mount point`, not an error.
 - **A VM backup is disk and configuration.** It is not the running memory state, and a database inside it restores at
   the consistency of the mode above.
-
-## Unraid
-
-- **Parity protects against a failed disk, not against deletion, corruption, or ransomware**; a deleted file is deleted
-  on parity too. Parity is not a backup and does not count toward any copy.
-- **A New Config resets the array and invalidates parity**; the array is unprotected until the sync completes, and the
-  history a rebuild needs is cleared. Move data off a disk before removing it.
 
 ## State, secrets, and the recovery graph
 

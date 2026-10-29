@@ -1,7 +1,7 @@
 # infrastructure
 
 Infrastructure changes handled like production work, from the plan to the evidence that closes them, across Ansible,
-containers, Proxmox, Unraid, and network configuration.
+containers, Proxmox, and network configuration.
 
 ## The Problem
 
@@ -12,7 +12,7 @@ guarantees, naive networking assumptions.
 
 ## The Solution
 
-Six skills: one foundational discipline skill defining what good infrastructure work looks like, and five
+Five skills: one foundational discipline skill defining what good infrastructure work looks like, and four
 domain-specific skills targeting concrete tools and technologies. All enforce production-grade conventions,
 security-first defaults, and ground their guidance in official documentation.
 
@@ -53,13 +53,6 @@ Proxmox VE administration: VM and LXC provisioning, storage backends (ZFS/Ceph/L
 bridges, VXLAN/EVPN), clustering and high availability (Corosync, fencing, QDevice), API automation (pvesh, Terraform,
 cloud-init), backup strategies (vzdump, PBS with encryption and deduplication), PCIe/GPU passthrough (IOMMU, vGPU,
 Looking Glass), and security (firewall, RBAC, ACME certificates).
-
-### unraid
-
-Unraid server management: array configuration (parity, cache/SSD pools, write modes), Docker containers (macvlan/ipvlan,
-Compose, reverse proxy), VM management (GPU passthrough, IOMMU, performance tuning), shares and permissions, plugin
-ecosystem (Community Applications), user scripts, backup strategy (3-2-1 with Borgmatic/Kopia/Restic), UPS/NUT
-integration, and programmatic access (GraphQL API, MCP management agent).
 
 ### networking
 
