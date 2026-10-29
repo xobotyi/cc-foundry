@@ -5,7 +5,7 @@ import {afterAll, beforeAll, describe, expect, test} from 'vite-plus/test';
 import type {ToolErrorOccurrence} from './errors.mts';
 import {isObject, type Json, listOf, parseJson} from './json.mts';
 import {LoadedContext} from './loaded.mts';
-import {type Correction, sessionCandidates} from './session.mts';
+import {type Correction, type Retraction, sessionCandidates} from './session.mts';
 
 type Line = Readonly<Record<string, unknown>>;
 
@@ -44,7 +44,7 @@ afterAll(async () => {
 	await rm(dir, {recursive: true, force: true});
 });
 
-async function loadedPaths(candidate: Correction | ToolErrorOccurrence): Promise<Json[]> {
+async function loadedPaths(candidate: Correction | Retraction | ToolErrorOccurrence): Promise<Json[]> {
 	const set = parseJson(await readFile('loaded' in candidate ? String(candidate.loaded) : '', 'utf8'));
 	return listOf(isObject(set) ? set.files : undefined).map((file) => (isObject(file) ? (file.path ?? null) : null));
 }
@@ -52,11 +52,11 @@ async function loadedPaths(candidate: Correction | ToolErrorOccurrence): Promise
 async function candidatesOf(
 	entries: readonly Line[],
 	context?: LoadedContext,
-): Promise<Array<Correction | ToolErrorOccurrence>> {
+): Promise<Array<Correction | Retraction | ToolErrorOccurrence>> {
 	files += 1;
 	const file = path.join(dir, `${files}.jsonl`);
 	await writeFile(file, entries.map((entry) => JSON.stringify(entry)).join('\n'));
-	const candidates: Array<Correction | ToolErrorOccurrence> = [];
+	const candidates: Array<Correction | Retraction | ToolErrorOccurrence> = [];
 	for await (const candidate of sessionCandidates(file, 0, context)) {
 		candidates.push(candidate);
 	}
@@ -193,6 +193,23 @@ describe('sessionCandidates', () => {
 				signal: 'tool-error',
 				signature: 'Bash: zsh-nomatch',
 				did: ['Bash ls *.txt; echo done'],
+			}),
+		]);
+	});
+
+	test('reads an agent message that withdraws its own claim from the line that says so', async () => {
+		const candidates = await candidatesOf([
+			human('00', 'open'),
+			call('01', 'b1', 'npm test -- --once'),
+			said('02', 'Ran the suite.\n\nCorrection: the flag is `--run`; I was wrong about `--once`.\n\nRerunning.'),
+			said('03', 'All the correction candidates are listed.'),
+		]);
+
+		expect(candidates).toStrictEqual([
+			expect.objectContaining({
+				signal: 'retraction',
+				text: 'Correction: the flag is `--run`; I was wrong about `--once`.\n\nRerunning.',
+				did: ['Bash npm test -- --once'],
 			}),
 		]);
 	});
