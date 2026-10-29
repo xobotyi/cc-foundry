@@ -12,12 +12,19 @@ Every plugin version bump that lands on master ships with a GitHub release. The 
 — there are no CHANGELOG.md files (see [ADR 1.5](/design-docs/adr/1.5-plugin-changelog.md)). A pushed version bump
 without a release is an incomplete ship.
 
+## Before the Push
+
+Run `vp run cli check --pre-push` and push only when it reports no error. It fails on a plugin whose shipped files
+changed since `origin/master` while its version did not — a change that never reaches an install, because Claude Code
+keys its plugin cache on the version.
+
 ## When to Release
 
 - After every push to master, check the pushed range for plugin version bumps; create one release per plugin whose
   version changed.
 - The user's authorization to push covers release creation — do not ask a second time.
-- Repo-level changes that bump no plugin version (ADRs, root docs, `.dev/` tooling, this skill) get no release.
+- Repo-level changes that bump no plugin version (ADRs, root docs, the dev CLI in `src/`, CI, this skill) get no
+  release.
 - Several plugins bumped in one push → one release each.
 
 ## Identify What to Release
