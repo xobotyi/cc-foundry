@@ -106,8 +106,9 @@ before running Claude Code in a cloned repo.
   and `${CLAUDE_PLUGIN_DATA}`.
 - **Session** — `${CLAUDE_SESSION_ID}`, `${CLAUDE_EFFORT}`.
 
-`${CLAUDE_SKILL_DIR}` and `${CLAUDE_PROJECT_DIR}` substitute in **both** the body and Bash rules inside `allowed-tools`.
-Using the same variable in both places lets a bundled script run without a permission prompt:
+`${CLAUDE_SKILL_DIR}` and `${CLAUDE_PROJECT_DIR}`, and in plugin skills `${CLAUDE_PLUGIN_ROOT}` and
+`${CLAUDE_PLUGIN_DATA}`, substitute in **both** the body and Bash rules inside `allowed-tools`. Using the same variable
+in both places lets a bundled script run without a permission prompt:
 
 ```yaml
 allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/render.sh *)
