@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # constraint: yarn refuses a package version younger than its default npmMinimalAgeGate of one day
+    cooldown:
+      default-days: 1
+    groups:
+      npm-deps:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # constraint: @types/node's major is the Node major it types, and the plugin scripts' floor is Node 26 (ADR 1.13)
+      - dependency-name: '@types/node'
+        update-types:
+          - version-update:semver-major
