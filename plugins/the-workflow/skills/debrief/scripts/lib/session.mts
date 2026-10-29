@@ -1,7 +1,7 @@
 import {errorLine, errorSignature, type ToolErrorOccurrence} from './errors.mts';
 import {isObject} from './json.mts';
 import {repositoryOf} from './projects.mts';
-import {TEXT_LIMIT, truncate} from './text.mts';
+import {tail, TEXT_LIMIT, truncate} from './text.mts';
 import {type EntryBase, isSdk, type QueuedCommand, readEntries, type ToolUse, type UserEntry} from './transcript.mts';
 
 const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
@@ -93,7 +93,7 @@ export async function* sessionCandidates(
 		at: entry.timestamp,
 		signal,
 		text: truncate(text, TEXT_LIMIT),
-		said: truncate(said, SAID_LIMIT),
+		said: tail(said, SAID_LIMIT),
 		did,
 		skills: [...skills],
 	});
