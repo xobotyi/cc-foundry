@@ -23,7 +23,7 @@ vp run typecheck   # tsc
 **Flags:**
 
 - `--pre-push` — `unbumped-change` compares against `origin/master` instead of each plugin's latest release tag, and
-  fails instead of warning
+  fails instead of warning. CI passes it on a pull request, where `HEAD` is the merge into `master`
 - `--format` — `github` prints GitHub Actions annotations, and is the default when `GITHUB_ACTIONS` is set
 
 **Behavior:**

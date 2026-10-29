@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          cache: true
+      - run: vp check
+      - run: vp run typecheck
+      - run: vp test
+
+  plugin-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # constraint: the renames-history and unbumped-change rules read the full git history and the release tags
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          cache: true
+      - run: npm install -g @anthropic-ai/claude-code@latest
+      - run: vp run cli check ${{ github.event_name == 'pull_request' && '--pre-push' || '' }}
+
+  # constraint: the protect-master ruleset requires this job's check by name
+  ci-ok:
+    if: always()
+    needs: [lint-and-test, plugin-check]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: verify all jobs succeeded
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          [[ "$RESULTS" != *'"failure"'* && "$RESULTS" != *'"cancelled"'* ]]
