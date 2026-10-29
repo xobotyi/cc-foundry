@@ -1,6 +1,7 @@
 # javascript
 
-JavaScript and TypeScript discipline for Claude Code, with a bundled `typescript-language-server` configuration.
+JavaScript and TypeScript written for the baseline the project declares (the ECMAScript edition, the TypeScript release,
+the Node major), navigated through `typescript-language-server` instead of text search.
 
 ## The Problem
 
@@ -27,7 +28,7 @@ silently, the API that reads as committed and is not. Each skill states its vers
 per-version reference for detail. Each ships the source list it was written from in `.dev/reference-inventory.json`, so
 the corpus behind it can be refetched and rechecked.
 
-## Prerequisites
+## Installation
 
 Install `typescript-language-server` and make sure it is on `PATH`:
 
@@ -35,7 +36,7 @@ Install `typescript-language-server` and make sure it is on `PATH`:
 npm install -g typescript-language-server typescript
 ```
 
-## Installation
+Then install the plugin:
 
 ```
 /plugin install javascript --marketplace xobotyi/cc-foundry

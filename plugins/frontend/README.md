@@ -1,6 +1,7 @@
 # frontend
 
-Frontend platform discipline plugin for Claude Code.
+CSS, accessibility, and React, Vue, or Svelte code that follows the browser's rules, with each visible design choice
+made on purpose.
 
 ## The Problem
 

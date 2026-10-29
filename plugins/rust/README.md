@@ -1,6 +1,7 @@
 # rust
 
-Rust language discipline plugin for Claude Code with built-in `rust-analyzer` LSP support.
+Idiomatic Rust 2024 that restructures ownership when the borrow checker objects and keeps CPU parallelism apart from
+async, navigated through `rust-analyzer` instead of text search.
 
 ## The Problem
 
@@ -17,13 +18,13 @@ call hierarchies.
 
 ## The Solution
 
-This plugin provides language-discipline skills and a `rust-analyzer` LSP server. The `rust` skill covers core
-conventions (ownership/borrowing, error handling, traits, iterators, idioms, anti-patterns, project structure, the
-cargo/clippy/rustfmt toolchain, rustdoc, and Rust 2024 edition specifics) and folds in concurrency — both CPU-bound
-parallelism (threads/rayon) and I/O-bound async (Tokio) — so the high-stakes footguns load before any async code is
-written. The `rust-testing` skill covers the testing ecosystem. Both enforce LSP-first navigation.
+This plugin provides language-discipline skills and a `rust-analyzer` language-server configuration. The `rust` skill
+covers core conventions (ownership/borrowing, error handling, traits, iterators, idioms, anti-patterns, project
+structure, the cargo/clippy/rustfmt toolchain, rustdoc, and Rust 2024 edition specifics) and folds in concurrency — both
+CPU-bound parallelism (threads/rayon) and I/O-bound async (Tokio) — so the high-stakes footguns load before any async
+code is written. The `rust-testing` skill covers the testing ecosystem. Both enforce LSP-first navigation.
 
-## Prerequisites
+## Installation
 
 Install `rust-analyzer` and ensure it is available in PATH:
 
@@ -31,7 +32,7 @@ Install `rust-analyzer` and ensure it is available in PATH:
 rustup component add rust-analyzer
 ```
 
-## Installation
+Then install the plugin:
 
 ```
 /plugin install rust --marketplace xobotyi/cc-foundry

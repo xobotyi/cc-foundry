@@ -1,7 +1,16 @@
 # wall-clock
 
-Claude Code tells the model today's date and nothing else about time. This plugin puts the wall clock into context at
-the moments the agent is about to act.
+The agent knows the time of day, how long you were away, and how long its current turn has run.
+
+Two ticks from one turn of a session in this repository ([`hooks/wall-clock.mts`](hooks/wall-clock.mts)):
+
+```
+<wall-clock at="Thu 2026-10-29 11:24:09+01:00" away="2m36s"/>
+<wall-clock at="Thu 2026-10-29 11:25:14+01:00" turn="1m05s"/>
+```
+
+The first arrived with the prompt, two and a half minutes after the agent last spoke. The second arrived a minute into
+the turn, while the agent was working.
 
 ## The Problem
 

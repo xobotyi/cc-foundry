@@ -1,6 +1,7 @@
 # backend
 
-Backend platform discipline plugin for Claude Code.
+Services whose logs, metrics, and traces follow Prometheus, StatsD, and OpenTelemetry conventions and can be correlated
+with each other.
 
 ## The Problem
 

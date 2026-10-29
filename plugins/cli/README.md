@@ -1,7 +1,7 @@
 # cli
 
-CLI platform discipline for Claude Code — command-line interface design, shell scripting conventions, and terminal UX
-patterns.
+Command-line tools that get streams, exit codes, and signals right, and shell scripts that survive quoting and
+portability traps.
 
 ## The Problem
 

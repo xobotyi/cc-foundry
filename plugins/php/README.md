@@ -1,6 +1,7 @@
 # php
 
-PHP language discipline plugin for Claude Code targeting PHP 8.5+, with LSP-powered code intelligence via Intelephense.
+PHP 8.5 code that uses the modern language and current PHPUnit and Pest conventions, navigated through Intelephense
+instead of text search.
 
 ## The Problem
 
@@ -32,7 +33,7 @@ patterns.
 The bundled Intelephense LSP configuration enables semantic code intelligence — go to definition, find references, hover
 for type info, workspace symbol search — directly in Claude Code for `.php` files.
 
-## Prerequisites
+## Installation
 
 Install Intelephense (the PHP language server) and ensure it's available in PATH:
 
@@ -40,7 +41,7 @@ Install Intelephense (the PHP language server) and ensure it's available in PATH
 npm install -g intelephense
 ```
 
-## Installation
+Then install the plugin:
 
 ```
 /plugin install php --marketplace xobotyi/cc-foundry

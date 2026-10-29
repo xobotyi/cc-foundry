@@ -1,7 +1,7 @@
 # the-writer
 
-Prose discipline for agent-authored text: make what agents write read like a human wrote it, without lying about
-anything and without flattening whoever wrote it first.
+Agent-written prose that reads like a person wrote it, edited without inventing anything and without flattening the
+voice of whoever wrote it first.
 
 ## The Problem
 
@@ -38,6 +38,12 @@ stakes the source did not carry, and it conserves every claim in the original â€
 readability for humans, explicitly not AI-detector evasion: detectors fire on post-training artifacts and flag
 second-language writing at the same time, so a detector score is not a target worth hitting.
 
+## Installation
+
+```
+/plugin install the-writer --marketplace xobotyi/cc-foundry
+```
+
 ## Skills
 
 ### humanize
@@ -58,12 +64,6 @@ The skill ships with a pattern catalog (`references/patterns.md`) organized by m
 (`references/baselines.md`) carrying every number it states with the corpus, the date, and the caveat â€” including the
 markers that failed to replicate and the ones no study has measured.
 
-## Installation
-
-```
-/plugin install the-writer --marketplace xobotyi/cc-foundry
-```
-
 ## Usage
 
 The skill activates when a task involves prose for human readers. Invoke it explicitly with:
@@ -79,3 +79,7 @@ Typical asks:
 - "Write the release announcement" (the drafting constraints engage automatically)
 
 To match a specific voice, provide a writing sample: "Humanize this, matching the style of `docs/old-post.md`."
+
+## License
+
+MIT
