@@ -1,9 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {exec} from './exec.ts';
-import type {ExecResult} from './exec.ts';
+import {claude} from './claude.ts';
 import type {Finding} from './finding.ts';
-import {isErrnoCode, isObject} from './repo.ts';
+import {isObject} from './repo.ts';
 import type {Repo} from './repo.ts';
 
 const RULE = 'validate';
@@ -42,17 +41,7 @@ export async function validateRepo(repo: Repo): Promise<Finding[]> {
 }
 
 async function validateTarget(root: string, target: string): Promise<Finding[]> {
-	let result: ExecResult;
-	try {
-		result = await exec('claude', ['plugin', 'validate', '--json', target], {cwd: root});
-	} catch (error) {
-		if (isErrnoCode(error, 'ENOENT')) {
-			throw new Error('claude is not on PATH; install it with `npm install -g @anthropic-ai/claude-code`', {
-				cause: error,
-			});
-		}
-		throw error;
-	}
+	const result = await claude(root, ['plugin', 'validate', '--json', target]);
 	// constraint: claude plugin validate exits 1 when it finds an error and still prints the report on stdout
 	if (result.stdout === '') {
 		throw new Error(`claude plugin validate ${target} printed no report: ${result.stderr.trim()}`);
