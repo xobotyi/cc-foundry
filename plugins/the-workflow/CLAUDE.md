@@ -7,10 +7,11 @@ structured context transfer across a boundary, and the user's corrections turned
 
 - **`claude-md`** — CLAUDE.md and `.claude/rules/` authoring: what loads when, layer routing, writing, trimming,
   diagnosis of an ignored rule
-- **`handoff`** — triage conversation context into a standalone transfer document. User-invoked only, via `/handoff`
+- **`handoff`** — triage conversation context into a standalone transfer document. User-invoked only, via
+  `/the-workflow:handoff`
 - **`debrief`** — harvest the user's corrections from session transcripts and write each durable lesson into the
-  instruction file it belongs in, through an approval gate. User-invoked only, via `/debrief`; the extractor is
-  `scripts/extract-corrections.mts`
+  instruction file it belongs in, through an approval gate. User-invoked only, via `/the-workflow:debrief`; the
+  extractor is `scripts/extract-corrections.mts`
 
 ## Skill Dependencies
 
