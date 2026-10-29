@@ -1,6 +1,6 @@
 {
 	"name": "the-workflow",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Agentic workflow mechanics: CLAUDE.md instruction quality, structured context handoff, and correction harvesting",
 	"author": {
 		"name": "xobotyi",
