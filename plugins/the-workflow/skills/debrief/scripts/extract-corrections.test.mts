@@ -2,18 +2,13 @@ import {mkdir, mkdtemp, rm, utimes, writeFile} from 'node:fs/promises';
 import {homedir, tmpdir} from 'node:os';
 import path from 'node:path';
 import {afterAll, beforeAll, describe, expect, onTestFinished, test} from 'vite-plus/test';
-import {
-	extract,
-	frontmatterValue,
-	indexRow,
-	lineNumbers,
-	listProjects,
-	parseSince,
-	projectDirs,
-	recurringErrors,
-	type Candidate,
-	type ExtractOptions,
-} from './extract-corrections.mts';
+import {indexRow, lineNumbers, parseSince} from './extract-corrections.mts';
+import {recurringErrors, type ToolErrorOccurrence} from './lib/errors.mts';
+import {type Candidate, extract, type ExtractOptions} from './lib/extract.mts';
+import type {JsonObject} from './lib/json.mts';
+import {frontmatterValue} from './lib/memory.mts';
+import {listProjects, projectDirs} from './lib/projects.mts';
+import type {Correction} from './lib/session.mts';
 
 type Line = Readonly<Record<string, unknown>>;
 
@@ -279,6 +274,11 @@ async function extractFrom(project: string, options: Partial<ExtractOptions> = {
 	return records;
 }
 
+async function correctionsFrom(project: string, options: Partial<ExtractOptions> = {}): Promise<Correction[]> {
+	const records = await extractFrom(project, options);
+	return records.filter((record): record is Correction => record.signal !== 'tool-error' && record.signal !== 'memory');
+}
+
 async function memoryOf(
 	settings: Line,
 	options: Partial<ExtractOptions> = {},
@@ -288,7 +288,7 @@ async function memoryOf(
 	});
 	await writeFile(path.join(configDir, 'settings.json'), JSON.stringify(settings));
 	const records = await extractFrom(LEARN, options);
-	return records.filter(({signal}) => signal === 'memory').map(({type, text}) => [type, text]);
+	return records.filter((record) => record.signal === 'memory').map(({type, text}) => [type, text]);
 }
 
 describe('extract', () => {
@@ -307,21 +307,21 @@ describe('extract', () => {
 	});
 
 	test('attaches the assistant action the user reacted to', async () => {
-		const [rejection] = await extractFrom(PROJECT);
+		const [rejection] = await correctionsFrom(PROJECT);
 
 		expect(rejection?.said).toBe('Editing the handler.');
 		expect(rejection?.did).toStrictEqual(['Edit /work/acme.app/a.js']);
 	});
 
 	test('attaches the abandoned work to a rewind', async () => {
-		const records = await extractFrom(PROJECT);
+		const records = await correctionsFrom(PROJECT);
 		const rewind = records.find(({signal}) => signal === 'rewind');
 
 		expect(rewind?.did).toStrictEqual(['Write /work/acme.app/b.js']);
 	});
 
 	test('attaches the skills invoked before a candidate, typed or called, built-in commands excluded', async () => {
-		const [candidate] = await extractFrom(LEARN);
+		const [candidate] = await correctionsFrom(LEARN);
 
 		expect(candidate?.text).toBe('correction after skills');
 		expect(candidate?.skills).toStrictEqual(['the-coder:coding', 'git-commit:commit', 'deep-research']);
@@ -384,21 +384,21 @@ describe('extract', () => {
 	});
 
 	test('emits an entry copied into a later transcript once', async () => {
-		const records = await extractFrom(PROJECT);
+		const records = await correctionsFrom(PROJECT);
 		const late = records.filter(({text}) => text === 'late follow-up');
 
 		expect(late.map(({session}) => session)).toStrictEqual(['s1']);
 	});
 
 	test('folds a worktree session into its repository', async () => {
-		const records = await extractFrom(PROJECT);
+		const records = await correctionsFrom(PROJECT);
 		const worktree = records.find(({text}) => text === 'worktree correction');
 
 		expect(worktree?.project).toBe(PROJECT);
 	});
 
 	test('keeps the launch repository after the agent changes directory', async () => {
-		const records = await extractFrom(PROJECT);
+		const records = await correctionsFrom(PROJECT);
 		const late = records.find(({text}) => text === 'late follow-up');
 
 		expect(late?.project).toBe(PROJECT);
@@ -419,7 +419,7 @@ describe('extract', () => {
 	});
 
 	test('keys a subdirectory launch and a linked worktree to their repository root', async () => {
-		const candidates = await extractFrom(repoRoot);
+		const candidates = await correctionsFrom(repoRoot);
 
 		expect(candidates.map(({text, project}) => [text, project])).toStrictEqual([
 			['subdirectory correction', repoRoot],
@@ -450,10 +450,11 @@ describe('listProjects', () => {
 });
 
 describe('recurringErrors', () => {
-	const occurrence = (session: string, text: string): Candidate => ({
+	const occurrence = (session: string, text: string, at = '2026-10-07T10:00:00Z'): ToolErrorOccurrence => ({
+		id: `${session}/${text}`,
 		project: LEARN,
 		session,
-		at: '2026-10-07T10:00:00Z',
+		at,
 		signal: 'tool-error',
 		signature: `Read: ${text.replaceAll(/(?:~|\/)[^\s:'"`,)]+/g, '<path>').replaceAll(/\d+/g, '<n>')}`,
 		text,
@@ -469,10 +470,20 @@ describe('recurringErrors', () => {
 	});
 
 	test('counts repeats and sessions, reporting the latest occurrence', () => {
-		const errors = [occurrence('s1', 'gone'), occurrence('s2', 'gone'), occurrence('s2', 'gone')];
+		const errors = [
+			occurrence('s1', 'gone'),
+			occurrence('s2', 'gone', '2026-10-08T10:00:00Z'),
+			occurrence('s2', 'gone', '2026-10-09T10:00:00Z'),
+		];
 
 		expect(recurringErrors(errors, 2)).toStrictEqual([
-			expect.objectContaining({id: 'error:Read: gone', count: 3, sessions: 2, projects: [LEARN]}),
+			expect.objectContaining({
+				id: 'error:Read: gone',
+				at: '2026-10-09T10:00:00Z',
+				count: 3,
+				sessions: 2,
+				projects: [LEARN],
+			}),
 		]);
 	});
 });
@@ -536,7 +547,7 @@ describe('frontmatterValue', () => {
 });
 
 describe('index and pick', () => {
-	const records = [
+	const records: readonly JsonObject[] = [
 		{signal: 'rejection', project: PROJECT, at: '2026-10-01T10:00:00Z', text: 'no,\n  keep it pure'},
 		{signal: 'tool-error', projects: [LEARN, PROJECT], at: '2026-10-02T00:00:00Z', text: 'String not found.'},
 	];
