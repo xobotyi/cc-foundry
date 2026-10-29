@@ -9,6 +9,7 @@ const INTERRUPT_PREFIX = '[Request interrupted by user';
 const SKILL_BODY_PREFIX = 'Base directory for this skill:';
 const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const RAN_AND_FAILED = /^Exit code \d+/;
+const SUGGESTION_ACCEPTED = 'suggestion_accepted';
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
 const INPUT_LIMIT = 160;
@@ -233,7 +234,8 @@ export async function* sessionCandidates(
 				yield held;
 			}
 			const signal = parent !== undefined && promptParents.has(parent) ? 'rewind' : (pending ?? 'follow-up');
-			held = !opening && inWindow ? candidate(entry, signal, text) : undefined;
+			const predicted = entry.promptSource === SUGGESTION_ACCEPTED;
+			held = !opening && inWindow && !predicted ? candidate(entry, signal, text) : undefined;
 			opening = false;
 			said = '';
 			did = [];
