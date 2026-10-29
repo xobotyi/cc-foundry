@@ -313,7 +313,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/validate-commit-message.mts --file <message f
 
 The validator checks the subject length, the trailing period, the filler tics of the subject, the blank line after the
 subject, the presence of a body, and the required trailers. It does not check the ASCII rule, the 72-character body
-wrap, the scope format, or the register. You own those.
+wrap, the scope format, the register, or AI attribution. You own those.
 
 </mandatory>
 
