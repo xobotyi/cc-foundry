@@ -20,13 +20,6 @@ Focuses on platform-level concerns that apply across languages.
 /plugin install backend --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install backend@foundry
-```
-
 ## Skills
 
 ### observability

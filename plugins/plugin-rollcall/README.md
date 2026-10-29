@@ -32,13 +32,6 @@ reload for that session. A session where every enabled plugin has an install rec
 /plugin install plugin-rollcall --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install plugin-rollcall@foundry
-```
-
 Install it at user scope, which is the default. Installed at project scope, the mod falls to the bug it works around: a
 new worktree or a fresh clone of that project has no install record for it, so it is skipped at startup there.
 

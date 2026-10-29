@@ -46,13 +46,6 @@ Code runs it with `node`, which strips the types itself, so nothing is built at 
 /plugin install the-statusline --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install the-statusline@foundry
-```
-
 The plugin automatically:
 
 - Installs the status line script as `statusline.mts` in your Claude configuration directory: `CLAUDE_CONFIG_DIR` when

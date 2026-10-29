@@ -27,13 +27,6 @@ the gates check evidence — was it reproduced, was it searched for, was the cla
 /plugin install open-source --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install open-source@foundry
-```
-
 ## Skills
 
 ### issue-writing

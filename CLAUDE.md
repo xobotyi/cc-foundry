@@ -81,15 +81,10 @@ process (Research → Scaffold → Write → Ship).
 
 **Installation instructions:**
 
-- Every plugin README's Installation section gives the one-step command, then the two-step form for Claude Code before
-  2.1.275 — `claude plugin validate .` advises the one-step line, and `@foundry` refreshes a stale catalog before the
-  lookup:
+- Every plugin README's Installation section gives the one-step command, which `claude plugin validate .` advises, and
+  no older-version form — Claude Code updates itself:
   ```
   /plugin install <plugin-name> --marketplace xobotyi/cc-foundry
-  ```
-  ```
-  /plugin marketplace add xobotyi/cc-foundry
-  /plugin install <plugin-name>@foundry
   ```
 - Do not use manual cp/ln installation methods
 

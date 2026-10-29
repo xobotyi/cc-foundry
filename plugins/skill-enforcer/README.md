@@ -44,13 +44,6 @@ with `node`, which strips the types itself, so nothing is built at install time.
 /plugin install skill-enforcer --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install skill-enforcer@foundry
-```
-
 ## How It Works
 
 ### Framework injection (session start)

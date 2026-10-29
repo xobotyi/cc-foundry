@@ -22,13 +22,6 @@ References provide extended examples, code pattern catalogs, and specification d
 /plugin install cli --marketplace xobotyi/cc-foundry
 ```
 
-On Claude Code before 2.1.275, add the marketplace first:
-
-```
-/plugin marketplace add xobotyi/cc-foundry
-/plugin install cli@foundry
-```
-
 ## Skills
 
 ### cli
