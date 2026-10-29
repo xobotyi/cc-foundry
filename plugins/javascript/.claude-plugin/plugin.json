@@ -1,6 +1,6 @@
 {
 	"name": "javascript",
-	"version": "2.1.1",
+	"version": "2.2.0",
 	"description": "JavaScript and TypeScript discipline: the language, the type system, the Node and Bun runtimes, Vitest, and LSP-powered code intelligence",
 	"author": {
 		"name": "xobotyi",
