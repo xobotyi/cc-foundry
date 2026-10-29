@@ -83,8 +83,6 @@ nothing else. Per change type: whether the reverse exists, what it costs, and wh
 - **`zpool upgrade` is one-way**: the pool stops importing on systems without the enabled features; the reverse is a
   send and receive into a new pool. Setting the pool's `compatibility` property prevents the upgrade. Removing a
   top-level vdev evacuates it and is impossible on raidz or draid pools.
-- **An Unraid array change resets the array configuration and invalidates parity**; the data is unprotected until the
-  parity sync completes, and the array history a rebuild needs is cleared.
 - Capture before apply: a backup independent of the volume, used-space figures, and the shrink or import support of
   every system that will touch the volume.
 

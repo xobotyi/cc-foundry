@@ -10,8 +10,8 @@ when_to_use: >-
   the tool's own skill. Also invoke on the symptoms: a change reported success and the target still runs the old
   state, a revert that did not restore, a plan that proposes destroying what should exist, an operator locked out by
   their own change, a backup nobody has restored, a secret in a plan or a log, a certificate renewed but not served,
-  or a "done" with no post-apply check behind it. Covers the discipline of the change; how a play, image, VM, share,
-  or ruleset is written belongs to the ansible, containers, proxmox, unraid, and networking skills.
+  or a "done" with no post-apply check behind it. Covers the discipline of the change; how a play, image, VM, or
+  ruleset is written belongs to the ansible, containers, proxmox, and networking skills.
 compatibility: Uses Claude Code frontmatter beyond the Agent Skills spec (when_to_use)
 ---
 
@@ -195,6 +195,6 @@ When **reviewing** a change, cite the missing evidence and name the check that w
 ## Integration
 
 This skill governs what a change must carry, how it is applied, and the evidence that closes it. The **ansible**,
-**containers**, **proxmox**, **unraid**, and **networking** skills govern how their artifact is written and what it
-does, and each wins on that question. The **coding** skill governs the shape of the work. All are active at once; this
-skill runs once, across the whole change, not before and after the tool skill.
+**containers**, **proxmox**, and **networking** skills govern how their artifact is written and what it does, and each
+wins on that question. The **coding** skill governs the shape of the work. All are active at once; this skill runs once,
+across the whole change, not before and after the tool skill.

@@ -192,7 +192,7 @@ signals. `shell-scripting` writes the scripts: strict mode, quoting, portability
 
 Without domain knowledge, agents ship configurations with insecure defaults, no idempotency, and naive networking.
 `devops` governs the change itself, from target identity to the evidence that closes it, and stays active beside the
-tool skill: `ansible`, `containers`, `proxmox`, `unraid`, or `networking`. [Read more](plugins/infrastructure/)
+tool skill: `ansible`, `containers`, `proxmox`, or `networking`. [Read more](plugins/infrastructure/)
 
 ## Updates
 

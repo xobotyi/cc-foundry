@@ -1,7 +1,7 @@
 # infrastructure Plugin
 
 Infrastructure engineering discipline: foundational DevOps principles, Ansible automation, container orchestration,
-Proxmox virtualization, Unraid NAS management, and network architecture.
+Proxmox virtualization, and network architecture.
 
 ## Skills
 
@@ -16,8 +16,6 @@ Proxmox virtualization, Unraid NAS management, and network architecture.
   networking, volumes, supply chain security, signal handling
 - **`proxmox`** — Proxmox VE: VM/LXC provisioning, storage (ZFS/Ceph/LVM), networking/SDN, clustering/HA, API
   automation, cloud-init, backups/PBS, PCIe passthrough
-- **`unraid`** — Unraid server management: arrays, Docker, VMs/GPU passthrough, shares, plugins, user scripts, backup
-  (3-2-1), UPS/NUT, GraphQL API
 - **`networking`** — what a network configuration does once loaded, where that differs from what the file reads:
   nftables evaluation and its coexistence with Docker, firewalld, and ufw, OPNsense and pfSense rule order, bridges and
   VLANs, reverse-path filtering, policy routing, MTU, IPv6, systemd-resolved and Docker DNS, Unbound, Pi-hole v6,
@@ -51,8 +49,8 @@ major to one core line (11 → 2.18, 12 → 2.19, 13 → 2.20, 14 → 2.21); the
 
 `devops` and the tool skill are active at once across the whole change; there is no before-and-after sandwich. The
 split, stated from both sides in the Integration sections: `devops` owns what a change must carry, how it is applied,
-and the evidence that closes it; the tool skill (`ansible`, `containers`, `proxmox`, `unraid`, `networking`) owns how
-its artifact is written and what it does, and wins on that question.
+and the evidence that closes it; the tool skill (`ansible`, `containers`, `proxmox`, `networking`) owns how its artifact
+is written and what it does, and wins on that question.
 
 Ownership between the tool skills: the host-firewall side of a published container port (Docker's chains, the nftables
 backend) is `networking`; container networking modes and Compose are `containers`. The hypervisor bridge setting
@@ -63,7 +61,8 @@ backend) is `networking`; container networking modes and Compose are `containers
 Skills assume the `the-coder` plugin for language-agnostic coding discipline when writing configuration files, scripts,
 or automation code. The Ansible Automation Platform product (controller, mesh, hub certification, the platform's
 Event-Driven Ansible service, Lightspeed) is out of scope by decision: the `ansible` skill states the boundary once and
-carries nothing about the product.
+carries nothing about the product. Unraid is out of scope by decision: no skill or reference carries Unraid-specific
+content, because the maintainer runs no Unraid system to verify a claim against.
 
 ## Conventions
 
