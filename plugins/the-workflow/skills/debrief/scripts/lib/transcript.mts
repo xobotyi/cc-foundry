@@ -56,6 +56,10 @@ export type ToolUse = {
 export type AssistantEntry = EntryBase & {
 	readonly kind: 'assistant';
 	readonly blocks: ReadonlyArray<TextBlock | ToolUse>;
+	/** The model that wrote the message. */
+	readonly model: string | undefined;
+	/** The tokens of the request that produced the message; undefined when the entry records no usage. */
+	readonly context: number | undefined;
 };
 
 /** A message the user or a channel queued while the agent worked. */
@@ -136,6 +140,20 @@ export function contentText(content: Json | undefined): string {
 		.map((block) => (isObject(block) && block.type === 'text' ? (stringOf(block.text) ?? '') : undefined))
 		.filter((text) => text !== undefined)
 		.join('\n');
+}
+
+/** Sums the tokens a request held, from the `usage` of its response: uncached input plus cache writes and reads. */
+export function requestTokens(usage: Json | undefined): number | undefined {
+	if (!isObject(usage)) {
+		return undefined;
+	}
+
+	let total = 0;
+	for (const key of ['input_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens']) {
+		const tokens = usage[key];
+		total += typeof tokens === 'number' ? tokens : 0;
+	}
+	return total;
 }
 
 const originOf = (value: Json | undefined): Origin => ({kind: isObject(value) ? stringOf(value.kind) : undefined});
@@ -232,7 +250,8 @@ export function parseEntry(line: string): Entry | undefined {
 		entrypoint: stringOf(raw.entrypoint),
 		isSidechain: raw.isSidechain === true,
 	};
-	const content = isObject(raw.message) ? raw.message.content : undefined;
+	const message = isObject(raw.message) ? raw.message : {};
+	const content = message.content;
 
 	switch (stringOf(raw.type) ?? '') {
 		case 'user': {
@@ -248,7 +267,13 @@ export function parseEntry(line: string): Entry | undefined {
 			};
 		}
 		case 'assistant': {
-			return {...base, kind: 'assistant', blocks: assistantBlocks(content)};
+			return {
+				...base,
+				kind: 'assistant',
+				blocks: assistantBlocks(content),
+				model: stringOf(message.model),
+				context: requestTokens(message.usage),
+			};
 		}
 		case 'attachment': {
 			return {...base, kind: 'attachment', attachment: attachmentOf(raw.attachment)};
