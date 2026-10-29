@@ -1,7 +1,7 @@
 import {errorLine, errorSignature, type ToolErrorOccurrence} from './errors.mts';
 import {isObject} from './json.mts';
 import {repositoryOf} from './projects.mts';
-import {tail, TEXT_LIMIT, truncate} from './text.mts';
+import {similarity, tail, TEXT_LIMIT, truncate} from './text.mts';
 import {type EntryBase, isSdk, type QueuedCommand, readEntries, type ToolUse, type UserEntry} from './transcript.mts';
 
 const REJECTION_PREFIX = "The user doesn't want to proceed with this tool use";
@@ -10,6 +10,7 @@ const SKILL_BODY_PREFIX = 'Base directory for this skill:';
 const COMMAND_NAME = /<command-name>\/([^<\s]+)<\/command-name>/;
 const RAN_AND_FAILED = /^Exit code \d+/;
 const SUGGESTION_ACCEPTED = 'suggestion_accepted';
+const RETYPED_SIMILARITY = 0.9;
 const SAID_LIMIT = 600;
 const DID_LIMIT = 3;
 const INPUT_LIMIT = 160;
@@ -75,7 +76,7 @@ export async function* sessionCandidates(
 	let opening = true;
 	let held: Correction | undefined;
 	let lastParent: string | undefined;
-	const promptParents = new Set<string | undefined>();
+	const promptsByParent = new Map<string | undefined, string>();
 	let answered = false;
 	let said = '';
 	let did: string[] = [];
@@ -233,14 +234,16 @@ export async function* sessionCandidates(
 			if (held !== undefined) {
 				yield held;
 			}
-			const signal = parent !== undefined && promptParents.has(parent) ? 'rewind' : (pending ?? 'follow-up');
+			const replaced = parent === undefined ? undefined : promptsByParent.get(parent);
+			const signal = replaced === undefined ? (pending ?? 'follow-up') : 'rewind';
 			const predicted = entry.promptSource === SUGGESTION_ACCEPTED;
-			held = !opening && inWindow && !predicted ? candidate(entry, signal, text) : undefined;
+			const retyped = replaced !== undefined && similarity(replaced, text) >= RETYPED_SIMILARITY;
+			held = !opening && inWindow && !predicted && !retyped ? candidate(entry, signal, text) : undefined;
 			opening = false;
 			said = '';
 			did = [];
 		}
-		promptParents.add(parent);
+		promptsByParent.set(parent, text);
 		lastParent = parent;
 		answered = false;
 		pending = undefined;
