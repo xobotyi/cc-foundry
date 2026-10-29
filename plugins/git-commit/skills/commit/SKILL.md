@@ -25,16 +25,6 @@ Do not start the pipeline before that skill is loaded.
 
 </prerequisite>
 
-## Context
-
-- Status: !`git status --short --branch`
-- Recent commits (all refs): !`git log --oneline -5 --all`
-
-The first status column shows the staged state. The second column shows the unstaged state. The `??` mark shows an
-untracked file.
-
-If the status shows no change, tell the user that there is nothing to commit. Then stop.
-
 ## Project Configuration
 
 <project-config>
@@ -78,8 +68,7 @@ commands without a prompt, and the grant clears when the user sends the next mes
 crosses that boundary often, because the Quality Gate can run for many turns.
 
 A permission prompt for `git add` or `git commit` in the middle of the pipeline shows that the grant expired. Invoke
-this skill again to restore it. The dynamic context of this skill changes between invocations, so the full skill content
-enters the context a second time.
+this skill again to restore it.
 
 </permission-window>
 
@@ -120,15 +109,22 @@ Run this pipeline during the work. Do not save it for the end of the task.
 
 ### 1. Survey Changes
 
-Read the changes and find the separate units:
+Run these commands in the repository that gets the commit:
 
 ```bash
-git diff               # unstaged changes to tracked files
-git diff --cached      # staged changes
+git status --short --branch              # staged, unstaged, and untracked files
+git diff                                 # unstaged changes to tracked files
+git diff --cached                        # staged changes
+git log --all --oneline --no-merges -10  # the subject form of the history
 ```
 
-Neither command shows an untracked file. `git status --short` marks an untracked file with `??`. Stage such a file with
-an explicit path. In a repo with no commits, all files are untracked.
+The first status column shows the staged state. The second column shows the unstaged state. The `??` mark shows an
+untracked file. If the status shows no change, tell the user that there is nothing to commit. Then stop.
+
+The two diff commands do not show an untracked file. Stage such a file with an explicit path. In a repo with no commits,
+all files are untracked.
+
+Then find the separate units in the changes.
 
 <atomic-commit-rule>
 **Make one commit for each logical change. One logical change is one unit.** A unit is the smallest

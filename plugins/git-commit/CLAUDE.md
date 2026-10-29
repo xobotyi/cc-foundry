@@ -46,6 +46,9 @@ CLAUDE.md:
   `Skill(git-commit:commit-message)` composition `commit` depends on
 - **`allowed-tools` is a per-turn grant.** It clears on the next user message even though the skill content stays in
   context; `commit/SKILL.md` `<permission-window>` states the symptom and the recovery
+- **`commit` has no dynamic context** — a `!` command runs in the working directory of the session, which is not always
+  the repository that gets the commit, and a command that fails stops the skill from loading. Step 1 reads the target
+  repository instead, and its log shows the subject form of the history
 - **Both SKILL.md files stay under 5,000 tokens** — the per-skill compaction budget, past which the tail is dropped on
   re-attach, and the tail is where the `<critical>` block sits
 - **No `references/` directory.** Each skill is behaviorally self-sufficient; content that would go to a reference is
