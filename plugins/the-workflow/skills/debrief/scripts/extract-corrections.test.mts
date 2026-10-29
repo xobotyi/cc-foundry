@@ -290,7 +290,10 @@ async function extractFrom(project: string, options: Partial<ExtractOptions> = {
 
 async function correctionsFrom(project: string, options: Partial<ExtractOptions> = {}): Promise<Correction[]> {
 	const records = await extractFrom(project, options);
-	return records.filter((record): record is Correction => record.signal !== 'tool-error' && record.signal !== 'memory');
+	return records.filter(
+		(record): record is Correction =>
+			record.signal !== 'tool-error' && record.signal !== 'memory' && record.signal !== 'retraction',
+	);
 }
 
 async function memoryOf(
