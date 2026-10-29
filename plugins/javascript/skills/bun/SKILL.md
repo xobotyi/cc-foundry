@@ -168,8 +168,8 @@ options.
 - **Pick the right global reset.** `mock.clearAllMocks()` clears history and keeps implementations;
   `jest.resetAllMocks()` also drops them (1.4.0 — before, it behaved like `clearAllMocks`); `mock.restore()` restores
   spied originals and undoes no `mock.module()` override.
-- **`expectTypeOf` is a no-op at runtime.** A green `bun test` proves nothing about types — run `bunx tsc --noEmit`
-  separately.
+- **`expectTypeOf` is a no-op at runtime.** A green `bun test` proves nothing about types — run the project's type-check
+  command separately.
 - **`bun test` sets `NODE_ENV=test` unless it is already set, and runs in UTC.** `process.env.TZ` stays unset — the
   runtime zone is UTC, not an environment variable a preload can read.
 - **An unhandled rejection between tests fails the run.** When it happens while a file loads, none of that file's tests

@@ -138,7 +138,8 @@ the dual-package hazard.
 Node erases type syntax and runs the result. It does not compile, does not type-check, and does not read
 `tsconfig.json`.
 
-- **Keep `tsc --noEmit` in the verification path.** Running a `.ts` file proves it parses, nothing more.
+- **Keep the project's type-check command in the verification path.** Running a `.ts` file proves it parses, nothing
+  more.
 - **`import type` is mandatory for type-only imports.** Erasure is syntactic: without the keyword the import survives as
   a value import and fails at run time. `verbatimModuleSyntax: true` makes `tsc` enforce it.
 - **Write the real extension in the specifier** — `import './x.ts'`, and `require('./x.ts')` in CommonJS. Node loads the
