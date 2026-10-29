@@ -5,6 +5,7 @@ import path from 'node:path';
 import {text} from 'node:stream/consumers';
 import {parseArgs} from 'node:util';
 import {exists} from './lib/files.mts';
+import {projectDirs, transcriptFiles} from './lib/projects.mts';
 import {isObject, parseJson, stringOf} from './lib/json.mts';
 import {
 	type Arm,
@@ -22,11 +23,23 @@ import {
 const DEFAULT_SAMPLES = 3;
 const DEFAULT_TIMEOUT_S = 600;
 const USAGE = [
-	'usage: replay.mts locate --transcript <file> --entry <id>',
-	'       replay.mts verify --transcript <file> --entry <id> --edits <file> [--samples <n>] [--model <m>]',
-	'                         [--effort <e>] [--out <dir>] [--disable-plugin <plugin>]... [--timeout <s>] [--dry-run]',
+	'usage: replay.mts locate --session <id> --entry <id> [--projects-dir <dir>]',
+	'       replay.mts verify --session <id> --entry <id> --edits <file> [--projects-dir <dir>] [--samples <n>]',
+	'                         [--model <m>] [--effort <e>] [--out <dir>] [--disable-plugin <plugin>]... [--timeout <s>]',
+	'                         [--dry-run]',
 	'       replay.mts stop-hook',
 ].join('\n');
+
+/** Finds the transcript of a session under `projectsDir`; throws when no transcript, or more than one, has its id. */
+export async function transcriptOf(projectsDir: string, session: string): Promise<string> {
+	const files = await transcriptFiles(await projectDirs(projectsDir, [], true), 0, session);
+	const [found] = files;
+	if (found === undefined || files.length > 1) {
+		throw new Error(`session ${session}: ${files.length} transcripts under ${projectsDir}`);
+	}
+
+	return found.file;
+}
 
 /**
  * Locates the turn a candidate corrects and writes its two replay copies under `out`: `sham`, the control, and `rule`,
@@ -115,8 +128,9 @@ async function main(): Promise<void> {
 	const {values} = parseArgs({
 		args: rest,
 		options: {
-			transcript: {type: 'string'},
+			session: {type: 'string'},
 			entry: {type: 'string'},
+			'projects-dir': {type: 'string'},
 			edits: {type: 'string'},
 			samples: {type: 'string', default: String(DEFAULT_SAMPLES)},
 			model: {type: 'string'},
@@ -128,12 +142,15 @@ async function main(): Promise<void> {
 		},
 	});
 
-	if (values.transcript === undefined || values.entry === undefined) {
+	if (values.session === undefined || values.entry === undefined) {
 		throw new TypeError(USAGE);
 	}
 
+	const configDir = process.env.CLAUDE_CONFIG_DIR ?? path.join(homedir(), '.claude');
+	const projectsDir = values['projects-dir'] ?? path.join(configDir, 'projects');
 	if (command === 'locate') {
-		process.stdout.write(`${JSON.stringify(await locateTurn(values.transcript, values.entry), null, '\t')}\n`);
+		const point = await locateTurn(await transcriptOf(projectsDir, values.session), values.entry);
+		process.stdout.write(`${JSON.stringify(point, null, '\t')}\n`);
 		return;
 	}
 
@@ -151,9 +168,10 @@ async function main(): Promise<void> {
 		throw new RangeError(`--timeout ${values.timeout}: expected a positive number of seconds`);
 	}
 
+	const transcript = await transcriptOf(projectsDir, values.session);
 	const out = path.resolve(values.out ?? (await mkdtemp(path.join(tmpdir(), 'debrief-replay-'))));
 	const {point, cwd, arms} = await prepareArms({
-		transcript: values.transcript,
+		transcript,
 		entry: values.entry,
 		edits: values.edits,
 		out,
