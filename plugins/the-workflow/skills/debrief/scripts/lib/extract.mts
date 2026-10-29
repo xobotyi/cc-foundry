@@ -1,4 +1,5 @@
 import {recurringErrors, type RecurringError, type ToolErrorOccurrence} from './errors.mts';
+import {LoadedContext} from './loaded.mts';
 import {type MemoryLookup, memoryDir, type MemoryRecord, memoryRecords} from './memory.mts';
 import {projectDirs, repositoryOf, transcriptFiles} from './projects.mts';
 import {type Correction, sessionCandidates} from './session.mts';
@@ -13,12 +14,14 @@ export type ExtractOptions = MemoryLookup & {
 	readonly allProjects: boolean;
 	readonly since: number;
 	readonly session: string | undefined;
+	/** The directory the instruction sets of the corrections are written to; none are collected without it. */
+	readonly contextDir: string | undefined;
 };
 
 /**
  * Yields every record of one extraction in output order: the candidates of each transcript, oldest file first, then
  * the tool errors that recur, then the auto memories written in the window. A record copied into a later transcript
- * is yielded once.
+ * is yielded once. With `contextDir`, the instruction sets the corrections name are written there before the errors.
  */
 export async function* extract(options: ExtractOptions): AsyncGenerator<Candidate> {
 	const {projectsDir, since, session} = options;
@@ -26,10 +29,11 @@ export async function* extract(options: ExtractOptions): AsyncGenerator<Candidat
 	const files = await transcriptFiles(dirs, since, session);
 	const emitted = new Set<string | undefined>();
 	const errors: ToolErrorOccurrence[] = [];
+	const context = options.contextDir === undefined ? undefined : new LoadedContext(options.contextDir);
 
 	for (const {file} of files) {
 		// oxlint-disable-next-line no-await-in-loop -- transcripts are read oldest first, and a copied entry keeps its first one
-		for await (const candidate of sessionCandidates(file, since)) {
+		for await (const candidate of sessionCandidates(file, since, context)) {
 			if (candidate.id !== undefined && emitted.has(candidate.id)) {
 				continue;
 			}
@@ -42,6 +46,7 @@ export async function* extract(options: ExtractOptions): AsyncGenerator<Candidat
 		}
 	}
 
+	await context?.write();
 	yield* recurringErrors(errors, session === undefined ? 2 : 1);
 
 	const heads = await Promise.all(
