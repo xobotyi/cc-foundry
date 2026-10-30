@@ -24,7 +24,7 @@
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",
-		"@types/node": "^26.6.5",
+		"@types/node": "^26.6.6",
 		"@types/turndown": "^5.0.6",
 		"@ver0/oxlint-config": "^2.0.4",
 		"typescript": "^7.0.2",
