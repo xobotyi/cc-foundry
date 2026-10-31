@@ -1,4 +1,11 @@
-import type {On, SessionStartInput} from 'claude-code';
+import type {
+	On,
+	SessionCompactInput,
+	SessionCompactResult,
+	SessionEndInput,
+	SessionMessage,
+	SessionStartInput,
+} from 'claude-code';
 import {describe, expect, mock, test} from 'claude-code/testing';
 
 const ROOT = '/repo';
@@ -6,12 +13,21 @@ const ROOT = '/repo';
 const INTERACTIVE: SessionStartInput = {surface: 'terminal', isInteractive: true, cwd: ROOT};
 const HEADLESS: SessionStartInput = {surface: null, isInteractive: false, cwd: ROOT};
 
+const CLEAR: SessionEndInput = {reason: 'clear', sessionId: 's1', resume: {id: 's1'}};
+const RESUME: SessionEndInput = {reason: 'resume', sessionId: 's1', resume: {id: 's1'}};
+const EXIT: SessionEndInput = {reason: 'prompt_input_exit', sessionId: 's1', resume: {id: 's1'}};
+
+const SUMMARY: SessionMessage = {role: 'user', text: 'the summary', toolUses: []};
+
+const AUTO_COMPACT: SessionCompactInput = {trigger: 'auto', messages: [SUMMARY]};
+
 type Machine = {
 	readonly enabledPlugins: Readonly<Record<string, boolean>>;
 	readonly knownMarketplaces?: string;
 	readonly installedPlugins?: string;
 	readonly reload?: Promise<void>;
 	readonly configDir?: string;
+	readonly compaction?: SessionCompactResult;
 };
 
 type Observed = {
@@ -36,6 +52,8 @@ function machineOf(on: On, machine: Machine): Observed {
 
 	mock.env(on, env);
 	on('session.start', ($, e) => ({cwd: e.cwd}));
+	on('session.end', ($, e) => ({sessionId: e.sessionId}));
+	on('session.compact', () => machine.compaction ?? {messages: [SUMMARY]});
 	on('session.root', () => ({value: ROOT}));
 	on('settings.read', () => ({value: {enabledPlugins: machine.enabledPlugins}}));
 	on('fs.exists', ($, e) => ({value: files.has(e.path)}));
@@ -60,6 +78,8 @@ function recordsOf(plugins: Readonly<Record<string, readonly object[]>>): string
 }
 
 const FOUNDRY = JSON.stringify({foundry: {source: {source: 'github', repo: 'xobotyi/cc-foundry'}}});
+
+const CODER_SKIPPED: Machine = {enabledPlugins: {'the-coder@foundry': true}, knownMarketplaces: FOUNDRY};
 
 describe('register', () => {
 	test('reloads when an enabled plugin has records only for other projects', async ($, on) => {
@@ -173,5 +193,103 @@ describe('register', () => {
 		expect(observed.lines).toEqual([
 			'roll call failed: Error: installed_plugins.json: a the-coder@foundry record has no scope',
 		]);
+	});
+
+	test('reloads after /clear once the clear has finished', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.end(CLEAR);
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins', 'reload-plugins']);
+		expect(observed.lines).toEqual([
+			'reloaded plugins skipped at startup: the-coder@foundry',
+			'reloaded plugins after /clear: the-coder@foundry',
+		]);
+	});
+
+	test('reloads after a resume', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.end(RESUME);
+		await clock.settle();
+
+		expect(observed.lines.at(-1)).toBe('reloaded plugins after a resume: the-coder@foundry');
+	});
+
+	test('reloads after a compaction of the main conversation', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.compact(AUTO_COMPACT);
+		await clock.settle();
+
+		expect(observed.lines.at(-1)).toBe('reloaded plugins after compaction: the-coder@foundry');
+	});
+
+	test('does not reload after a subagent compaction or a precomputed one', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.compact({...AUTO_COMPACT, agentId: 'a1'});
+		await $.session.compact({...AUTO_COMPACT, trigger: 'precompute'});
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+	});
+
+	test('does not reload after a compaction that was skipped', async ($, on) => {
+		const observed = machineOf(on, {...CODER_SKIPPED, compaction: {skip: 'nothing to compact'}});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.compact(AUTO_COMPACT);
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+	});
+
+	test('does not reload when a session ends for another reason', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.end(EXIT);
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+	});
+
+	test('runs one reload for the transitions that come before it', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.end(CLEAR);
+		await $.session.compact(AUTO_COMPACT);
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins', 'reload-plugins']);
+		expect(observed.lines.at(-1)).toBe('reloaded plugins after /clear: the-coder@foundry');
+	});
+
+	test('does not reload after a compaction in a non-interactive session', async ($, on) => {
+		const observed = machineOf(on, CODER_SKIPPED);
+		const clock = mock.clock(on);
+		await $.session.start(HEADLESS);
+
+		await $.session.compact(AUTO_COMPACT);
+		await clock.settle();
+
+		expect(observed.commands).toEqual([]);
 	});
 });
