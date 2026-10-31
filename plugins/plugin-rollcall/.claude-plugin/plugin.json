@@ -10,5 +10,13 @@
 	"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/plugin-rollcall",
 	"repository": "https://github.com/xobotyi/cc-foundry",
 	"license": "MIT",
-	"keywords": ["plugins", "mod", "reload", "enabledPlugins", "workaround"]
+	"keywords": ["plugins", "mod", "reload", "enabledPlugins", "workaround"],
+	"userConfig": {
+		"install": {
+			"title": "Install skipped plugins",
+			"description": "After a reload, run claude plugin install <plugin> --scope local for each plugin without an install record, so later sessions load it at startup. Writes installed_plugins.json and the project's .claude/settings.local.json.",
+			"type": "boolean",
+			"default": false
+		}
+	}
 }

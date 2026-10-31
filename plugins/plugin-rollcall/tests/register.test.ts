@@ -30,8 +30,8 @@ type Machine = {
 	readonly configDir?: string;
 	readonly compaction?: SessionCompactResult;
 	readonly listedPlugins?: readonly string[];
-	readonly installMode?: string;
 	readonly install?: Promise<ProcessRunResult>;
+	readonly env?: Readonly<Record<string, string>>;
 };
 
 type Observed = {
@@ -39,6 +39,8 @@ type Observed = {
 	readonly lines: string[];
 	readonly processes: string[];
 };
+
+const INSTALL_MODE = {options: {install: true}};
 
 const INSTALLED: ProcessRunResult = {
 	exitCode: 0,
@@ -61,9 +63,8 @@ function machineOf(on: On, machine: Machine): Observed {
 		files.set(`${pluginsDir}/installed_plugins.json`, machine.installedPlugins);
 	}
 
-	const env: Record<string, string> = {HOME: '/home/u'};
+	const env: Record<string, string> = {HOME: '/home/u', ...machine.env};
 	if (machine.configDir !== undefined) env.CLAUDE_CONFIG_DIR = machine.configDir;
-	if (machine.installMode !== undefined) env.FOUNDRY_PLUGIN_ROLLCALL_INSTALL = machine.installMode;
 
 	mock.env(on, env);
 	on('session.start', ($, e) => ({cwd: e.cwd}));
@@ -420,8 +421,8 @@ describe('register', () => {
 		]);
 	});
 
-	test('installs each plugin without a record at local scope in install mode', async ($, on) => {
-		const observed = machineOf(on, {...CODER_SKIPPED, installMode: '1'});
+	test('installs each plugin without a record at local scope in install mode', INSTALL_MODE, async ($, on) => {
+		const observed = machineOf(on, {...CODER_SKIPPED});
 		const clock = mock.clock(on);
 
 		await $.session.start(INTERACTIVE);
@@ -434,8 +435,8 @@ describe('register', () => {
 		]);
 	});
 
-	test('does not install outside install mode', async ($, on) => {
-		const observed = machineOf(on, {...CODER_SKIPPED, installMode: '0'});
+	test('does not install by default, whatever FOUNDRY_PLUGIN_ROLLCALL_INSTALL holds', async ($, on) => {
+		const observed = machineOf(on, {...CODER_SKIPPED, env: {FOUNDRY_PLUGIN_ROLLCALL_INSTALL: '1'}});
 		const clock = mock.clock(on);
 
 		await $.session.start(INTERACTIVE);
@@ -445,8 +446,8 @@ describe('register', () => {
 		expect(observed.processes).toEqual([]);
 	});
 
-	test('does not install a plugin that has a record', async ($, on) => {
-		const observed = machineOf(on, {...CODER_RECORDED, installMode: '1'});
+	test('does not install a plugin that has a record', INSTALL_MODE, async ($, on) => {
+		const observed = machineOf(on, {...CODER_RECORDED});
 		const clock = mock.clock(on);
 		await $.session.start(INTERACTIVE);
 
@@ -457,8 +458,8 @@ describe('register', () => {
 		expect(observed.processes).toEqual([]);
 	});
 
-	test('does not hold the session start for the install', async ($, on) => {
-		const observed = machineOf(on, {...CODER_SKIPPED, installMode: '1', install: new Promise(() => {})});
+	test('does not hold the session start for the install', INSTALL_MODE, async ($, on) => {
+		const observed = machineOf(on, {...CODER_SKIPPED, install: new Promise(() => {})});
 		const clock = mock.clock(on);
 
 		await $.session.start(INTERACTIVE);
@@ -468,8 +469,8 @@ describe('register', () => {
 		expect(observed.lines).toEqual(['reloaded plugins skipped at startup: the-coder@foundry']);
 	});
 
-	test('does not start an install while another runs', async ($, on) => {
-		const observed = machineOf(on, {...CODER_SKIPPED, installMode: '1', install: new Promise(() => {})});
+	test('does not start an install while another runs', INSTALL_MODE, async ($, on) => {
+		const observed = machineOf(on, {...CODER_SKIPPED, install: new Promise(() => {})});
 		const clock = mock.clock(on);
 		await $.session.start(INTERACTIVE);
 
@@ -480,9 +481,9 @@ describe('register', () => {
 		expect(observed.processes).toHaveLength(1);
 	});
 
-	test('reports an install that fails', async ($, on) => {
+	test('reports an install that fails', INSTALL_MODE, async ($, on) => {
 		const failed = Promise.resolve({...INSTALLED, exitCode: 1, stderr: 'Plugin not found\nmore detail'});
-		const observed = machineOf(on, {...CODER_SKIPPED, installMode: '1', install: failed});
+		const observed = machineOf(on, {...CODER_SKIPPED, install: failed});
 		const clock = mock.clock(on);
 
 		await $.session.start(INTERACTIVE);
@@ -491,27 +492,5 @@ describe('register', () => {
 		expect(observed.lines.at(-1)).toBe(
 			'roll call failed: claude plugin install the-coder@foundry --scope local exited 1: Plugin not found',
 		);
-	});
-
-	test('reports an install mode value it does not know', async ($, on) => {
-		const observed = machineOf(on, {...CODER_SKIPPED, installMode: 'yes'});
-		const clock = mock.clock(on);
-
-		await $.session.start(INTERACTIVE);
-		await clock.settle();
-
-		expect(observed.processes).toEqual([]);
-		expect(observed.lines.at(-1)).toBe(
-			'roll call failed: Error: FOUNDRY_PLUGIN_ROLLCALL_INSTALL must be 0 or 1, not "yes"',
-		);
-	});
-
-	test('reports an empty install mode value when no plugin is missing', async ($, on) => {
-		const observed = machineOf(on, {...CODER_RECORDED, installMode: ''});
-
-		await $.session.start(INTERACTIVE);
-
-		expect(observed.commands).toEqual([]);
-		expect(observed.lines).toEqual(['roll call failed: Error: FOUNDRY_PLUGIN_ROLLCALL_INSTALL must be 0 or 1, not ""']);
 	});
 });

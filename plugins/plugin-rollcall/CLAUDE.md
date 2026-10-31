@@ -35,11 +35,12 @@ Run every command in this file from the repository root.
   aside, when an enabled plugin of that name comes from a known marketplace and `$.command.list()` lists no command of
   it. The mod schedules the reload, which runs once the turn ends even when the install records cannot be read, and adds
   a note to the failed result that names the reload (verified on 2.1.316).
-- `FOUNDRY_PLUGIN_ROLLCALL_INSTALL=1` turns on install mode: after a reload, the mod runs
-  `claude plugin install <id> --scope local` from the session root for each plugin without a record, in the background
-  and one at a time. That writes a `local` record and an `enabledPlugins` entry in the project's
-  `.claude/settings.local.json`, and the next session loads the plugin at startup (verified on 2.1.316). The line
-  `installed plugins at local scope: <ids>` follows; a failed install reports its exit code and first output line.
+- The `install` option turns on install mode. Claude Code stores it under `pluginConfigs[<id>].options` in user settings
+  (verified on 2.1.316). After a reload, the mod runs `claude plugin install <id> --scope local` from the session root
+  for each plugin without a record, in the background and one at a time. That writes a `local` record and an
+  `enabledPlugins` entry in the project's `.claude/settings.local.json`, and the next session loads the plugin at
+  startup (verified on 2.1.316). The line `installed plugins at local scope: <ids>` follows; a failed install reports
+  its exit code and first output line.
 - A reload keeps unchanged hooks modules loaded, so `session.start` does not fire again and the mod needs no loop guard
   (verified on 2.1.310). Recheck this if a session ever shows the reload line twice.
 - After a reload, one transcript line names the occasion and the plugins: `reloaded plugins <occasion>: <ids>`, where

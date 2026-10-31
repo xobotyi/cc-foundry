@@ -1,4 +1,4 @@
-import type {EngineInterface, On} from 'claude-code';
+import type {EngineInterface, On, PluginOptions} from 'claude-code';
 
 type ScheduledRollCall = {
 	readonly occasion: string;
@@ -6,6 +6,7 @@ type ScheduledRollCall = {
 };
 
 type SessionState = {
+	readonly isInstallMode: boolean;
 	isInteractive: boolean;
 	isInstalling: boolean;
 	scheduled?: ScheduledRollCall;
@@ -27,14 +28,15 @@ const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
  * that come before it share it. A failed skill call tells the model that the mod tries to reload its plugin when the
  * turn ends, and its reload runs even when the install records cannot be read.
  *
- * With `FOUNDRY_PLUGIN_ROLLCALL_INSTALL=1`, a reload also starts `claude plugin install <id> --scope local` in the
- * background for each plugin without an install record, which writes the record and enables the plugin in the
- * project's `.claude/settings.local.json`, so later sessions load it at startup.
+ * With the `install` option on, a reload also starts `claude plugin install <id> --scope local` in the background for
+ * each plugin without an install record, which writes the record and enables the plugin in the project's
+ * `.claude/settings.local.json`, so later sessions load it at startup.
  *
  * @param on the engine's registrar
+ * @param options the plugin's `userConfig` values: `install`, a boolean that defaults to false
  */
-export function register(on: On): void {
-	const session: SessionState = {isInteractive: false, isInstalling: false};
+export function register(on: On, options: PluginOptions): void {
+	const session: SessionState = {isInstallMode: options.install === true, isInteractive: false, isInstalling: false};
 
 	on('session.start', async ($, e, next) => {
 		session.isInteractive = e.isInteractive;
@@ -129,7 +131,7 @@ async function reloadMissing(
 		$.ui.log(`reloaded plugins ${occasion}: ${missing.join(', ')}`);
 	}
 
-	if (!(await isInstallModeOn($)) || unrecorded.length === 0 || session.isInstalling) return;
+	if (!session.isInstallMode || unrecorded.length === 0 || session.isInstalling) return;
 
 	session.isInstalling = true;
 	void installLocally($, unrecorded)
@@ -137,14 +139,6 @@ async function reloadMissing(
 		.finally(() => {
 			session.isInstalling = false;
 		});
-}
-
-async function isInstallModeOn($: EngineInterface): Promise<boolean> {
-	const value = await $.env.get('FOUNDRY_PLUGIN_ROLLCALL_INSTALL');
-	if (value === undefined || value === '0') return false;
-	if (value === '1') return true;
-
-	throw new Error(`FOUNDRY_PLUGIN_ROLLCALL_INSTALL must be 0 or 1, not "${value}"`);
 }
 
 async function installLocally($: EngineInterface, ids: readonly string[]): Promise<void> {

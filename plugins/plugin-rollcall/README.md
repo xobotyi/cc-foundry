@@ -56,11 +56,11 @@ new worktree or a fresh clone of that project has no install record for it, so i
 ## Configuration
 
 Install mode fixes the cause instead of the symptom. It is off by default, because it changes files in your repository
-and in your plugin directory. Turn it on with `FOUNDRY_PLUGIN_ROLLCALL_INSTALL` in a settings `env` block, for example
-in a repository's `.claude/settings.local.json`:
+and in your plugin directory. Turn on **Install skipped plugins** for `plugin-rollcall` in `/config`, or set the
+`install` option in your user `settings.json`:
 
 ```json
-{"env": {"FOUNDRY_PLUGIN_ROLLCALL_INSTALL": "1"}}
+{"pluginConfigs": {"plugin-rollcall@foundry": {"options": {"install": true}}}}
 ```
 
 After a reload, the mod then runs `claude plugin install <plugin> --scope local` for each plugin that has no install
@@ -73,7 +73,7 @@ installed:
 installed plugins at local scope: the-coder@foundry
 ```
 
-`0` or an unset variable keeps install mode off. Any other value than `0` or `1` is reported as `roll call failed`.
+The option is read when the mod loads, and changing it in `/config` reloads the mod.
 
 ## Limits
 
