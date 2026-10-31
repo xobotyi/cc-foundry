@@ -28,6 +28,7 @@ type Machine = {
 	readonly reload?: Promise<void>;
 	readonly configDir?: string;
 	readonly compaction?: SessionCompactResult;
+	readonly listedPlugins?: readonly string[];
 };
 
 type Observed = {
@@ -55,6 +56,19 @@ function machineOf(on: On, machine: Machine): Observed {
 	on('session.end', ($, e) => ({sessionId: e.sessionId}));
 	on('session.compact', () => machine.compaction ?? {messages: [SUMMARY]});
 	on('session.root', () => ({value: ROOT}));
+	on('command.list', () => ({
+		value: (machine.listedPlugins ?? []).map((plugin) => ({
+			name: `${plugin}:skill`,
+			description: '',
+			source: 'plugin' as const,
+			plugin,
+		})),
+	}));
+	on('tool.call', ($, e) => ({
+		isError: true,
+		result: undefined,
+		text: `<tool_use_error>Unknown skill: ${e.tool === 'Skill' ? e.skill : e.tool}</tool_use_error>`,
+	}));
 	on('settings.read', () => ({value: {enabledPlugins: machine.enabledPlugins}}));
 	on('fs.exists', ($, e) => ({value: files.has(e.path)}));
 	on('fs.read', ($, e) => ({value: files.get(e.path) ?? ''}));
@@ -80,6 +94,15 @@ function recordsOf(plugins: Readonly<Record<string, readonly object[]>>): string
 const FOUNDRY = JSON.stringify({foundry: {source: {source: 'github', repo: 'xobotyi/cc-foundry'}}});
 
 const CODER_SKIPPED: Machine = {enabledPlugins: {'the-coder@foundry': true}, knownMarketplaces: FOUNDRY};
+
+const CODER_RECORDED: Machine = {
+	...CODER_SKIPPED,
+	installedPlugins: recordsOf({'the-coder@foundry': [{scope: 'user'}]}),
+};
+
+const CODER_NOTE =
+	'plugin-rollcall: Claude Code lists no skill or command of the the-coder@foundry plugin, ' +
+	'so plugin-rollcall tries to reload it when this turn ends.';
 
 describe('register', () => {
 	test('reloads when an enabled plugin has records only for other projects', async ($, on) => {
@@ -291,5 +314,90 @@ describe('register', () => {
 		await clock.settle();
 
 		expect(observed.commands).toEqual([]);
+	});
+
+	test('reloads after a skill of an unloaded plugin fails, and tells the model', async ($, on) => {
+		const observed = machineOf(on, CODER_RECORDED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+
+		expect(call.context).toEqual([CODER_NOTE]);
+		expect(observed.commands).toEqual([]);
+
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.lines).toEqual(['reloaded plugins after the-coder:coding failed: the-coder@foundry']);
+	});
+
+	test('does not reload when the plugin of a failed skill lists commands', async ($, on) => {
+		const observed = machineOf(on, {...CODER_RECORDED, listedPlugins: ['the-coder']});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:nonexistent'});
+		await clock.settle();
+
+		expect(call.context).toBeUndefined();
+		expect(observed.commands).toEqual([]);
+	});
+
+	test('does not reload for a failed skill of no enabled marketplace plugin', async ($, on) => {
+		const observed = machineOf(on, CODER_RECORDED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.tool.call({tool: 'Skill', skill: 'golang:golang'});
+		await $.tool.call({tool: 'Skill', skill: 'the-coder'});
+		await clock.settle();
+
+		expect(observed.commands).toEqual([]);
+	});
+
+	test('does not act on a failed skill in a non-interactive session', async ($, on) => {
+		const observed = machineOf(on, CODER_RECORDED);
+		const clock = mock.clock(on);
+		await $.session.start(HEADLESS);
+
+		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await clock.settle();
+
+		expect(call.context).toBeUndefined();
+		expect(observed.commands).toEqual([]);
+	});
+
+	test('reloads a plugin confirmed by a failed skill in a reload it shares', async ($, on) => {
+		const observed = machineOf(on, CODER_RECORDED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.session.end(CLEAR);
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.lines).toEqual(['reloaded plugins after /clear: the-coder@foundry']);
+	});
+
+	test('reloads a plugin confirmed by a failed skill when the install records cannot be read', async ($, on) => {
+		const observed = machineOf(on, {
+			...CODER_SKIPPED,
+			installedPlugins: recordsOf({'the-coder@foundry': [{projectPath: ROOT}]}),
+		});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await clock.settle();
+
+		const unreadable = 'roll call failed: Error: installed_plugins.json: a the-coder@foundry record has no scope';
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.lines).toEqual([
+			unreadable,
+			unreadable,
+			'reloaded plugins after the-coder:coding failed: the-coder@foundry',
+		]);
 	});
 });

@@ -1,22 +1,33 @@
 import type {EngineInterface, On} from 'claude-code';
 
+type ScheduledRollCall = {
+	readonly occasion: string;
+	readonly unloaded: Set<string>;
+};
+
 type SessionState = {
 	isInteractive: boolean;
-	isRollCallScheduled: boolean;
+	scheduled?: ScheduledRollCall;
 };
+
+// constraint: Claude Code names a skill it cannot find in the error text alone, as `Unknown skill: <plugin>:<skill>`
+const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
 
 /**
  * Registers the roll call: in an interactive session where a plugin the settings enable is missing, it runs
  * `/reload-plugins`. A plugin is missing when it comes from a known marketplace and has no install record for the user
- * or for this project, so Claude Code skipped it at startup.
+ * or for this project, so Claude Code skipped it at startup. A plugin is also missing when a call to one of its skills
+ * fails as unknown while no command of it is listed, install records aside.
  *
- * At session start the reload holds the first prompt until it completes. After `/clear`, a resume, or a compaction of
- * the main conversation, the reload runs once that transition finishes, and transitions that come before it share it.
+ * At session start the reload holds the first prompt until it completes. After `/clear`, a resume, a compaction of the
+ * main conversation, or a failed skill call, the reload runs once that transition or turn finishes, and the occasions
+ * that come before it share it. A failed skill call tells the model that the mod tries to reload its plugin when the
+ * turn ends, and its reload runs even when the install records cannot be read.
  *
  * @param on the engine's registrar
  */
 export function register(on: On): void {
-	const session: SessionState = {isInteractive: false, isRollCallScheduled: false};
+	const session: SessionState = {isInteractive: false};
 
 	on('session.start', async ($, e, next) => {
 		session.isInteractive = e.isInteractive;
@@ -40,25 +51,60 @@ export function register(on: On): void {
 
 		return compaction;
 	});
-}
 
-function scheduleRollCall($: EngineInterface, session: SessionState, occasion: string): void {
-	if (!session.isInteractive || session.isRollCallScheduled) return;
+	on('tool.call', async ($, e, next) => {
+		const call = await next(e);
+		if (!session.isInteractive || e.tool !== 'Skill' || call.isError !== true) return call;
 
-	session.isRollCallScheduled = true;
-	// constraint: Claude Code refuses `$.command.run` from a hook that the turn or a command waits on; a timer runs it after
-	$.clock.after(0, () => {
-		session.isRollCallScheduled = false;
-		void rollCall($, occasion);
+		const unloaded = await unloadedPluginOf($, call.text ?? '').catch((err: unknown) => {
+			$.ui.log(`roll call failed: ${String(err)}`);
+
+			return undefined;
+		});
+		if (unloaded === undefined) return call;
+
+		scheduleRollCall($, session, `after ${e.skill} failed`, [unloaded]);
+		const note =
+			`plugin-rollcall: Claude Code lists no skill or command of the ${unloaded} plugin, ` +
+			'so plugin-rollcall tries to reload it when this turn ends.';
+
+		return {...call, context: [...(call.context ?? []), note]};
 	});
 }
 
-async function rollCall($: EngineInterface, occasion: string): Promise<void> {
-	await reloadMissing($, occasion).catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`));
+function scheduleRollCall(
+	$: EngineInterface,
+	session: SessionState,
+	occasion: string,
+	unloaded: readonly string[] = [],
+): void {
+	if (!session.isInteractive) return;
+
+	if (session.scheduled !== undefined) {
+		for (const id of unloaded) session.scheduled.unloaded.add(id);
+		return;
+	}
+
+	const scheduled: ScheduledRollCall = {occasion, unloaded: new Set(unloaded)};
+	session.scheduled = scheduled;
+	// constraint: Claude Code refuses `$.command.run` from a hook that the turn or a command waits on; a timer runs it after
+	$.clock.after(0, () => {
+		session.scheduled = undefined;
+		void rollCall($, scheduled.occasion, [...scheduled.unloaded]);
+	});
 }
 
-async function reloadMissing($: EngineInterface, occasion: string): Promise<void> {
-	const missing = await missingPluginsOf($);
+async function rollCall($: EngineInterface, occasion: string, unloaded: readonly string[] = []): Promise<void> {
+	await reloadMissing($, occasion, unloaded).catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`));
+}
+
+async function reloadMissing($: EngineInterface, occasion: string, unloaded: readonly string[]): Promise<void> {
+	const unrecorded = await missingPluginsOf($).catch((err: unknown) => {
+		$.ui.log(`roll call failed: ${String(err)}`);
+
+		return [];
+	});
+	const missing = [...new Set([...unloaded, ...unrecorded])];
 	if (missing.length === 0) return;
 
 	await $.command.run({command: 'reload-plugins'});
@@ -89,6 +135,19 @@ async function marketplacePluginsOf($: EngineInterface): Promise<string[]> {
 	const marketplaces = Object.keys(objectOf('known_marketplaces.json', marketplacesFile));
 
 	return enabled.filter((id) => marketplaces.includes(id.slice(id.lastIndexOf('@') + 1)));
+}
+
+async function unloadedPluginOf($: EngineInterface, error: string): Promise<string | undefined> {
+	const name = UNKNOWN_PLUGIN_SKILL.exec(error)?.[1];
+	if (name === undefined) return undefined;
+
+	const plugins = await marketplacePluginsOf($);
+	const id = plugins.find((candidate) => candidate.slice(0, candidate.lastIndexOf('@')) === name);
+	if (id === undefined) return undefined;
+
+	const commands = await $.command.list();
+
+	return commands.some((command) => command.plugin === name) ? undefined : id;
 }
 
 async function pluginsDirOf($: EngineInterface): Promise<string> {
