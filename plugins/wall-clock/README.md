@@ -1,4 +1,11 @@
+<div align="center">
+
 # wall-clock
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+
+</div>
 
 The agent knows the time of day, how long you were away, and how long its current turn has run.
 

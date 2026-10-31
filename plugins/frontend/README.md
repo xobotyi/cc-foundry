@@ -1,4 +1,11 @@
+<div align="center">
+
 # frontend
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+
+</div>
 
 CSS, accessibility, and React, Vue, or Svelte code that follows the browser's rules, with each visible design choice
 made on purpose.

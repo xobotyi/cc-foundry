@@ -1,4 +1,12 @@
+<div align="center">
+
 # git-commit
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 Claude's work, committed in units a reviewer can read one at a time. The `commit` skill splits the diff into the
 smallest units it judges to keep the tree working, orders them, and audits every message body against the staged diff

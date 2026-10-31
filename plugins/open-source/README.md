@@ -1,4 +1,12 @@
+<div align="center">
+
 # open-source
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 Issues and pull requests for projects you don't maintain, drafted to the project's own rules for a human to submit.
 

@@ -1,4 +1,12 @@
+<div align="center">
+
 # javascript
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 JavaScript and TypeScript written for the baseline the project declares (the ECMAScript edition, the TypeScript release,
 the Node major), navigated through `typescript-language-server` instead of text search.

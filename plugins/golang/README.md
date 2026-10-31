@@ -1,4 +1,12 @@
+<div align="center">
+
 # golang
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 Go that follows the language's own idioms and the version the module's `go` directive permits, navigated through `gopls`
 instead of text search.

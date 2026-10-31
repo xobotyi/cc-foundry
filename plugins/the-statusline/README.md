@@ -1,4 +1,11 @@
+<div align="center">
+
 # the-statusline
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+
+</div>
 
 A two-row status line that shows the context left, the rate limit closest to running out, and what the session costs,
 and keeps working when an agent changes directory.
