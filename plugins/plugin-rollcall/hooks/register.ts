@@ -7,8 +7,11 @@ type ScheduledRollCall = {
 
 type SessionState = {
 	isInteractive: boolean;
+	isInstalling: boolean;
 	scheduled?: ScheduledRollCall;
 };
+
+const INSTALL_TIMEOUT_MS = 120_000;
 
 // constraint: Claude Code names a skill it cannot find in the error text alone, as `Unknown skill: <plugin>:<skill>`
 const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
@@ -24,14 +27,18 @@ const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
  * that come before it share it. A failed skill call tells the model that the mod tries to reload its plugin when the
  * turn ends, and its reload runs even when the install records cannot be read.
  *
+ * With `FOUNDRY_PLUGIN_ROLLCALL_INSTALL=1`, a reload also starts `claude plugin install <id> --scope local` in the
+ * background for each plugin without an install record, which writes the record and enables the plugin in the
+ * project's `.claude/settings.local.json`, so later sessions load it at startup.
+ *
  * @param on the engine's registrar
  */
 export function register(on: On): void {
-	const session: SessionState = {isInteractive: false};
+	const session: SessionState = {isInteractive: false, isInstalling: false};
 
 	on('session.start', async ($, e, next) => {
 		session.isInteractive = e.isInteractive;
-		if (e.isInteractive) await rollCall($, 'skipped at startup');
+		if (e.isInteractive) await rollCall($, session, 'skipped at startup');
 
 		return next(e);
 	});
@@ -90,25 +97,73 @@ function scheduleRollCall(
 	// constraint: Claude Code refuses `$.command.run` from a hook that the turn or a command waits on; a timer runs it after
 	$.clock.after(0, () => {
 		session.scheduled = undefined;
-		void rollCall($, scheduled.occasion, [...scheduled.unloaded]);
+		void rollCall($, session, scheduled.occasion, [...scheduled.unloaded]);
 	});
 }
 
-async function rollCall($: EngineInterface, occasion: string, unloaded: readonly string[] = []): Promise<void> {
-	await reloadMissing($, occasion, unloaded).catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`));
+async function rollCall(
+	$: EngineInterface,
+	session: SessionState,
+	occasion: string,
+	unloaded: readonly string[] = [],
+): Promise<void> {
+	await reloadMissing($, session, occasion, unloaded).catch((err: unknown) =>
+		$.ui.log(`roll call failed: ${String(err)}`),
+	);
 }
 
-async function reloadMissing($: EngineInterface, occasion: string, unloaded: readonly string[]): Promise<void> {
+async function reloadMissing(
+	$: EngineInterface,
+	session: SessionState,
+	occasion: string,
+	unloaded: readonly string[],
+): Promise<void> {
 	const unrecorded = await missingPluginsOf($).catch((err: unknown) => {
 		$.ui.log(`roll call failed: ${String(err)}`);
 
 		return [];
 	});
 	const missing = [...new Set([...unloaded, ...unrecorded])];
-	if (missing.length === 0) return;
+	if (missing.length > 0) {
+		await $.command.run({command: 'reload-plugins'});
+		$.ui.log(`reloaded plugins ${occasion}: ${missing.join(', ')}`);
+	}
 
-	await $.command.run({command: 'reload-plugins'});
-	$.ui.log(`reloaded plugins ${occasion}: ${missing.join(', ')}`);
+	if (!(await isInstallModeOn($)) || unrecorded.length === 0 || session.isInstalling) return;
+
+	session.isInstalling = true;
+	void installLocally($, unrecorded)
+		.catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`))
+		.finally(() => {
+			session.isInstalling = false;
+		});
+}
+
+async function isInstallModeOn($: EngineInterface): Promise<boolean> {
+	const value = await $.env.get('FOUNDRY_PLUGIN_ROLLCALL_INSTALL');
+	if (value === undefined || value === '0') return false;
+	if (value === '1') return true;
+
+	throw new Error(`FOUNDRY_PLUGIN_ROLLCALL_INSTALL must be 0 or 1, not "${value}"`);
+}
+
+async function installLocally($: EngineInterface, ids: readonly string[]): Promise<void> {
+	const root = await $.session.root();
+	const installed: string[] = [];
+
+	// constraint: each install rewrites installed_plugins.json and .claude/settings.local.json, so one runs at a time
+	for (const id of ids) {
+		const argv = ['claude', 'plugin', 'install', id, '--scope', 'local'];
+		const run = await $.process.run(argv, {cwd: root, timeoutMs: INSTALL_TIMEOUT_MS});
+		if (run.exitCode === 0) {
+			installed.push(id);
+		} else {
+			const reason = (run.stderr.trim() || run.stdout.trim()).split('\n')[0];
+			$.ui.log(`roll call failed: ${argv.join(' ')} exited ${run.exitCode}: ${reason}`);
+		}
+	}
+
+	if (installed.length > 0) $.ui.log(`installed plugins at local scope: ${installed.join(', ')}`);
 }
 
 async function missingPluginsOf($: EngineInterface): Promise<string[]> {
