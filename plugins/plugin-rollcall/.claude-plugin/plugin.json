@@ -1,6 +1,6 @@
 {
 	"name": "plugin-rollcall",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"description": "Reloads plugins that settings enable but Claude Code skipped at startup",
 	"author": {
 		"name": "xobotyi",
