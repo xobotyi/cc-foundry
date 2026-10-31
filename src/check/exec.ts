@@ -13,6 +13,8 @@ export type ExecOptions = {
 	readonly cwd?: string;
 	/** Written to the process's stdin, which is then closed. */
 	readonly input?: string;
+	/** Variables set on top of this process's environment. */
+	readonly env?: Readonly<Record<string, string>>;
 };
 
 /**
@@ -20,7 +22,8 @@ export type ExecOptions = {
  * before it reads all of its input settles with its exit code.
  */
 export async function exec(command: string, args: readonly string[], options: ExecOptions = {}): Promise<ExecResult> {
-	const child = spawn(command, args, {cwd: options.cwd, stdio: ['pipe', 'pipe', 'pipe']});
+	const env = options.env === undefined ? undefined : {...process.env, ...options.env};
+	const child = spawn(command, args, {cwd: options.cwd, env, stdio: ['pipe', 'pipe', 'pipe']});
 	const exited = new Promise<number | null>((resolve, reject) => {
 		child.once('error', reject);
 		child.once('close', resolve);
