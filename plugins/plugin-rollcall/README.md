@@ -35,6 +35,10 @@ A reload does not always survive `/clear`, a resume, or a compaction: the plugin
 the check after each of them and reloads once that step has finished. Steps that follow each other before the reload
 runs share one reload.
 
+The mod also catches a missing plugin in the act. When a call to one of a plugin's skills fails as unknown, the plugin
+is enabled, and Claude Code lists no command of it, the mod tells the model that it tries to reload the plugin when the
+turn ends, and reloads it then. The skill works from the next turn, whether or not the plugin has an install record.
+
 The mod only reads. It never writes install records or settings, so it cannot corrupt a file another session writes. A
 read that lands mid-write in another session can still fail; the mod then reports `roll call failed` and skips the
 reload for that session. A session where every enabled plugin has an install record never sees it.
@@ -60,9 +64,12 @@ new worktree or a fresh clone of that project has no install record for it, so i
   alongside the mod rather than after it, and a mod cannot fire them again. The plugin's other hooks run as usual from
   the first prompt on. A manual `/reload-plugins` has the same gap.
 - Some organizations manage a plugin that intercepts compaction before any other plugin sees it. Under such a plugin the
-  mod never learns of a compaction and does not reload after one.
-- Tested with Claude Code 2.1.310. The reload after `/clear` is tested with 2.1.316; the reloads after a resume and
-  after a compaction are covered by the test suite only.
+  mod never learns of a compaction and does not reload after one; the first failed skill call of a missing plugin
+  reloads it instead.
+- A plugin with no skills or commands never lists one, so a failed call to a skill it lacks reloads it even when it is
+  loaded.
+- Tested with Claude Code 2.1.310. The reloads after `/clear` and after a failed skill call are tested with 2.1.316; the
+  reloads after a resume and after a compaction are covered by the test suite only.
 
 ## License
 
