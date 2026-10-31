@@ -109,3 +109,32 @@ vp run cli docs-fetch <inventory-path> [--dirty]
   as `.html` instead
 - Every saved file gets YAML frontmatter with `url` and `fetchedAt`
 - `lastFetched` in the inventory file is rewritten after the run
+
+### xerj-hub-refresh
+
+Move the XERJ Corpus Hub manifests of released plugins to their release commit, inside a xerj checkout. The `release`
+skill runs it after it publishes the releases.
+
+```bash
+vp run cli xerj-hub-refresh --hub <xerj-checkout> --sha <release-commit> <plugin>...
+```
+
+**Arguments:**
+
+- `plugin` — a released plugin; every cc-foundry manifest whose `paths` lie inside `plugins/<plugin>/` moves
+
+**Flags:**
+
+- `--hub` — a xerj checkout on the `corpus-hub` branch; the manifests in `tools/xerj-code/hub/` are rewritten in place
+- `--sha` — the full SHA of the release commit, which must be on `origin/master`
+
+**Behavior:**
+
+- Measures each manifest at the new pin with `xerj corpus add --from` in a throwaway `XERJ_CODE_HOME`, so `xerj` must be
+  on `PATH`
+- Rewrites `sha`, `files`, `bytes`, `cloned_at`, the detected `licence`, and the review's `at` and `note`. The backlog
+  rows stay as they are
+- Leaves a manifest already at the pin alone, and skips the manifests of other repositories
+- Fails with every file unchanged when a plugin is missing, when a build fails, or when the LICENSE at the release
+  differs from the one at a manifest's current pin — a changed licence needs a human review
+- Commits nothing
