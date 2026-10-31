@@ -1,9 +1,10 @@
 ---
 name: release
 description: >-
-  GitHub release creation for cc-foundry plugins: per-plugin tags, release notes as the changelog, and post-merge
-  publishing. Invoke whenever task involves merging a pull request into master, releasing or publishing a plugin
-  version, bumping plugin versions, or writing release notes.
+  GitHub release creation for cc-foundry plugins: per-plugin tags, release notes as the changelog, post-merge
+  publishing, and moving the released plugins' XERJ Corpus Hub pins. Invoke whenever task involves merging a pull
+  request into master, releasing or publishing a plugin version, bumping plugin versions, writing release notes, or
+  refreshing the Corpus Hub pins.
 ---
 
 # Plugin Releases
@@ -110,3 +111,41 @@ gh release create <plugin>-v<X.Y.Z> \
 
 - `gh release view <tag>` — confirm title, target, and notes.
 - Cross-check: every plugin bumped in the merged range has a release; `plugin.json` version equals the latest tag.
+
+## Move the XERJ Corpus Hub Pins
+
+The XERJ Corpus Hub pins every cc-foundry corpus to a commit, so a release reaches hub users only once the corpora
+inside that plugin move to its release target. Do this after the releases of a merge are published. The user's
+authorization to merge covers this pull request as well. Work in this order:
+
+1. Find an open refresh pull request: `gh pr list --repo xerj-org/xerj --author xobotyi --base corpus-hub --state open`.
+   When one exists, add to its branch instead of opening a second one.
+2. Clone the fork into a new temporary directory, partial and sparse:
+   ```bash
+   git clone --filter=blob:none --sparse git@github.com:xobotyi/xerj.git <tmp>
+   git -C <tmp> sparse-checkout set tools/xerj-code/hub tools/packs
+   git -C <tmp> remote add upstream https://github.com/xerj-org/xerj.git
+   git -C <tmp> fetch upstream corpus-hub
+   ```
+   Switch to the open pull request's branch from step 1, or create `cc-foundry-pins-<YYYY-MM-DD>` from
+   `upstream/corpus-hub` when there is none.
+3. From the cc-foundry root, after `git fetch origin`, run the refresh once per release target, naming the plugins
+   released at that target:
+   ```bash
+   vp run cli xerj-hub-refresh --hub <tmp> --sha <release-target-sha> <plugin>...
+   ```
+   A plugin with no corpus moves nothing; when no manifest changed, delete the clone and stop. When the command reports
+   that the LICENSE changed, stop and ask the user to review the licence, because the hub accepts a changed licence only
+   with a human review.
+4. Run the hub's CI check in the clone: `python3 -I tools/xerj-code/hub/validate_hub.py`.
+5. Commit in the clone with the subject `hub: move cc-foundry pins to <plugin> v<X.Y.Z>`, naming every release the
+   commit covers, and never add a `Co-Authored-By` trailer, which xerj's `.github/AI_CONTRIBUTIONS.md` forbids. The
+   commit author is `xobotyi`, the account that signed xerj's CLA.
+6. Push the branch to the fork and open the pull request against `corpus-hub`. The body opens with xerj's provenance
+   line, naming the real tool and model:
+   ```
+   Written by an AI coding agent (Claude Code, <model>), run by @xobotyi, who approved this release.
+   ```
+   Then link each release, and list each moved corpus with its old and new pin as the command printed them.
+7. Confirm that `gh pr checks <number> --repo xerj-org/xerj` reports `validate` and `verification/cla-signed` as
+   passing, then delete the clone.
