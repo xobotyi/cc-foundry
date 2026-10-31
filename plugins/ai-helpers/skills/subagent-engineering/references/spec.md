@@ -201,11 +201,23 @@ Events without matcher support (always fire): `UserPromptSubmit`, `Stop`, `Teamm
 
 ### Exit Code Behavior
 
-For `PreToolUse`:
+For `PreToolUse`, the exit code and stdout decide the outcome together:
 
-- `0` → allow
-- `2` → block tool call; stderr (or stdout if stderr empty) shown to Claude
-- Other non-zero → non-blocking error; execution continues
+- `0` → success. The fields of a JSON object on stdout apply. Without a JSON decision, the call goes through the normal
+  permission flow: exit 0 alone does not allow it.
+- `2` → blocks the tool call. Claude receives stderr as the reason. JSON fields on stdout are still read, but they
+  cannot override the block.
+- Any other code, on a hook without `"onFailure": "block"` → non-blocking error, and the call goes through the normal
+  permission flow. When stdout is a JSON object that passes schema validation, Claude Code ignores the exit code and the
+  fields alone decide.
+
+`"onFailure": "block"` on a command or HTTP hook (Claude Code 2.1.295 and later) blocks the call when the hook fails: an
+exit code other than 0 and 2 with or without JSON, a hook that cannot start, invalid JSON, or a timeout.
+
+A JSON decision sits in `hookSpecificOutput.permissionDecision`. `allow` skips the permission prompt, except for actions
+that no permission mode approves. `deny` blocks the call and shows `permissionDecisionReason` to Claude. `ask` prompts
+the user. `defer` ends the turn so that a `-p` caller can resume the call later; an interactive session ignores it. Deny
+and ask permission rules apply whatever the hook returns.
 
 ### Subagent Lifecycle Events (in `settings.json`)
 

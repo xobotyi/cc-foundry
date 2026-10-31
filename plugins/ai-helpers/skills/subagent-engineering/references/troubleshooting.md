@@ -221,12 +221,12 @@ Fix:
 
 ### TeammateIdle not firing
 
-Cause: hook `event` field set incorrectly, or hook exit code is 0 (exit 2 is required to inject instructions).
+Cause: hook `event` field set incorrectly, or the hook exits 0, which lets the teammate go idle.
 
 Fix:
 
 - Confirm hook event is `TeammateIdle` (not `AgentIdle` or similar).
-- Exit with code `2` to inject new instructions; exit `0` means "continue normally".
+- Exit `2` to keep the teammate working: it receives the hook's stderr as feedback. Exit `0` lets it go idle.
 
 ### TaskCompleted hook not blocking completion
 
@@ -377,10 +377,8 @@ Diagnosis checklist:
 
 ### Hook fires but has no effect
 
-Cause: hook exits with code 0 (no-op). Exit codes:
-
-- **0** — continue normally
-- **2** — inject content into context (for `PreToolUse` / `TeammateIdle`) or block (for `TaskCompleted`)
+Cause: the hook exits 0 without a JSON decision, or its run ends in a non-blocking error. For `PreToolUse`, the Exit
+Code Behavior section of `spec.md` states which exit code and stdout produce which outcome.
 
 Fix:
 
