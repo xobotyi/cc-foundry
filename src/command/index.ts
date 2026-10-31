@@ -1,6 +1,7 @@
 import {defineCommand} from 'citty';
 import check from './check.ts';
 import docsFetch from './docs-fetch.ts';
+import xerjHubRefresh from './xerj-hub-refresh.ts';
 
 export default defineCommand({
 	meta: {
@@ -11,5 +12,6 @@ export default defineCommand({
 	subCommands: {
 		check,
 		'docs-fetch': docsFetch,
+		'xerj-hub-refresh': xerjHubRefresh,
 	},
 });

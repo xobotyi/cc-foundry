@@ -58,7 +58,8 @@ process (Research → Scaffold → Write → Ship).
 **Development artifacts:**
 
 - `src/` holds the repository's dev CLI, run from the root as `vp run cli <command>`: `check` validates the marketplace
-  and every plugin, `docs-fetch` fetches a skill's reference sources ([src/CLAUDE.md](/src/CLAUDE.md))
+  and every plugin, `docs-fetch` fetches a skill's reference sources, `xerj-hub-refresh` moves the XERJ Corpus Hub pins
+  of released plugins ([src/CLAUDE.md](/src/CLAUDE.md))
 - A plugin's `.dev/` directory holds its build tooling and source materials
 - `.dev/reference/` holds fetched docs (raw source, not shipped as-is)
 - `references/` holds processed content (shipped with plugin)
