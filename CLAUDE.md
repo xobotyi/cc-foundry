@@ -86,6 +86,9 @@ process (Research → Scaffold → Write → Ship).
 - Prefer that env knob over a `userConfig` key for optional tuning values, because `userConfig` prompts the user at
   enable time. Where userConfig is warranted, plumb it into the same env name via `${user_config.KEY}` in the hook
   command rather than reading a second variable
+- A mod (a plugin whose `hooks.json` lists `modules`) declares its settings as `userConfig` fields and reads them from
+  `register(on, options)`, with no env knob: Claude Code lists them in `/config`, and a mod has no hook command to plumb
+  an env name through
 
 **Plugin dependencies:**
 
