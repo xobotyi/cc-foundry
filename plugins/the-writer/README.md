@@ -1,4 +1,12 @@
+<div align="center">
+
 # the-writer
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 Agent-written prose that reads like a person wrote it, edited without inventing anything and without flattening the
 voice of whoever wrote it first.

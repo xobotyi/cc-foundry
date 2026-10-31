@@ -1,4 +1,11 @@
+<div align="center">
+
 # plugin-rollcall
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code 2.1.287+](https://img.shields.io/badge/Claude%20Code-2.1.287%2B%20mod-d97757.svg)](https://claude.com/blog/claude-code-mods)
+
+</div>
 
 Plugins that a repository enables in its `.claude/settings.json` load from your first prompt there, including in a fresh
 clone or a new worktree, where Claude Code skips them until you type `/reload-plugins`.

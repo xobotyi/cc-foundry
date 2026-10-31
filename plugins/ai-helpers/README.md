@@ -1,4 +1,12 @@
+<div align="center">
+
 # ai-helpers
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 Prompts, skills, subagents, and output styles that do what you wrote them to do: skills that activate, agents that stay
 in scope, and styles that hold their voice.

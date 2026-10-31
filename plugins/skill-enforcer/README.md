@@ -1,4 +1,11 @@
+<div align="center">
+
 # skill-enforcer
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+
+</div>
 
 Claude checks which skills apply before it answers, and goes back to the unread references of a loaded skill when the
 work moves to a new phase, such as from coding to testing.

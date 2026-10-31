@@ -1,4 +1,12 @@
+<div align="center">
+
 # cc-foundry
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code plugin marketplace](https://img.shields.io/badge/Claude%20Code-plugin%20marketplace-d97757.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
+
+</div>
 
 Plugins that give Claude Code a working discipline (how it codes, commits, plans, and writes) and the language and
 platform knowledge to apply it. It is the set its author works with every day, made public, and its rules come with
