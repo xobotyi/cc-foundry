@@ -35,6 +35,11 @@ Run every command in this file from the repository root.
   aside, when an enabled plugin of that name comes from a known marketplace and `$.command.list()` lists no command of
   it. The mod schedules the reload, which runs once the turn ends even when the install records cannot be read, and adds
   a note to the failed result that names the reload (verified on 2.1.316).
+- `FOUNDRY_PLUGIN_ROLLCALL_INSTALL=1` turns on install mode: after a reload, the mod runs
+  `claude plugin install <id> --scope local` from the session root for each plugin without a record, in the background
+  and one at a time. That writes a `local` record and an `enabledPlugins` entry in the project's
+  `.claude/settings.local.json`, and the next session loads the plugin at startup (verified on 2.1.316). The line
+  `installed plugins at local scope: <ids>` follows; a failed install reports its exit code and first output line.
 - A reload keeps unchanged hooks modules loaded, so `session.start` does not fire again and the mod needs no loop guard
   (verified on 2.1.310). Recheck this if a session ever shows the reload line twice.
 - After a reload, one transcript line names the occasion and the plugins: `reloaded plugins <occasion>: <ids>`, where
@@ -58,14 +63,17 @@ Run every command in this file from the repository root.
   of a missing plugin fails.
 - A plugin with no skills or commands never lists one, so a failed call to a skill it lacks reloads it even when it is
   loaded.
+- Install mode's `enabledPlugins` entry in `.claude/settings.local.json` outranks the project's settings: a plugin the
+  project later disables stays enabled in that checkout until the entry is removed.
 
 ## Conventions
 
-- The mod only reads. It never writes install records or settings, because another session may write the same files at
-  the same time.
+- The mod writes plugin state only in install mode, only through `claude plugin install`, and one install at a time:
+  another session may write the same files at the same time, and Claude Code's installer is the only writer that knows
+  their shape. Outside install mode the mod only reads.
 - Hook engine events, never `classic.*`. A managed-tier plugin first in a chain can pass an event past every mod: on one
   machine a managed plugin passes every `classic.*` event and `session.compact` past them, while `session.start`,
   `session.end`, and `tool.call` reach the mod (verified on 2.1.316).
 - Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in
   `register.ts`. `claude plugin validate` refuses any other form, because its static analysis reads the calls off the
-  source.
+  source. For the same reason `$.env.get` takes a literal variable name.
