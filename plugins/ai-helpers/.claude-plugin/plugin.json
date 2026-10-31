@@ -1,6 +1,6 @@
 {
 	"name": "ai-helpers",
-	"version": "2.2.2",
+	"version": "2.2.3",
 	"description": "AI artifact engineering: prompts, skills, subagents, and output styles",
 	"author": {
 		"name": "xobotyi",
