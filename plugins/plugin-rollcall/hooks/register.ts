@@ -66,21 +66,29 @@ async function reloadMissing($: EngineInterface, occasion: string): Promise<void
 }
 
 async function missingPluginsOf($: EngineInterface): Promise<string[]> {
+	const enabled = await marketplacePluginsOf($);
+	if (enabled.length === 0) return [];
+
+	// constraint: installed_plugins.json is Claude Code's internal plugin state, and its shape is undocumented
+	const [recordsFile, root] = await Promise.all([
+		readJson($, `${await pluginsDirOf($)}/installed_plugins.json`),
+		$.session.root(),
+	]);
+	const recorded = recordedIdsOf(recordsFile, root);
+
+	return enabled.filter((id) => !recorded.has(id));
+}
+
+async function marketplacePluginsOf($: EngineInterface): Promise<string[]> {
 	const settings = await $.settings.read();
 	const enabled = enabledIdsOf(settings.enabledPlugins);
 	if (enabled.length === 0) return [];
 
-	const pluginsDir = await pluginsDirOf($);
-	// constraint: both files are Claude Code's internal plugin state, and their shape is undocumented
-	const [marketplacesFile, recordsFile, root] = await Promise.all([
-		readJson($, `${pluginsDir}/known_marketplaces.json`),
-		readJson($, `${pluginsDir}/installed_plugins.json`),
-		$.session.root(),
-	]);
+	// constraint: known_marketplaces.json is Claude Code's internal plugin state, and its shape is undocumented
+	const marketplacesFile = await readJson($, `${await pluginsDirOf($)}/known_marketplaces.json`);
 	const marketplaces = Object.keys(objectOf('known_marketplaces.json', marketplacesFile));
-	const recorded = recordedIdsOf(recordsFile, root);
 
-	return enabled.filter((id) => marketplaces.includes(id.slice(id.lastIndexOf('@') + 1)) && !recorded.has(id));
+	return enabled.filter((id) => marketplaces.includes(id.slice(id.lastIndexOf('@') + 1)));
 }
 
 async function pluginsDirOf($: EngineInterface): Promise<string> {
