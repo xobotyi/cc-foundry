@@ -3,14 +3,15 @@
 A Claude Code mod that works around
 [anthropics/claude-code#83422](https://github.com/anthropics/claude-code/issues/83422): a marketplace plugin enabled in
 settings is skipped at startup when `installed_plugins.json` holds no install record for the user or for the session's
-project path. At `session.start` the mod finds such plugins and runs `/reload-plugins`, which loads them.
+project path. At `session.start`, and again after `/clear`, a resume, or a compaction, the mod finds such plugins and
+runs `/reload-plugins`, which loads them.
 
 ## Components
 
 Run every command in this file from the repository root.
 
 - **`hooks/register.ts`** — the whole implementation, loaded through `modules` in `hooks/hooks.json`.
-  `claude plugin validate plugins/plugin-rollcall` lists `session.start` as its only hook.
+  `claude plugin validate plugins/plugin-rollcall` lists its hooks: `session.start`, `session.end`, `session.compact`.
 - **`tests/register.test.ts`** — the test-kit suite. Run `claude plugin test plugins/plugin-rollcall` after any change
   to the module.
 - **`tsconfig.json`** — extends `.claude-plugin/types/tsconfig.json`, which Claude Code generates for its own version
@@ -24,9 +25,14 @@ Run every command in this file from the repository root.
   equal to `$.session.root()`. This rule mirrors the loader as observed on 2.1.310; the loader's rule is undocumented.
 - The hook awaits the reload, so the first prompt waits for it, including a prompt passed as `claude "<prompt>"`. The
   await does not deadlock, and the reload takes about 150 ms (verified on 2.1.310).
+- After `/clear` or a resume (`session.end`) and after a compaction of the main conversation (`session.compact`), the
+  mod schedules the roll call with `$.clock.after(0, …)`. Claude Code refuses `$.command.run` from a hook that a turn or
+  a command waits on, and the timer runs once they finish (verified on 2.1.316). Transitions that come before the timer
+  fires share its reload.
 - A reload keeps unchanged hooks modules loaded, so `session.start` does not fire again and the mod needs no loop guard
   (verified on 2.1.310). Recheck this if a session ever shows the reload line twice.
-- After the reload, one transcript line names the plugins it reloaded: `reloaded plugins skipped at startup: <ids>`.
+- After a reload, one transcript line names the occasion and the plugins: `reloaded plugins <occasion>: <ids>`, where
+  the occasion is `skipped at startup`, `after /clear`, `after a resume`, or `after compaction`.
   `claude --plugin-dir plugins/plugin-rollcall` shows it end to end while a plugin that this repository's
   `.claude/settings.json` enables has no install record for the repository's path.
 - A failure goes to the transcript as `roll call failed: <error>`; a malformed state file throws rather than guessing.
@@ -42,11 +48,15 @@ Run every command in this file from the repository root.
   `$.classic` exists only in the test kit (verified on 2.1.310).
 - The detection reads install records, not what the loader did, so it cannot tell when #83422 is fixed. From then on it
   reloads in every session where an enabled plugin has no record. Delete the plugin once the issue is fixed.
+- Where a managed-tier plugin passes `session.compact` past the mods, no reload follows a compaction.
 
 ## Conventions
 
 - The mod only reads. It never writes install records or settings, because another session may write the same files at
   the same time.
+- Hook engine events, never `classic.*`. A managed-tier plugin first in a chain can pass an event past every mod: on one
+  machine a managed plugin passes every `classic.*` event and `session.compact` past them, while `session.start`,
+  `session.end`, and `tool.call` reach the mod (verified on 2.1.316).
 - Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in
   `register.ts`. `claude plugin validate` refuses any other form, because its static analysis reads the calls off the
   source.

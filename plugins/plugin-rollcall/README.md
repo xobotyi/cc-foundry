@@ -9,7 +9,8 @@ The line the mod adds to the transcript after it reloads ([`hooks/register.ts`](
 reloaded plugins skipped at startup: the-coder@foundry
 ```
 
-It names every plugin it had to reload, so a skipped plugin is visible instead of silently missing.
+It names every plugin it had to reload, so a skipped plugin is visible instead of silently missing. A reload after
+`/clear`, a resume, or a compaction names that occasion instead: `reloaded plugins after /clear: the-coder@foundry`.
 
 ## The Problem
 
@@ -30,6 +31,10 @@ runs `/reload-plugins` and holds your first prompt until the reload completes, a
 therefore sees every plugin, even a prompt passed on the command line as `claude "…"`. The transcript shows the reload
 as a prompt from `plugin-rollcall`, followed by a line that names the plugins it reloaded.
 
+A reload does not always survive `/clear`, a resume, or a compaction: the plugins can go missing again. The mod repeats
+the check after each of them and reloads once that step has finished. Steps that follow each other before the reload
+runs share one reload.
+
 The mod only reads. It never writes install records or settings, so it cannot corrupt a file another session writes. A
 read that lands mid-write in another session can still fail; the mod then reports `roll call failed` and skips the
 reload for that session. A session where every enabled plugin has an install record never sees it.
@@ -48,13 +53,16 @@ new worktree or a fresh clone of that project has no install record for it, so i
 - Interactive sessions only. In a `claude -p` run, `/reload-plugins` reports that it is not available and would run
   after the turn anyway.
 - The detection mirrors the loader's behavior as observed, not a documented contract. A plugin skipped for any other
-  reason triggers a reload that does not help, once per session.
+  reason triggers a reload that does not help, at session start and again after each `/clear`, resume, or compaction.
 - The detection reads install records, not what the loader did, so it cannot tell when the bug is fixed. From then on it
   reloads in every session where an enabled plugin has no record. Uninstall the mod once #83422 is fixed.
 - A plugin loaded by the reload misses its own `SessionStart` hooks for that session. Claude Code starts those hooks
   alongside the mod rather than after it, and a mod cannot fire them again. The plugin's other hooks run as usual from
   the first prompt on. A manual `/reload-plugins` has the same gap.
-- Tested with Claude Code 2.1.310.
+- Some organizations manage a plugin that intercepts compaction before any other plugin sees it. Under such a plugin the
+  mod never learns of a compaction and does not reload after one.
+- Tested with Claude Code 2.1.310. The reload after `/clear` is tested with 2.1.316; the reloads after a resume and
+  after a compaction are covered by the test suite only.
 
 ## License
 

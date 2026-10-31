@@ -1,28 +1,68 @@
 import type {EngineInterface, On} from 'claude-code';
 
+type SessionState = {
+	isInteractive: boolean;
+	isRollCallScheduled: boolean;
+};
+
 /**
- * Registers a `session.start` hook that, in an interactive session where a plugin the settings enable is missing,
- * runs `/reload-plugins` and holds the first prompt until the reload completes. A plugin is missing when it comes from
- * a known marketplace and has no install record for the user or for this project, so Claude Code skipped it at startup.
+ * Registers the roll call: in an interactive session where a plugin the settings enable is missing, it runs
+ * `/reload-plugins`. A plugin is missing when it comes from a known marketplace and has no install record for the user
+ * or for this project, so Claude Code skipped it at startup.
+ *
+ * At session start the reload holds the first prompt until it completes. After `/clear`, a resume, or a compaction of
+ * the main conversation, the reload runs once that transition finishes, and transitions that come before it share it.
  *
  * @param on the engine's registrar
  */
 export function register(on: On): void {
+	const session: SessionState = {isInteractive: false, isRollCallScheduled: false};
+
 	on('session.start', async ($, e, next) => {
-		if (e.isInteractive) {
-			await reloadMissing($).catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`));
-		}
+		session.isInteractive = e.isInteractive;
+		if (e.isInteractive) await rollCall($, 'skipped at startup');
 
 		return next(e);
 	});
+
+	on('session.end', async ($, e, next) => {
+		if (e.reason === 'clear') scheduleRollCall($, session, 'after /clear');
+		if (e.reason === 'resume') scheduleRollCall($, session, 'after a resume');
+
+		return next(e);
+	});
+
+	on('session.compact', async ($, e, next) => {
+		const compaction = await next(e);
+		if (e.agentId === undefined && e.trigger !== 'precompute' && compaction.skip === undefined) {
+			scheduleRollCall($, session, 'after compaction');
+		}
+
+		return compaction;
+	});
 }
 
-async function reloadMissing($: EngineInterface): Promise<void> {
+function scheduleRollCall($: EngineInterface, session: SessionState, occasion: string): void {
+	if (!session.isInteractive || session.isRollCallScheduled) return;
+
+	session.isRollCallScheduled = true;
+	// constraint: Claude Code refuses `$.command.run` from a hook that the turn or a command waits on; a timer runs it after
+	$.clock.after(0, () => {
+		session.isRollCallScheduled = false;
+		void rollCall($, occasion);
+	});
+}
+
+async function rollCall($: EngineInterface, occasion: string): Promise<void> {
+	await reloadMissing($, occasion).catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`));
+}
+
+async function reloadMissing($: EngineInterface, occasion: string): Promise<void> {
 	const missing = await missingPluginsOf($);
 	if (missing.length === 0) return;
 
 	await $.command.run({command: 'reload-plugins'});
-	$.ui.log(`reloaded plugins skipped at startup: ${missing.join(', ')}`);
+	$.ui.log(`reloaded plugins ${occasion}: ${missing.join(', ')}`);
 }
 
 async function missingPluginsOf($: EngineInterface): Promise<string[]> {
