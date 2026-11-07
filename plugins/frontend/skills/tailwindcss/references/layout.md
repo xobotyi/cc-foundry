@@ -43,7 +43,6 @@
 - **`absolute`** — `position: absolute`
 - **`fixed`** — `position: fixed`
 - **`sticky`** — `position: sticky`
-
 - `static` — normal flow; offsets ignored; not a positioning context for children.
 - `relative` — normal flow; offsets relative to natural position; IS a positioning context.
 - `absolute` — removed from flow; offsets relative to nearest non-static ancestor.

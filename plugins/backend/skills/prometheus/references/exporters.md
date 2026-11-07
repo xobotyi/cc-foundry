@@ -78,7 +78,7 @@ Instead, create fresh metric instances each scrape:
 
 ### Scrape Meta-Metrics
 
-```
+```text
 myexporter_scrape_duration_seconds   (gauge — per-scrape duration)
 myexporter_scrape_errors_total       (counter — collection failures)
 ```
@@ -95,7 +95,7 @@ the target is down, because it allows partial metric export even when the target
 Include the original metric name, collector/exporter name, and any transformation rules in the `HELP` string. This helps
 users trace metrics back to their source.
 
-```
+```text
 # HELP haproxy_server_bytes_in_total Total bytes received from server.
 # Derived from HAProxy stat: bin
 ```

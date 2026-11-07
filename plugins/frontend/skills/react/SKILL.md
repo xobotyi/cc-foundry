@@ -61,6 +61,7 @@ declarative — it references results, not processes.
 
 - **Handler object** — group all event handlers in a single `handle` object. This creates a clear boundary between logic
   and rendering:
+
   ```tsx
   const handle = {
     submit() { /* ... */ },
@@ -68,9 +69,11 @@ declarative — it references results, not processes.
     keyDown(e: KeyboardEvent) { if (e.key === 'Enter') handle.submit(); },
   };
   ```
+
   Reference in JSX as `onChange={handle.inputChange}`. Never inline handler logic in JSX.
 - **Pre-render computation** — move list rendering and derived JSX out of the return statement into component body
   variables:
+
   ```tsx
   const tabElements: ReactNode[] = [];
   for (const tab of allTabs) {
@@ -78,6 +81,7 @@ declarative — it references results, not processes.
   }
   return <TabList>{tabElements}</TabList>;
   ```
+
   JSX `.map()` inside the return statement is discouraged — compute element arrays in the body, reference them in JSX.
 - **Conditional rendering** — simple conditions (`{isVisible && <Component />}`) are acceptable inline in JSX. When the
   condition is complex or involves multiple branches, compute the result in the component body and reference the
@@ -209,7 +213,7 @@ function, a client snapshot getter, and a server snapshot getter for SSR.
 4. Still painful after composition? Use Context with `use()`.
 5. Is it server data? Use a data-fetching library — not `useState` + `useEffect`.
 
-```
+```text
 Local state → Lift state up → Composition → Context → External library
 ```
 

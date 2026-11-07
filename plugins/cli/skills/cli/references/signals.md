@@ -25,14 +25,16 @@ The most important signal to handle correctly:
 1. **Respond immediately.** Print a message ("Shutting down...") before starting cleanup.
 2. **Cleanup with a timeout.** Don't let cleanup hang forever. Set a deadline (e.g., 5 seconds).
 3. **Second Ctrl-C skips cleanup.** Tell the user what the second press will do:
-   ```
+
+   ```text
    ^C Gracefully stopping... (press Ctrl+C again to force)
    ```
+
 4. **Exit with code 130** (128 + 2) to preserve signal information for calling scripts.
 
 ### Implementation Pattern
 
-```
+```text
 on SIGINT:
     if first_interrupt:
         print "Shutting down... (Ctrl+C again to force)"
@@ -105,7 +107,7 @@ When your program spawns child processes:
 
 When exiting due to a signal, use exit code `128 + signal_number`:
 
-```
+```text
 SIGINT (2)  -> exit 130
 SIGTERM (15) -> exit 143
 SIGPIPE (13) -> exit 141

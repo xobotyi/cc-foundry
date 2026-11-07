@@ -64,11 +64,13 @@ import styles from './Button.module.css';
 - **Use simple, descriptive class names.** Scoping eliminates conflict risk. `.button` not `.btn-component-primary-v2`.
 - **One module per component.**
 - **Compose shared styles:**
+
   ```css
   .button {
     composes: resetButton from './shared.module.css';
   }
   ```
+
 - **Global escape hatch:** `:global(.utility-class)` when needed.
 - **Pair with custom properties** for theming (variables aren't scoped).
 
@@ -136,7 +138,7 @@ Maps naturally to cascade layers:
 
 ### Modern Token-Based Architecture
 
-```
+```text
 tokens/
 ├── colors.css       /* Design tokens as custom properties */
 ├── spacing.css
@@ -167,9 +169,11 @@ utilities/
 - **Never use ID selectors for styling.** `#header` = specificity 1-0-0.
 - **Avoid qualifying classes with elements.** `.error` not `div.error`.
 - **Use `:where()` to zero-out specificity** when needed:
+
   ```css
   :where(.card) .title { /* 0-0-1 specificity */ }
   ```
+
 - **Use `:is()` with awareness** -- takes highest specificity of its arguments.
 
 ### Selector Nesting Depth

@@ -18,7 +18,7 @@ only).
 ### Sources
 
 - Installed executable `~/.local/share/claude/versions/2.1.319` (embedded JavaScript, inspected read-only)
-- https://code.claude.com/docs/en/memory.md, `settings-reference.md`, `errors.md`, `sub-agents.md`,
+- <https://code.claude.com/docs/en/memory.md>, `settings-reference.md`, `errors.md`, `sub-agents.md`,
   `claude-directory.md`
 - `CHANGELOG.md` of github.com/anthropics/claude-code (latest 2.1.319)
 - `~/.claude.json` (cached server flags), `~/.claude/settings.json`
@@ -153,7 +153,7 @@ transcript files are dated 2026-10-08.
 - `plugins/plugin-rollcall/.claude-plugin/types/claude-code-tools/index.d.ts` — per-tool inputs and results (73 tools)
 - `plugins/plugin-rollcall/hooks/register.ts`, `plugins/plugin-rollcall/tests/register.test.ts` — the one mod in the
   repository
-- https://code.claude.com/docs/en/plugins/mods/ (overview, create, reference, interface, events, api, test,
+- <https://code.claude.com/docs/en/plugins/mods/> (overview, create, reference, interface, events, api, test,
   troubleshoot, admin) — official documentation
 
 ### Findings

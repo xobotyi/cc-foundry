@@ -103,7 +103,7 @@ $public-spacing: 16px;    // public
 
 ### File Organization
 
-```
+```text
 styles/
 ├── _index.scss          # @forward entrypoint
 ├── abstracts/

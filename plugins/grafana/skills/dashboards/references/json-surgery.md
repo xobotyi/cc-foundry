@@ -28,7 +28,7 @@ Where a panel lives in Classic schema depends on the state of its row:
 Both states coexist in one dashboard. Any recipe that only walks `.panels[]` silently misses every panel inside a
 collapsed row. The canonical path expression covering every panel at both levels:
 
-```
+```text
 (.panels[], .panels[].panels[]?)
 ```
 

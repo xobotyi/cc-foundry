@@ -111,7 +111,7 @@ Accept secrets via:
 
 When debugging config issues, provide a way to see which source provided each value:
 
-```
+```text
 $ myapp config show --resolved
 port = 8080  (from: --port flag)
 debug = true (from: MYAPP_DEBUG env)

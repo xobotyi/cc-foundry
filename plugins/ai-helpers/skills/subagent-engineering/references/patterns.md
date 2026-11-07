@@ -26,7 +26,7 @@ underperforming agent systems.
 
 Agents execute in order. Each agent's output is the next agent's input.
 
-```
+```text
 pm-spec → architect → implementer → test-runner
 ```
 
@@ -66,7 +66,7 @@ Set status to READY_FOR_BUILD when ADR is complete.
 
 Spawn multiple subagents for independent subtasks. Main agent synthesizes results.
 
-```
+```text
                 → subagent-A → summary-A
 main agent →    → subagent-B → summary-B  → synthesize
                 → subagent-C → summary-C
@@ -74,7 +74,7 @@ main agent →    → subagent-B → summary-B  → synthesize
 
 **Example prompt:**
 
-```
+```text
 Research the authentication, database, and API modules in parallel using separate subagents.
 ```
 
@@ -91,7 +91,7 @@ that arrive only when a teammate sends them) not justified for small fan-outs.
 
 Main agent delegates to general-purpose clones rather than specialized agents.
 
-```
+```text
 main agent → clone (handles subtask A)
            → clone (handles subtask B)
            → clone (handles subtask C)
@@ -113,7 +113,7 @@ main agent → clone (handles subtask A)
 
 Lead agent breaks down work and assigns to specialized workers. Workers have narrow scopes.
 
-```
+```text
 orchestrator
 ├── code-reviewer (Read, Grep, Glob only)
 ├── security-auditor (Read, Grep, Glob, plan mode)
@@ -156,7 +156,7 @@ session — under `-p` a named subagent runs as an ordinary subagent.
 
 **Team lifecycle:**
 
-```
+```text
 1. TaskCreate(subject, description)                      — sessions with the Task tools
    TaskCreate(subject, description, blockedBy=["task-1"])
 2. Agent(prompt, name="researcher-auth")   — the name makes it a teammate
@@ -177,7 +177,7 @@ can open in its own split pane.
 
 _Independent parallel work:_
 
-```
+```text
 ├── Task: "Refactor auth middleware"        (no dependencies)
 ├── Task: "Refactor logging middleware"     (no dependencies)
 └── Task: "Refactor rate-limit middleware"  (no dependencies)
@@ -187,7 +187,7 @@ _Independent parallel work:_
 
 _Pipeline with dependencies:_
 
-```
+```text
 ├── Task 1: "Design API schema for /users endpoint"
 ├── Task 2: "Implement API handlers"         (blockedBy: ["1"])
 └── Task 3: "Write integration tests"        (blockedBy: ["2"])
@@ -197,7 +197,7 @@ Task 2 cannot start until Task 1 completes.
 
 _Research fan-out with synthesis:_
 
-```
+```text
 ├── Task 1: "Analyze authentication patterns"
 ├── Task 2: "Analyze authorization patterns"
 ├── Task 3: "Analyze session management patterns"
@@ -215,7 +215,7 @@ _Research fan-out with synthesis:_
 
 Good task description:
 
-```
+```text
 Refactor the authentication middleware in src/middleware/auth.ts.
 Replace session-based auth with JWT validation.
 JWT secret is in process.env.JWT_SECRET.
@@ -224,7 +224,7 @@ Existing tests are in src/middleware/__tests__/auth.test.ts — update them.
 
 Bad task description:
 
-```
+```text
 Fix the auth thing we discussed.
 ```
 
@@ -307,7 +307,7 @@ tools: Bash, Read
 
 **Or at runtime:**
 
-```
+```text
 Run the test suite in the background and let me know when it's done.
 ```
 

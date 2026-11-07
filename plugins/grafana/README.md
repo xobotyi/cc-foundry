@@ -27,7 +27,7 @@ perceptually sound design choices, not just technically valid ones.
 
 ## Installation
 
-```
+```text
 /plugin install grafana --marketplace xobotyi/cc-foundry
 ```
 

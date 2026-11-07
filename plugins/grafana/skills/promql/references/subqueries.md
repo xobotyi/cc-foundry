@@ -16,7 +16,7 @@ a raw selector. Used when a range-vector function needs already-aggregated or tr
 
 ## Syntax
 
-```
+```text
 <instant-vector-expression> '[' <range> ':' [<resolution>] ']' [ @ <timestamp> ] [ offset <duration> ]
 ```
 

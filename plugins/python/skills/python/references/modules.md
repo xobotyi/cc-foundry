@@ -74,7 +74,7 @@ Python has two types of packages:
 A directory containing `__init__.py`. When imported, `__init__.py` is implicitly executed and its objects bound to names
 in the package namespace.
 
-```
+```text
 parent/
     __init__.py
     one/
@@ -91,7 +91,7 @@ Directories without `__init__.py` — composite packages where portions may resi
 Namespace packages use a custom iterable for `__path__` that performs a new search on each import attempt if `sys.path`
 changes.
 
-```
+```text
 company/
 ├── auth/           # no __init__.py
 │   └── tokens.py

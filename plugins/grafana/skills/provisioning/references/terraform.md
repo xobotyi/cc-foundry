@@ -98,7 +98,7 @@ commit tokens.
 | RBAC role assignment  | `grafana_role_assignment`             |
 | Cloud stack           | `grafana_cloud_stack`                 |
 
-Full catalog: https://registry.terraform.io/providers/grafana/grafana/latest/docs
+Full catalog: <https://registry.terraform.io/providers/grafana/grafana/latest/docs>
 
 ## Folders and dashboards
 

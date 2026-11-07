@@ -5,14 +5,14 @@ visualization, and alerting. Each backend has different requirements for metric 
 
 ## Architecture Overview
 
-```
+```text
 Application  --UDP-->  StatsD Daemon  --flush-->  Backend
                        (aggregation)              (storage + query)
 ```
 
 Common topologies:
 
-```
+```text
 # Classic: StatsD -> Graphite
 App -> statsd (Node.js) -> Graphite (Carbon + Whisper)
 
@@ -62,7 +62,7 @@ StatsD server.
 
 **Recommended:** Run as a sidecar alongside the application pod.
 
-```
+```text
 +-------------+    +----------+    +------------+
 | Application +--->| Exporter |<---+ Prometheus |
 +-------------+    +----------+    +------------+
@@ -70,7 +70,7 @@ StatsD server.
 
 **Transitional:** Run alongside existing StatsD with relay mode.
 
-```
+```text
 +-------------+    +----------+    +--------+
 | Application +--->| Exporter +--->| StatsD |
 +-------------+    +----------+    +--------+
@@ -190,7 +190,7 @@ templates = [
 
 Transforms:
 
-```
+```text
 cpu.load.us-west:100|g  =>  cpu_load,region=us-west value=100
 mem.cached.host01:256|g =>  mem_cached,host=host01 value=256
 ```

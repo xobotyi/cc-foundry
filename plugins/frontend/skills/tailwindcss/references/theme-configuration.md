@@ -122,7 +122,7 @@ Breakpoints generate **variants**, not utilities. Colors generate multiple utili
 All v4 default colors use OKLCH. Use OKLCH for custom colors — perceptually uniform, works reliably in CSS
 `color-mix()`.
 
-```
+```text
 oklch(lightness chroma hue)
 oklch(0.72 0.11 178)   /* lightness: 0–1, chroma: 0–0.4+, hue: 0–360 */
 ```

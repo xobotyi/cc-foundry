@@ -48,7 +48,7 @@ second-language writing at the same time, so a detector score is not a target wo
 
 ## Installation
 
-```
+```text
 /plugin install the-writer --marketplace xobotyi/cc-foundry
 ```
 
@@ -76,7 +76,7 @@ markers that failed to replicate and the ones no study has measured.
 
 The skill activates when a task involves prose for human readers. Invoke it explicitly with:
 
-```
+```text
 /the-writer:humanize
 ```
 

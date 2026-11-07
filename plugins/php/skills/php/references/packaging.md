@@ -74,7 +74,7 @@ Prefer `^` (caret) for dependencies — it allows minor and patch updates while 
 
 The standard autoloading mechanism. Maps namespace prefixes to base directories.
 
-```
+```text
 Fully Qualified Class Name:  App\Http\Controller\UserController
 Namespace Prefix:            App\
 Base Directory:              src/
@@ -92,7 +92,7 @@ Rules:
 
 ### Application
 
-```
+```text
 my-project/
 ├── composer.json
 ├── composer.lock
@@ -117,7 +117,7 @@ my-project/
 
 ### Library
 
-```
+```text
 my-library/
 ├── composer.json
 ├── src/

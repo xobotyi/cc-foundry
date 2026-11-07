@@ -25,7 +25,7 @@ Focuses on platform-level concerns that apply across languages.
 
 ## Installation
 
-```
+```text
 /plugin install backend --marketplace xobotyi/cc-foundry
 ```
 

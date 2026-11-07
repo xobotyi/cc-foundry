@@ -128,7 +128,7 @@ FROM node:22-alpine
 
 ## .dockerignore
 
-```
+```text
 .git
 .github
 .env
@@ -153,7 +153,6 @@ from the build context.
 - **`ENTRYPOINT ["app"]` + `CMD ["--default-flag"]`** — App with overridable defaults
 - **`CMD ["app", "--flag"]`** — Simple service, fully overridable
 - **`ENTRYPOINT ["entrypoint.sh"]` + `CMD ["app"]`** — Init script pattern (Postgres-style)
-
 - Use exec form `["binary", "arg"]` — not shell form `binary arg`
 - Shell form wraps in `/bin/sh -c`, preventing signal forwarding to PID 1
 - Entrypoint scripts must use `exec "$@"` to replace shell with the app process
@@ -223,11 +222,13 @@ docker buildx build \
 ```
 
 - Use `--platform` in `FROM` to handle architecture-specific base images:
+
   ```dockerfile
   FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS build
   ARG TARGETOS TARGETARCH
   RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /app
   ```
+
 - `$BUILDPLATFORM` — the platform running the build (for cross-compilation)
 - `$TARGETPLATFORM`, `$TARGETOS`, `$TARGETARCH` — the target platform
 - Essential for ARM/x86 portability (Apple Silicon, Raspberry Pi, cloud ARM instances)

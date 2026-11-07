@@ -120,7 +120,7 @@ subgraphs, nodes to subgraphs, and subgraphs to nodes.
 
 The default layout engine is Dagre. For large or complex diagrams with overlapping nodes, use the ELK renderer:
 
-```
+```text
 %%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
 ```
 

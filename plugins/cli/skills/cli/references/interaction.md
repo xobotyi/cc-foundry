@@ -8,7 +8,7 @@ user input. Extends the behavioral rules in SKILL.md with patterns and edge case
 The fundamental mechanism for deciding between interactive and non-interactive behavior is checking whether
 stdin/stdout/stderr are connected to a terminal (TTY).
 
-```
+```text
 if stdin is TTY:
     interactive input is possible (prompts, confirmations)
 else:
@@ -126,7 +126,7 @@ When the user hits Ctrl-C during a long operation:
 
 Example:
 
-```
+```text
 ^C Gracefully stopping... (press Ctrl+C again to force)
 ```
 
@@ -136,14 +136,14 @@ Example:
 
 Structure error messages consistently:
 
-```
+```text
 error: <what went wrong>
   hint: <how to fix it>
 ```
 
 Or with context:
 
-```
+```text
 error: cannot write to /etc/config
   cause: permission denied
   hint: run with sudo or use --config-dir to specify a writable location

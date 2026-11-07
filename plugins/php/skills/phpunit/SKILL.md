@@ -101,7 +101,6 @@ final class PaymentServiceTest extends TestCase
 - **`assertPostConditions()`** — Method scope; after test, before tearDown
 - **`tearDown()`** — Method scope; after each test
 - **`tearDownAfterClass()`** — Class scope; once after last test
-
 - **Call `parent::setUp()`** when extending abstract test cases — otherwise parent fixture setup is silently skipped.
 - **Use `#[Before]` / `#[After]` attributes** when multiple setup methods are needed (avoids fragile `parent::setUp()`
   chains).
@@ -357,7 +356,7 @@ PHPUnit 11 uses PHP 8 attributes exclusively. All attributes are in the `PHPUnit
 
 ### Directory Structure
 
-```
+```text
 tests/
 ├── Unit/                     # Fast, isolated, no I/O
 │   ├── Service/
@@ -458,7 +457,7 @@ existing test style. If an existing codebase contradicts a convention, follow th
 When **reviewing** tests: cite the specific issue and show the fix inline. Don't lecture — state what's wrong and how to
 fix it.
 
-```
+```text
 Bad:  "According to PHPUnit best practices, you should use createStub
        instead of createMock when you don't need expectations..."
 Good: "createMock → createStub (no expects() call, stub is sufficient)"

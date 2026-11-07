@@ -117,7 +117,7 @@ Create a top-level `tests/` directory next to `src/`. Cargo compiles **each file
 test there reaches only the public API and must bring the crate in with `use my_crate::...` - exactly as an external
 consumer would.
 
-```
+```text
 adder
 |-- Cargo.toml
 |-- src
@@ -157,7 +157,7 @@ When several integration files share setup, extract it - but the naive extractio
 **Bad - `tests/common.rs`:** Cargo compiles it as its own integration crate and prints a spurious empty section, even
 though it has no `#[test]` functions and is never called directly:
 
-```
+```text
      Running tests/common.rs (target/debug/deps/common-92948b65e88960b4)
 
 running 0 tests
@@ -168,7 +168,7 @@ test result: ok. 0 passed; 0 failed; ...
 **Good - `tests/common/mod.rs`:** the `mod.rs`-in-subdirectory form is the older module-path convention that Rust still
 understands. Files in subdirectories of `tests/` are **not** compiled as separate crates and get no output section.
 
-```
+```text
 tests
 |-- common
 |   `-- mod.rs

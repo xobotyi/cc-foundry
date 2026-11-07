@@ -336,7 +336,7 @@ groups:
 
 ### Multi-tenant rules layout
 
-```
+```text
 /tmp/loki/rules/<tenant id>/rules1.yaml
                             /rules2.yaml
 ```

@@ -34,7 +34,7 @@ If both pre-checks pass, proceed to diagnosis.
 
 ## Iteration Cycle
 
-```
+```text
 Observe → Diagnose → Hypothesize → Modify (one change) → Test → Repeat
 ```
 

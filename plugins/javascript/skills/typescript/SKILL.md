@@ -341,7 +341,7 @@ code contradicts one, follow the codebase and flag the divergence once.
 
 When **reviewing** TypeScript, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "TypeScript best practices recommend avoiding type assertions here because..."
 Good: const u = res.data as User  ->  const u: User = parseUser(res.data)
 ```

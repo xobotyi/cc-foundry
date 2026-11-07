@@ -53,7 +53,7 @@ uv tool install pyright
 
 Then install the plugin:
 
-```
+```text
 /plugin install python --marketplace xobotyi/cc-foundry
 ```
 

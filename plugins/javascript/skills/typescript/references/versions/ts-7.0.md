@@ -58,7 +58,6 @@ under 7.0. 7.0 adopts every 6.0 default and turns every 6.0 deprecation into a r
   ```
 
   The alias is needed because tools resolve `typescript` through a peer dependency and cannot be pointed elsewhere.
-
 - **`--checkers N`** sets the number of type-checking workers, default 4. More workers trade memory for speed; `1` makes
   checking single-threaded and removes the duplicated work the workers share. Varying it can surface order-dependent
   results, so pin it across CI and local runs.

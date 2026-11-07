@@ -77,7 +77,7 @@ Distinguish uses with labels where appropriate (e.g., database connection pool s
 
 For every log level, maintain a counter:
 
-```
+```text
 log_messages_total{level="info"}
 log_messages_total{level="warning"}
 log_messages_total{level="error"}
@@ -89,7 +89,7 @@ Check for significant changes in log rates as part of release validation.
 
 Every failure increments a counter. Always pair with a total attempts counter:
 
-```
+```text
 http_requests_total{handler="/api"}          # total
 http_request_errors_total{handler="/api"}    # failures
 ```
@@ -98,7 +98,7 @@ Failure ratio: `rate(http_request_errors_total[5m]) / rate(http_requests_total[5
 
 ### Threadpools
 
-```
+```text
 threadpool_tasks_queued        (gauge)
 threadpool_threads_active      (gauge)
 threadpool_threads_total       (gauge)
@@ -109,7 +109,7 @@ threadpool_queue_wait_seconds     (histogram)
 
 ### Caches
 
-```
+```text
 cache_requests_total{result="hit"}
 cache_requests_total{result="miss"}
 cache_evictions_total
@@ -123,7 +123,7 @@ Plus the downstream system's metrics (the system the cache sits in front of).
 
 When implementing a non-trivial custom collector:
 
-```
+```text
 mycollector_scrape_duration_seconds  (gauge — time to collect)
 mycollector_scrape_errors_total      (counter — collection failures)
 ```
@@ -134,7 +134,7 @@ Collector durations are gauges (per-scrape measurement), not histograms.
 
 ### Use Labels, Not Separate Metrics
 
-```
+```text
 # Bad — separate metrics per status code
 http_responses_500_total
 http_responses_403_total
@@ -151,7 +151,7 @@ metric as a default target.
 
 ### Timestamps, Not Durations
 
-```
+```text
 # Bad — requires update logic, stale if process hangs
 time_since_last_success_seconds
 

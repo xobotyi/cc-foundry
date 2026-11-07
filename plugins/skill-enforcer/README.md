@@ -12,7 +12,7 @@ work moves to a new phase, such as from coding to testing.
 
 The reminder the hook injects after an edit ([`hooks/sef-hook.mts`](hooks/sef-hook.mts)):
 
-```
+```text
 <SEF phase="PHASE-CHANGE">
 If the kind of work changed with this edit, for example from implementation to testing, invoke the skills
 whose descriptions name the new kind and read the loaded skills' references whose condition now holds. A
@@ -48,7 +48,7 @@ re-evaluate on a phase shift — and the model acts on it silently.
 
 **Checkpoint flow:**
 
-```
+```text
 Session start    ->  Load the SEF framework
 User prompt      ->  USER-PROMPT: invoke each skill whose description matches, honoring exclusions
 After Read       ->  EVALUATION: act if the read opened a skill-covered domain
@@ -64,7 +64,7 @@ applies it silently: it acts on the rule, but never echoes the reminder or narra
 The hook needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and Claude Code runs it
 with `node`, which strips the types itself, so nothing is built at install time.
 
-```
+```text
 /plugin install skill-enforcer --marketplace xobotyi/cc-foundry
 ```
 
@@ -135,7 +135,7 @@ after compaction.
 
 ## Architecture
 
-```
+```text
 hooks/
 ├── hooks.json     # Hook configuration (event -> command mapping)
 └── sef-hook.mts    # Unified hook module with an action parameter

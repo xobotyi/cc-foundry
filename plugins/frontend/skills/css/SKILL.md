@@ -297,7 +297,7 @@ When **reviewing** CSS:
 - Cite the specific violation and show the fix inline.
 - Don't lecture or quote the rule — state what's wrong and how to fix it.
 
-```
+```text
 Bad review comment:
   "According to CSS best practices, you should avoid using ID selectors
    for styling because they have high specificity."

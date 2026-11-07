@@ -141,6 +141,7 @@ services:
 - Use structured logging (JSON) for machine-parseable output
 - Never log secrets, tokens, or passwords
 - For non-blocking logging:
+
   ```bash
   docker run --log-opt mode=non-blocking --log-opt max-buffer-size=4m myimage
   ```

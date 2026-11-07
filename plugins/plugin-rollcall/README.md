@@ -12,7 +12,7 @@ clone or a new worktree, where Claude Code skips them until you type `/reload-pl
 
 The line the mod adds to the transcript after it reloads ([`hooks/register.ts`](hooks/register.ts)):
 
-```
+```text
 reloaded plugins skipped at startup: the-coder@foundry
 ```
 
@@ -53,7 +53,7 @@ install record never sees it.
 
 ## Installation
 
-```
+```text
 /plugin install plugin-rollcall --marketplace xobotyi/cc-foundry
 ```
 
@@ -76,7 +76,7 @@ it writes the install record and enables the plugin in the project's `.claude/se
 session on, Claude Code loads the plugin at startup and the mod has nothing to reload. The transcript names what was
 installed:
 
-```
+```text
 installed plugins at local scope: the-coder@foundry
 ```
 

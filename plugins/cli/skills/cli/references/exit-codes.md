@@ -42,7 +42,7 @@ the conventional exit code to preserve the signal information for calling script
 
 ### Map exit codes to actionable failure modes:
 
-```
+```text
 0 = success
 1 = runtime/operational error (network failure, file not found)
 2 = usage error (bad arguments, missing required input)

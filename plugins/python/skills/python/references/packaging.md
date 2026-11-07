@@ -234,7 +234,7 @@ uv version --short  # just the version number
 
 ### src Layout (Recommended)
 
-```
+```text
 my-project/
 ├── pyproject.toml
 ├── uv.lock
@@ -259,7 +259,7 @@ my-project/
 
 ### Flat Layout (Simple Scripts/Small Projects)
 
-```
+```text
 my-project/
 ├── pyproject.toml
 ├── my_package/

@@ -14,7 +14,7 @@ before the commit lands.
 
 A commit from this repository, made through the skill ([0f876f6](https://github.com/xobotyi/cc-foundry/commit/0f876f6)):
 
-```
+```text
 [the-statusline] count the ellipsis as width when collapsing a path
 
 The second collapse stage counted the ellipsis that replaces the first
@@ -61,7 +61,7 @@ formatting conventions the audit measures against.
 The validator needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and the commit skill
 runs it with `node`, which strips the types itself, so nothing is built at install time.
 
-```
+```text
 /plugin install git-commit --marketplace xobotyi/cc-foundry
 ```
 
@@ -69,7 +69,7 @@ runs it with `node`, which strips the types itself, so nothing is built at insta
 
 Type the skill command, or let Claude reach for it on its own when work arrives at a committable state:
 
-```
+```text
 /git-commit:commit
 ```
 
@@ -134,7 +134,7 @@ priority and override plugin defaults. Use for project conventions not covered b
 
 The `commit-message` skill defines the expected format:
 
-```
+```text
 [scope] subject
 
 body

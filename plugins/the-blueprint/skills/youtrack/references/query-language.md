@@ -24,7 +24,7 @@ than an error.
 Shapes for the searches an agent runs most. Substitute the project short name, the field names, and the values the
 project actually defines.
 
-```
+```text
 issue ID: PROJ-142                          one issue, without the text match a bare ID adds
 in: PROJ #Unresolved summary: pagination    candidate duplicates of a reported defect
 in: PROJ #Unresolved has: -Assignee         unassigned open work
@@ -201,7 +201,7 @@ with unit letters, space-separated: `2y 3M 1w 2d 12h`. Units are `y M w d h`; mi
 Hour precision behaves differently from day precision. At 15:35, `created: {minus 48h}` returns issues created two days
 ago between 15:00 and 16:00, while `created: {minus 2d}` returns that whole day. `14d` and `2w` are identical.
 
-```
+```text
 commented: {minus 7d} .. Today
 updated: {minus 2h} .. *
 created: * .. {minus 1y 6M} #Unresolved
@@ -222,7 +222,7 @@ A query naming no sort returns `updated desc`.
 
 ## Grammar
 
-```
+```text
 <SearchRequest>       ::= <OrExpression>
 <OrExpression>        ::= <AndExpression> ('or' <AndExpression>)*
 <AndExpression>       ::= <AndOperand> ('and' <AndOperand>)*

@@ -68,7 +68,7 @@ out the rules nothing else can vouch for; later, ask for it whenever memory need
 
 ## Installation
 
-```
+```text
 /plugin install better-memory --marketplace xobotyi/cc-foundry
 ```
 

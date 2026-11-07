@@ -42,7 +42,7 @@ rustup component add rust-analyzer
 
 Then install the plugin:
 
-```
+```text
 /plugin install rust --marketplace xobotyi/cc-foundry
 ```
 

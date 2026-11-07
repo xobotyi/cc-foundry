@@ -34,7 +34,7 @@ Filters return matching logs; downstream pipes work on matched rows only.
 - `*` wildcard for multi-field prefix search: `kubernetes.*:nginx`.
 - Field names and args can be wrapped in `"..."`, `'...'`, or `` `...` `` for special chars.
 
-```
+```text
 "some 'field':123":i('some("value")') AND `other"value'`
 ```
 
@@ -85,7 +85,7 @@ Logs stored in time-partitioned blocks. `_time` filter restricts which blocks mu
 Logs belong to **streams** — sets sharing immutable label values (Prometheus-style). Use braces with PromQL selector
 syntax:
 
-```
+```text
 {app="nginx"}
 {app="nginx", instance=~"web-.*"}
 {app="nginx", level!="debug"}
@@ -118,7 +118,7 @@ Highest-leverage filter — prunes which on-disk data needs reading.
 
 Every stream has a unique hex `_stream_id`. Filter by ID:
 
-```
+```text
 _stream_id:0000007b000001c850d9950ea6196b1a4812081265faa1c7
 _stream_id:in(id1, id2, id3)
 _stream_id:in(_time:5m error | fields _stream_id)
@@ -134,20 +134,20 @@ Use when the ID comes from UI links, alert payloads, or trace correlation; `{...
 
 Filter by time-of-day or day-of-week regardless of date:
 
-```
+```text
 _time:day_range[09:00, 17:00]            # business hours
 _time:day_range(00:00, 06:00]            # nighttime
 _time:day_range[09:00, 17:00] offset 2h  # specific timezone
 ```
 
-```
+```text
 _time:week_range[Mon, Fri]               # weekdays
 _time:week_range[Sat, Sun]               # weekends
 ```
 
 Combine with `_time` for date+within-day:
 
-```
+```text
 _time:7d AND _time:day_range[09:00, 17:00]
 ```
 
@@ -157,7 +157,7 @@ _time:7d AND _time:day_range[09:00, 17:00]
 
 ### Word Filter
 
-```
+```text
 error
 log.level:error
 ```
@@ -168,7 +168,7 @@ prefix `error*`).
 
 ### Phrase Filter
 
-```
+```text
 "error: cannot open file"
 "event.original":"cannot open file"
 ```
@@ -178,7 +178,7 @@ double quotes: `'"foo":"bar"'`.
 
 ### Prefix Filter
 
-```
+```text
 error*
 log.level:error*
 "warn"*
@@ -188,7 +188,7 @@ Matches anything starting with the prefix. `error*` matches `error`, `errors`, `
 
 ### Exact Prefix Filter
 
-```
+```text
 log.level:="warn"*
 ```
 
@@ -196,7 +196,7 @@ Field value must START with `warn`, not just contain a word starting with `warn`
 
 ### Substring Filter
 
-```
+```text
 log.level:~"err"
 ```
 
@@ -208,7 +208,7 @@ No dedicated substring operator — use word filter (`err*`) or regex.
 
 ### Exact
 
-```
+```text
 log.level:="error"
 "event.original":="GET /api"
 ```
@@ -217,7 +217,7 @@ Whole-field equality. Faster than word matching. Negate with `!=`.
 
 ### Multi-Exact
 
-```
+```text
 log.level:in("error", "fatal", "panic")
 log.level:!in("debug", "trace")
 ```
@@ -228,7 +228,7 @@ OR-of-exacts via hash lookup. Much faster than `log.level:~"error|fatal|panic"`.
 
 ## Regexp Filter
 
-```
+```text
 ~"(?i)error|warn"
 log.level:~"^err"
 log.level:!~"^debug"
@@ -239,7 +239,7 @@ RE2 syntax; `!~` negates. Regex scans byte-by-byte; word/exact use inverted inde
 
 Optimization: pre-filter with word/exact to reduce candidates:
 
-```
+```text
 log.level:error AND log.level:~"error.*timeout"
 ```
 
@@ -247,7 +247,7 @@ log.level:error AND log.level:~"error.*timeout"
 
 ## Range Filters
 
-```
+```text
 duration_ms:>1000
 duration_ms:>=500
 duration_ms:<100
@@ -256,7 +256,7 @@ duration_ms:<=10
 
 Intervals:
 
-```
+```text
 duration_ms:[100, 1000]      # closed-closed
 duration_ms:(100, 1000)      # open-open
 duration_ms:[100, 1000)      # closed-open
@@ -268,7 +268,7 @@ Numeric suffixes: `1K`, `1Mi`, `1.5G`, `1ns`, `1m`, `1h`. Time-like values parse
 
 ## Length Range
 
-```
+```text
 _msg:len_range(100, 1000)
 session_id:len_range(36, 36)
 ```
@@ -281,7 +281,7 @@ For suspicious short/long logs or fixed-length identifier validation.
 
 ### IPv4 Range
 
-```
+```text
 client_ip:ipv4_range("10.0.0.0", "10.255.255.255")
 client_ip:ipv4_range("192.168.0.0/16")
 client_ip:ipv4_range("172.16.0.0/12")
@@ -291,13 +291,13 @@ CIDR or low/high. Faster than regex for IP ranges.
 
 ### IPv6 Range
 
-```
+```text
 client_ip:ipv6_range("2001:db8::/32")
 ```
 
 ### String Range
 
-```
+```text
 session_id:string_range("a", "f")
 ```
 
@@ -309,7 +309,7 @@ Alphabetical, `a` (inclusive) to `f` (exclusive).
 
 In-order word/phrase sequence, anything between:
 
-```
+```text
 seq("ssh", "login", "fail")
 _msg:seq("ssh", "login", "fail")
 ```
@@ -320,7 +320,7 @@ Matches `ssh: login fail`, `ssh user login failed`, `ssh-related login attempt f
 
 ## Pattern Match
 
-```
+```text
 | filter _msg:pattern("user: <user_id> from <ip>")
 ```
 
@@ -330,7 +330,7 @@ Matches `ssh: login fail`, `ssh user login failed`, `ssh-related login attempt f
 
 ## `contains_all` / `contains_any`
 
-```
+```text
 _msg:contains_all("error", "timeout", "retry")
 _msg:contains_any("error", "warn", "critical")
 ```
@@ -339,7 +339,7 @@ AND/OR equivalents, concise for large lists.
 
 `json_array_contains_any` matches JSON-array field containing any value:
 
-```
+```text
 labels:json_array_contains_any("error", "fatal")
 ```
 
@@ -347,7 +347,7 @@ labels:json_array_contains_any("error", "fatal")
 
 ## Case-Insensitive Filters
 
-```
+```text
 i(error)
 log.level:i(error)
 log.level:i("error")*
@@ -363,7 +363,7 @@ character.
 
 ## Empty and Any Value
 
-```
+```text
 log.level:""           # field missing or empty
 log.level:!""          # field non-empty
 log.level:*            # any non-empty value
@@ -375,7 +375,7 @@ log.level:*            # any non-empty value
 
 Filter by storage type:
 
-```
+```text
 duration_ms:value_type(int64)
 duration_ms:value_type(uint64)
 client_ip:value_type(ipv4)
@@ -390,7 +390,7 @@ field sometimes stored as string).
 
 Compare two fields in same row:
 
-```
+```text
 eq_field(field1, field2)         # field1 == field2
 lt_field(field1, field2)         # field1 <  field2
 le_field(field1, field2)         # field1 <= field2
@@ -402,7 +402,7 @@ For `actual_size > declared_size` checks, mismatched timestamps.
 
 ## Subquery Filter
 
-```
+```text
 client_ip:in(_time:1h error | fields client_ip)
 ```
 
@@ -420,7 +420,7 @@ For cross-stream correlation: "all logs from clients who saw any error."
 - `OR`.
 - `NOT` (or `-` or `!`).
 
-```
+```text
 error AND _time:5m AND {app="nginx"}
 error _time:5m {app="nginx"}                    # AND implicit
 error AND NOT buggy_app
@@ -440,7 +440,7 @@ NOT > AND > OR.
 
 ### Field-Scoped Composition
 
-```
+```text
 log.level:(error OR warn) -app:buggy_app
 client_ip:(192.168.1.0/16 OR 10.0.0.0/8)
 ```
@@ -449,7 +449,7 @@ Cleaner than `(log.level:error OR log.level:warn)`.
 
 ### Multi-Field Search
 
-```
+```text
 *:error                       # any field
 "kubernetes.*":nginx          # any field starting with "kubernetes."
 ```

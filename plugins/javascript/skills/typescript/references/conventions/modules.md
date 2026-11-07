@@ -99,7 +99,6 @@ to decide the format of each output file.
   Where a matched path has no TypeScript extension, resolution substitutes extensions in order — `.cts`, then `.d.cts`,
   then `.cjs` for a `.cjs` target. A package that resolves to the JavaScript file with no declaration beside it counts
   as resolved, and every import from it is `any`.
-
 - **Verify the published shape with `@arethetypeswrong/cli`** before release. It reports the mismatches — a CJS build
   described by an ESM declaration, a missing condition, a `types` entry pointing at the wrong extension — that produce
   errors only in a consumer's project.

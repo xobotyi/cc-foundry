@@ -170,7 +170,7 @@ downstream alerts when an upstream root cause is already alerting.
 
 Tree shape:
 
-```
+```text
 default                                          (contact: slack-default)
   ├─ team=security                               (contact: pagerduty-secops)
   ├─ team=platform, severity=~"critical|warning" (contact: pagerduty-platform)

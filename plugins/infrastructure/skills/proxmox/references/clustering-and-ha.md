@@ -44,9 +44,11 @@ Two-node clusters have no fault tolerance by default — losing one node means l
 
 - **QDevice (recommended):** An external lightweight daemon (`corosync-qdevice`) running on a third machine provides a
   tie-breaking vote. The QDevice host does not need to be a Proxmox node — any Linux machine works.
-  ```
+
+  ```text
   pvecm qdevice setup <qdevice-ip>
   ```
+
 - **Manual quorum override (dangerous):** `pvecm expected 1` forces the remaining node to operate without quorum. Only
   use during planned maintenance, never as a permanent solution.
 
@@ -54,7 +56,7 @@ Two-node clusters have no fault tolerance by default — losing one node means l
 
 **Adding a node:**
 
-```
+```text
 # On the new node:
 pvecm add <existing-node-ip>
 ```
@@ -106,7 +108,7 @@ restarting a VM on another node while the original is still running causes data 
 
 HA groups define which nodes can run specific resources and set failover priority.
 
-```
+```text
 ha-group create mygroup -nodes "node1:2,node2:1,node3:1" -nofailback 0
 ```
 
@@ -118,7 +120,7 @@ ha-group create mygroup -nodes "node1:2,node2:1,node3:1" -nofailback 0
 
 ### HA Resource Configuration
 
-```
+```text
 ha-manager add vm:100 -group mygroup -state started -max_restart 3 -max_relocate 2
 ```
 

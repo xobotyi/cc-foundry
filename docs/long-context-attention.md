@@ -366,7 +366,7 @@ The summary captures intent and decisions; the verbatim files capture the precis
 
 For a 750,000-token prompt referencing 50,000-token content, the manual compaction analogue is:
 
-```
+```text
 <system_instructions>
   [task instructions, placed at end for recency]
 </system_instructions>
@@ -578,44 +578,45 @@ Organized by what they tell you:
 
 **Effective context measurement**
 
-- RULER (NVIDIA): https://arxiv.org/abs/2404.06654
-- NoLiMa (Adobe): https://arxiv.org/abs/2502.05167
-- HELMET: https://arxiv.org/abs/2410.02694
-- LongBench v2: https://arxiv.org/abs/2412.15204
-- Stanford HELM Long Context (Sep 2025): https://crfm.stanford.edu/2025/09/29/helm-long-context.html
+- RULER (NVIDIA): <https://arxiv.org/abs/2404.06654>
+- NoLiMa (Adobe): <https://arxiv.org/abs/2502.05167>
+- HELMET: <https://arxiv.org/abs/2410.02694>
+- LongBench v2: <https://arxiv.org/abs/2412.15204>
+- Stanford HELM Long Context (Sep 2025): <https://crfm.stanford.edu/2025/09/29/helm-long-context.html>
 - Chroma "Context Rot" coverage:
-  https://wandb.ai/byyoung3/ml-news/reports/Chroma-Research-Warns-of-Context-Rot-as-LLMs-Falter-with-Long-Inputs--VmlldzoxMzczMjQ4MQ
-- LindleyLabs reality check: https://lindleylabs.com/blog/your-million-token-context-window-is-a-lie
-- TokenMix Q1 2026 numbers: https://tokenmix.ai/blog/1m-token-context-reality-check-2026
+  <https://wandb.ai/byyoung3/ml-news/reports/Chroma-Research-Warns-of-Context-Rot-as-LLMs-Falter-with-Long-Inputs--VmlldzoxMzczMjQ4MQ>
+- LindleyLabs reality check: <https://lindleylabs.com/blog/your-million-token-context-window-is-a-lie>
+- TokenMix Q1 2026 numbers: <https://tokenmix.ai/blog/1m-token-context-reality-check-2026>
 
 **Mechanism**
 
-- YaRN (RoPE scaling): https://openreview.net/attachment?id=wHBfxhZu1u&name=pdf
-- Layer-Specific Positional Scaling: https://arxiv.org/abs/2503.04355
-- StreamingLLM (attention sinks): https://github.com/mit-han-lab/streaming-llm
-- SnapStream (production KV compression, Nov 2025): https://arxiv.org/abs/2511.03092
-- MoBA (Mixture of Block Attention): https://arxiv.org/abs/2502.13189
+- YaRN (RoPE scaling): <https://openreview.net/attachment?id=wHBfxhZu1u&name=pdf>
+- Layer-Specific Positional Scaling: <https://arxiv.org/abs/2503.04355>
+- StreamingLLM (attention sinks): <https://github.com/mit-han-lab/streaming-llm>
+- SnapStream (production KV compression, Nov 2025): <https://arxiv.org/abs/2511.03092>
+- MoBA (Mixture of Block Attention): <https://arxiv.org/abs/2502.13189>
 
 **Lost in the middle and calibration**
 
-- Lost in the Middle (Liu et al. 2023): https://arxiv.org/abs/2307.03172
-- Lost in the Middle: An Emergent Property (Oct 2025): https://arxiv.org/abs/2510.10276
-- Found in the Middle (calibration): https://arxiv.org/abs/2406.16008
-- Never Lost in the Middle (position-agnostic training): https://arxiv.org/abs/2311.09198
+- Lost in the Middle (Liu et al. 2023): <https://arxiv.org/abs/2307.03172>
+- Lost in the Middle: An Emergent Property (Oct 2025): <https://arxiv.org/abs/2510.10276>
+- Found in the Middle (calibration): <https://arxiv.org/abs/2406.16008>
+- Never Lost in the Middle (position-agnostic training): <https://arxiv.org/abs/2311.09198>
 
 **Prompting techniques**
 
-- Attention Instruction: https://arxiv.org/abs/2406.17095
-- Model Tells Itself Where to Attend (AutoPASTA): https://arxiv.org/abs/2409.10790
-- Question Tokens Deserve More Attention: https://arxiv.org/abs/2504.09402
-- Context-Aware Hierarchical Merging (with hallucination warning): https://arxiv.org/abs/2502.00977
-- Sufficient Context (RAG-on-top-of-long-context): https://arxiv.org/abs/2411.06037
+- Attention Instruction: <https://arxiv.org/abs/2406.17095>
+- Model Tells Itself Where to Attend (AutoPASTA): <https://arxiv.org/abs/2409.10790>
+- Question Tokens Deserve More Attention: <https://arxiv.org/abs/2504.09402>
+- Context-Aware Hierarchical Merging (with hallucination warning): <https://arxiv.org/abs/2502.00977>
+- Sufficient Context (RAG-on-top-of-long-context): <https://arxiv.org/abs/2411.06037>
 
 **Vendor guidance**
 
 - Anthropic, Effective context engineering for AI agents (Sep 2025):
-  https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
-- Anthropic, Prompt engineering for Claude's long context window: https://www.anthropic.com/news/prompting-long-context
+  <https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents>
+- Anthropic, Prompt engineering for Claude's long context window:
+  <https://www.anthropic.com/news/prompting-long-context>
 - Anthropic Claude Docs, Long context prompting tips:
-  https://anthropic.mintlify.app/en/docs/build-with-claude/prompt-engineering/long-context-tips
-- Scale AI, Long-context instruction following: https://scale.com/blog/long-context-instruction-following
+  <https://anthropic.mintlify.app/en/docs/build-with-claude/prompt-engineering/long-context-tips>
+- Scale AI, Long-context instruction following: <https://scale.com/blog/long-context-instruction-following>

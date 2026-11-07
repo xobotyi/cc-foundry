@@ -38,7 +38,7 @@ All accept the optional `/prometheus` prefix: `/prometheus/api/v1/query` is equi
 
 Adds a label matcher to every selector:
 
-```
+```text
 GET /api/v1/query_range?extra_label=user_id=123&extra_label=group_id=456&query=<query>
 ```
 
@@ -50,7 +50,7 @@ For auth proxies (vmauth, vmgateway) — user query untouched; executed query se
 
 Adds a full selector (regex supported):
 
-```
+```text
 GET /api/v1/query_range?extra_filters[]={env=~"prod|staging",user="xyz"}&query=<query>
 ```
 
@@ -60,7 +60,7 @@ More expressive than `extra_label` — supports `=~`, `!=`, regex values, multi-
 
 Rounds response values to N decimals:
 
-```
+```text
 GET /api/v1/query?query=avg_over_time(temperature[1h])&round_digits=2
 ```
 
@@ -174,7 +174,7 @@ Cluster splits read/write:
 
 ### Query Path
 
-```
+```text
 http://<vmselect>:8481/select/<accountID>/prometheus/<suffix>
 http://<vmselect>:8481/select/<accountID>/graphite/<suffix>
 ```
@@ -227,7 +227,7 @@ flags.
 
 `multitenant` path queries across tenants:
 
-```
+```text
 http://vmselect:8481/select/multitenant/prometheus/api/v1/query?query=up{vm_account_id=~"1|2|3"}
 ```
 

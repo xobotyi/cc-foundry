@@ -5,7 +5,7 @@ alerts, and recording rules.
 
 ## Decision Tree
 
-```
+```text
 Can the value decrease?
 ├── No  → Counter
 └── Yes → Is it a snapshot of current state?
@@ -34,7 +34,7 @@ A monotonically increasing value that can only go up or reset to zero on restart
 
 **Common mistake:** Using a counter for values that can decrease (e.g., current connections). Use a gauge instead.
 
-```
+```text
 # Good: counter for cumulative events
 http_requests_total{method="GET", status="200"} 14832
 
@@ -64,7 +64,7 @@ A value that can go up and down arbitrarily.
 2. **Info metrics** — `myapp_build_info{version="1.2.3", commit="abc"} 1`. Pseudo-metric exposing metadata as labels
    with value 1.
 
-```
+```text
 # Good: gauge for current state
 node_memory_MemAvailable_bytes 4.123e+09
 
@@ -98,7 +98,7 @@ instances.
 - Default buckets work for many HTTP latency use cases
 - Buckets cannot be changed after metric creation
 
-```
+```text
 # Histogram exposes multiple series:
 http_request_duration_seconds_bucket{le="0.1"}  24054
 http_request_duration_seconds_bucket{le="0.25"} 33342

@@ -295,7 +295,7 @@ uses a `node:` API that has a Bun-native equivalent, follow the codebase. Flag t
 
 When **reviewing** Bun, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "Bun's build API generally prefers rejection over a status flag, so you may want to..."
 Good: if (!result.success) -> Bun.build() rejects; catch the AggregateError, or pass throw: false
 ```

@@ -136,7 +136,7 @@ Is the style focused and correctly bounded?
 
 Calculate weighted score:
 
-```
+```text
 Score = (RoleVoice x 2 + RuleIntent x 2 + Format x 1 +
          Exemplars x 1 + ScaffoldingDebt x 1 + Scope x 1) / 8
 ```

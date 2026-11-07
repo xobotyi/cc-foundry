@@ -35,7 +35,7 @@ Install what matches your work. Each command adds the marketplace the first time
 - **Your sessions run long or unattended** — `wall-clock` for the time, `the-statusline` for context and rate limits,
   and `the-workflow` for handoffs between sessions.
 
-```
+```text
 /plugin install the-coder --marketplace xobotyi/cc-foundry
 /plugin install git-commit --marketplace xobotyi/cc-foundry
 /plugin install skill-enforcer --marketplace xobotyi/cc-foundry
@@ -55,7 +55,7 @@ The repository itself is developed with these plugins, so it doubles as a sample
 is `git-commit` output. A fix from the status line, cause first, then what the user saw
 ([ae8e706](https://github.com/xobotyi/cc-foundry/commit/ae8e706)):
 
-```
+```text
 [the-statusline] keep the root when collapsing an absolute path
 
 Collapsing cut each directory segment to its first character, and the

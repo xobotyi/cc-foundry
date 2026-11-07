@@ -34,7 +34,7 @@ inadequate ones. Short is not the defect; uninformative is.
 
 With conventional commits, where the project uses them:
 
-```
+```text
 fix(auth): resolve session expiry race condition
 feat(api): add rate limiting to public endpoints
 docs(readme): update installation instructions for v3

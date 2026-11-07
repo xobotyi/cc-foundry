@@ -104,7 +104,7 @@ Available on all rollups, transforms, and binary operators.
 
 PromQL `{env="prod",job="a"}` is a single AND. MetricsQL adds top-level disjunction:
 
-```
+```text
 {env="prod",job="a" or env="dev",job="b"}
 ```
 
@@ -116,7 +116,7 @@ Multi-constant matching: `status_code == (300, 301, 304)` returns series where `
 
 Reusable named subexpressions:
 
-```
+```text
 WITH (
   errs = rate(http_requests_total{status=~"5.."}[5m]),
   total = rate(http_requests_total[5m]),
@@ -136,7 +136,7 @@ Compose with `default`-on-missing: `(up{job="x"} default 0) == 0` reliably alert
 
 ## group_left(\*) and Label Copy
 
-```
+```text
 kube_pod_info * on(namespace) group_left(*) prefix "ns_" kube_namespace_labels
 ```
 
@@ -145,7 +145,7 @@ Copies **all** labels from right side except those in `on(...)`, prefixed with `
 
 ## Aggregate `limit N`
 
-```
+```text
 sum(http_requests_total) by (path) limit 10
 ```
 
@@ -162,7 +162,7 @@ Returns 10 paths total. Other series dropped silently. Distinct from `topk(10, .
 
 ## Cluster Endpoint Structure
 
-```
+```text
 http://<vmselect>:8481/select/<accountID>/prometheus/api/v1/query
 http://<vmselect>:8481/select/<accountID>/prometheus/api/v1/query_range
 ```
@@ -203,7 +203,7 @@ For plotting quantile confidence intervals.
 
 `histogram_over_time(gauge[d])` produces VictoriaMetrics-format histograms from gauge values:
 
-```
+```text
 histogram_quantile(0.5, sum(histogram_over_time(temperature[24h])) by (vmrange,country))
 ```
 

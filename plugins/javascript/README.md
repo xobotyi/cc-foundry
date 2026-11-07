@@ -46,7 +46,7 @@ npm install -g typescript-language-server typescript
 
 Then install the plugin:
 
-```
+```text
 /plugin install javascript --marketplace xobotyi/cc-foundry
 ```
 

@@ -78,7 +78,6 @@ Rhetorical shapes that perform deliberation without committing to a claim.
   corpus has no authorship labels, so the rates describe published writing rather than model output. The construction is
   also common in human myth-busting and "common misconceptions" writing, so a single instance with a real contrast earns
   its place, and a second is a reason to read the passage — keep the strongest, restate the rest without the foil.
-
 - **Hedging verbs as padding** — "ensures", "supports", "reflects", "highlights" gluing a subject to an unearned
   benefit. Say what the thing does, with evidence, or cut it.
 - **Intensifiers without evidence** — "significantly", "effectively", "seamlessly", "dramatically", "robust". Back it

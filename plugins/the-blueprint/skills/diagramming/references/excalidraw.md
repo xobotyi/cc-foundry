@@ -535,7 +535,7 @@ lengths and element count.
 
 For processes, pipelines, data flow. Elements spaced 280px apart horizontally (180px box + ~100px gap):
 
-```
+```text
 Element 1: x=100,  y=200, width=180, height=80
 Element 2: x=380,  y=200  (arrow from 1→2)
 Element 3: x=660,  y=200  (arrow from 2→3)
@@ -548,7 +548,7 @@ Title at `x=100, y=100, fontSize=28`.
 
 For hierarchies, decision trees. Elements spaced 150px apart vertically:
 
-```
+```text
 Element 1: x=400, y=100
 Element 2: x=400, y=300  (arrow from 1→2)
 Element 3: x=400, y=500  (arrow from 2→3)
@@ -558,7 +558,7 @@ Element 3: x=400, y=500  (arrow from 2→3)
 
 For relationship diagrams, ER diagrams. Elements arranged in rows and columns:
 
-```
+```text
 columns = ceil(sqrt(element_count))
 
 Element[i]:
@@ -568,7 +568,7 @@ Element[i]:
 
 Example for 6 elements (3x2 grid):
 
-```
+```text
 (100, 200)  (400, 200)  (700, 200)
 (100, 400)  (400, 400)  (700, 400)
 ```
@@ -577,7 +577,7 @@ Example for 6 elements (3x2 grid):
 
 For mind maps, star topologies. Central element with branches radiating outward:
 
-```
+```text
 Center: x=500, y=400, width=200, height=80
 
 Branch[i]:
@@ -590,7 +590,7 @@ Branch[i]:
 
 For system architecture diagrams. Horizontal tiers stacked vertically:
 
-```
+```text
 Tier 1 (Client):     y=100,  elements at x=200, 500, 800
 Tier 2 (API):        y=350,  elements at x=350, 650
 Tier 3 (Services):   y=600,  elements at x=200, 500, 800
@@ -603,7 +603,7 @@ Use frames or background zones to group each tier. Vertical arrows between tiers
 
 For flowcharts with yes/no decisions:
 
-```
+```text
 Decision:      x=400, y=200  (diamond, 140x100)
 Yes branch:    x=200, y=400  (arrow labeled "Yes")
 No branch:     x=600, y=400  (arrow labeled "No")
@@ -611,7 +611,7 @@ No branch:     x=600, y=400  (arrow labeled "No")
 
 Each subsequent level doubles width to prevent overlap:
 
-```
+```text
 Level 0: 1 node at x=400
 Level 1: 2 nodes at x=200, x=600 (spread=200)
 Level 2: 4 nodes at x=100, x=300, x=500, x=700 (spread=100)

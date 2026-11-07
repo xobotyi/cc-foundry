@@ -51,7 +51,7 @@ npm install -g intelephense
 
 Then install the plugin:
 
-```
+```text
 /plugin install php --marketplace xobotyi/cc-foundry
 ```
 

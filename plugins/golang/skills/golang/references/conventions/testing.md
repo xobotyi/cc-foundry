@@ -473,7 +473,7 @@ func Test_Scanner(t *testing.T) {
 
 Use `_internal_test.go` suffix for tests that need access to unexported identifiers:
 
-```
+```text
 scanner_test.go                    # Black-box: package scanner_test (preferred)
 scanner_internal_test.go           # White-box: package scanner
 scanner_benchmark_test.go          # Black-box benchmarks

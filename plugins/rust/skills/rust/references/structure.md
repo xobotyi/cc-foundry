@@ -36,7 +36,7 @@ as a child of the crate root, not of `front_of_house`. The directory tree mirror
 
 **Do — `mod.rs`-free: the module file sits beside its submodule directory.**
 
-```
+```text
 src/
   lib.rs                  // mod front_of_house;  (declares the module)
   front_of_house.rs       // mod hosting;          (the front_of_house body + declares submodule)
@@ -59,7 +59,7 @@ pub fn add_to_waitlist() {}
 
 **Don't — new `mod.rs` files: every module folds into an identically-named file.**
 
-```
+```text
 src/
   lib.rs
   front_of_house/

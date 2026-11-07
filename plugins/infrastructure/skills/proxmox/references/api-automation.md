@@ -17,7 +17,7 @@ interface is available programmatically.
 API tokens provide non-interactive authentication without exposing user credentials. Each token has an ID and a secret
 value shown once at creation.
 
-```
+```text
 pveum user token add root@pam automation --privsep=1
 ```
 
@@ -30,7 +30,7 @@ pveum user token add root@pam automation --privsep=1
 
 **Using tokens in API calls:**
 
-```
+```text
 Authorization: PVEAPIToken=root@pam!automation=<secret-uuid>
 ```
 
@@ -38,7 +38,7 @@ Authorization: PVEAPIToken=root@pam!automation=<secret-uuid>
 
 For interactive or short-lived sessions, obtain a ticket via `/access/ticket`:
 
-```
+```text
 curl -k -d "username=root@pam&password=<password>" \
   https://<host>:8006/api2/json/access/ticket
 ```

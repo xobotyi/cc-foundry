@@ -31,7 +31,6 @@ Run every command in this file from the repository root.
   all, so Claude Code's own memory runs unchanged and only the skill remains. `sift` off keeps the tools and the gate,
   never starts sift, lists candidates in `MEMORY.md` because nothing would promote them, and drops the "unverified"
   note.
-
 - The memory directory is the `autoMemoryDirectory` setting, else `<config dir>/projects/<key>/memory`. The key is the
   git root (the main worktree's for a worktree) with every non-alphanumeric character replaced by `-`. A key over 200
   characters is matched by prefix among the existing project directories, because Claude Code suffixes a hash that no
@@ -117,7 +116,6 @@ Run every command in this file from the repository root.
 - `MEMORY.md` lists promoted entries and entries no sift has judged yet; candidates stay out until promoted. Up to five
   open instruction proposals follow, with a count of the rest, and at session start the mod registers
   `mcp__better-memory__answer_instruction_proposal` when one is open.
-
 - A plugin reload (`/reload-plugins`, an update, or an edit of a `--plugin-dir` module) runs `register` again in the
   live session, and `session.start` does not fire again. The mod restores the session at the next `turn.start`, taking
   interactivity from `$.session.surfaces()`, which is empty in a `-p` run. A sift running at the reload dies with the
@@ -147,7 +145,6 @@ Run every command in this file from the repository root.
 ## Conventions
 
 - `SIFT_PROMPT` in `register.ts` and `skills/sift/SKILL.md` state the same verdicts for one store; change them together.
-
 - Hook engine events, never `classic.*` or `prompt.*`: a managed-tier plugin first in a chain can pass them past every
   mod.
 - Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in

@@ -5,7 +5,7 @@ aggregation silently corrupts metric data, especially after downsampling.
 
 ## The Flush Cycle
 
-```
+```text
    App sends metrics (UDP)
           |
           v
@@ -63,7 +63,7 @@ a source stops reporting.
 
 The server computes and sends multiple derived metrics:
 
-```
+```text
 stats.timers.<name>.count          # number of values received
 stats.timers.<name>.mean           # average
 stats.timers.<name>.upper          # maximum
@@ -198,7 +198,7 @@ Enable client-side aggregation for high-throughput applications that emit thousa
 DogStatsD v1.3+ supports sending pre-aggregated metrics with explicit timestamps. When a timestamp is present, the Agent
 forwards the value without aggregation.
 
-```
+```text
 page.views:150|c|#env:prod|T1656581400
 ```
 

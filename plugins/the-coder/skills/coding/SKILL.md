@@ -22,7 +22,7 @@ cache, a pool, or a memo waits for a measurement.
 
 ## Core Loop
 
-```
+```text
 Discover → Plan → Implement → Verify
 ```
 

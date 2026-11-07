@@ -38,7 +38,7 @@ record-and-sample, or drop.
 
 The most common production configuration. Respects parent sampling decisions while allowing custom root sampling:
 
-```
+```text
 ParentBased(
     root = TraceIdRatioBased(0.1),           // 10% of root spans
     remoteParentSampled = AlwaysOn,          // respect sampled parent
@@ -97,7 +97,7 @@ processors:
 
 ### Tail Sampling Architecture
 
-```
+```text
 ┌─────────┐     ┌─────────┐     ┌─────────────────────┐     ┌─────────┐
 │Service A │────►│Load Bal.│────►│ Collector             │────►│ Backend │
 │Service B │────►│Exporter │────►│ (tail sampling proc.) │────►│         │

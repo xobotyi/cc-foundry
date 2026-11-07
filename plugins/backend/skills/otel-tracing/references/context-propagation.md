@@ -10,7 +10,7 @@ isolated spans — no distributed trace.
 2. **Carrier** transports the serialized context across the network
 3. **Receiver** **extracts** context from the incoming carrier and uses it as the parent for new spans
 
-```
+```text
 Service A                    Network               Service B
 ─────────                    ───────               ─────────
 Create span
@@ -30,7 +30,7 @@ The default propagation format. Uses two HTTP headers:
 
 ### traceparent
 
-```
+```text
 {version}-{trace-id}-{parent-id}-{trace-flags}
 00-a0892f3577b34da6a3ce929d0e0e4736-f03067aa0ba902b7-01
 ```
@@ -51,7 +51,7 @@ Vendor-specific key-value pairs. Carried alongside `traceparent` for multi-vendo
 
 Serialize context into a carrier for outgoing requests.
 
-```
+```text
 // Pseudocode
 propagator.inject(context, carrier, setter)
 ```
@@ -64,7 +64,7 @@ propagator.inject(context, carrier, setter)
 
 Deserialize context from an incoming carrier.
 
-```
+```text
 // Pseudocode
 extractedContext = propagator.extract(context, carrier, getter)
 ```
@@ -77,7 +77,7 @@ extractedContext = propagator.extract(context, carrier, getter)
 
 Combine multiple propagators (e.g., W3C Trace Context + Baggage):
 
-```
+```text
 propagator = CompositeTextMapPropagator([
     TraceContextPropagator(),
     BaggagePropagator()

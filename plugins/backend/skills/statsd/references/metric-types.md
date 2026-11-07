@@ -7,7 +7,7 @@ silently incorrect data.
 
 All metrics use UTF-8 text over UDP:
 
-```
+```text
 <metric_name>:<value>|<type>[|@<sample_rate>][|#<tags>]
 ```
 
@@ -36,7 +36,7 @@ Ethernet: 1432 bytes, Gigabit/jumbo: 8932 bytes, Internet: ~512 bytes).
 
 **Examples:**
 
-```
+```text
 requests.total:1|c                    # increment by 1
 requests.total:5|c                    # increment by 5
 requests.total:1|c|@0.1              # sampled: server multiplies by 10
@@ -70,7 +70,7 @@ page.views:1|c|#page:/home,method:GET # DogStatsD tagged counter
 
 **Examples:**
 
-```
+```text
 queue.depth:42|g                # set to 42
 temperature.celsius:21.5|g      # set to 21.5
 queue.depth:+5|g                # increment current value by 5
@@ -79,7 +79,7 @@ queue.depth:-3|g                # decrement current value by 3
 
 **Important:** You cannot set a gauge to a negative number directly. Set to zero first, then decrement:
 
-```
+```text
 gauge.value:0|g
 gauge.value:-10|g
 ```
@@ -113,7 +113,7 @@ gauge.value:-10|g
 
 **Examples:**
 
-```
+```text
 api.request.duration:320|ms             # 320ms request
 db.query.time:45|ms                     # 45ms query
 api.request.duration:120|ms|@0.5        # sampled at 50%
@@ -167,7 +167,7 @@ histogram that happens to record durations.
 
 **Examples:**
 
-```
+```text
 users.unique:user123|s           # track user123
 users.unique:user456|s           # track user456
 users.unique:user123|s           # duplicate, ignored
@@ -216,7 +216,7 @@ transfer and Datadog custom metric billing.
 
 Pack multiple metrics into a single UDP datagram separated by `\n`:
 
-```
+```text
 requests.total:1|c\nresponse.time:42|ms\nqueue.depth:10|g
 ```
 

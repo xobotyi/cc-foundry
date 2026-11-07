@@ -36,7 +36,7 @@ minimal filler, iterative refinement focus.
 
 ## Installation
 
-```
+```text
 /plugin install ai-helpers --marketplace xobotyi/cc-foundry
 ```
 
@@ -149,7 +149,7 @@ Where a project already fixed a name, that name wins.
 
 ## Skill Relationships
 
-```
+```text
 prompt-engineering (foundation)
     ↑
     ├── skill-engineering (skills are prompts)

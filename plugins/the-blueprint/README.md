@@ -14,7 +14,7 @@ kept where the next reader finds it.
 Two entries from this repository's decision index, written with the `adr` skill
 ([`design-docs/ADR.md`](../../design-docs/ADR.md)):
 
-```
+```text
 ## plugins/the-blueprint
 
 - [1.10 Keep decision records living: rewritten in place, deleted once they stop holding](/design-docs/adr/1.10-decision-record-lifecycle.md)
@@ -59,7 +59,7 @@ decisions, so it stays discoverable months later when someone asks "why did we b
 
 ## Installation
 
-```
+```text
 /plugin install the-blueprint --marketplace xobotyi/cc-foundry
 ```
 
@@ -232,7 +232,7 @@ diagrams, ER diagrams, mind maps, or any visual representation of systems and pr
 
 The DRAFT pipeline skills form a linear flow with user approval gates at each transition:
 
-```
+```text
 discovery → research → alignment → frame → tasks → task-creation
 ```
 

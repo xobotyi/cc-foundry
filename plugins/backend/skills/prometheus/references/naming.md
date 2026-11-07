@@ -5,7 +5,7 @@ unfamiliar with the system should guess what it measures.
 
 ## Metric Name Structure
 
-```
+```text
 <namespace>_<subsystem>_<name>_<unit>_<suffix>
 ```
 
@@ -30,7 +30,7 @@ Not all parts are required. The minimum is namespace + meaningful name + unit/su
 
 Every metric MUST have a namespace prefix identifying its origin:
 
-```
+```text
 prometheus_notifications_total       # Prometheus server metrics
 process_cpu_seconds_total            # Standard process metrics
 http_request_duration_seconds        # Generic HTTP metrics
@@ -53,7 +53,7 @@ Always use base units. Let visualization tools handle conversion.
 
 Append the unit to the metric name in plural form:
 
-```
+```text
 http_request_duration_seconds        # time in seconds
 node_memory_usage_bytes              # memory in bytes
 disk_usage_ratio                     # ratio 0-1
@@ -71,7 +71,7 @@ disk_usage_ratio                     # ratio 0-1
 
 Order components so related metrics sort together lexicographically:
 
-```
+```text
 # Good — common prefix groups related metrics
 prometheus_tsdb_head_truncations_closed_total
 prometheus_tsdb_head_truncations_established_total
@@ -84,7 +84,7 @@ prometheus_tsdb_head_truncations_total
 A metric MUST represent the same logical thing across all its label dimensions. Test: `sum()` or `avg()` across all
 dimensions should be meaningful.
 
-```
+```text
 # Good — all dimensions measure the same thing (request duration)
 http_request_duration_seconds{method="GET"}
 http_request_duration_seconds{method="POST"}
@@ -102,7 +102,7 @@ If `sum()` across dimensions is nonsensical, split into separate metrics.
 
 Use labels to differentiate characteristics of the thing being measured:
 
-```
+```text
 api_http_requests_total{operation="create"}
 api_http_requests_total{operation="update"}
 api_http_requests_total{operation="delete"}

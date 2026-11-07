@@ -5,13 +5,13 @@ dots become hierarchical groupings. Poor naming makes metrics undiscoverable and
 
 ## Hierarchy Structure
 
-```
+```text
 <namespace>.<subsystem>.<target>.<metric>.<unit>
 ```
 
 **Examples:**
 
-```
+```text
 myapp.api.request.duration.ms
 myapp.api.request.count.total
 myapp.db.query.duration.ms
@@ -25,7 +25,7 @@ myapp.worker.job.processed.total
 Top-level identifier, typically the service or application name. Prevents metric collisions across services sharing a
 StatsD server.
 
-```
+```text
 payment-service.checkout.amount.usd     # good: namespaced
 checkout.amount.usd                      # bad: collides with other services
 ```
@@ -75,7 +75,7 @@ instead of splitting them.
 
 Use tags for dimensions. Keep metric names stable:
 
-```
+```text
 http.request.duration:42|ms|#method:GET,status:200,endpoint:/api/users
 http.request.duration:15|ms|#method:POST,status:201,endpoint:/api/users
 ```
@@ -86,7 +86,7 @@ http.request.duration:15|ms|#method:POST,status:201,endpoint:/api/users
 
 Encode dimensions in the metric name:
 
-```
+```text
 http.request.get.200.api_users.duration:42|ms
 http.request.post.201.api_users.duration:15|ms
 ```
