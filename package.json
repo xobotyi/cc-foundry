@@ -19,8 +19,8 @@
 		"citty": "^0.2.2",
 		"consola": "^3.4.2",
 		"fs-extra": "^11.4.1",
-		"linkedom": "^0.18.14",
-		"turndown": "^7.2.4"
+		"linkedom": "^0.18.15",
+		"turndown": "^7.2.5"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",
@@ -29,7 +29,7 @@
 		"@ver0/oxlint-config": "^2.0.4",
 		"rumdl": "0.3.2",
 		"typescript": "^7.0.2",
-		"vite-plus": "^1.4.0"
+		"vite-plus": "^1.5.0"
 	},
 	"devEngines": {
 		"runtime": {
