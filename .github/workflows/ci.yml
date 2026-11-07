@@ -23,6 +23,7 @@ jobs:
       # constraint: src/check/validate.test.ts runs claude plugin validate
       - run: npm install -g @anthropic-ai/claude-code@latest
       - run: vp check
+      - run: vp exec rumdl fmt --check .
       - run: vp run typecheck
       - run: vp test
 
