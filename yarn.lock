@@ -57,6 +57,7 @@ __metadata:
     consola: "npm:^3.4.2"
     fs-extra: "npm:^11.4.1"
     linkedom: "npm:^0.18.14"
+    rumdl: "npm:0.3.2"
     turndown: "npm:^7.2.4"
     typescript: "npm:^7.0.2"
     vite-plus: "npm:^1.4.0"
@@ -445,6 +446,55 @@ __metadata:
   version: 1.0.0-next.29
   resolution: "@polka/url@npm:1.0.0-next.29"
   checksum: 10c0/0d58e081844095cb029d3c19a659bfefd09d5d51a2f791bc61eba7ea826f13d6ee204a8a448c2f5a855c17df07b37517373ff916dd05801063c0568ae9937684
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-darwin-arm64@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-darwin-arm64@npm:0.3.2"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-darwin-x64@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-darwin-x64@npm:0.3.2"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-linux-arm64-musl@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-linux-arm64-musl@npm:0.3.2"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-linux-arm64@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-linux-arm64@npm:0.3.2"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-linux-x64-musl@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-linux-x64-musl@npm:0.3.2"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-linux-x64@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-linux-x64@npm:0.3.2"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rumdl/cli-win32-x64@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@rumdl/cli-win32-x64@npm:0.3.2"
+  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -1798,6 +1848,38 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 10c0/2bdb6b93fbb1820b024b496042cce405c57e2f85e777c9aabd55f9b26d145408f9f74f5934676ffdc46f3dcff656d78413a6e43968e7b3f92eea35b3052e9053
+  languageName: node
+  linkType: hard
+
+"rumdl@npm:0.3.2":
+  version: 0.3.2
+  resolution: "rumdl@npm:0.3.2"
+  dependencies:
+    "@rumdl/cli-darwin-arm64": "npm:0.3.2"
+    "@rumdl/cli-darwin-x64": "npm:0.3.2"
+    "@rumdl/cli-linux-arm64": "npm:0.3.2"
+    "@rumdl/cli-linux-arm64-musl": "npm:0.3.2"
+    "@rumdl/cli-linux-x64": "npm:0.3.2"
+    "@rumdl/cli-linux-x64-musl": "npm:0.3.2"
+    "@rumdl/cli-win32-x64": "npm:0.3.2"
+  dependenciesMeta:
+    "@rumdl/cli-darwin-arm64":
+      optional: true
+    "@rumdl/cli-darwin-x64":
+      optional: true
+    "@rumdl/cli-linux-arm64":
+      optional: true
+    "@rumdl/cli-linux-arm64-musl":
+      optional: true
+    "@rumdl/cli-linux-x64":
+      optional: true
+    "@rumdl/cli-linux-x64-musl":
+      optional: true
+    "@rumdl/cli-win32-x64":
+      optional: true
+  bin:
+    rumdl: bin/rumdl
+  checksum: 10c0/bbda13ca335e645013c3ec39ab7b003d1d6db04b89ed8e5067614711fbfc59bb1774cb9ac5bb2bdc5b7248034ad072986500d8308d59bc8196482ddf9b5b5bf4
   languageName: node
   linkType: hard
 

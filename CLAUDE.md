@@ -35,9 +35,10 @@ process (Research → Scaffold → Write → Ship).
 
 **Formatting:**
 
-- Vite+ formats and lints every file: Oxfmt and Oxlint, configured in `vite.config.ts` from the ver0 project's settings
-  (`@ver0/oxlint-config` for lint)
-- After editing any file, run `vp fmt <file>` before committing; `vp check` fails on an unformatted file
+- Vite+ formats and lints every file but markdown: Oxfmt and Oxlint, configured in `vite.config.ts` from the ver0
+  project's settings (`@ver0/oxlint-config` for lint). rumdl formats markdown, configured in `.rumdl.toml`
+- After editing a file, format it before committing: `vp exec rumdl fmt <file>` for markdown, `vp fmt <file>` for any
+  other file. `vp check` fails on an unformatted file, and `vp exec rumdl fmt --check .` on unformatted markdown
 
 **Skill structure:**
 

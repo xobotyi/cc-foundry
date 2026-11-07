@@ -80,4 +80,4 @@ for ignored instructions, and the canonical scaffold. Subagents briefed to touch
 
 ## Formatting
 
-- After editing, format the file with `vp fmt <file>`.
+- After editing, format the file with `vp exec rumdl fmt <file>`.
