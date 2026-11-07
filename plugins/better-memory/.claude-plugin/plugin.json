@@ -1,0 +1,28 @@
+{
+	"name": "better-memory",
+	"version": "0.0.1",
+	"description": "Keeps Claude Code's auto memory to facts that still hold: gates memory writes and sifts new entries when the session goes idle",
+	"author": {
+		"name": "xobotyi",
+		"email": "xog3@yandex.ru",
+		"url": "https://github.com/xobotyi"
+	},
+	"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/better-memory",
+	"repository": "https://github.com/xobotyi/cc-foundry",
+	"license": "MIT",
+	"keywords": ["memory", "auto-memory", "mod", "sift"],
+	"userConfig": {
+		"enabled": {
+			"title": "Guard auto memory",
+			"description": "Run the better-memory mod: memory is written only through its tools, entries need anchors, and it maintains MEMORY.md. Off, Claude Code's own memory runs unchanged and only the sift skill remains.",
+			"type": "boolean",
+			"default": true
+		},
+		"sift": {
+			"title": "Sift when idle",
+			"description": "Judge new and unchecked entries in a separate Claude process when an interactive session goes idle. Off, entries stay as written until you run the sift skill.",
+			"type": "boolean",
+			"default": true
+		}
+	}
+}

@@ -139,6 +139,12 @@
 			"source": "./plugins/plugin-rollcall",
 			"category": "productivity",
 			"tags": ["hooks", "automation"]
+		},
+		{
+			"name": "better-memory",
+			"source": "./plugins/better-memory",
+			"category": "productivity",
+			"tags": ["hooks", "memory", "automation"]
 		}
 	]
 }
