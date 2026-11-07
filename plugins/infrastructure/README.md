@@ -26,7 +26,7 @@ security-first defaults, and ground their guidance in official documentation.
 
 ## Installation
 
-```
+```text
 /plugin install infrastructure --marketplace xobotyi/cc-foundry
 ```
 

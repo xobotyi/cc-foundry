@@ -72,7 +72,7 @@ enables cross-service analysis without learning each library's custom attribute 
 
 Client span:
 
-```
+```text
 name: "GET"
 kind: CLIENT
 attributes:
@@ -86,7 +86,7 @@ attributes:
 
 Corresponding server span:
 
-```
+```text
 name: "GET /webshop/articles/:article_id"
 kind: SERVER
 attributes:

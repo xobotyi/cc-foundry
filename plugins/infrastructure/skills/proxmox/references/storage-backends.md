@@ -64,10 +64,12 @@ crashes from OOM contention.
 - **Rule of thumb:** 2GB base + 1GB per TB of storage
 - **Monitor:** ARC hit ratio above 90% means the cache earns its RAM. Below 70%, diminishing returns
 - **Configuration:**
-  ```
+
+  ```text
   # /etc/modprobe.d/zfs.conf
   options zfs zfs_arc_max=8589934592  # 8GB
   ```
+
   Run `update-initramfs -u` after changes. Reboot to apply.
 - Temporary adjustment: `echo "$[10 * 1024*1024*1024]" > /sys/module/zfs/parameters/zfs_arc_max`
 - If `zfs_arc_max` <= `zfs_arc_min`, `zfs_arc_max` is ignored — set `zfs_arc_min` lower first

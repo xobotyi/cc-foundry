@@ -151,7 +151,6 @@ services:
 - **Named volume** — `volname:/path`: Persistent data (databases, uploads)
 - **Bind mount** — `./host:/container`: Development, config files
 - **tmpfs** — `type: tmpfs`: Ephemeral scratch data, secrets at runtime
-
 - Named volumes survive `docker compose down` (but not `down -v`)
 - Bind mounts for development; named volumes for production
 - Use `:ro` suffix for read-only mounts
@@ -262,7 +261,7 @@ docker compose -f compose.yml -f compose.prod.yml config
 
 ### Project organization
 
-```
+```text
 project/
 ├── compose.yml              # Common defaults
 ├── compose.override.yml     # Development (auto-loaded, gitignored)

@@ -416,7 +416,7 @@ Rules:
 
 ### The Correlation Workflow
 
-```
+```text
 Metrics dashboard shows error rate spike
   → Filter by service + time window
   → Find exemplar trace_id on the error counter
@@ -503,7 +503,7 @@ trace. This bidirectional linking is the backbone of incident investigation.
 - **No sensitive data in logs or span attributes.** Passwords, tokens, PII in telemetry is a security and compliance
   defect.
 
-```
+```text
 Bad review comment:
   "According to observability best practices, you should consider
    adding structured logging with appropriate fields..."

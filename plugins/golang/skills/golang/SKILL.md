@@ -297,7 +297,7 @@ contradicts one, follow the codebase and flag the divergence once.
 
 When **reviewing** Go, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "According to Go conventions, error strings should be lowercase..."
 Good: errors.New("Not found.") -> errors.New("not found")
 ```

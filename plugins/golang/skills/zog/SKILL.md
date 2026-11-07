@@ -167,7 +167,7 @@ follow the codebase and flag the divergence once.
 When **reviewing** Zog, cite the violation and show the fix inline. Do not lecture. Treat a `.Required()` on a value
 arriving from a form, a query string, or JSON as a defect until an emptiness test sits beside it.
 
-```
+```text
 Bad:  "Required only fires on a nil input, so an empty query parameter passes through..."
 Good: z.String().Required() -> z.String().Required().Min(1)
 ```

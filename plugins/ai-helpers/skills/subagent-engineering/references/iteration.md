@@ -6,7 +6,7 @@ Improving existing subagents based on observed behavior — targeted prompt fixe
 
 ## Improvement Workflow
 
-```
+```text
 1. Identify → What behavior is wrong?
 2. Diagnose → Root cause (description? prompt? tools? scope?)
 3. Hypothesize → One change that should fix it
@@ -161,7 +161,7 @@ prompt — before examples, after the role declaration.
 When an agent reliably fails on a subset of tasks or produces inconsistent quality, the root cause is often scope
 overload. Split into two focused agents:
 
-```
+```text
 # Before: one agent doing too much
 security-and-quality-reviewer.md
 
@@ -283,7 +283,7 @@ looks right."
 
 **Pattern:**
 
-```
+```text
 Session A (Author): Writes the new agent prompt, commits
 Session B (Reviewer): Opens fresh session, runs agent against test tasks, evaluates output cold
 ```

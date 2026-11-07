@@ -6,7 +6,7 @@ libraries.
 
 ## Protocol Format
 
-```
+```text
 <METRIC_NAME>:<VALUE>|<TYPE>|@<SAMPLE_RATE>|#<TAG_KEY>:<TAG_VALUE>,<TAG2>
 ```
 
@@ -23,7 +23,7 @@ dimensions in the metric name.
 
 ### Format
 
-```
+```text
 metric.name:1|c|#key1:value1,key2:value2,bare_tag
 ```
 
@@ -71,7 +71,7 @@ Configure aggregates in `datadog.yaml`:
 Distributions send raw values to Datadog for server-side aggregation. This provides globally accurate percentiles across
 all hosts.
 
-```
+```text
 request.duration:42|d|#service:api,env:prod
 ```
 
@@ -105,7 +105,7 @@ DogStatsD can send events (not just metrics) to the Datadog event stream.
 
 **Format:**
 
-```
+```text
 _e{<TITLE_LENGTH>,<TEXT_LENGTH>}:<TITLE>|<TEXT>|d:<TIMESTAMP>|h:<HOSTNAME>|p:<PRIORITY>|t:<ALERT_TYPE>|#<TAGS>
 ```
 
@@ -120,7 +120,7 @@ _e{<TITLE_LENGTH>,<TEXT_LENGTH>}:<TITLE>|<TEXT>|d:<TIMESTAMP>|h:<HOSTNAME>|p:<PR
 
 **Example:**
 
-```
+```text
 _e{14,21}:Deploy started|v2.1.0 to prod env|t:info|#service:api,env:prod
 ```
 
@@ -137,7 +137,7 @@ Report health status of a service or dependency.
 
 **Format:**
 
-```
+```text
 _sc|<NAME>|<STATUS>|d:<TIMESTAMP>|h:<HOSTNAME>|#<TAGS>|m:<MESSAGE>
 ```
 
@@ -150,7 +150,7 @@ _sc|<NAME>|<STATUS>|d:<TIMESTAMP>|h:<HOSTNAME>|#<TAGS>|m:<MESSAGE>
 
 **Example:**
 
-```
+```text
 _sc|redis.connection|0|#env:prod|m:Connection healthy
 _sc|redis.connection|2|#env:prod|m:Connection timed out after 10s
 ```
@@ -171,12 +171,12 @@ _sc|redis.connection|2|#env:prod|m:Connection timed out after 10s
 
 **Value packing (v1.1):** Send multiple values for the same metric in a single datagram, reducing packet count:
 
-```
+```text
 request.duration:42:38:55:41|d|#service:api
 ```
 
 **Timestamps (v1.3):** Pre-aggregated metrics can include a Unix timestamp to skip Agent-side aggregation:
 
-```
+```text
 page.views:150|c|#env:prod|T1656581400
 ```

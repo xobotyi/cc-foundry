@@ -340,7 +340,7 @@ suite contradicts one, follow the suite and flag the divergence once.
 
 When **reviewing** tests, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "Vitest best practice suggests awaiting async assertions..."
 Good: expect(fetchUser(1)).rejects.toThrow()  ->  await expect(fetchUser(1)).rejects.toThrow()
 ```

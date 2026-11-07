@@ -22,7 +22,7 @@ or deleted based on file contents. Not available in Grafana Cloud.
 The `provisioning` directory is configured via `grafana.ini`'s `[paths] provisioning` setting (default
 `<WORKING_DIR>/conf/provisioning`). Subdirectories:
 
-```
+```text
 provisioning/
 ├── datasources/        # *.yaml — data source configurations
 ├── dashboards/         # *.yaml — dashboard provider configurations (NOT dashboards themselves)
@@ -196,7 +196,7 @@ Kubernetes-style (required for dashboards v2 / dynamic dashboards):
 
 When `true`, the directory hierarchy maps to Grafana folder structure:
 
-```
+```text
 /etc/dashboards
 ├── server/
 │   ├── common_dashboard.json

@@ -30,7 +30,7 @@ the gates check evidence — was it reproduced, was it searched for, was the cla
 
 ## Installation
 
-```
+```text
 /plugin install open-source --marketplace xobotyi/cc-foundry
 ```
 

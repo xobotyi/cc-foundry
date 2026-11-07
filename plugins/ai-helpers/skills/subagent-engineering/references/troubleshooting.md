@@ -149,12 +149,14 @@ Fix:
 
 - Add numbered steps marked "complete IN ORDER before returning".
 - Add a completion checklist at the end of the system prompt:
-  ```
+
+  ```text
   Before returning, verify:
   - [ ] Step 1 completed
   - [ ] Step 2 completed
   - [ ] Output written to correct location
   ```
+
 - Add final instruction: "Do not return until all checklist items are checked."
 
 ---
@@ -327,12 +329,14 @@ startup.
 Fix:
 
 - Always include `settingSources`:
+
   ```typescript
   const options: ClaudeCodeOptions = {
     settingSources: ["user", "project"],
     // ...
   };
   ```
+
 - Valid values: `"user"` (loads `~/.claude/settings.json`), `"project"` (loads `.claude/settings.json`), `"enterprise"`.
 - If intentionally empty (fully isolated agent), confirm deliberately — it disables all configured tools and hooks.
 
@@ -345,9 +349,11 @@ Symptom: agent attempts a tool call and receives a permission error; task fails 
 Fix:
 
 - Enumerate all tools the agent needs in `allowedTools`:
+
   ```typescript
   allowedTools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
   ```
+
 - Tool names are case-sensitive and must match exactly.
 - Cross-reference the agent's system prompt workflow steps against `allowedTools` before running.
 - If using `disallowedTools` alongside `allowedTools`, `disallowedTools` takes precedence — check for conflicts.

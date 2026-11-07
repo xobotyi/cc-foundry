@@ -38,7 +38,7 @@ This separation is critical because:
 
 Check whether stdout and stderr are TTYs independently:
 
-```
+```text
 if stdout is TTY:
     human-readable output to stdout
 else:

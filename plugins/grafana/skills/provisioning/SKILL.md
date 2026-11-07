@@ -67,7 +67,7 @@ YAML files in `provisioning/` directories read by Grafana at startup. Not availa
 
 ### Directory layout
 
-```
+```text
 provisioning/
 ├── datasources/        # *.yaml — data source configs
 ├── dashboards/         # *.yaml — dashboard provider configs (NOT dashboards themselves)
@@ -165,7 +165,7 @@ Service account tokens (recommended) via `Authorization: Bearer <token>`. API ke
 
 ### Dashboard CRUD pattern
 
-```
+```text
 POST   /apis/dashboard.grafana.app/v1/namespaces/<ns>/dashboards
 PUT    /apis/dashboard.grafana.app/v1/namespaces/<ns>/dashboards/<uid>
 GET    /apis/dashboard.grafana.app/v1/namespaces/<ns>/dashboards/<uid>

@@ -68,13 +68,17 @@ screen.getByRole('link', { name: /about/i });
 
 - **Use `getBy` by default.** It throws a helpful error with the full DOM if the element isn't found.
 - **Use `queryBy` ONLY to assert non-existence:**
+
   ```tsx
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   ```
+
 - **Use `findBy` for async elements** (after data fetches, transitions):
+
   ```tsx
   const alert = await screen.findByRole('alert');
   ```
+
 - **Never use `queryBy` to assert existence** — `getBy` gives better errors.
 
 ## User Interactions

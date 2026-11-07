@@ -509,7 +509,7 @@ type MyString string
 
 Use kebab-case for Go source files:
 
-```
+```text
 user-service.go
 http-handler.go
 config-parser.go
@@ -517,7 +517,7 @@ config-parser.go
 
 Test files follow the same convention with suffixes:
 
-```
+```text
 user-service_test.go          # black-box tests (package foo_test)
 user-service_internal_test.go # white-box tests (package foo)
 ```

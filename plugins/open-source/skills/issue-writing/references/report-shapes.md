@@ -25,7 +25,7 @@ Lead with what a maintainer needs to decide whether to act.
 **Steps to reproduce** — numbered, each naming the action, starting from a clean environment with default configuration.
 Include setup that is not obvious: environment variables, feature flags, required data.
 
-```
+```text
 1. Install v2.4.1 in a clean profile
 2. Create input: printf 'line1\nline2\n' > test.txt
 3. Run: tool process test.txt --format json

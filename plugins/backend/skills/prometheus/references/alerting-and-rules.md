@@ -63,7 +63,7 @@ result as a new time series.
 
 ### Naming Convention
 
-```
+```text
 level:metric:operations
 ```
 

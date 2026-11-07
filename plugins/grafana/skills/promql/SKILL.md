@@ -393,7 +393,7 @@ Full pitfall catalog with diagnostics: [`${CLAUDE_SKILL_DIR}/references/optimiza
 
 ### Recording Rule Naming — `level:metric:operations`
 
-```
+```text
 instance:http_requests:rate5m                   # per-instance rate (no aggregation)
 job:http_requests:rate5m                        # rolled up to per-job
 job:http_errors_per_requests:ratio_rate5m       # ratio, per job

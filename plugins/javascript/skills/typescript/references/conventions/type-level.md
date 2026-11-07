@@ -45,7 +45,6 @@ hovered.
   ```
 
   Producing `never` for a key removes it, which is how a mapped type filters.
-
 - **`+` and `-` add and remove modifiers**: `{ -readonly [K in keyof T]-?: T[K] }` produces the mutable, fully required
   form. `-?` removes optionality; without it, `Required` cannot be expressed.
 - **A homomorphic mapped type — one written `[K in keyof T]` — preserves `readonly`, optionality, and array and tuple
@@ -78,7 +77,6 @@ hovered.
 
 - **A conditional that wraps its recursive call stops far earlier than 1000** — under 50 for the `Deep` form above on
   both 6.0 and 7.0, because each level spends the budget twice, once on the conditional and once on the tuple spread.
-
 - **The fix for `TS2589` is an accumulator.** Rewrite so the recursive call is in tail position and the work accumulates
   in a second type parameter. Where that does not fit, cap the depth explicitly with a counter parameter.
 - **A large union multiplies against everything it touches.** A conditional distributed over a 200-member union

@@ -27,7 +27,7 @@ This reference covers what query authors need to know — schema and storage det
 A native histogram is **one time series** with a composite sample (count + sum + sparse buckets) at each scrape. A
 classic histogram is **N+2 series** (one per bucket plus `_count` and `_sum`).
 
-```
+```text
 # Classic histogram — three or more series
 http_request_duration_seconds_bucket{le="0.1"}    14
 http_request_duration_seconds_bucket{le="0.5"}    98

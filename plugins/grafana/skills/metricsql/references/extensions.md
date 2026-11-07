@@ -22,7 +22,7 @@ Features with no PromQL equivalent. Avoid in queries that may be ported back to 
 
 ### Multiple `or` Filters
 
-```
+```text
 {env="prod",job="a" or env="dev",job="b"}
 ```
 
@@ -32,7 +32,7 @@ Equivalent to `{env="prod",job="a"} or {env="dev",job="b"}` at the selector leve
 
 ### Value Set Matching
 
-```
+```text
 status_code == (300, 301, 304)
 status_code != (300, 301, 304)
 ```
@@ -42,7 +42,7 @@ Returns series where the value matches (or doesn't) any listed constant. Cleaner
 
 ### Escape Sequences
 
-```
+```text
 foo\-bar{baz\=aa="b"}
 ```
 
@@ -52,7 +52,7 @@ Backslash-escapes special chars in names. `\xXX` for ASCII, `\uXXXX` for Unicode
 
 Identifiers can contain arbitrary Unicode letters:
 
-```
+```text
 ტემპერატურა{πόλη="Київ"}
 ```
 
@@ -64,13 +64,13 @@ Available for internationalized names; readability suffers.
 
 ### `default`
 
-```
+```text
 q1 default q2
 ```
 
 Fills gaps in `q1` from matching series in `q2`. Chain for fallback:
 
-```
+```text
 metric_a default metric_b default 0
 ```
 
@@ -81,14 +81,14 @@ Replaces the awkward `metric_a or vector(0)` pattern. Handles labels correctly v
 - `q1 if q2` — keeps `q1` where `q2` has a sample.
 - `q1 ifnot q2` — keeps `q1` where `q2` has **no** sample.
 
-```
+```text
 http_request_duration_seconds_sum if up == 1   # exclude periods when target was down
 errors_total ifnot maintenance_mode            # exclude maintenance windows
 ```
 
 ### Keep-Metric-Names on Binary Ops
 
-```
+```text
 (rate(http_requests_total[5m]) / 1024) keep_metric_names
 ```
 
@@ -98,7 +98,7 @@ Preserves the metric name through binary ops; without it, names are stripped (Pr
 
 ## group_left(\*) / group_right(\*)
 
-```
+```text
 kube_pod_info * on(namespace) group_left(*) prefix "ns_" kube_namespace_labels
 ```
 
@@ -112,7 +112,7 @@ kube_pod_info * on(namespace) group_left(*) prefix "ns_" kube_namespace_labels
 
 ## WITH Templates
 
-```
+```text
 WITH (
   total = rate(http_requests_total[5m]),
   errs = rate(http_requests_total{status=~"5.."}[5m]),
@@ -125,7 +125,7 @@ Expanded at parse time — executed query is the substituted form. Readability g
 
 ### String Concatenation
 
-```
+```text
 WITH (commonPrefix = "my_app_") {__name__=commonPrefix+"errors_total"}
 ```
 
@@ -135,7 +135,7 @@ For parameterizing dashboards over metric prefixes.
 
 References to earlier definitions:
 
-```
+```text
 WITH (
   base = rate(http_requests_total[5m]),
   total = sum(base) by (job),
@@ -165,7 +165,7 @@ when the downstream needs the name and meaning is clear.
 
 ### `limit N`
 
-```
+```text
 sum(http_requests_total) by (path) limit 10
 ```
 
@@ -180,7 +180,7 @@ Use `limit` for high-cardinality safety nets; `topk` for ranked dashboards.
 
 ### Multiple Arguments
 
-```
+```text
 avg(q1, q2, q3)
 ```
 
@@ -193,7 +193,7 @@ verbosity.
 
 ### Underscores in Numbers
 
-```
+```text
 1_234_567_890
 ```
 
@@ -216,7 +216,7 @@ Readability separator. Equivalent to `1234567890`.
 
 ### Fractional Durations
 
-```
+```text
 rate(metric[1.5m])
 rate(metric offset 0.5d)
 ```
@@ -227,7 +227,7 @@ Any decimal fraction valid in duration positions.
 
 Bare numbers = seconds:
 
-```
+```text
 rate(m[300] offset 1800)  ==  rate(m[5m]) offset 30m
 ```
 
@@ -235,7 +235,7 @@ rate(m[300] offset 1800)  ==  rate(m[5m]) offset 30m
 
 Durations anywhere a number is expected:
 
-```
+```text
 sum_over_time(m[1h]) / 1h  ==  sum_over_time(m[1h]) / 3600
 ```
 
@@ -245,7 +245,7 @@ sum_over_time(m[1h]) / 1h  ==  sum_over_time(m[1h]) / 3600
 
 `Ni` = N times current Grafana step:
 
-```
+```text
 rate(metric[10i] offset 5i)
 ```
 
@@ -257,7 +257,7 @@ rate(metric[10i] offset 5i)
 
 ### `offset` Anywhere
 
-```
+```text
 sum(foo) offset 24h
 ```
 
@@ -265,7 +265,7 @@ PromQL requires `offset` immediately after the selector. MetricsQL accepts it an
 
 ### `@` Modifier Anywhere
 
-```
+```text
 sum(foo) @ end()
 foo @ (end() - 1h)
 ```
@@ -275,7 +275,7 @@ subexpressions valid.
 
 ### Trailing Commas
 
-```
+```text
 m{foo="bar",}
 f(a, b,)
 WITH (x=y,) x
@@ -289,7 +289,7 @@ All valid. Helps multi-line editing.
 
 ### `histogram_quantile` with boundsLabel
 
-```
+```text
 histogram_quantile(0.95, rate(metric_bucket[5m]), "bound")
 ```
 
@@ -298,13 +298,13 @@ plotting "p95 ± uncertainty."
 
 ### `histogram_over_time`
 
-```
+```text
 histogram_over_time(gauge_metric[24h])
 ```
 
 VictoriaMetrics-format histograms from gauge values. Pair with `histogram_quantile`:
 
-```
+```text
 histogram_quantile(0.5, sum(histogram_over_time(temperature[24h])) by (vmrange, country))
 ```
 
@@ -312,7 +312,7 @@ Median temperature by country over 24h, no histogram instrumentation needed.
 
 ### `histogram_quantiles` (Plural)
 
-```
+```text
 histogram_quantiles("phi", 0.5, 0.95, 0.99, rate(metric_bucket[5m]))
 ```
 
@@ -322,7 +322,7 @@ One series per quantile with `phi` label. Cheaper than three `histogram_quantile
 
 ## Subqueries
 
-```
+```text
 max_over_time(rate(http_requests_total[5m])[1h:30s])
 ```
 
@@ -338,7 +338,7 @@ Inner rollup uses outer step; outer uses query `step`. Deterministic, cacheable.
 
 ## Graphite Compatibility
 
-```
+```text
 {__graphite__="foo.*.bar"}
 ```
 

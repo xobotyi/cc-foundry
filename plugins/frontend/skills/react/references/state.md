@@ -16,7 +16,7 @@ The most important decision in React state management is **where** state lives.
 5. **Is it server data (user profile, search results)?** Use a data-fetching library (react-query, SWR, framework
    loaders) — not `useState` + `useEffect`.
 
-```
+```text
 Local state (useState)
   → Lift state up (shared parent)
     → Composition (children, render props)

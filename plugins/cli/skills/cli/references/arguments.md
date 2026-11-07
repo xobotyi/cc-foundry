@@ -64,7 +64,7 @@ For complex tools with multiple operations:
 
 When a tool has many objects and operations, use `noun verb` or `verb noun`:
 
-```
+```text
 docker container create    # noun verb
 docker container list
 docker image pull

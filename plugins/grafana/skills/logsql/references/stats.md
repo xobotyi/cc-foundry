@@ -17,7 +17,7 @@ Stats pipe shape, grouping patterns, all stats functions, `running_stats`/`total
 
 ## Stats Pipe Shape
 
-```
+```text
 | stats <func1>(...) as <name1>, <func2>(...) as <name2>, ...
 ```
 
@@ -27,13 +27,13 @@ Stats pipe shape, grouping patterns, all stats functions, `running_stats`/`total
 
 Minimal:
 
-```
+```text
 _time:5m | stats count() as logs_total
 ```
 
 Multi-function:
 
-```
+```text
 _time:5m | stats
     count() as total,
     count_uniq(_stream) as streams,
@@ -46,20 +46,20 @@ _time:5m | stats
 
 ### By Fields
 
-```
+```text
 | stats by (field1, field2, ...) <func>(...) as <name>
 | stats (field1, field2) <func>(...) as <name>     # 'by' optional
 ```
 
 Independent aggregation per unique field combination.
 
-```
+```text
 _time:5m | stats by (host, path) count() as logs, count_uniq(client_ip) as ips
 ```
 
 ### By Time Buckets
 
-```
+```text
 | stats by (_time:1m) <func>(...) as <name>
 | stats by (_time:5m, host) count() as per_5m_per_host
 ```
@@ -75,7 +75,7 @@ Named steps for variable-length buckets:
 
 ### Time Buckets with Timezone
 
-```
+```text
 | stats by (_time:1d offset 'America/New_York') count() as per_day_ny
 | stats by (_time:1w offset 'Europe/London') count() as per_week_uk
 ```
@@ -84,7 +84,7 @@ Aligned to named timezone, not UTC. For daily/weekly stats matching business hou
 
 ### By Field Buckets
 
-```
+```text
 | stats by (duration_ms:100) count() as histogram
 | stats by (response_bytes:1Ki) count() as size_histogram
 ```
@@ -95,7 +95,7 @@ Fast distribution overview when full `histogram(...)` is overkill.
 
 ### By IPv4 Buckets
 
-```
+```text
 | stats by (client_ip:/24) count() as per_subnet
 | stats by (client_ip:/16) count() as per_class_b
 ```
@@ -106,7 +106,7 @@ Buckets IPv4s by CIDR prefix. Result = network address.
 
 ## Per-Aggregate Filters
 
-```
+```text
 | stats
     count() as total,
     count() if (level:error) as errors,
@@ -146,7 +146,7 @@ Prefer `count_uniq_hash` for high-cardinality fields.
 - **`median(field)`** — 50th percentile.
 - **`quantile(phi, field)`** — phi in `[0..1]`.
 
-```
+```text
 | stats by (host) quantile(0.5, duration_ms) p50, quantile(0.95, duration_ms) p95, quantile(0.99, duration_ms) p99
 ```
 
@@ -164,7 +164,7 @@ Use `uniq_values(_stream)` to enumerate contributing streams.
 
 Slowest request_id per endpoint:
 
-```
+```text
 | stats by (path) field_max(request_id, duration_ms) as slowest_req_id, max(duration_ms) as slowest_duration
 ```
 
@@ -178,7 +178,7 @@ For when you want every field of the extremal row.
 
 ### Histogram
 
-```
+```text
 | stats by (host) histogram(duration_ms) as duration_dist
 ```
 
@@ -199,7 +199,7 @@ Compute rates over query time range — for non-time-bucketed "events per second
 
 ## Running Stats
 
-```
+```text
 _time:5m
   | stats by (_time:1m) count() as hits
   | running_stats sum(hits) as cumulative_hits
@@ -213,7 +213,7 @@ For cumulative growth curves, running max, "errors so far today."
 
 ## Total Stats
 
-```
+```text
 _time:5m
   | stats by (_time:1m) count() as hits
   | total_stats sum(hits) as total_hits
@@ -230,7 +230,7 @@ For percentage-of-total, normalizing per-bucket values.
 
 `math` (alias: `eval`) — row-wise numeric calculations:
 
-```
+```text
 | math <expr1> as <name1>, <expr2> as <name2>, ...
 ```
 
@@ -260,7 +260,7 @@ For percentage-of-total, normalizing per-bucket values.
 
 Later expressions reference earlier results in the same pipe:
 
-```
+```text
 | math
     x = duration_ms / 1000,
     y = round(x, 0.1) as duration_sec,
@@ -275,7 +275,7 @@ Order matters within one `math` pipe.
 
 ### Top-K by Composite Metric
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg
   | stats by (endpoint)
@@ -289,7 +289,7 @@ Order matters within one `math` pipe.
 
 ### Percentage Across Time
 
-```
+```text
 {app="api"} _time:1h
   | stats by (_time:1m) count() as hits
   | total_stats sum(hits) as total
@@ -298,7 +298,7 @@ Order matters within one `math` pipe.
 
 ### Distinct Counts with Memory Safety
 
-```
+```text
 _time:1d
   | stats
       count_uniq(client_ip) as ips_exact,
@@ -310,7 +310,7 @@ _time:1d
 
 ### Multi-Aggregate in One Pass
 
-```
+```text
 _time:5m
   | stats
       count() as total,
@@ -325,7 +325,7 @@ One pass, six aggregates. `if (...)` filters have near-zero cost beyond the base
 
 ### Per-Stream Quantiles
 
-```
+```text
 _time:1h
   | unpack_json from _msg fields (duration_ms)
   | stats by (_stream)

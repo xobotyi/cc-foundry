@@ -20,31 +20,31 @@ Query recipes, field extraction, performance tips, troubleshooting workflows.
 
 ### Recent Errors from One Service
 
-```
+```text
 {app="api"} error _time:5m | sort by (_time) desc | limit 100
 ```
 
 ### Errors Excluding Known Noise
 
-```
+```text
 {app="api"} _time:5m error -(known_noise1 OR known_noise2)
 ```
 
 ### Logs in a Specific Time Window
 
-```
+```text
 {app="api"} _time:[2024-03-15T10:00:00Z, 2024-03-15T11:00:00Z] error
 ```
 
 ### Logs from Multiple Apps
 
-```
+```text
 {app in ("api", "worker", "scheduler")} _time:5m error
 ```
 
 ### High-Latency Requests
 
-```
+```text
 {app="api"} _time:5m
   | unpack_json from _msg
   | filter duration_ms:>1000
@@ -54,7 +54,7 @@ Query recipes, field extraction, performance tips, troubleshooting workflows.
 
 ### Surrounding Context for Each Error
 
-```
+```text
 {app="api"} _time:5m error
   | stream_context before 5 after 10
 ```
@@ -67,19 +67,19 @@ Each error plus 5 before and 10 after from the same stream.
 
 ### Total Logs Matching a Query
 
-```
+```text
 _time:5m error | count()
 ```
 
 ### Errors per Stream
 
-```
+```text
 _time:5m error | stats by (_stream) count() as errors | sort by (errors desc)
 ```
 
 ### Errors per Service (Multi-Aggregate)
 
-```
+```text
 {app=~".+"} _time:5m
   | stats by (app)
       count() as total,
@@ -91,7 +91,7 @@ _time:5m error | stats by (_stream) count() as errors | sort by (errors desc)
 
 ### Top 10 Noisiest Streams
 
-```
+```text
 _time:5m | top 10 (_stream)
 ```
 
@@ -99,7 +99,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### Unique Client Count (Memory-Safe)
 
-```
+```text
 {app="api"} _time:1d | count_uniq_hash(client_ip)
 ```
 
@@ -107,7 +107,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### Counting Distinct Values per Group
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg
   | stats by (endpoint) count_uniq(client_ip) as unique_clients
@@ -121,7 +121,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### Latency Percentiles per Endpoint
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg fields (endpoint, duration_ms)
   | stats by (endpoint)
@@ -137,7 +137,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### Histogram of Response Sizes
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg fields (response_bytes)
   | stats by (response_bytes:1Ki) count() as bucket_count
@@ -146,7 +146,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### Per-Subnet Request Counts
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg fields (client_ip)
   | stats by (client_ip:/24) count() as requests
@@ -156,7 +156,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### Status Code Distribution
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg fields (status)
   | stats by (status) count() as count
@@ -169,7 +169,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### JSON Structured Logs
 
-```
+```text
 {app="api"} _time:5m
   | unpack_json from _msg
   | filter level:error
@@ -178,7 +178,7 @@ Equivalent to: `_time:5m | stats by (_stream) count() as logs | sort by (logs de
 
 ### JSON with Selective Fields
 
-```
+```text
 {app="api"} _time:5m
   | unpack_json from _msg fields (level, component, duration_ms)
   | filter level:error
@@ -189,7 +189,7 @@ Faster than full unpack for few fields.
 
 ### Logfmt Logs
 
-```
+```text
 {app="caddy"} _time:5m
   | unpack_logfmt from _msg
   | filter status:>=500
@@ -198,7 +198,7 @@ Faster than full unpack for few fields.
 
 ### Syslog
 
-```
+```text
 {app="systemd"} _time:5m
   | unpack_syslog from _msg
   | filter severity:<=3            # warning or worse
@@ -207,7 +207,7 @@ Faster than full unpack for few fields.
 
 ### Regex Extraction from Free-Form Logs
 
-```
+```text
 {app="nginx"} _time:5m
   | extract_regexp '(?P<client_ip>[0-9.]+) - .+ "(?P<method>\\w+) (?P<path>[^ ]+) HTTP/[0-9.]+" (?P<status>\\d+) (?P<bytes>\\d+)'
   | stats by (status, method) count(), avg(bytes) as avg_bytes
@@ -215,7 +215,7 @@ Faster than full unpack for few fields.
 
 ### Pattern Extraction
 
-```
+```text
 {app="web"} _time:5m
   | extract '<ts> [<level>] <component>: <message>' from _msg
   | filter level:ERROR
@@ -224,7 +224,7 @@ Faster than full unpack for few fields.
 
 ### Field Fingerprinting (Collapse IDs)
 
-```
+```text
 {app="api"} _time:5m
   | collapse_nums at _msg
   | stats by (_msg) count() as occurrences
@@ -240,7 +240,7 @@ Top 20 log templates with IDs/numbers normalized to `<N>`.
 
 ### Per-Minute Error Rate
 
-```
+```text
 {app="api"} _time:1h error
   | stats by (_time:1m) count() as errors_per_min
   | sort by (_time)
@@ -248,7 +248,7 @@ Top 20 log templates with IDs/numbers normalized to `<N>`.
 
 ### Per-Minute Error Percentage
 
-```
+```text
 {app="api"} _time:1h
   | stats by (_time:1m)
       count() as total,
@@ -259,7 +259,7 @@ Top 20 log templates with IDs/numbers normalized to `<N>`.
 
 ### Cumulative Errors Over Time
 
-```
+```text
 {app="api"} _time:1h error
   | stats by (_time:1m) count() as hits
   | running_stats sum(hits) as cumulative
@@ -268,7 +268,7 @@ Top 20 log templates with IDs/numbers normalized to `<N>`.
 
 ### Daily Breakdown in Local Timezone
 
-```
+```text
 {app="api"} _time:7d error
   | stats by (_time:1d offset 'America/New_York') count() as daily_errors
   | sort by (_time)
@@ -276,7 +276,7 @@ Top 20 log templates with IDs/numbers normalized to `<N>`.
 
 ### Rate of Distinct Users Over Time
 
-```
+```text
 {app="api"} _time:1h
   | unpack_json from _msg fields (user_id)
   | stats by (_time:5m) count_uniq_hash(user_id) as unique_users_per_5m
@@ -291,7 +291,7 @@ Top 20 log templates with IDs/numbers normalized to `<N>`.
 
 Find clients with any error in last hour; show all their logs:
 
-```
+```text
 _time:1h
   | filter client_ip:in(
       {app="api"} _time:1h error | uniq by (client_ip) | fields client_ip
@@ -300,7 +300,7 @@ _time:1h
 
 ### Correlate Error in API with Slow Query in DB
 
-```
+```text
 {app="api"} _time:5m error
   | unpack_json from _msg fields (request_id)
   | join by (request_id) (
@@ -311,7 +311,7 @@ _time:1h
 
 ### Union of Multiple Service Queries
 
-```
+```text
 {app="api"} _time:5m error
   | union (
       {app="worker"} _time:5m error
@@ -328,21 +328,21 @@ _time:1h
 
 ### Free-Text Search Without `_time`
 
-```
+```text
 error                                        # BAD: scans all time
 error _time:5m                               # GOOD
 ```
 
 ### Free-Text Search Without Stream Filter
 
-```
+```text
 error _time:5m                               # OK
 error _time:5m {app="api"}                   # MUCH FASTER
 ```
 
 ### Regex When Exact Match Suffices
 
-```
+```text
 log.level:~"error"                           # SLOW
 log.level:="error"                           # FAST (exact)
 log.level:in("error", "fatal", "panic")      # FAST (multi-exact)
@@ -350,21 +350,21 @@ log.level:in("error", "fatal", "panic")      # FAST (multi-exact)
 
 ### Sort Before Limit
 
-```
+```text
 _time:5m | sort by (_time) | limit 10        # OK but materializes full sort
 _time:5m | first 10 by (_time)               # FASTER
 ```
 
 ### `count_uniq` on High-Cardinality
 
-```
+```text
 _time:1d | count_uniq(request_id)            # MAY OOM
 _time:1d | count_uniq_hash(request_id)       # SAFE, ±1%
 ```
 
 ### Multiple Pass Aggregations
 
-```
+```text
 # BAD: three full scans
 _time:5m | count()
 _time:5m error | count()
@@ -379,7 +379,7 @@ _time:5m | stats
 
 ### Unparenthesized OR Inside NOT
 
-```
+```text
 error -buggy_app OR foobar                   # parses as (error AND NOT buggy_app) OR foobar
 error -(buggy_app OR foobar)                 # parses as error AND NOT (buggy_app OR foobar)
 ```
@@ -409,7 +409,7 @@ Second form is almost always intended. Always parenthesize OR inside NOT.
 
 1. **Drop pipes, check filter alone.**
 
-   ```
+   ```text
    {app="api"} _time:5m error | limit 5
    ```
 
@@ -417,22 +417,24 @@ Second form is almost always intended. Always parenthesize OR inside NOT.
 
 2. **Loosen `_time`.**
 
-   ```
+   ```text
    {app="api"} _time:1d error | limit 5
    ```
 
 3. **Drop stream filter.**
 
-   ```
+   ```text
    _time:5m error | limit 5
    ```
 
    Rows here but not with stream filter = stream filter wrong. Verify with `| stats by (_stream) count()`.
 
 4. **Check field presence.**
-   ```
+
+   ```text
    _time:5m {app="api"} | field_names | limit 100
    ```
+
    Reveals which fields exist in matching rows.
 
 ### Query Returns Too Many Results
@@ -445,7 +447,7 @@ Second form is almost always intended. Always parenthesize OR inside NOT.
 
 1. **`| query_stats`** at the end:
 
-   ```
+   ```text
    _time:5m error | stats by (_stream) count() | query_stats
    ```
 
@@ -453,57 +455,67 @@ Second form is almost always intended. Always parenthesize OR inside NOT.
 
 2. **`| blocks_count`:**
 
-   ```
+   ```text
    _time:5m error | blocks_count
    ```
 
    Large counts → time and stream filters under-pruning.
 
 3. **Profile pipes incrementally:**
-   ```
+
+   ```text
    _time:5m error | limit 100                       # filter only
    _time:5m error | unpack_json from _msg | limit 100   # add parse
    _time:5m error | unpack_json from _msg | stats by (level) count()    # add aggregate
    ```
+
    Observe which step's runtime jumps.
 
 ### Unexpected Stats Results
 
 1. **`| limit 10` before `stats`** to inspect input:
 
-   ```
+   ```text
    _time:5m error | unpack_json from _msg | limit 10
    ```
 
 2. **`field_values`** for distinct values:
 
-   ```
+   ```text
    _time:5m | unpack_json from _msg | field_values level
    ```
 
 3. **Verify unpack/extract worked:**
-   ```
+
+   ```text
    _time:5m | unpack_json from _msg | fields _time, level, _msg | limit 5
    ```
+
    Empty `level` = no `level` key in JSON, or different structure.
 
 ### Quantiles Look Wrong
 
 - **Sample count per group:**
-  ```
+
+  ```text
   | stats by (group) count() as samples, quantile(0.95, x) as p95
   | filter samples:>=100
   ```
+
 - **Distribution via `histogram`:**
-  ```
+
+  ```text
   | stats by (group) histogram(x) as dist
   ```
+
 - **Compare percentiles:**
-  ```
+
+  ```text
   | stats by (group)
       quantile(0.5, x) p50,
       quantile(0.95, x) p95,
       quantile(0.99, x) p99,
       max(x) as worst
   ```
+
   p99 ≪ max = long tail outliers; p50 ≈ p99 = tight distribution.

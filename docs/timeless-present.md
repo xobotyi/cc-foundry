@@ -248,34 +248,34 @@ never revisited is not timeless. It is abandoned.
 
 **Style guides and enforcement**
 
-- Google, Timeless documentation: https://developers.google.com/style/timeless-documentation
-- Google, Present tense: https://developers.google.com/style/tense
-- Google, Document future features: https://developers.google.com/style/future
-- Microsoft Writing Style Guide, Verbs: https://learn.microsoft.com/en-us/style-guide/grammar/verbs
+- Google, Timeless documentation: <https://developers.google.com/style/timeless-documentation>
+- Google, Present tense: <https://developers.google.com/style/tense>
+- Google, Document future features: <https://developers.google.com/style/future>
+- Microsoft Writing Style Guide, Verbs: <https://learn.microsoft.com/en-us/style-guide/grammar/verbs>
 - Grafana writers' toolkit, prose lint rules (`Grafana.Timeless`, `Grafana.GoogleWill`):
-  https://grafana.com/docs/writers-toolkit/review/lint-prose/rules/
-- Helm documentation style guide: https://github.com/helm/helm-www/blob/main/style-guide.md
+  <https://grafana.com/docs/writers-toolkit/review/lint-prose/rules/>
+- Helm documentation style guide: <https://github.com/helm/helm-www/blob/main/style-guide.md>
 
 **Applied to AI agents**
 
-- Anchored Development: https://anchored-dev.org/
+- Anchored Development: <https://anchored-dev.org/>
 - ElevenLabs, `update-skills-from-changelog`:
-  https://github.com/elevenlabs/skills/blob/main/.agents/skills/update-skills-from-changelog/SKILL.md
-- AI-Knowledge `CLAUDE.md`: https://github.com/frederictriquet/AI-Knowledge/blob/master/CLAUDE.md
+  <https://github.com/elevenlabs/skills/blob/main/.agents/skills/update-skills-from-changelog/SKILL.md>
+- AI-Knowledge `CLAUDE.md`: <https://github.com/frederictriquet/AI-Knowledge/blob/master/CLAUDE.md>
 
 **Empirical**
 
-- Leidinger, van Rooij & Shutova, _The language of prompting_ (EMNLP Findings 2023): https://arxiv.org/abs/2311.01967
+- Leidinger, van Rooij & Shutova, _The language of prompting_ (EMNLP Findings 2023): <https://arxiv.org/abs/2311.01967>
 - Andriushchenko & Flammarion, _Does Refusal Training in LLMs Generalize to the Past Tense?_ (ICLR 2025):
-  https://arxiv.org/abs/2407.11969
-- Xu et al., _Knowledge Conflicts for LLMs: A Survey_: https://arxiv.org/html/2403.08319v2
-- Liu et al., _Lost in the Middle_: https://arxiv.org/abs/2307.03172
+  <https://arxiv.org/abs/2407.11969>
+- Xu et al., _Knowledge Conflicts for LLMs: A Survey_: <https://arxiv.org/html/2403.08319v2>
+- Liu et al., _Lost in the Middle_: <https://arxiv.org/abs/2307.03172>
 
 **Vendor**
 
 - Anthropic, published system prompts (current-date injection):
-  https://platform.claude.com/docs/en/release-notes/system-prompts
+  <https://platform.claude.com/docs/en/release-notes/system-prompts>
 
 **Linguistics**
 
-- Gnomic aspect: https://en.wikipedia.org/wiki/Gnomic_aspect
+- Gnomic aspect: <https://en.wikipedia.org/wiki/Gnomic_aspect>

@@ -31,7 +31,7 @@ Read the relevant reference before proceeding.
 
 ## The Three-Stage Shape
 
-```
+```text
 <filters> | <pipe1> | <pipe2> | ... | <pipeN>
 ```
 
@@ -42,7 +42,7 @@ Read the relevant reference before proceeding.
 
 Simplest valid query — one word, searched in `_msg`:
 
-```
+```text
 error
 ```
 
@@ -71,7 +71,7 @@ picker. **Do** add it for ad-hoc API queries.
 Logs belong to **streams** — Prometheus-style label sets identifying the source. Use `{...}` braces with PromQL selector
 syntax:
 
-```
+```text
 {app="nginx"}
 {app="nginx", instance=~"web-.*"}
 {app in ("nginx", "envoy")}
@@ -92,7 +92,7 @@ Full catalog: [`${CLAUDE_SKILL_DIR}/references/filters.md`].
 
 ### Word Filter
 
-```
+```text
 error
 log.level:error
 ```
@@ -102,7 +102,7 @@ case-insensitive.
 
 ### Phrase Filter
 
-```
+```text
 "error: cannot open file"
 "event.original":"cannot open file"
 ```
@@ -111,7 +111,7 @@ Quoted phrases match literally, whitespace and punctuation included.
 
 ### Prefix Filter
 
-```
+```text
 error*
 log.level:error*
 "warn"*
@@ -121,7 +121,7 @@ log.level:error*
 
 ### Exact / Multi-Exact
 
-```
+```text
 log.level:="error"
 log.level:in("error", "fatal", "panic")
 ```
@@ -130,7 +130,7 @@ log.level:in("error", "fatal", "panic")
 
 ### Regexp
 
-```
+```text
 ~"(?i)error|warn"
 log.level:~"^err"
 log.level:!~"^debug"
@@ -140,7 +140,7 @@ RE2 syntax. `!~` negates. Slower than word/exact — use sparingly.
 
 ### Range Filter
 
-```
+```text
 duration_ms:>1000
 duration_ms:[100, 1000]
 duration_ms:>=500
@@ -150,7 +150,7 @@ Numeric. Supports `>`, `>=`, `<`, `<=`, and `[low, high]` / `(low, high)` interv
 
 ### IPv4 Range
 
-```
+```text
 client_ip:ipv4_range("10.0.0.0", "10.255.255.255")
 client_ip:ipv4_range("192.168.0.0/16")
 ```
@@ -159,7 +159,7 @@ CIDR or low/high. IPv6: `ipv6_range`.
 
 ### Length Range
 
-```
+```text
 _msg:len_range(100, 1000)
 ```
 
@@ -167,7 +167,7 @@ Byte length of field value. For suspiciously short or long lines.
 
 ### Logical Composition
 
-```
+```text
 error AND _time:5m AND {app="nginx"}
 error _time:5m {app="nginx"}              # AND can be omitted
 error AND NOT buggy_app
@@ -183,7 +183,7 @@ Precedence: NOT > AND > OR. Parenthesize when in doubt — `error -buggy_app OR 
 
 Multi-field search by name prefix:
 
-```
+```text
 *:error          # any field containing 'error' word
 kubernetes.*:nginx   # any field starting with 'kubernetes.' containing 'nginx'
 ```
@@ -196,7 +196,7 @@ Pipes chain with `|`.
 
 ### `fields` — Select Output Fields
 
-```
+```text
 error _time:5m | fields _time, _stream, _msg
 ```
 
@@ -204,7 +204,7 @@ Reduces to named subset — faster transit, easier reading.
 
 ### `sort` — Order Results
 
-```
+```text
 error _time:5m | sort by (_time)
 error _time:5m | sort by (_time desc)
 ```
@@ -213,7 +213,7 @@ Unordered by default. Expensive — only sort small sets (< few million).
 
 ### `limit` / `first` / `last`
 
-```
+```text
 error _time:5m | sort by (_time) desc | limit 10
 error _time:5m | first 10 by (_time desc)
 error _time:5m | last 10 by (_time)
@@ -223,7 +223,7 @@ error _time:5m | last 10 by (_time)
 
 ### `stats` — Aggregate
 
-```
+```text
 _time:5m | stats count() as total_errors
 _time:5m | stats by (_stream) count() as errors_per_stream
 _time:5m | stats by (_time:1m) count() as per_minute_errors
@@ -236,7 +236,7 @@ Most powerful pipe. Grouping by fields, time buckets, field buckets, IPv4 bucket
 
 ### `unpack_json` / `unpack_logfmt` — Parse Structured Logs
 
-```
+```text
 {app="my-app"} | unpack_json from _msg
 {app="my-app"} | unpack_logfmt from _msg
 {app="my-app"} | unpack_json from _msg | stats by (level) count()
@@ -246,7 +246,7 @@ Parses field as JSON/logfmt, flattens into top-level fields. Downstream pipes fi
 
 ### `extract` / `extract_regexp` — Pattern-Based Field Extraction
 
-```
+```text
 _msg:"GET" | extract "GET <path> HTTP" from _msg
 _msg:"client" | extract_regexp "client (?P<client_ip>[0-9.]+)" from _msg
 ```
@@ -255,7 +255,7 @@ _msg:"client" | extract_regexp "client (?P<client_ip>[0-9.]+)" from _msg
 
 ### `math` / `eval` — Numeric Calculations
 
-```
+```text
 | math duration_ms / 1000 as duration_sec
 | eval (errors / total) * 100 as error_percent
 ```
@@ -264,7 +264,7 @@ Arithmetic, bitwise, defaults, max/min, abs/ceil/floor/round/exp/ln on numeric f
 
 ### `top` — N Largest Groups
 
-```
+```text
 _time:5m | top 10 (_stream)
 _time:5m | top 10 (host, path)
 ```
@@ -273,7 +273,7 @@ Shortcut for `stats by (group) count() | sort desc | limit N`.
 
 ### `uniq` — Distinct Rows
 
-```
+```text
 _time:5m | uniq by (host, path)
 ```
 
@@ -281,7 +281,7 @@ Like SQL `SELECT DISTINCT`. One row per unique field combination.
 
 ## Common Query Recipes
 
-```
+```text
 # Recent error logs from one service
 _time:5m {app="api"} error | sort by (_time) desc | limit 100
 
@@ -330,7 +330,7 @@ Most common; full catalog: [`${CLAUDE_SKILL_DIR}/references/stats.md`].
 
 ### By Fields
 
-```
+```text
 | stats by (host, path) count() as logs
 ```
 
@@ -338,7 +338,7 @@ Most common; full catalog: [`${CLAUDE_SKILL_DIR}/references/stats.md`].
 
 ### By Time Buckets
 
-```
+```text
 | stats by (_time:1m) count() as per_minute
 | stats by (_time:5m, host) count() as per_5m_per_host
 ```
@@ -348,7 +348,7 @@ Bucket = any duration. Named buckets: `nanosecond`, `microsecond`, `millisecond`
 
 ### Time Buckets with Timezone
 
-```
+```text
 | stats by (_time:1d offset 'America/New_York') count() as per_day_ny
 ```
 
@@ -356,7 +356,7 @@ Aligned to the named timezone, not UTC. Needed for daily/weekly stats in non-UTC
 
 ### By Field Buckets
 
-```
+```text
 | stats by (duration_ms:100) count() as histogram
 ```
 
@@ -364,7 +364,7 @@ Buckets numeric values into ranges. `duration_ms:100` → `[0,100)`, `[100,200)`
 
 ### With Additional Filters
 
-```
+```text
 | stats
     count() as total,
     count() if (level:error) as errors,
@@ -386,7 +386,7 @@ Per-aggregate filtering. One pass beats N separate queries.
 
 ## Query Options
 
-```
+```text
 _time:5m error | options concurrency=4, parallel_readers=8
 ```
 

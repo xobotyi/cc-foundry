@@ -100,7 +100,7 @@ Reach for it where a client renders errors beside a nested form.
 `z.Issues.Prettify(errs) string` — one line per issue prefixed `✖ `, with a second indented line `  → at <path>` where
 the path is not empty. Built for a console or a fatal log line, not for a response body.
 
-```
+```text
 ✖ string must be at least 3 characters
   → at user.name
 ✖ string is required

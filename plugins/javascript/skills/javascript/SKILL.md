@@ -341,7 +341,7 @@ code contradicts one, follow the codebase and flag the divergence once.
 
 When **reviewing** JavaScript, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "Best practice is to use nullish coalescing rather than logical OR for default values."
 Good: options.retries || 3 -> options.retries ?? 3 — 0 is a valid retry count
 ```

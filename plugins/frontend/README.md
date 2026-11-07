@@ -23,7 +23,7 @@ discipline (JavaScript/TypeScript).
 
 ## Installation
 
-```
+```text
 /plugin install frontend --marketplace xobotyi/cc-foundry
 ```
 

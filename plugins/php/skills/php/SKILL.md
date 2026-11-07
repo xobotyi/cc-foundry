@@ -36,7 +36,6 @@ Every PHP file starts with `declare(strict_types=1)`.
 - **Constants (class and global)** — UPPER_SNAKE_CASE: `MAX_RETRIES`, `DEFAULT_LOCALE`
 - **Namespaces** — PascalCase segments: `App\Http\Controller`
 - **Enum cases** — PascalCase: `Status::Active`, `Suit::Hearts`
-
 - **Descriptive names.** `$userCount` not `$n`. Short names (`$i`, `$k`, `$v`) only in tiny scopes (loops, array
   operations).
 - **No redundant context.** `$car->make` not `$car->carMake`.
@@ -126,6 +125,7 @@ enum Status: string
 
 - **Explicit visibility on everything** — properties, methods, constants.
 - **Constructor promotion** for data-carrying classes:
+
   ```php
   class User
   {
@@ -136,6 +136,7 @@ enum Status: string
       ) {}
   }
   ```
+
 - **Readonly properties** (8.1+) for immutable state. Must have a type declaration.
 - **Readonly classes** (8.2+) — all properties implicitly readonly, no dynamic properties.
 - **Asymmetric visibility** (8.4+) — `public protected(set)` for publicly readable, internally writable properties.
@@ -177,12 +178,14 @@ enum Status: string
   `createUser(name: 'John', admin: true)`.
 - **`match` over `switch`** — `match` is an expression, uses strict comparison, and does not fall through.
 - **Pipe operator** (8.5+) for functional chaining:
+
   ```php
   $result = $input
       |> trim(...)
       |> strtolower(...)
       |> ucfirst(...);
   ```
+
 - **First-class callables** with `...` syntax: `array_map(strlen(...), $strings)`.
 - **Arrow functions** for short closures: `fn($x) => $x * 2`. Arrow functions capture by value, not by reference.
 - **Closures** for multi-statement callbacks. Use `use` to capture outer variables. Prefer `static function` /
@@ -198,11 +201,13 @@ enum Status: string
 - **`throw` is an expression** (8.0+): `$value ?? throw new InvalidArgumentException()`.
 - **Chain exceptions.** `throw new AppException('context', previous: $e)` preserves the original cause.
 - **Custom exception hierarchy:**
+
   ```php
   class AppException extends \RuntimeException {}
   class NotFoundException extends AppException {}
   class ValidationException extends AppException {}
   ```
+
 - **Prefer `\RuntimeException` subtree** for application errors. `\LogicException` subtree for programming errors (wrong
   arguments, unimplemented methods).
 - **Error strings:** lowercase, no trailing punctuation. They compose in chains: `"user not found: invalid ID format"`.
@@ -272,7 +277,7 @@ $result = match ($status) {
 
 ### Project Structure
 
-```
+```text
 my-project/
 ├── composer.json
 ├── composer.lock
@@ -341,7 +346,7 @@ a convention, follow the codebase and flag the divergence once.
 When **reviewing** PHP code: cite the specific violation and show the fix inline. Don't lecture — state what's wrong and
 how to fix it.
 
-```
+```text
 Bad:  "According to PHP best practices, you should use strict_types
        declaration at the top of every file..."
 Good: "Missing declare(strict_types=1)."

@@ -34,7 +34,7 @@ brings engineering judgment, incremental commits, and a skill queue system that 
 
 ## Installation
 
-```
+```text
 /plugin install the-coder --marketplace xobotyi/cc-foundry
 ```
 

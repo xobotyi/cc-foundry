@@ -371,7 +371,7 @@ code contradicts one, follow the codebase and flag the divergence once.
 
 When **reviewing** Node.js code, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "Node.js best practice is to avoid process.exit() because stdout writes..."
 Good: process.exit(1) -> process.exitCode = 1
 ```

@@ -11,7 +11,7 @@ The agent knows the time of day, how long you were away, and how long its curren
 
 Two ticks from one turn of a session in this repository ([`hooks/wall-clock.mts`](hooks/wall-clock.mts)):
 
-```
+```text
 <wall-clock at="Thu 2026-10-29 11:24:09+01:00" away="2m36s"/>
 <wall-clock at="Thu 2026-10-29 11:25:14+01:00" turn="1m05s"/>
 ```
@@ -57,7 +57,7 @@ produce a stale reading.
 The hook needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and Claude Code runs it
 with `node`, which strips the types itself, so nothing is built at install time.
 
-```
+```text
 /plugin install wall-clock --marketplace xobotyi/cc-foundry
 ```
 

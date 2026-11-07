@@ -17,7 +17,7 @@ description: >-
 Tailwind code, invoke the `css` skill to load specificity, box model,
 and layout knowledge.
 
-```
+```text
 Skill(frontend:css)
 ```
 
@@ -148,7 +148,6 @@ Unprefixed = all sizes. Prefix = that breakpoint **and up**.
 - **`lg:`** — 64rem (1024px)
 - **`xl:`** — 80rem (1280px)
 - **`2xl:`** — 96rem (1536px)
-
 - Don't use `sm:` to mean "mobile only" — it means 640px and up
 - Unprefixed for mobile base, override at breakpoints
 - Range targeting: `md:max-xl:flex` (only between md and xl)

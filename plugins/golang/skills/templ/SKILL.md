@@ -160,7 +160,7 @@ builds.
 
 When **reviewing** templ, cite the violation and show the fix inline. Do not lecture.
 
-```
+```text
 Bad:  "templ only sanitizes href, src, and action, so htmx attributes should be wrapped..."
 Good: hx-get={ path } -> hx-get={ templ.URL(path) }
 ```

@@ -75,7 +75,7 @@ Ask the user for approval of descriptions before proceeding.
    artificial serialization that blocks parallel execution.
 4. Visualize when helpful:
 
-```
+```text
 Phase 1: Tracer Bullet
   [#1 Schema migration] (no deps, AFK)
       ├──→ [#2 API handler] (depends on #1, AFK)

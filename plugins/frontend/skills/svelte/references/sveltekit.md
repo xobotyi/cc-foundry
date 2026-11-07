@@ -6,7 +6,7 @@ SvelteKit conventions: routing, load functions, form actions, hooks, and state m
 
 Routes are directories under `src/routes/`. Files with `+` prefix are route files.
 
-```
+```text
 src/routes/
 ├── +page.svelte              -> /
 ├── +layout.svelte            -> wraps all pages

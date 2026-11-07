@@ -43,7 +43,7 @@ Make sure `$GOPATH/bin` (or `$HOME/go/bin`) is in your PATH.
 
 Then install the plugin:
 
-```
+```text
 /plugin install golang --marketplace xobotyi/cc-foundry
 ```
 

@@ -119,7 +119,7 @@ Also `add work <work item>`. `remove` is not supported for work items.
 
 ## Grammar
 
-```
+```text
 <CommandList>              ::= <Command> (<Command>)*
 <Command>                  ::= <Comment> | <Value> | <LinkCommand> | <TagCommand>
                              | <AttributeCommand> | <MultipleCommand>

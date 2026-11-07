@@ -9,7 +9,7 @@ Software-Defined Networking (SDN). Network configuration is defined in `/etc/net
 Every Proxmox node has at least one Linux bridge (`vmbr0`) connecting guest virtual NICs to a physical NIC. Guests
 attach to bridges, not directly to physical interfaces.
 
-```
+```text
 Physical NIC (eno1) --- Bridge (vmbr0) -+- VM 100 (virtio)
                                         +- VM 101 (virtio)
                                         +- CT 200 (veth)
@@ -21,7 +21,7 @@ Physical NIC (eno1) --- Bridge (vmbr0) -+- VM 100 (virtio)
 - **VLAN-aware bridges** (recommended): A single bridge handles multiple VLANs via 802.1Q tagging, eliminating the need
   for separate bridges per VLAN. The VLAN-aware checkbox must be **explicitly enabled** — it is off by default.
 
-  ```
+  ```text
   auto vmbr0
   iface vmbr0 inet manual
       bridge-ports eno1
@@ -37,7 +37,6 @@ Physical NIC (eno1) --- Bridge (vmbr0) -+- VM 100 (virtio)
 
   The host address sits on a tagged VLAN interface, not on the bridge: a guest NIC with no tag joins VLAN 1 untagged, so
   a host address on the bare bridge shares a segment with every untagged guest.
-
 - **Traditional bridges** (legacy): One bridge per VLAN, using VLAN sub-interfaces. More complex to manage at scale.
 
 ### OVS vs Linux Bridge
@@ -132,11 +131,13 @@ bridge-like interface for guest assignment.
 - **DHCP prerequisite:** Automatic DHCP within an SDN VNet requires a **gateway** configured on the subnet — without it,
   DHCP silently fails
 - **Multiple EVPN exit nodes:** Asymmetric routing causes Linux to drop packets. Disable reverse path filtering:
-  ```
+
+  ```text
   # /etc/sysctl.conf (or /etc/sysctl.d/zzz-network.conf)
   net.ipv4.conf.all.rp_filter=0
   net.ipv4.conf.default.rp_filter=0
   ```
+
   Note: `default` must be set before interfaces are created (use a `zzz-` prefix sysctl file to ensure late loading)
 
 ### SDN-Firewall Integration (PVE 8.3+)

@@ -57,7 +57,7 @@ Color urgency increases as context or the rate limit runs low: gray â†’ yellow â
 The status line needs Node.js 26 or later as the `node` on your `PATH`. Its script is written in TypeScript, and Claude
 Code runs it with `node`, which strips the types itself, so nothing is built at install time.
 
-```
+```text
 /plugin install the-statusline --marketplace xobotyi/cc-foundry
 ```
 
@@ -87,7 +87,7 @@ To modify the status line display, edit `statusline.mts` in the plugin directory
 
 ## Uninstalling
 
-```
+```text
 /plugin uninstall the-statusline
 ```
 

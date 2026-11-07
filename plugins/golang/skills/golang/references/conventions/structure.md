@@ -136,7 +136,7 @@ Each step should be a separate commit. Never combine breaking changes with new f
 
 For versioned packages, use directory-based versioning:
 
-```
+```text
 lib/auth/v1/  # original version
 lib/auth/v2/  # breaking changes
 ```

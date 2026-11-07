@@ -4,7 +4,7 @@
 
 **Complete names only.** Tailwind scans source files as plain text — it cannot resolve expressions.
 
-```
+```text
 // NEVER
 const cls = `text-${color}-600`         // broken: scanner sees only the template literal
 const cls = "text-" + size              // broken: concatenation invisible to scanner
@@ -22,7 +22,7 @@ const cls = map[color]                  // works: full class names present in so
 
 Variants prefix the utility with `variant:`. Stack left-to-right, each narrowing the condition.
 
-```
+```text
 hover:bg-sky-700            // hover state
 dark:bg-gray-800            // dark mode
 sm:grid-cols-3              // responsive breakpoint ≥ 40rem
@@ -32,7 +32,7 @@ dark:lg:hover:bg-indigo-600 // dark mode AND ≥ 64rem AND hover
 **v4 stacking order is left-to-right** (v3 was right-to-left). When migrating stacked variants involving `*` or
 `prose-*`, reverse the order.
 
-```
+```text
 // v3
 first:*:pt-0
 // v4

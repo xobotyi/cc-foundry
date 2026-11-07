@@ -86,11 +86,13 @@ passthrough, or live migration. **Use OCI containers** (PVE 9.1+) for single-pur
 ### Container Templates
 
 - Download official templates from Proxmox template repository via the GUI or:
-  ```
+
+  ```text
   pveam update
   pveam available
   pveam download local <template-name>
   ```
+
 - Create custom templates by configuring a container, then backing it up as a `.tar.gz` template
 
 ### Linked vs Full Clone

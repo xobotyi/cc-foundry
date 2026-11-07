@@ -123,7 +123,6 @@ def test_inactive_users_excluded(make_user):
 - **`class`** — All tests in a class. Shared expensive setup within a test class.
 - **`module`** — All tests in a file. Database connection per test file.
 - **`session`** — Entire test run. Server startup, heavy resource initialization.
-
 - **Session-scoped fixtures** must be in `conftest.py` at the root test directory.
 - **Don't mix scopes carelessly.** A function-scoped fixture cannot depend on a function-scoped fixture that modifies
   state from a broader scope.
@@ -366,7 +365,7 @@ async def test_with_async_client(async_client):
 
 ### Hierarchy
 
-```
+```text
 tests/
 ├── conftest.py              # session/root fixtures
 ├── unit/
@@ -438,7 +437,7 @@ existing test style. If an existing codebase contradicts a convention, follow th
 When **reviewing** tests: cite the specific issue and show the fix inline. Don't lecture — state what's wrong and how to
 fix it.
 
-```
+```text
 Bad:  "According to pytest best practices, you should use fixtures
        instead of setUp methods..."
 Good: "setUp/tearDown -> @pytest.fixture with yield"

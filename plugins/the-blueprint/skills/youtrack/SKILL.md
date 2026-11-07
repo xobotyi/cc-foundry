@@ -126,7 +126,7 @@ what was found, never what exists.
 
 The forms a simple search needs:
 
-```
+```text
 in: PROJ #Unresolved for: me              attribute filters and a keyword
 State: {In Progress}                      braces wrap a value containing spaces
 Priority: Critical, Major                 several values of one attribute are OR

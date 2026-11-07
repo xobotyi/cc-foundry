@@ -181,9 +181,11 @@ watch(searchQuery, (query) => {
 ## Profiling
 
 1. Enable Vue-specific performance markers:
+
    ```ts
    app.config.performance = true
    ```
+
 2. Use Chrome DevTools Performance panel.
 3. Use Vue DevTools performance profiler.
 4. Measure before and after — don't optimize without data.

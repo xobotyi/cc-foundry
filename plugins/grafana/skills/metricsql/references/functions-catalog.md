@@ -300,7 +300,7 @@ Reduce many series to fewer via grouping. All accept `by(labels)` / `without(lab
 
 Cap result series after aggregation:
 
-```
+```text
 sum(x) by (y) limit 3
 ```
 

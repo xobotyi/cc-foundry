@@ -263,7 +263,7 @@ codebase and flag the divergence once.
 When **reviewing** tests: cite the specific issue and show the fix inline. Don't lecture — state what's wrong and how to
 fix it.
 
-```
+```text
 Bad:  "Pest best practices recommend the expectation API over PHPUnit assertions because it reads more fluently..."
 Good: "$this->assertSame(3, $x) → expect($x)->toBe(3)"
 ```

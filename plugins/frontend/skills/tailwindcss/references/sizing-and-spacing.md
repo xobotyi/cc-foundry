@@ -108,6 +108,7 @@ Sets both `width` and `height` simultaneously. Accepts all the same values as `w
 - `max-w-none` — removes max-width constraint
 - `min-w-auto` — `min-width: auto`
 - `container` — responsive breakpoint-locked max-width utility:
+
   ```css
   width: 100%;
   @media (width >= 40rem) { max-width: 40rem; }  /* sm  */
@@ -116,6 +117,7 @@ Sets both `width` and `height` simultaneously. Accepts all the same values as `w
   @media (width >= 80rem) { max-width: 80rem; }  /* xl  */
   @media (width >= 96rem) { max-width: 96rem; }  /* 2xl */
   ```
+
   Does **not** center itself — add `mx-auto px-4` explicitly.
 
 ### Min/Max Height

@@ -49,7 +49,7 @@ multi-stack/multi-org setups.
 
 ### Create
 
-```
+```text
 POST /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards
 ```
 
@@ -82,7 +82,7 @@ Status codes: 201 created, 400 invalid, 401 unauthorized, 403 denied, 409 confli
 
 ### Update
 
-```
+```text
 PUT /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards/:uid
 ```
 
@@ -90,14 +90,14 @@ Same body shape. Add `metadata.annotations.grafana.app/message` to record a comm
 
 ### Get
 
-```
+```text
 GET /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards/:uid
 GET /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards/:uid/dto   # with access info
 ```
 
 ### List with pagination
 
-```
+```text
 GET /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards?limit=100
 ```
 
@@ -106,7 +106,7 @@ response has no `continue` field.
 
 ### Delete
 
-```
+```text
 DELETE /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards/:uid
 ```
 
@@ -114,7 +114,7 @@ DELETE /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards/:uid
 
 Use the resource history API:
 
-```
+```text
 GET /apis/dashboard.grafana.app/v1/namespaces/:namespace/dashboards/:uid/history
 ```
 
@@ -124,7 +124,7 @@ New API: `folder.grafana.app/v1`.
 
 ### List
 
-```
+```text
 GET /apis/folder.grafana.app/v1/namespaces/:namespace/folders?limit=100
 ```
 
@@ -132,7 +132,7 @@ Same pagination contract as dashboards.
 
 ### Get
 
-```
+```text
 GET /apis/folder.grafana.app/v1/namespaces/:namespace/folders/:uid
 ```
 
@@ -140,7 +140,7 @@ Response includes `metadata.annotations.grafana.app/folder` (parent folder UID) 
 
 ### Create
 
-```
+```text
 POST /apis/folder.grafana.app/v1/namespaces/:namespace/folders
 ```
 
@@ -160,7 +160,7 @@ Set `metadata.annotations.grafana.app/folder` to nest under a parent (requires n
 
 ### Update
 
-```
+```text
 PUT /apis/folder.grafana.app/v1/namespaces/:namespace/folders/:uid
 ```
 
@@ -168,7 +168,7 @@ Change `metadata.annotations.grafana.app/folder` to move under a different paren
 
 ### Delete
 
-```
+```text
 DELETE /apis/folder.grafana.app/v1/namespaces/:namespace/folders/:uid?forceDeleteRules=false
 ```
 
@@ -183,7 +183,7 @@ Legacy `/api/datasources` is the only data source surface.
 
 ### List
 
-```
+```text
 GET /api/datasources
 ```
 
@@ -191,14 +191,14 @@ Returns up to 5000 entries (no pagination). Override via `default.ini`.
 
 ### Get by UID / name
 
-```
+```text
 GET /api/datasources/uid/:uid
 GET /api/datasources/name/:name   # deprecated
 ```
 
 ### Create
 
-```
+```text
 POST /api/datasources
 ```
 
@@ -221,7 +221,7 @@ encrypted field names under `secureJsonFields`.
 
 ### Update
 
-```
+```text
 PUT /api/datasources/uid/:uid
 ```
 
@@ -229,14 +229,14 @@ Same body shape. `uid` cannot be changed.
 
 ### Delete
 
-```
+```text
 DELETE /api/datasources/uid/:uid
 DELETE /api/datasources/name/:name   # deprecated
 ```
 
 ### Proxy and health
 
-```
+```text
 GET /api/datasources/proxy/uid/:uid/*    # proxy any call to the data source
 GET /api/datasources/uid/:uid/health     # health check (plugin must implement)
 GET /api/datasources/uid/:uid/resources/* # data-source-specific resource endpoint
@@ -244,7 +244,7 @@ GET /api/datasources/uid/:uid/resources/* # data-source-specific resource endpoi
 
 ### Query
 
-```
+```text
 POST /api/ds/query
 ```
 

@@ -14,11 +14,13 @@ CLAUDE.md uses.
 Sections in this order:
 
 1. The header: `# <plugin-name>` and one badge per line, centered together in one `<div align="center">` block:
-   ```
+
+   ```text
    [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
    [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
    [![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/xobotyi/badge.svg)](https://hub.xerj.org/contributors/xobotyi)
    ```
+
    A mod's Claude Code badge states the minimum version it runs on and links to
    `https://claude.com/blog/claude-code-mods`. The XERJ badge appears only on a plugin that has a corpus on the XERJ
    Corpus Hub, named `xobotyi--cc-foundry-<plugin-name>` or `xobotyi--cc-foundry-<plugin-name>-<skill>`.
@@ -32,9 +34,11 @@ Sections in this order:
 6. `## Installation` — prerequisites such as a Node version or a language-server binary, then the one-step command,
    which `claude plugin validate .` advises. No form for older Claude Code releases, since Claude Code updates itself,
    and no manual `cp` or `ln` installation:
-   ```
+
+   ```text
    /plugin install <plugin-name> --marketplace xobotyi/cc-foundry
    ```
+
 7. Plugin-specific sections as the plugin needs them (usage, configuration, limits), then `## License`.
 
 ## Root README

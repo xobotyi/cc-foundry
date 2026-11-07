@@ -9,7 +9,7 @@ direct impact on metric accuracy and application performance.
 
 StatsD listens on UDP port **8125** by default. DogStatsD also supports Unix Domain Sockets (UDS) for lower overhead.
 
-```
+```text
 # Standard StatsD
 host: 127.0.0.1, port: 8125, protocol: UDP
 
@@ -120,7 +120,7 @@ metric based on the sample rate.
 
 ### How It Works
 
-```
+```text
 client.increment("requests", rate=0.1)
 ```
 
@@ -194,6 +194,7 @@ When sending thousands of metrics per second, the default configuration may caus
    ```
 
 7. **Increase client queue size** — prevents drops when Agent is temporarily slow:
+
    ```java
    .queueSize(8192)  // default: 4096
    ```

@@ -23,11 +23,13 @@ Attributes are key-value pairs that annotate a span with metadata about the oper
    `user.email = "john@example.com"` creates unbounded cardinality.
 3. **Check `IsRecording` before expensive computation.** If the span is not recording (sampled out), attribute
    computation is wasted work:
-   ```
+
+   ```text
    if span.IsRecording() {
        span.SetAttribute("db.statement", sanitize(query))
    }
    ```
+
 4. **Never store PII in attributes.** Trace data often flows to shared backends. Use opaque identifiers instead of
    names, emails, or addresses.
 5. **Respect attribute limits.** SDKs enforce `AttributeCountLimit` (default 128). Excess attributes are silently
@@ -67,7 +69,7 @@ points in time during a span's duration.
 
 `RecordException` is a specialized event for recording exceptions:
 
-```
+```text
 span.recordException(error)
 span.setStatus(StatusCode.ERROR, error.message)
 ```

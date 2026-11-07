@@ -168,7 +168,7 @@ Group questions by the codebase area they investigate, not by topic.
 
 Each task description dispatched to a teammate must include exactly:
 
-```
+```text
 ## Questions
 1. [question text]
 2. [question text]

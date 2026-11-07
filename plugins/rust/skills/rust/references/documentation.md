@@ -287,7 +287,6 @@ broken_intra_doc_links = "deny"
   (Equivalent to `#![warn(missing_docs)]` at the crate root, but kept in the central lint table.) On items where a doc
   is redundant, override at the narrowest scope with `#[expect(missing_docs, reason = "...")]` so the override warns if
   it ever becomes stale - never a bare `#[allow]`.
-
 - **`rustdoc::broken_intra_doc_links`** - catches dead `[`Item`]` links. Deny it.
 - **`rustdoc::private_intra_doc_links`**, **`rustdoc::bare_urls`**, **`rustdoc::invalid_rust_codeblocks`** - additional
   `rustdoc::*` lints worth denying to keep generated docs clean; all live under `[lints.rustdoc]`.

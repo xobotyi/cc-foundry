@@ -211,7 +211,7 @@ existing code contradicts a convention, follow the codebase and flag the diverge
 When **reviewing** Charm TUI code, cite the violation and show the fix inline. Do not lecture. Treat every v1 idiom as a
 defect, including the ones that look right.
 
-```
+```text
 Bad:  "In v2 the terminal features moved onto the View struct, so the alt screen is..."
 Good: tea.NewProgram(m, tea.WithAltScreen()) -> v.AltScreen = true on every View() return
 ```

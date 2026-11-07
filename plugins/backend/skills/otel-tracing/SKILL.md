@@ -60,7 +60,6 @@ SpanKind tells backends how to assemble the trace tree. Set it correctly.
 - `PRODUCER` (Outgoing) — Enqueue message, schedule job
 - `CONSUMER` (Incoming) — Dequeue message, process job
 - `INTERNAL` (Neither) — In-process business logic, computation
-
 - A single span MUST NOT serve more than one purpose
 - Create a new span before injecting context for outgoing calls
 - `CLIENT` -> `SERVER` for synchronous calls; `PRODUCER` -> `CONSUMER` for async
@@ -71,7 +70,6 @@ SpanKind tells backends how to assemble the trace tree. Set it correctly.
 - `Unset` — No error. Default — do not change on success.
 - `Error` — Operation failed. When an error occurs; include description.
 - `Ok` — Explicitly successful. Only to override a previous `Error`; rarely needed.
-
 - Leave status `Unset` on success — it already means "no error"
 - `Ok` is a "final call" — once set, subsequent `Error` attempts are ignored
 - Instrumentation libraries SHOULD NOT set `Ok` — leave to application code

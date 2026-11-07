@@ -5,7 +5,7 @@ Understanding the SDK architecture is essential for configuring tracing in appli
 
 ## Architecture Overview
 
-```
+```text
 Application Code
        │
        ▼
@@ -30,7 +30,7 @@ The entry point for tracing. Holds all configuration and creates Tracers.
 
 **Configuration:**
 
-```
+```text
 // Pseudocode
 provider = TracerProvider(
     sampler: ParentBased(root: TraceIdRatioBased(0.1)),
@@ -61,7 +61,7 @@ setGlobalTracerProvider(provider)
 
 Created by `TracerProvider`. Responsible for creating spans.
 
-```
+```text
 tracer = provider.getTracer("com.example.my-library", "1.0.0")
 span = tracer.startSpan("operation-name")
 ```
@@ -81,7 +81,7 @@ Hooks into span lifecycle for processing. Receives spans at creation (`OnStart`)
 
 Exports each span synchronously when it ends. **Development/testing only.**
 
-```
+```text
 SimpleSpanProcessor(exporter)
 ```
 
@@ -93,7 +93,7 @@ SimpleSpanProcessor(exporter)
 
 Buffers spans and exports in batches. **Use in production.**
 
-```
+```text
 BatchSpanProcessor(
     exporter: OTLPExporter(),
     maxQueueSize: 2048,          // buffer capacity
@@ -121,7 +121,7 @@ BatchSpanProcessor(
 
 Register multiple processors for different purposes:
 
-```
+```text
 provider = TracerProvider(
     spanProcessors: [
         BatchSpanProcessor(OTLPExporter()),        // export to backend
@@ -149,7 +149,7 @@ backend(s).
 
 ### Exporter Interface
 
-```
+```text
 interface SpanExporter {
     export(batch: Span[]) → Success | Failure
     shutdown()
@@ -182,7 +182,7 @@ A `Resource` describes the entity producing telemetry. Attached to all spans fro
 
 ### Minimal Production Setup
 
-```
+```text
 resource = Resource(
     service.name: "my-service",
     service.version: "1.0.0",
@@ -203,7 +203,7 @@ setGlobalTracerProvider(provider)
 
 ### Development Setup
 
-```
+```text
 provider = TracerProvider(
     resource: Resource(service.name: "my-service"),
     sampler: AlwaysOn,
@@ -234,7 +234,7 @@ A standalone process that receives, processes, and exports telemetry. Decouples 
 
 **Typical deployment:**
 
-```
+```text
 ┌─────────┐     ┌───────────┐     ┌─────────┐
 │ App      │────►│ Collector │────►│ Backend │
 │ (SDK)    │OTLP │           │OTLP │ (Jaeger)│

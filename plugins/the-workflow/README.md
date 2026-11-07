@@ -139,7 +139,7 @@ with the session's full context, which is why it runs only on request.
 
 ## Installation
 
-```
+```text
 /plugin install the-workflow --marketplace xobotyi/cc-foundry
 ```
 

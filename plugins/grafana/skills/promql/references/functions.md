@@ -182,7 +182,6 @@ suffix).
   ```
 
   Boundaries can be `-Inf` / `+Inf`. Used for SLO-style "X% of requests under Y ms" queries.
-
 - **`histogram_avg(v)`** — average of observed values. Equivalent to `histogram_sum(v) / histogram_count(v)`.
 - **`histogram_count(v)`** — count of observations.
 - **`histogram_sum(v)`** — sum of observed values.

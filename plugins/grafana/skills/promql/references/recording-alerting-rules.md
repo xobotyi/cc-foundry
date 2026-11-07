@@ -70,7 +70,7 @@ Community convention `level:metric:operations`, each component encoding meaning:
 
 ### Examples
 
-```
+```text
 instance:http_requests:rate5m                       # per-instance request rate over 5m
 job:http_requests:rate5m                            # rolled up to per-job
 job:http_errors_per_requests:ratio_rate5m           # ratio of error rate to request rate, per job

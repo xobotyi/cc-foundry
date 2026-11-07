@@ -36,7 +36,7 @@ Subagents are not always the right tool — pick the right primitive for the job
 
 Recommended for first-time creation:
 
-```
+```text
 /agents
 → Library tab → Create new agent
 → Personal (user-level) or Project (project-level)

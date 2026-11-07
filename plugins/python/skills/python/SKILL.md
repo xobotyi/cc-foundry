@@ -35,7 +35,6 @@ unless the project explicitly requires it.
 - **Name-mangled attributes** — `__` prefix: `__secret` (rarely needed)
 - **Type variables** — PascalCase, short: `T`, `KT`, `VT`, `ResponseT`
 - **Protocols** — PascalCase, `-able`/`-ible` suffix: `Renderable`, `Serializable`
-
 - **Descriptive names.** `user_count` not `n`. Short names (`i`, `x`) only in tiny scopes (comprehensions, simple
   lambdas).
 - **No redundant context.** `car.make` not `car.car_make`.
@@ -188,6 +187,7 @@ match command:
 ## Decorators
 
 - **Preserve signatures** with `functools.wraps`:
+
   ```python
   def retry[**P, R](fn: Callable[P, R]) -> Callable[P, R]:
       @functools.wraps(fn)
@@ -195,6 +195,7 @@ match command:
           ...
       return wrapper
   ```
+
 - **Decorator order matters.** Decorators apply bottom-up. `@staticmethod` and `@classmethod` must be outermost (topmost
   in source).
 - **Parametric decorators** return a decorator: `@retry(attempts=3)` means `retry` returns the actual decorator
@@ -205,6 +206,7 @@ match command:
 ## Context Managers
 
 - **`contextlib.contextmanager`** for simple resource management:
+
   ```python
   @contextmanager
   def managed_connection(url: str) -> Iterator[Connection]:
@@ -214,6 +216,7 @@ match command:
       finally:
           conn.close()
   ```
+
 - **Class-based context managers** when state management is complex — implement `__enter__` and `__exit__`.
 - **`contextlib.suppress(ExceptionType)`** instead of empty `except: pass`.
 - **`contextlib.closing(thing)`** for objects with `.close()` but no `__exit__`.
@@ -251,11 +254,13 @@ match command:
 - **Don't use exceptions for flow control.** `if key in dict:` not `try: dict[key] except KeyError:` (unless the miss is
   rare and lookup is expensive).
 - **Custom exceptions** inherit from a project-specific base that extends `Exception`:
+
   ```python
   class AppError(Exception): ...
   class NotFoundError(AppError): ...
   class ValidationError(AppError): ...
   ```
+
 - **Error strings:** lowercase, no trailing punctuation. They compose in chains: `"parse config: invalid format"`.
 - **`else` clause** runs only when no exception was raised — use for code that should execute on success but isn't part
   of the `try` body.
@@ -358,7 +363,7 @@ match command:
 
 ### Project Layout
 
-```
+```text
 my-project/
 ├── pyproject.toml
 ├── uv.lock
@@ -425,7 +430,7 @@ contradicts a convention, follow the codebase and flag the divergence once.
 When **reviewing** Python code: cite the specific violation and show the fix inline. Don't lecture — state what's wrong
 and how to fix it.
 
-```
+```text
 Bad:  "According to Python best practices, you should use type unions
        with the pipe operator instead of Optional..."
 Good: "Optional[str] -> str | None"

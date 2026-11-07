@@ -29,6 +29,7 @@ volumes:
 - Survive `docker compose down` (but not `down -v`)
 - Docker pre-populates empty volumes from container contents at mount point
 - `--mount` syntax is more explicit than `-v`:
+
   ```bash
   docker run --mount source=pgdata,target=/var/lib/postgresql/data postgres:17
   ```

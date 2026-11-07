@@ -26,7 +26,7 @@ References provide extended examples, code pattern catalogs, and specification d
 
 ## Installation
 
-```
+```text
 /plugin install cli --marketplace xobotyi/cc-foundry
 ```
 

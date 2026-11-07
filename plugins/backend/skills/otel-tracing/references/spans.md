@@ -97,7 +97,7 @@ SpanKind describes the relationship between spans in a trace. It tells backends 
 
 **Idiomatic patterns for ensuring spans end:**
 
-```
+```text
 // Go: defer
 span := tracer.Start(ctx, "operation")
 defer span.End()

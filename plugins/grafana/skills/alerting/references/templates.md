@@ -187,13 +187,13 @@ Grafana-managed alerts add:
 
 ### Annotation summary with query value
 
-```
+```text
 CPU usage for {{ $labels.instance }} has exceeded 80% ({{ $values.A.Value }}) for the last 5 minutes.
 ```
 
 ### Label template — severity tiers from query value
 
-```
+```text
 {{ if (gt $values.A.Value 90.0) -}}
 critical
 {{ else if (gt $values.A.Value 80.0) -}}
@@ -207,7 +207,7 @@ low
 
 ### Notification subject — counts and group labels
 
-```
+```text
 {{ define "custom.title" -}}
 [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }}
 {{- end }}
@@ -215,7 +215,7 @@ low
 
 ### Notification body — per-alert summary
 
-```
+```text
 {{ define "alert.detail" }}
 - Summary: {{ .Annotations.summary }}
 - Status: {{ .Status }}
@@ -234,7 +234,7 @@ low
 
 ### Webhook JSON payload
 
-```
+```text
 {{ define "webhook.payload" -}}
 {{ coll.Dict
   "status" .Status

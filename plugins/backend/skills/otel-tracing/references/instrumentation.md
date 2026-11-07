@@ -43,7 +43,7 @@ provides:
 
 ## Getting a Tracer
 
-```
+```text
 // Pseudocode — pattern is the same across languages
 tracer = tracerProvider.getTracer(
     "com.example.my-service",  // instrumentation scope name
@@ -77,7 +77,7 @@ tracer = tracerProvider.getTracer(
 
 ### Decision Guide
 
-```
+```text
 Is this a network call or significant I/O?
   └─ Yes → Create a span (CLIENT or SERVER kind)
   └─ No
@@ -93,7 +93,7 @@ Is this a network call or significant I/O?
 
 ### Server-Side (Incoming Request)
 
-```
+```text
 // 1. Extract context from incoming request
 extractedContext = propagator.extract(context, request, getter)
 
@@ -119,7 +119,7 @@ try (scope = span.makeCurrent()) {
 
 ### Client-Side (Outgoing Request)
 
-```
+```text
 // 1. Create client span
 span = tracer.startSpan("GET",
     kind: CLIENT,
@@ -142,7 +142,7 @@ try (scope = span.makeCurrent()) {
 
 ### Async Producer/Consumer
 
-```
+```text
 // Producer: create span and inject context into message
 span = tracer.startSpan("send",
     kind: PRODUCER,
@@ -168,7 +168,7 @@ span = tracer.startSpan("process",
 
 When a consumer processes multiple messages at once, link to each producer:
 
-```
+```text
 links = messages.map(msg =>
     Link(propagator.extract(context, msg.headers, getter))
 )

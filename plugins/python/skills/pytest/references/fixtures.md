@@ -277,7 +277,7 @@ def clean_db(database):
 
 ## conftest.py Fixture Discovery
 
-```
+```text
 tests/
 ├── conftest.py          # fixtures available to ALL tests
 ├── api/

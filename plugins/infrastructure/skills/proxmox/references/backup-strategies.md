@@ -41,7 +41,7 @@ Use **zstd** as the default — it provides the best balance of compression rati
 
 Configure backup jobs via the GUI (Datacenter > Backup) or `/etc/pve/jobs.cfg`:
 
-```
+```text
 vzdump: backup-daily
     enabled 1
     schedule daily 02:00
@@ -67,7 +67,7 @@ vzdump: backup-daily
 
 Configure retention per backup job or per storage:
 
-```
+```text
 prune-backups: keep-daily=7,keep-weekly=4,keep-monthly=6,keep-yearly=1
 ```
 
@@ -150,7 +150,7 @@ gives administrators flexibility to use non-Proxmox backup services with first-c
 
 Add PBS as a storage in PVE:
 
-```
+```text
 pvesm add pbs pbs-store \
   --server 10.0.0.50 \
   --datastore mystore \
