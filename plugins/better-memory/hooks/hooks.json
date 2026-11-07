@@ -1,0 +1,4 @@
+{
+	"description": "Gates auto-memory writes, records candidates, and sifts them when the session goes idle",
+	"modules": ["./register.ts"]
+}

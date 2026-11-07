@@ -134,6 +134,14 @@ A plugin a repository enables can be missing from your sessions in a fresh clone
 `/reload-plugins`. This mod runs the reload at session start and holds your first prompt until it completes. Install it
 at user scope. [Read more](plugins/plugin-rollcall/)
 
+### better-memory
+
+Auto memory saves one-session requests as standing rules and keeps notes long after they stop being true. With this mod,
+the agent saves memory only through a tool that steers instructions to CLAUDE.md and refuses any entry that cites
+nothing from the session: your words, a file, a page, or a command's output. When the session goes idle, a separate
+Claude process removes every entry that no longer holds, and `/better-memory:sift` runs the same review with you, moving
+the rules you approve into CLAUDE.md. [Read more](plugins/better-memory/)
+
 ## AI Artifacts
 
 ### ai-helpers

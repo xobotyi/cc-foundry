@@ -25,7 +25,7 @@ export default defineConfig({
 	lint: {
 		// constraint: these files type-check against types Claude Code writes only when it loads the mod
 		// interactively, so a checkout without them fails with an invalid tsconfig
-		ignorePatterns: ['plugins/plugin-rollcall/**/*.ts'],
+		ignorePatterns: ['plugins/plugin-rollcall/**/*.ts', 'plugins/better-memory/**/*.ts'],
 		extends: [javascript, typescript, node, vitest],
 		options: {typeAware: true, typeCheck: true},
 	},

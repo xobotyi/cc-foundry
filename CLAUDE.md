@@ -22,6 +22,7 @@ styles, hooks, and workflow automation.
 - `plugins/golang/`, `plugins/javascript/`, `plugins/php/`, `plugins/python/`, `plugins/rust/` — language disciplines
 - `plugins/wall-clock/` — wall-clock and elapsed-time grounding for agent context (hook-only)
 - `plugins/plugin-rollcall/` — reloads settings-enabled plugins that Claude Code skipped at startup (mod)
+- `plugins/better-memory/` — gates auto-memory writes and sifts entries to facts that still hold (mod)
 
 Each plugin has its own `CLAUDE.md` with plugin-specific context.
 
