@@ -5,7 +5,8 @@ The repository's dev CLI. Run every command from the repository root.
 ```bash
 vp install
 vp run cli <command> [options]
-vp check          # format, lint, and type-check every file
+vp check          # format, lint, and type-check every file but markdown
+vp exec rumdl fmt --check .   # check the markdown format
 ```
 
 ## Commands
@@ -64,8 +65,8 @@ vp run typecheck   # tsc
 - `unbumped-change` — a plugin whose shipped files changed keeps no unchanged version. Shipped means everything except
   `CLAUDE.md`, `README.md`, `LICENSE`, `.dev/`, `tests/`, and `*.test.*`; a `plugin.json` change counts unless it only
   touches display keys (`description`, `keywords`, `author`, …) or a key naming its default location. A file whose two
-  versions format to the same text through `vp fmt` has not changed. A warning since the latest release tag, an error
-  under `--pre-push`
+  versions format to the same text through their formatter, rumdl for markdown and `vp fmt` for the rest, has not
+  changed. A warning since the latest release tag, an error under `--pre-push`
 - `root-docs` — the root `CLAUDE.md` names `plugins/<name>/` and the root `README.md` has a `### <name>` section, for
   every plugin. Only the names are checked, not the prose around them
 

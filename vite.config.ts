@@ -13,11 +13,8 @@ export default defineConfig({
 		singleQuote: true,
 		trailingComma: 'all',
 		bracketSpacing: false,
-		ignorePatterns: ['**/.dev/reference/**', '**/LICENSE'],
-		overrides: [
-			{files: ['**/*.md'], options: {proseWrap: 'always'}},
-			{files: ['**/skills/**/*.md', '**/CLAUDE.md'], options: {embeddedLanguageFormatting: 'off'}},
-		],
+		// constraint: rumdl formats markdown, configured in .rumdl.toml
+		ignorePatterns: ['**/.dev/reference/**', '**/LICENSE', '**/*.md'],
 	},
 	test: {
 		include: ['src/**/*.test.ts', 'plugins/**/*.test.mts'],

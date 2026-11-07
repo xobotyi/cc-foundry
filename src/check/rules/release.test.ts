@@ -75,6 +75,23 @@ test('unbumped-change ignores a change the formatter rewrites away, and counts o
 	]);
 });
 
+test('unbumped-change judges markdown by what rumdl rewrites away', async () => {
+	await using fixture = await createFixture();
+	await fixture.write('plugins/alpha/skills/one/SKILL.md', '---\nname: one\n---\n\n```\nrun it\n```\n');
+	await fixture.commit('add a block');
+	await fixture.git('tag', 'alpha-v1.0.0');
+	await fixture.write('plugins/alpha/skills/one/SKILL.md', '---\nname: one\n---\n\n```text\nrun it\n```\n');
+
+	expect(await unbumpedChanges(await loadRepo(fixture.root), normalRun)).toStrictEqual([]);
+
+	await fixture.write('plugins/alpha/skills/one/SKILL.md', '---\nname: one\n---\n\n```text\nrun it twice\n```\n');
+
+	expect(brief(await unbumpedChanges(await loadRepo(fixture.root), normalRun))).toStrictEqual([
+		'warning plugins/alpha/.claude-plugin/plugin.json: skills/one/SKILL.md changed since alpha-v1.0.0, ' +
+			'and the version is still 1.0.0',
+	]);
+});
+
 test('unbumped-change counts a manifest key that changes the install', async () => {
 	await using fixture = await released();
 	await fixture.editManifest('alpha', (m) => ({...m, dependencies: ['beta']}));

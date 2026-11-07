@@ -47,4 +47,4 @@ Sections in this order:
 ## Every README
 
 - Update the README in the same session as any change that alters what a user sees or installs.
-- Format with `vp fmt <file>`.
+- Format with `vp exec rumdl fmt <file>`.

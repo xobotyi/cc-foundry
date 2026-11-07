@@ -1,0 +1,24 @@
+[global]
+line-length = 120
+exclude = ["**/.dev/reference/**"]
+# XML tags structure prompt text and a README centers its badges in a div; a bold line labels a step, not a section;
+# the fixes of MD026 and MD038 change text, a heading that links point at and the spaces a code span shows
+disable = ["MD026", "MD033", "MD036", "MD038"]
+
+[per-file-ignores]
+# a skill, an agent, and an output style open with frontmatter and no title; a README opens with its badge block
+"**/README.md" = ["MD041"]
+"plugins/*/skills/*/SKILL.md" = ["MD041"]
+"plugins/*/agents/*.md" = ["MD041"]
+"plugins/*/output-styles/*.md" = ["MD041"]
+# Claude Code expands ${CLAUDE_SKILL_DIR} when it loads the skill, so the links resolve only there
+"plugins/frontend/skills/accessibility/SKILL.md" = ["MD057"]
+
+[MD013]
+reflow = true
+# nothing can break a line inside a code block or a code span
+code-blocks = false
+code-spans = false
+
+[MD018]
+magiclink = true
