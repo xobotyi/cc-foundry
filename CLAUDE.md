@@ -55,6 +55,13 @@ process (Research → Scaffold → Write → Ship).
 - An audit assembled from grep hits reports clean on every line it never opened. If the conclusion would change had you
   read the whole file, you have not audited it.
 
+**Changing prompt text:**
+
+- Before committing a cut or rewrite of skill or prompt instruction text, try a headless A/B run of the old and new
+  versions on the same fixture and compare the outcomes. Skip it only when no fixture can exercise the change, and say
+  so in the report.
+- A token or line count is not evidence that the new text works.
+
 **Development artifacts:**
 
 - `src/` holds the repository's dev CLI, run from the root as `vp run cli <command>`: `check` validates the marketplace
