@@ -145,6 +145,9 @@ Run every command in this file from the repository root.
 ## Conventions
 
 - `SIFT_PROMPT` in `register.ts` and `skills/sift/SKILL.md` state the same verdicts for one store; change them together.
+- Sift runs Opus at medium effort. Opus at low effort and Sonnet at medium effort open too few files to confirm file
+  anchors: on four real stores, both removed all 10 entries that Opus at medium effort promoted on file anchors. Change
+  the model or the effort only after a run on real stores keeps the entries that Opus at medium effort promotes.
 - Hook engine events, never `classic.*` or `prompt.*`: a managed-tier plugin first in a chain can pass them past every
   mod.
 - Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in
