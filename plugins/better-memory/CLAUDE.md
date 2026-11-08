@@ -54,6 +54,9 @@ Run every command in this file from the repository root.
     anchor keeps the call's input and the passages of its output that share the most words with the fact.
   - A type of `feedback` is refused with a pointer to CLAUDE.md.
   - `remove_entry` writes a report with the reason and the entry's text, then deletes the entry.
+  - A `ui.render` hook on `ToolUse` draws a collapsed row of each of the three tools as a label and one field,
+    `Save memory(<name>: "<description>")`. It rewrites the row's `tool` and `input` props and lets the engine draw
+    the row, which keeps its status dot, spinner, and error states; an expanded row (ctrl+o) draws the call as made.
 - The gate:
   - A Write or Edit of any file in the memory directory, `MEMORY.md` included, is refused with a pointer to the tools.
   - A Bash command that names the memory directory, or names the project directory beside a `memory` path segment as a

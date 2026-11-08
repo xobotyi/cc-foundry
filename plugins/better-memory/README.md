@@ -98,9 +98,10 @@ passages of its output that show the fact.
 
 ## What You See
 
-Nothing in normal operation: the plugin's tools never ask for permission. Instruction proposals reach you as one
-question from the agent in a later session, and while the review file holds rules, the agent mentions once per session
-that `/better-memory:sift` can review them.
+Each save or removal shows in the conversation as one short row, such as
+`Save memory(user-rust: "The user is new to Rust")`; ctrl+o shows the whole call. The plugin's tools never ask for
+permission. Instruction proposals reach you as one question from the agent in a later session, and while the review file
+holds rules, the agent mentions once per session that `/better-memory:sift` can review them.
 
 ## Limits
 
