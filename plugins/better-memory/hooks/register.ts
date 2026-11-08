@@ -218,10 +218,10 @@ const MAX_CALL_OUTPUT_CHARS = 2_400;
 const MAX_SESSION_PROMPTS = 40;
 const MAX_PROMPT_CHARS = 4_000;
 const SESSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-// constraint: Claude Code stores a compaction summary, a message from another Claude session, and reminders as user
-// messages, and $.session.messages() carries no flag that tells them from what the user typed
+// constraint: Claude Code stores a compaction summary, a message from another Claude session, reminders, and the mod's
+// own session note as user messages, and $.session.messages() carries no flag that tells them from what the user typed
 const NOT_TYPED =
-	/^(<(local-command-|task-notification|system-reminder|teammate-message)|This session is being continued from a previous conversation|Another Claude session sent a message:)/;
+	/^(<(local-command-|task-notification|system-reminder|teammate-message|better-memory-note)|This session is being continued from a previous conversation|Another Claude session sent a message:)/;
 const DEFAULT_RETENTION_DAYS = 30;
 const DAY_MS = 86_400_000;
 const COMMON_WORDS = new Set([
@@ -350,6 +350,11 @@ export function register(on: On, options: PluginOptions): void {
 		const started = await next(e);
 		session.isInteractive = e.isInteractive;
 		await startSession($, session).catch((err: unknown) => logFailure($, session, `start failed: ${String(err)}`));
+		// constraint: a note added at turn.start misses that turn's first model request, and a reload, which restores
+		// the session at turn.start, would add a second note to a conversation that holds one
+		if (session.isInteractive) {
+			await addSessionNote($, session).catch((err: unknown) => logFailure($, session, `note failed: ${String(err)}`));
+		}
 
 		return started;
 	});
@@ -505,7 +510,7 @@ async function startSession($: EngineInterface, session: Session): Promise<void>
 		await $.tool.register({
 			name: 'answer_instruction_proposal',
 			description:
-				"Records the user's answer to an open instruction proposal listed in MEMORY.md. Call it once the user " +
+				"Records the user's answer to an open instruction proposal listed in better-memory's note. Call it once the user " +
 				'accepts or declines; on accepted, also make the CLAUDE.md edit.',
 			inputSchema: {
 				type: 'object',
@@ -706,7 +711,9 @@ async function answerProposal(
 	args: {id: string; answer: 'accepted' | 'declined'},
 ): Promise<ToolCallResult> {
 	if (args.answer !== 'accepted' && args.answer !== 'declined') {
-		return {deny: 'answer_instruction_proposal takes an id from MEMORY.md and an answer of accepted or declined.'};
+		return {
+			deny: "answer_instruction_proposal takes an id from better-memory's note and an answer of accepted or declined.",
+		};
 	}
 
 	const paths = await pathsOf($, session);
@@ -721,8 +728,6 @@ async function answerProposal(
 		isFound = true;
 	});
 	if (!isFound) return {deny: `No open instruction proposal has the id ${args.id}.`};
-
-	await writeIndex($, paths, session.isSiftOn);
 
 	return {result: `Recorded: instruction proposal ${args.id} ${args.answer}.`};
 }
@@ -1257,11 +1262,16 @@ async function writeIndex($: EngineInterface, paths: Paths, isSiftOn: boolean): 
 			});
 		}
 
-		const lines = await indexLinesOf($, paths, records, new Set(), isSiftOn);
-		const review = `${paths.dataDir}/${REVIEW_FILE}`;
-		const reviewCount = (await $.fs.exists(review)) ? reviewCountOf(await readText($, review)) : 0;
-		await $.fs.write(indexPath, indexOf(lines, records.instructionProposals, reviewCount));
+		await $.fs.write(indexPath, indexOf(await indexLinesOf($, paths, records, new Set(), isSiftOn)));
 	});
+}
+
+async function addSessionNote($: EngineInterface, session: Session): Promise<void> {
+	const paths = await pathsOf($, session);
+	const review = `${paths.dataDir}/${REVIEW_FILE}`;
+	const reviewCount = (await $.fs.exists(review)) ? reviewCountOf(await readText($, review)) : 0;
+	const note = sessionNoteOf((await readRecords($, paths)).instructionProposals, reviewCount);
+	if (note !== undefined) await $.session.append({message: {type: 'user', content: [{type: 'text', text: note}]}});
 }
 
 async function indexLinesOf(
@@ -1922,25 +1932,27 @@ export function indexLineOf(file: string, front: {name?: string; description?: s
 	return front.description === undefined ? `- [${title}](${file})` : `- [${title}](${file}) — ${front.description}`;
 }
 
-export function indexOf(
-	lines: readonly string[],
-	proposals: readonly InstructionProposal[],
-	reviewCount: number,
-): string {
-	const open = proposals.filter((proposal) => proposal.status === 'open');
-	const shown = open.slice(0, MAX_SHOWN_PROPOSALS);
-	const parts = [
+export function indexOf(lines: readonly string[]): string {
+	return [
 		'# Memory',
 		'',
 		'Facts recorded by earlier sessions and kept by better-memory. Where an entry conflicts with a CLAUDE.md instruction, the instruction wins.',
 		'',
 		...(lines.length === 0 ? ['No entries.'] : lines),
-	];
+		'',
+	].join('\n');
+}
+
+/**
+ * The note the mod adds to an interactive session at its start: up to five open instruction proposals with a count of
+ * the rest, and the number of instructions waiting in review.md. Undefined when neither waits.
+ */
+export function sessionNoteOf(proposals: readonly InstructionProposal[], reviewCount: number): string | undefined {
+	const open = proposals.filter((proposal) => proposal.status === 'open');
+	const shown = open.slice(0, MAX_SHOWN_PROPOSALS);
+	const parts: string[] = [];
 	if (shown.length > 0) {
 		parts.push(
-			'',
-			'## Instruction proposals',
-			'',
 			`better-memory proposes adding each instruction below to a CLAUDE.md file. These are not memory entries. Once per session, when the current task allows, list them to the user together in one message. Call \`${ANSWER_TOOL}\` with each answer the user gives; on accepted, also make the CLAUDE.md edit.`,
 			'',
 			...shown.map(
@@ -1951,20 +1963,18 @@ export function indexOf(
 		if (open.length > shown.length) {
 			parts.push(
 				'',
-				`${open.length - shown.length} more instruction proposals wait and appear here as these are answered.`,
+				`${open.length - shown.length} more instruction proposals wait and come in a later session as these are answered.`,
 			);
 		}
 	}
 	if (reviewCount > 0) {
 		parts.push(
-			'',
-			'## Instructions waiting for review',
-			'',
+			...(parts.length > 0 ? [''] : []),
 			`better-memory moved ${reviewCount} instructions from entries written before it out of memory, because nothing shows the user gave them as standing. Once per session, when the current task allows, tell the user they can review them with /better-memory:sift.`,
 		);
 	}
 
-	return `${parts.join('\n')}\n`;
+	return parts.length === 0 ? undefined : ['<better-memory-note>', ...parts, '</better-memory-note>'].join('\n');
 }
 
 export function siftTaskOf(

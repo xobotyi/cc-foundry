@@ -20,6 +20,7 @@ import {
 	readsOf,
 	removalReportOf,
 	reportOf,
+	sessionNoteOf,
 	urlsOf,
 	userTextsOf,
 } from '../hooks/register.js';
@@ -77,6 +78,7 @@ type Observed = {
 	readonly lines: string[];
 	readonly registered: string[];
 	readonly uses: ToolUseSummary[];
+	readonly notes: string[];
 };
 
 function machineOf(on: On, machine: Machine = {}): Observed {
@@ -89,7 +91,16 @@ function machineOf(on: On, machine: Machine = {}): Observed {
 		clock += 1_000;
 		files.set(path, {text, mtimeMs: clock});
 	};
-	const observed: Observed = {files, spawns: [], spawnArgvs: [], calls: [], lines: [], registered: [], uses: []};
+	const observed: Observed = {
+		files,
+		spawns: [],
+		spawnArgvs: [],
+		calls: [],
+		lines: [],
+		registered: [],
+		uses: [],
+		notes: [],
+	};
 	const store = new Map<string, unknown>();
 
 	mock.env(on, {HOME});
@@ -184,6 +195,10 @@ function machineOf(on: On, machine: Machine = {}): Observed {
 	on('ui.log', ($, e) => {
 		observed.lines.push(e.text);
 		return {value: undefined};
+	});
+	on('session.append', ($, e, next) => {
+		if (e.door === 'note') observed.notes.push(JSON.stringify(e.message));
+		return next(e);
 	});
 	on('tool.call', ($, e) => {
 		observed.calls.push(e.tool);
@@ -792,7 +807,6 @@ describe('sift', () => {
 		expect(review).toContain('## tabs.md\n\n- Target: the project CLAUDE.md\n- Instruction: Indent with tabs.');
 		expect(review).toContain('A rule.');
 		expect(review).not.toContain('kensai.md');
-		expect(observed.files.get(`${MEMORY}/MEMORY.md`)?.text).toContain('better-memory moved 1 instructions');
 	});
 	test('turns a promotion into a removal when sift did not read the file it cites', async ($, on) => {
 		const observed = machineOf(on, {
@@ -917,7 +931,31 @@ describe('sift', () => {
 
 		expect(observed.registered).toEqual(['write_entry', 'remove_entry', 'answer_instruction_proposal']);
 		expect(recordsOf(observed).instructionProposals[0]?.status).toBe('declined');
-		expect(observed.files.get(`${MEMORY}/MEMORY.md`)?.text).not.toContain('Instruction proposals');
+		expect(observed.notes).toEqual([]);
+	});
+
+	test('notes the open instruction proposals and the review file at the start of an interactive session', async ($, on) => {
+		const records = {
+			entries: {},
+			instructionProposals: [
+				{id: 'i-1', file: 'tabs.md', target: 'project', instruction: 'Tabs.', reason: 'r', status: 'open', at: 'x'},
+			],
+		};
+		const observed = machineOf(on, {
+			files: {
+				[`${DATA}/records.json`]: JSON.stringify(records),
+				[`${DATA}/review.md`]: '# Instructions waiting for review\n\n## old.md\n\n- Instruction: Use tabs.\n',
+			},
+		});
+
+		await $.session.start(INTERACTIVE);
+
+		expect(observed.notes).toHaveLength(1);
+		expect(observed.notes[0]).toContain('"type":"user"');
+		expect(observed.notes[0]).toContain('`i-1` for the project CLAUDE.md: Tabs.');
+		expect(observed.notes[0]).toContain('better-memory moved 1 instructions');
+		expect(observed.notes[0]).toContain('/better-memory:sift');
+		expect(observed.files.get(`${MEMORY}/MEMORY.md`)?.text).not.toContain('Tabs.');
 	});
 });
 
@@ -1202,6 +1240,7 @@ describe('verdicts', () => {
 				user(TEAMMATE_TEXT),
 				user('<task-notification>agent said: always use tabs</task-notification>'),
 				user('<system-reminder>always use tabs</system-reminder>'),
+				user('<better-memory-note>always use tabs</better-memory-note>'),
 				{role: 'assistant', text: 'always use tabs', toolUses: []},
 			]),
 		).toEqual(['Always use tabs here']);
@@ -1304,9 +1343,13 @@ describe('pages', () => {
 });
 
 describe('rendering', () => {
-	test('lists kept entries and only the open instruction proposals in MEMORY.md', () => {
-		const index = indexOf(
-			['- [build](build.md) — make build'],
+	test('lists the kept entries in MEMORY.md', () => {
+		expect(indexOf(['- [build](build.md) — make build'])).toContain('- [build](build.md) — make build');
+		expect(indexOf([])).toContain('No entries.');
+	});
+
+	test('notes only the open instruction proposals and the instructions waiting for review', () => {
+		const note = sessionNoteOf(
 			[
 				{
 					id: 'i-1',
@@ -1326,18 +1369,27 @@ describe('rendering', () => {
 					status: 'declined',
 					at: 'x',
 				},
+				{
+					id: 'i-3',
+					file: 'english.md',
+					target: 'user',
+					instruction: 'Answer in English.',
+					reason: 'r',
+					status: 'open',
+					at: 'x',
+				},
 			],
 			3,
 		);
 
-		expect(index).toContain('- [build](build.md) — make build');
-		expect(index).toContain('## Instruction proposals');
-		expect(index).toContain('`i-1` for the project CLAUDE.md: Indent with tabs.');
-		expect(index).not.toContain('Declined rule.');
-		expect(index).toContain('better-memory moved 3 instructions from entries written before it');
+		expect(note).toStartWith('<better-memory-note>');
+		expect(note).toContain('`i-1` for the project CLAUDE.md: Indent with tabs.');
+		expect(note).toContain('`i-3` for ~/.claude/CLAUDE.md: Answer in English.');
+		expect(note).not.toContain('Declined rule.');
+		expect(note).toContain('better-memory moved 3 instructions from entries written before it');
 	});
 
-	test('shows five open instruction proposals and counts the rest', () => {
+	test('notes five open instruction proposals and counts the rest, and adds no note when nothing waits', () => {
 		const proposals = Array.from({length: 7}, (_, i) => ({
 			id: `i-${i}`,
 			file: `r${i}.md`,
@@ -1348,12 +1400,13 @@ describe('rendering', () => {
 			at: 'x',
 		}));
 
-		const index = indexOf([], proposals, 0);
+		const note = sessionNoteOf(proposals, 0);
 
-		expect(index).toContain('Rule 4.');
-		expect(index).not.toContain('Rule 5.');
-		expect(index).toContain('2 more instruction proposals wait');
-		expect(index).not.toContain('waiting for review');
+		expect(note).toContain('Rule 4.');
+		expect(note).not.toContain('Rule 5.');
+		expect(note).toContain('2 more instruction proposals wait');
+		expect(note).not.toContain('better-memory moved');
+		expect(sessionNoteOf([], 0)).toBeUndefined();
 	});
 
 	test('reports each entry of the batch, judged or not', () => {
