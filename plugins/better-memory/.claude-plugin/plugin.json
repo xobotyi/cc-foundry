@@ -1,6 +1,6 @@
 {
 	"name": "better-memory",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Keeps Claude Code's auto memory to facts that still hold: gates memory writes and sifts new entries when the session goes idle",
 	"author": {
 		"name": "xobotyi",
