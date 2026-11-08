@@ -109,16 +109,21 @@ Run every command in this file from the repository root.
   removal, and the report lists its instruction under "Instructions without the user's words", so the user answers no
   question for an instruction nothing shows they gave. When the entry is legacy (no record, or `unsifted`: written
   before the plugin or while it was off), the mod first appends the instruction and the entry's text to
-  `better-memory/review.md`, which never expires and which `MEMORY.md` points the agent to once per session until the
-  `sift` skill works it off. A legacy store's first run would otherwise drop rules the user relies on whose transcripts
+  `better-memory/review.md`, which never expires and which the session note points the agent to until the `sift`
+  skill works it off. A legacy store's first run would otherwise drop rules the user relies on whose transcripts
   are already gone.
 - The mod applies every verdict and writes a report of the run to `reports/`, with the full text of each entry. A
   promotion is recorded. A removal deletes the entry. An instruction proposal deletes the entry and records the
   instruction, with its quotes, for the project or the user CLAUDE.md. An entry that changed while sift ran is skipped.
   The first write of `MEMORY.md` saves the existing one to `reports/`.
-- `MEMORY.md` lists promoted entries and entries no sift has judged yet; candidates stay out until promoted. Up to five
-  open instruction proposals follow, with a count of the rest, and at session start the mod registers
-  `mcp__better-memory__answer_instruction_proposal` when one is open.
+- `MEMORY.md` lists promoted entries and entries no sift has judged yet; candidates stay out until promoted.
+- At the start of an interactive session, the mod adds a note to the conversation through `$.session.append`: up to five
+  open instruction proposals with a count of the rest, and the number of instructions in `review.md`. It registers
+  `mcp__better-memory__answer_instruction_proposal` when a proposal is open. The note, and not `MEMORY.md`, carries them
+  because Claude Code leaves `MEMORY.md` out of the context when its memory recall is on (a server flag, or a non-empty
+  `CLAUDE_MEMORY_STORES`; verified on 2.1.319). The note goes in at `session.start`: one added at `turn.start` misses
+  that turn's first model request. It is wrapped in `<better-memory-note>`, which `NOT_TYPED` matches, so the quote
+  check never takes its text for the user's words.
 - A plugin reload (`/reload-plugins`, an update, or an edit of a `--plugin-dir` module) runs `register` again in the
   live session, and `session.start` does not fire again. The mod restores the session at the next `turn.start`, taking
   interactivity from `$.session.surfaces()`, which is empty in a `-p` run. A sift running at the reload dies with the
@@ -127,6 +132,8 @@ Run every command in this file from the repository root.
 ## Known Limits
 
 - Sift needs the `claude` command on the session's `PATH`; without it every run fails and logs the failure.
+- The session note is a row of the conversation, so a compaction can summarize it away; the open proposals then come in
+  the next interactive session. A plugin reload adds no note, and a headless run gets none.
 - Within a session the mod changes each of its files, and each entry, one change at a time, because hooks interleave at
   every await: a file is rewritten whole, and a verdict must not delete an entry written after sift checked it. Across
   sessions `records.json` and the lock are last-writer-wins: two sessions on one project that write in the same moment

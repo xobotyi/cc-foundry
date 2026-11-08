@@ -56,9 +56,10 @@ removed, and the report of the run lists it.
 Sift has read-only tools and no network: the plugin fetches the linked pages itself, so a memory entry cannot make sift
 send your data anywhere. It runs apart from your conversation and never interrupts it.
 
-**At the next session.** The plugin writes `MEMORY.md` itself: the promoted entries, the entries not judged yet, and up
-to five open instruction proposals. The agent lists those proposals to you together, once per session; your answer to
-each is recorded, and on yes the agent makes the CLAUDE.md edit.
+**At the next session.** The plugin writes `MEMORY.md` itself: the promoted entries and the entries not judged yet. When
+an interactive session starts, it also hands the agent a note with up to five open instruction proposals. The agent
+lists those proposals to you together once the task at hand allows; your answer to each is recorded, and on yes the
+agent makes the CLAUDE.md edit.
 
 **When you ask for it.** `/better-memory:sift` runs the same pass by hand, with you in the loop. The agent reads every
 entry and the waiting review file, checks the facts against the project, and merges rules that say the same thing. It
@@ -100,8 +101,8 @@ passages of its output that show the fact.
 
 Each save or removal shows in the conversation as one short row, such as
 `Save memory(user-rust: "The user is new to Rust")`; ctrl+o shows the whole call. The plugin's tools never ask for
-permission. Instruction proposals reach you as one question from the agent in a later session, and while the review file
-holds rules, the agent mentions once per session that `/better-memory:sift` can review them.
+permission. Once the task at hand allows, the agent puts instruction proposals to you as one question in a later
+interactive session, and while the review file holds rules, it mentions that `/better-memory:sift` can review them.
 
 ## Limits
 
