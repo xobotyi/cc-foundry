@@ -34,6 +34,7 @@ const ORIGIN = '8ff5d77c-dc1d-42bf-8227-bffeb4662fdd';
 const SESSION = 's1';
 const WRITE = 'mcp__better-memory__write_entry';
 const REMOVE = 'mcp__better-memory__remove_entry';
+const ANSWER = 'mcp__better-memory__answer_instruction_proposal';
 
 const HEADLESS: SessionStartInput = {surface: null, isInteractive: false, cwd: ROOT};
 const INTERACTIVE: SessionStartInput = {surface: 'terminal', isInteractive: true, cwd: ROOT};
@@ -512,6 +513,50 @@ describe('remove_entry', () => {
 		const removed = await $.tool.call({tool: REMOVE, name: 'nothing', reason: 'gone'});
 
 		expect(removed.deny).toContain('No memory entry is named nothing');
+	});
+});
+
+describe('tool rows', () => {
+	const ROW = {tool_use_id: 'u1', isRunning: false, isErrored: false, isInterrupted: false};
+
+	function drawnRowsOf(on: On): object[] {
+		const drawn: object[] = [];
+		on('ui.render', {component: 'ToolUse'}, ($, e) => {
+			drawn.push(e.props);
+			return {type: 'Text', children: ['row']};
+		});
+
+		return drawn;
+	}
+
+	test("draws a call of the mod's tool as its label and one field", async ($, on) => {
+		const drawn = drawnRowsOf(on);
+		const mount = {plugin: 'better-memory', surface: 'terminal', component: 'ToolUse'} as const;
+
+		await $.ui.mount({...mount, props: {...ROW, tool: WRITE, input: RUST_ENTRY}});
+		await $.ui.mount({...mount, props: {...ROW, tool: REMOVE, input: {name: 'user-rust', reason: 'Gone.'}}});
+		await $.ui.mount({...mount, props: {...ROW, tool: ANSWER, input: {id: 'p1', answer: 'accepted'}}});
+
+		expect(drawn).toEqual([
+			{...ROW, tool: 'Save memory', input: {'user-rust': 'The user is new to Rust'}},
+			{...ROW, tool: 'Remove memory', input: {'user-rust': 'Gone.'}},
+			{...ROW, tool: 'Answer instruction proposal', input: {p1: 'accepted'}},
+		]);
+	});
+
+	test('draws the label alone while the call is incomplete, and the whole call when expanded', async ($, on) => {
+		const drawn = drawnRowsOf(on);
+		const mount = {plugin: 'better-memory', surface: 'terminal', component: 'ToolUse'} as const;
+
+		await $.ui.mount({...mount, props: {...ROW, isRunning: true, tool: WRITE, input: {name: 'user-rust'}}});
+		await $.ui.mount({...mount, props: {...ROW, tool: WRITE, input: RUST_ENTRY, isExpanded: true}});
+		await $.ui.mount({...mount, props: {...ROW, tool: 'mcp__other__send', input: {name: 'x', description: 'y'}}});
+
+		expect(drawn).toEqual([
+			{...ROW, isRunning: true, tool: 'Save memory', input: {}},
+			{...ROW, tool: WRITE, input: RUST_ENTRY, isExpanded: true},
+			{...ROW, tool: 'mcp__other__send', input: {name: 'x', description: 'y'}},
+		]);
 	});
 });
 

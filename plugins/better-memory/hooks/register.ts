@@ -183,6 +183,9 @@ type Session = {
 	siftRuns: number;
 };
 
+/** How a collapsed row draws a call of the mod's tool: a label, and the input fields of the one value it shows. */
+type ToolRow = {label: string; key: string; value: string};
+
 export const INDEX_FILE = 'MEMORY.md';
 const REVIEW_FILE = 'review.md';
 const REVIEW_HEADER = [
@@ -196,6 +199,11 @@ const MOD_TOOL_PREFIX = 'mcp__better-memory__';
 const ANSWER_TOOL = 'mcp__better-memory__answer_instruction_proposal';
 const WRITE_TOOL = 'mcp__better-memory__write_entry';
 const REMOVE_TOOL = 'mcp__better-memory__remove_entry';
+const TOOL_ROWS: Readonly<Record<string, ToolRow>> = {
+	[WRITE_TOOL]: {label: 'Save memory', key: 'name', value: 'description'},
+	[REMOVE_TOOL]: {label: 'Remove memory', key: 'name', value: 'reason'},
+	[ANSWER_TOOL]: {label: 'Answer instruction proposal', key: 'id', value: 'answer'},
+};
 const ENTRY_TYPES: readonly EntryType[] = ['user', 'project', 'reference'];
 const ENTRY_NAME = /^[a-z0-9][a-z0-9_-]{0,79}$/;
 const IDLE_MS = 30_000;
@@ -382,6 +390,13 @@ export function register(on: On, options: PluginOptions): void {
 		deny: 'better-memory could not record the answer; the instruction proposal stays open.',
 	}));
 
+	on('ui.render', {component: 'ToolUse', props: {tool: [WRITE_TOOL, REMOVE_TOOL, ANSWER_TOOL]}}, ($, e, next) => {
+		const row = TOOL_ROWS[e.props.tool];
+		if (row === undefined || e.props.isExpanded === true) return next(e);
+
+		return next({...e, props: {...e.props, tool: row.label, input: rowInputOf(row, e.props.input)}});
+	});
+
 	on('turn.start', async ($, e, next) => {
 		if (e.agentId === undefined) {
 			session.timer?.cancel();
@@ -402,6 +417,18 @@ export function register(on: On, options: PluginOptions): void {
 
 		return completed;
 	});
+}
+
+/**
+ * The input a collapsed row of the mod's tool draws: the call's key field named for its value field, which the engine
+ * draws as `Label(key: "value")`. A call whose two fields are not strings, as while it streams, draws the label alone.
+ */
+function rowInputOf(row: ToolRow, input: unknown): Record<string, string> {
+	const fields = typeof input === 'object' && input !== null ? (input as Record<string, unknown>) : {};
+	const key = fields[row.key];
+	const value = fields[row.value];
+
+	return typeof key === 'string' && typeof value === 'string' ? {[key]: value} : {};
 }
 
 async function startSession($: EngineInterface, session: Session): Promise<void> {
