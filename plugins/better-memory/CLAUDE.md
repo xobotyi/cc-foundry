@@ -43,11 +43,14 @@ Run every command in this file from the repository root.
 - The project directory is `<config dir>/projects/<key>`, where Claude Code keeps the project's transcripts as
   `<session id>.jsonl`.
 - Plugin data sits beside the memory directory in `better-memory/`: `records.json` (each entry's state, origin anchor,
-  evidence anchors, and reads, plus instruction proposals), `reports/`, and `errors.log` for headless failures.
-  `parseRecords` migrates records that hold the older `evidence` and `premise` fields.
-- Retention follows Claude Code's `cleanupPeriodDays` (30 days when unset): at session start the mod deletes reports
-  older than it and drops instruction proposals answered before it. A report is the only copy of a deleted entry's text,
-  so a wrong removal stays recoverable for as long as the transcripts that could show it is wrong.
+  and evidence anchors, plus instruction proposals), `uses/`, `reports/`, and `errors.log` for headless failures.
+  `parseRecords` migrates records that hold the older `evidence` and `premise` fields, and drops the read counts records
+  once held.
+- `uses/<session id>.json` counts the session's uses of each entry. Each session writes only its own file, because
+  sessions on one store rewrite `records.json` whole and would lose each other's counts.
+- Retention follows Claude Code's `cleanupPeriodDays` (30 days when unset): at session start the mod deletes reports and
+  use files older than it and drops instruction proposals answered before it. A report is the only copy of a deleted
+  entry's text, so a wrong removal stays recoverable for as long as the transcripts that could show it is wrong.
 - The mod registers its tools at session start, schemas in the tool list rather than behind ToolSearch, and answers
   `tool.check` with `allow` for all three, so none raises a permission prompt in any mode but plan mode.
   - `write_entry` takes a name, a type of `user`, `project`, or `reference`, a one-line description, the fact, and at
@@ -71,8 +74,8 @@ Run every command in this file from the repository root.
     that project's next session reconciles its records and sift judges the changed files. The managed
     `cc-plugin-sec-default` announces the refusal as a skipped `tool.check` hook in the session, while the refusal
     stands (verified on 2.1.319).
-  - A Read of an entry counts toward its reads; an entry that sift has not promoted gets an "unverified" note after the
-    result.
+  - A Read of an entry counts as a read in the session's use file; an entry that sift has not promoted gets an
+    "unverified" note after the result.
   - A failure inside the gate refuses a memory write and passes any other call.
 - The write rules are the `write_entry` description; Write and Edit carry a one-line pointer to the tools through
   `tool.describe`. Claude Code's own auto-memory section of the system prompt tells the model to write entries with

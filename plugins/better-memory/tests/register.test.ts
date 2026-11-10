@@ -220,11 +220,16 @@ function machineOf(on: On, machine: Machine = {}): Observed {
 function recordsOf(observed: Observed): {
 	entries: Record<
 		string,
-		{state: string; origin?: {session: string; round?: number}; anchors?: object[]; reads?: {count: number}}
+		{state: string; origin?: {session: string; round?: number}; anchors?: object[]; reads?: unknown}
 	>;
 	instructionProposals: {instruction: string; status: string}[];
 } {
 	return JSON.parse(observed.files.get(`${DATA}/records.json`)?.text ?? '{"entries":{},"instructionProposals":[]}');
+}
+
+/** The counts in a session's use file, by kind and then by entry file. */
+function usesIn(observed: Observed, session = SESSION): Record<string, Record<string, {count: number}> | undefined> {
+	return JSON.parse(observed.files.get(`${DATA}/uses/${session}.json`)?.text ?? '{}');
 }
 
 function filesUnder(observed: Observed, dir: string): string[] {
@@ -462,7 +467,7 @@ describe('write_entry', () => {
 		expect(observed.files.has(`${MEMORY}/user-rust.md`)).toBe(false);
 	});
 
-	test('keeps the record of every entry when writes and reads run at once', async ($, on) => {
+	test('keeps every record and count when writes and reads run at once', async ($, on) => {
 		const observed = machineOf(on, {userMessages: [RUST_SAID], files: {[`${MEMORY}/old.md`]: FACT}});
 		await $.session.start(HEADLESS);
 
@@ -472,12 +477,11 @@ describe('write_entry', () => {
 			$.tool.call({tool: 'Read', file_path: `${MEMORY}/old.md`}),
 		]);
 
-		const entries = recordsOf(observed).entries;
-		expect(Object.keys(entries).toSorted()).toEqual(['old.md', 'rust-two.md', 'user-rust.md']);
-		expect(entries['old.md']?.reads?.count).toBe(1);
+		expect(Object.keys(recordsOf(observed).entries).toSorted()).toEqual(['rust-two.md', 'user-rust.md']);
+		expect(usesIn(observed).reads?.['old.md']?.count).toBe(1);
 	});
 
-	test('replaces an entry of the same name and keeps its reads', async ($, on) => {
+	test('replaces an entry of the same name with a candidate', async ($, on) => {
 		const records = {entries: {'user-rust.md': {state: 'promoted', reads: {count: 3, last: 'x'}}}};
 		const observed = machineOf(on, {
 			userMessages: [RUST_SAID],
@@ -487,7 +491,11 @@ describe('write_entry', () => {
 
 		await $.tool.call({tool: WRITE, ...RUST_ENTRY});
 
-		expect(recordsOf(observed).entries['user-rust.md']).toMatchObject({state: 'candidate', reads: {count: 3}});
+		expect(recordsOf(observed).entries['user-rust.md']).toEqual({
+			state: 'candidate',
+			origin: expect.objectContaining({session: SESSION}),
+			anchors: [expect.objectContaining({type: 'quote'})],
+		});
 		expect(observed.files.get(`${MEMORY}/user-rust.md`)?.text).toContain('parallel compute');
 	});
 });
@@ -587,7 +595,19 @@ describe('read tracking', () => {
 		await $.tool.call({tool: 'Read', file_path: `${MEMORY}/rust.md`});
 		await $.tool.call({tool: 'Read', file_path: `${MEMORY}/rust.md`});
 
-		expect(recordsOf(observed).entries['rust.md']?.reads?.count).toBe(2);
+		expect(usesIn(observed).reads?.['rust.md']?.count).toBe(2);
+		expect(recordsOf(observed).entries['rust.md']).toBeUndefined();
+	});
+
+	test("counts in the session's own use file and leaves another session's untouched", async ($, on) => {
+		const other = '{"reads": {"rust.md": {"count": 5, "last": "x"}}}\n';
+		const observed = machineOf(on, {files: {[`${MEMORY}/rust.md`]: FACT, [`${DATA}/uses/other.json`]: other}});
+		await $.session.start(HEADLESS);
+
+		await $.tool.call({tool: 'Read', file_path: `${MEMORY}/rust.md`});
+
+		expect(observed.files.get(`${DATA}/uses/other.json`)?.text).toBe(other);
+		expect(usesIn(observed).reads?.['rust.md']?.count).toBe(1);
 	});
 
 	test('marks an unsifted entry as unverified', async ($, on) => {
@@ -1030,7 +1050,7 @@ describe('settings', () => {
 });
 
 describe('retention', () => {
-	test("deletes reports and answered instruction proposals older than Claude Code's transcript period", async ($, on) => {
+	test("deletes reports, use files, and answered instruction proposals older than Claude Code's transcript period", async ($, on) => {
 		const day = 86_400_000;
 		const proposal = (id: string, status: string, answeredAt?: string): object => ({
 			id,
@@ -1056,14 +1076,18 @@ describe('retention', () => {
 				[`${DATA}/records.json`]: JSON.stringify(records),
 				[`${DATA}/reports/old.md`]: 'old',
 				[`${DATA}/reports/new.md`]: 'new',
+				[`${DATA}/uses/old.json`]: '{}',
+				[`${DATA}/uses/new.json`]: '{}',
 			},
-			mtimes: {[`${DATA}/reports/old.md`]: Date.now() - 15 * day},
+			mtimes: {[`${DATA}/reports/old.md`]: Date.now() - 15 * day, [`${DATA}/uses/old.json`]: Date.now() - 15 * day},
 		});
 
 		await $.session.start(HEADLESS);
 
 		expect(observed.files.has(`${DATA}/reports/old.md`)).toBe(false);
 		expect(observed.files.has(`${DATA}/reports/new.md`)).toBe(true);
+		expect(observed.files.has(`${DATA}/uses/old.json`)).toBe(false);
+		expect(observed.files.has(`${DATA}/uses/new.json`)).toBe(true);
 		expect(recordsOf(observed).instructionProposals.map((kept) => kept.instruction)).toEqual([
 			'open-old',
 			'answered-new',
@@ -1334,7 +1358,11 @@ describe('verdicts', () => {
 						evidence: 'said it',
 						premise: ['path: x.md', 'prose'],
 					},
-					'b.md': {state: 'promoted', premise: ['Known ripgrep behavior, not run here']},
+					'b.md': {
+						state: 'promoted',
+						premise: ['Known ripgrep behavior, not run here'],
+						reads: {count: 3, last: 'x'},
+					},
 				},
 			}),
 		);
