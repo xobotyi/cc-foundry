@@ -176,6 +176,7 @@ type Session = {
 	isSiftOn: boolean;
 	isStarted: boolean;
 	isInteractive: boolean;
+	isGuarding: boolean;
 	sessionId: string;
 	paths?: Paths;
 	timer?: Timer;
@@ -330,7 +331,8 @@ End your answer with one JSON block, one verdict per entry in <entries>, and not
  * each verdict: it keeps a promoted entry whose anchors it confirms, deletes a removed one, files an instruction the
  * user's words back as an instruction proposal for a CLAUDE.md, writes MEMORY.md, and writes a report that keeps the
  * text of every entry it deleted. Reports and answered instruction proposals expire with Claude Code's transcripts.
- * Reads of entries are counted for later decay.
+ * Reads of entries are counted for later decay. The mod sits out a session whose auto memory is off, sift's own process
+ * included, and a session with no built-in tools.
  *
  * Plugin data lives beside the memory directory, in `better-memory/`: `records.json` and `reports/`.
  *
@@ -342,6 +344,7 @@ export function register(on: On, options: PluginOptions): void {
 		isSiftOn: options.sift !== false,
 		isStarted: false,
 		isInteractive: false,
+		isGuarding: true,
 		sessionId: '',
 		siftRuns: 0,
 	};
@@ -352,7 +355,7 @@ export function register(on: On, options: PluginOptions): void {
 		await startSession($, session).catch((err: unknown) => logFailure($, session, `start failed: ${String(err)}`));
 		// constraint: a note added at turn.start misses that turn's first model request, and a reload, which restores
 		// the session at turn.start, would add a second note to a conversation that holds one
-		if (session.isInteractive) {
+		if (session.isInteractive && session.isGuarding) {
 			await addSessionNote($, session).catch((err: unknown) => logFailure($, session, `note failed: ${String(err)}`));
 		}
 
@@ -361,11 +364,14 @@ export function register(on: On, options: PluginOptions): void {
 
 	on('tool.describe', {tool: ['Write', 'Edit']}, async ($, e, next) => {
 		const described = await next(e);
+		if (!session.isGuarding) return described;
 
 		return {...described, description: `${described.description}\n\n${memoryPointerOf(session)}`};
 	});
 
 	on('tool.call', async ($, e, next) => {
+		if (!session.isGuarding) return next(e);
+
 		switch (e.tool) {
 			case 'Write':
 			case 'Edit':
@@ -379,9 +385,9 @@ export function register(on: On, options: PluginOptions): void {
 
 	on('tool.check', {tool: [WRITE_TOOL, REMOVE_TOOL, ANSWER_TOOL]}, () => ({decision: 'allow'})).catch(() => undefined);
 
-	on('tool.check', {tool: 'Bash'}, async ($, e, next) => gateShell($, session, e, next)).catch(($, e) =>
-		isShellOnMemory(session, e.input) ? {decision: 'deny', reason: GATE_FAILURE} : undefined,
-	);
+	on('tool.check', {tool: 'Bash'}, async ($, e, next) =>
+		session.isGuarding ? gateShell($, session, e, next) : next(e),
+	).catch(($, e) => (isShellOnMemory(session, e.input) ? {decision: 'deny', reason: GATE_FAILURE} : undefined));
 
 	on('tool.call', {tool: WRITE_TOOL}, async ($, e) => writeEntry($, session, e)).catch(() => ({
 		deny: 'better-memory could not save the entry; nothing was written.',
@@ -438,6 +444,11 @@ function rowInputOf(row: ToolRow, input: unknown): Record<string, string> {
 
 async function startSession($: EngineInterface, session: Session): Promise<void> {
 	session.isStarted = true;
+	// constraint: a session with no built-in tools, as `--tools ""` starts one, refuses every tool a plugin registers
+	session.isGuarding =
+		(await $.settings.read({key: 'autoMemoryEnabled'})) !== false && (await $.tool.list()).some((tool) => !tool.mcp);
+	if (!session.isGuarding) return;
+
 	session.sessionId = await $.session.id();
 	const paths = await pathsOf($, session);
 	await $.tool.register({
@@ -733,7 +744,9 @@ async function answerProposal(
 }
 
 async function scheduleSift($: EngineInterface, session: Session): Promise<void> {
-	if (!session.isSiftOn || session.sift !== undefined || session.siftRuns >= MAX_SIFT_RUNS) return;
+	if (!session.isGuarding || !session.isSiftOn || session.sift !== undefined || session.siftRuns >= MAX_SIFT_RUNS) {
+		return;
+	}
 
 	// constraint: a mod's child process ends when its module unloads, and a headless run unloads with its turn, so only
 	// an interactive session starts sift; the entries of a headless run carry their anchors to a later session

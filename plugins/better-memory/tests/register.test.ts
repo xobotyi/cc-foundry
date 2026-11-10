@@ -1,4 +1,4 @@
-import type {On, SessionMessage, SessionStartInput, ToolUseSummary, TurnCompleteInput} from 'claude-code';
+import type {On, SessionMessage, SessionStartInput, ToolInfo, ToolUseSummary, TurnCompleteInput} from 'claude-code';
 import {describe, expect, mock, test} from 'claude-code/testing';
 
 import {
@@ -60,7 +60,8 @@ type File = {text: string; mtimeMs: number};
 type Machine = {
 	readonly files?: Readonly<Record<string, string>>;
 	readonly mtimes?: Readonly<Record<string, number>>;
-	readonly settings?: {readonly cleanupPeriodDays?: number};
+	readonly settings?: {readonly cleanupPeriodDays?: number; readonly autoMemoryEnabled?: boolean};
+	readonly tools?: readonly ToolInfo[];
 	readonly isTerminal?: boolean;
 	readonly userMessages?: readonly string[];
 	readonly siftEvents?: readonly object[];
@@ -110,6 +111,9 @@ function machineOf(on: On, machine: Machine = {}): Observed {
 	on('session.root', () => ({value: machine.root ?? ROOT}));
 	on('session.repo', () => ({value: null}));
 	on('settings.read', () => ({value: {...machine.settings}}));
+	on('tool.list', () => ({
+		value: [...(machine.tools ?? [{name: 'Write', description: 'Writes a file.', mcp: false}])],
+	}));
 	on('turn.complete', ($, e) => ({text: e.answer}));
 	on('turn.start', ($, e) => ({turnId: e.turnId}));
 	on('session.turns', () => ({value: (machine.userMessages ?? []).length}));
@@ -988,6 +992,41 @@ describe('settings', () => {
 			expect(read.context).toBeUndefined();
 		},
 	);
+
+	test("sits out a session whose auto memory is off, as sift's own process runs", async ($, on) => {
+		const observed = machineOf(on, {
+			files: {
+				[`${MEMORY}/rust.md`]: FACT,
+				[`${DATA}/review.md`]: '# Instructions waiting for review\n\n## old.md\n\n- Instruction: Use tabs.\n',
+			},
+			settings: {autoMemoryEnabled: false},
+		});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		const read = await $.tool.call({tool: 'Read', file_path: `${MEMORY}/rust.md`});
+		await $.tool.call({tool: 'Write', file_path: `${MEMORY}/note.md`, content: FACT});
+		const shell = await $.tool.check({tool: 'Bash', input: {command: `rm ${MEMORY}/rust.md`}});
+		await $.turn.complete(turnOf('Done.'));
+		await clock.advance(30_000);
+
+		expect(read.context).toBeUndefined();
+		expect(observed.calls).toEqual(['Read', 'Write']);
+		expect(shell.decision).toBe('allow');
+		expect(observed.registered).toEqual([]);
+		expect(observed.notes).toEqual([]);
+		expect(observed.spawns).toEqual([]);
+		expect(observed.files.has(`${DATA}/records.json`)).toBe(false);
+		expect(observed.files.has(`${MEMORY}/MEMORY.md`)).toBe(false);
+	});
+
+	test('sits out a session with no built-in tools, as a `--tools ""` run starts one', async ($, on) => {
+		const observed = machineOf(on, {tools: [{name: 'mcp__other__send', description: 'Sends.', mcp: true}]});
+		await $.session.start(HEADLESS);
+
+		expect(observed.registered).toEqual([]);
+		expect(filesUnder(observed, DATA)).toEqual([]);
+	});
 });
 
 describe('retention', () => {
