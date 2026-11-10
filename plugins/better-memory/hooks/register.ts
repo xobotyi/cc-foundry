@@ -44,8 +44,8 @@ export type EntryRecord = {
 /** One kind of use of the entries in one session: per entry file, how many times and when last. */
 type UseCounts = Record<string, {count: number; last: string}>;
 
-/** What one session's use file holds. */
-export type Uses = {reads: UseCounts};
+/** What one session's use file holds: the entries it opened with Read, and the entries recall showed it. */
+export type Uses = {reads: UseCounts; recalls: UseCounts};
 
 export type InstructionProposal = {
 	id: string;
@@ -336,8 +336,9 @@ End your answer with one JSON block, one verdict per entry in <entries>, and not
  * each verdict: it keeps a promoted entry whose anchors it confirms, deletes a removed one, files an instruction the
  * user's words back as an instruction proposal for a CLAUDE.md, writes MEMORY.md, and writes a report that keeps the
  * text of every entry it deleted. Reports and answered instruction proposals expire with Claude Code's transcripts.
- * Reads of entries are counted for later decay. The mod sits out a session whose auto memory is off, sift's own process
- * included, and a session with no built-in tools.
+ * Claude Code's memory recall shows only the entries MEMORY.md lists, an entry sift has not promoted marked as such.
+ * Reads and recalls of entries are counted for later decay. The mod sits out a session whose auto memory is off, sift's
+ * own process included, and a session with no built-in tools.
  *
  * Plugin data lives beside the memory directory, in `better-memory/`: `records.json`, `uses/`, and `reports/`.
  *
@@ -387,6 +388,13 @@ export function register(on: On, options: PluginOptions): void {
 				return next(e);
 		}
 	}).catch(($, e) => (isMemoryWrite(session, e) ? {deny: GATE_FAILURE} : undefined));
+
+	on('prompt.attachment', {type: 'relevant_memories'}, async ($, e, next) => {
+		const attached = await next(e);
+		if (!session.isGuarding || attached.text === null) return attached;
+
+		return {text: await recalledTextOf($, session, attached.text)};
+	}).catch(() => undefined);
 
 	on('tool.check', {tool: [WRITE_TOOL, REMOVE_TOOL, ANSWER_TOOL]}, () => ({decision: 'allow'})).catch(() => undefined);
 
@@ -732,6 +740,41 @@ async function countUses(
 		for (const file of files) uses[kind][file] = {count: (uses[kind][file]?.count ?? 0) + 1, last};
 		await $.fs.write(path, `${JSON.stringify(uses, null, '\t')}\n`);
 	});
+}
+
+/**
+ * The recall attachment as MEMORY.md would show its entries: an entry the index leaves out is dropped, an entry sift has
+ * not promoted carries the "unverified" note, and each entry left in counts as recalled. Null when no memory is left.
+ */
+async function recalledTextOf($: EngineInterface, session: Session, text: string): Promise<string | null> {
+	const paths = await pathsOf($, session);
+	const own = [...new Set(recallPathsOf(text))].filter((path) => entryFileOf(path, paths.memoryDir) !== undefined);
+	const read = await Promise.all(
+		own.map(async (path): Promise<[string, string][]> =>
+			(await $.fs.exists(path)) ? [[path, await readText($, path)]] : [],
+		),
+	);
+	const recall = recallOf(text, paths.memoryDir, new Map(read.flat()));
+	if (recall.memories.every((memory) => memory.file === undefined)) return text;
+
+	const states = (await readRecords($, paths)).entries;
+	const shown = recall.memories.filter(
+		({file}) => file === undefined || !session.isSiftOn || states[file]?.state !== 'candidate',
+	);
+	await countUses(
+		$,
+		session,
+		paths,
+		'recalls',
+		shown.flatMap(({file}) => (file === undefined ? [] : [file])),
+	);
+	const texts = shown.map(({text: memoryText, file}) =>
+		file === undefined || !session.isSiftOn || states[file]?.state === 'promoted'
+			? memoryText
+			: `${memoryText}\n\n${UNVERIFIED_NOTE}`,
+	);
+
+	return texts.length === 0 ? null : `${recall.lead}${texts.join('\n\n')}\n`;
 }
 
 async function answerProposal(
@@ -1463,6 +1506,51 @@ export function entryFileOf(path: string, memoryDir: string): string | undefined
 	return file === '' ? undefined : file;
 }
 
+/** One memory of a recall attachment: its text, and its file when it is an entry of this store. */
+export type RecalledMemory = {text: string; file?: string};
+
+/** A recall attachment: the lead line above its memories, and the memories. */
+export type Recall = {lead: string; memories: RecalledMemory[]};
+
+// constraint: Claude Code renders each recalled memory as an optional age line, `Memory: <path>:`, a blank line, and the
+// file's text, and joins the memories with a blank line under one lead line
+const RECALL_HEADER = /^(?:This memory is [^\n]*\n\n)?Memory: (.+):$/;
+
+/** The paths of the recall headers in a recall attachment, a header-like line inside a memory's text included. */
+function recallPathsOf(text: string): string[] {
+	return [...text.matchAll(new RegExp(RECALL_HEADER.source, 'gm'))].map(([, path = '']) => path);
+}
+
+/**
+ * Splits a recall attachment into its memories, by the header Claude Code writes above each. When `contents` holds the
+ * file a header names and the text below the header is that file, the next memory starts only past it, so a line of an
+ * entry that reads as a header cannot split the entry.
+ */
+export function recallOf(text: string, memoryDir: string, contents: ReadonlyMap<string, string>): Recall {
+	const headers = new RegExp(RECALL_HEADER.source, 'gm');
+	const headerFrom = (at: number): RegExpExecArray | null => {
+		headers.lastIndex = at;
+		return headers.exec(text);
+	};
+	const memories: RecalledMemory[] = [];
+	let header = headerFrom(0);
+	const lead = text.slice(0, header?.index ?? text.length);
+	while (header !== null) {
+		const path = header[1] ?? '';
+		const bodyAt = header.index + header[0].length + '\n\n'.length;
+		const content = contents.get(path);
+		const next = headerFrom(
+			content !== undefined && text.startsWith(content, bodyAt) ? bodyAt + content.length : bodyAt,
+		);
+		const file = entryFileOf(path, memoryDir);
+		const isEntry = file !== undefined && file !== INDEX_FILE && file.endsWith('.md') && !file.includes('/');
+		memories.push({text: text.slice(header.index, next?.index ?? text.length).trimEnd(), ...(isEntry ? {file} : {})});
+		header = next;
+	}
+
+	return {lead, memories};
+}
+
 /** An absolute path with its `.` and `..` segments resolved, the way the file system reads it. */
 function resolvedOf(path: string): string {
 	const segments: string[] = [];
@@ -1939,7 +2027,7 @@ export function usesOf(text: string): Uses {
 	if (typeof parsed !== 'object' || parsed === null) throw new Error('a use file holds no object');
 	const uses = parsed as Partial<Uses>;
 
-	return {reads: uses.reads ?? {}};
+	return {reads: uses.reads ?? {}, recalls: uses.recalls ?? {}};
 }
 
 /**

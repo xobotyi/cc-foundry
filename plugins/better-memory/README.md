@@ -107,6 +107,10 @@ Each save or removal shows in the conversation as one short row, such as
 permission. Once the task at hand allows, the agent puts instruction proposals to you as one question in a later
 interactive session, and while the review file holds rules, it mentions that `/better-memory:sift` can review them.
 
+When Claude Code recalls memories for a prompt, the plugin lets through only the entries `MEMORY.md` lists. With sift
+on, a new entry stays out of recall until sift confirms it, and a recalled entry sift has not confirmed comes with a
+note to check it first.
+
 ## Limits
 
 - Sift costs an Opus run per batch of up to twelve entries, and runs only when the store holds entries to judge.
@@ -114,6 +118,8 @@ interactive session, and while the review file holds rules, it mentions that `/b
   in the project.
 - In plan mode the plugin's tools get no automatic approval, because plan mode lets no hook approve a tool that writes.
 - Sift runs the `claude` command, so it needs `claude` on the `PATH` of your session.
+- On a machine with managed settings, recall passes the plugin by, unless the managed settings themselves enable the
+  plugin.
 - Entries written before the plugin have no recorded anchors. Sift keeps a fact only when your messages in the
   transcript of the session that wrote it, a file it reads, or a page the entry links confirm it; once Claude Code has
   deleted that transcript, your words are gone from the evidence. Rules from that time wait for the skill instead.
