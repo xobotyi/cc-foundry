@@ -31,6 +31,11 @@ Run every command in this file from the repository root.
   all, so Claude Code's own memory runs unchanged and only the skill remains. `sift` off keeps the tools and the gate,
   never starts sift, lists candidates in `MEMORY.md` because nothing would promote them, and drops the "unverified"
   note.
+- The mod sits out a session whose auto memory is off and a session with no built-in tools: it registers no tool, gates
+  no call, counts no read, adds no note, and starts no sift. A plugin that managed settings enable loads in every Claude
+  Code process, `--setting-sources ""` included (verified on 2.1.319), so sift's own process, which runs with auto
+  memory off, would otherwise count its reads and mark the entries it judges as unverified. A `--tools ""` session
+  refuses every tool a plugin registers.
 - The memory directory is the `autoMemoryDirectory` setting, else `<config dir>/projects/<key>/memory`. The key is the
   git root (the main worktree's for a worktree) with every non-alphanumeric character replaced by `-`. A key over 200
   characters is matched by prefix among the existing project directories, because Claude Code suffixes a hash that no

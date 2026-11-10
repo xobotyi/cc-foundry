@@ -83,6 +83,9 @@ default applies. Change them later in `/config` or with `/plugin configure`.
 - **Sift when idle** (`sift`) — off, the tools and their checks stay, no separate Claude process ever runs, and new
   entries reach `MEMORY.md` at once. Cleanup is then whenever you run the skill.
 
+The mod also does nothing in a session that has auto memory off (`autoMemoryEnabled` set to `false`), such as the
+separate Claude process that sift runs, or that starts with no built-in tools (`--tools ""`).
+
 ## Where Things Live
 
 Reports and the plugin's records live beside the memory directory, in `~/.claude/projects/<project>/better-memory/`.
