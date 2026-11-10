@@ -365,6 +365,44 @@ describe('the write gate', () => {
 		expect(data.decision).toBe('allow');
 	});
 
+	test('passes a shell read the engine does not mark read-only: a variable, a loop, a quoted filter', async ($, on) => {
+		machineOf(on);
+		await $.session.start(HEADLESS);
+		const reads = [
+			`M=${MEMORY}; ls -la $M | head -40; echo ---; rg -l -i 'worktree|settings\\.json' $M 2>/dev/null | head -20`,
+			`for f in ${MEMORY}/reference_*.md; do echo "=== $(basename $f)"; sed -n '/^---$/,/^---$/!p' "$f"; done`,
+			`cat ${MEMORY}/rust.md; echo ===; jq -r '.entries | to_entries[] | select(.value.reads.count > 0)' ${DATA}/records.json 2>&1`,
+			`echo cp ${MEMORY}/rust.md; rg -w rm ${MEMORY}`,
+			`echo sed -i ${MEMORY}/rust.md -delete; cat ${MEMORY}/rust.md`,
+		];
+
+		const checks = await Promise.all(reads.map(async (command) => $.tool.check({tool: 'Bash', input: {command}})));
+
+		expect(checks.map((check) => check.decision)).toEqual(reads.map(() => 'allow'));
+	});
+
+	test('refuses a shell write into the memory directory in any of the forms it can take', async ($, on) => {
+		machineOf(on);
+		await $.session.start(HEADLESS);
+		const writes = [
+			`M=${MEMORY}; rm $M/rust.md`,
+			`echo x >> "${MEMORY}/rust.md"`,
+			`sed -i '' 's/Rust/Go/' ${MEMORY}/rust.md`,
+			`perl -pi -e 's/Rust/Go/' ${MEMORY}/rust.md`,
+			`sed --in-place=.bak -e 's/Rust/Go/' ${MEMORY}/rust.md`,
+			`cp /tmp/rust.md ${MEMORY}/`,
+			`find ${MEMORY} -name '*.md' -delete`,
+			`cat /tmp/rust.md | tee ${MEMORY}/rust.md`,
+			`find ${MEMORY} -name '*.md' -print0 | xargs -0 rm`,
+			`find ${MEMORY} -name '*.md' -exec rm {} \\;`,
+			`if true; then sudo -E rm ${MEMORY}/rust.md; fi`,
+		];
+
+		const checks = await Promise.all(writes.map(async (command) => $.tool.check({tool: 'Bash', input: {command}})));
+
+		expect(checks.map((check) => check.decision)).toEqual(writes.map(() => 'deny'));
+	});
+
 	test("passes a read-only command on the memory directory and any command on another project's store", async ($, on) => {
 		machineOf(on);
 		await $.session.start(HEADLESS);

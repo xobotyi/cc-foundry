@@ -68,13 +68,19 @@ Run every command in this file from the repository root.
     the row, which keeps its status dot, spinner, and error states; an expanded row (ctrl+o) draws the call as made.
 - The gate:
   - A Write or Edit of any file in the memory directory, `MEMORY.md` included, is refused with a pointer to the tools.
-  - A Bash command that names the memory directory, or names the project directory beside a `memory` path segment as a
-    `cd` into it does, and that the engine does not mark `isReadOnly` is refused by a `tool.check` hook, the one event
-    that carries the engine's read-only verdict before a call runs. `better-memory/` is no `memory` segment, so the
-    `sift` skill can delete `review.md` from the shell. Reads pass, and so does any command on another project's store:
-    that project's next session reconciles its records and sift judges the changed files. The managed
-    `cc-plugin-sec-default` announces the refusal as a skipped `tool.check` hook in the session, while the refusal
-    stands (verified on 2.1.319).
+  - A `tool.check` hook, the one event that carries the engine's read-only verdict before a call runs, refuses a Bash
+    command when all three hold:
+    - it names the memory directory, or names the project directory beside a `memory` path segment, as a `cd` into
+      it does;
+    - the engine does not mark it `isReadOnly`;
+    - `isShellWrite` finds a write in it.
+
+    The engine leaves a read with a variable, a loop, or a `;` unmarked, so `isShellWrite`, not that verdict, tells such
+    a read from a write.
+    `better-memory/` is no `memory` segment, so the `sift` skill can delete `review.md` from the shell. Any command on
+    another project's store passes: that project's next session reconciles its records and sift judges the changed
+    files. On a machine with managed settings, `cc-plugin-sec-default` announces the refusal of a mod outside the
+    managed tier as a skipped `tool.check` hook in the session, while the refusal stands (verified on 2.1.319).
   - A Read of an entry counts as a read in the session's use file; an entry that sift has not promoted gets an
     "unverified" note after the result.
   - Claude Code's memory recall puts up to five entries in a `relevant_memories` attachment and makes no tool call, so
@@ -153,7 +159,11 @@ Run every command in this file from the repository root.
   every await: a file is rewritten whole, and a verdict must not delete an entry written after sift checked it. Across
   sessions `records.json` and the lock are last-writer-wins: two sessions on one project that write in the same moment
   can lose one record update, and the mods API offers no lock that spans them.
-- The shell gate matches text. A command that reaches the memory directory through a variable or a script passes it.
+- The shell gate matches text. A command that reaches the memory directory through a variable set elsewhere, that writes
+  through a script (`python -c`, `node -e`), that runs its write behind a prefix option that takes an argument
+  (`sudo -u user rm`, `xargs -n 1 rm`), or that quotes or escapes its command name (`"rm"`, `r""m`, `\rm`) passes it. A
+  write it misses leaves an entry with no record or one changed since its sift, which sift judges again with no anchor
+  recorded at the write; a removal it misses keeps no report of the removed text.
 - An entry written before the plugin has no recorded anchors, so it stays only when its session transcript, a file sift
   reads, or a page the entry links backs it.
 - An anchor in a transcript part that compaction replaced no longer holds at a write, because `$.session.messages()`

@@ -608,7 +608,7 @@ async function gateShell(
 	next: (e: ToolCheckInput) => Promise<ToolCheckResult>,
 ): Promise<ToolCheckResult> {
 	const command = (e.input as {command?: unknown} | undefined)?.command;
-	if (e.isReadOnly === true || typeof command !== 'string') return next(e);
+	if (e.isReadOnly === true || typeof command !== 'string' || !isShellWrite(command)) return next(e);
 
 	const paths = await pathsOf($, session);
 
@@ -1638,6 +1638,81 @@ export function referencesMemory(command: string, memoryDir: string, home: strin
 	const namesParent = spellingsOf(parent).some((dir) => occursAsPath(command, dir, false));
 
 	return namesParent && occursAsPath(command, memoryDir.slice(parent.length + 1), true);
+}
+
+const FILE_COMMANDS = new Set([
+	'rm',
+	'rmdir',
+	'mv',
+	'cp',
+	'ln',
+	'touch',
+	'mkdir',
+	'tee',
+	'truncate',
+	'install',
+	'rsync',
+	'dd',
+	'unlink',
+	'chmod',
+	'chown',
+]);
+
+/** The words that run the command after them, with their own options between. */
+const COMMAND_PREFIXES = new Set([
+	'sudo',
+	'xargs',
+	'env',
+	'exec',
+	'nohup',
+	'time',
+	'command',
+	'builtin',
+	'if',
+	'then',
+	'else',
+	'while',
+	'until',
+	'do',
+	'!',
+]);
+
+/**
+ * Whether a shell command can change a file: a redirect into one, an in-place `sed` or `perl`, `find -delete`, or a
+ * command of `FILE_COMMANDS`. Quoted text is no command, so a `>` in a jq filter is no redirect, and a word counts as a
+ * command only where the shell runs it, so `echo cp` is no copy.
+ */
+export function isShellWrite(command: string): boolean {
+	const unquoted = command.replace(/'[^']*'|"(?:[^"\\]|\\.)*"/g, "''");
+	for (const [target] of unquoted.matchAll(/(?<=(?<![<>])\d*>{1,2}\|?\s*)[^\s;&|)]+/g)) {
+		if (!target.startsWith('&') && target !== '/dev/null') return true;
+	}
+
+	return unquoted.split(/;|&&|\|\||[|&()`\n]|\$\(|\s-(?:exec|execdir|ok)\s/).some(isWritingCommand);
+}
+
+/**
+ * Whether one simple shell command changes a file: a command of `FILE_COMMANDS`, `find -delete`, or an in-place `sed` or
+ * `perl`, past the variable assignments and the prefixes that run another command.
+ */
+function isWritingCommand(segment: string): boolean {
+	const words = segment.trim().split(/\s+/);
+	let at = 0;
+	while (at < words.length) {
+		const word = words[at] ?? '';
+		if (!/^\w+=/.test(word) && !COMMAND_PREFIXES.has(word)) break;
+
+		at += 1;
+		if (COMMAND_PREFIXES.has(word)) while (words[at]?.startsWith('-') === true) at += 1;
+	}
+	const command = words[at] ?? '';
+	const args = words.slice(at + 1);
+	if (command === 'find') return args.includes('-delete');
+	if (command === 'sed' || command === 'perl') {
+		return args.some((arg) => /^-[a-zA-Z]*i/.test(arg) || arg.startsWith('--in-place'));
+	}
+
+	return FILE_COMMANDS.has(command);
 }
 
 /** Whether `text` occurs in `command` ending at a path boundary, and starting at one when `isSegment`. */
