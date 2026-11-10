@@ -39,8 +39,13 @@ export type EntryRecord = {
 	anchors?: Anchor[];
 	reason?: string;
 	siftedAt?: string;
-	reads?: {count: number; last: string};
 };
+
+/** One kind of use of the entries in one session: per entry file, how many times and when last. */
+type UseCounts = Record<string, {count: number; last: string}>;
+
+/** What one session's use file holds. */
+export type Uses = {reads: UseCounts};
 
 export type InstructionProposal = {
 	id: string;
@@ -334,7 +339,7 @@ End your answer with one JSON block, one verdict per entry in <entries>, and not
  * Reads of entries are counted for later decay. The mod sits out a session whose auto memory is off, sift's own process
  * included, and a session with no built-in tools.
  *
- * Plugin data lives beside the memory directory, in `better-memory/`: `records.json` and `reports/`.
+ * Plugin data lives beside the memory directory, in `better-memory/`: `records.json`, `uses/`, and `reports/`.
  *
  * @param on the engine's registrar
  */
@@ -514,7 +519,8 @@ async function startSession($: EngineInterface, session: Session): Promise<void>
 	const retention = await $.settings.read({key: 'cleanupPeriodDays'});
 	const cutoff =
 		Date.now() - (typeof retention === 'number' && retention > 0 ? retention : DEFAULT_RETENTION_DAYS) * DAY_MS;
-	await pruneReports($, paths, cutoff);
+	await pruneExpired($, `${paths.dataDir}/reports`, cutoff);
+	await pruneExpired($, `${paths.dataDir}/uses`, cutoff);
 	const records = await reconcile($, paths, cutoff);
 	await writeIndex($, paths, session.isSiftOn);
 	if (records.instructionProposals.some((proposal) => proposal.status === 'open')) {
@@ -650,13 +656,7 @@ async function writeEntry($: EngineInterface, session: Session, e: WriteEntryCal
 	await exclusively(`${paths.memoryDir}/${file}`, async () => {
 		await $.fs.write(`${paths.memoryDir}/${file}`, entryTextOf(input));
 		await updateRecords($, paths, (current) => {
-			const previous = current.entries[file];
-			current.entries[file] = {
-				state: 'candidate',
-				origin,
-				anchors,
-				...(previous?.reads === undefined ? {} : {reads: previous.reads}),
-			};
+			current.entries[file] = {state: 'candidate', origin, anchors};
 		});
 	});
 	await writeIndex($, paths, session.isSiftOn);
@@ -706,14 +706,32 @@ async function trackRead(
 	const read = await next(e);
 	if (read.deny !== undefined || read.isError === true) return read;
 
-	const records = await updateRecords($, paths, (current) => {
-		const record = current.entries[file] ?? {state: 'unsifted'};
-		record.reads = {count: (record.reads?.count ?? 0) + 1, last: new Date().toISOString()};
-		current.entries[file] = record;
-	});
-	if (!session.isSiftOn || records.entries[file]?.state === 'promoted') return read;
+	await countUses($, session, paths, 'reads', [file]);
+	if (!session.isSiftOn || (await readRecords($, paths)).entries[file]?.state === 'promoted') return read;
 
 	return {...read, context: [...(read.context ?? []), UNVERIFIED_NOTE]};
+}
+
+/**
+ * Counts uses of entries in this session's own file, `better-memory/uses/<session id>.json`. No other session writes
+ * that file, so sessions on one store never lose each other's counts.
+ */
+async function countUses(
+	$: EngineInterface,
+	session: Session,
+	paths: Paths,
+	kind: keyof Uses,
+	files: readonly string[],
+): Promise<void> {
+	if (files.length === 0 || session.sessionId === '') return;
+
+	const path = `${paths.dataDir}/uses/${session.sessionId}.json`;
+	await exclusively(path, async () => {
+		const uses = (await $.fs.exists(path)) ? usesOf(await readText($, path)) : usesOf('{}');
+		const last = new Date().toISOString();
+		for (const file of files) uses[kind][file] = {count: (uses[kind][file]?.count ?? 0) + 1, last};
+		await $.fs.write(path, `${JSON.stringify(uses, null, '\t')}\n`);
+	});
 }
 
 async function answerProposal(
@@ -1253,9 +1271,8 @@ async function reconcile($: EngineInterface, paths: Paths, cutoff: number): Prom
 	});
 }
 
-/** Deletes the reports written before the cutoff. */
-async function pruneReports($: EngineInterface, paths: Paths, cutoff: number): Promise<void> {
-	const dir = `${paths.dataDir}/reports`;
+/** Deletes the files of `dir` last written before the cutoff. */
+async function pruneExpired($: EngineInterface, dir: string, cutoff: number): Promise<void> {
 	if (!(await $.fs.exists(dir))) return;
 
 	const expired = (await $.fs.list(dir))
@@ -1916,16 +1933,30 @@ export function parseRecords(text: string): Records {
 	};
 }
 
-/** An entry record as records.json may hold it, including the fields that anchors replaced. */
+/** A session's use file as JSON holds it; a kind it lacks counts nothing yet. */
+export function usesOf(text: string): Uses {
+	const parsed: unknown = JSON.parse(text);
+	if (typeof parsed !== 'object' || parsed === null) throw new Error('a use file holds no object');
+	const uses = parsed as Partial<Uses>;
+
+	return {reads: uses.reads ?? {}};
+}
+
+/**
+ * An entry record as records.json may hold it, including the fields that anchors replaced and the read count that moved
+ * to the use files.
+ */
 type StoredEntryRecord = Omit<EntryRecord, 'origin'> & {
 	origin?: string | WriteOrigin;
 	writtenAt?: string;
 	evidence?: string;
 	premise?: readonly string[];
+	reads?: unknown;
 };
 
 function migratedOf(stored: StoredEntryRecord): EntryRecord {
 	const {origin, writtenAt, evidence, premise, ...record} = stored;
+	delete record.reads;
 	const anchors: Anchor[] = [...(record.anchors ?? [])];
 	if (evidence !== undefined && evidence !== '') anchors.push({type: 'quote', text: evidence});
 	for (const path of pathPremisesOf(premise ?? [])) anchors.push({type: 'file', path});
