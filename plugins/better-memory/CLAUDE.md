@@ -46,8 +46,9 @@ Run every command in this file from the repository root.
   and evidence anchors, plus instruction proposals), `uses/`, `reports/`, and `errors.log` for headless failures.
   `parseRecords` migrates records that hold the older `evidence` and `premise` fields, and drops the read counts records
   once held.
-- `uses/<session id>.json` counts the session's uses of each entry. Each session writes only its own file, because
-  sessions on one store rewrite `records.json` whole and would lose each other's counts.
+- `uses/<session id>.json` counts the session's uses of each entry: its reads, and its recalls apart from them. Each
+  session writes only its own file, because sessions on one store rewrite `records.json` whole and would lose each
+  other's counts.
 - Retention follows Claude Code's `cleanupPeriodDays` (30 days when unset): at session start the mod deletes reports and
   use files older than it and drops instruction proposals answered before it. A report is the only copy of a deleted
   entry's text, so a wrong removal stays recoverable for as long as the transcripts that could show it is wrong.
@@ -76,12 +77,18 @@ Run every command in this file from the repository root.
     stands (verified on 2.1.319).
   - A Read of an entry counts as a read in the session's use file; an entry that sift has not promoted gets an
     "unverified" note after the result.
+  - Claude Code's memory recall puts up to five entries in a `relevant_memories` attachment and makes no tool call, so
+    the Read hook never sees them. A `prompt.attachment` hook shows only what `MEMORY.md` lists: it drops an entry the
+    index leaves out, adds the "unverified" note to an entry sift has not promoted, and counts each entry left in as a
+    recall in the session's use file. `recallOf` splits the attachment at the `Memory: <path>:` header Claude Code
+    writes above each entry, and a body that matches its entry's file ends only past that file's text, so a line of an
+    entry that reads as a header does not split it. Claude Code adds a recall only after a tool round, so a turn
+    answered without a tool call gets none (verified on 2.1.319).
   - A failure inside the gate refuses a memory write and passes any other call.
 - The write rules are the `write_entry` description; Write and Edit carry a one-line pointer to the tools through
   `tool.describe`. Claude Code's own auto-memory section of the system prompt tells the model to write entries with
-  Write, and a mod cannot change it: on a machine with managed settings, the built-in `cc-plugin-sec-default` passes
-  `prompt.section`, `prompt.context`, `prompt.compose`, and `prompt.attachment` past every mod, and the engine announces
-  each skipped hook in the session (verified on 2.1.319).
+  Write. The mod leaves that section unchanged until a transcript shows the gate refusing a Write or Edit into memory,
+  or an entry of type `feedback`.
 - Sift is a child `claude -p` process the mod starts with `$.process.spawn`: no setting sources, no MCP servers, auto
   memory off, Read, Grep, and Glob as its only tools under `bypassPermissions`, Opus at medium effort, a $5 budget, and
   `SIFT_PROMPT` as its whole system prompt. It is not an agent of the session because Claude Code runs a mod's agent
@@ -151,6 +158,8 @@ Run every command in this file from the repository root.
   reads, or a page the entry links backs it.
 - An anchor in a transcript part that compaction replaced no longer holds at a write, because `$.session.messages()`
   returns the compacted transcript.
+- On a machine with managed settings, a mod outside the managed tier gets no `prompt.attachment` event, so recall shows
+  every entry, candidates included, with no note and no count.
 
 ## Plugin Scope
 
@@ -166,8 +175,9 @@ Run every command in this file from the repository root.
 - Sift runs Opus at medium effort. Opus at low effort and Sonnet at medium effort open too few files to confirm file
   anchors: on four real stores, both removed all 10 entries that Opus at medium effort promoted on file anchors. Change
   the model or the effort only after a run on real stores keeps the entries that Opus at medium effort promotes.
-- Hook engine events, never `classic.*` or `prompt.*`: a managed-tier plugin first in a chain can pass them past every
-  mod.
+- Hook engine events, never `classic.*`. A `prompt.*` hook only adds to what the mod does without it: on a machine with
+  managed settings, the built-in `cc-plugin-sec-default` passes `prompt.*` past every mod outside the managed tier, and
+  the engine announces each skipped hook in the session (verified on 2.1.319).
 - Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in
   `register.ts`. `claude plugin validate` reads the calls off the source.
 - Never call `$.ui.log` in a headless session: a log line after the result breaks `claude -p --output-format json`.

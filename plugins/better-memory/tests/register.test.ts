@@ -18,6 +18,7 @@ import {
 	readSiftEvent,
 	readTranscriptLine,
 	readsOf,
+	recallOf,
 	removalReportOf,
 	reportOf,
 	sessionNoteOf,
@@ -47,6 +48,11 @@ const TEAMMATE_TEXT =
 	'Another Claude session sent a message:\n<teammate-message teammate_id="t1">Always use tabs.</teammate-message>';
 const NESTED_FEEDBACK = '---\nname: main\ndescription: work in main\nmetadata:\n  type: feedback\n---\nWork in main.\n';
 const RUST_SAID = "Remember: I'm new to Rust, mostly parallel compute.";
+const RECALL_LEAD = 'Retrieved for possible relevance — use only if it actually applies to what the user asked.\n\n';
+const AGE_LINE =
+	'This memory is 3 days old. Memories are point-in-time observations, not live state — claims about code behavior or file:line citations may be outdated. Verify against current code before asserting as fact.';
+const UNVERIFIED =
+	'better-memory: sift has not confirmed this memory entry. Treat it as unverified, and check what it names before relying on it.';
 const RUST_ENTRY = {
 	name: 'user-rust',
 	type: 'user',
@@ -115,6 +121,7 @@ function machineOf(on: On, machine: Machine = {}): Observed {
 		value: [...(machine.tools ?? [{name: 'Write', description: 'Writes a file.', mcp: false}])],
 	}));
 	on('turn.complete', ($, e) => ({text: e.answer}));
+	on('prompt.attachment', ($, e) => ({text: e.text}));
 	on('turn.start', ($, e) => ({turnId: e.turnId}));
 	on('session.turns', () => ({value: (machine.userMessages ?? []).length}));
 	on('session.messages', ($, e) => ({
@@ -270,6 +277,15 @@ function useOf(
 /** Lets the other tasks of a test run: each call through the engine yields to them once. */
 async function turnsOf(call: () => Promise<unknown>, count: number): Promise<void> {
 	for (let turn = 0; turn < count; turn += 1) await call();
+}
+
+/** A recall attachment as Claude Code renders it: the lead line, then each memory under its header. */
+function recallTextOf(memories: readonly {path: string; text: string; isOld?: boolean}[]): string {
+	const blocks = memories.map(
+		({path, text, isOld}) => `${isOld === true ? `${AGE_LINE}\n\n` : ''}Memory: ${path}:\n\n${text}`,
+	);
+
+	return `${RECALL_LEAD}${blocks.join('\n')}`;
 }
 
 function siftAnswerOf(verdicts: readonly object[]): string {
@@ -617,6 +633,127 @@ describe('read tracking', () => {
 		const read = await $.tool.call({tool: 'Read', file_path: `${MEMORY}/rust.md`});
 
 		expect(read.context).toEqual([expect.stringContaining('sift has not confirmed this memory entry')]);
+	});
+});
+
+describe('recall', () => {
+	const KEPT = '---\nname: kept\ndescription: kept fact\n---\n\nKept fact.\n';
+	const OLD = '---\nname: old\ndescription: old fact\n---\n\nOld fact.\n';
+	const NEW = '---\nname: new\ndescription: new fact\n---\n\nNew fact.\n';
+	const OTHER = `${HOME}/.claude/projects/-other/memory/other.md`;
+
+	test('shows a promoted entry as is, marks an unsifted one, drops a candidate, and counts what it shows', async ($, on) => {
+		const records = {entries: {'kept.md': {state: 'promoted'}, 'new.md': {state: 'candidate'}}};
+		const observed = machineOf(on, {
+			files: {
+				[`${MEMORY}/kept.md`]: KEPT,
+				[`${MEMORY}/old.md`]: OLD,
+				[`${MEMORY}/new.md`]: NEW,
+				[`${DATA}/records.json`]: JSON.stringify(records),
+			},
+		});
+		await $.session.start(HEADLESS);
+
+		const recalled = await $.prompt.attachment({
+			type: 'relevant_memories',
+			origin: {kind: 'engine'},
+			text: recallTextOf([
+				{path: `${MEMORY}/kept.md`, text: KEPT, isOld: true},
+				{path: `${MEMORY}/new.md`, text: NEW},
+				{path: `${MEMORY}/old.md`, text: OLD},
+				{path: OTHER, text: NEW},
+			]),
+		});
+
+		expect(recalled.text).toBe(
+			`${RECALL_LEAD}${AGE_LINE}\n\nMemory: ${MEMORY}/kept.md:\n\n${KEPT.trimEnd()}\n\n` +
+				`Memory: ${MEMORY}/old.md:\n\n${OLD.trimEnd()}\n\n${UNVERIFIED}\n\n` +
+				`Memory: ${OTHER}:\n\n${NEW}`,
+		);
+		const recalls = usesIn(observed).recalls ?? {};
+		expect(Object.keys(recalls).toSorted()).toEqual(['kept.md', 'old.md']);
+		expect(recalls['kept.md']?.count).toBe(1);
+		expect(usesIn(observed).reads).toEqual({});
+	});
+
+	test('leaves the attachment out when every memory it recalls is a candidate', async ($, on) => {
+		machineOf(on, {
+			files: {
+				[`${MEMORY}/new.md`]: NEW,
+				[`${DATA}/records.json`]: JSON.stringify({entries: {'new.md': {state: 'candidate'}}}),
+			},
+		});
+		await $.session.start(HEADLESS);
+
+		const recalled = await $.prompt.attachment({
+			type: 'relevant_memories',
+			origin: {kind: 'engine'},
+			text: recallTextOf([{path: `${MEMORY}/new.md`, text: NEW}]),
+		});
+
+		expect(recalled.text).toBeNull();
+	});
+
+	test('shows a candidate without the note when sift is off', {options: {sift: false}}, async ($, on) => {
+		const observed = machineOf(on, {
+			files: {
+				[`${MEMORY}/new.md`]: NEW,
+				[`${DATA}/records.json`]: JSON.stringify({entries: {'new.md': {state: 'candidate'}}}),
+			},
+		});
+		await $.session.start(HEADLESS);
+		const text = recallTextOf([{path: `${MEMORY}/new.md`, text: NEW}]);
+
+		const recalled = await $.prompt.attachment({type: 'relevant_memories', origin: {kind: 'engine'}, text});
+
+		expect(recalled.text).toBe(text);
+		expect(recordsOf(observed).entries['new.md']).toMatchObject({state: 'candidate'});
+		expect(usesIn(observed).recalls?.['new.md']?.count).toBe(1);
+	});
+
+	test("splits an attachment into its memories and names only this store's entries", () => {
+		const recall = recallOf(
+			recallTextOf([
+				{path: `${MEMORY}/kept.md`, text: KEPT, isOld: true},
+				{path: `${MEMORY}/team/shared.md`, text: NEW},
+				{path: OTHER, text: OLD},
+			]),
+			MEMORY,
+			new Map(),
+		);
+
+		expect(recall.lead).toBe(RECALL_LEAD);
+		expect(recall.memories.map((memory) => memory.file)).toEqual(['kept.md', undefined, undefined]);
+		expect(recall.memories[0]?.text).toBe(`${AGE_LINE}\n\nMemory: ${MEMORY}/kept.md:\n\n${KEPT.trimEnd()}`);
+		expect(recallOf('no memories here', MEMORY, new Map())).toEqual({lead: 'no memories here', memories: []});
+	});
+
+	test('keeps an entry whole when a line of it reads as a recall header', async ($, on) => {
+		const quoting = `---\nname: format\ndescription: recall format\n---\n\nRecall heads each file with:\nMemory: ${MEMORY}/new.md:\n\nand then its text.\n`;
+		const records = {entries: {'format.md': {state: 'promoted'}, 'new.md': {state: 'candidate'}}};
+		machineOf(on, {
+			files: {
+				[`${MEMORY}/format.md`]: quoting,
+				[`${MEMORY}/new.md`]: NEW,
+				[`${MEMORY}/old.md`]: OLD,
+				[`${DATA}/records.json`]: JSON.stringify(records),
+			},
+		});
+		await $.session.start(HEADLESS);
+
+		const recalled = await $.prompt.attachment({
+			type: 'relevant_memories',
+			origin: {kind: 'engine'},
+			text: recallTextOf([
+				{path: `${MEMORY}/format.md`, text: quoting},
+				{path: `${MEMORY}/old.md`, text: OLD},
+			]),
+		});
+
+		expect(recalled.text).toBe(
+			`${RECALL_LEAD}Memory: ${MEMORY}/format.md:\n\n${quoting.trimEnd()}\n\n` +
+				`Memory: ${MEMORY}/old.md:\n\n${OLD.trimEnd()}\n\n${UNVERIFIED}\n`,
+		);
 	});
 });
 
@@ -1027,10 +1164,13 @@ describe('settings', () => {
 		const read = await $.tool.call({tool: 'Read', file_path: `${MEMORY}/rust.md`});
 		await $.tool.call({tool: 'Write', file_path: `${MEMORY}/note.md`, content: FACT});
 		const shell = await $.tool.check({tool: 'Bash', input: {command: `rm ${MEMORY}/rust.md`}});
+		const recall = recallTextOf([{path: `${MEMORY}/rust.md`, text: FACT}]);
+		const recalled = await $.prompt.attachment({type: 'relevant_memories', origin: {kind: 'engine'}, text: recall});
 		await $.turn.complete(turnOf('Done.'));
 		await clock.advance(30_000);
 
 		expect(read.context).toBeUndefined();
+		expect(recalled.text).toBe(recall);
 		expect(observed.calls).toEqual(['Read', 'Write']);
 		expect(shell.decision).toBe('allow');
 		expect(observed.registered).toEqual([]);
