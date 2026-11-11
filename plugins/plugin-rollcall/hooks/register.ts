@@ -19,9 +19,9 @@ const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
 
 /**
  * Registers the roll call: in an interactive session where a plugin the settings enable is missing, it runs
- * `/reload-plugins`. A plugin is missing when it comes from a known marketplace and has no install record for the user
- * or for this project, so Claude Code skipped it at startup. A plugin is also missing when a call to one of its skills
- * fails as unknown while no command of it is listed, install records aside.
+ * `/reload-plugins`. A plugin is missing when it comes from a known marketplace and has no install record for the user,
+ * for the managed settings, or for this project, so Claude Code skipped it at startup. A plugin is also missing when a
+ * call to one of its skills fails as unknown while no command of it is listed, install records aside.
  *
  * At session start the reload holds the first prompt until it completes. After `/clear`, a resume, a compaction of the
  * main conversation, or a failed skill call, the reload runs once that transition or turn finishes, and the occasions
@@ -233,7 +233,7 @@ function recordedIdsOf(file: unknown, root: string): Set<string> {
 		for (const record of records) {
 			const {scope, projectPath} = objectOf(`installed_plugins.json ${id} record`, record);
 			if (typeof scope !== 'string') throw new Error(`installed_plugins.json: a ${id} record has no scope`);
-			if (scope === 'user' || projectPath === root) recorded.add(id);
+			if (scope === 'user' || scope === 'managed' || projectPath === root) recorded.add(id);
 		}
 	}
 
