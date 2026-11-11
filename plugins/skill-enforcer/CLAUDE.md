@@ -51,7 +51,8 @@ literals, because `claude plugin validate` reads a matcher off the source; chang
 - On a machine with managed settings, the built-in `cc-plugin-sec-default` passes `session.compact`, `prompt.compose`,
   `skill.prompt`, and every `classic.*` event past a mod outside the managed tier, while `prompt.submit`, `tool.call`,
   and `session.end` reach it (verified on 2.1.319). There a compaction gets no SEF instructions, and the framework
-  returns only at the next process start, `/clear`, or resume. The reminders are unaffected.
+  returns only at the next process start, `/clear`, or resume. The reminders are unaffected. A mod that managed
+  settings list in `prependPlugins` ahead of `sec-default@builtin` receives `session.compact` (verified on 2.1.319).
 - A subagent's conversation gets the tool reminders and never the framework.
 
 ## Conventions

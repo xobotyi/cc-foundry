@@ -173,10 +173,10 @@ versions leaked into visible output.
 - Some organizations manage a plugin that intercepts compaction before any other plugin sees it. Under such a plugin
   the mod adds no compaction instructions and does not learn of the compaction, so the framework returns only when you
   start Claude Code again, run `/clear`, or resume a session. The reminders keep working, and each one carries its full
-  rule.
+  rule. A mod that the organization's managed settings load ahead of that plugin is not affected.
 - A subagent gets the reminders after its tool calls and never the framework.
-- Tested with Claude Code 2.1.319, headless. The framework's return after `/clear`, a resume, and a compaction is
-  covered by the test suite only.
+- Tested with Claude Code 2.1.319. The framework's return after a compaction is tested with the mod loaded from managed
+  settings; its return after `/clear` and after a resume is covered by the test suite only.
 
 ## License
 
