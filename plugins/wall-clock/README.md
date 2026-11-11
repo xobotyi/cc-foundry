@@ -3,13 +3,13 @@
 # wall-clock
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![Claude Code 2.1.319+](https://img.shields.io/badge/Claude%20Code-2.1.319%2B%20mod-d97757.svg)](https://claude.com/blog/claude-code-mods)
 
 </div>
 
 The agent knows the time of day, how long you were away, and how long its current turn has run.
 
-Two ticks from one turn of a session in this repository ([`hooks/wall-clock.mts`](hooks/wall-clock.mts)):
+Two ticks from one turn of a session in this repository ([`hooks/register.ts`](hooks/register.ts)):
 
 ```text
 <wall-clock at="Thu 2026-10-29 11:24:09+01:00" away="2m36s"/>
@@ -35,27 +35,25 @@ problem.
 
 ## The Solution
 
-Three hooks and one script. Nothing to configure to get started:
+One mod that Claude Code loads itself. It runs no process and needs nothing installed besides Claude Code:
 
-- **On every prompt** — `<wall-clock at="Mon 2026-08-17 18:21:19+02:00" away="1h04m"/>`. The `away` figure is the gap
-  since the agent last spoke, so a returning user is visible.
-- **During a turn** — `<wall-clock at="…" turn="12m30s"/>`, at most once a minute. Long autonomous runs stay time-aware
-  without the agent stopping to run a command.
-- **Before compaction** — a note telling the compactor to drop the accumulated blocks, since the next turn re-injects a
+- **On a prompt** — `<wall-clock at="Mon 2026-08-17 18:21:19+02:00" away="1h04m"/>`. The `away` figure is the time since
+  the agent's last turn ended, so a returning user is visible.
+- **During a turn** — `<wall-clock at="…" turn="12m30s"/>` after a tool result, at most once a minute. Long autonomous
+  runs stay time-aware without the agent stopping to run a command. A subagent gets its own ticks, counted from the
+  start of its own turn.
+- **Before compaction** — a note telling the compactor to drop the accumulated blocks, since the next tick brings a
   fresh one.
 
-The first tick of a session carries one extra line explaining that the newest block is the current time and that `date`
-answers when a turn needs better precision than the last tick.
+The first tick of a conversation carries one extra line explaining that the newest block is the current time and that
+`date` answers when a turn needs better precision than the last tick.
 
-Two design choices matter for how much you can trust the numbers. Elapsed figures are computed in the hook, so the model
-never subtracts timestamps and never invents a duration. And there is no state file: every figure comes from the
-transcript Claude Code is already writing, so a resumed session, a crash, or two sessions in the same project cannot
-produce a stale reading.
+Elapsed figures are computed in the mod, so the model never subtracts timestamps and never invents a duration. The mod
+saves when the last turn of each session ended, so a session you resume the next day still reports how long you were
+away, and one session never borrows the figure of another. Where it has nothing to count from, it gives the time alone
+instead of guessing.
 
 ## Installation
-
-The hook needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and Claude Code runs it
-with `node`, which strips the types itself, so nothing is built at install time.
 
 ```text
 /plugin install wall-clock --marketplace xobotyi/cc-foundry
@@ -63,35 +61,28 @@ with `node`, which strips the types itself, so nothing is built at install time.
 
 ## Configuration
 
-The tick period defaults to one minute. Change it in `~/.claude/settings.json` or a project's
-`.claude/settings.local.json`:
+The tick period defaults to one minute. Change **Tick period** for `wall-clock` in `/config`, or set the `tickSeconds`
+option in your user `settings.json`:
 
 ```json
-{"env": {"FOUNDRY_WALL_CLOCK_TICK_SECONDS": "300"}}
+{"pluginConfigs": {"wall-clock@foundry": {"options": {"tickSeconds": 300}}}}
 ```
 
-`0` ticks on every tool batch. That helps when you are debugging something timing-sensitive, and costs tokens the rest
-of the time. A value that is not a non-negative number is ignored with a warning on stderr, and the default applies.
+`0` sets no minimum, so a tick follows each tool call that was not denied. That helps when you are debugging something
+timing-sensitive, and costs tokens the rest of the time. A negative value is read as the default.
 
 Budget for the context cost before you lower it: a tick is roughly 20 tokens, so a minute-long period costs about 1.2k
 tokens per hour of continuous autonomous work.
 
-## What It Costs
-
-The script spawns on every prompt and every tool batch, whether or not it emits anything, because deciding to stay quiet
-means finding the previous tick first. Each run reads at most 256 KB from the end of the transcript, no matter how large
-that file grows, and those bytes are almost always in the page cache because Claude Code wrote them moments earlier. One
-run takes about 26ms, most of it Node startup.
-
 ## Limits
 
-- The scan only sees the last 256 KB of the transcript, and it never reads more. A burst of very large tool output
-  pushes the previous tick and the start of your turn out of view, so that tick reports the time with no elapsed figure.
-  For the same reason a period longer than the window can hold degrades to a shorter one, which keeps the knob practical
-  in minutes rather than hours.
-- Teammates and subagents are untested. Hook payloads carry an agent id inside a subagent, so ticks probably do fire
-  there, anchored on the spawn prompt.
-- `turn` is the only elapsed figure during a turn. There is no session age and no per-tool duration yet.
+- `away` needs a saved turn end of the same session on the same machine. A new session, a forked one, a session you
+  continue on another machine, and one you resume after more than 30 days start with the time alone.
+- A prompt you type while a turn is still running gets no tick, because Claude Code queues it and the time would be old
+  by the time the model reads it. The next tool result carries one instead.
+- On a machine with managed settings, Claude Code does not let a mod you installed yourself add to the compaction
+  instructions, so the compactor gets no note there. The ticks are unaffected.
+- `away` and `turn` are the only elapsed figures. There is no session age and no per-tool duration.
 
 ## License
 

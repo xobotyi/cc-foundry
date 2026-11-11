@@ -20,7 +20,7 @@ styles, hooks, and workflow automation.
 - `plugins/cli/` — CLI platform discipline (CLI design, shell scripting)
 - `plugins/open-source/` — open-source contribution discipline (issues, pull requests)
 - `plugins/golang/`, `plugins/javascript/`, `plugins/php/`, `plugins/python/`, `plugins/rust/` — language disciplines
-- `plugins/wall-clock/` — wall-clock and elapsed-time grounding for agent context (hook-only)
+- `plugins/wall-clock/` — wall-clock and elapsed-time grounding for agent context (mod)
 - `plugins/plugin-rollcall/` — reloads settings-enabled plugins that Claude Code skipped at startup (mod)
 - `plugins/better-memory/` — gates auto-memory writes and sifts entries to facts that still hold (mod)
 
