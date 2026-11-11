@@ -1,41 +1,4 @@
 {
-	"description": "Injects wall-clock time and elapsed intervals into context at turn and tool-batch boundaries",
-	"hooks": {
-		"UserPromptSubmit": [
-			{
-				"hooks": [
-					{
-						"type": "command",
-						"command": "node",
-						"args": ["${CLAUDE_PLUGIN_ROOT}/hooks/wall-clock.mts"],
-						"timeout": 5
-					}
-				]
-			}
-		],
-		"PostToolBatch": [
-			{
-				"hooks": [
-					{
-						"type": "command",
-						"command": "node",
-						"args": ["${CLAUDE_PLUGIN_ROOT}/hooks/wall-clock.mts"],
-						"timeout": 5
-					}
-				]
-			}
-		],
-		"PreCompact": [
-			{
-				"hooks": [
-					{
-						"type": "command",
-						"command": "node",
-						"args": ["${CLAUDE_PLUGIN_ROOT}/hooks/wall-clock.mts"],
-						"timeout": 5
-					}
-				]
-			}
-		]
-	}
+	"description": "Injects wall-clock time and elapsed intervals into context beside prompts and after tool results",
+	"modules": ["./register.ts"]
 }
