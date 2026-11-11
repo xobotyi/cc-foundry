@@ -119,8 +119,8 @@ Contributing to a project you don't maintain means following rules that live out
 
 ### wall-clock
 
-Claude Code gives the model today's date and nothing else about time. Hooks inject the wall clock on every prompt, with
-how long you were away, and once a minute during a long turn. [Read more](plugins/wall-clock/)
+Claude Code gives the model today's date and nothing else about time. A mod injects the wall clock with your prompt,
+with how long you were away, and once a minute during a long turn. [Read more](plugins/wall-clock/)
 
 ### the-statusline
 

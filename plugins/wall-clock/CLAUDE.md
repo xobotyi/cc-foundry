@@ -1,73 +1,85 @@
 # wall-clock Plugin
 
-Injects wall-clock time and elapsed intervals into model context at turn and tool-batch boundaries, so the agent knows
-what time it is and how long the current work has been running. Claude Code itself supplies only a calendar date, frozen
-at process start.
+A Claude Code mod that injects wall-clock time and elapsed intervals into model context beside prompts and after tool
+results, so the agent knows what time it is and how long the current work has been running. Claude Code itself supplies
+only a calendar date, frozen at process start. Why it is a mod, and where it holds its state:
+[ADR 1.15](/design-docs/adr/1.15-wall-clock-state.md).
 
 ## Components
 
-- **`hooks/wall-clock.mts`** — the whole implementation, a TypeScript module Node 26 runs directly, with no
-  dependencies. `respond` holds the logic; the entry point only reads stdin and the tick-period knob.
-- **`hooks/hooks.json`** — registers the three events, 5s timeout each.
-- **`hooks/wall-clock.test.mts`** — pins the anchors, the throttle and the shapes a tick is recorded in, the failure
-  paths, and the formatting, against transcripts written per test. Run `vp test plugins/wall-clock` after any change to
-  the hook.
+Run every command in this file from the repository root.
+
+- **`hooks/register.ts`** — the whole implementation, loaded through `modules` in `hooks/hooks.json`.
+  `claude plugin validate plugins/wall-clock` lists its hooks: `prompt.submit`, `turn.start`, `turn.complete`,
+  `session.start`, `tool.call`, `session.compact`, `session.end`.
+- **`tests/register.test.ts`** — the test-kit suite. It pins the anchors, the period, the legend, the compaction note,
+  and the formatting, on a mocked clock. Run `claude plugin test plugins/wall-clock` after any change to the module.
+- **`tsconfig.json`** — extends `.claude-plugin/types/tsconfig.json`, which Claude Code generates for its own version
+  and gitignores. Start `claude --plugin-dir plugins/wall-clock` interactively once to generate it, then type-check with
+  `yarn dlx -p typescript tsc -p plugins/wall-clock`.
 
 ## How It Works
 
-Every figure derives from the session transcript Claude Code already writes. The hook keeps no state of its own, so
-nothing can go stale across `--resume`, a crash, or two concurrent sessions in one project.
+A tick is one block of the `context` a prompt enters with, or of the `context` a tool result returns with. The model
+reads it and the user never sees it.
 
-- **UserPromptSubmit** — emits `at` plus `away`, the gap since the agent last spoke.
-- **PostToolBatch** — emits `at` plus `turn`, elapsed since the current prompt landed, throttled to one tick per period.
-- **PreCompact** — emits an instruction to drop the accumulated ticks, which are re-injected on the next turn anyway.
-  The instruction goes out as plain stdout, never as JSON: Claude Code merges a PreCompact hook's plain stdout into the
-  compaction instructions and rejects `hookSpecificOutput` for this event (verified on 2.1.310).
+- `prompt.submit` while the session is idle -> `at` plus `away`, the time since the last turn of this session's main
+  conversation ended
+- `tool.call` that was not denied -> `at` plus `turn`, the time since the turn of that conversation started, at most
+  once per period
+- `session.compact` -> the compaction note, after the instructions the compaction already has
 
-**Anchors** — chosen so that neither event depends on whether the current prompt has reached the transcript yet:
+**State in the process** — the mod keeps one loop record for the main conversation and one per subagent id: when its
+turn started (`turn.start`), when it last got a tick, and whether it holds the legend. Every time comes from
+`$.clock.now()`, which the test kit mocks; `Date` only formats it.
 
-- `away` — newest `type: "assistant"` entry.
-- `turn` — newest `type: "user"` entry with no `attachment`, no `isMeta`, and text content. Tool results carry only
-  `tool_result` blocks, so they are excluded; an image prompt carries text beside the image, so it is included.
+**State in the store** — a main `turn.complete` writes its time to `$.store` under `turnEndedAt:<session id>`, and
+`prompt.submit` reads the key of `$.session.id()` for `away`. The store is the only source of `away`.
 
-**Throttle** — also stateless. The previous tick is found by scanning the transcript tail for `<wall-clock `, matching
-only inside `attachment.stdout` or `attachment.content`. Batch ticks are recorded in both forms and prompt ticks only in
-`content`, so both fields must be read or a prompt tick fails to throttle the batch tick behind it. `content` is a
-string in a `hook_success` attachment and an array of strings in a `hook_additional_context` one, so both shapes are
-read (2.1.310). Requiring the attachment is what stops the hook's own source, quoted into the transcript by a Read or a
-Write, from matching itself; an instruction file loaded into context is a `nested_memory` attachment whose `content` is
-an object, and it never counts.
+- A turn end belongs to one session id. A new session, a `/clear`, and a `--fork-session` resume have another id and
+  get no `away` from it; `claude --resume` keeps the id and gets it (verified on 2.1.319).
+- `session.start` deletes every turn end older than 30 days, so the store stays bounded.
+- A subagent's turn end is not stored.
 
-**Failure paths** — the exit code is always 0 and a diagnostic goes to stderr (visible under `claude --debug`), because
-a hook that disturbs a session is worse than a missing tick:
+**Ticks and the legend:**
 
-- Malformed hook payload — nothing emitted.
-- Unreadable transcript, batch event — nothing emitted. Without the transcript there is no throttle, and a tick would
-  otherwise fire on every batch.
-- Unreadable transcript, prompt event — `at` only, no elapsed field.
-- Anchor outside the window — `at` only. The absolute time is always correct; an elapsed figure is omitted rather than
-  guessed, and the window is never widened to hunt for the anchor.
+- A prompt's tick counts toward the period of the main conversation. A dropped prompt counts for nothing.
+- A subagent's tool results count from its own turn and its own last tick.
+- A prompt submitted while a turn runs (`e.turnId` is set) gets no tick: `prompt.submit` fires when the prompt is typed,
+  the engine then queues it, and the stamp would be stale when the model reads it. The period restarts instead, so the
+  next tool result of the main conversation carries a tick.
+- The legend rides on the first tick of a conversation, and again on the first tick after a compaction of that
+  conversation that was not skipped. `/clear` and a resume (`session.end`) start the main record over.
+- A reload of the module starts every loop record over.
+
+**Failure** — a hook that throws is skipped by the engine and the event goes on without a tick. The mod adds no
+`.catch`: a missing tick is the correct result of a failure.
 
 ## Configuration
 
-- **`FOUNDRY_WALL_CLOCK_TICK_SECONDS`** — minimum seconds between batch ticks. Default 60. `0` ticks on every batch.
-  Non-numeric and negative values warn on stderr and fall back to the default.
-
-## Conventions
-
-- **One vocabulary.** The plugin is `wall-clock`, the script is `wall-clock.mts`, the injected tag is `<wall-clock>`,
-  and one emission is a **tick**. Never introduce a second word for any of them.
-- **Elapsed values are computed in the hook**, never left to the model. An injected figure must never require the model
-  to subtract two timestamps.
-- **Sync `fs` calls are correct here** — this is a one-shot CLI process with no event loop to starve.
+- **`tickSeconds`** (`userConfig`, number, default 60) — minimum seconds between two ticks of one conversation during a
+  turn. `0` sets no minimum. A negative value reads as the default.
 
 ## Known Limits
 
-- **Window-bounded scan** — the tail scan reads 256 KB, once, and never retries wider. A burst of large tool output
-  pushes both the anchor and the previous tick out of view, so that tick carries the time without an elapsed figure and
-  is not throttled against its predecessor. A period longer than the window can hold degrades to a shorter one, which
-  puts the practical ceiling on the knob in minutes, not hours.
-- **Subagents unverified** — hook payloads carry `agent_id` inside a subagent, so batch ticks probably fire in teammate
-  loops anchored on the spawn prompt. Untested.
-- **No session age and no tool durations.** `turn` is the only elapsed figure during autonomous work; the file's
-  `birthtime` is not the session start.
+- **No `away` where the store holds no turn end of the session.** A forked session, a session continued on another
+  machine, and a session resumed after 30 days carry `at` alone on their first prompt.
+- **No `turn` after a module reload mid-turn.** The turn start lives in the process.
+- **No tick for a turn that calls no tool after a prompt typed mid-turn.** That prompt gets none, and only a tool result
+  carries the next one.
+- **Compaction under managed settings.** The built-in `cc-plugin-sec-default` passes `session.compact` past a mod
+  outside the managed tier (verified on 2.1.319), so there a compaction gets no note and the legend does not return
+  after it. `prompt.submit`, `turn.start`, `turn.complete`, and `tool.call` reach the mod (verified on 2.1.319).
+- **No session age and no tool durations.** `away` and `turn` are the only elapsed figures.
+
+## Conventions
+
+- **One vocabulary.** The plugin is `wall-clock`, the injected tag is `<wall-clock>`, one emission is a **tick**, and
+  the minimum time between two ticks is the **period**. Never introduce a second word for any of them.
+- **Elapsed values are computed in the mod**, never left to the model. An injected figure must never require the model
+  to subtract two timestamps.
+- **A tick never carries a stale time.** Where the model reads a context later than the mod writes it, the mod writes
+  no tick.
+- **Mod API** — hook engine events, never `classic.*`: a managed-tier plugin passes every `classic.*` event past the
+  mod. Write each mods API call in full as `$.namespace.method(...)`; `claude plugin validate` reads the calls off the
+  source.
