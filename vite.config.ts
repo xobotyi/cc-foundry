@@ -20,9 +20,9 @@ export default defineConfig({
 		include: ['src/**/*.test.ts', 'plugins/**/*.test.mts'],
 	},
 	lint: {
-		// constraint: these files type-check against types Claude Code writes only when it loads the mod
-		// interactively, so a checkout without them fails with an invalid tsconfig
-		ignorePatterns: ['plugins/plugin-rollcall/**/*.ts', 'plugins/better-memory/**/*.ts'],
+		// constraint: a mod's .ts files type-check against types Claude Code writes only when it loads the mod
+		// interactively, so a checkout without them fails with an invalid tsconfig; a plugin script is .mts
+		ignorePatterns: ['plugins/**/*.ts'],
 		extends: [javascript, typescript, node, vitest],
 		options: {typeAware: true, typeCheck: true},
 	},
