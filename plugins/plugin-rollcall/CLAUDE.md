@@ -5,7 +5,7 @@ A Claude Code mod that works around
 settings is skipped at startup when `installed_plugins.json` holds no install record for the user, for the managed
 settings, or for the session's project path. At `session.start`, and again after `/clear`, a resume, or a compaction,
 the mod finds such plugins and runs `/reload-plugins`, which loads them. A failed skill call of an enabled plugin that
-lists no command triggers the same reload, install records aside.
+lists no command ends the turn, triggers the same reload, install records aside, and resumes the task with a prompt.
 
 ## Components
 
@@ -13,7 +13,7 @@ Run every command in this file from the repository root.
 
 - **`hooks/register.ts`** — the whole implementation, loaded through `modules` in `hooks/hooks.json`.
   `claude plugin validate plugins/plugin-rollcall` lists its hooks: `session.start`, `session.end`, `session.compact`,
-  `tool.call`.
+  `tool.call`, `turn.step`, `turn.complete`.
 - **`tests/register.test.ts`** — the test-kit suite. Run `claude plugin test plugins/plugin-rollcall` after any change
   to the module.
 - **`tsconfig.json`** — extends `.claude-plugin/types/tsconfig.json`, which Claude Code generates for its own version
@@ -36,8 +36,20 @@ Run every command in this file from the repository root.
   fires share its reload.
 - A failed `Skill` call whose error reads `Unknown skill: <plugin>:<skill>` marks the plugin missing, install records
   aside, when an enabled plugin of that name comes from a known marketplace and `$.command.list()` lists no command of
-  it. The mod schedules the reload, which runs once the turn ends even when the install records cannot be read, and adds
-  a note to the failed result that names the reload (verified on 2.1.316).
+  it. The reload it triggers runs even when the install records cannot be read, and a note on the failed result tells
+  the model what follows.
+- A `$.command.run` queued mid-turn runs only once the turn ends, so a turn that goes on without the skill can run for
+  many minutes, and an interrupt drops the queued reload (`the command was removed from the queue before it ran`,
+  observed on 2.1.319). For a failure in the main conversation, the next `turn.step` calls `$.turn.abort`. At
+  `turn.complete` with `reason: "aborted"`, the mod schedules the reload, then `$.prompt.submit`s a prompt that names
+  the failed skills and asks the model to call them again and continue. The submitted prompt starts a turn of its own
+  once the session is idle (verified on 2.1.319). A turn that ends before its next step, or whose abort is refused,
+  gets the reload with no prompt.
+- After that reload the mod reads `$.command.list()` again. The prompt names a failed plugin that still lists no command
+  as not loaded and asks for no retry of its skills, and the mod acts on no later failure of that plugin in the session.
+  Without that, a plugin the reload cannot load would end every turn that calls its skill.
+- A failure inside a subagent (`agentId` on the call) does not end the main turn. The mod schedules the reload, which
+  runs once the main turn ends.
 - The `install` option turns on install mode. Claude Code stores it under `pluginConfigs[<id>].options` in user settings
   (verified on 2.1.316). After a reload, the mod runs `claude plugin install <id> --scope local` from the session root
   for each plugin without a record, in the background and one at a time. That writes a `local` record and an
@@ -66,7 +78,9 @@ Run every command in this file from the repository root.
 - Where a managed-tier plugin passes `session.compact` past the mods, no reload follows a compaction until a skill call
   of a missing plugin fails.
 - A plugin with no skills or commands never lists one, so a failed call to a skill it lacks reloads it even when it is
-  loaded.
+  loaded, and ends the turn once before the mod stops acting on it.
+- Ending the turn drops the rest of what the model planned in it; the prompt that resumes the task carries only the
+  failed skills' names.
 - Install mode's `enabledPlugins` entry in `.claude/settings.local.json` outranks the project's settings: a plugin the
   project later disables stays enabled in that checkout until the entry is removed.
 

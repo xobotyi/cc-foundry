@@ -3,6 +3,13 @@ import type {EngineInterface, On, PluginOptions} from 'claude-code';
 type ScheduledRollCall = {
 	readonly occasion: string;
 	readonly unloaded: Set<string>;
+	readonly resumed: string[];
+};
+
+type FailedSkills = {
+	readonly skills: string[];
+	readonly unloaded: Set<string>;
+	isEnding: boolean;
 };
 
 type SessionState = {
@@ -10,6 +17,8 @@ type SessionState = {
 	isInteractive: boolean;
 	isInstalling: boolean;
 	scheduled?: ScheduledRollCall;
+	failed?: FailedSkills;
+	readonly unloadable: Set<string>;
 };
 
 const INSTALL_TIMEOUT_MS = 120_000;
@@ -25,8 +34,12 @@ const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
  *
  * At session start the reload holds the first prompt until it completes. After `/clear`, a resume, a compaction of the
  * main conversation, or a failed skill call, the reload runs once that transition or turn finishes, and the occasions
- * that come before it share it. A failed skill call tells the model that the mod tries to reload its plugin when the
- * turn ends, and its reload runs even when the install records cannot be read.
+ * that come before it share it. A failed skill call's reload runs even when the install records cannot be read.
+ *
+ * A failed skill call of the main conversation ends its turn before the next model request. Once the reload has run, a
+ * prompt from the mod asks the model to call the skills again, or to go on without a plugin the reload did not load.
+ * The mod acts on no later failure of such a plugin. A failed skill call of a subagent tells the model that the mod
+ * tries to reload its plugin when the turn ends.
  *
  * With the `install` option on, a reload also starts `claude plugin install <id> --scope local` in the background for
  * each plugin without an install record, which writes the record and enables the plugin in the project's
@@ -36,7 +49,12 @@ const UNKNOWN_PLUGIN_SKILL = /Unknown skill: ([^\s:<]+):/;
  * @param options the plugin's `userConfig` values: `install`, a boolean that defaults to false
  */
 export function register(on: On, options: PluginOptions): void {
-	const session: SessionState = {isInstallMode: options.install === true, isInteractive: false, isInstalling: false};
+	const session: SessionState = {
+		isInstallMode: options.install === true,
+		isInteractive: false,
+		isInstalling: false,
+		unloadable: new Set(),
+	};
 
 	on('session.start', async ($, e, next) => {
 		session.isInteractive = e.isInteractive;
@@ -70,14 +88,50 @@ export function register(on: On, options: PluginOptions): void {
 
 			return undefined;
 		});
-		if (unloaded === undefined) return call;
+		if (unloaded === undefined || session.unloadable.has(unloaded)) return call;
 
-		scheduleRollCall($, session, `after ${e.skill} failed`, [unloaded]);
-		const note =
-			`plugin-rollcall: Claude Code lists no skill or command of the ${unloaded} plugin, ` +
-			'so plugin-rollcall tries to reload it when this turn ends.';
+		const lead = `plugin-rollcall: Claude Code lists no skill or command of the ${unloaded} plugin, `;
+		if (e.agentId !== undefined) {
+			scheduleRollCall($, session, `after ${e.skill} failed`, [unloaded]);
 
-		return {...call, context: [...(call.context ?? []), note]};
+			return {
+				...call,
+				context: [...(call.context ?? []), `${lead}so plugin-rollcall tries to reload it when this turn ends.`],
+			};
+		}
+
+		session.failed ??= {skills: [], unloaded: new Set(), isEnding: false};
+		if (!session.failed.skills.includes(e.skill)) session.failed.skills.push(e.skill);
+		session.failed.unloaded.add(unloaded);
+
+		return {
+			...call,
+			context: [...(call.context ?? []), `${lead}so plugin-rollcall ends this turn and reloads the plugins.`],
+		};
+	});
+
+	// constraint: a queued reload waits for the turn to end; `$.turn.abort` stops the turn's running tool calls, and the
+	// calls of a step have all finished when the next step starts
+	on('turn.step', async function* ($, e, next) {
+		const failed = session.failed;
+		if (e.agentId === undefined && failed !== undefined && !failed.isEnding) {
+			failed.isEnding = true;
+			await $.turn.abort({turnId: e.turnId}).catch((err: unknown) => $.ui.log(`roll call failed: ${String(err)}`));
+		}
+
+		return yield* next(e);
+	});
+
+	on('turn.complete', async ($, e, next) => {
+		const completed = await next(e);
+		const failed = session.failed;
+		if (e.agentId !== undefined || failed === undefined) return completed;
+
+		session.failed = undefined;
+		const resumed = failed.isEnding && e.reason === 'aborted' ? failed.skills : [];
+		scheduleRollCall($, session, `after ${failed.skills.join(', ')} failed`, [...failed.unloaded], resumed);
+
+		return completed;
 	});
 }
 
@@ -86,20 +140,22 @@ function scheduleRollCall(
 	session: SessionState,
 	occasion: string,
 	unloaded: readonly string[] = [],
+	resumed: readonly string[] = [],
 ): void {
 	if (!session.isInteractive) return;
 
 	if (session.scheduled !== undefined) {
 		for (const id of unloaded) session.scheduled.unloaded.add(id);
+		session.scheduled.resumed.push(...resumed);
 		return;
 	}
 
-	const scheduled: ScheduledRollCall = {occasion, unloaded: new Set(unloaded)};
+	const scheduled: ScheduledRollCall = {occasion, unloaded: new Set(unloaded), resumed: [...resumed]};
 	session.scheduled = scheduled;
 	// constraint: Claude Code refuses `$.command.run` from a hook that the turn or a command waits on; a timer runs it after
 	$.clock.after(0, () => {
 		session.scheduled = undefined;
-		void rollCall($, session, scheduled.occasion, [...scheduled.unloaded]);
+		void rollCall($, session, scheduled.occasion, [...scheduled.unloaded], scheduled.resumed);
 	});
 }
 
@@ -108,8 +164,9 @@ async function rollCall(
 	session: SessionState,
 	occasion: string,
 	unloaded: readonly string[] = [],
+	resumed: readonly string[] = [],
 ): Promise<void> {
-	await reloadMissing($, session, occasion, unloaded).catch((err: unknown) =>
+	await reloadMissing($, session, occasion, unloaded, resumed).catch((err: unknown) =>
 		$.ui.log(`roll call failed: ${String(err)}`),
 	);
 }
@@ -119,6 +176,7 @@ async function reloadMissing(
 	session: SessionState,
 	occasion: string,
 	unloaded: readonly string[],
+	resumed: readonly string[],
 ): Promise<void> {
 	const unrecorded = await missingPluginsOf($).catch((err: unknown) => {
 		$.ui.log(`roll call failed: ${String(err)}`);
@@ -131,6 +189,8 @@ async function reloadMissing(
 		$.ui.log(`reloaded plugins ${occasion}: ${missing.join(', ')}`);
 	}
 
+	if (resumed.length > 0) await resumeTurn($, session, resumed, unloaded);
+
 	if (!session.isInstallMode || unrecorded.length === 0 || session.isInstalling) return;
 
 	session.isInstalling = true;
@@ -139,6 +199,34 @@ async function reloadMissing(
 		.finally(() => {
 			session.isInstalling = false;
 		});
+}
+
+async function resumeTurn(
+	$: EngineInterface,
+	session: SessionState,
+	skills: readonly string[],
+	unloaded: readonly string[],
+): Promise<void> {
+	const commands = await $.command.list();
+	const listed = new Set(commands.map((command) => command.plugin));
+	const failedPlugins = new Set(skills.map((skill) => skill.slice(0, skill.indexOf(':'))));
+	const lost = unloaded.filter((id) => failedPlugins.has(pluginNameOf(id)) && !listed.has(pluginNameOf(id)));
+	for (const id of lost) session.unloadable.add(id);
+	const retried = skills.filter((skill) => listed.has(skill.slice(0, skill.indexOf(':'))));
+
+	const sentences = [
+		`plugin-rollcall ended your last turn after ${skills.join(', ')} failed as unknown, and reloaded the plugins.`,
+	];
+	if (lost.length > 0) {
+		sentences.push(`The reload did not load these plugins, so their skills stay unavailable: ${lost.join(', ')}.`);
+	}
+	sentences.push(
+		retried.length > 0
+			? `Call ${retried.join(', ')} again, then continue the task you were working on.`
+			: 'Continue the task you were working on.',
+	);
+
+	await $.prompt.submit({text: sentences.join(' ')});
 }
 
 async function installLocally($: EngineInterface, ids: readonly string[]): Promise<void> {
@@ -191,12 +279,16 @@ async function unloadedPluginOf($: EngineInterface, error: string): Promise<stri
 	if (name === undefined) return undefined;
 
 	const plugins = await marketplacePluginsOf($);
-	const id = plugins.find((candidate) => candidate.slice(0, candidate.lastIndexOf('@')) === name);
+	const id = plugins.find((candidate) => pluginNameOf(candidate) === name);
 	if (id === undefined) return undefined;
 
 	const commands = await $.command.list();
 
 	return commands.some((command) => command.plugin === name) ? undefined : id;
+}
+
+function pluginNameOf(id: string): string {
+	return id.slice(0, id.lastIndexOf('@'));
 }
 
 async function pluginsDirOf($: EngineInterface): Promise<string> {
