@@ -25,6 +25,10 @@ lost, and what would reopen it.
 - [1.9 Write instruction artifacts in the timeless present](/design-docs/adr/1.9-instruction-timelessness.md)
 - [1.13 Write plugin scripts as TypeScript that Node 26 runs directly](/design-docs/adr/1.13-plugin-script-runtime.md)
 
+## plugins/skill-enforcer
+
+- [1.14 Deliver the Skill Enforcement Framework from a mod](/design-docs/adr/1.14-sef-delivery.md)
+
 ## plugins/the-blueprint
 
 - [1.10 Keep decision records living: rewritten in place, deleted once they stop holding](/design-docs/adr/1.10-decision-record-lifecycle.md)
