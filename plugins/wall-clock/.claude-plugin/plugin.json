@@ -10,5 +10,13 @@
 	"homepage": "https://github.com/xobotyi/cc-foundry/tree/master/plugins/wall-clock",
 	"repository": "https://github.com/xobotyi/cc-foundry",
 	"license": "MIT",
-	"keywords": ["time", "wall-clock", "elapsed", "timezone", "hooks", "context"]
+	"keywords": ["time", "wall-clock", "elapsed", "timezone", "mod", "context"],
+	"userConfig": {
+		"tickSeconds": {
+			"title": "Tick period",
+			"description": "Minimum seconds between two ticks during a turn. 0 sets no minimum.",
+			"type": "number",
+			"default": 60
+		}
+	}
 }
