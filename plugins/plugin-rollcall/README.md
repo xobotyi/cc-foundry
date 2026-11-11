@@ -45,8 +45,13 @@ the check after each of them and reloads once that step has finished. Steps that
 runs share one reload.
 
 The mod also catches a missing plugin in the act. When a call to one of a plugin's skills fails as unknown, the plugin
-is enabled, and Claude Code lists no command of it, the mod tells the model that it tries to reload the plugin when the
-turn ends, and reloads it then. The skill works from the next turn, whether or not the plugin has an install record.
+is enabled, and Claude Code lists no command of it, the mod ends the turn before the model carries on without the skill.
+Claude Code runs `/reload-plugins` only between turns, so a reload asked for mid-turn would wait until the model had
+finished the whole task without it. Once the reload has run, the mod sends a prompt that asks the model to call the
+skill again and continue the task, so the work resumes with the skill loaded and without you typing anything. This
+works whether or not the plugin has an install record. If the reload does not load the plugin, the prompt says so, and
+the mod leaves later failures of that plugin alone. A skill call that fails inside a subagent does not end your turn;
+the plugin is reloaded once the turn ends.
 
 Unless you turn on install mode (see Configuration), the mod only reads. It never writes install records or settings, so
 it cannot corrupt a file another session writes. A read that lands mid-write in another session can still fail; the mod
@@ -104,9 +109,12 @@ The option is read when the mod loads, and changing it in `/config` reloads the 
   mod never learns of a compaction and does not reload after one; the first failed skill call of a missing plugin
   reloads it instead.
 - A plugin with no skills or commands never lists one, so a failed call to a skill it lacks reloads it even when it is
-  loaded.
-- Tested with Claude Code 2.1.310. The reloads after `/clear` and after a failed skill call, and install mode, are
-  tested with 2.1.316; the reloads after a resume and after a compaction are covered by the test suite only.
+  loaded, and ends that turn once.
+- Ending the turn drops whatever else the model had planned for it. The prompt that resumes the task names only the
+  failed skills, and the model picks the task up from the conversation.
+- Tested with Claude Code 2.1.310. The reload after `/clear` and install mode are tested with 2.1.316, and the ended
+  turn and resume after a failed skill call with 2.1.319; the reloads after a resume and after a compaction are covered
+  by the test suite only.
 
 ## License
 

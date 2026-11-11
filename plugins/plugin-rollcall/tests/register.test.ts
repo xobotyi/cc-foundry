@@ -6,7 +6,9 @@ import type {
 	SessionEndInput,
 	SessionMessage,
 	SessionStartInput,
+	TurnCompleteInput,
 } from 'claude-code';
+import type {Engine} from 'claude-code/testing';
 import {describe, expect, mock, test} from 'claude-code/testing';
 
 const ROOT = '/repo';
@@ -22,6 +24,9 @@ const SUMMARY: SessionMessage = {role: 'user', text: 'the summary', toolUses: []
 
 const AUTO_COMPACT: SessionCompactInput = {trigger: 'auto', messages: [SUMMARY]};
 
+const ENDED: TurnCompleteInput = {answer: '', durationMs: 1, isAborted: true, turnId: 't1', reason: 'aborted'};
+const ANSWERED: TurnCompleteInput = {answer: 'done', durationMs: 1, isAborted: false, turnId: 't1', reason: 'answer'};
+
 type Machine = {
 	readonly enabledPlugins: Readonly<Record<string, boolean>>;
 	readonly knownMarketplaces?: string;
@@ -30,6 +35,8 @@ type Machine = {
 	readonly configDir?: string;
 	readonly compaction?: SessionCompactResult;
 	readonly listedPlugins?: readonly string[];
+	readonly listedAfterReload?: readonly string[];
+	readonly isAbortRefused?: boolean;
 	readonly install?: Promise<ProcessRunResult>;
 	readonly env?: Readonly<Record<string, string>>;
 };
@@ -38,6 +45,8 @@ type Observed = {
 	readonly commands: string[];
 	readonly lines: string[];
 	readonly processes: string[];
+	readonly aborts: string[];
+	readonly prompts: string[];
 };
 
 const INSTALL_MODE = {options: {install: true}};
@@ -54,6 +63,9 @@ function machineOf(on: On, machine: Machine): Observed {
 	const commands: string[] = [];
 	const lines: string[] = [];
 	const processes: string[] = [];
+	const aborts: string[] = [];
+	const prompts: string[] = [];
+	let listedPlugins = machine.listedPlugins ?? [];
 	const pluginsDir = `${machine.configDir ?? '/home/u/.claude'}/plugins`;
 	const files = new Map<string, string>();
 	if (machine.knownMarketplaces !== undefined) {
@@ -72,7 +84,7 @@ function machineOf(on: On, machine: Machine): Observed {
 	on('session.compact', () => machine.compaction ?? {messages: [SUMMARY]});
 	on('session.root', () => ({value: ROOT}));
 	on('command.list', () => ({
-		value: (machine.listedPlugins ?? []).map((plugin) => ({
+		value: listedPlugins.map((plugin) => ({
 			name: `${plugin}:skill`,
 			description: '',
 			source: 'plugin' as const,
@@ -90,8 +102,24 @@ function machineOf(on: On, machine: Machine): Observed {
 	on('command.run', async ($, e) => {
 		commands.push(e.command);
 		await machine.reload;
+		listedPlugins = machine.listedAfterReload ?? listedPlugins;
 
 		return {text: 'Reloaded'};
+	});
+	on('turn.step', async function* ($, e) {
+		return {turnId: e.turnId, index: e.index, answer: '', toolUses: [], stopReason: 'end_turn', usage: null};
+	});
+	on('turn.complete', ($, e) => ({text: e.answer}));
+	on('turn.abort', ($, e) => {
+		aborts.push(e.turnId);
+		if (machine.isAbortRefused === true) throw new Error('not the running turn');
+
+		return {value: undefined};
+	});
+	on('prompt.submit', ($, e) => {
+		prompts.push(e.text);
+
+		return {text: e.text};
 	});
 	on('process.run', async ($, e) => {
 		processes.push(`${e.init?.cwd}: ${e.argv.join(' ')}`);
@@ -104,7 +132,12 @@ function machineOf(on: On, machine: Machine): Observed {
 		return {value: undefined};
 	});
 
-	return {commands, lines, processes};
+	return {commands, lines, processes, aborts, prompts};
+}
+
+async function stepOf($: Engine, agentId?: string): Promise<void> {
+	const step = $.turn.step({turnId: 't1', index: 1, model: 'claude', messageCount: 3, agentId});
+	for await (const chunk of step) void chunk;
 }
 
 function recordsOf(plugins: Readonly<Record<string, readonly object[]>>): string {
@@ -123,6 +156,16 @@ const CODER_RECORDED: Machine = {
 const CODER_NOTE =
 	'plugin-rollcall: Claude Code lists no skill or command of the the-coder@foundry plugin, ' +
 	'so plugin-rollcall tries to reload it when this turn ends.';
+
+const CODER_ENDING_NOTE =
+	'plugin-rollcall: Claude Code lists no skill or command of the the-coder@foundry plugin, ' +
+	'so plugin-rollcall ends this turn and reloads the plugins.';
+
+const CODER_CONTINUE =
+	'plugin-rollcall ended your last turn after the-coder:coding failed as unknown, and reloaded the plugins. ' +
+	'Call the-coder:coding again, then continue the task you were working on.';
+
+const SUBAGENT = 'a1';
 
 describe('register', () => {
 	test('reloads when an enabled plugin has records only for other projects', async ($, on) => {
@@ -351,20 +394,131 @@ describe('register', () => {
 		expect(observed.commands).toEqual([]);
 	});
 
-	test('reloads after a skill of an unloaded plugin fails, and tells the model', async ($, on) => {
-		const observed = machineOf(on, CODER_RECORDED);
+	test('ends the turn after a skill of an unloaded plugin fails, reloads, and asks to continue', async ($, on) => {
+		const observed = machineOf(on, {...CODER_RECORDED, listedAfterReload: ['the-coder']});
 		const clock = mock.clock(on);
 		await $.session.start(INTERACTIVE);
 
 		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await stepOf($);
+
+		expect(call.context).toEqual([CODER_ENDING_NOTE]);
+		expect(observed.aborts).toEqual(['t1']);
+		expect(observed.commands).toEqual([]);
+
+		await $.turn.complete(ENDED);
+		await clock.settle();
+
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.lines).toEqual(['reloaded plugins after the-coder:coding failed: the-coder@foundry']);
+		expect(observed.prompts).toEqual([CODER_CONTINUE]);
+	});
+
+	test('ends the turn once for skills of several unloaded plugins', async ($, on) => {
+		const observed = machineOf(on, {
+			enabledPlugins: {'the-coder@foundry': true, 'git-commit@foundry': true},
+			knownMarketplaces: FOUNDRY,
+			installedPlugins: recordsOf({'the-coder@foundry': [{scope: 'user'}], 'git-commit@foundry': [{scope: 'user'}]}),
+			listedAfterReload: ['the-coder', 'git-commit'],
+		});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await $.tool.call({tool: 'Skill', skill: 'git-commit:commit'});
+		await stepOf($);
+		await $.turn.complete(ENDED);
+		await clock.settle();
+
+		expect(observed.aborts).toEqual(['t1']);
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.lines).toEqual([
+			'reloaded plugins after the-coder:coding, git-commit:commit failed: the-coder@foundry, git-commit@foundry',
+		]);
+		expect(observed.prompts).toEqual([
+			'plugin-rollcall ended your last turn after the-coder:coding, git-commit:commit failed as unknown, ' +
+				'and reloaded the plugins. ' +
+				'Call the-coder:coding, git-commit:commit again, then continue the task you were working on.',
+		]);
+	});
+
+	test('reloads without asking to continue when the turn ends before its next step', async ($, on) => {
+		const observed = machineOf(on, {...CODER_RECORDED, listedAfterReload: ['the-coder']});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await $.turn.complete(ENDED);
+		await clock.settle();
+
+		expect(observed.aborts).toEqual([]);
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.prompts).toEqual([]);
+	});
+
+	test('reloads without asking to continue when the turn cannot be ended', async ($, on) => {
+		const observed = machineOf(on, {...CODER_RECORDED, listedAfterReload: ['the-coder'], isAbortRefused: true});
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await stepOf($);
+		await stepOf($);
+		await $.turn.complete(ANSWERED);
+		await clock.settle();
+
+		expect(observed.aborts).toEqual(['t1']);
+		expect(observed.commands).toEqual(['reload-plugins']);
+		expect(observed.prompts).toEqual([]);
+		expect(observed.lines).toHaveLength(2);
+		expect(observed.lines[0]?.startsWith('roll call failed: ')).toBe(true);
+		expect(observed.lines[1]).toBe('reloaded plugins after the-coder:coding failed: the-coder@foundry');
+	});
+
+	test('tells the model what the reload did not load, and ends no later turn for it', async ($, on) => {
+		const observed = machineOf(on, CODER_RECORDED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await stepOf($);
+		await $.turn.complete(ENDED);
+		await clock.settle();
+
+		expect(observed.prompts).toEqual([
+			'plugin-rollcall ended your last turn after the-coder:coding failed as unknown, and reloaded the plugins. ' +
+				'The reload did not load these plugins, so their skills stay unavailable: the-coder@foundry. ' +
+				'Continue the task you were working on.',
+		]);
+
+		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await stepOf($);
+		await $.turn.complete(ANSWERED);
+		await clock.settle();
+
+		expect(call.context).toBeUndefined();
+		expect(observed.aborts).toEqual(['t1']);
+		expect(observed.commands).toEqual(['reload-plugins']);
+	});
+
+	test('reloads after a skill of a subagent fails, and tells the model', async ($, on) => {
+		const observed = machineOf(on, CODER_RECORDED);
+		const clock = mock.clock(on);
+		await $.session.start(INTERACTIVE);
+
+		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:coding', agentId: SUBAGENT});
+		await stepOf($, SUBAGENT);
+		await stepOf($);
 
 		expect(call.context).toEqual([CODER_NOTE]);
+		expect(observed.aborts).toEqual([]);
 		expect(observed.commands).toEqual([]);
 
 		await clock.settle();
 
 		expect(observed.commands).toEqual(['reload-plugins']);
 		expect(observed.lines).toEqual(['reloaded plugins after the-coder:coding failed: the-coder@foundry']);
+		expect(observed.prompts).toEqual([]);
 	});
 
 	test('does not reload when the plugin of a failed skill lists commands', async ($, on) => {
@@ -373,9 +527,12 @@ describe('register', () => {
 		await $.session.start(INTERACTIVE);
 
 		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:nonexistent'});
+		await stepOf($);
+		await $.turn.complete(ANSWERED);
 		await clock.settle();
 
 		expect(call.context).toBeUndefined();
+		expect(observed.aborts).toEqual([]);
 		expect(observed.commands).toEqual([]);
 	});
 
@@ -386,8 +543,11 @@ describe('register', () => {
 
 		await $.tool.call({tool: 'Skill', skill: 'golang:golang'});
 		await $.tool.call({tool: 'Skill', skill: 'the-coder'});
+		await stepOf($);
+		await $.turn.complete(ANSWERED);
 		await clock.settle();
 
+		expect(observed.aborts).toEqual([]);
 		expect(observed.commands).toEqual([]);
 	});
 
@@ -397,9 +557,12 @@ describe('register', () => {
 		await $.session.start(HEADLESS);
 
 		const call = await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await stepOf($);
+		await $.turn.complete(ANSWERED);
 		await clock.settle();
 
 		expect(call.context).toBeUndefined();
+		expect(observed.aborts).toEqual([]);
 		expect(observed.commands).toEqual([]);
 	});
 
@@ -409,7 +572,7 @@ describe('register', () => {
 		await $.session.start(INTERACTIVE);
 
 		await $.session.end(CLEAR);
-		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding', agentId: SUBAGENT});
 		await clock.settle();
 
 		expect(observed.commands).toEqual(['reload-plugins']);
@@ -424,7 +587,7 @@ describe('register', () => {
 		const clock = mock.clock(on);
 		await $.session.start(INTERACTIVE);
 
-		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding', agentId: SUBAGENT});
 		await clock.settle();
 
 		const unreadable = 'roll call failed: Error: installed_plugins.json: a the-coder@foundry record has no scope';
@@ -466,7 +629,7 @@ describe('register', () => {
 		const clock = mock.clock(on);
 		await $.session.start(INTERACTIVE);
 
-		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding'});
+		await $.tool.call({tool: 'Skill', skill: 'the-coder:coding', agentId: SUBAGENT});
 		await clock.settle();
 
 		expect(observed.commands).toEqual(['reload-plugins']);
