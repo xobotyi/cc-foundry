@@ -1,46 +1,72 @@
 # skill-enforcer Plugin
 
-Injects skill-discipline reminders at lifecycle checkpoints so matching skills get invoked proactively and their
-phase-relevant references get read — not skipped.
+A Claude Code mod that injects skill-discipline reminders at lifecycle checkpoints so matching skills get invoked
+proactively and their phase-relevant references get read — not skipped. Why it is a mod:
+[ADR 1.14](/design-docs/adr/1.14-sef-delivery.md).
 
 ## Components
 
-- **`hooks/sef-hook.mts`** — the whole implementation, one TypeScript module that Node 26 runs directly, dispatched by a
-  CLI action argument.
-- **`hooks/hooks.json`** — the event wiring below.
-- **`hooks/sef-hook.test.mts`** — imports `reply` and `serialize` and pins the checkpoint table, the anti-leak contract,
-  the PreCompact output form, and the `hooks.json` wiring. Run `vp test plugins/skill-enforcer` after any change to the
-  hook.
+Run every command in this file from the repository root.
+
+- **`hooks/register.ts`** — the whole implementation, loaded through `modules` in `hooks/hooks.json`.
+  `claude plugin validate plugins/skill-enforcer` lists its hooks: `prompt.submit`, `tool.call`, `session.compact`,
+  `session.end`.
+- **`tests/register.test.ts`** — the test-kit suite. It pins the checkpoint table, the anti-leak contract, when the
+  framework enters, and the compaction instructions. Run `claude plugin test plugins/skill-enforcer` after any change to
+  the module.
+- **`tsconfig.json`** — extends `.claude-plugin/types/tsconfig.json`, which Claude Code generates for its own version
+  and gitignores. Start `claude --plugin-dir plugins/skill-enforcer` interactively once to generate it, then type-check
+  with `yarn dlx -p typescript tsc -p plugins/skill-enforcer`.
 
 ## Checkpoints
 
-`hooks/hooks.json` maps each lifecycle event to `node` with `${CLAUDE_PLUGIN_ROOT}/hooks/sef-hook.mts <action>` as its
-exec-form `args`, under a 5-second timeout; the action argument selects the payload. Event names and matchers are exact
-strings — a mismatch fires nothing and reports nothing.
+- `prompt.submit` of a prompt the person typed -> `USER-PROMPT` reminder, after the framework when the conversation
+  does not hold it
+- `tool.call` of `Read` -> `EVALUATION` reminder
+- `tool.call` of `Edit` or `Write` -> `PHASE-CHANGE` reminder
+- `tool.call` of `Skill` -> `SKILL-LOAD` reminder
+- `session.compact` -> the SEF compaction instructions, after the instructions the compaction already has
 
-- `SessionStart`, matcher `startup|resume|clear|compact` -> `session-start` — the full SEF framework
-- `PreCompact`, no matcher -> `pre-compact` — compaction instructions
-- `UserPromptSubmit`, no matcher -> `prompt` — `USER-PROMPT` reminder
-- `PostToolUse`, matcher `Read` -> `read` — `EVALUATION` reminder
-- `PostToolUse`, matcher `Edit|Write` -> `write` — `PHASE-CHANGE` reminder
-- `PostToolUse`, matcher `Skill` -> `skill` — `SKILL-LOAD` reminder
+`TOOL_PHASES` in `register.ts` maps a tool to its phase. The matcher of the `tool.call` hook lists the same tools as
+literals, because `claude plugin validate` reads a matcher off the source; change both together.
 
-The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -> `PHASE-CHANGE`). `REPLIES` in
-`sef-hook.mts` holds that mapping.
+## How It Works
+
+- A reminder is one block of the `context` a prompt enters with, or of the `context` a tool result returns with. The
+  model reads it and the user never sees it.
+- A tool reminder follows a call that succeeded, in the main conversation and in a subagent's alike. A denied call and
+  a call whose result is an error get none.
+- A task notification, and any prompt with `isMeta`, enters with no reminder and does not count as the conversation's
+  first prompt. Claude Code marks only some task notifications `isMeta`, so the hook also reads `origin.kind` (verified
+  on 2.1.319).
+- The framework enters with the first typed prompt after the process starts, and again with the first typed prompt
+  after `/clear`, a resume (`session.end`), or a compaction of the main conversation that was not skipped
+  (`session.compact`). `session.start` cannot carry it: that event fires once per process and never for `/clear`.
+- A prompt that is dropped leaves the framework for the next prompt.
+- The mod keeps one flag per process, `hasFramework`. A reload of the module starts it over, so the next typed prompt
+  carries the framework again.
+
+## Known Limits
+
+- On a machine with managed settings, the built-in `cc-plugin-sec-default` passes `session.compact`, `prompt.compose`,
+  `skill.prompt`, and every `classic.*` event past a mod outside the managed tier, while `prompt.submit`, `tool.call`,
+  and `session.end` reach it (verified on 2.1.319). There a compaction gets no SEF instructions, and the framework
+  returns only at the next process start, `/clear`, or resume. The reminders are unaffected.
+- A subagent's conversation gets the tool reminders and never the framework.
 
 ## Conventions
 
 **Single source of truth:**
 
-- Each checkpoint's rule lives once in the `STAGES` object in `sef-hook.mts`. `STAGES[phase].rule` feeds both the
-  session-start framework list and the per-checkpoint reminder.
+- Each checkpoint's rule lives once in the `STAGES` object in `register.ts`. `STAGES[phase].rule` feeds both the
+  framework list and the per-checkpoint reminder.
 - Add or rename a checkpoint by editing `STAGES`; the framework and reminder update together. Do not duplicate rule text
   elsewhere.
 
 **Self-contained reminders:**
 
-- Every reminder carries its full rule, never a pointer back to the session-start framework — at 1M-token scale the
-  framework sits in the low-attention middle, so the reminder is the operational contract.
+- Every reminder carries its full rule, never a pointer back to the framework — at 1M-token scale the framework sits in
+  the low-attention middle, so the reminder is the operational contract.
 
 **Anti-leak contract:**
 
@@ -51,12 +77,11 @@ The action argument and the phase name differ (`read` -> `EVALUATION`, `write` -
 
 **Token cost:**
 
-- Framework ~600 tokens once per session; each reminder ~80-120 tokens, byte-identical across firings so KV-cache reuses
-  them after the first occurrence. Rule text added to `STAGES` is paid at every firing.
+- Framework ~600 tokens once per conversation; each reminder ~80-120 tokens, byte-identical across firings so KV-cache
+  reuses them after the first occurrence. Rule text added to `STAGES` is paid at every firing.
 
-**Compaction handling:**
+**Mod API:**
 
-- PreCompact strips the framework and reminders (auto-reinjected on SessionStart) and preserves the flat list of
-  references read, for restoration after compaction.
-- The compaction instructions go out as plain stdout, never as JSON: Claude Code merges a PreCompact hook's plain stdout
-  into the compaction instructions and rejects `hookSpecificOutput` for this event (verified on 2.1.310).
+- Hook engine events, never `classic.*`: a managed-tier plugin passes every `classic.*` event past the mod.
+- Write each mods API call in full as `$.namespace.method(...)`, and pass `$` only to top-level functions in
+  `register.ts`. `claude plugin validate` reads the calls off the source.

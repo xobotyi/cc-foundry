@@ -3,14 +3,14 @@
 # skill-enforcer
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://code.claude.com/docs/en/plugins)
+[![Claude Code 2.1.287+](https://img.shields.io/badge/Claude%20Code-2.1.287%2B%20mod-d97757.svg)](https://claude.com/blog/claude-code-mods)
 
 </div>
 
 Claude checks which skills apply before it answers, and goes back to the unread references of a loaded skill when the
 work moves to a new phase, such as from coding to testing.
 
-The reminder the hook injects after an edit ([`hooks/sef-hook.mts`](hooks/sef-hook.mts)):
+The reminder the mod injects after an edit ([`hooks/register.ts`](hooks/register.ts)):
 
 ```text
 <SEF phase="PHASE-CHANGE">
@@ -49,7 +49,7 @@ re-evaluate on a phase shift — and the model acts on it silently.
 **Checkpoint flow:**
 
 ```text
-Session start    ->  Load the SEF framework
+First prompt     ->  The SEF framework, once per conversation
 User prompt      ->  USER-PROMPT: invoke each skill whose description matches, honoring exclusions
 After Read       ->  EVALUATION: act if the read opened a skill-covered domain
 After Edit/Write ->  PHASE-CHANGE: act if the type of work shifted
@@ -61,8 +61,8 @@ applies it silently: it acts on the rule, but never echoes the reminder or narra
 
 ## Installation
 
-The hook needs Node.js 26 or later as the `node` on your `PATH`. It is written in TypeScript, and Claude Code runs it
-with `node`, which strips the types itself, so nothing is built at install time.
+skill-enforcer is a mod: Claude Code 2.1.287 or later loads and runs it itself. It needs no Node.js and builds nothing
+at install time.
 
 ```text
 /plugin install skill-enforcer --marketplace xobotyi/cc-foundry
@@ -70,9 +70,10 @@ with `node`, which strips the types itself, so nothing is built at install time.
 
 ## How It Works
 
-### Framework injection (session start)
+### Framework injection (first prompt)
 
-At session start (and after compaction) the plugin injects the SEF framework (~600 tokens):
+With the first prompt you type in a conversation, and again with the first one after `/clear`, a resume, or a
+compaction, the mod injects the SEF framework (~600 tokens):
 
 - **Matching rule** — a skill matches when its description names the task, a file type in it, or a symptom it shows; a
   description that assigns the work to another skill is not a match
@@ -96,16 +97,17 @@ deliberation behind them is silent.
 
 ### Why reminders are self-contained
 
-Each reminder carries its full rule rather than a thin pointer back to the session-start framework. A pointer assumes
+Each reminder carries its full rule rather than a thin pointer back to the framework. A pointer assumes
 the framework is still in attention — true in small contexts, false at 1M-token scale, where after dozens of files and
 edits the framework sits in the low-attention middle of the context window. A self-contained reminder stays correct
 regardless: the reminder is the source of truth, and reaching back to the framework is optional.
 
 ### Lifecycle checkpoints
 
-Hooks inject a reminder at each tool-usage point:
+The mod injects a reminder at each checkpoint. A tool reminder follows a call that succeeded, in the main conversation
+and in a subagent's alike:
 
-**`<SEF phase="USER-PROMPT">`** — fires when the user submits a message
+**`<SEF phase="USER-PROMPT">`** — fires when you submit a message, and not for a task notification
 
 - Invoke each skill whose description names the task, a file type in it, or a symptom it shows. A description that
   assigns the work to another skill is not a match, and "could apply" is not a match: a skill body stays in context for
@@ -129,49 +131,34 @@ Hooks inject a reminder at each tool-usage point:
 
 ### Compaction handling
 
-The PreCompact hook tells Claude to drop the framework and reminders (re-injected automatically on the next
-SessionStart) while preserving a flat list of every skill reference read during the session, so context can be restored
-after compaction.
+When a conversation is compacted, the mod adds instructions for the summary: drop the framework and the reminders,
+which the mod injects again with your next prompt, and keep a flat list of every skill reference read during the
+session, so context can be restored after compaction.
 
 ## Architecture
 
 ```text
 hooks/
-├── hooks.json     # Hook configuration (event -> command mapping)
-└── sef-hook.mts    # Unified hook module with an action parameter
+├── hooks.json     # Names the hooks module
+└── register.ts    # The mod: every checkpoint, the framework, the compaction instructions
 ```
 
-The single `sef-hook.mts` script handles all hook events via a command-line argument:
+`register.ts` hooks four engine events:
 
-```bash
-node sef-hook.mts session-start  # Full framework (~600 tokens)
-node sef-hook.mts pre-compact    # Compaction instructions
-node sef-hook.mts prompt         # USER-PROMPT reminder
-node sef-hook.mts read           # EVALUATION reminder
-node sef-hook.mts write          # PHASE-CHANGE reminder
-node sef-hook.mts skill          # SKILL-LOAD reminder
-```
+- `prompt.submit` — the `USER-PROMPT` reminder, and the framework when the conversation does not hold it
+- `tool.call` of `Read`, `Edit`, `Write`, or `Skill` — the reminder of that checkpoint, after the tool's result
+- `session.compact` — the compaction instructions
+- `session.end` — notes a `/clear` or a resume, so the next prompt carries the framework
 
-Every payload is rendered from a single `STAGES` object in `sef-hook.mts`. Each checkpoint's rule is defined once
-(`STAGES[phase].rule`) and feeds both the session-start framework list and the per-checkpoint reminder — adding a
-checkpoint or editing a rule updates both at once, with no risk of drift.
-
-The `hooks.json` registers lifecycle events:
-
-| Event            | Matcher                           | Action          |
-| ---------------- | --------------------------------- | --------------- |
-| SessionStart     | `startup\|resume\|clear\|compact` | `session-start` |
-| PreCompact       | (all)                             | `pre-compact`   |
-| UserPromptSubmit | (all)                             | `prompt`        |
-| PostToolUse      | `Read`                            | `read`          |
-| PostToolUse      | `Edit\|Write`                     | `write`         |
-| PostToolUse      | `Skill`                           | `skill`         |
+Every payload is rendered from a single `STAGES` object in `register.ts`. Each checkpoint's rule is defined once
+(`STAGES[phase].rule`) and feeds both the framework list and the per-checkpoint reminder — adding a checkpoint or
+editing a rule updates both at once, with no risk of drift.
 
 ## Token Efficiency
 
 The plugin uses a "framework once + self-contained reminders repeatedly" pattern:
 
-- **One-time cost**: ~600 tokens for the framework at session start (purpose, matching rule, checkpoint rules)
+- **One-time cost**: ~600 tokens for the framework, once per conversation (purpose, matching rule, checkpoint rules)
 - **Per-reminder cost**: ~80-100 tokens per checkpoint, each a self-contained declarative rule plus the silent-apply
   contract
 
@@ -180,6 +167,16 @@ byte-identical across firings, so KV-cache reuses them after the first occurrenc
 cost is far below the raw token count. The framework carries no examples and no format scaffolding: rules are stated
 declaratively and applied directly, which both shrinks the payload and removes the tag-shaped artifact that earlier
 versions leaked into visible output.
+
+## Limits
+
+- Some organizations manage a plugin that intercepts compaction before any other plugin sees it. Under such a plugin
+  the mod adds no compaction instructions and does not learn of the compaction, so the framework returns only when you
+  start Claude Code again, run `/clear`, or resume a session. The reminders keep working, and each one carries its full
+  rule.
+- A subagent gets the reminders after its tool calls and never the framework.
+- Tested with Claude Code 2.1.319, headless. The framework's return after `/clear`, a resume, and a compaction is
+  covered by the test suite only.
 
 ## License
 

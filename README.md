@@ -78,7 +78,7 @@ output style carries the peer-engineering register and the skill queue. Every la
 
 ### skill-enforcer
 
-Claude skips skills and forgets them mid-session. Lifecycle hooks make it check which skills apply at every checkpoint:
+Claude skips skills and forgets them mid-session. A mod makes it check which skills apply at every checkpoint:
 your prompt, after it reads a file, after it edits one, and after it loads a skill. When the work shifts from coding to
 testing, it goes back to the references it has not read. [Read more](plugins/skill-enforcer/)
 
