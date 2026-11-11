@@ -2,10 +2,10 @@
 
 A Claude Code mod that works around
 [anthropics/claude-code#83422](https://github.com/anthropics/claude-code/issues/83422): a marketplace plugin enabled in
-settings is skipped at startup when `installed_plugins.json` holds no install record for the user or for the session's
-project path. At `session.start`, and again after `/clear`, a resume, or a compaction, the mod finds such plugins and
-runs `/reload-plugins`, which loads them. A failed skill call of an enabled plugin that lists no command triggers the
-same reload, install records aside.
+settings is skipped at startup when `installed_plugins.json` holds no install record for the user, for the managed
+settings, or for the session's project path. At `session.start`, and again after `/clear`, a resume, or a compaction,
+the mod finds such plugins and runs `/reload-plugins`, which loads them. A failed skill call of an enabled plugin that
+lists no command triggers the same reload, install records aside.
 
 ## Components
 
@@ -23,8 +23,11 @@ Run every command in this file from the repository root.
 ## How It Works
 
 - A plugin is missing when the merged `enabledPlugins` sets it `true`, its marketplace is a key of
-  `known_marketplaces.json`, and none of its records in `installed_plugins.json` has `scope: "user"` or a `projectPath`
-  equal to `$.session.root()`. This rule mirrors the loader as observed on 2.1.310; the loader's rule is undocumented.
+  `known_marketplaces.json`, and none of its records in `installed_plugins.json` has `scope: "user"`,
+  `scope: "managed"`, or a `projectPath` equal to `$.session.root()`. This rule mirrors the loader as observed on
+  2.1.310; the loader's rule is undocumented. A plugin that managed settings enable has one `managed` record with a null
+  `projectPath` and loads in every project, and `claude plugin install --scope local` writes no record beside it
+  (verified on 2.1.319).
 - The hook awaits the reload, so the first prompt waits for it, including a prompt passed as `claude "<prompt>"`. The
   await does not deadlock, and the reload takes about 150 ms (verified on 2.1.310).
 - After `/clear` or a resume (`session.end`) and after a compaction of the main conversation (`session.compact`), the

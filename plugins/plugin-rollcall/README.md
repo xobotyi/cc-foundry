@@ -23,20 +23,22 @@ It names every plugin it had to reload, so a skipped plugin is visible instead o
 
 Claude Code loads a marketplace plugin at startup only when `installed_plugins.json` in its plugin directory
 (`~/.claude/plugins/`, or `plugins/` under `CLAUDE_CONFIG_DIR` when that variable is set) holds an install record for it
-that applies to the session: one for your user, or one for this project's path. Enabling the plugin in project settings
-does not create that record. So unless you installed the plugin at user scope, a plugin enabled by a repository you
-cloned, by a new worktree, or by a project you never ran `/plugin install` in is skipped silently. The debug log calls
-it `plugin-cache-miss`, even though the plugin sits in the cache. `/reload-plugins` loads it, for that session only.
+that applies to the session: one for your user, one for your organization's managed settings, or one for this project's
+path. Enabling the plugin in project settings does not create that record. So unless you installed the plugin at user
+scope or your organization's managed settings enable it, a plugin enabled by a repository you cloned, by a new worktree,
+or by a project you never ran `/plugin install` in is skipped silently. The debug log calls it `plugin-cache-miss`, even
+though the plugin sits in the cache. `/reload-plugins` loads it, for that session only.
 
 The bug is tracked in [anthropics/claude-code#83422](https://github.com/anthropics/claude-code/issues/83422).
 
 ## The Solution
 
 When an interactive session starts, the mod reads the merged `enabledPlugins` and checks each enabled plugin from a
-known marketplace for a user install record or one for the session's project root. If any plugin has neither, the mod
-runs `/reload-plugins` and holds your first prompt until the reload completes, about 150 ms in testing. The first prompt
-therefore sees every plugin, even a prompt passed on the command line as `claude "…"`. The transcript shows the reload
-as a prompt from `plugin-rollcall`, followed by a line that names the plugins it reloaded.
+known marketplace for an install record for your user, for your organization's managed settings, or for the session's
+project root. If any plugin has none, the mod runs `/reload-plugins` and holds your first prompt until the reload
+completes, about 150 ms in testing. The first prompt therefore sees every plugin, even a prompt passed on the command
+line as `claude "…"`. The transcript shows the reload as a prompt from `plugin-rollcall`, followed by a line that names
+the plugins it reloaded.
 
 A reload does not always survive `/clear`, a resume, or a compaction: the plugins can go missing again. The mod repeats
 the check after each of them and reloads once that step has finished. Steps that follow each other before the reload
@@ -70,11 +72,11 @@ and in your plugin directory. Turn on **Install skipped plugins** for `plugin-ro
 {"pluginConfigs": {"plugin-rollcall@foundry": {"options": {"install": true}}}}
 ```
 
-After a reload, the mod then runs `claude plugin install <plugin> --scope local` for each plugin that has no install
-record for the project, one after another and without holding your prompt. This is the workaround confirmed in #83422:
-it writes the install record and enables the plugin in the project's `.claude/settings.local.json`. From the next
-session on, Claude Code loads the plugin at startup and the mod has nothing to reload. The transcript names what was
-installed:
+After a reload, the mod then runs `claude plugin install <plugin> --scope local` for each plugin it reloaded because it
+had no install record that applies to the session, one after another and without holding your prompt. This is the
+workaround confirmed in #83422: it writes the install record and enables the plugin in the project's
+`.claude/settings.local.json`. From the next session on, Claude Code loads the plugin at startup and the mod has nothing
+to reload. The transcript names what was installed:
 
 ```text
 installed plugins at local scope: the-coder@foundry

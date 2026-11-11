@@ -202,6 +202,21 @@ describe('register', () => {
 		expect(observed.lines).toEqual([]);
 	});
 
+	test('does not reload or install a plugin with a managed record', INSTALL_MODE, async ($, on) => {
+		const observed = machineOf(on, {
+			enabledPlugins: {'the-coder@foundry': true},
+			knownMarketplaces: FOUNDRY,
+			installedPlugins: recordsOf({'the-coder@foundry': [{scope: 'managed', projectPath: null}]}),
+		});
+		const clock = mock.clock(on);
+
+		await $.session.start(INTERACTIVE);
+		await clock.settle();
+
+		expect(observed.commands).toEqual([]);
+		expect(observed.processes).toEqual([]);
+	});
+
 	test('ignores disabled plugins and plugins outside a known marketplace', async ($, on) => {
 		const observed = machineOf(on, {
 			enabledPlugins: {'the-coder@foundry': false, 'telemetry@builtin': true},
