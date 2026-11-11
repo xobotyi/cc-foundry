@@ -1,12 +1,6 @@
-#!/usr/bin/env node
+import type {On} from 'claude-code';
 
 type Phase = 'USER-PROMPT' | 'SKILL-LOAD' | 'EVALUATION' | 'PHASE-CHANGE';
-
-/** The hook's answer to one CLI action. */
-export type Reply =
-	| {readonly event: string; readonly context: string}
-	| {readonly instructions: string}
-	| {readonly error: string};
 
 const STAGES: Readonly<Record<Phase, {readonly event: string; readonly rule: string}>> = {
 	'USER-PROMPT': {
@@ -29,10 +23,10 @@ const STAGES: Readonly<Record<Phase, {readonly event: string; readonly rule: str
 
 const SILENT = 'Act on this rule. Do not quote this reminder or report the check in your reply.';
 
-const renderTrigger = (phase: Phase): string => `<SEF phase="${phase}">\n${STAGES[phase].rule}\n\n${SILENT}\n</SEF>`;
+const reminderOf = (phase: Phase): string => `<SEF phase="${phase}">\n${STAGES[phase].rule}\n\n${SILENT}\n</SEF>`;
 
 const RULES_BLOCK = Object.entries(STAGES)
-	.map(([phase, s]) => `- ${phase} (when ${s.event}): ${s.rule}`)
+	.map(([phase, stage]) => `- ${phase} (when ${stage.event}): ${stage.rule}`)
 	.join('\n');
 
 const FRAMEWORK = `<SEF>
@@ -53,37 +47,57 @@ When compacting this conversation:
 - After compaction, skills are re-invoked automatically; the references listed above must be re-read to restore context.
 </sef-compaction>`;
 
-const REPLIES: Readonly<Record<string, Reply>> = {
-	'session-start': {event: 'SessionStart', context: FRAMEWORK},
-	'pre-compact': {instructions: COMPACT_INSTRUCTIONS},
-	prompt: {event: 'UserPromptSubmit', context: renderTrigger('USER-PROMPT')},
-	read: {event: 'PostToolUse', context: renderTrigger('EVALUATION')},
-	write: {event: 'PostToolUse', context: renderTrigger('PHASE-CHANGE')},
-	skill: {event: 'PostToolUse', context: renderTrigger('SKILL-LOAD')},
+const TOOL_PHASES: Readonly<Record<string, Phase>> = {
+	Read: 'EVALUATION',
+	Edit: 'PHASE-CHANGE',
+	Write: 'PHASE-CHANGE',
+	Skill: 'SKILL-LOAD',
 };
 
-/** The CLI actions the hook answers. */
-export const ACTIONS: readonly string[] = Object.keys(REPLIES);
+/**
+ * Registers the Skill Enforcement Framework: each prompt the person types enters with the USER-PROMPT reminder, and a
+ * successful Read, Edit, Write, or Skill call returns with the reminder of its checkpoint, in the main conversation
+ * and in a subagent's alike. A prompt the person did not type, such as a task notification, enters as it is.
+ *
+ * The framework enters with the first typed prompt of a conversation: at the start of the process, and again after
+ * `/clear`, a resume, or a compaction of the main conversation. A compaction is told to drop the framework and the
+ * reminders and to keep the list of skill references read.
+ *
+ * @param on the engine's registrar
+ */
+export function register(on: On): void {
+	let hasFramework = false;
 
-/** Returns the reply to a CLI action; a name the table only inherits, such as `constructor`, is an unknown action. */
-export function reply(action: string | undefined): Reply {
-	const known = action !== undefined && Object.hasOwn(REPLIES, action) ? REPLIES[action] : undefined;
-	return known ?? {error: `SEF hook error: Unknown action "${String(action)}". Valid: ${ACTIONS.join(', ')}`};
-}
+	on('prompt.submit', async ($, e, next) => {
+		if (e.isMeta === true || e.origin.kind === 'task-notification') return next(e);
 
-/** Returns the text the hook writes to stdout: instructions as they are, anything else as one JSON line. */
-export function serialize(answer: Reply): string {
-	if ('instructions' in answer) {
-		return answer.instructions;
-	}
+		const context = [...(e.context ?? []), ...(hasFramework ? [] : [FRAMEWORK]), reminderOf('USER-PROMPT')];
+		const submitted = await next({...e, context});
+		if (submitted.drop === undefined) hasFramework = true;
 
-	if ('error' in answer) {
-		return `${JSON.stringify({continue: true, systemMessage: answer.error})}\n`;
-	}
+		return submitted;
+	});
 
-	return `${JSON.stringify({hookSpecificOutput: {hookEventName: answer.event, additionalContext: answer.context}})}\n`;
-}
+	on('tool.call', {tool: ['Read', 'Edit', 'Write', 'Skill']}, async ($, e, next) => {
+		const call = await next(e);
+		const phase = TOOL_PHASES[e.tool];
+		if (phase === undefined || call.deny !== undefined || call.isError === true) return call;
 
-if (import.meta.main) {
-	process.stdout.write(serialize(reply(process.argv[2])));
+		return {...call, context: [...(call.context ?? []), reminderOf(phase)]};
+	});
+
+	on('session.compact', async ($, e, next) => {
+		const instructions =
+			e.instructions === undefined ? COMPACT_INSTRUCTIONS : `${e.instructions}\n\n${COMPACT_INSTRUCTIONS}`;
+		const compaction = await next({...e, instructions});
+		if (e.agentId === undefined && compaction.skip === undefined) hasFramework = false;
+
+		return compaction;
+	});
+
+	on('session.end', async ($, e, next) => {
+		if (e.reason === 'clear' || e.reason === 'resume') hasFramework = false;
+
+		return next(e);
+	});
 }
