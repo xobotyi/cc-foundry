@@ -7,7 +7,7 @@ styles, hooks, and workflow automation.
 
 - `plugins/ai-helpers/` — AI artifact engineering (prompts, skills, agents, styles)
 - `plugins/git-commit/` — structured commit workflow with validation
-- `plugins/skill-enforcer/` — skill activation enforcement via lifecycle hooks
+- `plugins/skill-enforcer/` — skill activation enforcement via lifecycle checkpoints (mod)
 - `plugins/the-blueprint/` — planning pipeline: DRAFT (discovery → research → alignment → frame → tasks)
 - `plugins/the-coder/` — language-agnostic coding discipline
 - `plugins/the-statusline/` — session metrics status line
