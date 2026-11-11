@@ -38,3 +38,7 @@ lost, and what would reopen it.
 
 - [1.7 Let the coding skill state comment and documentation policy in full](/design-docs/adr/1.7-comment-policy-ownership.md)
 - [1.8 Permit exactly five kinds of comment](/design-docs/adr/1.8-permitted-comments.md)
+
+## plugins/wall-clock
+
+- [1.15 Keep the wall clock's anchors in the mod, the turn end per session in its store](/design-docs/adr/1.15-wall-clock-state.md)
