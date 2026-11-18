@@ -144,8 +144,10 @@ The first pass draws the least that carries the information.
 - **A change to one of several siblings is checked against the rest.** Where it leaves them visibly inconsistent, say so
   and offer to extend it. Do not extend it unasked.
 - **A functional change restyles nothing it did not add.**
-- **With no system and more than one screen to build, define the tokens first** — color roles, type scale, spacing
-  scale, radius, elevation — and build every screen from them.
+- **With no system to build from, define the tokens first** — color roles, type scale, spacing scale, radius, elevation
+  — and build every screen from them. Padding, margin, and gap lengths inside a component take their values from the
+  spacing scale too. A value between two steps means the scale lacks a step: add the step, or use the nearest one. Only
+  an optical correction, such as a nudge that aligns an icon with its text, stays off the scale.
 
 ## Verify the render
 
@@ -163,7 +165,8 @@ The first pass draws the least that carries the information.
   Check each of these against a screenshot, and against computed styles where a number decides:
   - every item of an approved mockup and every requested control is present, in the approved order and position;
   - nothing overflows, clips, wraps apart from its label, or scrolls sideways;
-  - the gaps on both sides of a separator are equal, and spacing values come from one scale;
+  - the gaps on both sides of a separator are equal, and every spacing length except an optical correction comes from
+    one scale;
   - items on one line share a baseline, and edges that should align do;
   - inputs and surfaces that carry no meaning carry no accent tint;
   - text meets 4.5:1 contrast, and large text 3:1.
