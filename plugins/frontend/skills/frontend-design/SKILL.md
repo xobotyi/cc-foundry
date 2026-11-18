@@ -36,9 +36,10 @@ Before any visible choice, establish what has already made it. Take the first th
 3. **A host application** — when the work is injected into an interface the project does not own, as an extension, an
    embedded widget, or a plugin does, the host's controls, classes, spacing, and separators are the system. Write a
    component of your own only where the host has none.
-4. **The subject** — with none of the above, derive the choices from what the product is, who uses it, and the material
-   of its domain. Ask once for a reference when a person is there to answer and the surface has no design to inherit.
-   Without an answer, state the direction before building it.
+4. **The subject** — with none of the above, derive the direction from what the product is and who uses it. The material
+   of its domain supplies one signature element at most. Everything else is the product's own interface, finished to the
+   level of the software its users already pay for. Ask once for a reference when a person is there to answer and the
+   surface has no design to inherit. Without an answer, state the direction before building it.
 
 Where the project has a token source or a neighboring screen, read it before writing a style. A system recalled from a
 framework's documentation is not the project's system.
@@ -56,7 +57,7 @@ framework's documentation is not the project's system.
 - **For a surface with no design to inherit, write the decisions down before the code**: the palette as named values
   with roles, the typefaces and the role of each, the layout as what the user must see and do first, and the one element
   that leads. Test the palette and the typefaces: would they come out the same for a different product in the same
-  category? Those that would are defaults. Replace each with a choice only this subject explains.
+  category? Those that would are defaults. Replace each with a choice the product's direction explains.
 - **Never replace one default with another.** A different stock accent, or the fashionable alternative to the usual
   typeface, changes which default it is. Every widely prescribed substitute converges in its turn.
 - **Every decision you state must be findable in the render.** Do not describe design intent the code does not carry.
@@ -104,7 +105,8 @@ auditing a UI for a generic look, and before filling a free color or type axis.
 
 ## Draw less
 
-The first pass draws the least that carries the information.
+The first pass draws the least that carries the information. This bounds containers, controls, and text, never the
+finish of what remains.
 
 - **A count is a plain number.** A tag, pill, badge, or chip earns its container only when the container encodes
   something the bare text cannot.
