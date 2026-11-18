@@ -56,8 +56,10 @@ framework's documentation is not the project's system.
   persuade: a landing page, a campaign, a portfolio.
 - **For a surface with no design to inherit, write the decisions down before the code**: the palette as named values
   with roles, the typefaces and the role of each, the layout as what the user must see and do first, and the one element
-  that leads. Test the palette and the typefaces: would they come out the same for a different product in the same
-  category? Those that would are defaults. Replace each with a choice the product's direction explains.
+  that leads. Test the palette: would it come out the same for a different product in the same category? If it would,
+  it is a default. Replace it with a choice the product's direction explains. A neutral typeface is a choice when it is
+  set for each size: large type gets its own letter spacing, weight, and line height. A display face picked only to
+  differ from the default makes the page look dated.
 - **Never replace one default with another.** A different stock accent, or the fashionable alternative to the usual
   typeface, changes which default it is. Every widely prescribed substitute converges in its turn.
 - **Every decision you state must be findable in the render.** Do not describe design intent the code does not carry.
