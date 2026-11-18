@@ -49,8 +49,8 @@ often reported in generated interfaces.
 
 - **Nested corners** — inner radius equals outer radius minus the gap between them — Hobday. "Child ≤ parent;
   concentric" — Vercel Web Interface Guidelines.
-- **Spacing** — no source mandates a scale. Check that the values come from one scale and that related items sit closer
-  than unrelated ones.
+- **Spacing** — no source mandates a scale. Check that every spacing length except an optical correction comes from one
+  scale, and that related items sit closer than unrelated ones.
 
 ## Motion
 
