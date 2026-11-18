@@ -37,7 +37,8 @@ export async function validateRepo(repo: Repo): Promise<Finding[]> {
 		// oxlint-disable-next-line no-await-in-loop -- each batch caps how many validator processes run at once
 		results.push(...(await Promise.all(batch.map(async (target) => validateTarget(root, target)))));
 	}
-	return results.flat();
+	// constraint: Claude Code 2.1.327 lists each plugin's files in the marketplace report too, so findings repeat
+	return [...new Map(results.flat().map((f) => [`${f.file}\n${f.message}`, f])).values()];
 }
 
 async function validateTarget(root: string, target: string): Promise<Finding[]> {
