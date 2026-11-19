@@ -6,12 +6,13 @@ requires. Syntax, idiom, and toolchain belong to the language plugins.
 ## Skills
 
 - **`coding`** — discovery-first workflow: verify APIs before coding, split the work before writing it, prove completion
-  with evidence. Runs before the language skill, and again before "done". Four references carry the conditional depth:
+  with evidence. Runs before the language skill, and again before "done". Five references carry the conditional depth:
   - `references/comments.md` — the closed set, routing ladder, provenance, doc contract, repair scope
   - `references/naming.md` — the naming rules and the rename blast-radius limits
   - `references/debugging.md` — the ordered protocol, multi-component localization, the failed-fix counter
   - `references/patterns.md` — error handling, information hiding, dependency isolation, the green start,
     characterization tests, local shape, running less, refactor targets
+  - `references/porting.md` — the port rules and the places a port loses behavior
 
 ## Output Styles
 

@@ -223,7 +223,7 @@ blend them into an average. If you think an existing convention is harmful, surf
 Read `references/patterns.md` when writing error paths, introducing a seam for testability, exporting a symbol for a
 test, repairing a check that already fails, pinning behavior no test covers, reshaping a function whose body reads worse
 than it works, improving existing code rather than changing its behavior, or writing a loop, a request path, or an
-unbounded read.
+unbounded read. Read `references/porting.md` before porting code to another language, runtime, or library.
 
 ## Naming
 

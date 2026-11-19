@@ -53,9 +53,10 @@ rather than characters on the screen. The one thing it will not do to run less i
 until a measurement shows the cost it removes. Code that a change supersedes is deleted in the same task, so the old
 path does not live on beside its replacement.
 
-The skill body holds what applies to every code task. Four reference files carry the depth and load when their situation
+The skill body holds what applies to every code task. Five reference files carry the depth and load when their situation
 arrives: the comment and documentation policy when a comment is being written or repaired, the naming rules when a
-symbol is being named or renamed, the debugging protocol when something fails, and error-handling, information-hiding,
+symbol is being named or renamed, the debugging protocol when something fails, the porting rules when code moves to
+another language, runtime, or library, and error-handling, information-hiding,
 dependency-isolation, green-start, characterization-test, local-shape, running-less, and refactor guidance when an error
 path, a symbol exported for a test, a seam, a check that already fails, untested code about to change, a tangled
 function body, a loop or request path, or a cleanup is on the table. The split is not organizational tidiness. Claude
