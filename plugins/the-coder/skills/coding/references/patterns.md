@@ -1,8 +1,9 @@
-# Errors, Information Hiding, Dependency Isolation, Characterization Tests, Local Shape, Running Less, Refactor Targets
+# Patterns for Changing Code
 
-How error paths behave, what a module exports and what a test may reach, how a dependency is isolated for a test, how
-behavior no test covers is pinned before a change, the four local shapes and what each one collapses to, which execution
-and allocation a change can skip, and the named smells with the move each one takes.
+How error paths behave, what a module exports and what a test may reach, how a dependency is isolated for a test, which
+failing checks are repaired before a change starts, how behavior no test covers is pinned before a change, the four
+local shapes and what each one collapses to, which execution and allocation a change can skip, and the named smells with
+the move each one takes.
 
 ## Handle Errors Deliberately
 
@@ -54,6 +55,24 @@ reaching for a mock by default.
 - **Third-party or external** — inject it behind your own narrow interface and mock that interface, not
   the vendor SDK.
 </dependency-rules>
+
+## Start Green
+
+A check that fails before the change hides the failures the change adds, and it pulls the repair into the diff of the
+change. Run the project's lint, type, build, and test commands before the first edit, and record which of them fail.
+
+<start-green-rules>
+- **The repair ships first and alone.** It is committed ahead of the change and holds nothing of it.
+- **Fix the code, not the check.** A rule that the configuration gained after the code was written is the
+  project's rule. Never suppress the finding, and never relax the configuration.
+- **A repair that changes behavior is a bug fix.** A failing test, or a type error that shows a real
+  defect, ships as its own commit, apart from the mechanical repairs, and the report names the behavior
+  that changed. Where neither the test nor the type shows the intended behavior, ask before the fix.
+- **Ask before a repair larger than the task.** When the failures reach far past the files the change
+  touches, repair those files, report the count of the rest for each check, and ask.
+- **A missing check is a finding.** Report a project with no test command, or with no tests for the code
+  the change reaches. Then pin that code under the next section.
+</start-green-rules>
 
 ## Pin Behavior Before Changing It
 

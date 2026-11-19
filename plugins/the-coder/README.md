@@ -56,12 +56,12 @@ path does not live on beside its replacement.
 The skill body holds what applies to every code task. Four reference files carry the depth and load when their situation
 arrives: the comment and documentation policy when a comment is being written or repaired, the naming rules when a
 symbol is being named or renamed, the debugging protocol when something fails, and error-handling, information-hiding,
-dependency-isolation, characterization-test, local-shape, running-less, and refactor guidance when an error path, a
-symbol exported for a test, a seam, untested code about to change, a tangled function body, a loop or request path, or a
-cleanup is on the table. The split is not
-organizational tidiness. Claude Code keeps only the first 5,000 tokens of a skill when it re-attaches after compaction,
-and the body used to run past that — the debugging and verification sections were the part being dropped, in exactly the
-long sessions that need them most.
+dependency-isolation, green-start, characterization-test, local-shape, running-less, and refactor guidance when an error
+path, a symbol exported for a test, a seam, a check that already fails, untested code about to change, a tangled
+function body, a loop or request path, or a cleanup is on the table. The split is not organizational tidiness. Claude
+Code keeps only the first 5,000 tokens of a skill when it re-attaches after compaction, and the body used to run past
+that — the debugging and verification sections were the part being dropped, in exactly the long sessions that need them
+most.
 
 Debugging is a protocol rather than an instinct. Build a failing command before theorizing, tighten it, minimize it, and
 read the error literally. A command that will not go red because the code already does what the report asks is a finding
@@ -76,6 +76,11 @@ Completion needs evidence, and the skill is specific about what counts. A test s
 does not. A passing lint proves lint is clean; it says nothing about the build. A regression test proves the bug is
 fixed only once it has been watched failing with the fix reverted — one that never went red may be asserting something
 the bug never touched. And a subagent reporting success proves nothing at all: the diff it left behind is the evidence.
+
+Work on existing code starts from passing checks. Claude runs the project's lint, type, build, and test commands before
+the first edit, and a failure that was there before the task is repaired in its own commit ahead of the change, in the
+code and never in the check's configuration. When the failures reach far past the files the task touches, Claude repairs
+those files, reports the rest, and asks.
 
 Code that no test covers gets pinned before it changes. Claude writes characterization tests that assert what the
 unchanged code does, faults included, and commits them on their own while they pass. The change then lands against that
