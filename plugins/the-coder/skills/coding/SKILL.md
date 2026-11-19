@@ -204,12 +204,12 @@ Two rungs hold → take the higher one and move on. </reuse-ladder>
 - Prefer functions over classes when either works; avoid inheritance unless the problem demands it
 - Prefer explicit over implicit — no magic. Keep permission checks and validation visible at the call
   site, not hidden in middleware the next reader won't find
-- Prefer deep modules — a small interface hiding substantial implementation — over shallow ones that
-  expose nearly as much as they hide. A wrapper that only forwards calls earns nothing
+- Hide information: a module exports only what a caller outside it needs. A wrapper that only forwards
+  calls earns nothing
 - Don't introduce a seam (interface, port, strategy) until two concrete implementations need it —
   typically production plus test. One implementation behind an interface is indirection, not abstraction
 - Deletion test before adding an abstraction: imagine the module gone. If its complexity reappears in
-  every caller, it earns its place. If the complexity merely moves, it was a shallow pass-through
+  every caller, it earns its place. If the complexity merely moves, it was a pass-through
 </simplicity-rules>
 
 ### Follow Existing Patterns
@@ -219,9 +219,9 @@ adjacent tests, and the naming conventions. Read CLAUDE.md and the lint config f
 patterns contradict, pick one (more recent, more tested), explain the choice, and flag the other for cleanup — never
 blend them into an average. If you think an existing convention is harmful, surface it; don't fork it silently.
 
-Read `references/patterns.md` when writing error paths, introducing a seam for testability, pinning behavior no test
-covers, reshaping a function whose body reads worse than it works, improving existing code rather than changing its
-behavior, or writing a loop, a request path, or an unbounded read.
+Read `references/patterns.md` when writing error paths, introducing a seam for testability, exporting a symbol for a
+test, pinning behavior no test covers, reshaping a function whose body reads worse than it works, improving existing
+code rather than changing its behavior, or writing a loop, a request path, or an unbounded read.
 
 ## Naming
 
@@ -304,6 +304,7 @@ absence you do not claim, and an agent's success report is a claim like any othe
 
 - Write a failing test first, then implement until it passes.
 - A test must be able to fail. One that cannot fail when the business logic changes is testing nothing.
+- A test reaches a module only through its exports: it survives any change that keeps behavior.
 - For UI changes, exercise the feature in a browser. Type checks and test suites verify code correctness, not feature
   correctness; if you can't test it, say so rather than claiming success.
 
