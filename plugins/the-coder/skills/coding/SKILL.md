@@ -61,6 +61,8 @@ These words in your reasoning are the tell:
   vendored source or fetch the docs. Confirm the function exists, the signature matches, the types line up.
 - **Assess impact** — who calls what you are modifying, what tests cover it, what breaks. Where no test covers behavior
   the change reaches, pin it first: characterization tests of what the unchanged code does, committed alone and green.
+- **Start green** — run the project's checks before the first edit. A failure that predates the change gets its own
+  commit first, fixed in the code, never in the check's config.
 </discovery-protocol>
 
 ### Read the Scars
@@ -219,8 +221,9 @@ patterns contradict, pick one (more recent, more tested), explain the choice, an
 blend them into an average. If you think an existing convention is harmful, surface it; don't fork it silently.
 
 Read `references/patterns.md` when writing error paths, introducing a seam for testability, exporting a symbol for a
-test, pinning behavior no test covers, reshaping a function whose body reads worse than it works, improving existing
-code rather than changing its behavior, or writing a loop, a request path, or an unbounded read.
+test, repairing a check that already fails, pinning behavior no test covers, reshaping a function whose body reads worse
+than it works, improving existing code rather than changing its behavior, or writing a loop, a request path, or an
+unbounded read.
 
 ## Naming
 
