@@ -55,9 +55,10 @@ path does not live on beside its replacement.
 
 The skill body holds what applies to every code task. Four reference files carry the depth and load when their situation
 arrives: the comment and documentation policy when a comment is being written or repaired, the naming rules when a
-symbol is being named or renamed, the debugging protocol when something fails, and error-handling, dependency-isolation,
-characterization-test, local-shape, running-less, and refactor guidance when an error path, a seam, untested code about
-to change, a tangled function body, a loop or request path, or a cleanup is on the table. The split is not
+symbol is being named or renamed, the debugging protocol when something fails, and error-handling, information-hiding,
+dependency-isolation, characterization-test, local-shape, running-less, and refactor guidance when an error path, a
+symbol exported for a test, a seam, untested code about to change, a tangled function body, a loop or request path, or a
+cleanup is on the table. The split is not
 organizational tidiness. Claude Code keeps only the first 5,000 tokens of a skill when it re-attaches after compaction,
 and the body used to run past that — the debugging and verification sections were the part being dropped, in exactly the
 long sessions that need them most.

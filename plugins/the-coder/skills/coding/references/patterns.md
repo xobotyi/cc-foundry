@@ -1,8 +1,8 @@
-# Error Handling, Dependency Isolation, Characterization Tests, Local Shape, Running Less, and Refactor Targets
+# Errors, Information Hiding, Dependency Isolation, Characterization Tests, Local Shape, Running Less, Refactor Targets
 
-How error paths behave, how a dependency is isolated for a test, how behavior no test covers is pinned before a change,
-the four local shapes and what each one collapses to, which execution and allocation a change can skip, and the named
-smells with the move each one takes.
+How error paths behave, what a module exports and what a test may reach, how a dependency is isolated for a test, how
+behavior no test covers is pinned before a change, the four local shapes and what each one collapses to, which execution
+and allocation a change can skip, and the named smells with the move each one takes.
 
 ## Handle Errors Deliberately
 
@@ -18,6 +18,27 @@ smells with the move each one takes.
 - Match the codebase's existing error strategy (exceptions, result types, error codes) — don't
   introduce a second one
 </error-handling-rules>
+
+## Hide Information
+
+A module's exports are a contract with every caller, and a test is a caller. Each export is a symbol that a later change
+cannot rename, move, or delete without breaking code outside the module.
+
+<information-hiding-rules>
+- **Export on demand.** A symbol is exported when a caller outside the module uses it. A constant, a
+  helper, or a type that only the module reads stays private.
+- **A test asserts what a caller observes.** It calls the exports and checks results and effects. It never
+  reads the source text, and it never asserts the value of a constant the module keeps private.
+- **Never widen an export only for a test.** A helper that is easier to test directly than through the
+  module is a module of its own: move it there, where it is the export, and import it from the first
+  module. Where the language lets a test reach a private symbol with no export, the language skill decides
+  when a test takes that route.
+- **The package boundary hides what the file boundary cannot.** Where the language exports per file, the
+  package's entry point lists the public symbols, and a module that the entry point does not re-export is
+  internal to the package. Its tests import it directly; code outside the package never does.
+- **A caller that needs a private symbol is a design question.** Either the symbol belongs in the contract,
+  or the caller's logic belongs inside the module. Decide which; never export it to end the question.
+</information-hiding-rules>
 
 ## Isolate Dependencies for Testing
 
@@ -117,8 +138,7 @@ When the goal is to improve existing code, hunt for named smells and apply the m
 <refactor-targets>
 - **Duplication** — extract a shared function or type.
 - **Long function doing several things** — split it along the boundaries of what it does.
-- **Shallow module** (interface nearly as large as its implementation) — deepen it, or fold it into its
-  caller.
+- **Export that no outside caller uses** — unexport it, or fold the module into its caller.
 - **Feature envy** (a function reaching repeatedly into another type's internals) — move the logic to the
   data it operates on.
 - **Primitive obsession** (bare strings or ints carrying domain meaning) — introduce a value type.
