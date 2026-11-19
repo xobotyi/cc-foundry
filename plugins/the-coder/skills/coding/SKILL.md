@@ -260,8 +260,9 @@ weakening the check.
 
 <signal-rules>
 - Never delete, skip, or comment out a failing test to get green
-- Never loosen an assertion until it passes — that asserts the bug, not the behavior
-- Never add a lint or type suppression (`eslint-disable`, `# type: ignore`, `as any`) to silence an
+- Never loosen an assertion, re-record a snapshot, or relax a threshold until it passes — that asserts
+  the bug, not the behavior
+- Never add a suppression (`eslint-disable`, `# type: ignore`, `as any`) or a waiver label to silence an
   error you haven't understood
 - Never wrap failing code in catch-and-ignore or a silent fallback — an error that vanishes is a
   bug that relocated
