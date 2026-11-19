@@ -114,8 +114,7 @@ must not break; an unconfirmed one stays a question and constrains nothing.
 ### One Change at a Time
 
 An uncommitted working tree is the unit nobody can review and nobody can bisect. Commit at each verified step during the
-work, not once at the end. A large change is not one hard review — it is a review nobody does, and the defect that
-survives it costs more than the whole change saved.
+work, not once at the end.
 
 **Atomic is a code boundary, not a task boundary.** An atomic change is the smallest change that leaves the tree
 working: it builds, its tests pass, nothing is half-wired. It is not the smallest change that satisfies the request. One
@@ -180,7 +179,7 @@ The `git-commit` plugin's `commit` skill carries the pipeline for each of these 
 
 ### Write Simple Code
 
-Agents overcomplicate by default. Before writing new code, climb the reuse ladder and stop at the first rung that holds.
+Before writing new code, climb the reuse ladder and stop at the first rung that holds.
 The ladder runs _after_ you understand the problem — read the code the change touches and trace the real flow first,
 then climb. It shortens the solution, never the reading: a small diff you don't understand is laziness dressed up as
 efficiency.
@@ -251,8 +250,6 @@ into a design question rather than a fourth fix.
 
 ## Verification Discipline
 
-Verification is the highest-leverage activity in the loop. Code that "looks right" but hasn't been run is unverified.
-
 ### Never Silence the Signal
 
 A failing check is information about the code, not an obstacle to green. Make checks pass by fixing the code — never by
@@ -297,7 +294,7 @@ Every claim below needs its own proof. The third column is what people submit in
 | Nothing calls this    | the search command and its output, over the whole tree | a grep in one directory       |
 | A subagent finished   | the diff it left behind                                | its report                    |
 
-The last two are the ones most often asserted and least often checked. An absence you cannot show a sweep for is an
+An absence you cannot show a sweep for is an
 absence you do not claim, and an agent's success report is a claim like any other.
 
 ### Self-Verification Patterns
