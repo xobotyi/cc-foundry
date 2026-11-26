@@ -25,8 +25,8 @@ here trades on them. Establish which reader the item is for, and let that decide
 **Write only what was run or read.** Completing a missing section trades absence for error: the item stops failing for
 what it omits and starts failing for what it asserts, and a machine writer buys structural completeness while
 reproducibility barely moves. Completeness is not accuracy. Plausibility survives a style checklist, so the check is
-verification against the system — run the path, read the code, capture the output — and whatever could not be verified
-is marked as such inside the item.
+verification against the system — run the path, read the code, capture the output — and a claim that could not be
+verified carries a qualifier where it stands.
 
 **A filed item cannot answer a question.** Interrogating a human recovers most of what underspecification costs, and a
 model cannot reliably tell an underspecified task from a complete one. Two consequences hold together: everything the
@@ -55,8 +55,11 @@ that the item is complete, which is what the approval gate is for.
   trace, the log excerpt. Reports that carry the artifact itself are associated with shorter resolution times across
   large issue corpora; whether the artifact causes that is not established, and a paraphrase is not the artifact either
   way.
-- **Mark what was not verified.** Name the step not run, the environment not tested, the claim not confirmed. An item
-  that shows its gaps is cheaper than one that hides them.
+- **Qualify an unverified claim where it stands.** A short qualifier beside the claim — "read in the code, not run" —
+  tells the reader how far to trust it. An item that shows its gaps is cheaper than one that hides them.
+- **Write nothing about the session that produced the item.** Its participants, its date, the checks it skipped, and
+  the writer in the first person mean nothing to a reader who was not there. What the implementer must find out is an
+  open question; what the writer did not do goes in the approval draft.
 - **Take the type from the contract, not from the symptom.** "Something is broken, so it is a bug" is the reflex that
   misfiles a third of everything filed as a bug. The test is whether the behavior violates a stated contract —
   documentation, a test, an API guarantee — or only disappoints an expectation.
@@ -78,6 +81,9 @@ never where it ends up.
   symbol — each is read from the repository before it is named. A path for a file the work will create is not a
   location: choosing where new code goes is the implementer's decision, and prescribing it is implementation
   prescription.
+- **Never name a line number.** A line number moves with the next merge; the symbol it sits in does not.
+- **Name only what the reader can open.** A path outside the repository, or on the writer's machine, is not a
+  location. Attach the document or leave it out.
 - **Name the location; do not paste the code around it.** More retrieved context measures worse, not better. Precision
   moves the item, volume does not.
 - **Give a location even where the exact file is uncertain** — the module, the symbol, the failing test, the entry
@@ -103,14 +109,87 @@ never where it ends up.
   found. Follow the format the tracker already uses; where there is none, use a checklist. Never present that choice as
   evidence-backed.
 
-## Match the content to the kind of work
+## Shape the body for its kind
 
-- **A defect item** — the observed behavior in exact words, the expected behavior with what states it, the reproduction
-  that was actually run, the environment and version it was observed in, and the artifact.
-- **A change item** — the problem and the goal before any solution, the location, the acceptance criteria, and the
-  constraints. The solution belongs to the implementer.
-- **An investigation item** — the observation that prompted it, the question it must answer, and the form the answer
-  takes. Its acceptance criteria describe the answer, never code.
+Three templates cover the usual kinds of item. The body opens with a lead and continues under the headings of its
+template, in the order shown.
+
+- **A defect item:**
+
+  ```markdown
+  [lead]
+
+  ## Observed
+  [the behavior in exact words, with the artifact]
+
+  ## Expected
+  [the behavior the contract requires, and what states it]
+
+  ## Reproduction
+  [the steps that were run, and the environment and version they ran in]
+
+  ## Location
+
+  ## Acceptance criteria
+
+  ## Open questions
+
+  ## References
+  ```
+
+- **A change item:**
+
+  ```markdown
+  [lead]
+
+  ## Problem
+  [what is wrong or missing, before any solution]
+
+  ## Goal
+  [the state the change reaches; the solution belongs to the implementer]
+
+  ## Location
+
+  ## Acceptance criteria
+
+  ## Constraints
+
+  ## Open questions
+
+  ## References
+  ```
+
+- **An investigation item:**
+
+  ```markdown
+  [lead]
+
+  ## Observed
+  [the observation that prompted the item]
+
+  ## Question
+  [the question the investigation must answer]
+
+  ## Location
+
+  ## Acceptance criteria
+  [the form the answer takes, never code]
+
+  ## Open questions
+
+  ## References
+  ```
+
+- **Open with the lead: one plain sentence that gives the symptom or the need and its effect, with no identifier in
+  it.** The mechanism comes after the lead. A reader who knows none of the symbols learns from the lead what is wrong.
+- **One element has one heading name.** Use the headings exactly as the templates write them, and add no second name for
+  an element a template already names.
+- **An item that fits no template gets a shape composed for it.** The templates are the usual kinds, not the only ones.
+  Compose the sections the item needs, keep the lead, and use the template heading for every element the item shares
+  with a template.
+- **`Open questions` holds only what the implementer must find out, or what would change the work.**
+- **Leave out `Constraints`, `Open questions`, and `References` when they are empty.** Fill every other section of
+  the chosen template.
 
 **Ask for each element by name, in a fixed shape.** Reports state observed behavior far more often than expected
 behavior, and the projects whose templates name an element are the projects whose reports carry it. That is an
@@ -129,7 +208,10 @@ reports than missing information does.
   description restating build commands, code style, or test invocation duplicates a file the agent already has and
   charges the human reader for it. An unspecific request is paid for in turns.
 - **Never paste the conversation into the item.** Extract the intent, and link the thread where the raw exchange
-  matters.
+  matters. State a decision in the writer's words; never quote a chat message.
+- **For the human reader, move bulk out of the body.** A table, a full probe result, or a list of every site the change
+  touches goes into a comment on the item, and the body links it. The body names where the work starts. An item for the
+  agent reader keeps this material in the body.
 - **Never restate a document the item can link** — the design document, the frame, the alignment record.
 
 ## Set fields and links from the tracker
@@ -152,13 +234,14 @@ A created item is visible to everyone with access to the tracker, and retracting
 contribution also teaches the writer nothing reliably: a large share are closed with no reviewer explanation, or on
 inactivity alone. The correction has to come before filing, not after. This sequence is exact.
 
-1. **Present the complete draft** — project, type, title, description, every field with the value to be set, and every
-   link to be created.
-2. **Name what could not be verified**, in the draft itself and not only in the item body.
+1. **Present the complete draft** — project, type, title, description, every field with the value to be set, every
+   link to be created, and every comment to be added.
+2. **Name what could not be verified in the `Unverified` field of the draft** — the step not run, the environment not
+   tested, the claim not confirmed. The field stays in the draft and is never copied into the item.
 3. **Wait for explicit approval.** Revise and present again after any change. A batch built from a task breakdown is
    presented as a set and approved as a set; nothing is created ahead of that approval.
-4. **Create the item, set the fields, and create every link that applies.** One pair of items may carry more than one
-   relationship.
+4. **Create the item, set the fields, add the comments, and create every link that applies.** One pair of items may
+   carry more than one relationship.
 5. **Report the created ID and URL**, and name anything the tracker's tools could not do so the user can finish it by
    hand.
 
@@ -182,19 +265,28 @@ inactivity alone. The correction has to come before filing, not after. This sequ
 
 - [relationship] → [item ID]
 
+**Comments:**
+
+- [the comment body, or "none"]
+
 **Unverified:** [what was not run or read, or "none"]
 ```
 
 ## Title and description conventions
 
 These are conventions of this skill. No measurement stands behind them; they buy consistency across a tracker and
-nothing more. The fixed shape that names each element rests on an observational finding; the order below rests on
-consistency alone.
+nothing more. The fixed shape that names each element rests on an observational finding; the order of the template
+headings rests on consistency alone.
 
-- **Title in the imperative, naming the specific thing** — "Fix negative offset in paginator navigation", not "Fix
-  pagination bug". No project code, parent reference, or type label: the tracker holds those.
-- **Element order: the problem, the location, the acceptance criteria, then the documents the item links.** A reader who
-  stops after two sections knows what to do and where.
+- **A defect title states the symptom, never the fix** — "Paginator navigation produces a negative offset", not "Fix
+  negative offset in paginator navigation". A reader finds a defect by what it does.
+- **Every other title is in the imperative, naming the specific thing** — "Add cursor pagination to the audit log
+  export", not "Improve pagination".
+- **A title repeats nothing a tracker field holds** — no project code, parent reference, type label, or subsystem
+  name.
+- **A work item has its own register.** Write it the way an engineer writes to a teammate: plain sentences in natural
+  word order, in the language the tracker's items use. A writing rule the repository sets for its code, documents, or
+  commit messages does not extend to work items unless it names them.
 - **Write the item as a plan, not as a report.** The work has not started when the implementer reads it.
 - **Describe the change, not the code to write.** Pseudocode is acceptable where the logic is the hard part;
   configuration samples are acceptable where configuration is the deliverable.

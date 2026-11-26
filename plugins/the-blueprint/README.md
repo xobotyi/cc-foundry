@@ -163,10 +163,12 @@ tracker tasks.
 Writes and reviews the work item itself. It first establishes which of two readers the item is for — a human
 implementer, who pays for volume, or an autonomous agent, which pays for absence — and lets that decide what goes in.
 Every claim is verified against the system before it is written: the failing path is run, the code is read before a
-cause is named, the artifact is pasted rather than paraphrased, and whatever could not be verified is marked as such.
-Each item names a location — the file, module, symbol, or failing test where the work lands — and carries acceptance
-criteria the implementer can see, each written so an observation decides pass or fail. Nothing reaches the tracker until
-the user approves the complete draft, every item in a batch included.
+cause is named, the artifact is pasted rather than paraphrased, and a claim that could not be verified carries a
+qualifier where it stands. The body follows a template for its kind — defect, change, or investigation — or a shape
+composed for an item that fits none, and opens with one plain sentence that states the effect. Each item names a
+location — the file, module, symbol, or failing test where the work lands — and carries acceptance criteria the
+implementer can see, each written so an observation decides pass or fail. Nothing reaches the tracker until the user
+approves the complete draft, every item in a batch included.
 
 Standalone skill — not a DRAFT pipeline stage, but the terminus `tasks` hands off to, and a direct entry point for items
 that never came through the pipeline. Sizing and dependencies belong to `tasks`; field discovery, link types, and query
